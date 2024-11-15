@@ -15,6 +15,7 @@
 using System.Reflection;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
@@ -52,9 +53,9 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     public static IEnumerable<object[]> GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy()
     {
         var fieldsToSortBy =
-            typeof(FieldToSortBy).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            typeof(FieldToSortByDto).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
         var directionsToSortBy =
-            typeof(DirectionToSortBy).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            typeof(DirectionToSortByDto).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
         foreach (var field in fieldsToSortBy)
         {
@@ -82,7 +83,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var archivedMessage = await _fixture.CreateArchivedMessageAsync(
-            archivedMessageType: ArchivedMessageType.IncomingMessage,
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
             storeMessage: false);
 
         var messageCreatedAt = archivedMessage.CreatedAt.ToDateTimeUtc();
@@ -143,7 +144,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var archivedMessage = await _fixture.CreateArchivedMessageAsync();
 
         // Act
-        var result = await _sut.SearchAsync(new GetMessagesQuery(new SortedCursorBasedPagination()), CancellationToken.None);
+        var result = await _sut.SearchAsync(new GetMessagesQueryDto(new SortedCursorBasedPaginationDto()), CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
@@ -178,9 +179,9 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
-                new MessageCreationPeriod(
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
+                new MessageCreationPeriodDto(
                     expectedCreatedAt.PlusHours(-2),
                     expectedCreatedAt.PlusHours(2))),
             CancellationToken.None);
@@ -201,8 +202,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 SenderNumber: expectedSenderNumber),
             CancellationToken.None);
 
@@ -223,8 +224,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-        new GetMessagesQuery(
-        new SortedCursorBasedPagination(),
+        new GetMessagesQueryDto(
+        new SortedCursorBasedPaginationDto(),
         SenderRoleCode: expectedSenderRole.Code),
         CancellationToken.None);
 
@@ -245,8 +246,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-        new GetMessagesQuery(
-        new SortedCursorBasedPagination(),
+        new GetMessagesQueryDto(
+        new SortedCursorBasedPaginationDto(),
         ReceiverRoleCode: expectedReceiverRole.Code),
         CancellationToken.None);
 
@@ -268,8 +269,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-        new GetMessagesQuery(
-        new SortedCursorBasedPagination(),
+        new GetMessagesQueryDto(
+        new SortedCursorBasedPaginationDto(),
         ReceiverRoleCode: expectedReceiverRole.Code),
         CancellationToken.None);
 
@@ -277,7 +278,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
         result.Messages.Should().ContainSingle()
-            .Which.Should().Match<MessageInfo>(messageInfo =>
+            .Which.Should().Match<MessageInfoDto>(messageInfo =>
                 messageInfo.SenderRoleCode == expectedSenderRole.Code
                 && messageInfo.ReceiverRoleCode == expectedReceiverRole.Code);
     }
@@ -292,8 +293,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 ReceiverNumber: expectedReceiverNumber),
             CancellationToken.None);
 
@@ -314,8 +315,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: expectedMessageId),
             CancellationToken.None);
 
@@ -337,8 +338,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 DocumentTypes: [expectedDocumentType]),
             CancellationToken.None);
 
@@ -362,8 +363,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 DocumentTypes:
                 [
                     expectedDocumentType1,
@@ -395,8 +396,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 BusinessReasons: [expectedBusinessReason]),
             CancellationToken.None);
 
@@ -420,8 +421,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 BusinessReasons:
                 [
                     expectedBusinessReason1,
@@ -505,10 +506,10 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: expectedMessageId,
-                CreationPeriod: new MessageCreationPeriod(
+                CreationPeriod: new MessageCreationPeriodDto(
                     expectedCreatedAt.PlusHours(-2),
                     expectedCreatedAt.PlusHours(2)),
                 SenderNumber: expectedSenderNumber,
@@ -559,15 +560,15 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var expectedMessageId = Guid.NewGuid().ToString();
         await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
-            archivedMessageType: ArchivedMessageType.IncomingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage);
         await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(expectedMessageId),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: expectedMessageId,
                 IncludeRelatedMessages: false),
             CancellationToken.None);
@@ -585,28 +586,28 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         // Arrange
         var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: null,
-            archivedMessageType: ArchivedMessageType.IncomingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage);
         var messageWithRelation = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage);
         var messageWithRelation2 = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage);
         var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
 
         // Act
         // This could simulate a search for a message, where the message is a request with two responses
         var searchForRequest = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: messageWithoutRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
 
         // This could simulate a search for a message, where the message is a response to a request with two responses
         var searchForResponse = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: messageWithRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
@@ -650,13 +651,13 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 messageId: messageToCreate.MessageId);
         }
 
-        var pagination = new SortedCursorBasedPagination(
-            pageSize: 10,
-            navigationForward: true);
+        var pagination = new SortedCursorBasedPaginationDto(
+            PageSize: 10,
+            NavigationForward: true);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(pagination),
+            new GetMessagesQueryDto(pagination),
             CancellationToken.None);
 
         // Assert
@@ -690,13 +691,13 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 messageId: messageToCreate.MessageId);
         }
 
-        var pagination = new SortedCursorBasedPagination(
-            pageSize: 10,
-            navigationForward: false);
+        var pagination = new SortedCursorBasedPaginationDto(
+            PageSize: 10,
+            NavigationForward: false);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(pagination),
+            new GetMessagesQueryDto(pagination),
             CancellationToken.None);
 
         // Assert
@@ -717,7 +718,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         // Act
-        var act = () => new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: true);
+        var act = () => new SortedCursorBasedPaginationDto(PageSize: pageSize, NavigationForward: true);
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()
@@ -756,16 +757,16 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
-        var cursor = new SortingCursor(RecordId: lastMessageInOnThePreviousPage.RecordId);
+        var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId);
 
-        var pagination = new SortedCursorBasedPagination(
-            cursor: cursor,
-            pageSize: pageSize,
-            navigationForward: true);
+        var pagination = new SortedCursorBasedPaginationDto(
+            Cursor: cursor,
+            PageSize: pageSize,
+            NavigationForward: true);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(pagination),
+            new GetMessagesQueryDto(pagination),
             CancellationToken.None);
 
         // Assert
@@ -814,16 +815,16 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: false);
         // The cursor points at the first item of the previous page, when navigating backward
         var firstMessageInOnThePreviousPage = firstPageMessages.Messages.First();
-        var cursor = new SortingCursor(RecordId: firstMessageInOnThePreviousPage.RecordId);
+        var cursor = new SortingCursorDto(RecordId: firstMessageInOnThePreviousPage.RecordId);
 
-        var pagination = new SortedCursorBasedPagination(
-            cursor: cursor,
-            pageSize: pageSize,
-            navigationForward: false);
+        var pagination = new SortedCursorBasedPaginationDto(
+            Cursor: cursor,
+            PageSize: pageSize,
+            NavigationForward: false);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(pagination),
+            new GetMessagesQueryDto(pagination),
             CancellationToken.None);
 
         // Assert
@@ -844,8 +845,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
     public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
-        FieldToSortBy sortedBy,
-        DirectionToSortBy sortedDirection)
+        FieldToSortByDto sortedBy,
+        DirectionToSortByDto sortedDirection)
     {
         // Arrange
         var messages =
@@ -901,15 +902,15 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 receiverNumber: messageToCreate.Receiver);
         }
 
-        var pagination = new SortedCursorBasedPagination(
-            pageSize: messages.Count,
-            navigationForward: true,
-            fieldToSortBy: sortedBy,
-            directionSortBy: sortedDirection);
+        var pagination = new SortedCursorBasedPaginationDto(
+            PageSize: messages.Count,
+            NavigationForward: true,
+            FieldToSortBy: sortedBy,
+            DirectionToSortBy: sortedDirection);
 
         // Act
         var result = await _sut.SearchAsync(
-                new GetMessagesQuery(pagination),
+                new GetMessagesQueryDto(pagination),
                 CancellationToken.None);
 
         // Assert
@@ -925,8 +926,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
     public async Task
         Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
-            FieldToSortBy sortedBy,
-            DirectionToSortBy sortedDirection)
+            FieldToSortByDto sortedBy,
+            DirectionToSortByDto sortedDirection)
     {
         // Arrange
         var messages =
@@ -982,15 +983,15 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 receiverNumber: messageToCreate.Receiver);
         }
 
-        var pagination = new SortedCursorBasedPagination(
-            pageSize: messages.Count,
-            navigationForward: false,
-            fieldToSortBy: sortedBy,
-            directionSortBy: sortedDirection);
+        var pagination = new SortedCursorBasedPaginationDto(
+            PageSize: messages.Count,
+            NavigationForward: false,
+            FieldToSortBy: sortedBy,
+            DirectionToSortBy: sortedDirection);
 
         // Act
         var result = await _sut.SearchAsync(
-                new GetMessagesQuery(pagination),
+                new GetMessagesQueryDto(pagination),
                 CancellationToken.None);
 
         // Assert
@@ -1025,15 +1026,15 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 messageId: messageToCreate.MessageId);
         }
 
-        var pagination = new SortedCursorBasedPagination(
-            pageSize: 10,
-            navigationForward: true);
+        var pagination = new SortedCursorBasedPaginationDto(
+            PageSize: 10,
+            NavigationForward: true);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
+            new GetMessagesQueryDto(
                 pagination,
-                new MessageCreationPeriod(
+                new MessageCreationPeriodDto(
                 expectedPeriodStartedAt,
                 expectedPeriodEndedAt)),
             CancellationToken.None);
@@ -1074,23 +1075,23 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 senderNumber: messageToCreate.SenderNumber);
         }
 
-        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true, orderByField: FieldToSortBy.SenderNumber);
+        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true, orderByField: FieldToSortByDto.SenderNumber);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
-        var cursor = new SortingCursor(RecordId: lastMessageInOnThePreviousPage.RecordId, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
+        var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
 
-        var pagination = new SortedCursorBasedPagination(
-            cursor: cursor,
-            pageSize: pageSize,
-            navigationForward: true,
-            fieldToSortBy: FieldToSortBy.SenderNumber,
-            directionSortBy: DirectionToSortBy.Descending);
+        var pagination = new SortedCursorBasedPaginationDto(
+            Cursor: cursor,
+            PageSize: pageSize,
+            NavigationForward: true,
+            FieldToSortBy: FieldToSortByDto.SenderNumber,
+            DirectionToSortBy: DirectionToSortByDto.Descending);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
+            new GetMessagesQueryDto(
                 pagination,
-                new MessageCreationPeriod(expectedPeriodStartedAt, expectedPeriodEndedAt)),
+                new MessageCreationPeriodDto(expectedPeriodStartedAt, expectedPeriodEndedAt)),
             CancellationToken.None);
 
         // Assert
@@ -1108,43 +1109,43 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     private static
         IOrderedEnumerable<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>
         GetSortedMessaged(
-            FieldToSortBy sortedBy,
-            DirectionToSortBy sortedDirection,
+            FieldToSortByDto sortedBy,
+            DirectionToSortByDto sortedDirection,
             List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)> messages,
             Dictionary<string, int> recordIdsForMessages)
     {
         var orderedMessages = messages.Order();
-        if (sortedBy.Identifier == FieldToSortBy.MessageId.Identifier)
+        if (sortedBy.Identifier == FieldToSortByDto.MessageId.Identifier)
         {
-            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
+            orderedMessages = sortedDirection.Identifier == DirectionToSortByDto.Ascending.Identifier
                 ? messages.OrderBy(x => x.MessageId)
                 : messages.OrderByDescending(x => x.MessageId);
         }
 
-        if (sortedBy.Identifier == FieldToSortBy.CreatedAt.Identifier)
+        if (sortedBy.Identifier == FieldToSortByDto.CreatedAt.Identifier)
         {
-            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
+            orderedMessages = sortedDirection.Identifier == DirectionToSortByDto.Ascending.Identifier
                 ? messages.OrderBy(x => x.CreatedAt).ThenByDescending(x => recordIdsForMessages[x.MessageId])
                 : messages.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
 
-        if (sortedBy.Identifier == FieldToSortBy.DocumentType.Identifier)
+        if (sortedBy.Identifier == FieldToSortByDto.DocumentType.Identifier)
         {
-            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
+            orderedMessages = sortedDirection.Identifier == DirectionToSortByDto.Ascending.Identifier
                 ? messages.OrderBy(x => x.DocumentType).ThenByDescending(x => recordIdsForMessages[x.MessageId])
                 : messages.OrderByDescending(x => x.DocumentType).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
 
-        if (sortedBy.Identifier == FieldToSortBy.SenderNumber.Identifier)
+        if (sortedBy.Identifier == FieldToSortByDto.SenderNumber.Identifier)
         {
-            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
+            orderedMessages = sortedDirection.Identifier == DirectionToSortByDto.Ascending.Identifier
                 ? messages.OrderBy(x => x.Sender).ThenByDescending(x => recordIdsForMessages[x.MessageId])
                 : messages.OrderByDescending(x => x.Sender).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
 
-        if (sortedBy.Identifier == FieldToSortBy.ReceiverNumber.Identifier)
+        if (sortedBy.Identifier == FieldToSortByDto.ReceiverNumber.Identifier)
         {
-            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
+            orderedMessages = sortedDirection.Identifier == DirectionToSortByDto.Ascending.Identifier
                 ? messages.OrderBy(x => x.Receiver).ThenByDescending(x => recordIdsForMessages[x.MessageId])
                 : messages.OrderByDescending(x => x.Receiver).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
@@ -1152,14 +1153,14 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         return orderedMessages;
     }
 
-    private async Task<MessageSearchResult> SkipFirstPage(
+    private async Task<MessageSearchResultDto> SkipFirstPage(
         int pageSize,
         bool navigatingForward,
-        FieldToSortBy? orderByField = null)
+        FieldToSortByDto? orderByField = null)
     {
-        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: navigatingForward, fieldToSortBy: orderByField, directionSortBy: DirectionToSortBy.Descending);
+        var pagination = new SortedCursorBasedPaginationDto(PageSize: pageSize, NavigationForward: navigatingForward, FieldToSortBy: orderByField, DirectionToSortBy: DirectionToSortByDto.Descending);
         return await _sut.SearchAsync(
-            new GetMessagesQuery(pagination),
+            new GetMessagesQueryDto(pagination),
             CancellationToken.None);
     }
 }

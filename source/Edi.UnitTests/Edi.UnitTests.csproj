@@ -37,6 +37,6 @@
     <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
     <ProjectReference Include="..\Edi\Edi.csproj" />
-    <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
+    <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

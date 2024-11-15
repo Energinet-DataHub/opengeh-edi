@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
 
 public static class FieldToSortByMapper
 {
-    public static FieldToSortBy? MapToFieldToSortBy(Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy? fieldToSortBy)
+    public static FieldToSortByDto? MapToFieldToSortBy(Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy? fieldToSortBy)
     {
         return fieldToSortBy switch
         {
-            Models.FieldToSortBy.CreatedAt => FieldToSortBy.CreatedAt,
-            Models.FieldToSortBy.MessageId => FieldToSortBy.MessageId,
-            Models.FieldToSortBy.SenderNumber => FieldToSortBy.SenderNumber,
-            Models.FieldToSortBy.ReceiverNumber => FieldToSortBy.ReceiverNumber,
-            Models.FieldToSortBy.DocumentType => FieldToSortBy.DocumentType,
+            Models.FieldToSortBy.CreatedAt => FieldToSortByDto.CreatedAt,
+            Models.FieldToSortBy.MessageId => FieldToSortByDto.MessageId,
+            Models.FieldToSortBy.SenderNumber => FieldToSortByDto.SenderNumber,
+            Models.FieldToSortBy.ReceiverNumber => FieldToSortByDto.ReceiverNumber,
+            Models.FieldToSortBy.DocumentType => FieldToSortByDto.DocumentType,
             _ => null,
         };
     }

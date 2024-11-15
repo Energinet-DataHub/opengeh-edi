@@ -80,7 +80,9 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
         var processes = CreateWholesaleServicesProcesses(request.InitializeWholesaleServicesProcessDto);
 
         foreach (var wholesaleServicesProcess in processes)
+        {
             _wholesaleServicesProcessRepository.Add(wholesaleServicesProcess);
+        }
 
         return Task.FromResult(Unit.Value);
     }

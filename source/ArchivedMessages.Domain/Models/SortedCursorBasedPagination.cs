@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 /// <summary>
 /// The SortedCursorBasedPagination is navigating forward or backwards through a dataset
@@ -23,7 +23,7 @@ public class SortedCursorBasedPagination(
     int pageSize = 100,
     bool navigationForward = true,
     FieldToSortBy? fieldToSortBy = null,
-    DirectionToSortBy? directionSortBy = null)
+    DirectionToSortBy? directionToSortBy = null)
 {
     /// <summary>
     ///  The current position in the dataset.
@@ -43,12 +43,12 @@ public class SortedCursorBasedPagination(
     /// <summary>
     ///  The field to sort by.
     /// </summary>
-    public FieldToSortBy SortBy { get; } = fieldToSortBy ?? FieldToSortBy.CreatedAt;
+    public FieldToSortBy FieldToSortBy { get; } = fieldToSortBy ?? FieldToSortBy.CreatedAt;
 
     /// <summary>
     /// The direction to sort by.
     /// </summary>
-    public DirectionToSortBy DirectionToSortBy { get; } = directionSortBy ?? DirectionToSortBy.Descending;
+    public DirectionToSortBy DirectionToSortBy { get; } = directionToSortBy ?? DirectionToSortBy.Descending;
 }
 
 /// <summary>
