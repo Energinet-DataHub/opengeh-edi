@@ -84,7 +84,7 @@ jobs:
           files: |
             ${{ env.RELEASE_FOLDER_PATH }}/dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
   build_testsuite:
-    name: Build tests
+    name: Build ${{ matrix.testdll.name }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -115,15 +115,15 @@ jobs:
             --configuration Release \
             --output '${{ matrix.testdll.outputpath }}'
 
-      - name: Copy all bin folders
-        shell: bash
-        run: |
-          # Create base directory
-          mkdir -p '${{ inputs.output_path }}/source' ';'
-          # Copy everything from source to the new directory
-          cp -a source/. '${{ inputs.output_path }}/source'
-          # Remove obj-directories from artifact
-          find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +
+      # - name: Copy all bin folders
+      #   shell: bash
+      #   run: |
+      #     # Create base directory
+      #     mkdir -p '${{ inputs.output_path }}/source' ';'
+      #     # Copy everything from source to the new directory
+      #     cp -a source/. '${{ inputs.output_path }}/source'
+      #     # Remove obj-directories from artifact
+      #     find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +
 
 
 
