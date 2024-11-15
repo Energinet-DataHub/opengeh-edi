@@ -33,9 +33,8 @@ jobs:
     # Set job outputs to values from filter step
     outputs:
       job_context: "{ 
-        'architecture_tests': '${{ steps.filter.outputs.architecture_tests }}',
-        'db_migrations': '${{ steps.filter.outputs.db_migrations }}',
-        'processmanager_client': '${{ steps.filter.outputs.processmanager_client }}',
+        'b2bapi': '${{ steps.filter.outputs.b2bapi }}',
+        'b2capi': '${{ steps.filter.outputs.b2capi }}',
         'render_c4model_views': '${{ steps.filter.outputs.render_c4model_views }}'
         }"
     steps:
@@ -49,8 +48,10 @@ jobs:
         id: filter
         with:
           filters: |
-            architecture_tests:
-              - 'source/ArchitectureTests/**'
+            b2bapi:
+              - 'src/B2BApi/**/*'
+            b2capi:
+              - 'src/B2CWebApi/**/*'              
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'

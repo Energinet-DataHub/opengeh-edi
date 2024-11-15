@@ -24,44 +24,34 @@ on:
 
 jobs:
   print_context:
+    name: Print job context
     runs-on: ubuntu-latest
     steps:
       - name: Print context
         run: |
           echo "Job context: ${{ inputs.job_context }}"
-          echo "Job context auditlog: ${{ fromJson(inputs.job_context).auditlog }}"
 
   build_artifact:
     name: Artifact - ${{ matrix.artifact.name }}    
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   
+    env:
+      RELEASE_FOLDER_PATH: ${{ github.workspace }}/output
+      RELEASE_ZIP_FILENAME: dotnet_${{ github.event.pull_request.number }}.zip
+      RELEASE_VERSION: dotnet_${{ github.event.pull_request.number }}
     strategy:
       fail-fast: false
       matrix:
         artifact:
-          - name: B2BAPI
+          - name: B2B API
+            should_build: ${{ fromJson(needs.print_context.outputs.job_context).b2bapi == 'true' }}
+            project_name: b2bapi
             path: source/B2BApi/B2BApi.csproj
-            outputpath:  ${{ github.workspace }}\output\functions\b2bapi
-          - name: Databasemigration
-            path: source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj
-            outputpath: ${{ github.workspace }}\output\migration\databasemigration
-          - name: SubsystemTests
-            path: source/SubsystemTests/SubsystemTests.csproj
-            outputpath: ${{ github.workspace }}\output\SubsystemTests
-          - name: SystemTests
-            path: source/SystemTests/SystemTests.csproj
-            outputpath: ${{ github.workspace }}\output\SystemTests
-          - name: B2CWebApi'
+            outputpath: ${{ github.workspace }}/output/functions/b2bapi
+          - name: B2C WebAPI
+            should_build: ${{ fromJson(needs.print_context.outputs.job_context).b2capi == 'true' }}
+            project_name: b2capi
             path: source/B2CWebApi/B2CWebApi.csproj
-            outputpath: ${{ github.workspace }}\output\b2cwebapi
-          - name: ProcessManager API
-            path: source/ProcessManager/ProcessManager.csproj
-            outputpath: ${{ github.workspace }}\output\functions\ProcessManager.Api
-          - name: ProcessManager Orchestrations
-            path: source/ProcessManager.Orchestrations/ProcessManager.Orchestrations.csproj
-            outputpath: ${{ github.workspace }}\output\functions\ProcessManager.Orchestrations
-          - name: ProcessManager Migration
-            path: source/ProcessManager.DatabaseMigration/ProcessManager.DatabaseMigration.csproj
-            outputpath: ${{ github.workspace }}\output\migration\ProcessManager.DatabaseMigration
+            outputpath: ${{ github.workspace }}/output/functions/b2capi
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -71,13 +61,30 @@ jobs:
           dotnet publish \
             '${{ matrix.artifact.path }}' \
             --configuration Release \
-            --output '${{ matrix.artifact.outputpath }}'
+            --output '${{ matrix.artifact.outputpath }}'  
+            
+      - name: Zip files for prerelease
+        if: github.event_name == 'pull_request'
+        uses: thedoctor0/zip-release@0.6.2
+        with:
+          type: zip
+          filename: ${{ env.RELEASE_ZIP_FILENAME }}
+          directory: ${{ env.RELEASE_FOLDER_PATH }}
+
+      - name: Create pre-release
+        if: github.event_name == 'pull_request'
+        uses: Energinet-Datahub/.github/.github/actions/github-create-release@v14
+        with:
+          repo_token: ${{ github.token }}
+          automatic_release_tag: ${{ env.RELEASE_VERSION }}_${{ matrix.artifact.project_name}}
+          prerelease: true
+          title: ${{ env.RELEASE_VERSION }}
+          files: |
+            ${{ env.RELEASE_FOLDER_PATH }}/${{ env.RELEASE_ZIP_FILENAME }}            
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
-  tests:    
-    if: ${{ fromJson(inputs.job_context).architecture_tests == 'true' }}
-    name: Test - ${{ matrix.tests_filter_expression.name}}
+  unit_tests:    
     strategy:
       fail-fast: false
       matrix:
@@ -96,7 +103,6 @@ jobs:
   # Tests that require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   integration_tests:
-    name: Test - ${{ matrix.tests_filter_expression.name}}
     strategy:
       fail-fast: false
       matrix:
