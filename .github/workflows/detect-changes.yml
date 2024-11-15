@@ -51,7 +51,7 @@ jobs:
             b2bapi:
               - 'source/B2BApi/**/*'
             b2capi:
-              - 'source/B2CWebApi/**/*'           
+              - 'source/B2CWebApi/**/*'
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'

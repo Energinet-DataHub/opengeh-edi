@@ -91,21 +91,21 @@ jobs:
     strategy:
       matrix:
         testproject:
-        - name: IntegrationTests
-          path: .\source\IntegrationTests\IntegrationTests.csproj
-          outputpath: .\source\Tests\bin\Release\net8.0
-        - name: ArchitectureTests
-          path: .\source\ArchitectureTests\ArchitectureTests.csproj
-          outputpath: .\source\Tests\bin\Release\net8.0
-        - name: Tests
-          path: .\source\Tests\Tests.csproj
-          outputpath: .\source\Tests\bin\Release\net8.0
-        - name: B2BApiAppTests
-          path: .\source\B2BApi.AppTests\B2BApi.AppTests.csproj
-          outputpath: .\source\Tests\bin\Release\net8.0
-        - name: B2CWebApiAppTests
-          path: .\source\B2CWebApi.AppTests\B2CWebApi.AppTests.csproj
-          outputpath: .\source\Tests\bin\Release\net8.0
+          - name: IntegrationTests
+            path: .\source\IntegrationTests\IntegrationTests.csproj
+            outputpath: .\source\Tests\bin\Release\net8.0
+          - name: ArchitectureTests
+            path: .\source\ArchitectureTests\ArchitectureTests.csproj
+            outputpath: .\source\Tests\bin\Release\net8.0
+          - name: Tests
+            path: .\source\Tests\Tests.csproj
+            outputpath: .\source\Tests\bin\Release\net8.0
+          - name: B2BApiAppTests
+            path: .\source\B2BApi.AppTests\B2BApi.AppTests.csproj
+            outputpath: .\source\Tests\bin\Release\net8.0
+          - name: B2CWebApiAppTests
+            path: .\source\B2CWebApi.AppTests\B2CWebApi.AppTests.csproj
+            outputpath: .\source\Tests\bin\Release\net8.0
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -122,15 +122,15 @@ jobs:
           name: edi-tests-${{ matrix.testproject.name }}
           path: ./source/Tests/bin/Release/net8.0/*.dll
 
-      # - name: Copy all bin folders
-      #   shell: bash
-      #   run: |
-      #     # Create base directory
-      #     mkdir -p '${{ inputs.output_path }}/source' ';'
-      #     # Copy everything from source to the new directory
-      #     cp -a source/. '${{ inputs.output_path }}/source'
-      #     # Remove obj-directories from artifact
-      #     find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +
+          # - name: Copy all bin folders
+          #   shell: bash
+          #   run: |
+          #     # Create base directory
+          #     mkdir -p '${{ inputs.output_path }}/source' ';'
+          #     # Copy everything from source to the new directory
+          #     cp -a source/. '${{ inputs.output_path }}/source'
+          #     # Remove obj-directories from artifact
+          #     find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +
 
   merge:
     runs-on: ubuntu-latest
