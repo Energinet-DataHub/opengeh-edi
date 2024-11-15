@@ -55,9 +55,7 @@ public static class FileStorageExtensions
         var isIntegrationTest = uri == null;
         if (!isIntegrationTest)
         {
-            services.TryAddBlobStorageHealthCheck(
-                FileStorageName,
-                new Uri(uri!));
+            services.TryAddBlobStorageHealthCheck(FileStorageName);
         }
 
         return services;

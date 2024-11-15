@@ -59,31 +59,13 @@ public static class HealthCheckExtensions
         return services;
     }
 
-    public static IServiceCollection TryAddBlobStorageHealthCheck(
-        this IServiceCollection services,
-        string name,
-        string blobConnectionString)
+    public static IServiceCollection TryAddBlobStorageHealthCheck(this IServiceCollection services, string name)
     {
         services.TryAddHealthChecks(
             name,
             (key, builder) =>
             {
-                builder.AddAzureBlobStorage(blobConnectionString, name: key);
-            });
-
-        return services;
-    }
-
-    public static IServiceCollection TryAddBlobStorageHealthCheck(
-        this IServiceCollection services,
-        string name,
-        Uri storageAccountUri)
-    {
-        services.TryAddHealthChecks(
-            name,
-            (key, builder) =>
-            {
-                builder.AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: key);
+                builder.AddAzureBlobStorage(name: key);
             });
 
         return services;
