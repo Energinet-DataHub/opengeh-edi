@@ -24,14 +24,12 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 /// Each orchestration is registered with information by which it is possible
 /// to communicate with Durable Functions and start a new orchestration instance.
 /// </summary>
-public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegisterQueries
+internal class OrchestrationRegister(
+    ProcessManagerContext context) :
+        IOrchestrationRegister,
+        IOrchestrationRegisterQueries
 {
-    private readonly ProcessManagerContext _context;
-
-    public OrchestrationRegister(ProcessManagerContext context)
-    {
-        _context = context;
-    }
+    private readonly ProcessManagerContext _context = context;
 
     /// <inheritdoc />
     public Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id)

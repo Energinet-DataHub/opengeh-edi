@@ -17,13 +17,24 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
-public interface IOrchestrationInstanceRepository : IOrchestrationInstanceProgressRepository
+public interface IOrchestrationInstanceRepository
 {
     /// <summary>
+    /// Use <see cref="IUnitOfWork.CommitAsync"/> to save changes.
+    /// </summary>
+    public IUnitOfWork UnitOfWork { get; }
+
+    /// <summary>
     /// Add the orchestration instance.
-    /// To commit changes use <see cref="IUnitOfWork.CommitAsync"/>.
+    /// To commit changes use <see cref="UnitOfWork"/>.
     /// </summary>
     Task AddAsync(OrchestrationInstance orchestrationInstance);
+
+    /// <summary>
+    /// Get existing orchestration instance.
+    /// To commit changes use <see cref="UnitOfWork"/>.
+    /// </summary>
+    Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id);
 
     /// <summary>
     /// Get all orchestration instances filtered by their related orchestration definition name and version,

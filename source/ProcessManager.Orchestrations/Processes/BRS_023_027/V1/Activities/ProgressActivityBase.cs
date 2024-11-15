@@ -19,12 +19,9 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.
 
 internal abstract class ProgressActivityBase(
     IClock clock,
-    IOrchestrationInstanceProgressRepository progressRepository,
-    IUnitOfWork unitOfWork)
+    IOrchestrationInstanceProgressRepository progressRepository)
 {
     protected IClock Clock { get; } = clock;
 
     protected IOrchestrationInstanceProgressRepository ProgressRepository { get; } = progressRepository;
-
-    protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
 }

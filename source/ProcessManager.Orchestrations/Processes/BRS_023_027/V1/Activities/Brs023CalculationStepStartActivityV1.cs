@@ -21,12 +21,10 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.
 
 internal class Brs023CalculationStepStartActivityV1(
     IClock clock,
-    IOrchestrationInstanceProgressRepository progressRepository,
-    IUnitOfWork unitOfWork)
+    IOrchestrationInstanceProgressRepository progressRepository)
     : ProgressActivityBase(
         clock,
-        progressRepository,
-        unitOfWork)
+        progressRepository)
 {
     [Function(nameof(Brs023CalculationStepStartActivityV1))]
     public async Task Run(
@@ -38,7 +36,7 @@ internal class Brs023CalculationStepStartActivityV1(
 
         var step = orchestrationInstance.Steps.Single(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.CalculationStepSequence);
         step.Lifecycle.TransitionToRunning(Clock);
-        await UnitOfWork.CommitAsync().ConfigureAwait(false);
+        await ProgressRepository.UnitOfWork.CommitAsync().ConfigureAwait(false);
 
         // TODO: For demo purposes; remove when done
         await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);

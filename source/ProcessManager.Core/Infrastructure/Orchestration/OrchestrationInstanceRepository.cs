@@ -20,14 +20,19 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 
-public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository, IQueryScheduledOrchestrationInstancesByInstant
+/// <summary>
+/// Read/write access to the orchestration instance repository.
+/// </summary>
+internal class OrchestrationInstanceRepository(
+    ProcessManagerContext context) :
+        IOrchestrationInstanceRepository,
+        IOrchestrationInstanceProgressRepository,
+        IQueryScheduledOrchestrationInstancesByInstant
 {
-    private readonly ProcessManagerContext _context;
+    private readonly ProcessManagerContext _context = context;
 
-    public OrchestrationInstanceRepository(ProcessManagerContext context)
-    {
-        _context = context;
-    }
+    /// <inheritdoc />
+    public IUnitOfWork UnitOfWork => _context;
 
     /// <inheritdoc />
     public Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id)

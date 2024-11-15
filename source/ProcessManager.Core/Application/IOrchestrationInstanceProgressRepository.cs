@@ -18,13 +18,18 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
 /// <summary>
 /// Use this from Durable Functions activities to get the orchestration instance and then
-/// update its progress, before commiting changes back by using <see cref="IUnitOfWork.CommitAsync"/>.
+/// update its progress, before commiting changes back by using <see cref="UnitOfWork"/>.
 /// </summary>
 public interface IOrchestrationInstanceProgressRepository
 {
     /// <summary>
+    /// Use <see cref="IUnitOfWork.CommitAsync"/> to save changes.
+    /// </summary>
+    public IUnitOfWork UnitOfWork { get; }
+
+    /// <summary>
     /// Get existing orchestration instance.
-    /// To commit changes use <see cref="IUnitOfWork.CommitAsync"/>.
+    /// To commit changes use <see cref="UnitOfWork"/>.
     /// </summary>
     Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id);
 }

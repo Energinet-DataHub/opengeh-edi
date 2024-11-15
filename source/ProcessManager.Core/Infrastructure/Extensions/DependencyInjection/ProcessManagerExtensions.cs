@@ -70,6 +70,7 @@ public static class ProcessManagerExtensions
         services.TryAddScoped<IQueryScheduledOrchestrationInstancesByInstant, OrchestrationInstanceRepository>();
         services.TryAddScoped<IOrchestrationInstanceScheduleManager, OrchestrationInstanceManager>();
         // => Manager
+        services.TryAddScoped<IOrchestrationInstanceExecutor, DurableOrchestrationInstanceExecutor>();
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
         services.TryAddScoped<IOrchestrationInstanceRepository, OrchestrationInstanceRepository>();
         services.TryAddScoped<IOrchestrationInstanceManager, OrchestrationInstanceManager>();
@@ -125,6 +126,7 @@ public static class ProcessManagerExtensions
         // => Orchestration instances progress
         services.TryAddScoped<IOrchestrationInstanceProgressRepository, OrchestrationInstanceRepository>();
         // => Manager
+        services.TryAddScoped<IOrchestrationInstanceExecutor, DurableOrchestrationInstanceExecutor>();
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
         services.TryAddScoped<IOrchestrationInstanceRepository, OrchestrationInstanceRepository>();
         services.TryAddScoped<IOrchestrationInstanceManager, OrchestrationInstanceManager>();
@@ -161,8 +163,9 @@ public static class ProcessManagerExtensions
                     providerOptionsBuilder.UseNodaTime();
                     providerOptionsBuilder.EnableRetryOnFailure();
                 });
-            })
-            .AddScoped<IUnitOfWork, UnitOfWork>()
+            });
+
+        services
             .AddHealthChecks()
             .AddDbContextCheck<ProcessManagerContext>(name: "ProcesManagerDatabase");
 
