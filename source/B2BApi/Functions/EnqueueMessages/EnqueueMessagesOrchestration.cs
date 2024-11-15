@@ -41,7 +41,9 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
         var defaultRetryOptions = CreateDefaultRetryOptions();
         var enqueueRetryOptions = CreateEnqueueRetryOptions();
 
-        var enqueueMessagesInput = new EnqueueMessagesInput(input.CalculationId, input.EventId);
+        var gridAreaOwners = await GetGridAreaOwnersActivity.StartActivityAsync(context, enqueueRetryOptions);
+
+        var enqueueMessagesInput = new EnqueueMessagesInput(input.CalculationId, input.EventId, gridAreaOwners);
 
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
         var tasks = new Task<int>[6];
@@ -101,7 +103,7 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
         {
             var actor = actors.ElementAt(i);
             tasks[i] = EnqueueWholesaleResultsForAmountPerChargesActivity.StartActivityAsync(
-                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
+                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, input.GridAreaOwners, actor),
                 context,
                 options);
         }
@@ -125,7 +127,7 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
         {
             var actor = actors.ElementAt(i);
             tasks[i] = EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity.StartActivityAsync(
-                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
+                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, input.GridAreaOwners, actor),
                 context,
                 options);
         }
@@ -149,7 +151,7 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
         {
             var actor = actors.ElementAt(i);
             tasks[i] = EnqueueWholesaleResultsForTotalAmountsActivity.StartActivityAsync(
-                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
+                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, input.GridAreaOwners, actor),
                 context,
                 options);
         }

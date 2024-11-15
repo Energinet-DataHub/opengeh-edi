@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
@@ -37,7 +39,8 @@ public abstract class EnergyResultQueryBase<TResult>(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
 
-    protected override async Task<QueryResult<TResult>> CreateResultAsync(List<DatabricksSqlRow> currentResultSet)
+    protected override async Task<QueryResult<TResult>> CreateResultAsync(
+        List<DatabricksSqlRow> currentResultSet)
     {
         var firstRow = currentResultSet.First();
         var resultId = firstRow.ToGuid(EnergyResultColumnNames.ResultId);
