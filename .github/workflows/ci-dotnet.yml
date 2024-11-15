@@ -133,6 +133,7 @@ jobs:
   merge:
     runs-on: ubuntu-latest
     needs: build_testsuite
+    name: Merge test artifacts
     steps:
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4
@@ -144,7 +145,10 @@ jobs:
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   unit_tests:
-    needs: build_testsuite
+    needs: [
+      merge, 
+      build_testsuite
+    ]
     strategy:
       fail-fast: false
       matrix:
@@ -155,7 +159,7 @@ jobs:
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@kerbou/2524-build-brs-pipeline
     with:
-      download_artifact_name: edi-tests-${{ matrix.tests_filter_expression.name }}
+      download_artifact_name: test-artifacts
       download_attempt_limit: 30
       # Matrix parameters
       job_name: ${{ matrix.tests_filter_expression.name }}
@@ -164,7 +168,10 @@ jobs:
   # Tests that require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   integration_tests:
-    needs: build_testsuite
+    needs: [
+      merge, 
+      build_testsuite
+    ]
     strategy:
       fail-fast: false
       matrix:
