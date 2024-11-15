@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_FOLDER_PATH: ${{ github.workspace }}/output
-      RELEASE_ZIP_FILENAME: dotnet_${{ github.event.pull_request.number }}.zip
+      #RELEASE_ZIP_FILENAME: dotnet_${{ github.event.pull_request.number }}.zip
       RELEASE_VERSION: dotnet_${{ github.event.pull_request.number }}
     strategy:
       fail-fast: false
@@ -54,9 +54,11 @@ jobs:
             outputpath: functions/b2capi
     steps:
       - name: Checkout repository
+        if: ${{ matrix.artifact.should_build == 'true' }} 
         uses: actions/checkout@v4
 
       - name: Build ${{ matrix.artifact.name }}
+        if: ${{ matrix.artifact.should_build == 'true' }}
         run: |
           dotnet publish \
             '${{ matrix.artifact.path }}' \
@@ -64,15 +66,15 @@ jobs:
             --output '${{ env.RELEASE_FOLDER_PATH }}/${{ matrix.artifact.outputpath }}'
 
       - name: Zip files for prerelease
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && ${{ matrix.artifact.should_build == 'true' }}
         uses: thedoctor0/zip-release@0.6.2
         with:
           type: zip
-          filename: ${{ env.RELEASE_ZIP_FILENAME }}
+          filename: dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
           directory: ${{ env.RELEASE_FOLDER_PATH }}
 
       - name: Create pre-release
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && ${{ matrix.artifact.should_build == 'true' }}
         uses: Energinet-Datahub/.github/.github/actions/github-create-release@v14
         with:
           repo_token: ${{ github.token }}
@@ -80,8 +82,7 @@ jobs:
           prerelease: true
           title: ${{ env.RELEASE_VERSION }}_${{ matrix.artifact.project_name}}
           files: |
-            ${{ env.RELEASE_FOLDER_PATH }}/${{ env.RELEASE_ZIP_FILENAME }}
-
+            ${{ env.RELEASE_FOLDER_PATH }}/dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
   build_testsuite:
     name: Build tests
     runs-on: ubuntu-latest
