@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -93,6 +94,8 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             receiverNumber: receiverNumber,
             timestamp: Instant.FromUtc(year, month, date, 0, 0));
 
+        var mappedArchiveMessage = ArchivedMessageMapper.Map(archivedMessage);
+
         var expectedActorNumber = archivedMessageType == ArchivedMessageTypeDto.IncomingMessage ? senderNumber : receiverNumber;
         var expectedFileStorageReference = $"{expectedActorNumber}/{year:000}/{month:00}/{date:00}/{archivedMessage.Id.Value:N}";
 
@@ -101,7 +104,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.Value);
 
         using var assertionScope = new AssertionScope();
-        archivedMessage.FileStorageReference.Category.Value.Should().Be("archived");
+        mappedArchiveMessage.FileStorageReference.Category.Value.Should().Be("archived");
         actualFileStorageReference.Should().Be(expectedFileStorageReference);
     }
 

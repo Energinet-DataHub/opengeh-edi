@@ -28,9 +28,11 @@ public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRe
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        await _archivedMessageRepository.AddAsync(ArchivedMessageMapper.Map(message), cancellationToken).ConfigureAwait(false);
+        var mappedArchivedMessage = ArchivedMessageMapper.Map(message);
 
-        return new ArchivedFile(message.FileStorageReference, message.ArchivedMessageStream);
+        await _archivedMessageRepository.AddAsync(mappedArchivedMessage, cancellationToken).ConfigureAwait(false);
+
+        return new ArchivedFile(mappedArchivedMessage.FileStorageReference, mappedArchivedMessage.ArchivedMessageStream);
     }
 
     public async Task<ArchivedMessageStreamDto?> GetAsync(ArchivedMessageIdDto id, CancellationToken cancellationToken)

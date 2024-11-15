@@ -77,16 +77,6 @@ public class ArchivedMessageDto
         RelatedToMessageId = relatedToMessageId;
         ArchivedMessageType = archivedMessageType;
         ArchivedMessageStream = archivedMessageStream;
-
-        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(
-            archivedMessageType,
-            senderNumber.Value,
-            receiverNumber.Value);
-        FileStorageReference = FileStorageReference.Create(
-            FileStorageCategory,
-            actorNumberForFileStorage,
-            createdAt,
-            Id.Value);
     }
 
     public ArchivedMessageIdDto Id { get; }
@@ -111,19 +101,7 @@ public class ArchivedMessageDto
 
     public MessageId? RelatedToMessageId { get; private set; }
 
-    public FileStorageReference FileStorageReference { get; }
-
     public ArchivedMessageTypeDto ArchivedMessageType { get; }
 
     public ArchivedMessageStreamDto ArchivedMessageStream { get; }
-
-    private static string GetActorNumberForFileStoragePlacement(ArchivedMessageTypeDto archivedMessageType, string senderActorNumber, string receiverActorNumber)
-    {
-        return archivedMessageType switch
-        {
-            ArchivedMessageTypeDto.IncomingMessage => senderActorNumber,
-            ArchivedMessageTypeDto.OutgoingMessage => receiverActorNumber,
-            _ => throw new ArgumentOutOfRangeException(nameof(archivedMessageType), archivedMessageType, "Unknown ArchivedMessageType"),
-        };
-    }
 }
