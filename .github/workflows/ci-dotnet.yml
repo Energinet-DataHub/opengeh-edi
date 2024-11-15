@@ -123,7 +123,7 @@ jobs:
           name: edi-tests-${{ matrix.testproject.name }}
           path: ./source/Tests/bin/Release/net8.0/*.dll
 
-      # - name: Copy all bin folders
+      # - name: Copy all bin folders 
       #   shell: bash
       #   run: |
       #     # Create base directory
