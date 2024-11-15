@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
-      job_context: ${{ steps.filter.changes }}
+      job_context: ${{ steps.filter.outputs.changes }}
       dotnet: ${{ steps.filter.outputs.dotnet }}
       db_migrations: ${{ steps.filter.outputs.db_migrations }}
       processmanager_client: ${{ steps.filter.outputs.processmanager_client }}
