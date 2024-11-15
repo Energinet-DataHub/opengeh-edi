@@ -53,6 +53,9 @@ jobs:
             path: source/B2CWebApi/B2CWebApi.csproj
             outputpath: functions/b2capi
     steps:
+      - name: Echo ${{matrix.artifact.should_build}}
+        run: echo ${{matrix.artifact.should_build}}
+        
       - name: Checkout repository
         if: ${{ matrix.artifact.should_build == 'true' }} 
         uses: actions/checkout@v4
