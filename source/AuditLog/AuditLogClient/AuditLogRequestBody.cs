@@ -15,7 +15,7 @@
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
 /// <summary>
-/// The HTTP request body for submitting an audit log entry to the shared audit log server.
+/// The HTTP request body for submitting an audit log entry to the shared audit log server
 /// <remarks>
 /// The shared audit log server documentation is available at
 /// https://github.com/Energinet-DataHub/opengeh-revision-log/blob/main/docs/documentation-for-submitting-audit-logs.md
