@@ -23,10 +23,10 @@ name: Detect changes
 on:
   workflow_call:
     outputs:
-      job_context: 
+      job_context:
         value: ${{ jobs.changes.outputs.job_context }}
-      #dotnet:
-      #  value: ${{ jobs.changes.outputs.dotnet }}
+      # dotnet:
+      #   value: ${{ jobs.changes.outputs.dotnet }}
       # db_migrations:
       #   value: ${{ jobs.changes.outputs.db_migrations }}
       # processmanager_client:
