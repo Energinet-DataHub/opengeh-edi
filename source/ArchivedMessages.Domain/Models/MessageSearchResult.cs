@@ -14,6 +14,6 @@
 
 using System.Collections.ObjectModel;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);

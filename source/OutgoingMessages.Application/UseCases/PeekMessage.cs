@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -118,7 +119,7 @@ public class PeekMessage
         var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp, cancellationToken).ConfigureAwait(false);
 
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
-        var archivedMessageToCreate = new ArchivedMessage(
+        var archivedMessageToCreate = new ArchivedMessageDto(
             outgoingMessageBundle.MessageId.Value,
             outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
             outgoingMessageBundle.DocumentType.ToString(),
@@ -129,7 +130,7 @@ public class PeekMessage
             authenticatedActor.ActorRole,
             timestamp,
             outgoingMessageBundle.BusinessReason,
-            ArchivedMessageType.OutgoingMessage,
+            ArchivedMessageTypeDto.OutgoingMessage,
             marketDocumentStream,
             outgoingMessageBundle.RelatedToMessageId);
 

@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Domain</AssemblyName>
-    <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Domain</RootNamespace>
+    <AssemblyName>Energinet.DataHub.EDI.ArchivedMessages.Domain</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.ArchivedMessages.Domain</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NodaTime" Version="3.1.12" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
   </ItemGroup>
 </Project>

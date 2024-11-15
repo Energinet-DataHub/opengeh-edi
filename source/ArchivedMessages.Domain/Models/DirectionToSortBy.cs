@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+public readonly struct DirectionToSortBy
+{
+    public static readonly DirectionToSortBy Ascending = new("ASC");
+    public static readonly DirectionToSortBy Descending = new("DESC");
 
-public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);
+    public DirectionToSortBy(string identifier)
+    {
+        Identifier = identifier;
+    }
+
+    public string Identifier { get; }
+}
