@@ -24,7 +24,7 @@ on:
   workflow_call:
     outputs:
       job_context: 
-        value: ${{ jobs.changes.outputs }}
+        value: ${{ jobs.changes.outputs.job_context }}
       #dotnet:
       #  value: ${{ jobs.changes.outputs.dotnet }}
       # db_migrations:
