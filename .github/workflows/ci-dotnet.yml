@@ -87,7 +87,7 @@ jobs:
             ${{ env.RELEASE_FOLDER_PATH }}/dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
             
   build_testsuite:
-    name: Build test ${{ matrix.testproject.name }}
+    name: Build ${{ matrix.testproject.name }}
     runs-on: ubuntu-latest
     env:
       outputpath: ${{ github.workspace }}/source/Tests/bin/Release/net8.0
