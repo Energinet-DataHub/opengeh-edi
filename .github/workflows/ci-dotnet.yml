@@ -107,23 +107,23 @@ jobs:
           - name: ProcessManagerSubsystemTests
             path: .\source\ProcessManager.SubsystemTests\ProcessManager.SubsystemTests.csproj
           - name: B2BApi AppTests
-            path: \source\B2BApi.AppTests\B2BApi.AppTests.csproj
+            path: .\source\B2BApi.AppTests\B2BApi.AppTests.csproj
           - name: B2CWebApi AppTests
-            path: \source\B2CWebApi.AppTests\B2CWebApi.AppTests.csproj
+            path: .\source\B2CWebApi.AppTests\B2CWebApi.AppTests.csproj
           - name: Integration tests 
-            path: \source\IntegrationTests\IntegrationTests.csproj
+            path: .\source\IntegrationTests\IntegrationTests.csproj
           - name: ArchivedMessages - integration tests
-            path: \source\ArchivedMessages.IntegrationTests\ArchivedMessages.IntegrationTests.csproj
+            path: .\source\ArchivedMessages.IntegrationTests\ArchivedMessages.IntegrationTests.csproj
           - name: IntegrationEvents - integration tests
-            path: \source\IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj
+            path: .\source\IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj
           - name: MasterData - integration tests
-            path: \source\MasterData.IntegrationTests\MasterData.IntegrationTests.csproj   
+            path: .\source\MasterData.IntegrationTests\MasterData.IntegrationTests.csproj   
           - name: IncomingMessages - integration tests
-            path: \source\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj
+            path: .\source\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj
           - name: OutgoingMessages - integration tests
-            path: \source\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj
+            path: .\source\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj
           - name: Edi - integration/unit tests
-            path: \source\Edi.UnitTests\Edi.UnitTests.csproj
+            path: .\source\Edi.UnitTests\Edi.UnitTests.csproj
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
