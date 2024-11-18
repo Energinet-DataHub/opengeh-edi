@@ -78,6 +78,9 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
         var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
         _logger.WriteLine($"Dequeued messages count: {dequeuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
 
+        _fixture.TelemetryClient.GetMetric(EnqueuedAmountMetric).TrackValue(enqueuedMessagesCount);
+        _fixture.TelemetryClient.GetMetric(DequeuedAmountMetric).TrackValue(dequeuedMessagesCount);
+
         using var scope = new AssertionScope();
         enqueuedMessagesCount.Should().BeGreaterThanOrEqualTo(
             _fixture.MinimumEnqueuedMessagesCount,
@@ -86,8 +89,5 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
         dequeuedMessagesCount.Should().BeGreaterThanOrEqualTo(
             _fixture.MinimumDequeuedMessagesCount,
             $"because the system should be performant enough to dequeue at least {_fixture.MinimumDequeuedMessagesCount} messages during the load test");
-
-        _fixture.TelemetryClient.GetMetric(EnqueuedAmountMetric).TrackValue(enqueuedMessagesCount);
-        _fixture.TelemetryClient.GetMetric(DequeuedAmountMetric).TrackValue(dequeuedMessagesCount);
     }
 }
