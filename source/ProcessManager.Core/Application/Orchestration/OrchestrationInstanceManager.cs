@@ -12,48 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
 /// <summary>
-/// An encapsulation of <see cref="IDurableClient"/> that allows us to
-/// provide a "framework" for managing Durable Functions orchestration instances using custom domain types.
+/// An manager that allows us to provide a framework for managing orchestration instances
+/// using custom domain types.
 /// </summary>
-public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrchestrationInstanceScheduleManager
+internal class OrchestrationInstanceManager(
+    IClock clock,
+    IOrchestrationInstanceExecutor executor,
+    IOrchestrationRegisterQueries orchestrationRegister,
+    IOrchestrationInstanceRepository repository) :
+        IStartOrchestrationInstanceCommands,
+        IStartScheduledOrchestrationInstanceCommand,
+        ICancelScheduledOrchestrationInstanceCommand
 {
-    private readonly IClock _clock;
-    private readonly IDurableClient _durableClient;
-    private readonly IOrchestrationRegisterQueries _orchestrationRegister;
-    private readonly IOrchestrationInstanceRepository _orchestrationInstanceRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    /// <summary>
-    /// Construct manager.
-    /// </summary>
-    /// <param name="clock"></param>
-    /// <param name="durableClient">Must be a Durable Task Client that is connected to
-    /// the same Task Hub as the Durable Functions host containing orchestrations.</param>
-    /// <param name="orchestrationRegister"></param>
-    /// <param name="orchestrationInstanceRepository"></param>
-    /// <param name="unitOfWork"></param>
-    public OrchestrationInstanceManager(
-        IClock clock,
-        IDurableClient durableClient,
-        IOrchestrationRegisterQueries orchestrationRegister,
-        IOrchestrationInstanceRepository orchestrationInstanceRepository,
-        IUnitOfWork unitOfWork)
-    {
-        _clock = clock;
-        _durableClient = durableClient;
-        _orchestrationRegister = orchestrationRegister;
-        _orchestrationInstanceRepository = orchestrationInstanceRepository;
-        _unitOfWork = unitOfWork;
-    }
+    private readonly IClock _clock = clock;
+    private readonly IOrchestrationInstanceExecutor _executor = executor;
+    private readonly IOrchestrationRegisterQueries _orchestrationRegister = orchestrationRegister;
+    private readonly IOrchestrationInstanceRepository _repository = repository;
 
     /// <inheritdoc />
     public async Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(
@@ -92,7 +74,7 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
     /// <inheritdoc />
     public async Task StartScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id)
     {
-        var orchestrationInstance = await _orchestrationInstanceRepository.GetAsync(id).ConfigureAwait(false);
+        var orchestrationInstance = await _repository.GetAsync(id).ConfigureAwait(false);
         if (!orchestrationInstance.Lifecycle.IsPendingForScheduledStart())
             throw new InvalidOperationException("Orchestration instance cannot be started.");
 
@@ -106,13 +88,13 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
     /// <inheritdoc />
     public async Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id)
     {
-        var orchestrationInstance = await _orchestrationInstanceRepository.GetAsync(id).ConfigureAwait(false);
+        var orchestrationInstance = await _repository.GetAsync(id).ConfigureAwait(false);
         if (!orchestrationInstance.Lifecycle.IsPendingForScheduledStart())
             throw new InvalidOperationException("Orchestration instance cannot be canceled.");
 
         // Transition lifecycle
         orchestrationInstance.Lifecycle.TransitionToTerminated(_clock, OrchestrationInstanceTerminationStates.UserCanceled);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        await _repository.UnitOfWork.CommitAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -160,8 +142,8 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
             runAt);
         orchestrationInstance.ParameterValue.SetFromInstance(inputParameter);
 
-        await _orchestrationInstanceRepository.AddAsync(orchestrationInstance).ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        await _repository.AddAsync(orchestrationInstance).ConfigureAwait(false);
+        await _repository.UnitOfWork.CommitAsync().ConfigureAwait(false);
 
         return orchestrationInstance;
     }
@@ -170,14 +152,9 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
         OrchestrationDescription orchestrationDescription,
         OrchestrationInstance orchestrationInstance)
     {
-        await _durableClient
-            .StartNewAsync(
-                orchestratorFunctionName: orchestrationDescription.FunctionName,
-                orchestrationInstance.Id.Value.ToString(),
-                input: orchestrationInstance.ParameterValue.SerializedParameterValue)
-            .ConfigureAwait(false);
+        await _executor.StartNewOrchestrationInstanceAsync(orchestrationDescription, orchestrationInstance).ConfigureAwait(false);
 
         orchestrationInstance.Lifecycle.TransitionToQueued(_clock);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        await _repository.UnitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }

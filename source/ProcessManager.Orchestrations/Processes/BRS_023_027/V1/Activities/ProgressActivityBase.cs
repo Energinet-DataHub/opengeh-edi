@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
 
 internal abstract class ProgressActivityBase(
     IClock clock,
-    IOrchestrationInstanceProgressRepository progressRepository,
-    IUnitOfWork unitOfWork)
+    IOrchestrationInstanceProgressRepository progressRepository)
 {
     protected IClock Clock { get; } = clock;
 
     protected IOrchestrationInstanceProgressRepository ProgressRepository { get; } = progressRepository;
-
-    protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
 }
