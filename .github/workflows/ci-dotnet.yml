@@ -92,6 +92,7 @@ jobs:
     env:
       outputpath: ${{ github.workspace }}/source/Tests/bin/Release/net8.0
     strategy:
+      fail-fast: false
       matrix:
         testproject:
           - name: ArchitectureTests
@@ -122,7 +123,7 @@ jobs:
             path: .\source\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj
           - name: OutgoingMessages - integration tests
             path: .\source\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj
-          - name: Edi - integration/unit tests
+          - name: Edi - integration unit tests
             path: .\source\Edi.UnitTests\Edi.UnitTests.csproj
     steps:
       - name: Checkout repository
