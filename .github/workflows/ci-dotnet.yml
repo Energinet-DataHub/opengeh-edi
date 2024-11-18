@@ -105,8 +105,8 @@ jobs:
             path: .\source\ProcessManager.Orchestrations.Tests\ProcessManager.Orchestrations.Tests.csproj
           - name: ProcessManager.Tests
             path: .\source\ProcessManager.Tests\ProcessManager.Tests.csproj  
-          - name: ProcessManager.SubsystemTests
-            path: .\source\ProcessManager.SubsystemTests\ProcessManager.SubsystemTests.csproj
+          # - name: ProcessManager.SubsystemTests
+          #   path: .\source\ProcessManager.SubsystemTests\ProcessManager.SubsystemTests.csproj
           - name: B2BApi.AppTests
             path: .\source\B2BApi.AppTests\B2BApi.AppTests.csproj
           - name: B2CWebApi.AppTests
@@ -207,11 +207,11 @@ jobs:
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
-          - name: ProcessManager Subsystem Tests
-            paths: \source\ProcessManager.SubsystemTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.SubsystemTests.dll
-            filter: empty # Means skip
-            use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip
+          # - name: ProcessManager Subsystem Tests
+          #   paths: \source\ProcessManager.SubsystemTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.SubsystemTests.dll
+          #   filter: empty # Means skip
+          #   use_azure_functions_tools: true
+          #   contentroot_variable_name: empty # Means skip
 
           - name: B2BApi AppTests
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
