@@ -89,24 +89,21 @@ jobs:
   build_testsuite:
     name: Build ${{ matrix.testproject.name }}
     runs-on: ubuntu-latest
+    env:
+      outputpath: ${{ github.workspace }}/source/Tests/bin/Release/net8.0
     strategy:
       matrix:
         testproject:
           - name: ArchitectureTests
             path: .\source\ArchitectureTests\ArchitectureTests.csproj
-            outputpath: .\source\Tests\bin\Release\net8.0
           - name: Tests
             path: .\source\Tests\Tests.csproj
-            outputpath: .\source\Tests\bin\Release\net8.0
           - name: ProcessManagerCoreTests
             path: .\source\ProcessManager.Core.Tests\ProcessManager.Core.Tests.csproj
-            outputpath: .\source\Tests\bin\Release\net8.0 
           - name: ProcessManagerOrchestrationTests
             path: .\source\ProcessManager.Orchestrations.Tests\ProcessManager.Orchestrations.Tests.csproj
-            outputpath: .\source\Tests\bin\Release\net8.0 
           - name: ProcessManagerTests
-            path: .\source\ProcessManager.Tests\ProcessManager.Tests.csproj
-            outputpath: .\source\Tests\bin\Release\net8.0                              
+            path: .\source\ProcessManager.Tests\ProcessManager.Tests.csproj                             
             
     steps:
       - name: Checkout repository
@@ -117,14 +114,14 @@ jobs:
           dotnet publish \
             '${{ matrix.testproject.path }}' \
             --configuration Release \
-            --output '${{ matrix.testproject.outputpath }}'
+            --output '${{ env.outputpath }}'
 
           ls source/Tests/bin/Release/net8.0 
 
       - uses: actions/upload-artifact@v4
         with:
           name: edi-tests-${{ matrix.testproject.name }}
-          path: ./source/Tests/bin/Release/net8.0/*
+          path: ${{ env.outputpath }}/*
 
   merge:
     runs-on: ubuntu-latest
