@@ -120,6 +120,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         // Act
         var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         // Assert
@@ -142,6 +143,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         // Act
         var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         // Assert
@@ -166,6 +168,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         // Act
         var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         // Assert

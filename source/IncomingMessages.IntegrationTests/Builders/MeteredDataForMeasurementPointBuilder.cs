@@ -33,7 +33,7 @@ public static class MeteredDataForMeasurementPointBuilder
         string messageId = "111131835",
         string senderRole = "MDR",
         string receiverNumber = "5790001330552",
-        string schema = "un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3")
+        string? schema = null)
     {
         string content;
         if (format == DocumentFormat.Ebix)
@@ -47,7 +47,20 @@ public static class MeteredDataForMeasurementPointBuilder
                 messageId,
                 senderRole,
                 receiverNumber,
-                schema);
+                schema ?? "un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3");
+        }
+        else if (format == DocumentFormat.Xml)
+        {
+            content = GetXml(
+                senderActorNumber,
+                series,
+                messageType,
+                processType,
+                businessType,
+                messageId,
+                senderRole,
+                receiverNumber,
+                schema ?? "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1");
         }
         else
         {
@@ -116,6 +129,64 @@ public static class MeteredDataForMeasurementPointBuilder
     </ns0:PayloadEnergyTimeSeries>
     "))}
 </ns0:DK_MeteredDataTimeSeries>");
+        return doc.OuterXml;
+    }
+
+    private static string GetXml(
+        ActorNumber senderActorNumber,
+        IReadOnlyCollection<(string TransactionId, Instant PeriodStart, Instant PeriodEnd, Resolution Resolution)> series,
+        string messageType,
+        string processType,
+        string businessType,
+        string messageId,
+        string senderRole,
+        string receiverNumber,
+        string schema)
+    {
+        var doc = new XmlDocument();
+        doc.LoadXml($@"
+<cim:NotifyValidatedMeasureData_MarketDocument xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:cim=""{schema}"" xsi:schemaLocation=""{schema} urn-ediel-org-measure-notifyvalidatedmeasuredata-0-1.xsd"">
+    <cim:mRID>{messageId}</cim:mRID>
+    <cim:type>{messageType}</cim:type>
+    <cim:process.processType>{processType}</cim:process.processType>
+    <cim:businessSector.type>{businessType}</cim:businessSector.type>
+    <cim:sender_MarketParticipant.mRID codingScheme=""A10"">{senderActorNumber.Value}</cim:sender_MarketParticipant.mRID>
+    <cim:sender_MarketParticipant.marketRole.type>{senderRole}</cim:sender_MarketParticipant.marketRole.type>
+    <cim:receiver_MarketParticipant.mRID codingScheme=""A10"">{receiverNumber}</cim:receiver_MarketParticipant.mRID>
+    <cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
+    <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
+    
+    {string.Join("\n", series.Select(s => $@"
+        <cim:Series>
+            <cim:mRID>{s.TransactionId}</cim:mRID>
+            <cim:originalTransactionIDReference_Series.mRID>C1875000</cim:originalTransactionIDReference_Series.mRID>
+            <!--  Kun ved svar på anmodning (RSM-015)  -->
+            <cim:marketEvaluationPoint.mRID codingScheme=""A10"">579999993331812345</cim:marketEvaluationPoint.mRID>
+            <!--    -->
+            <cim:marketEvaluationPoint.type>E17</cim:marketEvaluationPoint.type>
+            <!--   -->
+            <cim:registration_DateAndOrTime.dateTime>2022-12-17T07:30:00Z</cim:registration_DateAndOrTime.dateTime>
+            <!--    -->
+            <cim:product>8716867000030</cim:product>
+            <cim:quantity_Measure_Unit.name>KWH</cim:quantity_Measure_Unit.name>
+            <cim:Period>
+                <cim:resolution>{s.Resolution.Code}</cim:resolution>
+                <cim:timeInterval>
+                    <cim:start>{s.PeriodStart.ToString("yyyy-MM-ddTHH:mm'Z'", null)}</cim:start>
+                    <cim:end>{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", null)}</cim:end>
+                </cim:timeInterval>
+
+            {string.Join("\n", GetEnergyObservations(s.Resolution).Select(e => $@"
+                <cim:Point>
+                    <cim:position>{e.Position}</cim:position>
+                    <cim:quantity>{e.Quantity}</cim:quantity>
+                    <cim:quality>A03</cim:quality>
+                </cim:Point>
+        "))}
+        </cim:Period>
+    </cim:Series>
+    "))}
+</cim:NotifyValidatedMeasureData_MarketDocument>");
         return doc.OuterXml;
     }
 

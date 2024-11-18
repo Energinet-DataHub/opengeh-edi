@@ -63,6 +63,10 @@ limitations under the License.
         <EmbeddedResource Include="IncomingMessages\EbixMeteredDataForMeasurementPoint.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
+        <None Remove="IncomingMessages\MeteredDataForMeasurementPoint.xml" />
+        <EmbeddedResource Include="IncomingMessages\MeteredDataForMeasurementPoint.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

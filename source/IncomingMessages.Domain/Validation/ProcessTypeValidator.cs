@@ -21,29 +21,31 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 public class ProcessTypeValidator : IProcessTypeValidator
 {
     private static readonly IReadOnlyCollection<string> _aggregatedMeasureDataWhitelist =
-        new[]
-        {
-            BusinessReason.PreliminaryAggregation.Code,
+    [
+        BusinessReason.PreliminaryAggregation.Code,
             BusinessReason.BalanceFixing.Code,
             BusinessReason.WholesaleFixing.Code,
             BusinessReason.Correction.Code,
-        };
+    ];
 
     private static readonly IReadOnlyCollection<string> _wholesaleServicesWhitelist =
-        new[]
-        {
-            BusinessReason.WholesaleFixing.Code,
+    [
+        BusinessReason.WholesaleFixing.Code,
             BusinessReason.Correction.Code,
-        };
+    ];
+
+    private static readonly IReadOnlyCollection<string> _meteredDataForMeasurementPointEbixWhiteList =
+    [
+        BusinessReason.PeriodicMetering.Code,
+            BusinessReason.PeriodicFlexMetering.Code, // Flex metering is only supported for Ebix and should be rejected when used for CIM
+    ];
 
     private static readonly IReadOnlyCollection<string> _meteredDataForMeasurementPointWhiteList =
-        new[]
-        {
-            BusinessReason.PeriodicMetering.Code,
-            BusinessReason.PeriodicFlexMetering.Code, // Flex metering is only supported for Ebix and should be rejected when used for CIM
-        };
+    [
+        BusinessReason.PeriodicMetering.Code,
+    ];
 
-    public async Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
+    public async Task<Result> ValidateAsync(IIncomingMessage message, DocumentFormat documentFormat, CancellationToken cancellationToken)
     {
         return await Task.FromResult(
                 message switch
@@ -57,9 +59,13 @@ public class ProcessTypeValidator : IProcessTypeValidator
                             ? Result.Succeeded()
                             : Result.Failure(new NotSupportedProcessType(rwsm.BusinessReason)),
                     MeteredDataForMeasurementPointMessage mdfmpm =>
-                        _meteredDataForMeasurementPointWhiteList.Contains(mdfmpm.BusinessReason)
-                            ? Result.Succeeded()
-                            : Result.Failure(new NotSupportedProcessType(mdfmpm.BusinessReason)),
+                        documentFormat == DocumentFormat.Ebix
+                            ? _meteredDataForMeasurementPointEbixWhiteList.Contains(mdfmpm.BusinessReason)
+                                ? Result.Succeeded()
+                                : Result.Failure(new NotSupportedProcessType(mdfmpm.BusinessReason))
+                            : _meteredDataForMeasurementPointWhiteList.Contains(mdfmpm.BusinessReason)
+                                ? Result.Succeeded()
+                                : Result.Failure(new NotSupportedProcessType(mdfmpm.BusinessReason)),
                     _ => throw new InvalidOperationException($"The baw's on the slates! {message.GetType().Name}"),
                 })
             .ConfigureAwait(false);
