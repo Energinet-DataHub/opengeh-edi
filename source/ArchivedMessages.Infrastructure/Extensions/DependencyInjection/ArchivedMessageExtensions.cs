@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
+using Energinet.DataHub.EDI.ArchivedMessages.Application;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 
 public static class ArchivedMessageExtensions
 {

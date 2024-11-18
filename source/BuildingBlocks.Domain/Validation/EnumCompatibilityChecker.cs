@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Validation;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
-
-public static class DirectionToSortByMapper
+public static class EnumCompatibilityChecker
 {
-    public static DirectionToSortByDto? MapToDirectionToSortBy(
-        Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy? directionToSortBy)
+    public static bool AreEnumsCompatible<T1, T2>()
+        where T1 : Enum
+        where T2 : Enum
     {
-        return directionToSortBy switch
-        {
-            Models.DirectionToSortBy.Ascending => DirectionToSortByDto.Ascending,
-            Models.DirectionToSortBy.Descending => DirectionToSortByDto.Descending,
-            _ => null,
-        };
+        var firstEnum = Enum.GetValues(typeof(T1)).Cast<Enum>().ToDictionary(e => e.ToString(), Convert.ToInt32);
+        var secondEnum = Enum.GetValues(typeof(T2)).Cast<Enum>().ToDictionary(e => e.ToString(), Convert.ToInt32);
+
+        return firstEnum.All(e => secondEnum.ContainsKey(e.Key) && secondEnum[e.Key] == e.Value);
     }
 }

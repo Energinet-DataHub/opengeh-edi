@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 /// <summary>
 /// Represents a query options for retrieving messages.
 /// Including the pagination for the specific query.
 /// </summary>
-public sealed record GetMessagesQuery(
-    SortedCursorBasedPagination Pagination,
-    MessageCreationPeriod? CreationPeriod = null,
+public sealed record GetMessagesQueryDto(
+    SortedCursorBasedPaginationDto Pagination,
+    MessageCreationPeriodDto? CreationPeriod = null,
     string? MessageId = null,
     string? SenderNumber = null,
     string? SenderRoleCode = null,
