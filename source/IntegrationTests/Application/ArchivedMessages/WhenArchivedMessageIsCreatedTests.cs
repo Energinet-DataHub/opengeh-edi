@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -74,9 +76,9 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     }
 
     [Theory]
-    [InlineData(ArchivedMessageType.IncomingMessage)]
-    [InlineData(ArchivedMessageType.OutgoingMessage)]
-    public async Task Archived_document_is_saved_at_correct_path(ArchivedMessageType archivedMessageType)
+    [InlineData(ArchivedMessageTypeDto.IncomingMessage)]
+    [InlineData(ArchivedMessageTypeDto.OutgoingMessage)]
+    public async Task Archived_document_is_saved_at_correct_path(ArchivedMessageTypeDto archivedMessageType)
     {
         var messageId = MessageId.New();
         var senderNumber = "1122334455667788";
@@ -92,7 +94,9 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             receiverNumber: receiverNumber,
             timestamp: Instant.FromUtc(year, month, date, 0, 0));
 
-        var expectedActorNumber = archivedMessageType == ArchivedMessageType.IncomingMessage ? senderNumber : receiverNumber;
+        var mappedArchiveMessage = ArchivedMessageMapper.Map(archivedMessage);
+
+        var expectedActorNumber = archivedMessageType == ArchivedMessageTypeDto.IncomingMessage ? senderNumber : receiverNumber;
         var expectedFileStorageReference = $"{expectedActorNumber}/{year:000}/{month:00}/{date:00}/{archivedMessage.Id.Value:N}";
 
         await ArchiveMessage(archivedMessage);
@@ -100,7 +104,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.Value);
 
         using var assertionScope = new AssertionScope();
-        archivedMessage.FileStorageReference.Category.Value.Should().Be("archived");
+        mappedArchiveMessage.FileStorageReference.Category.Value.Should().Be("archived");
         actualFileStorageReference.Should().Be(expectedFileStorageReference);
     }
 
@@ -148,15 +152,15 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             Assert.Fail("We should be able to save multiple messages with the same message id");
         }
 
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(new SortedCursorBasedPagination()), CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQueryDto(new SortedCursorBasedPaginationDto()), CancellationToken.None);
 
         Assert.Equal(2, result.Messages.Count);
         Assert.Equal(messageId, result.Messages[0].MessageId);
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    private static ArchivedMessage CreateArchivedMessage(
-        ArchivedMessageType? archivedMessageType = null,
+    private static ArchivedMessageDto CreateArchivedMessage(
+        ArchivedMessageTypeDto? archivedMessageType = null,
         string? messageId = null,
         string? documentContent = null,
         string? senderNumber = null,
@@ -177,7 +181,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             streamWriter.Flush();
         }
 
-        return new ArchivedMessage(
+        return new ArchivedMessageDto(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             new[] { EventId.From(Guid.NewGuid()) },
             DocumentType.NotifyAggregatedMeasureData.Name,
@@ -187,11 +191,11 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             ActorRole.EnergySupplier,
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             BusinessReason.BalanceFixing.Name,
-            archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
+            archivedMessageType ?? ArchivedMessageTypeDto.OutgoingMessage,
             new MarketDocumentStream(documentStream));
     }
 
-    private async Task ArchiveMessage(ArchivedMessage archivedMessage)
+    private async Task ArchiveMessage(ArchivedMessageDto archivedMessage)
     {
         await _archivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
     }

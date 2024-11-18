@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using NodaTime;
 
-public enum ArchivedMessageType
-{
-    IncomingMessage,
-    OutgoingMessage,
-}
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+
+public sealed record MessageCreationPeriodDto(Instant DateToSearchFrom, Instant DateToSearchTo);
