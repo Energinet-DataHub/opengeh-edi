@@ -19,9 +19,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Validation;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 
-internal static class ArchivedMessageMapper
+public static class ArchivedMessageMapper
 {
-    internal static ArchivedMessage Map(ArchivedMessageDto dto)
+    public static ArchivedMessage Map(ArchivedMessageDto dto)
     {
         return !EnumCompatibilityChecker.AreEnumsCompatible<ArchivedMessageType, ArchivedMessageTypeDto>()
             ? throw new InvalidEnumMappingException($"Enum of type {nameof(ArchivedMessageType)} cannot be mapped to type {nameof(ArchivedMessageTypeDto)}.")

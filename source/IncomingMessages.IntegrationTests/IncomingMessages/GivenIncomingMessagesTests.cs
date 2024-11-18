@@ -486,13 +486,17 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage;
 
         foreach (var assertProperty in assertProperties)
+        {
             assertProperty.Value(archivedMessageAsDictionary[assertProperty.Key]);
+        }
 
         assertProperties.Should()
             .HaveSameCount(archivedMessageAsDictionary, "because all archived message properties should be asserted");
 
         foreach (var dbPropertyName in archivedMessageAsDictionary.Keys)
+        {
             assertProperties.Keys.Should().Contain(dbPropertyName);
+        }
     }
 
     protected override void Dispose(bool disposing)
