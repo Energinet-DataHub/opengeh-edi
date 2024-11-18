@@ -55,9 +55,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ matrix.artifact.name }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          key: ${{ runner.os }}-nuget-${{ env.RELEASE_VERSION }}-${{ matrix.artifact.project_name}}
 
       - name: Echo ${{matrix.artifact.should_build}}
         run: echo ${{matrix.artifact.should_build}}
