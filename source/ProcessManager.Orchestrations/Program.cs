@@ -66,5 +66,5 @@ var host = new HostBuilder()
     })
     .Build();
 
-await host.SynchronizeWithOrchestrationRegisterAsync().ConfigureAwait(false);
+await host.SynchronizeWithOrchestrationRegisterAsync("ProcessManager.Orchestrations").ConfigureAwait(false);
 await host.RunAsync().ConfigureAwait(false);

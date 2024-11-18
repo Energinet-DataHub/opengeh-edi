@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+using Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -20,14 +21,20 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 
-public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository, IQueryScheduledOrchestrationInstancesByInstant
+/// <summary>
+/// Read/write access to the orchestration instance repository.
+/// </summary>
+internal class OrchestrationInstanceRepository(
+    ProcessManagerContext context) :
+        IOrchestrationInstanceRepository,
+        IOrchestrationInstanceProgressRepository,
+        IOrchestrationInstanceQueries,
+        IScheduledOrchestrationInstancesByInstantQuery
 {
-    private readonly ProcessManagerContext _context;
+    private readonly ProcessManagerContext _context = context;
 
-    public OrchestrationInstanceRepository(ProcessManagerContext context)
-    {
-        _context = context;
-    }
+    /// <inheritdoc />
+    public IUnitOfWork UnitOfWork => _context;
 
     /// <inheritdoc />
     public Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id)
@@ -45,7 +52,7 @@ public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository,
         await _context.OrchestrationInstances.AddAsync(orchestrationInstance).ConfigureAwait(false);
     }
 
-    /// <inheritdoc cref="IQueryScheduledOrchestrationInstancesByInstant.FindAsync(Instant)"/>
+    /// <inheritdoc cref="IScheduledOrchestrationInstancesByInstantQuery.FindAsync(Instant)"/>
     public async Task<IReadOnlyCollection<OrchestrationInstance>> FindAsync(Instant scheduledToRunBefore)
     {
         var query = _context.OrchestrationInstances

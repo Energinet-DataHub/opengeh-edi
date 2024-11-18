@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +23,10 @@ namespace Energinet.DataHub.ProcessManager.Api;
 
 internal class CancelScheduledOrchestrationInstanceTrigger(
     ILogger<CancelScheduledOrchestrationInstanceTrigger> logger,
-    IOrchestrationInstanceManager manager)
+    ICancelScheduledOrchestrationInstanceCommand command)
 {
     private readonly ILogger _logger = logger;
-    private readonly IOrchestrationInstanceManager _manager = manager;
+    private readonly ICancelScheduledOrchestrationInstanceCommand _command = command;
 
     /// <summary>
     /// Cancel a scheduled orchestration instance.
@@ -41,7 +41,7 @@ internal class CancelScheduledOrchestrationInstanceTrigger(
         Guid id,
         FunctionContext executionContext)
     {
-        await _manager
+        await _command
             .CancelScheduledOrchestrationInstanceAsync(new OrchestrationInstanceId(id))
             .ConfigureAwait(false);
 

@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
-public interface IOrchestrationInstanceScheduleManager
+/// <summary>
+/// Readonly access to the orchestration register.
+/// </summary>
+internal interface IOrchestrationRegisterQueries
 {
-    /// <summary>
-    /// Start a scheduled orchestration instance.
-    /// </summary>
-    Task StartScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
+    Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id);
+
+    Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool? isEnabled);
 }

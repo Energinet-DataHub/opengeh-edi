@@ -13,25 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
 /// <summary>
-/// Read/write access to the orchestration register.
+/// Abstracts the execution of orchestration instances from technology specific implementations.
 /// </summary>
-public interface IOrchestrationRegister
+internal interface IOrchestrationInstanceExecutor
 {
-    Task<IReadOnlyCollection<OrchestrationDescription>> GetAllByHostNameAsync(string hostName);
-
     /// <summary>
-    /// Durable Functions orchestration host's can use this method to register the orchestrations
-    /// they host.
+    /// Start a new orchestration instance.
     /// </summary>
-    Task RegisterAsync(OrchestrationDescription orchestrationDescription, string hostName);
-
-    /// <summary>
-    /// Durable Functions orchestration host's can use this method to disable orchestrations they don't host anymore
-    /// or want to disable for other reasons.
-    /// </summary>
-    Task DeregisterAsync(OrchestrationDescription orchestrationDescription);
+    Task StartNewOrchestrationInstanceAsync(OrchestrationDescription orchestrationDescription, OrchestrationInstance orchestrationInstance);
 }
