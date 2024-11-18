@@ -84,11 +84,11 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
         // Assert
         if (_unsupportedCombinationsOfIncomingDocumentTypeAndDocumentFormat.Contains((incomingDocumentType, documentFormat)))
         {
-            await act.Should().ThrowAsync<InvalidOperationException>("because this combination is not supported");
+            await act.Should().ThrowAsync<NotSupportedException>("because this combination is not supported");
         }
         else
         {
-            await act.Should().NotThrowAsync<InvalidOperationException>("because this combination is valid, but no parser was found");
+            await act.Should().NotThrowAsync<NotSupportedException>("because this combination is valid, but no parser was found");
         }
     }
 }

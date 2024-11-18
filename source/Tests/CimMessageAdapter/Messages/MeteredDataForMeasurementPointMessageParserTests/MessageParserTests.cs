@@ -17,15 +17,14 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeasurementPointEbixMessageParserTests;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeasurementPointMessageParserTests;
 
 public sealed class MessageParserTests
 {
@@ -35,10 +34,10 @@ public sealed class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}MeteredDataForMeasurementPoint{Path.DirectorySeparatorChar}";
 
-    private readonly MarketMessageParser _marketMessageParser = new(
-    [
-        new MeteredDataForMeasurementPointEbixMessageParser(new EbixSchemaProvider(), new Logger<MeteredDataForMeasurementPointEbixMessageParser>(new LoggerFactory())),
-    ]);
+    private readonly Dictionary<DocumentFormat, IMessageParser> _marketMessageParser = new()
+    {
+        { DocumentFormat.Ebix, new EbixMessageParser(new EbixSchemaProvider()) },
+    };
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
     {
@@ -67,10 +66,8 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var result = await _marketMessageParser.GetValueOrDefault(format)!.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
             CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
@@ -122,10 +119,8 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var result = await _marketMessageParser.GetValueOrDefault(format)!.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
             CancellationToken.None);
 
         result.Success.Should().BeFalse();

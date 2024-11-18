@@ -14,21 +14,20 @@
 
 using Azure.Storage.Blobs;
 using Dapper;
-using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
-using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -154,8 +153,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         return services.BuildServiceProvider();
     }
 
-    public async Task<ArchivedMessage> CreateArchivedMessageAsync(
-        ArchivedMessageType? archivedMessageType = null,
+    public async Task<ArchivedMessageDto> CreateArchivedMessageAsync(
+        ArchivedMessageTypeDto? archivedMessageType = null,
         string? messageId = null,
         string? documentContent = null,
         string? documentType = null,
@@ -177,7 +176,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             streamWriter.Flush();
         }
 
-        var archivedMessage = new ArchivedMessage(
+        var archivedMessage = new ArchivedMessageDto(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             Array.Empty<EventId>(),
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
@@ -187,8 +186,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             receiverRole ?? ActorRole.DanishEnergyAgency,
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             businessReasons ?? BusinessReason.BalanceFixing.Name,
-            archivedMessageType ?? ArchivedMessageType.IncomingMessage,
-            new ArchivedMessageStream(documentStream),
+            archivedMessageType ?? ArchivedMessageTypeDto.IncomingMessage,
+            new ArchivedMessageStreamDto(documentStream),
             relatedToMessageId ?? null);
 
         if (storeMessage)
@@ -210,12 +209,12 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         return archivedMessages.ToList().AsReadOnly();
     }
 
-    public async Task<ArchivedMessageStream> GetMessagesFromBlob(FileStorageReference reference)
+    public async Task<ArchivedMessageStreamDto> GetMessagesFromBlob(FileStorageReference reference)
     {
         var blobClient = Services.GetService<IFileStorageClient>()!;
 
         var fileStorageFile = await blobClient.DownloadAsync(reference, CancellationToken.None).ConfigureAwait(false);
-        return new ArchivedMessageStream(fileStorageFile);
+        return new ArchivedMessageStreamDto(fileStorageFile);
     }
 
     protected virtual void Dispose(bool disposing)

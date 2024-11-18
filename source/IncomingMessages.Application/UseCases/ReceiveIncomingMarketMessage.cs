@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -30,6 +32,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 public class ReceiveIncomingMarketMessage
 {
     private readonly MarketMessageParser _marketMessageParser;
+    private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
+    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
@@ -41,6 +45,8 @@ public class ReceiveIncomingMarketMessage
 
     public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
+        IDictionary<(IncomingDocumentType DocumentType, DocumentFormat DocumentFormat), IMessageParser> messageParsers,
+        IFeatureFlagManager featureFlagManager,
         ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
@@ -51,6 +57,8 @@ public class ReceiveIncomingMarketMessage
         AuthenticatedActor actorAuthenticator)
     {
         _marketMessageParser = marketMessageParser;
+        _messageParsers = messageParsers;
+        _featureFlagManager = featureFlagManager;
         _validateIncomingMessage = validateIncomingMessage;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
@@ -70,11 +78,12 @@ public class ReceiveIncomingMarketMessage
     {
         ArgumentNullException.ThrowIfNull(documentType);
         ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
-
-        var incomingMarketMessageParserResult =
-            await _marketMessageParser.ParseAsync(incomingMarketMessageStream, incomingDocumentFormat, documentType, cancellationToken)
-                .ConfigureAwait(false);
-
+        var incomingMarketMessageParserResult = await ParseIncomingMessageAsync(
+                incomingMarketMessageStream,
+                incomingDocumentFormat,
+                documentType,
+                cancellationToken)
+            .ConfigureAwait(false);
         if (incomingMarketMessageParserResult.Errors.Count != 0
             || incomingMarketMessageParserResult.IncomingMessage == null)
         {
@@ -138,6 +147,24 @@ public class ReceiveIncomingMarketMessage
         return documentType != IncomingDocumentType.MeteredDataForMeasurementPoint;
     }
 
+    private async Task<IncomingMarketMessageParserResult> ParseIncomingMessageAsync(
+        IIncomingMarketMessageStream incomingMarketMessageStream,
+        DocumentFormat documentFormat,
+        IncomingDocumentType documentType,
+        CancellationToken cancellationToken)
+    {
+        if (await _featureFlagManager.UseNewIncomingMessageParserAsync().ConfigureAwait(false))
+        {
+            if (_messageParsers.TryGetValue((documentType, documentFormat), out var messageParser))
+            {
+                return await messageParser.ParseAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        return await _marketMessageParser.ParseAsync(incomingMarketMessageStream, documentFormat, documentType, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     private async Task ArchiveIncomingMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         IIncomingMessage incomingMessage,
@@ -146,7 +173,7 @@ public class ReceiveIncomingMarketMessage
     {
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
+            new ArchivedMessageDto(
                 incomingMessage.MessageId,
                 incomingDocumentType.Name,
                 authenticatedActor.ActorNumber,
@@ -157,7 +184,7 @@ public class ReceiveIncomingMarketMessage
                 ActorRole.MeteredDataAdministrator,
                 _clock.GetCurrentInstant(),
                 incomingMessage.BusinessReason,
-                ArchivedMessageType.IncomingMessage,
+                ArchivedMessageTypeDto.IncomingMessage,
                 incomingMarketMessageStream),
             cancellationToken).ConfigureAwait(false);
     }

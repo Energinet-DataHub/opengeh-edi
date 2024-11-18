@@ -14,23 +14,22 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
-#pragma warning disable CA1711 // Is a "Stream" value type
-public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessageStream
+public sealed record ArchivedMessageStreamDto : StreamValueObject, IArchivedMessageStream
 {
-    public ArchivedMessageStream(FileStorageFile fileStorageFile)
+    public ArchivedMessageStreamDto(FileStorageFile fileStorageFile)
         : base(fileStorageFile?.Stream) { }
 
-    public ArchivedMessageStream(IMarketDocumentStream marketDocumentStream)
+    public ArchivedMessageStreamDto(IMarketDocumentStream marketDocumentStream)
         : base(marketDocumentStream?.Stream) { }
 
-    public ArchivedMessageStream(IIncomingMarketMessageStream incomingMarketMessageStream)
+    public ArchivedMessageStreamDto(IIncomingMarketMessageStream incomingMarketMessageStream)
         : base(incomingMarketMessageStream?.Stream) { }
 
     /// <summary>
-    /// This is only intended for testing purposes
+    /// This is only intended for testing and mapping purposes
     /// </summary>
-    internal ArchivedMessageStream(Stream stream)
+    public ArchivedMessageStreamDto(Stream stream)
         : base(stream) { }
 }

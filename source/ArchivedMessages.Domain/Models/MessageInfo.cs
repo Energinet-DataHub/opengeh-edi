@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using NodaTime;
 
-public readonly struct DirectionToSortBy
-{
-    public static readonly DirectionToSortBy Ascending = new("ASC");
-    public static readonly DirectionToSortBy Descending = new("DESC");
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
-    private DirectionToSortBy(string identifier)
-    {
-        Identifier = identifier;
-    }
-
-    public string Identifier { get; }
-}
+public record MessageInfo(
+    long RecordId,
+    Guid Id,
+    string? MessageId,
+    string DocumentType,
+    string SenderNumber,
+    string SenderRoleCode,
+    string ReceiverNumber,
+    string ReceiverRoleCode,
+    Instant CreatedAt,
+    string? BusinessReason);
