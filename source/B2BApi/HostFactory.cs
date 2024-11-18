@@ -74,8 +74,6 @@ public static class HostFactory
 
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
-                        // (MWO) TODO: This is probably wrong; there are no references to this string elsewhere.
-                        .TryAddBlobStorageHealthCheck("edi-web-jobs-storage", "edi-web-jobs-storage")
 
                         // Data retention
                         .AddDataRetention()
