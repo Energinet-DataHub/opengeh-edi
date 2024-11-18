@@ -89,7 +89,9 @@ public class AssertEbixDocument
         Assert.Equal(expectedValue, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Value);
 
         foreach (var (name, value) in attributes)
+        {
             Assert.Equal(value, _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)?.Attribute(name)?.Value);
+        }
 
         return this;
     }

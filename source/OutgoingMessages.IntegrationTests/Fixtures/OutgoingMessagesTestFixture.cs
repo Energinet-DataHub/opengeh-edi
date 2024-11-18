@@ -66,7 +66,9 @@ public class OutgoingMessagesTestFixture : IDisposable, IAsyncLifetime
         var containers = blobServiceClient.GetBlobContainers();
 
         foreach (var containerToDelete in containers)
+        {
             blobServiceClient.DeleteBlobContainer(containerToDelete.Name);
+        }
 
         if (disposing)
         {
