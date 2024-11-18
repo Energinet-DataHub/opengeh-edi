@@ -85,7 +85,7 @@ jobs:
           title: ${{ env.RELEASE_VERSION }}_${{ matrix.artifact.project_name}}
           files: |
             ${{ env.RELEASE_FOLDER_PATH }}/dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
-            
+
   build_testsuite:
     name: Build ${{ matrix.testproject.name }}
     runs-on: ubuntu-latest
@@ -104,7 +104,7 @@ jobs:
           - name: ProcessManager.Orchestrations.Tests
             path: .\source\ProcessManager.Orchestrations.Tests\ProcessManager.Orchestrations.Tests.csproj
           - name: ProcessManager.Tests
-            path: .\source\ProcessManager.Tests\ProcessManager.Tests.csproj  
+            path: .\source\ProcessManager.Tests\ProcessManager.Tests.csproj
           # - name: ProcessManager.SubsystemTests
           #   path: .\source\ProcessManager.SubsystemTests\ProcessManager.SubsystemTests.csproj
           - name: B2BApi.AppTests
@@ -118,7 +118,7 @@ jobs:
           - name: IntegrationEvents.IntegrationTests
             path: .\source\IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj
           - name: MasterData.IntegrationTests
-            path: .\source\MasterData.IntegrationTests\MasterData.IntegrationTests.csproj   
+            path: .\source\MasterData.IntegrationTests\MasterData.IntegrationTests.csproj
           - name: IncomingMessages.IntegrationTests
             path: .\source\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj
           - name: OutgoingMessages.IntegrationTests
@@ -136,7 +136,7 @@ jobs:
             --configuration Release \
             --output '${{ env.outputpath }}'
 
-          ls source/Tests/bin/Release/net8.0 
+          ls source/Tests/bin/Release/net8.0
 
       - uses: actions/upload-artifact@v4
         with:
