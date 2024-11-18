@@ -30,7 +30,7 @@
         <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
         <ProjectReference Include="..\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
-        <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
+        <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemDefinitionGroup>

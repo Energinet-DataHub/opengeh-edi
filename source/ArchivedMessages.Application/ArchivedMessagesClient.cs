@@ -12,38 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application;
 
-public class ArchivedMessagesClient : IArchivedMessagesClient
+public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRepository) : IArchivedMessagesClient
 {
-    private readonly IArchivedMessageRepository _archivedMessageRepository;
+    private readonly IArchivedMessageRepository _archivedMessageRepository = archivedMessageRepository;
 
-    public ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRepository)
-    {
-        _archivedMessageRepository = archivedMessageRepository;
-    }
-
-    public async Task<IArchivedFile> CreateAsync(ArchivedMessage message, CancellationToken cancellationToken)
+    public async Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
-        await _archivedMessageRepository.AddAsync(message, cancellationToken).ConfigureAwait(false);
 
-        return new ArchivedFile(message.FileStorageReference, message.ArchivedMessageStream);
+        var mappedArchivedMessage = ArchivedMessageMapper.Map(message);
+
+        await _archivedMessageRepository.AddAsync(mappedArchivedMessage, cancellationToken).ConfigureAwait(false);
+
+        return new ArchivedFile(mappedArchivedMessage.FileStorageReference, mappedArchivedMessage.ArchivedMessageStream);
     }
 
-    public async Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)
+    public async Task<ArchivedMessageStreamDto?> GetAsync(ArchivedMessageIdDto id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
-        return await _archivedMessageRepository.GetAsync(id, cancellationToken).ConfigureAwait(false);
+
+        var archivedMessageId = new ArchivedMessageId(id.Value);
+
+        var result = await _archivedMessageRepository.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
+
+        return result != null ? new ArchivedMessageStreamDto(result.Stream) : null;
     }
 
-    public Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken)
+    public async Task<MessageSearchResultDto> SearchAsync(GetMessagesQueryDto queryInputDto, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(queryInput);
-        return _archivedMessageRepository.SearchAsync(queryInput, cancellationToken);
+        ArgumentNullException.ThrowIfNull(queryInputDto);
+
+        var result = await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
+
+        return MessagesSearchResultMapper.Map(result);
     }
 }

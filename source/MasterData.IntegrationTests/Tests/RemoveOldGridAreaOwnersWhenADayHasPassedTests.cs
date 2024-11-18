@@ -182,7 +182,9 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
     private async Task AddActorsToDatabaseAsync(List<GridAreaOwnershipAssignedDto> gridAreaOwners)
     {
         foreach (var gao in gridAreaOwners)
+        {
             await _masterDataClient!.UpdateGridAreaOwnershipAsync(gao, CancellationToken.None);
+        }
     }
 
     private async Task<ActorNumber> GetGridAreaOwnersForGridArea(string gridAreaCode)

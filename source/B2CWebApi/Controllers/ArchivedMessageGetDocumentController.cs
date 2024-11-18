@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +49,7 @@ public class ArchivedMessageGetDocumentController : ControllerBase
                 id.ToString())
             .ConfigureAwait(false);
 
-        var archivedMessageId = new ArchivedMessageId(id);
+        var archivedMessageId = new ArchivedMessageIdDto(id);
         var archivedMessageStream = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
 
         return archivedMessageStream is null ? NoContent() : Ok(archivedMessageStream.Stream);

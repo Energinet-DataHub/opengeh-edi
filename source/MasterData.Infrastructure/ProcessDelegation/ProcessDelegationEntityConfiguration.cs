@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegations;
 
 public class ProcessDelegationEntityConfiguration : IEntityTypeConfiguration<Domain.ProcessDelegations.ProcessDelegation>
 {

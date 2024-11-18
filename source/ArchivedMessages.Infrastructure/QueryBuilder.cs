@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Dapper;
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
@@ -144,11 +144,11 @@ internal sealed class QueryBuilder
                """;
     }
 
-    private string OrderBy(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, bool navigatingForward)
+    private string OrderBy(FieldToSortBy fieldToSortBy, DirectionToSortBy sortByDirection, bool navigatingForward)
     {
         var pagingDirection = navigatingForward ? "DESC" : "ASC";
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
-        var sortDirection = navigatingForward ? directionToSortBy : directionToSortBy.Identifier == DirectionToSortBy.Ascending.Identifier ? DirectionToSortBy.Descending : DirectionToSortBy.Ascending;
+        var sortDirection = navigatingForward ? sortByDirection : sortByDirection.Identifier == DirectionToSortBy.Ascending.Identifier ? DirectionToSortBy.Descending : DirectionToSortBy.Ascending;
         return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, RecordId {pagingDirection}";
     }
 
@@ -156,7 +156,7 @@ internal sealed class QueryBuilder
     {
         var whereClause = " WHERE ";
         whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
-        whereClause += WherePaginationPosition(query.Pagination.SortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
+        whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
         string sqlStatement;
 
         if (query.IncludeRelatedMessages == true && query.MessageId is not null)
@@ -183,7 +183,7 @@ internal sealed class QueryBuilder
             sqlStatement = selectStatement + whereClause;
         }
 
-        sqlStatement += OrderBy(query.Pagination.SortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);
+        sqlStatement += OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);
         return sqlStatement;
     }
 

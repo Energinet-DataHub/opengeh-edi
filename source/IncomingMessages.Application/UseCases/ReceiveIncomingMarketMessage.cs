@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -146,7 +147,7 @@ public class ReceiveIncomingMarketMessage
     {
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
+            new ArchivedMessageDto(
                 incomingMessage.MessageId,
                 incomingDocumentType.Name,
                 authenticatedActor.ActorNumber,
@@ -157,7 +158,7 @@ public class ReceiveIncomingMarketMessage
                 ActorRole.MeteredDataAdministrator,
                 _clock.GetCurrentInstant(),
                 incomingMessage.BusinessReason,
-                ArchivedMessageType.IncomingMessage,
+                ArchivedMessageTypeDto.IncomingMessage,
                 incomingMarketMessageStream),
             cancellationToken).ConfigureAwait(false);
     }
