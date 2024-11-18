@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;

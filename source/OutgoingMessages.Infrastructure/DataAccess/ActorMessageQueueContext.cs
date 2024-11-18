@@ -14,9 +14,8 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.DataAccess.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -28,18 +27,18 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Outgoin
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 
-public class ActorMessageQueueContext : DbContext, IEdiDbContext
+public class ActorMessageQueueContext : DbContext, IEdiDbContext, IActorMessageQueueContext
 {
-    private readonly Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext _executionContext;
+    private readonly BuildingBlocks.Domain.ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly IClock _clock;
 
 #nullable disable
     public ActorMessageQueueContext(
         DbContextOptions<ActorMessageQueueContext> options,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext executionContext,
+        BuildingBlocks.Domain.ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
         IClock clock)
         : base(options)

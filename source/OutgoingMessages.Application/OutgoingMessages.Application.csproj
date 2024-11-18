@@ -6,23 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
-    <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
-    <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemDefinitionGroup>

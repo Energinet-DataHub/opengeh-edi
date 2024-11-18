@@ -15,10 +15,10 @@
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -29,7 +29,7 @@ public class DequeuedBundlesRetention : IDataRetention
     private readonly IClock _clock;
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
-    private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly IActorMessageQueueContext _actorMessageQueueContext;
     private readonly IBundleRepository _bundleRepository;
     private readonly ILogger<DequeuedBundlesRetention> _logger;
     private readonly IAuditLogger _auditLogger;
@@ -38,7 +38,7 @@ public class DequeuedBundlesRetention : IDataRetention
         IClock clock,
         IMarketDocumentRepository marketDocumentRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
-        ActorMessageQueueContext actorMessageQueueContext,
+        IActorMessageQueueContext actorMessageQueueContext,
         IBundleRepository bundleRepository,
         ILogger<DequeuedBundlesRetention> logger,
         IAuditLogger auditLogger)

@@ -27,7 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using FluentAssertions;

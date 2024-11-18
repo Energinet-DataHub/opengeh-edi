@@ -19,7 +19,6 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Diagnostics.Health
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
@@ -30,7 +29,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
@@ -54,6 +53,12 @@ public static class OutgoingMessagesExtensions
         services.AddBuildingBlocks(configuration)
             .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration)
             .AddScoped<BuildingBlocks.Domain.ExecutionContext>();
+
+        // Data access
+        services.AddScoped<IActorMessageQueueContext, ActorMessageQueueContext>(sp =>
+        {
+            return sp.GetRequiredService<ActorMessageQueueContext>();
+        });
 
         // AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
