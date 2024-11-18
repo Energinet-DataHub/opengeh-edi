@@ -52,6 +52,13 @@ jobs:
             path: source/B2CWebApi/B2CWebApi.csproj
             outputpath: functions/b2capi
     steps:
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ matrix.artifact.name }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Echo ${{matrix.artifact.should_build}}
         run: echo ${{matrix.artifact.should_build}}
 
