@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
@@ -27,6 +28,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
@@ -133,6 +135,15 @@ public static class IncomingMessagesExtensions
             .AddSingleton<CimXmlSchemaProvider>()
             .AddSingleton<EbixSchemaProvider>()
             .AddSingleton<JsonSchemaProvider>();
+
+        services
+            .AddTransient<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>();
+
+        services.AddTransient<IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>>(provider => new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
+        {
+            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Ebix), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>() },
+        });
+
         return services;
     }
 }
