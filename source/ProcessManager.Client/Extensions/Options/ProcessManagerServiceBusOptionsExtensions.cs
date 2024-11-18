@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 
 public static class ProcessManagerServiceBusOptionsExtensions
 {
@@ -30,6 +28,10 @@ public static class ProcessManagerServiceBusOptionsExtensions
             .ValidateOnStart();
     }
 
+    /// <summary>
+    /// Get the <see cref="ProcessManagerServiceBusOptions"/> registered in the service provider.
+    /// <remarks>Throws an exception if the <see cref="IOptions{TOptions}"/> for <see cref="ProcessManagerServiceBusOptions"/> hasn't been registered.</remarks>
+    /// </summary>
     public static ProcessManagerServiceBusOptions GetRequiredProcessManagerServiceBusOptions(this IServiceProvider provider)
     {
         var options = provider.GetRequiredService<IOptions<ProcessManagerServiceBusOptions>>();
