@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Interfaces</AssemblyName>
-    <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Interfaces</RootNamespace>
+    <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Application</AssemblyName>
+    <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Application</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs.Batch" Version="12.18.1" />
