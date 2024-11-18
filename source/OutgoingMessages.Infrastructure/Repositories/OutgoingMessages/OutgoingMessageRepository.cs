@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;

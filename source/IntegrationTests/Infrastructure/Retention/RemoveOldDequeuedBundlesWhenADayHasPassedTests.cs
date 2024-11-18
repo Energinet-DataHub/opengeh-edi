@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;

@@ -16,7 +16,7 @@ using System.Xml.Linq;
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;

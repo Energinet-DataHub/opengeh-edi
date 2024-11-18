@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 

@@ -14,9 +14,9 @@
 
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using Energinet.DataHub.EDI.BuildingBlocks.Application.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Application;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
