@@ -55,7 +55,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ env.RELEASE_VERSION }}-${{ matrix.artifact.project_name}}
+          key: ${{ runner.os }}-nuget-${{ env.RELEASE_VERSION }}-${{ matrix.artifact.project_name}} # Cache per PR
 
       - name: Echo ${{matrix.artifact.should_build}}
         run: echo ${{matrix.artifact.should_build}}
@@ -95,6 +95,7 @@ jobs:
     name: Build ${{ matrix.testproject.name }}
     runs-on: ubuntu-latest
     env:
+      RELEASE_VERSION: dotnet_${{ github.event.pull_request.number }}
       outputpath: ${{ github.workspace }}/source/Tests/bin/Release/net8.0
     strategy:
       fail-fast: false
@@ -133,6 +134,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ env.RELEASE_VERSION }}-${{ matrix.testproject.name}} # Cache per PR
 
       - name: Build ${{ matrix.testproject.name }}
         run: |
