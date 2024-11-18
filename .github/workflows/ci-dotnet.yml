@@ -92,12 +92,12 @@ jobs:
     strategy:
       matrix:
         testproject:
-          - name: IntegrationTests
-            path: .\source\IntegrationTests\IntegrationTests.csproj
-            outputpath: .\source\Tests\bin\Release\net8.0
-          # - name: ArchitectureTests
-          #   path: .\source\ArchitectureTests\ArchitectureTests.csproj
+          # - name: IntegrationTests
+          #   path: .\source\IntegrationTests\IntegrationTests.csproj
           #   outputpath: .\source\Tests\bin\Release\net8.0
+          - name: ArchitectureTests
+            path: .\source\ArchitectureTests\ArchitectureTests.csproj
+            outputpath: .\source\Tests\bin\Release\net8.0
           # - name: Tests
           #   path: .\source\Tests\Tests.csproj
           #   outputpath: .\source\Tests\bin\Release\net8.0
@@ -128,7 +128,7 @@ jobs:
             --configuration Release \
             --output '${{ matrix.testproject.outputpath }}'
 
-          ls ${{ matrix.testproject.outputpath }}
+          ls source/Tests/bin/Release/net8.0 
 
       - uses: actions/upload-artifact@v4
         with:
