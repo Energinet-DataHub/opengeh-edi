@@ -13,18 +13,17 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Azure.Storage.Blobs;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class FileStorageExtensions
 {
-    private const string FileStorageName = "edi-documents-storage";
+    public const string FileStorageName = "edi-documents-storage";
 
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
@@ -34,29 +33,35 @@ public static class FileStorageExtensions
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING) || !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_URL), $"{nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)} or {nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL)} (if using Default Azure Credentials) must be set in configuration");
 
-        services.AddSingleton<BlobServiceClient>(
-            x =>
-            {
-                var options = x.GetRequiredService<IOptions<BlobServiceClientConnectionOptions>>();
-                var blobServiceClient = !string.IsNullOrEmpty(options.Value.AZURE_STORAGE_ACCOUNT_URL) // Uses AZURE_STORAGE_ACCOUNT_URL to run with Azure credentials in our Azure environments, and uses AZURE_STORAGE_ACCOUNT_CONNECTION_STRING to run locally and in our tests
-                    ? new BlobServiceClient(new Uri(options.Value.AZURE_STORAGE_ACCOUNT_URL), new DefaultAzureCredential())
-                    : new BlobServiceClient(options.Value.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING);
+        var blobServiceClientConnectionOptions =
+            configuration
+                //.GetRequiredSection(BlobServiceClientConnectionOptions.SectionName)
+                .Get<BlobServiceClientConnectionOptions>()
+            ?? throw new InvalidOperationException("Missing Blob Service Client Connection configuration.");
 
-                return blobServiceClient;
+        services.AddAzureClients(
+            builder =>
+            {
+                builder.UseCredential(new DefaultAzureCredential());
+
+                if (!string.IsNullOrEmpty(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL))
+                {
+                    builder
+                        .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL))
+                        .WithName(FileStorageName);
+                }
+                else
+                {
+                    builder
+                        .AddBlobServiceClient(
+                            blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)
+                        .WithName(FileStorageName);
+                }
             });
 
+        services.TryAddBlobStorageHealthCheck(FileStorageName, FileStorageName);
+
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
-
-        var uri = configuration["AZURE_STORAGE_ACCOUNT_URL"];
-
-        // If this uri is null, then we are running our solution locally or running tests.
-        // For our tests we will have a call of "AddFileStorage" for every test method. Hence "new uri(xxx)" will be called for every test.
-        // Which will slow down the tests. Which we can remove by having this check.
-        var isIntegrationTest = uri == null;
-        if (!isIntegrationTest)
-        {
-            services.TryAddBlobStorageHealthCheck(FileStorageName);
-        }
 
         return services;
     }
