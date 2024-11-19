@@ -69,7 +69,7 @@ var host = new HostBuilder()
             brs_026_v1.AppendStepDescription("Hent anmodningsdata");
             brs_026_v1.AppendStepDescription("Udsend beskeder");
 
-            return [brs_023_027_v1];
+            return [brs_023_027_v1, brs_026_v1];
         });
         // => Handlers
         services.AddScoped<NotifyAggregatedMeasureDataHandler>();
