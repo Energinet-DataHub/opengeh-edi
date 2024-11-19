@@ -66,9 +66,10 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     {
         var data = new TheoryData<DocumentFormat, IncomingDocumentType, ActorRole, IncomingMarketMessageStream>
         {
-            { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
-            { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.MeteredDataResponsible, ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
+            { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
+            { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Xml, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.xml") },
         };
 
         return data;
@@ -81,17 +82,17 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             [
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestAggregatedMeasureData,
-                ReadJsonFile(@"IncomingMessages\FailSchemeValidationAggregatedMeasureData.json"),
+                ReadFile(@"IncomingMessages\FailSchemeValidationAggregatedMeasureData.json"),
             ],
             [
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestWholesaleSettlement,
-                ReadJsonFile(@"IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json"),
+                ReadFile(@"IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json"),
             ],
             [
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestWholesaleSettlement,
-                ReadJsonFile(
+                ReadFile(
                     @"IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json"),
             ],
         ];
@@ -146,7 +147,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
-            ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsMdr.json"),
+            ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsMdr.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             DocumentFormat.Json,
@@ -365,7 +366,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
-        var messageStream = ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json");
+        var messageStream = ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json");
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -401,7 +402,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible));
 
-        var messageStream = ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml");
+        var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml");
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -445,7 +446,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
-        var messageStream = ReadJsonFile(path);
+        var messageStream = ReadFile(path);
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -505,7 +506,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         base.Dispose(disposing);
     }
 
-    private static IncomingMarketMessageStream ReadJsonFile(string path)
+    private static IncomingMarketMessageStream ReadFile(string path)
     {
         var jsonDoc = File.ReadAllText(path);
 

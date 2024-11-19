@@ -137,11 +137,14 @@ public static class IncomingMessagesExtensions
             .AddSingleton<JsonSchemaProvider>();
 
         services
-            .AddTransient<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>();
+            .AddTransient<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointEbixMessageParser>();
+        services
+            .AddTransient<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointXmlMessageParser>();
 
         services.AddTransient<IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>>(provider => new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
         {
-            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Ebix), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>() },
+            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Ebix), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointEbixMessageParser>() },
+            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Xml), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointXmlMessageParser>() },
         });
 
         return services;
