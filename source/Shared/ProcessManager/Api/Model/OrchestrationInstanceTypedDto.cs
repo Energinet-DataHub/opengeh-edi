@@ -23,13 +23,13 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 /// <typeparam name="TInputParameterDto">Must be a JSON serializable type.</typeparam>
 /// <param name="Id"></param>
 /// <param name="Lifecycle">The high-level lifecycle states that all orchestration instances can go through.</param>
-/// <param name="InputParameter">Contains the Durable Functions orchestration input parameter value.</param>
+/// <param name="ParameterValue">Contains the Durable Functions orchestration input parameter value.</param>
 /// <param name="Steps">Workflow steps the orchestration instance is going through.</param>
 /// <param name="CustomState">Any custom state of the orchestration instance.</param>
 public record OrchestrationInstanceTypedDto<TInputParameterDto>(
     Guid Id,
     OrchestrationInstanceLifecycleStateDto Lifecycle,
-    TInputParameterDto InputParameter,
+    TInputParameterDto ParameterValue,
     IReadOnlyCollection<StepInstanceDto> Steps,
     string CustomState)
         where TInputParameterDto : class;
