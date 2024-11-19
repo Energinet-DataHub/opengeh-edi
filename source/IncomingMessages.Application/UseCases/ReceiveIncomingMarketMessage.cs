@@ -45,7 +45,7 @@ public class ReceiveIncomingMarketMessage
 
     public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
-        IDictionary<(IncomingDocumentType DocumentType, DocumentFormat DocumentFormat), IMessageParser> messageParsers,
+        IEnumerable<IMessageParser> messageParsers,
         IFeatureFlagManager featureFlagManager,
         ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
@@ -57,7 +57,10 @@ public class ReceiveIncomingMarketMessage
         AuthenticatedActor actorAuthenticator)
     {
         _marketMessageParser = marketMessageParser;
-        _messageParsers = messageParsers;
+        _messageParsers = messageParsers
+            .ToDictionary(
+                parser => (parser.DocumentType, parser.DocumentFormat),
+                parser => parser);
         _featureFlagManager = featureFlagManager;
         _validateIncomingMessage = validateIncomingMessage;
         _responseFactory = responseFactory;

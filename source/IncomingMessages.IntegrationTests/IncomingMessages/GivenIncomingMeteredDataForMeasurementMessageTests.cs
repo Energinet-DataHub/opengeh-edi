@@ -43,7 +43,9 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         : base(incomingMessagesTestFixture, testOutputHelper)
     {
         _marketMessageParser = GetService<MarketMessageParser>();
-        _messageParsers = GetService<IDictionary<(IncomingDocumentType DocumentType, DocumentFormat DocumentFormat), IMessageParser>>();
+        _messageParsers = GetService<IList<IMessageParser>>().ToDictionary(
+            parser => (parser.DocumentType, parser.DocumentFormat),
+            parser => parser);
 
         var authenticatedActor = GetService<AuthenticatedActor>();
         _actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDM"));

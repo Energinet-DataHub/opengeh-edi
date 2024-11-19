@@ -39,6 +39,7 @@ public record MeteredDataForMeasurementPointSeries(
     string StartDateTime,
     string? EndDateTime,
     string? ProductNumber,
+    string? RegisteredAt,
     string? ProductUnitType,
     string? MeteringPointType,
     string? MeteringPointLocationId,

@@ -28,14 +28,14 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
 {
     private const string HeaderElementName = "HeaderEnergyDocument";
     private const string EnergyContextElementName = "ProcessEnergyContext";
-    private const string Identification = "Identification";
-    private const string DocumentType = "DocumentType";
-    private const string Creation = "Creation";
-    private const string SenderEnergyParty = "SenderEnergyParty";
-    private const string RecipientEnergyParty = "RecipientEnergyParty";
-    private const string EnergyBusinessProcess = "EnergyBusinessProcess";
-    private const string EnergyBusinessProcessRole = "EnergyBusinessProcessRole";
-    private const string EnergyIndustryClassification = "EnergyIndustryClassification";
+    private const string IdentificationElementName = "Identification";
+    private const string DocumentTypeElementName = "DocumentType";
+    private const string CreationElementName = "Creation";
+    private const string SenderEnergyPartyElementName = "SenderEnergyParty";
+    private const string RecipientEnergyPartyElementName = "RecipientEnergyParty";
+    private const string EnergyBusinessProcessElementName = "EnergyBusinessProcess";
+    private const string EnergyBusinessProcessRoleElementName = "EnergyBusinessProcessRole";
+    private const string EnergyIndustryClassificationElementName = "EnergyIndustryClassification";
     private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
 
     protected abstract string RootPayloadElementName { get; }
@@ -160,18 +160,18 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         var headerElement = document.Descendants(ns + HeaderElementName).SingleOrDefault();
         if (headerElement == null) throw new InvalidOperationException("Header element not found");
 
-        var messageId = headerElement.Element(ns + Identification)?.Value ?? string.Empty;
-        var messageType = headerElement.Element(ns + DocumentType)?.Value ?? string.Empty;
-        var createdAt = headerElement.Element(ns + Creation)?.Value ?? string.Empty;
-        var senderId = headerElement.Element(ns + SenderEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
-        var receiverId = headerElement.Element(ns + RecipientEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
+        var messageId = headerElement.Element(ns + IdentificationElementName)?.Value ?? string.Empty;
+        var messageType = headerElement.Element(ns + DocumentTypeElementName)?.Value ?? string.Empty;
+        var createdAt = headerElement.Element(ns + CreationElementName)?.Value ?? string.Empty;
+        var senderId = headerElement.Element(ns + SenderEnergyPartyElementName)?.Element(ns + IdentificationElementName)?.Value ?? string.Empty;
+        var receiverId = headerElement.Element(ns + RecipientEnergyPartyElementName)?.Element(ns + IdentificationElementName)?.Value ?? string.Empty;
 
         var energyContextElement = document.Descendants(ns + EnergyContextElementName).FirstOrDefault();
         if (energyContextElement == null) throw new InvalidOperationException("Energy Context element not found");
 
-        var businessReason = energyContextElement.Element(ns + EnergyBusinessProcess)?.Value ?? string.Empty;
-        var senderRole = energyContextElement.Element(ns + EnergyBusinessProcessRole)?.Value ?? string.Empty;
-        var businessType = energyContextElement.Element(ns + EnergyIndustryClassification)?.Value;
+        var businessReason = energyContextElement.Element(ns + EnergyBusinessProcessElementName)?.Value ?? string.Empty;
+        var senderRole = energyContextElement.Element(ns + EnergyBusinessProcessRoleElementName)?.Value ?? string.Empty;
+        var businessType = energyContextElement.Element(ns + EnergyIndustryClassificationElementName)?.Value;
 
         return new MessageHeader(
             messageId,

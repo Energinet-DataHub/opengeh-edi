@@ -70,6 +70,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
             { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
             { DocumentFormat.Xml, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Json, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.json") },
         };
 
         return data;
