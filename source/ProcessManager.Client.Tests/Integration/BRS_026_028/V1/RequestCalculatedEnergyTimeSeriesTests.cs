@@ -58,6 +58,7 @@ public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
     [Fact]
     public async Task RequestCalculatedEnergyTimeSeries_WhenStartedUsingClient_CanMonitorLifecycle()
     {
+        // TODO: Implement test after implementation of shared Service Bus topic in app fixtures
         // Arrange
         // var requestCalculatedDataClient = new RequestCalculatedDataClientV1();
         // var input = new RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1>(

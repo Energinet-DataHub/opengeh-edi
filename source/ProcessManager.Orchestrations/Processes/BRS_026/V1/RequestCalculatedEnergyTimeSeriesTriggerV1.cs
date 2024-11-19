@@ -30,7 +30,7 @@ public class RequestCalculatedEnergyTimeSeriesTriggerV1(
     private readonly RequestCalculatedEnergyTimeSeriesHandler _handler = handler;
 
     /// <summary>
-    /// Schedule a BRS-023 or BRS-027 calculation and return its id.
+    /// Start a BRS-026 request.
     /// </summary>
     [Function(nameof(RequestCalculatedEnergyTimeSeriesTriggerV1))]
     public async Task Run(

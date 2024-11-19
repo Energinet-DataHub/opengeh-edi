@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1.Models;
 
@@ -23,6 +22,9 @@ public class RequestCalculatedEnergyTimeSeriesHandler(
 {
     private readonly IStartOrchestrationInstanceCommands _commands = commands;
 
+    /// <summary>
+    /// Start a request for calculated energy time series.
+    /// </summary>
     public async Task StartRequestCalculatedEnergyTimeSeriesAsync(RequestCalculatedEnergyTimeSeriesInputV1 input)
     {
         await _commands.StartNewOrchestrationInstanceAsync(
