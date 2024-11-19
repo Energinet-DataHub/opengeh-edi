@@ -13,18 +13,14 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 
-/// <summary>
-/// Use this from Durable Functions activities to get the orchestration instance and then
-/// update its progress, before commiting changes back by using <see cref="IUnitOfWork.CommitAsync"/>.
-/// </summary>
-public interface IOrchestrationInstanceProgressRepository
+public interface IScheduledOrchestrationInstancesByInstantQuery
 {
     /// <summary>
-    /// Get existing orchestration instance.
-    /// To commit changes use <see cref="IUnitOfWork.CommitAsync"/>.
+    /// Find scheduled orchestration instances that should be started when comparing to given <paramref name="scheduledToRunBefore"/>.
     /// </summary>
-    Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id);
+    Task<IReadOnlyCollection<OrchestrationInstance>> FindAsync(Instant scheduledToRunBefore);
 }

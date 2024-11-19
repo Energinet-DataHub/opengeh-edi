@@ -12,21 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 
-public class UnitOfWork : IUnitOfWork
+public interface IStartScheduledOrchestrationInstanceCommand
 {
-    private readonly ProcessManagerContext _context;
-
-    public UnitOfWork(ProcessManagerContext context)
-    {
-        _context = context;
-    }
-
-    public async Task CommitAsync()
-    {
-        await _context.SaveChangesAsync().ConfigureAwait(false);
-    }
+    /// <summary>
+    /// Start a scheduled orchestration instance.
+    /// </summary>
+    Task StartScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
 }

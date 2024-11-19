@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+using Energinet.DataHub.ProcessManagement.Core.Application.Registration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
+namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Registration;
 
 /// <summary>
 /// Keep a register of known Durable Functions orchestrations.
 /// Each orchestration is registered with information by which it is possible
 /// to communicate with Durable Functions and start a new orchestration instance.
 /// </summary>
-public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegisterQueries
+internal class OrchestrationRegister(
+    ProcessManagerContext context) :
+        IOrchestrationRegister,
+        IOrchestrationRegisterQueries
 {
-    private readonly ProcessManagerContext _context;
-
-    public OrchestrationRegister(ProcessManagerContext context)
-    {
-        _context = context;
-    }
+    private readonly ProcessManagerContext _context = context;
 
     /// <inheritdoc />
     public Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id)

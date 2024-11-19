@@ -32,14 +32,12 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
     private readonly ProcessManagerCoreFixture _fixture;
     private readonly ProcessManagerContext _dbContext;
     private readonly OrchestrationInstanceRepository _sut;
-    private readonly UnitOfWork _unitOfWork;
 
     public OrchestrationInstanceRepositoryTests(ProcessManagerCoreFixture fixture)
     {
         _fixture = fixture;
         _dbContext = _fixture.DatabaseManager.CreateDbContext();
         _sut = new OrchestrationInstanceRepository(_dbContext);
-        _unitOfWork = new UnitOfWork(_dbContext);
     }
 
     public Task InitializeAsync()
@@ -98,7 +96,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
 
         // Act
         await _sut.AddAsync(newOrchestrationInstance);
-        var act = _unitOfWork.CommitAsync;
+        var act = () => _sut.UnitOfWork.CommitAsync();
 
         // Assert
         await act.Should()
@@ -118,7 +116,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
 
         // Act
         await _sut.AddAsync(newOrchestrationInstance);
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Assert
         var actual = await _sut.GetAsync(newOrchestrationInstance.Id);
@@ -146,7 +144,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
             runAt: SystemClock.Instance.GetCurrentInstant().PlusDays(5));
         await _sut.AddAsync(scheduledIntoTheFarFuture);
 
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Act
         var actual = await _sut.FindAsync(
@@ -177,7 +175,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         var basedOn02 = CreateOrchestrationInstance(existingOrchestrationDescription02);
         await _sut.AddAsync(basedOn02);
 
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Act
         var actual = await _sut.SearchAsync(existingOrchestrationDescription01.Name);
@@ -204,7 +202,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         var basedOnV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
         await _sut.AddAsync(basedOnV2);
 
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Act
         var actual = await _sut.SearchAsync(existingOrchestrationDescriptionV1.Name, existingOrchestrationDescriptionV1.Version);
@@ -241,7 +239,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         isRunningV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
         await _sut.AddAsync(isRunningV2);
 
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Act
         var actual = await _sut.SearchAsync(existingOrchestrationDescriptionV1.Name, lifecycleState: OrchestrationInstanceLifecycleStates.Running);
@@ -280,7 +278,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         isTerminatedAsFailedV2.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Failed);
         await _sut.AddAsync(isTerminatedAsFailedV2);
 
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Act
         var actual = await _sut.SearchAsync(
@@ -319,7 +317,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         isRunning02.Lifecycle.TransitionToRunning(SystemClock.Instance);
         await _sut.AddAsync(isRunning02);
 
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Act
         var actual = await _sut.SearchAsync(
@@ -364,7 +362,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         isTerminated02.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
         await _sut.AddAsync(isTerminated02);
 
-        await _unitOfWork.CommitAsync();
+        await _sut.UnitOfWork.CommitAsync();
 
         // Act
         var actual = await _sut.SearchAsync(

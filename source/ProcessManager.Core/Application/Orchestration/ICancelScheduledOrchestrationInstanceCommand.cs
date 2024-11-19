@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-public interface IUnitOfWork
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+
+public interface ICancelScheduledOrchestrationInstanceCommand
 {
-    Task CommitAsync();
+    /// <summary>
+    /// Cancel a scheduled orchestration instance.
+    /// </summary>
+    Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
 }
