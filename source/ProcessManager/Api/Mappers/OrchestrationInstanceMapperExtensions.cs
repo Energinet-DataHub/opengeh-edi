@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using ApiModel = Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using DomainModel = Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
@@ -64,12 +63,12 @@ internal static class OrchestrationInstanceMapperExtensions
     {
         switch (entity)
         {
-            case UserIdentity user:
+            case DomainModel.UserIdentity user:
                 return new ApiModel.UserIdentityDto(
                     UserId: user.UserId.Value,
                     ActorId: user.ActorId.Value);
 
-            case ActorIdentity actor:
+            case DomainModel.ActorIdentity actor:
                 return new ApiModel.ActorIdentityDto(
                     ActorId: actor.ActorId.Value);
 
