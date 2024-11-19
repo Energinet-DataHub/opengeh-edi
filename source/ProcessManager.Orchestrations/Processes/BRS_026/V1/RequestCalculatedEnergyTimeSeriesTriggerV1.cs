@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Orchestrations.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1.Models;
@@ -37,7 +38,7 @@ public class RequestCalculatedEnergyTimeSeriesTriggerV1(
         [ServiceBusTrigger(
             $"%{ProcessManagerTopicOptions.SectionName}:{nameof(ProcessManagerTopicOptions.TopicName)}%",
             $"%{ProcessManagerTopicOptions.SectionName}:{nameof(ProcessManagerTopicOptions.Brs026SubscriptionName)}%",
-            Connection = ProcessManagerTopicOptions.SectionName)]
+            Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {
         using var serviceBusMessageLoggerScope = _logger.BeginScope(new
