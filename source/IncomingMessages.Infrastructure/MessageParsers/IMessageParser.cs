@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
-/// <summary>
-/// Readonly access to the orchestration register.
-/// </summary>
-public interface IOrchestrationRegisterQueries
+public interface IMessageParser
 {
-    Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id);
-
-    Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool? isEnabled);
+    Task<IncomingMarketMessageParserResult> ParseAsync(
+        IIncomingMarketMessageStream marketMessage,
+        CancellationToken cancellationToken);
 }

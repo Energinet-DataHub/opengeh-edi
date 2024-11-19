@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Api.Mappers;
 using Microsoft.AspNetCore.Http;
@@ -24,10 +24,10 @@ namespace Energinet.DataHub.ProcessManager.Api;
 
 internal class GetOrchestrationInstanceTrigger(
     ILogger<GetOrchestrationInstanceTrigger> logger,
-    IOrchestrationInstanceRepository repository)
+    IOrchestrationInstanceQueries queries)
 {
     private readonly ILogger _logger = logger;
-    private readonly IOrchestrationInstanceRepository _repository = repository;
+    private readonly IOrchestrationInstanceQueries _queries = queries;
 
     /// <summary>
     /// Get orchestration instance.
@@ -42,7 +42,7 @@ internal class GetOrchestrationInstanceTrigger(
         Guid id,
         FunctionContext executionContext)
     {
-        var orchestrationInstance = await _repository
+        var orchestrationInstance = await _queries
             .GetAsync(new OrchestrationInstanceId(id))
             .ConfigureAwait(false);
 

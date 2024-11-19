@@ -12,28 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
-using Microsoft.Extensions.Logging;
-using NodaTime;
 using NodaTime.Extensions;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 
-public class NotifyAggregatedMeasureDataHandler(
-    ILogger<NotifyAggregatedMeasureDataHandler> logger,
-    IClock clock,
-    IOrchestrationInstanceRepository repository,
-    IUnitOfWork unitOfWork,
-    IOrchestrationInstanceManager manager)
+internal class NotifyAggregatedMeasureDataHandler(
+    IStartOrchestrationInstanceCommands manager)
 {
-    private readonly ILogger _logger = logger;
-    private readonly IClock _clock = clock;
-    private readonly IOrchestrationInstanceRepository _repository = repository;
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly IOrchestrationInstanceManager _manager = manager;
+    private readonly IStartOrchestrationInstanceCommands _manager = manager;
 
     public async Task<OrchestrationInstanceId> ScheduleNewCalculationAsync(
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto)

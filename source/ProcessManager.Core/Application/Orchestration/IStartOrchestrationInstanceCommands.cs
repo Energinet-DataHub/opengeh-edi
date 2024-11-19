@@ -15,9 +15,9 @@
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
-public interface IOrchestrationInstanceManager
+public interface IStartOrchestrationInstanceCommands
 {
     /// <summary>
     /// Start a new instance of an orchestration.
@@ -39,9 +39,4 @@ public interface IOrchestrationInstanceManager
         Instant runAt,
         IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class;
-
-    /// <summary>
-    /// Cancel a scheduled orchestration instance.
-    /// </summary>
-    Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
 }

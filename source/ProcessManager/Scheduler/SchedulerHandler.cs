@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -21,13 +21,13 @@ namespace Energinet.DataHub.ProcessManager.Scheduler;
 public class SchedulerHandler(
     ILogger<SchedulerHandler> logger,
     IClock clock,
-    IQueryScheduledOrchestrationInstancesByInstant query,
-    IOrchestrationInstanceScheduleManager manager)
+    IScheduledOrchestrationInstancesByInstantQuery query,
+    IStartScheduledOrchestrationInstanceCommand command)
 {
     private readonly ILogger _logger = logger;
     private readonly IClock _clock = clock;
-    private readonly IQueryScheduledOrchestrationInstancesByInstant _query = query;
-    private readonly IOrchestrationInstanceScheduleManager _manager = manager;
+    private readonly IScheduledOrchestrationInstancesByInstantQuery _query = query;
+    private readonly IStartScheduledOrchestrationInstanceCommand _command = command;
 
     public async Task StartScheduledOrchestrationInstancesAsync()
     {
@@ -40,7 +40,7 @@ public class SchedulerHandler(
         {
             try
             {
-                await _manager
+                await _command
                     .StartScheduledOrchestrationInstanceAsync(orchestrationInstance.Id)
                     .ConfigureAwait(false);
             }

@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Nito.AsyncEx;
 using NodaTime;
 using Xunit.Abstractions;
@@ -35,6 +36,8 @@ namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
 public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
 {
+    private const string EnqueuedAmountMetric = "EnqueuedAmount";
+    private const string DequeuedAmountMetric = "DequeuedAmount";
     private readonly LoadTestFixture _fixture;
     private readonly ITestOutputHelper _logger;
     private readonly EdiDriver _ediDriver;
@@ -69,12 +72,19 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
     [Fact]
     public async Task After_load_test()
     {
-        await _ediDriver.StopOrchestrationForCalculationAsync(
-            calculationId: _fixture.LoadTestCalculationId,
-            createdAfter: SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1)));
+        var enqueuedMessagesCount = await _ediDatabaseDriver.CountEnqueuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
+        _logger.WriteLine($"Enqueued messages count: {enqueuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
 
         var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
         _logger.WriteLine($"Dequeued messages count: {dequeuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
+
+        _fixture.TelemetryClient.GetMetric(EnqueuedAmountMetric).TrackValue(enqueuedMessagesCount);
+        _fixture.TelemetryClient.GetMetric(DequeuedAmountMetric).TrackValue(dequeuedMessagesCount);
+
+        using var scope = new AssertionScope();
+        enqueuedMessagesCount.Should().BeGreaterThanOrEqualTo(
+            _fixture.MinimumEnqueuedMessagesCount,
+            $"because the system should be performant enough to enqueue at least {_fixture.MinimumEnqueuedMessagesCount} messages during the load test");
 
         dequeuedMessagesCount.Should().BeGreaterThanOrEqualTo(
             _fixture.MinimumDequeuedMessagesCount,

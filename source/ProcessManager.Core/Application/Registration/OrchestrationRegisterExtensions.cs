@@ -14,9 +14,9 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Registration;
 
-public static class OrchestrationRegisterExtensions
+internal static class OrchestrationRegisterExtensions
 {
     /// <summary>
     /// Synchronize the orchestration register with the Durable Functions orchestrations for an application host.
@@ -58,9 +58,7 @@ public static class OrchestrationRegisterExtensions
                     && x.Version == hostDescription.Version);
 
             if (registerDescription == null || registerDescription.IsEnabled == false)
-            {
                 await register.RegisterAsync(hostDescription, hostName).ConfigureAwait(false);
-            }
         }
     }
 }

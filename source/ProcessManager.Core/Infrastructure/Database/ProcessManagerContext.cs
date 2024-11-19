@@ -12,22 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 
-public class ProcessManagerContext : DbContext
+public class ProcessManagerContext(
+    DbContextOptions<ProcessManagerContext> options) :
+        DbContext(options), IUnitOfWork
 {
-    public ProcessManagerContext(DbContextOptions<ProcessManagerContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<OrchestrationDescription> OrchestrationDescriptions { get; private set; }
 
     public DbSet<OrchestrationInstance> OrchestrationInstances { get; private set; }
+
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        return SaveChangesAsync(cancellationToken);
+    }
 
     public override int SaveChanges()
     {
