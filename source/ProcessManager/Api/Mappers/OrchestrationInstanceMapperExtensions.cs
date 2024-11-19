@@ -63,14 +63,14 @@ internal static class OrchestrationInstanceMapperExtensions
     {
         switch (entity)
         {
+            case DomainModel.ActorIdentity actor:
+                return new ApiModel.ActorIdentityDto(
+                    ActorId: actor.ActorId.Value);
+
             case DomainModel.UserIdentity user:
                 return new ApiModel.UserIdentityDto(
                     UserId: user.UserId.Value,
                     ActorId: user.ActorId.Value);
-
-            case DomainModel.ActorIdentity actor:
-                return new ApiModel.ActorIdentityDto(
-                    ActorId: actor.ActorId.Value);
 
             default:
                 throw new InvalidOperationException($"Invalid type '{entity.GetType()}'; cannot be mapped.");
