@@ -96,6 +96,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is InvalidReceiverId);
@@ -113,6 +114,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverId);
@@ -129,6 +131,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverRole);
@@ -165,6 +168,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
@@ -182,6 +186,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
@@ -198,6 +203,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
@@ -224,6 +230,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         // Assert
@@ -250,6 +257,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
@@ -269,6 +277,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var resultFromFirstMessage = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         // Request from a second sender.
@@ -282,6 +291,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser2 = await ParseMessageAsync(message02);
         var resultFromSecondMessage = await _validateIncomingMessage.ValidateAsync(
             messageParser2.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.DoesNotContain(resultFromFirstMessage.Errors, error => error is DuplicateTransactionIdDetected);
@@ -303,6 +313,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is EmptyTransactionId);
@@ -319,6 +330,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is EmptyMessageId);
@@ -338,11 +350,13 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser01 = await ParseMessageAsync(message01);
         var result01 = await _validateIncomingMessage.ValidateAsync(
             messageParser01.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         var messageParser02 = await ParseMessageAsync(message02);
         var result02 = await _validateIncomingMessage.ValidateAsync(
             messageParser02.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
@@ -365,6 +379,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.False(result.Success);
@@ -383,6 +398,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
@@ -480,6 +496,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         result.Errors.Should().NotContainItemsAssignableTo<InvalidMessageIdSize>();
@@ -503,6 +520,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         result.Errors.Should().ContainItemsAssignableTo<InvalidMessageIdSize>();
@@ -546,6 +564,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         result.Errors.Should().NotContainItemsAssignableTo<InvalidTransactionIdSize>();
@@ -562,6 +581,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         result.Errors.Should().NotContainItemsAssignableTo<InvalidTransactionIdSize>();
@@ -578,6 +598,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         result.Errors.Should().ContainItemsAssignableTo<InvalidTransactionIdSize>();
@@ -594,6 +615,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.NotNull(result);
@@ -611,6 +633,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var messageParser = await ParseMessageAsync(message);
         var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
+            DocumentFormat.Xml,
             CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is NotSupportedBusinessType);

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
@@ -53,6 +54,7 @@ public class ValidateIncomingMessage
 
     public async Task<Result> ValidateAsync(
         IIncomingMessage incomingMessage,
+        DocumentFormat documentFormat,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(incomingMessage);
@@ -62,7 +64,7 @@ public class ValidateIncomingMessage
                     VerifyReceiverAsync(incomingMessage),
                     CheckMessageIdAsync(incomingMessage, cancellationToken),
                     CheckMessageTypeAsync(incomingMessage, cancellationToken),
-                    CheckBusinessReasonAsync(incomingMessage, cancellationToken),
+                    CheckBusinessReasonAsync(incomingMessage, documentFormat, cancellationToken),
                     CheckBusinessTypeAsync(incomingMessage, cancellationToken))
                 .ConfigureAwait(false))
             .SelectMany(errs => errs);
@@ -135,9 +137,10 @@ public class ValidateIncomingMessage
 
     private async Task<IReadOnlyCollection<ValidationError>> CheckBusinessReasonAsync(
         IIncomingMessage message,
+        DocumentFormat documentFormat,
         CancellationToken cancellationToken)
     {
-        var result = await _processTypeValidator.ValidateAsync(message, cancellationToken)
+        var result = await _processTypeValidator.ValidateAsync(message, documentFormat, cancellationToken)
             .ConfigureAwait(false);
         return result.Errors;
     }

@@ -112,7 +112,7 @@ public class ReceiveIncomingMarketMessage
                 .ConfigureAwait(false);
 
         var validationResult = await _validateIncomingMessage
-            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, cancellationToken)
+            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, incomingDocumentFormat, cancellationToken)
             .ConfigureAwait(false);
 
         if (!validationResult.Success)

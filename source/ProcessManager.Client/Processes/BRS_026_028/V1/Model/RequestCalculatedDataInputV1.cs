@@ -12,18 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
-
-/// <summary>
-/// Validation for Process Type
-/// </summary>
-public interface IProcessTypeValidator
-{
-    /// <summary>
-    /// Validates Process Type
-    /// </summary>
-    public Task<Result> ValidateAsync(IIncomingMessage message, DocumentFormat documentFormat, CancellationToken cancellationToken);
-}
+public record RequestCalculatedDataInputV1<TInput>(
+    string MessageId,
+    TInput Input)
+    where TInput : class;

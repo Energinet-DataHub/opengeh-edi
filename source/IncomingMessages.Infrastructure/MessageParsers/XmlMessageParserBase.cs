@@ -20,23 +20,22 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
-public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) : MessageParserBase<XmlSchema>()
+public abstract class XmlMessageParserBase(CimXmlSchemaProvider schemaProvider) : MessageParserBase<XmlSchema>
 {
-    private const string HeaderElementName = "HeaderEnergyDocument";
-    private const string EnergyContextElementName = "ProcessEnergyContext";
-    private const string Identification = "Identification";
-    private const string DocumentType = "DocumentType";
-    private const string Creation = "Creation";
-    private const string SenderEnergyParty = "SenderEnergyParty";
-    private const string RecipientEnergyParty = "RecipientEnergyParty";
-    private const string EnergyBusinessProcess = "EnergyBusinessProcess";
-    private const string EnergyBusinessProcessRole = "EnergyBusinessProcessRole";
-    private const string EnergyIndustryClassification = "EnergyIndustryClassification";
-    private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
+    private const string MridElementName = "mRID";
+    private const string TypeElementName = "type";
+    private const string ProcessTypeElementName = "process.processType";
+    private const string SenderMridElementName = "sender_MarketParticipant.mRID";
+    private const string SenderRoleElementName = "sender_MarketParticipant.marketRole.type";
+    private const string ReceiverMridElementName = "receiver_MarketParticipant.mRID";
+    private const string ReceiverRoleElementName = "receiver_MarketParticipant.marketRole.type";
+    private const string CreatedDateTimeElementName = "createdDateTime";
+    private const string BusinessSectorTypeElementName = "businessSector.type";
+    private readonly CimXmlSchemaProvider _schemaProvider = schemaProvider;
 
     protected abstract string RootPayloadElementName { get; }
 
@@ -105,6 +104,31 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         return @namespace.Split(':');
     }
 
+    private string BusinessProcessType(string @namespace)
+    {
+        ArgumentNullException.ThrowIfNull(@namespace);
+        var split = SplitNamespace(@namespace);
+        if (split.Length < 6)
+        {
+            throw new XmlException($"Invalid namespace format");
+        }
+
+        return split[3];
+    }
+
+    private string GetVersion(string @namespace)
+    {
+        ArgumentNullException.ThrowIfNull(@namespace);
+        var split = SplitNamespace(@namespace);
+        if (split.Length < 5)
+        {
+            throw new XmlException($"Invalid namespace format");
+        }
+
+        var version = split[4] + "." + split[5];
+        return version;
+    }
+
     private string GetNamespace(IIncomingMarketMessageStream marketMessage)
     {
         ArgumentNullException.ThrowIfNull(marketMessage);
@@ -128,60 +152,29 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         throw new XmlException($"Namespace for element '{RootPayloadElementName}' not found.");
     }
 
-    private string BusinessProcessType(string @namespace)
-    {
-        ArgumentNullException.ThrowIfNull(@namespace);
-        var split = SplitNamespace(@namespace);
-        if (split.Length < 5)
-        {
-            throw new XmlException($"Invalid namespace format");
-        }
-
-        var businessReason = split[4];
-        var parts = businessReason.Split('-');
-        return parts.Last();
-    }
-
-    private string GetVersion(string @namespace)
-    {
-        ArgumentNullException.ThrowIfNull(@namespace);
-        var split = SplitNamespace(@namespace);
-        if (split.Length < 6)
-        {
-            throw new XmlException($"Invalid namespace format");
-        }
-
-        var version = split[5];
-        return version.StartsWith('v') ? version[1..] : version;
-    }
-
     private MessageHeader ParseHeader(XDocument document, XNamespace ns)
     {
-        var headerElement = document.Descendants(ns + HeaderElementName).SingleOrDefault();
+        var headerElement = document.Descendants(ns + RootPayloadElementName).SingleOrDefault();
         if (headerElement == null) throw new InvalidOperationException("Header element not found");
 
-        var messageId = headerElement.Element(ns + Identification)?.Value ?? string.Empty;
-        var messageType = headerElement.Element(ns + DocumentType)?.Value ?? string.Empty;
-        var createdAt = headerElement.Element(ns + Creation)?.Value ?? string.Empty;
-        var senderId = headerElement.Element(ns + SenderEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
-        var receiverId = headerElement.Element(ns + RecipientEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
-
-        var energyContextElement = document.Descendants(ns + EnergyContextElementName).FirstOrDefault();
-        if (energyContextElement == null) throw new InvalidOperationException("Energy Context element not found");
-
-        var businessReason = energyContextElement.Element(ns + EnergyBusinessProcess)?.Value ?? string.Empty;
-        var senderRole = energyContextElement.Element(ns + EnergyBusinessProcessRole)?.Value ?? string.Empty;
-        var businessType = energyContextElement.Element(ns + EnergyIndustryClassification)?.Value;
+        var messageId = headerElement.Element(ns + MridElementName)?.Value ?? string.Empty;
+        var messageType = headerElement.Element(ns + TypeElementName)?.Value ?? string.Empty;
+        var processType = headerElement.Element(ns + ProcessTypeElementName)?.Value ?? string.Empty;
+        var senderId = headerElement.Element(ns + SenderMridElementName)?.Value ?? string.Empty;
+        var senderRole = headerElement.Element(ns + SenderRoleElementName)?.Value ?? string.Empty;
+        var receiverId = headerElement.Element(ns + ReceiverMridElementName)?.Value ?? string.Empty;
+        var receiverRole = headerElement.Element(ns + ReceiverRoleElementName)?.Value ?? string.Empty;
+        var createdAt = headerElement.Element(ns + CreatedDateTimeElementName)?.Value ?? string.Empty;
+        var businessType = headerElement.Element(ns + BusinessSectorTypeElementName)?.Value;
 
         return new MessageHeader(
             messageId,
             messageType,
-            businessReason,
+            processType,
             senderId,
             senderRole,
             receiverId,
-            // ReceiverRole is not specified in incoming Ebix documents
-            ActorRole.MeteredDataAdministrator.Code,
+            receiverRole,
             createdAt,
             businessType);
     }

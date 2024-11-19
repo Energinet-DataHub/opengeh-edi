@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
+namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 
 /// <summary>
-/// Validation for Process Type
+/// Options for configuration of Process Manager Service Bus clients using the Process Manager.
 /// </summary>
-public interface IProcessTypeValidator
+public class ProcessManagerServiceBusClientsOptions
 {
+    public const string SectionName = "ProcessManagerServiceBusClients";
+
     /// <summary>
-    /// Validates Process Type
+    /// Name of the topic which the Process Manager receives service bus messages on
     /// </summary>
-    public Task<Result> ValidateAsync(IIncomingMessage message, DocumentFormat documentFormat, CancellationToken cancellationToken);
+    [Required]
+    public string TopicName { get; set; } = string.Empty;
 }
