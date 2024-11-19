@@ -79,11 +79,11 @@ public static class ClientExtensions
                         var serviceBusOptions = provider.GetRequiredService<IOptions<ProcessManagerServiceBusClientsOptions>>().Value;
                         var serviceBusSender = provider
                             .GetRequiredService<ServiceBusClient>()
-                            .CreateSender(serviceBusOptions.ProcessManagerTopic);
+                            .CreateSender(serviceBusOptions.TopicName);
 
                         return serviceBusSender;
                     })
-                    .WithName(nameof(ProcessManagerServiceBusClientsOptions.ProcessManagerTopic));
+                    .WithName(nameof(ProcessManagerServiceBusClientsOptions.TopicName));
             });
 
         services.AddScoped<IRequestCalculatedDataClientV1, RequestCalculatedDataClientV1>();
