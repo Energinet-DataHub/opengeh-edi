@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Text.Json;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Api.Mappers;
 using Energinet.DataHub.ProcessManager.Api.Model;
+using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using FluentAssertions;
 using NodaTime;
 
@@ -24,6 +26,15 @@ namespace Energinet.DataHub.ProcessManager.Tests.Unit.Api.Mappers;
 
 public class OrchestrationInstanceMapperExtensionsTests
 {
+    public static IEnumerable<object[]> GetOperatingIdentity()
+    {
+        return new List<object[]>
+        {
+            new object[] { new ActorIdentity(new ActorId(Guid.NewGuid())), typeof(ActorIdentityDto) },
+            new object[] { new UserIdentity(new UserId(Guid.NewGuid()), new ActorId(Guid.NewGuid())), typeof(UserIdentityDto) },
+        };
+    }
+
     /// <summary>
     /// Even the 'ParameterValue' is mapped in a way that allows us to serialize the object
     /// and deserialize it to a strongly typed orchestration instance with parmeters.
@@ -45,7 +56,22 @@ public class OrchestrationInstanceMapperExtensionsTests
         typedDto!.ParameterValue.TestInt.Should().NotBeNull();
     }
 
-    private static OrchestrationInstance CreateOrchestrationInstance()
+    [Theory]
+    [MemberData(nameof(GetOperatingIdentity))]
+    public void MapToDto_WhenOrchestrationInstanceWithOperatingIdentity_DeserializedToExpectedType(OperatingIdentity operatingIdentity, Type expectedType)
+    {
+        var orchestrationInstance = CreateOrchestrationInstance(operatingIdentity);
+
+        // Act
+        var actualDto = orchestrationInstance.MapToDto();
+        var dtoAsJson = JsonSerializer.Serialize(actualDto);
+
+        // Assert
+        var dto = JsonSerializer.Deserialize<OrchestrationInstanceDto>(dtoAsJson);
+        dto!.Lifecycle.CreatedBy.Should().BeOfType(expectedType);
+    }
+
+    private static OrchestrationInstance CreateOrchestrationInstance(OperatingIdentity? createdBy = default)
     {
         var orchestrationDescription = new OrchestrationDescription(
             name: "name",
@@ -59,9 +85,10 @@ public class OrchestrationInstanceMapperExtensionsTests
         orchestrationDescription.AppendStepDescription("Test step 2");
         orchestrationDescription.AppendStepDescription("Test step 3");
 
-        var userIdentity = new UserIdentity(
-            new UserId(Guid.NewGuid()),
-            new ActorId(Guid.NewGuid()));
+        var userIdentity = createdBy
+            ?? new UserIdentity(
+                new UserId(Guid.NewGuid()),
+                new ActorId(Guid.NewGuid()));
 
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
             userIdentity,
