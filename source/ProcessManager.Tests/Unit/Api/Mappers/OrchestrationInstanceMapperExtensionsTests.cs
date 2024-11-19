@@ -34,10 +34,12 @@ public class OrchestrationInstanceMapperExtensionsTests
         var orchestrationInstance = CreateOrchestrationInstance();
 
         // Act
+        // => We create and serialize 'OrchestrationInstanceDto'
         var actualDto = orchestrationInstance.MapToDto();
         var dtoAsJson = JsonSerializer.Serialize(actualDto);
 
         // Assert
+        // => But we can deserialize to specific 'OrchestrationInstanceTypedDto<TestOrchestrationParameter>'
         var typedDto = JsonSerializer.Deserialize<OrchestrationInstanceTypedDto<TestOrchestrationParameter>>(dtoAsJson);
         typedDto!.ParameterValue.TestString.Should().NotBeNull();
         typedDto!.ParameterValue.TestInt.Should().NotBeNull();
