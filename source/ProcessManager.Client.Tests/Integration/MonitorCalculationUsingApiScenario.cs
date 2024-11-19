@@ -69,6 +69,9 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
     {
         // TODO: Move to API test project
         dynamic scheduleRequestDto = new ExpandoObject();
+        scheduleRequestDto.UserIdentity = new ExpandoObject();
+        scheduleRequestDto.UserIdentity.UserId = Guid.NewGuid();
+        scheduleRequestDto.UserIdentity.ActorId = Guid.NewGuid();
         scheduleRequestDto.RunAt = "2024-11-01T06:19:10.0209567+01:00";
         scheduleRequestDto.InputParameter = new ExpandoObject();
         scheduleRequestDto.InputParameter.CalculationType = 0;
@@ -76,7 +79,6 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
         scheduleRequestDto.InputParameter.PeriodStartDate = "2024-10-29T15:19:10.0151351+01:00";
         scheduleRequestDto.InputParameter.PeriodEndDate = "2024-10-29T16:19:10.0193962+01:00";
         scheduleRequestDto.InputParameter.IsInternalCalculation = true;
-        scheduleRequestDto.InputParameter.UserId = Guid.NewGuid();
 
         using var scheduleRequest = new HttpRequestMessage(
             HttpMethod.Post,

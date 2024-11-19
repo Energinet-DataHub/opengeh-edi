@@ -39,8 +39,8 @@ public class OrchestrationInstanceMapperExtensionsTests
 
         // Assert
         var typedDto = JsonSerializer.Deserialize<OrchestrationInstanceTypedDto<TestOrchestrationParameter>>(dtoAsJson);
-        typedDto!.ParameterValue.TestString.Should().NotBeNull();
-        typedDto!.ParameterValue.TestInt.Should().NotBeNull();
+        typedDto!.InputParameter.TestString.Should().NotBeNull();
+        typedDto!.InputParameter.TestInt.Should().NotBeNull();
     }
 
     private static OrchestrationInstance CreateOrchestrationInstance()
