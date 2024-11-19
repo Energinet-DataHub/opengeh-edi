@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
+
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-public record UserIdentityDto(
-    Guid UserId,
-    Guid ActorId)
-        : IOperatingIdentityDto;
+/// <summary>
+/// An identity performing an Process Manager operation.
+/// </summary>
+[JsonDerivedType(typeof(IOperatingIdentityDto), typeDiscriminator: "base")]
+[JsonDerivedType(typeof(UserIdentityDto), typeDiscriminator: "user")]
+[JsonDerivedType(typeof(ActorIdentityDto), typeDiscriminator: "actor")]
+public interface IOperatingIdentityDto;

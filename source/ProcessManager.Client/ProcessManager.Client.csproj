@@ -55,6 +55,7 @@
     <Compile Include="..\Shared\ProcessManager\Api\Model\CancelScheduledOrchestrationInstanceDto.cs" Link="Model\CancelScheduledOrchestrationInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceTypedDto.cs" Link="Model\OrchestrationInstanceTypedDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\ActorIdentityDto.cs" Link="Model\OrchestrationInstance\ActorIdentityDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OperatingIdentityDto.cs" Link="Model\OrchestrationInstance\OperatingIdentityDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" Link="Model\OrchestrationInstance\OrchestrationInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStateDto.cs" Link="Model\OrchestrationInstance\OrchestrationInstanceLifecycleStateDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" Link="Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" />

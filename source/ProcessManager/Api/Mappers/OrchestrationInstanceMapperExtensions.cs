@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using ApiModel = Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using DomainModel = Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
@@ -35,6 +36,7 @@ internal static class OrchestrationInstanceMapperExtensions
         this DomainModel.OrchestrationInstanceLifecycleState entity)
     {
         return new ApiModel.OrchestrationInstanceLifecycleStateDto(
+            CreatedBy: entity.CreatedBy.MapToDto(),
             State: Enum
                 .TryParse<ApiModel.OrchestrationInstanceLifecycleStates>(
                     entity.State.ToString(),
@@ -49,11 +51,31 @@ internal static class OrchestrationInstanceMapperExtensions
                     out var terminationStateResult)
                 ? terminationStateResult
                 : null,
+            CanceledBy: entity.CanceledBy?.MapToDto(),
             CreatedAt: entity.CreatedAt.ToDateTimeOffset(),
             ScheduledToRunAt: entity.ScheduledToRunAt?.ToDateTimeOffset(),
             QueuedAt: entity.QueuedAt?.ToDateTimeOffset(),
             StartedAt: entity.StartedAt?.ToDateTimeOffset(),
             TerminatedAt: entity.TerminatedAt?.ToDateTimeOffset());
+    }
+
+    public static ApiModel.IOperatingIdentityDto MapToDto(
+        this DomainModel.OperatingIdentity entity)
+    {
+        switch (entity)
+        {
+            case UserIdentity user:
+                return new ApiModel.UserIdentityDto(
+                    UserId: user.UserId.Value,
+                    ActorId: user.ActorId.Value);
+
+            case ActorIdentity actor:
+                return new ApiModel.ActorIdentityDto(
+                    ActorId: actor.ActorId.Value);
+
+            default:
+                throw new InvalidOperationException($"Invalid type '{entity.GetType()}'; cannot be mapped.");
+        }
     }
 
     public static ApiModel.StepInstanceDto MapToDto(
