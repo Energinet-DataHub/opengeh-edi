@@ -17,17 +17,5 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 /// <summary>
 /// A user identity performing a Process Manager operation.
 /// </summary>
-public class UserIdentity : OperatingIdentity
-{
-    public UserIdentity(
-        UserId userId,
-        ActorId actorId)
-    {
-        UserId = userId;
-        ActorId = actorId;
-    }
-
-    public UserId UserId { get; }
-
-    public ActorId ActorId { get; }
-}
+public record UserIdentity(UserId UserId, ActorId ActorId)
+    : OperatingIdentity;

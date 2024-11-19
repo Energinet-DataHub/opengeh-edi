@@ -17,6 +17,4 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 /// <summary>
 /// An identity performing an Process Manager operation.
 /// </summary>
-public abstract class OperatingIdentity
-{
-}
+public abstract record OperatingIdentity;
