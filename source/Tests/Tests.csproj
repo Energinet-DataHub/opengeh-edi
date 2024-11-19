@@ -91,6 +91,18 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\VersionIndexOutOfRangeRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\BadVersionMeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\InvalidMeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPointWithTwoTransactions.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement2ChargeTypes.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -123,7 +135,7 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\FailSchemeValidationRequestWholesaleSettlement.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-        <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json"/>
+        <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json" />
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>

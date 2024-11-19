@@ -33,7 +33,6 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
         (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Ebix),
         (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Ebix),
         // TODO: Remove when implementing parsers for CIM
-        (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Xml),
         (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Json),
     };
 
@@ -73,13 +72,23 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
     {
         // Arrange
         var marketMessageParser = GetService<MarketMessageParser>();
+        var messageParsers = GetService<IDictionary<(IncomingDocumentType DocumentType, DocumentFormat DocumentFormat), IMessageParser>>();
 
         // Act
-        var act = () => marketMessageParser.ParseAsync(
-            new IncomingMarketMessageStream(new MemoryStream()),
-            documentFormat,
-            incomingDocumentType,
-            CancellationToken.None);
+        var act = async () =>
+        {
+            var incomingMarketMessageStream = new IncomingMarketMessageStream(new MemoryStream());
+            if (messageParsers.TryGetValue((incomingDocumentType, documentFormat), out var messageParser))
+            {
+                return await messageParser.ParseAsync(incomingMarketMessageStream, CancellationToken.None).ConfigureAwait(false);
+            }
+
+            return await marketMessageParser.ParseAsync(
+                incomingMarketMessageStream,
+                documentFormat,
+                incomingDocumentType,
+                CancellationToken.None);
+        };
 
         // Assert
         if (_unsupportedCombinationsOfIncomingDocumentTypeAndDocumentFormat.Contains((incomingDocumentType, documentFormat)))
