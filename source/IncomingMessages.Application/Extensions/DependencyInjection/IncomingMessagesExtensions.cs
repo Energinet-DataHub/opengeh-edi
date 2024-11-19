@@ -143,14 +143,6 @@ public static class IncomingMessagesExtensions
         services
             .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointXmlMessageParser>();
 
-        // TODO: IOC should not be responsible for register this dictionary
-        services.AddTransient<IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>>(provider => new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
-        {
-            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Ebix), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointEbixMessageParser>() },
-            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Xml), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointXmlMessageParser>() },
-            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Json), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointJsonMessageParser>() },
-        });
-
         return services;
     }
 }
