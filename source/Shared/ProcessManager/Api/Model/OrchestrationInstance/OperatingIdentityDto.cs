@@ -18,6 +18,8 @@ namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 /// <summary>
 /// An identity performing an Process Manager operation.
+///
+/// We use https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism
 /// </summary>
 [JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
 [JsonDerivedType(typeof(IOperatingIdentityDto), typeDiscriminator: "base")]
