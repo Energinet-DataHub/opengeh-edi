@@ -70,7 +70,7 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
     {
         // Arrange
         var marketMessageParser = GetService<MarketMessageParser>();
-        var messageParsers = GetService<IList<IMessageParser>>().ToDictionary(
+        var messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
             parser => (parser.DocumentType, parser.DocumentFormat),
             parser => parser);
 

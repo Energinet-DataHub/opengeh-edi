@@ -43,7 +43,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         : base(incomingMessagesTestFixture, testOutputHelper)
     {
         _marketMessageParser = GetService<MarketMessageParser>();
-        _messageParsers = GetService<IList<IMessageParser>>().ToDictionary(
+        _messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
             parser => (parser.DocumentType, parser.DocumentFormat),
             parser => parser);
 
