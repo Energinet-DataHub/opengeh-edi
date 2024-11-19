@@ -57,7 +57,12 @@ public class OrchestrationInstanceMapperExtensionsTests
         orchestrationDescription.AppendStepDescription("Test step 2");
         orchestrationDescription.AppendStepDescription("Test step 3");
 
+        var userIdentity = new UserIdentity(
+            new UserId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()));
+
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
+            userIdentity,
             orchestrationDescription,
             skipStepsBySequence: [],
             SystemClock.Instance);

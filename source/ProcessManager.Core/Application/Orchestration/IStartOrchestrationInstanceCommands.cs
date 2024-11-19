@@ -23,6 +23,7 @@ public interface IStartOrchestrationInstanceCommands
     /// Start a new instance of an orchestration.
     /// </summary>
     Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(
+        OperatingIdentity identity,
         string name,
         int version,
         TParameter inputParameter,
@@ -33,6 +34,7 @@ public interface IStartOrchestrationInstanceCommands
     /// Schedule a new instance of an orchestration.
     /// </summary>
     Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
+        UserIdentity identity,
         string name,
         int version,
         TParameter inputParameter,

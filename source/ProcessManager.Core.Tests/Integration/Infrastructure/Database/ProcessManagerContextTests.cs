@@ -97,8 +97,13 @@ public class ProcessManagerContextTests
 
     private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription orchestrationDescription)
     {
+        var userIdentity = new UserIdentity(
+            new UserId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()));
+
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
-            description: orchestrationDescription,
+            userIdentity,
+            orchestrationDescription,
             skipStepsBySequence: [3],
             clock: SystemClock.Instance);
 

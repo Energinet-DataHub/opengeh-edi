@@ -26,6 +26,7 @@ internal class NotifyAggregatedMeasureDataHandler(
     private readonly IStartOrchestrationInstanceCommands _manager = manager;
 
     public async Task<OrchestrationInstanceId> ScheduleNewCalculationAsync(
+        UserIdentity userIdentity,
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto)
     {
         // TODO:
@@ -39,6 +40,7 @@ internal class NotifyAggregatedMeasureDataHandler(
 
         var orchestrationInstanceId = await _manager
             .ScheduleNewOrchestrationInstanceAsync(
+                userIdentity,
                 name: "BRS_023_027",
                 version: 1,
                 inputParameter: dto.InputParameter,
