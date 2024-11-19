@@ -23,7 +23,7 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class FileStorageExtensions
 {
-    public const string FileStorageName = "edi-documents-storage";
+    private const string FileStorageName = "EDI blob file storage";
 
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
@@ -34,9 +34,7 @@ public static class FileStorageExtensions
             .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING) || !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_URL), $"{nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)} or {nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL)} (if using Default Azure Credentials) must be set in configuration");
 
         var blobServiceClientConnectionOptions =
-            configuration
-                //.GetRequiredSection(BlobServiceClientConnectionOptions.SectionName)
-                .Get<BlobServiceClientConnectionOptions>()
+            configuration.Get<BlobServiceClientConnectionOptions>()
             ?? throw new InvalidOperationException("Missing Blob Service Client Connection configuration.");
 
         services.AddAzureClients(
@@ -48,18 +46,20 @@ public static class FileStorageExtensions
                 {
                     builder
                         .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL))
-                        .WithName(FileStorageName);
+                        .WithName(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
                 }
                 else
                 {
                     builder
                         .AddBlobServiceClient(
                             blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)
-                        .WithName(FileStorageName);
+                        .WithName(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
                 }
             });
 
-        services.TryAddBlobStorageHealthCheck(FileStorageName, FileStorageName);
+        services.TryAddBlobStorageHealthCheck(
+            FileStorageName,
+            blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
 

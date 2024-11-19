@@ -18,6 +18,8 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Opti
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
 public class BlobServiceClientConnectionOptions
 {
+    public string AZURE_STORAGE_ACCOUNT_CLIENT_NAME { get; init; } = string.Empty;
+
     public string AZURE_STORAGE_ACCOUNT_CONNECTION_STRING { get; init; } = string.Empty;
 
     public string AZURE_STORAGE_ACCOUNT_URL { get; init; } = string.Empty;
