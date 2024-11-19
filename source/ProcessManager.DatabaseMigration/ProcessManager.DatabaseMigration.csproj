@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Scripts\202410240915 Create StepDescription table.sql" />
+    <None Remove="Scripts\202411192300 Add operating identity columns.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,7 @@
     <EmbeddedResource Include="Scripts\202410240917 Create StepInstance table.sql" />
     <EmbeddedResource Include="Scripts\202410240914 Create OrchestrationDescription table.sql" />
     <EmbeddedResource Include="Scripts\202410240916 Create OrchestrationInstance table.sql" />
+    <EmbeddedResource Include="Scripts\202411192300 Add operating identity columns.sql" />
   </ItemGroup>
 
 </Project>
