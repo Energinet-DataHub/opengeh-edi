@@ -7,9 +7,16 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.22.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.4" />
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="13.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
+    <PackageReference Include="Google.Protobuf" Version="3.28.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.62.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
@@ -29,11 +36,24 @@
   <ItemGroup>
     <Folder Include="Api\Model\" />
     <Folder Include="Processes\BRS_021\" />
-    <Folder Include="Processes\BRS_026_028\" />
+    <Folder Include="Processes\BRS_026\V1\Activities\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Api\Model\ScheduleOrchestrationInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Processes\BRS_023_027\V1\Model\CalculationTypes.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" Link="Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" />
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_026\V1\Model\RequestCalculatedEnergyTimeSeriesInputV1.cs">
+      <Link>Processes\BRS_026\V1\Models\RequestCalculatedEnergyTimeSeriesInputV1.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="../Shared/**/*.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
   </ItemGroup>
 </Project>
