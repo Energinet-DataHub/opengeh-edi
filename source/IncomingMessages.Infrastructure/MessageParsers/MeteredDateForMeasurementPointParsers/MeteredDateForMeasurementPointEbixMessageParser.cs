@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
 
-public class EbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageParserBase(schemaProvider)
+public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageParserBase(schemaProvider)
 {
     private const string SeriesElementName = "PayloadEnergyTimeSeries";
     private const string Identification = "Identification";
@@ -47,11 +47,13 @@ public class EbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageP
         foreach (var transactionElement in transactionElements)
         {
             var id = transactionElement.Element(ns + Identification)?.Value ?? string.Empty;
-            var resolution = transactionElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + ResolutionDuration)?.Value;
-            var startDateAndOrTimeDateTime = transactionElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + Start)?.Value ?? string.Empty;
-            var endDateAndOrTimeDateTime = transactionElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + End)?.Value;
-            var productNumber = transactionElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + Identification)?.Value;
-            var productUnitType = transactionElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + UnitType)?.Value;
+            var observationElement = transactionElement.Element(ns + ObservationTimeSeriesPeriod);
+            var resolution = observationElement?.Element(ns + ResolutionDuration)?.Value;
+            var startDateAndOrTimeDateTime = observationElement?.Element(ns + Start)?.Value ?? string.Empty;
+            var endDateAndOrTimeDateTime = observationElement?.Element(ns + End)?.Value;
+            var includedProductCharacteristicElement = transactionElement.Element(ns + IncludedProductCharacteristic);
+            var productNumber = includedProductCharacteristicElement?.Element(ns + Identification)?.Value;
+            var productUnitType = includedProductCharacteristicElement?.Element(ns + UnitType)?.Value;
             var meteringPointType = transactionElement.Element(ns + DetailMeasurementMeteringPointCharacteristic)?.Element(ns + MeteringPointType)?.Value;
             var meteringPointLocationId = transactionElement.Element(ns + MeteringPointDomainLocation)?.Element(ns + Identification)?.Value;
 

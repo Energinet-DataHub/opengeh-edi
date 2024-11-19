@@ -977,6 +977,10 @@
     <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_DK_MeteredDataTimeSeries-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyvalidatedmeasuredata-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyvalidatedmeasuredata-0-1.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   
   <ItemGroup>
