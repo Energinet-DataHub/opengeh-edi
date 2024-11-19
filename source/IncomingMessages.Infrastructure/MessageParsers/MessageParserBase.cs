@@ -27,9 +27,9 @@ public abstract class MessageParserBase<TSchema>() : IMessageParser
         CancellationToken cancellationToken)
     {
         var schemaResult = await GetSchemaAsync(marketMessage, cancellationToken).ConfigureAwait(false);
-        if (schemaResult.ValidationErrors.Any())
+        if (schemaResult.ValidationError is not null)
         {
-            return new IncomingMarketMessageParserResult(schemaResult.ValidationErrors.ToArray());
+            return new IncomingMarketMessageParserResult(schemaResult.ValidationError);
         }
 
         if (schemaResult.Schema == null)
@@ -41,7 +41,7 @@ public abstract class MessageParserBase<TSchema>() : IMessageParser
             .ConfigureAwait(false);
     }
 
-    protected abstract Task<(TSchema? Schema, IReadOnlyCollection<ValidationError> ValidationErrors)>
+    protected abstract Task<(TSchema? Schema, ValidationError? ValidationError)>
         GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken);
 
     protected abstract Task<IncomingMarketMessageParserResult> ParseMessageAsync(

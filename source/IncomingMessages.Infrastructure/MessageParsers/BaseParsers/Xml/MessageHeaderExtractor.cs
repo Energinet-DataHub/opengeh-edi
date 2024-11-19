@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+﻿﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -13,22 +13,11 @@
 // limitations under the License.
 
 using System.Xml;
-using System.Xml.Linq;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers.Xml;
 
 internal static class MessageHeaderExtractor
 {
-    private const string MridElementName = "mRID";
-    private const string TypeElementName = "type";
-    private const string ProcessTypeElementName = "process.processType";
-    private const string SenderMridElementName = "sender_MarketParticipant.mRID";
-    private const string SenderRoleElementName = "sender_MarketParticipant.marketRole.type";
-    private const string ReceiverMridElementName = "receiver_MarketParticipant.mRID";
-    private const string ReceiverRoleElementName = "receiver_MarketParticipant.marketRole.type";
-    private const string CreatedDateTimeElementName = "createdDateTime";
-    private const string BusinessSectorTypeElementName = "businessSector.type";
-
     public static async Task<MessageHeader> ExtractAsync(
         XmlReader reader,
         RootElement rootElement,
@@ -50,23 +39,23 @@ internal static class MessageHeaderExtractor
 
         while (!reader.EOF)
         {
-            if (reader.Is(MridElementName, ns))
+            if (reader.Is("mRID", ns))
                 messageId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(TypeElementName, ns))
+            else if (reader.Is("type", ns))
                 messageType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(ProcessTypeElementName, ns))
+            else if (reader.Is("process.processType", ns))
                 processType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(SenderMridElementName, ns))
+            else if (reader.Is("sender_MarketParticipant.mRID", ns))
                 senderId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(SenderRoleElementName, ns))
+            else if (reader.Is("sender_MarketParticipant.marketRole.type", ns))
                 senderRole = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(ReceiverMridElementName, ns))
+            else if (reader.Is("receiver_MarketParticipant.mRID", ns))
                 receiverId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(ReceiverRoleElementName, ns))
+            else if (reader.Is("receiver_MarketParticipant.marketRole.type", ns))
                 receiverRole = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(CreatedDateTimeElementName, ns))
+            else if (reader.Is("createdDateTime", ns))
                 createdAt = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            else if (reader.Is(BusinessSectorTypeElementName, ns))
+            else if (reader.Is("businessSector.type", ns))
                 businessType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             else await reader.ReadAsync().ConfigureAwait(false);
 
@@ -74,35 +63,5 @@ internal static class MessageHeaderExtractor
         }
 
         return new MessageHeader(messageId, messageType, processType, senderId, senderRole, receiverId, receiverRole, createdAt, businessType);
-    }
-
-    public static MessageHeader Extract(
-        XDocument document,
-        string headerElementName,
-        XNamespace ns)
-    {
-        var headerElement = document.Descendants(ns + headerElementName).SingleOrDefault();
-        if (headerElement == null) throw new InvalidOperationException("Header element not found");
-
-        var messageId = headerElement.Element(ns + MridElementName)?.Value ?? string.Empty;
-        var messageType = headerElement.Element(ns + TypeElementName)?.Value ?? string.Empty;
-        var processType = headerElement.Element(ns + ProcessTypeElementName)?.Value ?? string.Empty;
-        var senderId = headerElement.Element(ns + SenderMridElementName)?.Value ?? string.Empty;
-        var senderRole = headerElement.Element(ns + SenderRoleElementName)?.Value ?? string.Empty;
-        var receiverId = headerElement.Element(ns + ReceiverMridElementName)?.Value ?? string.Empty;
-        var receiverRole = headerElement.Element(ns + ReceiverRoleElementName)?.Value ?? string.Empty;
-        var createdAt = headerElement.Element(ns + CreatedDateTimeElementName)?.Value ?? string.Empty;
-        var businessType = headerElement.Element(ns + BusinessSectorTypeElementName)?.Value;
-
-        return new MessageHeader(
-            messageId,
-            messageType,
-            processType,
-            senderId,
-            senderRole,
-            receiverId,
-            receiverRole,
-            createdAt,
-            businessType);
     }
 }

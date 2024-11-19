@@ -23,21 +23,22 @@ public class ProcessTypeValidator : IProcessTypeValidator
     private static readonly IReadOnlyCollection<string> _aggregatedMeasureDataWhitelist =
     [
         BusinessReason.PreliminaryAggregation.Code,
-            BusinessReason.BalanceFixing.Code,
-            BusinessReason.WholesaleFixing.Code,
-            BusinessReason.Correction.Code,
+        BusinessReason.BalanceFixing.Code,
+        BusinessReason.WholesaleFixing.Code,
+        BusinessReason.Correction.Code,
     ];
 
     private static readonly IReadOnlyCollection<string> _wholesaleServicesWhitelist =
     [
         BusinessReason.WholesaleFixing.Code,
-            BusinessReason.Correction.Code,
+        BusinessReason.Correction.Code,
     ];
 
     private static readonly IReadOnlyCollection<string> _meteredDataForMeasurementPointEbixWhiteList =
     [
         BusinessReason.PeriodicMetering.Code,
-            BusinessReason.PeriodicFlexMetering.Code, // Flex metering is only supported for Ebix and should be rejected when used for CIM
+        BusinessReason.PeriodicFlexMetering
+            .Code, // Flex metering is only supported for Ebix and should be rejected when used for CIM
     ];
 
     private static readonly IReadOnlyCollection<string> _meteredDataForMeasurementPointWhiteList =
@@ -45,7 +46,10 @@ public class ProcessTypeValidator : IProcessTypeValidator
         BusinessReason.PeriodicMetering.Code,
     ];
 
-    public async Task<Result> ValidateAsync(IIncomingMessage message, DocumentFormat documentFormat, CancellationToken cancellationToken)
+    public async Task<Result> ValidateAsync(
+        IIncomingMessage message,
+        DocumentFormat documentFormat,
+        CancellationToken cancellationToken)
     {
         return await Task.FromResult(
                 message switch

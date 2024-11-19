@@ -63,9 +63,8 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         return CreateResult(header, transactions);
     }
 
-    protected override async Task<(XmlSchema? Schema, IReadOnlyCollection<ValidationError> ValidationErrors)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
+    protected override async Task<(XmlSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
     {
-        IList<ValidationError>? validationErrors = [];
         XmlSchema? xmlSchema = default;
         try
         {
@@ -77,23 +76,23 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
 
             if (xmlSchema is null)
             {
-                validationErrors.Add(new InvalidBusinessReasonOrVersion(businessProcessType, version));
+                return (xmlSchema, new InvalidBusinessReasonOrVersion(businessProcessType, version));
             }
         }
         catch (XmlException exception)
         {
-            validationErrors.Add(InvalidMessageStructure.From(exception));
+            return (xmlSchema, InvalidMessageStructure.From(exception));
         }
         catch (ObjectDisposedException objectDisposedException)
         {
-            validationErrors.Add(InvalidMessageStructure.From(objectDisposedException));
+            return (xmlSchema, InvalidMessageStructure.From(objectDisposedException));
         }
         catch (IndexOutOfRangeException indexOutOfRangeException)
         {
-            validationErrors.Add(InvalidMessageStructure.From(indexOutOfRangeException));
+            return (xmlSchema, InvalidMessageStructure.From(indexOutOfRangeException));
         }
 
-        return (xmlSchema, validationErrors.AsReadOnly());
+        return (xmlSchema, null);
     }
 
     protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber);
@@ -206,6 +205,6 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     {
         var message =
             $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
-        ValidationErrors.Add(Domain.Validation.ValidationErrors.InvalidMessageStructure.From(message));
+        ValidationErrors.Add(InvalidMessageStructure.From(message));
     }
 }
