@@ -20,34 +20,16 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 /// Contains information about an orchestration instance including
 /// specific input parameter values.
 /// </summary>
-/// <typeparam name="TParameterDto">Must be a JSON serializable type.</typeparam>
-public record OrchestrationInstanceTypedDto<TParameterDto>(
+/// <typeparam name="TInputParameterDto">Must be a JSON serializable type.</typeparam>
+/// <param name="Id"></param>
+/// <param name="Lifecycle">The high-level lifecycle states that all orchestration instances can go through.</param>
+/// <param name="InputParameter">Contains the Durable Functions orchestration input parameter value.</param>
+/// <param name="Steps">Workflow steps the orchestration instance is going through.</param>
+/// <param name="CustomState">Any custom state of the orchestration instance.</param>
+public record OrchestrationInstanceTypedDto<TInputParameterDto>(
     Guid Id,
-    OrchestrationInstanceLifecycleStatesDto Lifecycle,
-    TParameterDto ParameterValue,
+    OrchestrationInstanceLifecycleStateDto Lifecycle,
+    TInputParameterDto InputParameter,
     IReadOnlyCollection<StepInstanceDto> Steps,
     string CustomState)
-        where TParameterDto : class
-{
-    public Guid Id { get; } = Id;
-
-    /// <summary>
-    /// The high-level lifecycle states that all orchestration instances can go through.
-    /// </summary>
-    public OrchestrationInstanceLifecycleStatesDto Lifecycle { get; } = Lifecycle;
-
-    /// <summary>
-    /// Contains the Durable Functions orchestration input parameter value.
-    /// </summary>
-    public TParameterDto ParameterValue { get; } = ParameterValue;
-
-    /// <summary>
-    /// Workflow steps the orchestration instance is going through.
-    /// </summary>
-    public IReadOnlyCollection<StepInstanceDto> Steps { get; } = Steps;
-
-    /// <summary>
-    /// Any custom state of the orchestration instance.
-    /// </summary>
-    public string CustomState { get; } = CustomState;
-}
+        where TInputParameterDto : class;

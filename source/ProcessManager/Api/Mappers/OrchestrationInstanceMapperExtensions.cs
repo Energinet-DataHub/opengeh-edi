@@ -31,10 +31,10 @@ internal static class OrchestrationInstanceMapperExtensions
             CustomState: entity.CustomState.Value);
     }
 
-    public static ApiModel.OrchestrationInstanceLifecycleStatesDto MapToDto(
+    public static ApiModel.OrchestrationInstanceLifecycleStateDto MapToDto(
         this DomainModel.OrchestrationInstanceLifecycleState entity)
     {
-        return new ApiModel.OrchestrationInstanceLifecycleStatesDto(
+        return new ApiModel.OrchestrationInstanceLifecycleStateDto(
             State: Enum
                 .TryParse<ApiModel.OrchestrationInstanceLifecycleStates>(
                     entity.State.ToString(),

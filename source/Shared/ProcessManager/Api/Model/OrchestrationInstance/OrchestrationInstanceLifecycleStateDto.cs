@@ -15,14 +15,20 @@
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 /// <summary>
-/// The step instance lifecycle state information.
+/// The orchestration instance lifecycle state information.
 /// </summary>
 /// <param name="State"></param>
 /// <param name="TerminationState"></param>
+/// <param name="CreatedAt">The time when the orchestration instance was created (State => Pending).</param>
+/// <param name="ScheduledToRunAt">The time when the orchestration instance should be executed by the Scheduler.</param>
+/// <param name="QueuedAt">The time when the Process Manager has queued the orchestration instance for execution by Durable Functions (State => Queued).</param>
 /// <param name="StartedAt">The time when the Process Manager was used from Durable Functions to transition the state to Running.</param>
 /// <param name="TerminatedAt">The time when the Process Manager was used from Durable Functions to transition the state to Terminated.</param>
-public record StepInstanceLifecycleStateDto(
-    StepInstanceLifecycleStates State,
-    OrchestrationStepTerminationStates? TerminationState,
+public record OrchestrationInstanceLifecycleStateDto(
+    OrchestrationInstanceLifecycleStates State,
+    OrchestrationInstanceTerminationStates? TerminationState,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? ScheduledToRunAt,
+    DateTimeOffset? QueuedAt,
     DateTimeOffset? StartedAt,
     DateTimeOffset? TerminatedAt);

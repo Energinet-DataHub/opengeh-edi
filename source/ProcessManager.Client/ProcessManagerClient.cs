@@ -15,6 +15,8 @@
 using System.Globalization;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
+using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 
@@ -32,12 +34,16 @@ internal class ProcessManagerClient : IProcessManagerClient
 
     /// <inheritdoc/>
     public async Task CancelScheduledOrchestrationInstanceAsync(
-        Guid id,
+        CancelOrchestrationInstanceDto requestDto,
         CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(
-            HttpMethod.Delete,
-            $"/api/processmanager/orchestrationinstance/{id}");
+            HttpMethod.Post,
+            "/api/processmanager/orchestrationinstance/cancel");
+        request.Content = new StringContent(
+            JsonSerializer.Serialize(requestDto),
+            Encoding.UTF8,
+            "application/json");
 
         using var actualResponse = await _httpClient
             .SendAsync(request, cancellationToken)
