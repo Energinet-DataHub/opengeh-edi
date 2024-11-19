@@ -61,11 +61,14 @@ public static class ClientExtensions
 
     /// <summary>
     /// Register Process Manager RequestCalculatedData client for use in applications.
-    /// <remarks>The application must register the <see cref="ServiceBusClient"/> by calling </remarks>
+    /// <remarks>The application must register the <see cref="ServiceBusClient"/> and contain configuration for <see cref="ProcessManagerServiceBusClientsOptions"/></remarks>
     /// </summary>
     public static IServiceCollection AddProcessManagerRequestCalculatedDataClient(this IServiceCollection services)
     {
-        services.AddProcessManagerServiceBusOptions();
+        services
+            .AddOptions<ProcessManagerServiceBusClientsOptions>()
+            .BindConfiguration(ProcessManagerServiceBusClientsOptions.SectionName)
+            .ValidateDataAnnotations();
 
         services.AddAzureClients(
             builder =>
@@ -73,14 +76,14 @@ public static class ClientExtensions
                 builder.AddClient<ServiceBusSender, ServiceBusClientOptions>(
                     (_, _, provider) =>
                     {
-                        var serviceBusOptions = provider.GetRequiredProcessManagerServiceBusOptions();
+                        var serviceBusOptions = provider.GetRequiredService<IOptions<ProcessManagerServiceBusClientsOptions>>().Value;
                         var serviceBusSender = provider
                             .GetRequiredService<ServiceBusClient>()
                             .CreateSender(serviceBusOptions.ProcessManagerTopic);
 
                         return serviceBusSender;
                     })
-                    .WithName(nameof(ProcessManagerServiceBusOptions.ProcessManagerTopic));
+                    .WithName(nameof(ProcessManagerServiceBusClientsOptions.ProcessManagerTopic));
             });
 
         services.AddScoped<IRequestCalculatedDataClientV1, RequestCalculatedDataClientV1>();

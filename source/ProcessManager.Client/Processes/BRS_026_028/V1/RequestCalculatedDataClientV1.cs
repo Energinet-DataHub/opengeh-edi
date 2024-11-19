@@ -27,7 +27,7 @@ namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1;
 public class RequestCalculatedDataClientV1(
     IAzureClientFactory<ServiceBusSender> serviceBusFactory) : IRequestCalculatedDataClientV1
 {
-    private readonly ServiceBusSender _serviceBusSender = serviceBusFactory.CreateClient(nameof(ProcessManagerServiceBusOptions.ProcessManagerTopic));
+    private readonly ServiceBusSender _serviceBusSender = serviceBusFactory.CreateClient(nameof(ProcessManagerServiceBusClientsOptions.ProcessManagerTopic));
 
     public async Task RequestCalculatedEnergyTimeSeriesAsync(RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1> input, CancellationToken cancellationToken)
     {

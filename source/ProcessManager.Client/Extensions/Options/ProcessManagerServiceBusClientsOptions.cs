@@ -20,9 +20,9 @@ namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 /// <summary>
 /// Options for configuration of Process Manager Service Bus clients using the Process Manager.
 /// </summary>
-public class ProcessManagerServiceBusOptions
+public class ProcessManagerServiceBusClientsOptions
 {
-    public const string SectionName = "ProcessManagerServiceBus";
+    public const string SectionName = "ProcessManagerServiceBusClients";
 
     /// <summary>
     /// Name of the topic which the Process Manager receives service bus messages on
