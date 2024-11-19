@@ -19,6 +19,7 @@ using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Startup;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
+using Energinet.DataHub.ProcessManager.Orchestrations.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1;
@@ -36,6 +37,7 @@ var host = new HostBuilder()
         services.AddNodaTimeForApplication();
 
         // ProcessManager
+        services.AddProcessManagerTopic();
         // => Orchestration Descriptions
         services.AddProcessManagerForOrchestrations(() =>
         {
