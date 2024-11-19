@@ -35,7 +35,7 @@ internal static class OrchestrationInstanceMapperExtensions
         this DomainModel.OrchestrationInstanceLifecycleState entity)
     {
         return new ApiModel.OrchestrationInstanceLifecycleStateDto(
-            CreatedBy: entity.CreatedBy.MapToDto(),
+            CreatedBy: entity.CreatedBy.Value.MapToDto(),
             State: Enum
                 .TryParse<ApiModel.OrchestrationInstanceLifecycleStates>(
                     entity.State.ToString(),
@@ -50,7 +50,7 @@ internal static class OrchestrationInstanceMapperExtensions
                     out var terminationStateResult)
                 ? terminationStateResult
                 : null,
-            CanceledBy: entity.CanceledBy?.MapToDto(),
+            CanceledBy: entity.CanceledBy?.Value.MapToDto(),
             CreatedAt: entity.CreatedAt.ToDateTimeOffset(),
             ScheduledToRunAt: entity.ScheduledToRunAt?.ToDateTimeOffset(),
             QueuedAt: entity.QueuedAt?.ToDateTimeOffset(),

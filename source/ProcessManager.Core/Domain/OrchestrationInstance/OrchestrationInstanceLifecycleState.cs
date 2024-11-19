@@ -20,7 +20,7 @@ public class OrchestrationInstanceLifecycleState
 {
     internal OrchestrationInstanceLifecycleState(OperatingIdentity createdBy, IClock clock, Instant? runAt)
     {
-        CreatedBy = createdBy;
+        CreatedBy = new OperatingIdentityComplexType(createdBy);
         CreatedAt = clock.GetCurrentInstant();
         ScheduledToRunAt = runAt;
 
@@ -44,7 +44,7 @@ public class OrchestrationInstanceLifecycleState
     /// <summary>
     /// The identity that caused this orchestration instance to be created.
     /// </summary>
-    public OperatingIdentity CreatedBy { get; }
+    public OperatingIdentityComplexType CreatedBy { get; }
 
     /// <summary>
     /// The time when the orchestration instance was created (State => Pending).
@@ -77,7 +77,13 @@ public class OrchestrationInstanceLifecycleState
     /// <summary>
     /// The identity that caused this orchestration instance to be canceled.
     /// </summary>
-    public OperatingIdentity? CanceledBy { get; private set; }
+    public OperatingIdentityComplexType? CanceledBy { get; private set; }
+
+    internal string? CreatedByIdentityType { get; private set; }
+
+    internal Guid? CreatedByActorId { get; private set; }
+
+    internal Guid? CreatedByUserId { get; private set; }
 
     public bool IsPendingForScheduledStart()
     {
@@ -128,12 +134,15 @@ public class OrchestrationInstanceLifecycleState
                 if (State is not OrchestrationInstanceLifecycleStates.Running)
                     throw new InvalidOperationException($"Cannot change termination state to '{terminationState}' when '{State}'.");
                 break;
+
             case OrchestrationInstanceTerminationStates.UserCanceled:
                 if (!IsPendingForScheduledStart())
                     throw new InvalidOperationException("User cannot cancel orchestration instance.");
-                CanceledBy = userIdentity
-                    ?? throw new InvalidOperationException("User identity must be specified.");
+                if (userIdentity == null)
+                    throw new InvalidOperationException("User identity must be specified.");
+                CanceledBy = new OperatingIdentityComplexType(userIdentity);
                 break;
+
             default:
                 throw new InvalidOperationException($"Unsupported termination state '{terminationState}'.");
         }

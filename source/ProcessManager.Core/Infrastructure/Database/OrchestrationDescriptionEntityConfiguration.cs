@@ -40,7 +40,7 @@ internal class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigur
             o => o.ParameterDefinition,
             b =>
             {
-                b.Property(pv => pv.SerializedParameterDefinition)
+                b.Property(pd => pd.SerializedParameterDefinition)
                     .HasColumnName(nameof(OrchestrationDescription.ParameterDefinition.SerializedParameterDefinition));
             });
 
