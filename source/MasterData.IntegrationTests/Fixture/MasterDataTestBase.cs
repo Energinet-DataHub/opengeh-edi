@@ -49,6 +49,7 @@ public class MasterDataTestBase
         builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["DB_CONNECTION_STRING"] = _masterDataFixture.DatabaseManager.ConnectionString,
+            ["AZURE_STORAGE_ACCOUNT_URL"] = "https://fake.fakeurl.com",
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });
 
