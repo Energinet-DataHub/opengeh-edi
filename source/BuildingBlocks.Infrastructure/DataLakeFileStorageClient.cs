@@ -19,7 +19,7 @@ using Azure.Storage.Blobs.Specialized;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Application;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
 public class DataLakeFileStorageClient : IFileStorageClient
 {

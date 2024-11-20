@@ -14,8 +14,6 @@
 
 using Azure.Storage.Blobs;
 using Dapper;
-using Energinet.DataHub.BuildingBlocks.Tests.Database;
-using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
@@ -26,6 +24,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;

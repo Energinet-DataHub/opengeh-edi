@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
 public static class SerializerExtensions
 {

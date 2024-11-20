@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 
 public static class TestLoggerExtensions
 {

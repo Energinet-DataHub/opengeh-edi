@@ -14,7 +14,7 @@
 
 using Microsoft.FeatureManagement;
 
-namespace BuildingBlocks.Infrastructure.FeatureFlag;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
 /// A <see cref="IFeatureFlagManager"/> implementation using the Microsoft.FeatureManagement package

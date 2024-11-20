@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
 /// <summary>
 /// A IFileStorageClient that avoids uploading a file to Azurite,

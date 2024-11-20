@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Infrastructure</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Infrastructure</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="7.0.0" />
+    <PackageReference Include="Azure.Storage.Blobs.Batch" Version="12.18.1" />
     <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="13.2.0" />
     <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0" />
     <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
@@ -18,7 +19,6 @@
     <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Interfaces\BuildingBlocks.Interfaces.csproj" />
   </ItemGroup>

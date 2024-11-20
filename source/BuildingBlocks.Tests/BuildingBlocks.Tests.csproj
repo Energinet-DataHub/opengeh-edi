@@ -16,8 +16,8 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>Energinet.DataHub.BuildingBlocks.Tests</AssemblyName>
-        <RootNamespace>Energinet.DataHub.BuildingBlocks.Tests</RootNamespace>
+        <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Tests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Tests</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     
@@ -36,7 +36,6 @@ limitations under the License.
     <ItemGroup>
         <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-        <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     </ItemGroup>
 </Project>

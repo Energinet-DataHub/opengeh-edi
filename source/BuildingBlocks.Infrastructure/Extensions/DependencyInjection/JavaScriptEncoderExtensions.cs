@@ -16,7 +16,7 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
 public static class JavaScriptEncoderExtensions
 {

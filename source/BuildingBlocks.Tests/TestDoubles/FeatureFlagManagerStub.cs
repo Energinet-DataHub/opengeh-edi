@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
 /// <summary>
 /// A FeatureFlagManager used to set default values and which allows overriding feature flags during tests
