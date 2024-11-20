@@ -37,10 +37,10 @@ internal class NotifyAggregatedMeasureDataTriggerV1(
             Route = "processmanager/orchestrationinstance/brs_023_027/1")]
         HttpRequest httpRequest,
         [FromBody]
-        ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1> dto,
+        ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1> command,
         FunctionContext executionContext)
     {
-        var orchestrationInstanceId = await _handler.ScheduleNewCalculationAsync(dto).ConfigureAwait(false);
+        var orchestrationInstanceId = await _handler.ScheduleNewCalculationAsync(command).ConfigureAwait(false);
         return new OkObjectResult(orchestrationInstanceId.Value);
     }
 }

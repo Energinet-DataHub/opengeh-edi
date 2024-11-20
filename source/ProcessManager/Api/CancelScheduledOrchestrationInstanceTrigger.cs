@@ -40,13 +40,13 @@ internal class CancelScheduledOrchestrationInstanceTrigger(
             Route = "processmanager/orchestrationinstance/cancel")]
         HttpRequest httpRequest,
         [FromBody]
-        CancelScheduledOrchestrationInstanceCommand dto,
+        CancelScheduledOrchestrationInstanceCommand command,
         FunctionContext executionContext)
     {
         await _command
             .CancelScheduledOrchestrationInstanceAsync(
-                new UserIdentity(new UserId(dto.UserIdentity.UserId), new ActorId(dto.UserIdentity.ActorId)),
-                new OrchestrationInstanceId(dto.Id))
+                new UserIdentity(new UserId(command.UserIdentity.UserId), new ActorId(command.UserIdentity.ActorId)),
+                new OrchestrationInstanceId(command.Id))
             .ConfigureAwait(false);
 
         return new OkResult();
