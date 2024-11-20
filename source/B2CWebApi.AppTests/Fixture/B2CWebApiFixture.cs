@@ -114,7 +114,7 @@ public class B2CWebApiFixture : IAsyncLifetime
         var appSettings = new Dictionary<string, string?>
         {
             { "DB_CONNECTION_STRING", dbConnectionString },
-            { "AZURE_STORAGE_ACCOUNT_URL", AzuriteManager.BlobStorageServiceUri.AbsolutePath },
+            { "AZURE_STORAGE_ACCOUNT_URL", AzuriteManager.BlobStorageServiceUri.AbsoluteUri },
             { "UserAuthentication:MitIdExternalMetadataAddress", "YourMitIdExternalMetadataAddress" },
             { "UserAuthentication:ExternalMetadataAddress", OpenIdJwtManager.ExternalMetadataAddress },
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },
