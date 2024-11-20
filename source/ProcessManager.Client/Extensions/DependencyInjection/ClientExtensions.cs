@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
+using Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -27,30 +31,62 @@ namespace Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection
 public static class ClientExtensions
 {
     /// <summary>
-    /// Register Process Manager clients for use in applications.
+    /// Register Process Manager HTTP clients for use in applications.
     /// If <see cref="IHttpContextAccessor"/> is registered we try to retrieve the "Authorization"
     /// header value and forward it to the Process Manager API for authentication/authorization.
     /// </summary>
-    public static IServiceCollection AddProcessManagerClients(this IServiceCollection services)
+    public static IServiceCollection AddProcessManagerHttpClients(this IServiceCollection services)
     {
         services
-            .AddOptions<ProcessManagerClientOptions>()
-            .BindConfiguration(ProcessManagerClientOptions.SectionName)
+            .AddOptions<ProcessManagerHttpClientsOptions>()
+            .BindConfiguration(ProcessManagerHttpClientsOptions.SectionName)
             .ValidateDataAnnotations();
 
         services.AddHttpClient(HttpClientNames.GeneralApi, (sp, httpClient) =>
         {
-            var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
+            var options = sp.GetRequiredService<IOptions<ProcessManagerHttpClientsOptions>>().Value;
             ConfigureHttpClient(sp, httpClient, options.GeneralApiBaseAddress);
         });
         services.AddHttpClient(HttpClientNames.OrchestrationsApi, (sp, httpClient) =>
         {
-            var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
+            var options = sp.GetRequiredService<IOptions<ProcessManagerHttpClientsOptions>>().Value;
             ConfigureHttpClient(sp, httpClient, options.OrchestrationsApiBaseAddress);
         });
 
         services.AddScoped<IProcessManagerClient, ProcessManagerClient>();
         services.AddScoped<INotifyAggregatedMeasureDataClientV1, NotifyAggregatedMeasureDataClientV1>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Register Process Manager RequestCalculatedData client for use in applications.
+    /// <remarks>The application must register the <see cref="ServiceBusClient"/> and contain configuration for <see cref="ProcessManagerServiceBusClientsOptions"/></remarks>
+    /// </summary>
+    public static IServiceCollection AddProcessManagerRequestCalculatedDataClient(this IServiceCollection services)
+    {
+        services
+            .AddOptions<ProcessManagerServiceBusClientsOptions>()
+            .BindConfiguration(ProcessManagerServiceBusClientsOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        services.AddAzureClients(
+            builder =>
+            {
+                builder.AddClient<ServiceBusSender, ServiceBusClientOptions>(
+                    (_, _, provider) =>
+                    {
+                        var serviceBusOptions = provider.GetRequiredService<IOptions<ProcessManagerServiceBusClientsOptions>>().Value;
+                        var serviceBusSender = provider
+                            .GetRequiredService<ServiceBusClient>()
+                            .CreateSender(serviceBusOptions.TopicName);
+
+                        return serviceBusSender;
+                    })
+                    .WithName(nameof(ProcessManagerServiceBusClientsOptions.TopicName));
+            });
+
+        services.AddScoped<IRequestCalculatedDataClientV1, RequestCalculatedDataClientV1>();
 
         return services;
     }

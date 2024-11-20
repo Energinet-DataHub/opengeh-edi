@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.ProcessManager.Client</PackageId>
-    <PackageVersion>0.9.3$(VersionSuffix)</PackageVersion>
+    <PackageVersion>0.10.0$(VersionSuffix)</PackageVersion>
     <Title>DH3 Process Manager Client library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -62,9 +62,14 @@
     <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Model\ScheduleOrchestrationInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Processes\BRS_023_027\V1\Model\CalculationTypes.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" Link="Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" />
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_026\V1\Model\RequestCalculatedEnergyTimeSeriesInputV1.cs">
+      <Link>Processes\BRS_026_028\V1\Model\RequestCalculatedEnergyTimeSeriesInputV1.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.6" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
@@ -72,6 +77,20 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Google.Protobuf" Version="3.28.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.62.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="../Shared/**/*.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
   </ItemGroup>
 
 </Project>
