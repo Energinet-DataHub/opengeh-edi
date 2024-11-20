@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Api.Model;
+
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
 /// <summary>
@@ -22,4 +24,5 @@ public record NotifyAggregatedMeasureDataInputV1(
     IReadOnlyCollection<string> GridAreaCodes,
     DateTimeOffset PeriodStartDate,
     DateTimeOffset PeriodEndDate,
-    bool IsInternalCalculation);
+    bool IsInternalCalculation)
+        : IInputParameterDto;
