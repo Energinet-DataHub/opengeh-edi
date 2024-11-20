@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
@@ -39,6 +40,7 @@ public sealed class MessageParserTests
     {
         { DocumentFormat.Ebix, new MeteredDateForMeasurementPointEbixMessageParser(new EbixSchemaProvider()) },
         { DocumentFormat.Xml, new MeteredDateForMeasurementPointXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
+        { DocumentFormat.Json, new MeteredDateForMeasurementPointJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
     };
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
@@ -50,6 +52,8 @@ public sealed class MessageParserTests
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeasurementPoint.xml") },
             { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeasurementPoint.xml") },
             { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.xml") },
+            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeasurementPoint.json") },
+            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.json") },
         };
 
         return data;
@@ -63,6 +67,7 @@ public sealed class MessageParserTests
             { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
             { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionMeteredDataForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
             { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeasurementPoint.json"), nameof(InvalidMessageStructure) },
         };
 
         return data;
@@ -157,5 +162,10 @@ public sealed class MessageParserTests
         xmlDocument.Save(stream);
 
         return stream;
+    }
+
+    private static FileStream CreateBaseJsonMessage(string fileName)
+    {
+        return new FileStream($"{PathToMessages}json{SubPath}{fileName}", FileMode.Open, FileAccess.Read);
     }
 }

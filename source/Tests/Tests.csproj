@@ -79,6 +79,12 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\RequestAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\InvalidMeteredDataForMeasurementPoint.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPointWithTwoTransactions.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\EmptyJsonObject.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
@@ -152,6 +158,10 @@ limitations under the License.
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
         <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPointWithTwoTransactions.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPoint.json" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPoint.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
