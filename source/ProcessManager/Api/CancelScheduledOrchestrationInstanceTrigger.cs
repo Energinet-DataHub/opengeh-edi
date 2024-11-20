@@ -40,7 +40,7 @@ internal class CancelScheduledOrchestrationInstanceTrigger(
             Route = "processmanager/orchestrationinstance/cancel")]
         HttpRequest httpRequest,
         [FromBody]
-        CancelOrchestrationInstanceDto dto,
+        CancelScheduledOrchestrationInstanceDto dto,
         FunctionContext executionContext)
     {
         await _command

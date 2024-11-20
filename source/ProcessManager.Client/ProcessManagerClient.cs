@@ -34,7 +34,7 @@ internal class ProcessManagerClient : IProcessManagerClient
 
     /// <inheritdoc/>
     public async Task CancelScheduledOrchestrationInstanceAsync(
-        CancelOrchestrationInstanceDto requestDto,
+        CancelScheduledOrchestrationInstanceDto requestDto,
         CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(
