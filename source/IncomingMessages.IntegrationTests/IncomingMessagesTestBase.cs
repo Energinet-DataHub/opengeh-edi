@@ -82,10 +82,8 @@ public class IncomingMessagesTestBase : IDisposable
         string container,
         string fileStorageReference)
     {
-        var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
-        var blobServiceClient =
-            new BlobServiceClient(
-                azuriteBlobConnectionString); // Uses new client to avoid some form of caching or similar
+        var azuriteBlobUrl = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL");
+        var blobServiceClient = new BlobServiceClient(new Uri(azuriteBlobUrl!)); // Uses new client to avoid some form of caching or similar
 
         var containerClient = blobServiceClient.GetBlobContainerClient(container);
         var blobClient = containerClient.GetBlobClient(fileStorageReference);
@@ -160,8 +158,8 @@ public class IncomingMessagesTestBase : IDisposable
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
-            "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING",
-            Fixture.AzuriteManager.BlobStorageConnectionString);
+            "AZURE_STORAGE_ACCOUNT_URL",
+            Fixture.AzuriteManager.BlobStorageServiceUri.AbsolutePath);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

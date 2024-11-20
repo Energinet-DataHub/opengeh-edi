@@ -425,7 +425,7 @@ public class BehavioursTestBase : IDisposable
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", _integrationTestFixture.DatabaseManager.ConnectionString);
-        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", _integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
+        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", _integrationTestFixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

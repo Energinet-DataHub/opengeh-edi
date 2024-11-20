@@ -134,7 +134,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
-            ["AZURE_STORAGE_ACCOUNT_CONNECTION_STRING"] = AzuriteManager.BlobStorageConnectionString,
+            ["AZURE_STORAGE_ACCOUNT_URL"] = AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
             // TODO: fix this
             // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",

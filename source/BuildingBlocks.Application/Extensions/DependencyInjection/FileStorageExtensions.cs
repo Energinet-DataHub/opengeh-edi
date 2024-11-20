@@ -31,7 +31,9 @@ public static class FileStorageExtensions
         services
             .AddOptions<BlobServiceClientConnectionOptions>()
             .Bind(configuration)
-            .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING) || !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_URL), $"{nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)} or {nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL)} (if using Default Azure Credentials) must be set in configuration");
+            .Validate(
+                o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_URL),
+                $"{nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL)} must be set in configuration");
 
         var blobServiceClientConnectionOptions =
             configuration.Get<BlobServiceClientConnectionOptions>()
@@ -42,19 +44,9 @@ public static class FileStorageExtensions
             {
                 builder.UseCredential(new DefaultAzureCredential());
 
-                if (!string.IsNullOrEmpty(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL))
-                {
-                    builder
+                builder
                         .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL))
                         .WithName(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
-                }
-                else
-                {
-                    builder
-                        .AddBlobServiceClient(
-                            blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)
-                        .WithName(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
-                }
             });
 
         services.TryAddBlobStorageHealthCheck(

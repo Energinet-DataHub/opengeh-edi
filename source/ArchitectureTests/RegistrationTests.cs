@@ -62,7 +62,7 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", "FakeQueueNameWholesale");
         Environment.SetEnvironmentVariable($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", "FakeQueueNameEdi");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
-        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
+        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateDevelopmentStorageUrl());
 
         // The following declaration slows down the test execution, since creating a new Uri is a heavy operation
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
@@ -350,10 +350,7 @@ public class RegistrationTests
             return "https://dummy.url";
         }
 
-        public static string CreateDevelopmentStorageConnectionString()
-        {
-            return "UseDevelopmentStorage=true";
-        }
+        public static string CreateDevelopmentStorageUrl() => $"https://{Guid.NewGuid():N}.blob.core.windows.net";
 
         public override bool IsRunningLocally()
         {
