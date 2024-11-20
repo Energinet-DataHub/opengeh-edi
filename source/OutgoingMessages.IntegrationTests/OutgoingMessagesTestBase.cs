@@ -186,7 +186,7 @@ public class OutgoingMessagesTestBase : IDisposable
     private void BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
-        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", Fixture.AzuriteManager.BlobStorageServiceUri.AbsolutePath);
+        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

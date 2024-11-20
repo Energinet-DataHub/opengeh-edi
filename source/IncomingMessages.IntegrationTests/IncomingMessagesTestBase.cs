@@ -159,7 +159,7 @@ public class IncomingMessagesTestBase : IDisposable
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
             "AZURE_STORAGE_ACCOUNT_URL",
-            Fixture.AzuriteManager.BlobStorageServiceUri.AbsolutePath);
+            Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()
