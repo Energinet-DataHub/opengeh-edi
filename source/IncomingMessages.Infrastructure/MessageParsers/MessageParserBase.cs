@@ -22,6 +22,10 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
 public abstract class MessageParserBase<TSchema>() : IMessageParser
 {
+    public abstract IncomingDocumentType DocumentType { get; }
+
+    public abstract DocumentFormat DocumentFormat { get; }
+
     public async Task<IncomingMarketMessageParserResult> ParseAsync(
         IIncomingMarketMessageStream marketMessage,
         CancellationToken cancellationToken)
