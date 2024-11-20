@@ -17,14 +17,11 @@ using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
-/// Request for scheduling an orchestration instance.
+/// Command for canceling a scheduled orchestration instance.
 /// </summary>
-/// <typeparam name="TInputParameterDto">Must be a JSON serializable type.</typeparam>
-/// <param name="UserIdentity">Identity of the user requesting the operation.</param>
-/// <param name="RunAt">The time when the orchestration instance should be executed by the Scheduler.</param>
-/// <param name="InputParameter">Contains the Durable Functions orchestration input parameter value.</param>
-public record ScheduleOrchestrationInstanceDto<TInputParameterDto>(
+/// <param name="UserIdentity">Identity of the user executing the command.</param>
+/// <param name="Id">Id of the scheduled orchestration instance to cancel.</param>
+public record CancelScheduledOrchestrationInstanceCommand(
     UserIdentityDto UserIdentity,
-    DateTimeOffset RunAt,
-    TInputParameterDto InputParameter)
-        where TInputParameterDto : class;
+    Guid Id)
+        : UserCommand(UserIdentity);

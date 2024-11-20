@@ -26,7 +26,7 @@ internal class NotifyAggregatedMeasureDataHandler(
     private readonly IStartOrchestrationInstanceCommands _manager = manager;
 
     public async Task<OrchestrationInstanceId> ScheduleNewCalculationAsync(
-        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto)
+        ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1> dto)
     {
         // TODO:
         // Server-side validation => Validate "period" is midnight values when given "timezone" etc.

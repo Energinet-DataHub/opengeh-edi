@@ -92,7 +92,7 @@ public class MonitorCalculationUsingClientsScenario : IAsyncLifetime
         // Step 1: Schedule new calculation orchestration instance
         var orchestrationInstanceId = await calculationClient
             .ScheduleNewCalculationAsync(
-                new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>(
+                new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1>(
                     UserIdentity: new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance.UserIdentityDto(
                         UserId: Guid.NewGuid(),
                         ActorId: Guid.NewGuid()),

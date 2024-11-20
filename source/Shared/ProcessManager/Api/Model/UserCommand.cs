@@ -17,10 +17,7 @@ using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
-/// Request for canceling a scheduled orchestration instance.
+/// A command executed by a user.
 /// </summary>
-/// <param name="UserIdentity">Identity of the user requesting the operation.</param>
-/// <param name="Id">Id of the scheduled orchestration instance to cancel.</param>
-public record CancelScheduledOrchestrationInstanceDto(
-    UserIdentityDto UserIdentity,
-    Guid Id);
+/// <param name="UserIdentity">Identity of the user executing the command.</param>
+public abstract record UserCommand(UserIdentityDto UserIdentity);
