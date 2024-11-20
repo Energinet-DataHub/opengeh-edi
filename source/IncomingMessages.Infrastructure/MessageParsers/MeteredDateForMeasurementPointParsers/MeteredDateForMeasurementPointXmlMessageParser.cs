@@ -42,8 +42,6 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
 
     public override IncomingDocumentType DocumentType => IncomingDocumentType.MeteredDataForMeasurementPoint;
 
-    public override DocumentFormat DocumentFormat => DocumentFormat.Xml;
-
     protected override string RootPayloadElementName => "NotifyValidatedMeasureData_MarketDocument";
 
     protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
@@ -73,7 +71,6 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
                 ?.Value;
 
             var energyObservations = seriesElement
-                //.Element(ns + Period)?
                 .Descendants(ns + PointElementName)
                 .Select(
                     e => new EnergyObservation(
