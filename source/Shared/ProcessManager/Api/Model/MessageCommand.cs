@@ -17,37 +17,31 @@ using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
-/// Command for scheduling an orchestration instance.
+/// Command for starting an orchestration instance for a message.
 /// Must be JSON serializable.
 /// </summary>
 /// <typeparam name="TInputParameterDto">Must be a JSON serializable type.</typeparam>
-public record ScheduleOrchestrationInstanceCommand<TInputParameterDto>
-    : UserCommand
+public record MessageCommand<TInputParameterDto>
+    : StartOrchestrationInstanceCommand<TInputParameterDto>
     where TInputParameterDto : IInputParameterDto
 {
     /// <summary>
     /// Construct command.
     /// </summary>
-    /// <param name="operatingIdentity">Identity of the user executing the command.</param>
-    /// <param name="runAt">The time when the orchestration instance should be executed by the Scheduler.</param>
+    /// <param name="operatingIdentity">Identity executing the command.</param>
     /// <param name="inputParameter">Contains the Durable Functions orchestration input parameter value.</param>
-    public ScheduleOrchestrationInstanceCommand(
-        UserIdentityDto operatingIdentity,
-        DateTimeOffset runAt,
-        TInputParameterDto inputParameter)
-            : base(operatingIdentity)
+    /// <param name="messageId">Id of the message that casued this command to be executed.</param>
+    public MessageCommand(
+        IOperatingIdentityDto operatingIdentity,
+        TInputParameterDto inputParameter,
+        string messageId)
+            : base(operatingIdentity, inputParameter)
     {
-        RunAt = runAt;
-        InputParameter = inputParameter;
+        MessageId = messageId;
     }
 
     /// <summary>
-    /// The time when the orchestration instance should be executed by the Scheduler.
+    /// Id of the message that casued this command to be executed.
     /// </summary>
-    public DateTimeOffset RunAt { get; }
-
-    /// <summary>
-    /// Contains the Durable Functions orchestration input parameter value.
-    /// </summary>
-    public TInputParameterDto InputParameter { get; }
+    public string MessageId { get; }
 }

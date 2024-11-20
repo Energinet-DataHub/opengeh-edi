@@ -39,7 +39,9 @@ internal class NotifyAggregatedMeasureDataHandler(
 
         var orchestrationInstanceId = await _manager
             .ScheduleNewOrchestrationInstanceAsync(
-                identity: new UserIdentity(new UserId(command.UserIdentity.UserId), new ActorId(command.UserIdentity.ActorId)),
+                identity: new UserIdentity(
+                    new UserId(command.OperatingIdentity.UserId),
+                    new ActorId(command.OperatingIdentity.ActorId)),
                 name: "BRS_023_027",
                 version: 1,
                 inputParameter: command.InputParameter,

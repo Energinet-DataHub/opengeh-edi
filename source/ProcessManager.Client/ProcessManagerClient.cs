@@ -40,8 +40,9 @@ internal class ProcessManagerClient : IProcessManagerClient
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
             "/api/processmanager/orchestrationinstance/cancel");
+        var json = JsonSerializer.Serialize(command);
         request.Content = new StringContent(
-            JsonSerializer.Serialize(command),
+            json,
             Encoding.UTF8,
             "application/json");
 

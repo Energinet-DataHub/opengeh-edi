@@ -104,7 +104,7 @@ public class OrchestrationInstanceMapperExtensionsTests
         return orchestrationInstance;
     }
 
-    private class TestOrchestrationParameter
+    private class TestOrchestrationParameter : IInputParameterDto
     {
         public string? TestString { get; set; }
 

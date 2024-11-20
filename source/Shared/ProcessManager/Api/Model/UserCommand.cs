@@ -18,6 +18,7 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
 /// A command executed by a user.
+/// Must be JSON serializable.
 /// </summary>
 public abstract record UserCommand
         : OrchestrationInstanceCommand
@@ -25,9 +26,9 @@ public abstract record UserCommand
     /// <summary>
     /// Construct command.
     /// </summary>
-    /// <param name="userIdentity">Identity of the user executing the command.</param>
-    protected UserCommand(UserIdentityDto userIdentity)
-        : base(userIdentity)
+    /// <param name="operatingIdentity">Identity of the user executing the command.</param>
+    protected UserCommand(UserIdentityDto operatingIdentity)
+        : base(operatingIdentity)
     {
     }
 

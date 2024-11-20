@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1.Models;
 
@@ -26,13 +27,13 @@ public interface IRequestCalculatedDataClientV1
     /// Start a request for energy results
     /// </summary>
     public Task RequestCalculatedEnergyTimeSeriesAsync(
-        RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1> input,
+        MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command,
         CancellationToken cancellationToken);
 
     /// <summary>
     /// Start a request for wholesale results
     /// </summary>
     public Task RequestCalculatedWholesaleServicesAsync(
-        RequestCalculatedDataInputV1<object> input,
+        MessageCommand<RequestCalculatedWholesaleServicesInputV1> command,
         CancellationToken cancellationToken);
 }

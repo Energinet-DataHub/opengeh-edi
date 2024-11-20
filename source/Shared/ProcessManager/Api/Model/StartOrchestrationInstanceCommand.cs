@@ -18,12 +18,28 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
 /// Command for starting an orchestration instance.
+/// Must be JSON serializable.
 /// </summary>
 /// <typeparam name="TInputParameterDto">Must be a JSON serializable type.</typeparam>
-/// <param name="OperatingIdentity">Identity executing the command.</param>
-/// <param name="InputParameter">Contains the Durable Functions orchestration input parameter value.</param>
-public record StartOrchestrationInstanceCommand<TInputParameterDto>(
-    IOperatingIdentityDto OperatingIdentity,
-    TInputParameterDto InputParameter)
-        : OrchestrationInstanceCommand(OperatingIdentity)
-        where TInputParameterDto : IInputParameterDto;
+public record StartOrchestrationInstanceCommand<TInputParameterDto>
+    : OrchestrationInstanceCommand
+    where TInputParameterDto : IInputParameterDto
+{
+    /// <summary>
+    /// Construct command.
+    /// </summary>
+    /// <param name="operatingIdentity">Identity executing the command.</param>
+    /// <param name="inputParameter">Contains the Durable Functions orchestration input parameter value.</param>
+    public StartOrchestrationInstanceCommand(
+        IOperatingIdentityDto operatingIdentity,
+        TInputParameterDto inputParameter)
+            : base(operatingIdentity)
+    {
+        InputParameter = inputParameter;
+    }
+
+    /// <summary>
+    /// Contains the Durable Functions orchestration input parameter value.
+    /// </summary>
+    public TInputParameterDto InputParameter { get; }
+}

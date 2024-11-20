@@ -18,10 +18,26 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
 /// Command for canceling a scheduled orchestration instance.
+/// Must be JSON serializable.
 /// </summary>
-/// <param name="UserIdentity">Identity of the user executing the command.</param>
-/// <param name="Id">Id of the scheduled orchestration instance to cancel.</param>
-public record CancelScheduledOrchestrationInstanceCommand(
-    UserIdentityDto UserIdentity,
-    Guid Id)
-        : UserCommand(UserIdentity);
+public record CancelScheduledOrchestrationInstanceCommand
+    : UserCommand
+{
+    /// <summary>
+    /// Construct command.
+    /// </summary>
+    /// <param name="operatingIdentity">Identity of the user executing the command.</param>
+    /// <param name="id">Id of the scheduled orchestration instance to cancel.</param>
+    public CancelScheduledOrchestrationInstanceCommand(
+        UserIdentityDto operatingIdentity,
+        Guid id)
+            : base(operatingIdentity)
+    {
+        Id = id;
+    }
+
+    /// <summary>
+    /// Id of the scheduled orchestration instance to cancel.
+    /// </summary>
+    public Guid Id { get; }
+}

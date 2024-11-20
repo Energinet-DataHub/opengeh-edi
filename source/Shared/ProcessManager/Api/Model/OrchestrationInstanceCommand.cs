@@ -18,21 +18,8 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
 /// A orchestration instance command executed by an identity.
+/// Must be JSON serializable.
 /// </summary>
 /// <param name="OperatingIdentity">The identity executing the command.</param>
 public abstract record OrchestrationInstanceCommand(
     IOperatingIdentityDto OperatingIdentity);
-
-#pragma warning disable SA1201 // Elements should appear in the correct order
-public interface IOrchestratingInstanceCommand
-#pragma warning restore SA1201 // Elements should appear in the correct order
-{
-    IOperatingIdentityDto OperatingIdentity { get; }
-}
-
-#pragma warning disable SA1201 // Elements should appear in the correct order
-public interface IUserCommand : IOrchestratingInstanceCommand
-#pragma warning restore SA1201 // Elements should appear in the correct order
-{
-    new UserIdentityDto OperatingIdentity { get; }
-}

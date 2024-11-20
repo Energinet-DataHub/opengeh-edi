@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Api.Model;
+
 namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
 
-public record RequestCalculatedDataInputV1<TInput>(
-    string MessageId,
-    TInput Input)
-    where TInput : class;
+public record RequestCalculatedWholesaleServicesInputV1()
+    : IInputParameterDto;

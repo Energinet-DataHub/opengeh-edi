@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="..\Shared\ProcessManager\Api\Model\CancelScheduledOrchestrationInstanceCommand.cs" Link="Model\CancelScheduledOrchestrationInstanceCommand.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\IInputParameterDto.cs" Link="Model\IInputParameterDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\MessageCommand.cs" Link="Model\MessageCommand.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceCommand.cs" Link="Model\OrchestrationInstanceCommand.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceTypedDto.cs" Link="Model\OrchestrationInstanceTypedDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\ActorIdentityDto.cs" Link="Model\OrchestrationInstance\ActorIdentityDto.cs" />

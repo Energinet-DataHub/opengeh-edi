@@ -19,6 +19,7 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 /// <summary>
 /// Contains information about an orchestration instance including
 /// specific input parameter values.
+/// Must be JSON serializable.
 /// </summary>
 /// <typeparam name="TInputParameterDto">Must be a JSON serializable type.</typeparam>
 /// <param name="Id"></param>
@@ -32,4 +33,4 @@ public record OrchestrationInstanceTypedDto<TInputParameterDto>(
     TInputParameterDto ParameterValue,
     IReadOnlyCollection<StepInstanceDto> Steps,
     string CustomState)
-        where TInputParameterDto : class;
+        where TInputParameterDto : IInputParameterDto;

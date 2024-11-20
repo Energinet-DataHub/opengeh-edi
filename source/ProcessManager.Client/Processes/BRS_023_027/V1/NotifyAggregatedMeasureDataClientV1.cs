@@ -46,8 +46,9 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
             "/api/processmanager/orchestrationinstance/brs_023_027/1");
+        var json = JsonSerializer.Serialize(command);
         request.Content = new StringContent(
-            JsonSerializer.Serialize(command),
+            json,
             Encoding.UTF8,
             "application/json");
 

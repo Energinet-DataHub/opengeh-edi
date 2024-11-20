@@ -93,11 +93,11 @@ public class MonitorCalculationUsingClientsScenario : IAsyncLifetime
         var orchestrationInstanceId = await calculationClient
             .ScheduleNewCalculationAsync(
                 new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1>(
-                    UserIdentity: new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance.UserIdentityDto(
+                    operatingIdentity: new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance.UserIdentityDto(
                         UserId: Guid.NewGuid(),
                         ActorId: Guid.NewGuid()),
-                    RunAt: DateTimeOffset.Parse("2024-11-01T06:19:10.0209567+01:00"),
-                    InputParameter: new NotifyAggregatedMeasureDataInputV1(
+                    runAt: DateTimeOffset.Parse("2024-11-01T06:19:10.0209567+01:00"),
+                    inputParameter: new NotifyAggregatedMeasureDataInputV1(
                         CalculationTypes.BalanceFixing,
                         GridAreaCodes: new[] { "543" },
                         PeriodStartDate: DateTimeOffset.Parse("2024-10-29T15:19:10.0151351+01:00"),

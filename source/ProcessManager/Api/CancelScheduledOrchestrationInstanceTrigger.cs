@@ -45,7 +45,9 @@ internal class CancelScheduledOrchestrationInstanceTrigger(
     {
         await _command
             .CancelScheduledOrchestrationInstanceAsync(
-                new UserIdentity(new UserId(command.UserIdentity.UserId), new ActorId(command.UserIdentity.ActorId)),
+                new UserIdentity(
+                    new UserId(command.OperatingIdentity.UserId),
+                    new ActorId(command.OperatingIdentity.ActorId)),
                 new OrchestrationInstanceId(command.Id))
             .ConfigureAwait(false);
 
