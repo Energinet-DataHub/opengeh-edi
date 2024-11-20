@@ -29,3 +29,48 @@ public record ScheduleOrchestrationInstanceCommand<TInputParameterDto>(
     TInputParameterDto InputParameter)
         : UserCommand(UserIdentity)
         where TInputParameterDto : IInputParameterDto;
+
+public record ScheduleOrchestrationInstanceCommandV2<TInputParameterDto>
+    : IUserCommand
+    where TInputParameterDto : IInputParameterDto
+{
+    private readonly UserIdentityDto _userIdentity;
+
+    public ScheduleOrchestrationInstanceCommandV2(
+        UserIdentityDto userIdentity,
+        DateTimeOffset runAt,
+        TInputParameterDto inputParameter)
+    {
+        _userIdentity = userIdentity;
+
+        RunAt = runAt;
+        InputParameter = inputParameter;
+    }
+
+    public UserIdentityDto OperatingIdentity => _userIdentity;
+
+    public DateTimeOffset RunAt { get; }
+
+    public TInputParameterDto InputParameter { get; }
+
+    IOperatingIdentityDto IOrchestratingInstanceCommand.OperatingIdentity => _userIdentity;
+}
+
+public record ScheduleOrchestrationInstanceCommandV3<TInputParameterDto>
+    : UserCommand
+    where TInputParameterDto : IInputParameterDto
+{
+    public ScheduleOrchestrationInstanceCommandV3(
+        UserIdentityDto userIdentity,
+        DateTimeOffset runAt,
+        TInputParameterDto inputParameter)
+        : base(userIdentity)
+    {
+        RunAt = runAt;
+        InputParameter = inputParameter;
+    }
+
+    public DateTimeOffset RunAt { get; }
+
+    public TInputParameterDto InputParameter { get; }
+}

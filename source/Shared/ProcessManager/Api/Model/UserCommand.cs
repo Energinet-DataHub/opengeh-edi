@@ -19,6 +19,17 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 /// <summary>
 /// A command executed by a user.
 /// </summary>
-/// <param name="UserIdentity">Identity of the user executing the command.</param>
-public abstract record UserCommand(UserIdentityDto UserIdentity)
-    : OrchestrationInstanceCommand(UserIdentity);
+public abstract record UserCommand
+        : OrchestrationInstanceCommand
+{
+    /// <summary>
+    /// Construct command.
+    /// </summary>
+    /// <param name="userIdentity">Identity of the user executing the command.</param>
+    protected UserCommand(UserIdentityDto userIdentity)
+        : base(userIdentity)
+    {
+    }
+
+    public new UserIdentityDto OperatingIdentity => (UserIdentityDto)base.OperatingIdentity;
+}
