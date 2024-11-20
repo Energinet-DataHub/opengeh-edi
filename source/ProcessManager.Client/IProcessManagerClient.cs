@@ -26,7 +26,7 @@ public interface IProcessManagerClient
     /// Cancel a scheduled orchestration instance.
     /// </summary>
     public Task CancelScheduledOrchestrationInstanceAsync(
-        CancelScheduledOrchestrationInstanceCommand requestDto,
+        CancelScheduledOrchestrationInstanceCommand command,
         CancellationToken cancellationToken);
 
     /// <summary>

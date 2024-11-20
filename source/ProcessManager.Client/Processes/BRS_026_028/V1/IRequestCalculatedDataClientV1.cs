@@ -25,10 +25,14 @@ public interface IRequestCalculatedDataClientV1
     /// <summary>
     /// Start a request for energy results
     /// </summary>
-    public Task RequestCalculatedEnergyTimeSeriesAsync(RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1> input, CancellationToken cancellationToken);
+    public Task RequestCalculatedEnergyTimeSeriesAsync(
+        RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1> input,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Start a request for wholesale results
     /// </summary>
-    public Task RequestCalculatedWholesaleServicesAsync(RequestCalculatedDataInputV1<object> input, CancellationToken cancellationToken);
+    public Task RequestCalculatedWholesaleServicesAsync(
+        RequestCalculatedDataInputV1<object> input,
+        CancellationToken cancellationToken);
 }

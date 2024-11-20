@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
-
 namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
-/// A command executed by a user.
+/// Marker interface for serializable input parameters to an orchestration instance.
 /// </summary>
-/// <param name="UserIdentity">Identity of the user executing the command.</param>
-public abstract record UserCommand(UserIdentityDto UserIdentity)
-    : OrchestrationInstanceCommand(UserIdentity);
+public interface IInputParameterDto;

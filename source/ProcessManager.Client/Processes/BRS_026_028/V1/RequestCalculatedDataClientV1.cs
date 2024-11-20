@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Dynamic;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.ProcessManager.Api.Model;
+using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Contracts;
@@ -32,6 +33,17 @@ public class RequestCalculatedDataClientV1(
 
     public async Task RequestCalculatedEnergyTimeSeriesAsync(RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1> input, CancellationToken cancellationToken)
     {
+        var x1 = new StartOrchestrationInstanceCommand<RequestCalculatedEnergyTimeSeriesInputV1>(new ActorIdentityDto(Guid.NewGuid()), input.Input);
+        var y1 = ((ActorIdentityDto)x1.OperatingIdentity).ActorId;
+
+        var x2 = new ScheduleOrchestrationInstanceCommand<RequestCalculatedEnergyTimeSeriesInputV1>(
+            new UserIdentityDto(Guid.NewGuid(), Guid.NewGuid()),
+            DateTimeOffset.MinValue,
+            input.Input);
+        var y2 = ((ActorIdentityDto)x2.OperatingIdentity).ActorId;
+
+
+
         var serviceBusMessage = CreateServiceBusMessage(
             "BRS_026",
             1,

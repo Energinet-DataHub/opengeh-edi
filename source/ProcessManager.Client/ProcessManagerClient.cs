@@ -34,14 +34,14 @@ internal class ProcessManagerClient : IProcessManagerClient
 
     /// <inheritdoc/>
     public async Task CancelScheduledOrchestrationInstanceAsync(
-        CancelScheduledOrchestrationInstanceCommand requestDto,
+        CancelScheduledOrchestrationInstanceCommand command,
         CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
             "/api/processmanager/orchestrationinstance/cancel");
         request.Content = new StringContent(
-            JsonSerializer.Serialize(requestDto),
+            JsonSerializer.Serialize(command),
             Encoding.UTF8,
             "application/json");
 

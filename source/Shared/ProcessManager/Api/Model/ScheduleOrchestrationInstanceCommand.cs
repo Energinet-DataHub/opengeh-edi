@@ -28,4 +28,4 @@ public record ScheduleOrchestrationInstanceCommand<TInputParameterDto>(
     DateTimeOffset RunAt,
     TInputParameterDto InputParameter)
         : UserCommand(UserIdentity)
-        where TInputParameterDto : class;
+        where TInputParameterDto : IInputParameterDto;
