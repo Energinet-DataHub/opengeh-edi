@@ -78,27 +78,6 @@ public class IncomingMessagesTestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected static async Task<string> GetFileContentFromFileStorageAsync(
-        string container,
-        string fileStorageReference)
-    {
-        var azuriteBlobUrl = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL");
-        var blobServiceClient = new BlobServiceClient(new Uri(azuriteBlobUrl!)); // Uses new client to avoid some form of caching or similar
-
-        var containerClient = blobServiceClient.GetBlobContainerClient(container);
-        var blobClient = containerClient.GetBlobClient(fileStorageReference);
-
-        var blobContent = await blobClient.DownloadAsync();
-
-        if (!blobContent.HasValue)
-        {
-            throw new InvalidOperationException(
-                $"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
-        }
-
-        return await GetStreamContentAsStringAsync(blobContent.Value.Content);
-    }
-
     protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -112,6 +91,28 @@ public class IncomingMessagesTestBase : IDisposable
         var stringContent = await streamReader.ReadToEndAsync();
 
         return stringContent;
+    }
+
+    protected async Task<string> GetFileContentFromFileStorageAsync(
+        string container,
+        string fileStorageReference)
+    {
+        var clientFactory = ServiceProvider.GetRequiredService<IAzureClientFactory<BlobServiceClient>>();
+
+        var blobServiceClient = clientFactory.CreateClient(string.Empty);
+
+        var containerClient = blobServiceClient.GetBlobContainerClient(container);
+        var blobClient = containerClient.GetBlobClient(fileStorageReference);
+
+        var blobContent = await blobClient.DownloadAsync();
+
+        if (!blobContent.HasValue)
+        {
+            throw new InvalidOperationException(
+                $"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
+        }
+
+        return await GetStreamContentAsStringAsync(blobContent.Value.Content);
     }
 
     protected async Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(string messageId)
