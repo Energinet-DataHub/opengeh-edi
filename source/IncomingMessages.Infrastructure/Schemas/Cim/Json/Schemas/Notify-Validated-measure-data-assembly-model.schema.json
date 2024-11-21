@@ -1,0 +1,480 @@
+{
+    "$id": "file:///C:/Users/Public/Documents/iec.ch/TC57/2020/Notify-Validated-measure-data-assembly-model.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Notify-Validated-measure-data-assembly-model  profile generated 2022-02-14 11:19:38.665455",
+    "description": "This package contains the model that has been assembled from the contextual model. All classes with relations [1..1] or [0..1] have had their attributes integrated into their parent class.",
+    "namespace": "http://iec.ch/TC57/2020/Notify-Validated-measure-data-assembly-model#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "NotifyValidatedMeasureData_MarketDocument": {
+            "$ref": "#/definitions/NotifyValidatedMeasureData_MarketDocument"
+        }
+    },
+    "definitions": {
+        "Notify-Validated-measure-data-assembly-model": {
+            "$ref": "#"
+        },
+        "NotifyValidatedMeasureData_MarketDocument": {
+            "id": "#NotifyValidatedMeasureData_MarketDocument",
+            "title": "NotifyValidatedMeasureData_MarketDocument",
+            "description": "Electronic document containing the information necessary to satisfy a given business process set of requirements. ",
+            "modelReference": "http://iec.ch/TC57/CIM101#MarketDocument",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#MarketDocument.mRID",
+                    "type": "string"
+                },
+                "businessSector.type": {
+                    "description": "",
+                    "modelReference": "http://iec.ch/TC57/CIM101#businessSector.type",
+                    "$ref": "#/definitions/BusinessSectorKind_String"
+                },
+                "createdDateTime": {
+                    "description": "Date and time that this document was created.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#MarketDocument.createdDateTime",
+                    "type": "string",
+                    "pattern": "^(-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?)$"
+                },
+                "process.processType": {
+                    "description": "The kind of business process.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#process.processType",
+                    "$ref": "#/definitions/ProcessKind_String"
+                },
+                "receiver_MarketParticipant.mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#MarketParticipant.mRID",
+                    "$ref": "#/definitions/PartyID_String"
+                },
+                "receiver_MarketParticipant.marketRole.type": {
+                    "description": "The identification of the role played by a market player.\n\r\n\r--- \n\r--- All roles of this organisation.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#marketRole.type",
+                    "$ref": "#/definitions/MarketRoleKind_String"
+                },
+                "sender_MarketParticipant.mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#MarketParticipant.mRID",
+                    "$ref": "#/definitions/PartyID_String"
+                },
+                "sender_MarketParticipant.marketRole.type": {
+                    "description": "The identification of the role played by a market player.\n\r\n\r--- \n\r--- All roles of this organisation.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#marketRole.type",
+                    "$ref": "#/definitions/MarketRoleKind_String"
+                },
+                "type": {
+                    "description": "Utility-specific classification of this document, according to its corporate standards, practices, and existing IT systems (e.g., for management of assets, maintenance, work, outage, customers, etc.).",
+                    "modelReference": "http://iec.ch/TC57/CIM101#MarketDocument.type",
+                    "$ref": "#/definitions/MessageKind_String"
+                },
+                "Series": {
+                    "description": "",
+                    "modelReference": "http://iec.ch/TC57/CIM101#MarketDocument.Series",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Series"
+                    },
+                    "minItems": 0
+                }
+            },
+            "required": [
+                "mRID",
+                "type",
+                "createdDateTime",
+                "process.processType",
+                "sender_MarketParticipant.mRID",
+                "sender_MarketParticipant.marketRole.type",
+                "receiver_MarketParticipant.mRID",
+                "receiver_MarketParticipant.marketRole.type"
+            ]
+        },
+        "Point": {
+            "id": "#Point",
+            "title": "Point",
+            "description": "An identification of a set of values beeing adressed within a specific interval of time.",
+            "modelReference": "http://iec.ch/TC57/CIM101#Point",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "position": {
+                    "description": "A sequential value representing the relative position within a given time interval.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Point.position",
+                    "$ref": "#/definitions/Position_Integer"
+                },
+                "quality": {
+                    "description": "The quality of the information being provided. This quality may be estimated, not available, as provided, etc.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Point.quality",
+                    "$ref": "#/definitions/Quality_String"
+                },
+                "quantity": {
+                    "description": "Principal quantity identified for a point.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Point.quantity",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "position"
+            ]
+        },
+        "Series": {
+            "id": "#Series",
+            "title": "Series",
+            "description": "A set of similar physical or conceptual objects defined for the same period or point of time.",
+            "modelReference": "http://iec.ch/TC57/CIM101#Series",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Series.mRID",
+                    "type": "string"
+                },
+                "in_Domain.mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Domain.mRID",
+                    "$ref": "#/definitions/AreaID_String"
+                },
+                "marketEvaluationPoint.mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#marketEvaluationPoint.mRID",
+                    "$ref": "#/definitions/MeasurementPointID_String"
+                },
+                "marketEvaluationPoint.type": {
+                    "description": "Specifies if the Market Evaluation Point is an Exchange Point or an Accounting Point.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#marketEvaluationPoint.type",
+                    "$ref": "#/definitions/MarketEvaluationPointKind_String"
+                },
+                "originalTransactionIDReference_Series.mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Series.mRID",
+                    "type": "string"
+                },
+                "out_Domain.mRID": {
+                    "description": "Master resource identifier issued by a model authority. The mRID is unique within an exchange context. Global uniqueness is easily achieved by using a UUID, as specified in RFC 4122, for the mRID. The use of UUID is strongly recommended.\r\nFor CIMXML data files in RDF syntax conforming to IEC 61970-552, the mRID is mapped to rdf:ID or rdf:about attributes that identify CIM object elements.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Domain.mRID",
+                    "$ref": "#/definitions/AreaID_String"
+                },
+                "product": {
+                    "description": "The type of the product such as Power, energy, reactive power, transport capacity that is the subject of the time series.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Series.product",
+                    "type": "string"
+                },
+                "quantity_Measure_Unit.name": {
+                    "description": "The coded representation of the unit.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Measure_Unit.name",
+                    "$ref": "#/definitions/MeasurementUnitKind_String"
+                },
+                "registration_DateAndOrTime.dateTime": {
+                    "description": "Date and time as per ISO 8601 YYYY-MM-DDThh:mm:ss.sssZ.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#DateAndOrTime.dateTime",
+                    "type": "string",
+                    "pattern": "^(-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?)$"
+                },
+                "Period": {
+                    "description": "",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Series.Period",
+                    "$ref": "#/definitions/Series_Period"
+                }
+            },
+            "required": [
+                "mRID",
+                "marketEvaluationPoint.mRID",
+                "marketEvaluationPoint.type",
+                "quantity_Measure_Unit.name",
+                "Period"
+            ]
+        },
+        "Series_Period": {
+            "id": "#Series_Period",
+            "title": "Series_Period",
+            "description": "An identification of a time interval that may have a given resolution.",
+            "modelReference": "http://iec.ch/TC57/CIM101#Period",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "resolution": {
+                    "description": "The number of units of time that compose an individual step within a period.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Period.resolution",
+                    "type": "string",
+                    "pattern": "^(-?)P(?=\\d|T\\d)(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)([DW]))?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+(?:\\.\\d+)?)S)?)?$"
+                },
+                "timeInterval": {
+                    "description": "The start and end date and time for a given interval.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Period.timeInterval",
+                    "$ref": "#/definitions/ESMP_DateTimeInterval"
+                },
+                "Point": {
+                    "description": "",
+                    "modelReference": "http://iec.ch/TC57/CIM101#Period.Point",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Point"
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": [
+                "resolution",
+                "timeInterval",
+                "Point"
+            ]
+        },
+        "MessageKind_String": {
+            "id": "#MessageKind_String",
+            "title": "MessageKind_String",
+            "description": "The coded type of a document.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/MessageTypeList"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "ProcessKind_String": {
+            "id": "#ProcessKind_String",
+            "title": "ProcessKind_String",
+            "description": "The coded identification of the nature of process.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/ProcessTypeList"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "PartyID_String": {
+            "id": "#PartyID_String",
+            "title": "PartyID_String",
+            "description": "The identification of an actor in the energy market.\r\n\r\nIn the ESMP context, it is an authorized issuing office that provides an agreed identification coding scheme for market participant identification.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "codingScheme": {
+                    "description": "DomainQualification.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/CodingSchemeTypeList",
+                    "modelReference": "http://iec.ch/TC57/CIM101#String.codingScheme"
+                },
+                "value": {
+                    "description": "Main Core value Space.",
+                    "type": "string",
+                    "maxLength": 16,
+                    "modelReference": "http://iec.ch/TC57/CIM101#String.value"
+                }
+            },
+            "required": [
+                "codingScheme",
+                "value"
+            ]
+        },
+        "MarketRoleKind_String": {
+            "id": "#MarketRoleKind_String",
+            "title": "MarketRoleKind_String",
+            "description": "The identification of the role played by a party.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/RoleTypeList"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "Position_Integer": {
+            "id": "#Position_Integer",
+            "title": "Position_Integer",
+            "description": "An integer value, this value is used as a sequential value representing the relative position of an entity within a space such as a time interval.",
+            "modelReference": "http://iec.ch/TC57/CIM101#Integer",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "type": "integer",
+                    "maximum": 999999,
+                    "minimum": 1
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "Quality_String": {
+            "id": "#Quality_String",
+            "title": "Quality_String",
+            "description": "The coded identification of the quality of the information.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/QualityTypeList"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "MeasurementPointID_String": {
+            "id": "#MeasurementPointID_String",
+            "title": "MeasurementPointID_String",
+            "description": "The coded identification of a domain covering a number of related objects, such as metering point, accounting point, etc.\r\n\r\nIn the ESMP context, it is an authorized issuing office that provides an agreed identification coding scheme for measurement point identification.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "codingScheme": {
+                    "description": "DomainQualification.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/CodingSchemeTypeList",
+                    "modelReference": "http://iec.ch/TC57/CIM101#String.codingScheme"
+                },
+                "value": {
+                    "description": "Main Core value Space.",
+                    "type": "string",
+                    "maxLength": 35,
+                    "modelReference": "http://iec.ch/TC57/CIM101#String.value"
+                }
+            },
+            "required": [
+                "codingScheme",
+                "value"
+            ]
+        },
+        "AreaID_String": {
+            "id": "#AreaID_String",
+            "title": "AreaID_String",
+            "description": "The coded identification of a domain, i.e. balance area, grid area, etc.\r\n\r\nIn the ESMP context, it is an authorized issuing office that provides an agreed identification coding scheme for domain identification.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "codingScheme": {
+                    "description": "DomainQualification.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/CodingSchemeTypeList",
+                    "modelReference": "http://iec.ch/TC57/CIM101#String.codingScheme"
+                },
+                "value": {
+                    "description": "Main Core value Space.",
+                    "type": "string",
+                    "maxLength": 18,
+                    "modelReference": "http://iec.ch/TC57/CIM101#String.value"
+                }
+            },
+            "required": [
+                "codingScheme",
+                "value"
+            ]
+        },
+        "MeasurementUnitKind_String": {
+            "id": "#MeasurementUnitKind_String",
+            "title": "MeasurementUnitKind_String",
+            "description": "The coded identification of a unit of measure that is applied to a quantity. The measurement units shall be in compliance with UN/ECE Recommendation 20.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/UnitOfMeasureTypeList"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "YMDHM_DateTime": {
+            "id": "#YMDHM_DateTime",
+            "title": "YMDHM_DateTime",
+            "description": "In ESMP, the date and time is expressed as \"YYYY-MM-DDThh:mmZ\", which conforms with ISO 8601 UTC time zone. This date and time is without the seconds.",
+            "modelReference": "http://iec.ch/TC57/CIM101#DateTime",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "The date and time as \"YYYY-MM-DDThh:mmZ\", which conforms with the ISO 8601 UTC time zone.",
+                    "type": "string",
+                    "pattern": "^((([0-9]{4})[\\-](0[13578]|1[02])[\\-](0[1-9]|[12][0-9]|3[01])|([0-9]{4})[\\-]((0[469])|(11))[\\-](0[1-9]|[12][0-9]|30))T(([01][0-9]|2[0-3]):[0-5][0-9])Z)|(([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])[\\-](02)[\\-](0[1-9]|1[0-9]|2[0-9])T(([01][0-9]|2[0-3]):[0-5][0-9])Z)|(([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])[\\-](02)[\\-](0[1-9]|1[0-9]|2[0-8])T(([01][0-9]|2[0-3]):[0-5][0-9])Z)$"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "ESMP_DateTimeInterval": {
+            "id": "#ESMP_DateTimeInterval",
+            "title": "ESMP_DateTimeInterval",
+            "description": "This datatype enables to express the start date and time, and the end date and time of a time interval with a specific pattern. This pattern is the YYYY-MM-DDThh:mmZ.",
+            "modelReference": "http://iec.ch/TC57/CIM101#DateTimeInterval",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "start": {
+                    "description": "The start date and time of the interval with a minute resolution.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#DateTimeInterval.start",
+                    "$ref": "#/definitions/YMDHM_DateTime"
+                },
+                "end": {
+                    "description": "The end date and time of the interval with a minute resolution.",
+                    "modelReference": "http://iec.ch/TC57/CIM101#DateTimeInterval.end",
+                    "$ref": "#/definitions/YMDHM_DateTime"
+                }
+            },
+            "required": [
+                "start",
+                "end"
+            ]
+        },
+        "BusinessSectorKind_String": {
+            "id": "#BusinessSectorKind_String",
+            "title": "BusinessSectorKind_String",
+            "description": "A code indicating the function of the message.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/BusinessSectorTypeList"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        },
+        "MarketEvaluationPointKind_String": {
+            "id": "#MarketEvaluationPointKind_String",
+            "title": "MarketEvaluationPointKind_String",
+            "description": "A code specifying how the energy volumes are treated for settlement for an Accounting Point, such as profiled or non-profiled.",
+            "modelReference": "http://iec.ch/TC57/CIM101#String",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "Main Core value Space.",
+                    "$ref": "urn-entsoe-eu-wgedi-codelists.schema.json#/definitions/MeteringPointTypeList"
+                }
+            },
+            "required": [
+                "value"
+            ]
+        }
+    }
+}

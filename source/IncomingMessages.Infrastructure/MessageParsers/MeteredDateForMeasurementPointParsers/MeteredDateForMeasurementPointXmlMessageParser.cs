@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Xml.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
@@ -37,6 +38,11 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
     private const string PositionElementName = "position";
     private const string QuantityElementName = "quantity";
     private const string QualityElementName = "quality";
+    private const string RegistrationDateAndOrTimeElementName = "registration_DateAndOrTime.dateTime";
+
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.MeteredDataForMeasurementPoint;
+
+    public override DocumentFormat DocumentFormat => DocumentFormat.Xml;
 
     protected override string RootPayloadElementName => "NotifyValidatedMeasureData_MarketDocument";
 
@@ -51,6 +57,7 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
             var meteringPointLocationId = seriesElement.Element(ns + MeteringPointDomainLocationElementName)?.Value;
             var meteringPointType = seriesElement.Element(ns + TypeOfMeteringPointElementName)?.Value;
             var productNumber = seriesElement.Element(ns + ProductElementName)?.Value;
+            var registrationDateAndOrTime = seriesElement.Element(ns + RegistrationDateAndOrTimeElementName)?.Value;
             var productUnitType = seriesElement.Element(ns + UnitTypeElementName)?.Value;
 
             var periodElement = seriesElement.Element(ns + PeriodElementName);
@@ -82,6 +89,7 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
                     startDateAndOrTimeDateTime,
                     endDateAndOrTimeDateTime,
                     productNumber,
+                    registrationDateAndOrTime,
                     productUnitType,
                     meteringPointType,
                     meteringPointLocationId,

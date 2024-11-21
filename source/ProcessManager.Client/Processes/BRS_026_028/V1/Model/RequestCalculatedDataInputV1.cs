@@ -12,17 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
-
-public interface IMessageParser
-{
-    IncomingDocumentType DocumentType { get; }
-
-    DocumentFormat DocumentFormat { get; }
-
-    Task<IncomingMarketMessageParserResult> ParseAsync(
-        IIncomingMarketMessageStream marketMessage,
-        CancellationToken cancellationToken);
-}
+public record RequestCalculatedDataInputV1<TInput>(
+    string MessageId,
+    TInput Input)
+    where TInput : class;

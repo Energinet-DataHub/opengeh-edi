@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
+namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 
-public interface IMessageParser
+/// <summary>
+/// Options for configuration of Process Manager Service Bus clients using the Process Manager.
+/// </summary>
+public class ProcessManagerServiceBusClientsOptions
 {
-    IncomingDocumentType DocumentType { get; }
+    public const string SectionName = "ProcessManagerServiceBusClients";
 
-    DocumentFormat DocumentFormat { get; }
-
-    Task<IncomingMarketMessageParserResult> ParseAsync(
-        IIncomingMarketMessageStream marketMessage,
-        CancellationToken cancellationToken);
+    /// <summary>
+    /// Name of the topic which the Process Manager receives service bus messages on
+    /// </summary>
+    [Required]
+    public string TopicName { get; set; } = string.Empty;
 }
