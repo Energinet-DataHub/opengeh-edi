@@ -57,7 +57,7 @@ public class RequestCalculatedDataClientV1(
     private ServiceBusMessage CreateServiceBusMessage<TInputParameterDto>(
         string orchestrationName,
         int orchestrationVersion,
-        MessageCommand<TInputParameterDto> inputParameter)
+        MessageCommand<TInputParameterDto> command)
     where TInputParameterDto : IInputParameterDto
     {
         var message = new StartOrchestrationDto
