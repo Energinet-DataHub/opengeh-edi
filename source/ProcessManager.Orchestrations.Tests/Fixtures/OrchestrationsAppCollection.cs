@@ -21,6 +21,6 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 ///  * https://xunit.net/docs/shared-context#collection-fixture
 /// </summary>
 [CollectionDefinition(nameof(OrchestrationsAppCollection))]
-public class OrchestrationsAppCollection : ICollectionFixture<OrchestrationsAppFixture>
+public class OrchestrationsAppCollection : ICollectionFixture<OrchestrationsAppFixture>, ICollectionFixture<OrchestrationsAppFixtureNew>
 {
 }
