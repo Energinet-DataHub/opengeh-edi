@@ -36,7 +36,7 @@ public class B2CWebApiFixture : IAsyncLifetime
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
         DatabaseManager = new EdiDatabaseManager("B2CWebApi");
-        AzuriteManager = new AzuriteManager();
+        AzuriteManager = new AzuriteManager(useOAuth: true);
         OpenIdJwtManager = new OpenIdJwtManager(IntegrationTestConfiguration.B2CSettings);
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             TestLogger,
