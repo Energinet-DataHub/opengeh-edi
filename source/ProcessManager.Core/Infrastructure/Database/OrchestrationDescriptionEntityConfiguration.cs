@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 
-public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfiguration<OrchestrationDescription>
+internal class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfiguration<OrchestrationDescription>
 {
     public void Configure(EntityTypeBuilder<OrchestrationDescription> builder)
     {

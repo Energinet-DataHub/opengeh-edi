@@ -22,14 +22,14 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="FluentAssertions" Version="6.12.2" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.33.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -47,6 +47,7 @@ limitations under the License.
 
     <ItemGroup>
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
@@ -79,6 +80,12 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\RequestAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\InvalidMeteredDataForMeasurementPoint.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPointWithTwoTransactions.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\EmptyJsonObject.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
@@ -90,6 +97,18 @@ limitations under the License.
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\VersionIndexOutOfRangeRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\BadVersionMeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\InvalidMeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPointWithTwoTransactions.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement2ChargeTypes.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -123,7 +142,7 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\FailSchemeValidationRequestWholesaleSettlement.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-        <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json"/>
+        <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json" />
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -140,6 +159,10 @@ limitations under the License.
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
         <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPointWithTwoTransactions.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPoint.json" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPoint.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>

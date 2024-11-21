@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Api.Mappers;
 using Microsoft.AspNetCore.Http;
@@ -26,10 +26,10 @@ namespace Energinet.DataHub.ProcessManager.Api;
 
 internal class SearchOrchestrationInstancesTrigger(
     ILogger<SearchOrchestrationInstancesTrigger> logger,
-    IOrchestrationInstanceRepository repository)
+    IOrchestrationInstanceQueries queries)
 {
     private readonly ILogger _logger = logger;
-    private readonly IOrchestrationInstanceRepository _repository = repository;
+    private readonly IOrchestrationInstanceQueries _queries = queries;
 
     [Function(nameof(SearchOrchestrationInstancesTrigger))]
     public async Task<IActionResult> Run(
@@ -62,7 +62,7 @@ internal class SearchOrchestrationInstancesTrigger(
             ? Instant.FromDateTimeOffset(terminatedAtOrEarlierResult)
             : (Instant?)null;
 
-        var orchestrationInstances = await _repository
+        var orchestrationInstances = await _queries
             .SearchAsync(name, version, lifecycleState, terminationState, startedAtOrLater, terminatedAtOrEarlier)
             .ConfigureAwait(false);
 

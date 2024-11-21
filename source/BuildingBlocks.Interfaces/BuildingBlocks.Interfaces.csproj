@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Interfaces</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Interfaces</RootNamespace>

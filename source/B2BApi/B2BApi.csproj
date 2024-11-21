@@ -42,7 +42,7 @@ limitations under the License.
         <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.1.0" />
         <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="8.1.0" />
         <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.1.0" />
-      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -52,6 +52,7 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />

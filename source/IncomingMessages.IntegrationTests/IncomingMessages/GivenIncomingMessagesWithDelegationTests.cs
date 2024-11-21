@@ -112,7 +112,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>()!;
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
@@ -336,7 +336,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>()!;
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
@@ -399,7 +399,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>()!;
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsDelegated.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber);
@@ -495,7 +495,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>()!;
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsGridAccessProvider.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsGridAccessProvider.ActorNumber);
@@ -544,7 +544,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>()!;
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);

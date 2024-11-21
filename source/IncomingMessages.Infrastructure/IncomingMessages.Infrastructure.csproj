@@ -20,9 +20,9 @@
 
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net" Version="7.2.3" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.5" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.8.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -975,6 +975,14 @@
     </EmbeddedResource>
     <None Remove="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_DK_MeteredDataTimeSeries-2.xsd" />
     <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_DK_MeteredDataTimeSeries-2.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="Schemas\Cim\Json\Schemas\Notify-Validated-measure-data-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Notify-Validated-measure-data-assembly-model.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyvalidatedmeasuredata-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyvalidatedmeasuredata-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
