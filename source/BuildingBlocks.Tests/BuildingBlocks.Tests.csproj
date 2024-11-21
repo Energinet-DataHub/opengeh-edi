@@ -16,8 +16,8 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>Energinet.DataHub.BuildingBlocks.Tests</AssemblyName>
-        <RootNamespace>Energinet.DataHub.BuildingBlocks.Tests</RootNamespace>
+        <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Tests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Tests</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     
@@ -25,8 +25,8 @@ limitations under the License.
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
-        <PackageReference Include="FluentAssertions" Version="6.12.1" />
-        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.5" />
+        <PackageReference Include="FluentAssertions" Version="6.12.2" />
+        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.8.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
         <PackageReference Include="Microsoft.OpenApi" Version="1.6.22" />
         <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.1" />
@@ -36,7 +36,6 @@ limitations under the License.
     <ItemGroup>
         <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-        <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     </ItemGroup>
 </Project>

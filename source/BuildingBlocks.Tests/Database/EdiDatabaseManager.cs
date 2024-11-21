@@ -19,7 +19,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.Database;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 
 public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContext>(name + $"_{DateTime.Now:yyyyMMddHHmm}_")
 {

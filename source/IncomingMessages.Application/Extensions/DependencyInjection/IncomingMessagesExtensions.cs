@@ -14,12 +14,12 @@
 
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
@@ -137,12 +137,11 @@ public static class IncomingMessagesExtensions
             .AddSingleton<JsonSchemaProvider>();
 
         services
-            .AddTransient<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>();
-
-        services.AddTransient<IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>>(provider => new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
-        {
-            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Ebix), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>() },
-        });
+            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointJsonMessageParser>();
+        services
+            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointEbixMessageParser>();
+        services
+            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointXmlMessageParser>();
 
         return services;
     }

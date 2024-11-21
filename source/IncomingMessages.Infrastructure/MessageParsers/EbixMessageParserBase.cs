@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
@@ -27,17 +28,19 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
 {
     private const string HeaderElementName = "HeaderEnergyDocument";
     private const string EnergyContextElementName = "ProcessEnergyContext";
-    private const string Identification = "Identification";
-    private const string DocumentType = "DocumentType";
-    private const string Creation = "Creation";
-    private const string SenderEnergyParty = "SenderEnergyParty";
-    private const string RecipientEnergyParty = "RecipientEnergyParty";
-    private const string EnergyBusinessProcess = "EnergyBusinessProcess";
-    private const string EnergyBusinessProcessRole = "EnergyBusinessProcessRole";
-    private const string EnergyIndustryClassification = "EnergyIndustryClassification";
+    private const string IdentificationElementName = "Identification";
+    private const string DocumentTypeElementName = "DocumentType";
+    private const string CreationElementName = "Creation";
+    private const string SenderEnergyPartyElementName = "SenderEnergyParty";
+    private const string RecipientEnergyPartyElementName = "RecipientEnergyParty";
+    private const string EnergyBusinessProcessElementName = "EnergyBusinessProcess";
+    private const string EnergyBusinessProcessRoleElementName = "EnergyBusinessProcessRole";
+    private const string EnergyIndustryClassificationElementName = "EnergyIndustryClassification";
     private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
 
     protected abstract string RootPayloadElementName { get; }
+
+    private Collection<ValidationError> ValidationErrors { get; } = [];
 
     protected override async Task<IncomingMarketMessageParserResult> ParseMessageAsync(
         IIncomingMarketMessageStream marketMessage,
@@ -45,34 +48,27 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         CancellationToken cancellationToken)
     {
         using var reader = XmlReader.Create(marketMessage.Stream, CreateXmlReaderSettings(schemaResult));
-        if (Errors.Count > 0)
+        var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
+        if (ValidationErrors.Count > 0)
         {
-            return new IncomingMarketMessageParserResult(Errors.ToArray());
+            return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
         }
 
-        var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
         var @namespace = GetNamespace(marketMessage);
         var ns = XNamespace.Get(@namespace);
 
         var header = ParseHeader(document, ns);
         var transactions = ParseTransactions(document, ns, header.SenderId);
 
-        if (Errors.Count != 0)
-        {
-            return new IncomingMarketMessageParserResult(Errors.ToArray());
-        }
-
         return CreateResult(header, transactions);
     }
 
-    protected override async Task<(XmlSchema? Schema, IncomingMarketMessageParserResult? Result)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
+    protected override async Task<(XmlSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
     {
-        string? @namespace = null;
-        IncomingMarketMessageParserResult? parserResult = null;
         XmlSchema? xmlSchema = default;
         try
         {
-            @namespace = GetNamespace(marketMessage);
+            var @namespace = GetNamespace(marketMessage);
             var version = GetVersion(@namespace);
             var businessProcessType = BusinessProcessType(@namespace);
             xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version, cancellationToken)
@@ -80,24 +76,23 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
 
             if (xmlSchema is null)
             {
-                parserResult = new IncomingMarketMessageParserResult(
-                    new InvalidBusinessReasonOrVersion(businessProcessType, version));
+                return (xmlSchema, new InvalidBusinessReasonOrVersion(businessProcessType, version));
             }
         }
         catch (XmlException exception)
         {
-            parserResult = Invalid(exception);
+            return (xmlSchema, InvalidMessageStructure.From(exception));
         }
         catch (ObjectDisposedException objectDisposedException)
         {
-            parserResult = Invalid(objectDisposedException);
+            return (xmlSchema, InvalidMessageStructure.From(objectDisposedException));
         }
         catch (IndexOutOfRangeException indexOutOfRangeException)
         {
-            parserResult = Invalid(indexOutOfRangeException);
+            return (xmlSchema, InvalidMessageStructure.From(indexOutOfRangeException));
         }
 
-        return (xmlSchema, parserResult);
+        return (xmlSchema, null);
     }
 
     protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber);
@@ -165,18 +160,18 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         var headerElement = document.Descendants(ns + HeaderElementName).SingleOrDefault();
         if (headerElement == null) throw new InvalidOperationException("Header element not found");
 
-        var messageId = headerElement.Element(ns + Identification)?.Value ?? string.Empty;
-        var messageType = headerElement.Element(ns + DocumentType)?.Value ?? string.Empty;
-        var createdAt = headerElement.Element(ns + Creation)?.Value ?? string.Empty;
-        var senderId = headerElement.Element(ns + SenderEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
-        var receiverId = headerElement.Element(ns + RecipientEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
+        var messageId = headerElement.Element(ns + IdentificationElementName)?.Value ?? string.Empty;
+        var messageType = headerElement.Element(ns + DocumentTypeElementName)?.Value ?? string.Empty;
+        var createdAt = headerElement.Element(ns + CreationElementName)?.Value ?? string.Empty;
+        var senderId = headerElement.Element(ns + SenderEnergyPartyElementName)?.Element(ns + IdentificationElementName)?.Value ?? string.Empty;
+        var receiverId = headerElement.Element(ns + RecipientEnergyPartyElementName)?.Element(ns + IdentificationElementName)?.Value ?? string.Empty;
 
         var energyContextElement = document.Descendants(ns + EnergyContextElementName).FirstOrDefault();
         if (energyContextElement == null) throw new InvalidOperationException("Energy Context element not found");
 
-        var businessReason = energyContextElement.Element(ns + EnergyBusinessProcess)?.Value ?? string.Empty;
-        var senderRole = energyContextElement.Element(ns + EnergyBusinessProcessRole)?.Value ?? string.Empty;
-        var businessType = energyContextElement.Element(ns + EnergyIndustryClassification)?.Value;
+        var businessReason = energyContextElement.Element(ns + EnergyBusinessProcessElementName)?.Value ?? string.Empty;
+        var senderRole = energyContextElement.Element(ns + EnergyBusinessProcessRoleElementName)?.Value ?? string.Empty;
+        var businessType = energyContextElement.Element(ns + EnergyIndustryClassificationElementName)?.Value;
 
         return new MessageHeader(
             messageId,
@@ -210,6 +205,6 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     {
         var message =
             $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
-        Errors.Add(InvalidMessageStructure.From(message));
+        ValidationErrors.Add(InvalidMessageStructure.From(message));
     }
 }

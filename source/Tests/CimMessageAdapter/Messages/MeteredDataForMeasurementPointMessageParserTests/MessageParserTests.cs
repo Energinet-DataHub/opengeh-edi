@@ -18,6 +18,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -36,7 +38,9 @@ public sealed class MessageParserTests
 
     private readonly Dictionary<DocumentFormat, IMessageParser> _marketMessageParser = new()
     {
-        { DocumentFormat.Ebix, new EbixMessageParser(new EbixSchemaProvider()) },
+        { DocumentFormat.Ebix, new MeteredDateForMeasurementPointEbixMessageParser(new EbixSchemaProvider()) },
+        { DocumentFormat.Xml, new MeteredDateForMeasurementPointXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
+        { DocumentFormat.Json, new MeteredDateForMeasurementPointJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
     };
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
@@ -46,6 +50,10 @@ public sealed class MessageParserTests
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeasurementPoint.xml") },
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.xml") },
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.xml") },
+            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeasurementPoint.json") },
+            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.json") },
         };
 
         return data;
@@ -57,6 +65,9 @@ public sealed class MessageParserTests
         {
             { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDataForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
             { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionMeteredDataForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeasurementPoint.json"), nameof(InvalidMessageStructure) },
         };
 
         return data;
@@ -93,9 +104,11 @@ public sealed class MessageParserTests
             series.Resolution.Should()
                 .Match(resolution => resolution == "PT15M" || resolution == "PT1H");
             series.StartDateTime.Should()
-                .Match(startDate => startDate == "2024-06-28T22:00:00Z" || startDate == "2024-06-29T22:00:00Z");
+                .Match(startDate => startDate == "2024-06-28T22:00:00Z" || startDate == "2024-06-29T22:00:00Z"
+                || startDate == "2024-06-28T22:00Z" || startDate == "2024-06-29T22:00Z");
             series.EndDateTime.Should()
-                .Match(endDate => endDate == "2024-06-29T22:00:00Z" || endDate == "2024-06-30T22:00:00Z");
+                .Match(endDate => endDate == "2024-06-29T22:00:00Z" || endDate == "2024-06-30T22:00:00Z"
+                || endDate == "2024-06-29T22:00Z" || endDate == "2024-06-30T22:00Z");
             series.ProductNumber.Should().Be("8716867000030");
             series.ProductUnitType.Should().Be("KWH");
             series.MeteringPointType.Should().Be("E18");
@@ -109,7 +122,7 @@ public sealed class MessageParserTests
                 energyObservation.Position.Should().Be(position.ToString());
                 energyObservation.EnergyQuantity.Should().NotBeEmpty();
                 energyObservation.QuantityQuality.Should()
-                    .Match(quality => quality == "E01" || quality == "56");
+                    .Match(quality => quality == "E01" || quality == "56" || quality == "A03");
                 position++;
             }
         }
@@ -138,5 +151,21 @@ public sealed class MessageParserTests
         xmlDocument.Save(stream);
 
         return stream;
+    }
+
+    private static MemoryStream CreateBaseXmlMessage(string fileName)
+    {
+        var xmlDocument = XDocument.Load(
+            $"{PathToMessages}xml{SubPath}{fileName}");
+
+        var stream = new MemoryStream();
+        xmlDocument.Save(stream);
+
+        return stream;
+    }
+
+    private static FileStream CreateBaseJsonMessage(string fileName)
+    {
+        return new FileStream($"{PathToMessages}json{SubPath}{fileName}", FileMode.Open, FileAccess.Read);
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.OutgoingMessages.Application</AssemblyName>
@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -14,10 +14,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
-    <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
-    <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
+    <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemDefinitionGroup>

@@ -14,7 +14,7 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 
 public class LoggerSpy : ILogger
 {

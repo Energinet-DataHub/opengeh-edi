@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Microsoft.Azure.Functions.Worker;
 using NodaTime;
@@ -25,12 +25,10 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.
 /// </summary>
 internal class Brs023OrchestrationInitializeActivityV1(
     IClock clock,
-    IOrchestrationInstanceProgressRepository progressRepository,
-    IUnitOfWork unitOfWork)
+    IOrchestrationInstanceProgressRepository progressRepository)
     : ProgressActivityBase(
         clock,
-        progressRepository,
-        unitOfWork)
+        progressRepository)
 {
     [Function(nameof(Brs023OrchestrationInitializeActivityV1))]
     public async Task Run(
@@ -41,7 +39,7 @@ internal class Brs023OrchestrationInitializeActivityV1(
             .ConfigureAwait(false);
 
         orchestrationInstance.Lifecycle.TransitionToRunning(Clock);
-        await UnitOfWork.CommitAsync().ConfigureAwait(false);
+        await ProgressRepository.UnitOfWork.CommitAsync().ConfigureAwait(false);
 
         // TODO: For demo purposes; remove when done
         await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);

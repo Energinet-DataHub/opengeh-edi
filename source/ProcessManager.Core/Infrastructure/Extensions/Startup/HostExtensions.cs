@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Registration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +29,7 @@ public static class HostExtensions
     /// <summary>
     /// Register and deregister orchestrations during application startup.
     /// </summary>
-    public static async Task SynchronizeWithOrchestrationRegisterAsync(this IHost host)
+    public static async Task SynchronizeWithOrchestrationRegisterAsync(this IHost host, string hostName)
     {
         var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger(nameof(SynchronizeWithOrchestrationRegisterAsync));
@@ -40,7 +40,7 @@ public static class HostExtensions
             var register = host.Services.GetRequiredService<IOrchestrationRegister>();
             await register
                 .SynchronizeAsync(
-                    hostName: "ProcessManager.Orchestrations",
+                    hostName: hostName,
                     enabledDescriptions)
                 .ConfigureAwait(false);
         }

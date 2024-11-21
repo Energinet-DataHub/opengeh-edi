@@ -22,30 +22,30 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
 public abstract class MessageParserBase<TSchema>() : IMessageParser
 {
-    protected Collection<ValidationError> Errors { get; } = [];
+    public abstract IncomingDocumentType DocumentType { get; }
+
+    public abstract DocumentFormat DocumentFormat { get; }
 
     public async Task<IncomingMarketMessageParserResult> ParseAsync(
         IIncomingMarketMessageStream marketMessage,
         CancellationToken cancellationToken)
     {
         var schemaResult = await GetSchemaAsync(marketMessage, cancellationToken).ConfigureAwait(false);
+        if (schemaResult.ValidationError is not null)
+        {
+            return new IncomingMarketMessageParserResult(schemaResult.ValidationError);
+        }
+
         if (schemaResult.Schema == null)
         {
-            return schemaResult.Result ?? new IncomingMarketMessageParserResult(new InvalidSchemaOrNamespace());
+            return new IncomingMarketMessageParserResult(new InvalidSchemaOrNamespace());
         }
 
         return await ParseMessageAsync(marketMessage, schemaResult.Schema, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    protected static IncomingMarketMessageParserResult Invalid(
-        Exception exception)
-    {
-        return new IncomingMarketMessageParserResult(
-            InvalidMessageStructure.From(exception));
-    }
-
-    protected abstract Task<(TSchema? Schema, IncomingMarketMessageParserResult? Result)>
+    protected abstract Task<(TSchema? Schema, ValidationError? ValidationError)>
         GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken);
 
     protected abstract Task<IncomingMarketMessageParserResult> ParseMessageAsync(

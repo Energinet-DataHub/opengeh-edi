@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
@@ -45,7 +45,7 @@ public class ReceiveIncomingMarketMessage
 
     public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
-        IDictionary<(IncomingDocumentType DocumentType, DocumentFormat DocumentFormat), IMessageParser> messageParsers,
+        IEnumerable<IMessageParser> messageParsers,
         IFeatureFlagManager featureFlagManager,
         ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
@@ -57,7 +57,10 @@ public class ReceiveIncomingMarketMessage
         AuthenticatedActor actorAuthenticator)
     {
         _marketMessageParser = marketMessageParser;
-        _messageParsers = messageParsers;
+        _messageParsers = messageParsers
+            .ToDictionary(
+                parser => (parser.DocumentType, parser.DocumentFormat),
+                parser => parser);
         _featureFlagManager = featureFlagManager;
         _validateIncomingMessage = validateIncomingMessage;
         _responseFactory = responseFactory;
@@ -112,7 +115,7 @@ public class ReceiveIncomingMarketMessage
                 .ConfigureAwait(false);
 
         var validationResult = await _validateIncomingMessage
-            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, cancellationToken)
+            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, incomingDocumentFormat, cancellationToken)
             .ConfigureAwait(false);
 
         if (!validationResult.Success)
