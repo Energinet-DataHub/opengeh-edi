@@ -146,6 +146,9 @@ public static class IncomingMessagesExtensions
         services
             .AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
 
+        services
+            .AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
+
         return services;
     }
 }
