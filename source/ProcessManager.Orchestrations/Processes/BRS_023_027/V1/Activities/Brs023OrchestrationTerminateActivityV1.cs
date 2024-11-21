@@ -38,7 +38,7 @@ internal class Brs023OrchestrationTerminateActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        orchestrationInstance.Lifecycle.TransitionToTerminated(Clock, OrchestrationInstanceTerminationStates.Succeeded);
+        orchestrationInstance.Lifecycle.TransitionToSucceeded(Clock);
         await ProgressRepository.UnitOfWork.CommitAsync().ConfigureAwait(false);
 
         // TODO: For demo purposes; remove when done

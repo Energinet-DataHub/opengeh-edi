@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
+
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 /// <summary>
-/// The step instance lifecycle state information.
+/// An identity performing an Process Manager operation.
+///
+/// We use https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/polymorphism
 /// </summary>
-/// <param name="State"></param>
-/// <param name="TerminationState"></param>
-/// <param name="StartedAt">The time when the Process Manager was used from Durable Functions to transition the state to Running.</param>
-/// <param name="TerminatedAt">The time when the Process Manager was used from Durable Functions to transition the state to Terminated.</param>
-public record StepInstanceLifecycleStateDto(
-    StepInstanceLifecycleStates State,
-    OrchestrationStepTerminationStates? TerminationState,
-    DateTimeOffset? StartedAt,
-    DateTimeOffset? TerminatedAt);
+[JsonPolymorphic(UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor)]
+[JsonDerivedType(typeof(IOperatingIdentityDto), typeDiscriminator: "base")]
+[JsonDerivedType(typeof(UserIdentityDto), typeDiscriminator: "user")]
+[JsonDerivedType(typeof(ActorIdentityDto), typeDiscriminator: "actor")]
+public interface IOperatingIdentityDto;
