@@ -64,7 +64,7 @@ public class RequestCalculatedDataClientV1(
         {
             OrchestrationName = orchestrationName,
             OrchestrationVersion = orchestrationVersion,
-            JsonInput = JsonSerializer.Serialize(inputParameter.InputParameter),
+            JsonInput = JsonSerializer.Serialize(command.InputParameter),
         };
 
         ServiceBusMessage serviceBusMessage = new(JsonFormatter.Default.Format(message))
