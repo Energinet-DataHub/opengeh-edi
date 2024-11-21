@@ -70,7 +70,7 @@ public class RequestCalculatedDataClientV1(
         ServiceBusMessage serviceBusMessage = new(JsonFormatter.Default.Format(message))
         {
             Subject = orchestrationName,
-            MessageId = inputParameter.MessageId,
+            MessageId = command.MessageId,
             ContentType = "application/json",
         };
 
