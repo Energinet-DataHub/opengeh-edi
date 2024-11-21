@@ -26,13 +26,13 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Integration.Moni
 [Collection(nameof(OrchestrationsAppCollection))]
 public class HealthCheckEndpointTests : IAsyncLifetime
 {
-    public HealthCheckEndpointTests(OrchestrationsAppFixtureNew fixture, ITestOutputHelper testOutputHelper)
+    public HealthCheckEndpointTests(OrchestrationsAppFixture fixture, ITestOutputHelper testOutputHelper)
     {
         Fixture = fixture;
         Fixture.SetTestOutputHelper(testOutputHelper);
     }
 
-    private OrchestrationsAppFixtureNew Fixture { get; }
+    private OrchestrationsAppFixture Fixture { get; }
 
     public Task InitializeAsync()
     {
