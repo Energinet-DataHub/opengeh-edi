@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Compile Include="..\ProcessManager.Core.Tests\Fixtures\ProcessManagerDatabaseManager.cs" Link="Fixtures\ProcessManagerDatabaseManager.cs" />
-    <Compile Include="..\ProcessManager.Orchestrations.Tests\Fixtures\OrchestrationsAppFixtureBase.cs" Link="Fixtures\OrchestrationsAppFixtureBase.cs" />
     <Compile Include="..\ProcessManager.Orchestrations.Tests\Fixtures\OrchestrationsAppManager.cs">
       <Link>Fixtures\OrchestrationsAppManager.cs</Link>
     </Compile>
