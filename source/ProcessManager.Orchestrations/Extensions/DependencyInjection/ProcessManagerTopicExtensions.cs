@@ -25,7 +25,7 @@ public static class ProcessManagerTopicExtensions
     public static IServiceCollection AddProcessManagerTopic(this IServiceCollection services)
     {
         services
-            .AddOptionsWithValidateOnStart<ProcessManagerTopicOptions>()
+            .AddOptions<ProcessManagerTopicOptions>()
             .BindConfiguration(ProcessManagerTopicOptions.SectionName)
             .ValidateDataAnnotations();
 
