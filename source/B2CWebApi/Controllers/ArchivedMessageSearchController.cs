@@ -30,16 +30,13 @@ public class ArchivedMessageSearchController : ControllerBase
 {
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly IAuditLogger _auditLogger;
-    private readonly ILogger<ArchivedMessageSearchController> _logger;
 
     public ArchivedMessageSearchController(
         IArchivedMessagesClient archivedMessagesClient,
-        IAuditLogger auditLogger,
-        ILogger<ArchivedMessageSearchController> logger)
+        IAuditLogger auditLogger)
     {
         _archivedMessagesClient = archivedMessagesClient;
         _auditLogger = auditLogger;
-        _logger = logger;
     }
 
     [ApiVersion("2.0")]
@@ -156,28 +153,19 @@ public class ArchivedMessageSearchController : ControllerBase
 
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
-        try
-        {
-            var messages = result.Messages
-                .Select(
-                    x => new ArchivedMessageResultV3(
-                        x.RecordId,
-                        x.Id.ToString(),
-                        x.MessageId,
-                        DocumentTypeMapper.ToDocumentType(x.DocumentType),
-                        x.SenderNumber,
-                        ActorRoleMapper.ToActorRole(x.SenderRoleCode),
-                        x.ReceiverNumber,
-                        ActorRoleMapper.ToActorRole(x.ReceiverRoleCode),
-                        x.CreatedAt.ToDateTimeOffset(),
-                        x.BusinessReason));
-            return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));
-        }
-        catch (ArgumentNullException ex)
-        {
-            var containsANullValue = result.Messages.Any(x => x == null);
-            _logger.LogError(ex, "An ArgumentNullException occurred while processing messages. TotalCount: {TotalCount}, ContainsANullableValue: {ContainsANullValue} Result: {Result}, Messages: {Messages}", result.TotalAmountOfMessages, containsANullValue, result, result?.Messages);
-            throw;
-        }
+        var messages = result.Messages
+            .Select(
+                x => new ArchivedMessageResultV3(
+                    x.RecordId,
+                    x.Id.ToString(),
+                    x.MessageId,
+                    DocumentTypeMapper.ToDocumentType(x.DocumentType),
+                    x.SenderNumber,
+                    ActorRoleMapper.ToActorRole(x.SenderRoleCode),
+                    x.ReceiverNumber,
+                    ActorRoleMapper.ToActorRole(x.ReceiverRoleCode),
+                    x.CreatedAt.ToDateTimeOffset(),
+                    x.BusinessReason));
+        return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));
     }
 }
