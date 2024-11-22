@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Xml.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
@@ -37,6 +38,10 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
     private const string EnergyQuantity = "EnergyQuantity";
     private const string QuantityQuality = "QuantityQuality";
     private const string IntervalEnergyObservation = "IntervalEnergyObservation";
+
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.MeteredDataForMeasurementPoint;
+
+    public override DocumentFormat DocumentFormat => DocumentFormat.Ebix;
 
     protected override string RootPayloadElementName => "DK_MeteredDataTimeSeries";
 
@@ -71,6 +76,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
                 startDateAndOrTimeDateTime,
                 endDateAndOrTimeDateTime,
                 productNumber,
+                null,
                 productUnitType,
                 meteringPointType,
                 meteringPointLocationId,

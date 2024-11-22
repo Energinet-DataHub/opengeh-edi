@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 namespace Energinet.DataHub.ProcessManager.Client;
@@ -25,7 +26,7 @@ public interface IProcessManagerClient
     /// Cancel a scheduled orchestration instance.
     /// </summary>
     public Task CancelScheduledOrchestrationInstanceAsync(
-        Guid id,
+        CancelScheduledOrchestrationInstanceCommand command,
         CancellationToken cancellationToken);
 
     /// <summary>

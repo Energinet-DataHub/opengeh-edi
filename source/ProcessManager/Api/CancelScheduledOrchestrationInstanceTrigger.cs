@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Api.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -35,14 +36,19 @@ internal class CancelScheduledOrchestrationInstanceTrigger(
     public async Task<IActionResult> Run(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
-            "delete",
-            Route = "processmanager/orchestrationinstance/{id:guid}")]
+            "post",
+            Route = "processmanager/orchestrationinstance/cancel")]
         HttpRequest httpRequest,
-        Guid id,
+        [FromBody]
+        CancelScheduledOrchestrationInstanceCommand command,
         FunctionContext executionContext)
     {
         await _command
-            .CancelScheduledOrchestrationInstanceAsync(new OrchestrationInstanceId(id))
+            .CancelScheduledOrchestrationInstanceAsync(
+                new UserIdentity(
+                    new UserId(command.OperatingIdentity.UserId),
+                    new ActorId(command.OperatingIdentity.ActorId)),
+                new OrchestrationInstanceId(command.Id))
             .ConfigureAwait(false);
 
         return new OkResult();

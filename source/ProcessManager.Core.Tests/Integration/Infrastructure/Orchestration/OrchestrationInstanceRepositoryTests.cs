@@ -266,7 +266,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         var isTerminatedAsSucceededV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
         isTerminatedAsSucceededV1.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminatedAsSucceededV1.Lifecycle.TransitionToRunning(SystemClock.Instance);
-        isTerminatedAsSucceededV1.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
+        isTerminatedAsSucceededV1.Lifecycle.TransitionToSucceeded(SystemClock.Instance);
         await _sut.AddAsync(isTerminatedAsSucceededV1);
 
         var isPendingV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
@@ -275,7 +275,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         var isTerminatedAsFailedV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
         isTerminatedAsFailedV2.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminatedAsFailedV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
-        isTerminatedAsFailedV2.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Failed);
+        isTerminatedAsFailedV2.Lifecycle.TransitionToFailed(SystemClock.Instance);
         await _sut.AddAsync(isTerminatedAsFailedV2);
 
         await _sut.UnitOfWork.CommitAsync();
@@ -353,13 +353,13 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         var isTerminated01 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
         isTerminated01.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminated01.Lifecycle.TransitionToRunning(SystemClock.Instance);
-        isTerminated01.Lifecycle.TransitionToTerminated(terminatedAtClockMock01.Object, OrchestrationInstanceTerminationStates.Succeeded);
+        isTerminated01.Lifecycle.TransitionToSucceeded(terminatedAtClockMock01.Object);
         await _sut.AddAsync(isTerminated01);
 
         var isTerminated02 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
         isTerminated02.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminated02.Lifecycle.TransitionToRunning(SystemClock.Instance);
-        isTerminated02.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
+        isTerminated02.Lifecycle.TransitionToFailed(SystemClock.Instance);
         await _sut.AddAsync(isTerminated02);
 
         await _sut.UnitOfWork.CommitAsync();
@@ -395,8 +395,13 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         OrchestrationDescription orchestrationDescription,
         Instant? runAt = default)
     {
+        var userIdentity = new UserIdentity(
+            new UserId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()));
+
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
-            description: orchestrationDescription,
+            userIdentity,
+            orchestrationDescription,
             skipStepsBySequence: [],
             clock: SystemClock.Instance,
             runAt: runAt);

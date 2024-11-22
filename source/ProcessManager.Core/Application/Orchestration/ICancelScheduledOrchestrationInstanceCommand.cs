@@ -21,5 +21,5 @@ public interface ICancelScheduledOrchestrationInstanceCommand
     /// <summary>
     /// Cancel a scheduled orchestration instance.
     /// </summary>
-    Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
+    Task CancelScheduledOrchestrationInstanceAsync(UserIdentity userIdentity, OrchestrationInstanceId id);
 }
