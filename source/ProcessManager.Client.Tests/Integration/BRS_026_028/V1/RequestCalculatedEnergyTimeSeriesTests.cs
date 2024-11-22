@@ -24,33 +24,27 @@ namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration.BRS_026_028.
 [Collection(nameof(ProcessManagerClientCollection))]
 public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
 {
-    private readonly ScenarioProcessManagerAppFixture _processManagerAppFixture;
-    private readonly ScenarioOrchestrationsAppFixture _orchestrationsAppFixture;
-
     public RequestCalculatedEnergyTimeSeriesTests(
-        ScenarioProcessManagerAppFixture processManagerAppFixture,
-        ScenarioOrchestrationsAppFixture orchestrationsAppFixture,
+        ProcessManagerClientFixture processManagerClientFixture,
         ITestOutputHelper testOutputHelper)
     {
-        _processManagerAppFixture = processManagerAppFixture;
-        _orchestrationsAppFixture = orchestrationsAppFixture;
-
-        _processManagerAppFixture.SetTestOutputHelper(testOutputHelper);
-        _orchestrationsAppFixture.SetTestOutputHelper(testOutputHelper);
+        ProcessManagerClientFixture = processManagerClientFixture;
+        ProcessManagerClientFixture.SetTestOutputHelper(testOutputHelper);
     }
+
+    public ProcessManagerClientFixture ProcessManagerClientFixture { get; }
 
     public Task InitializeAsync()
     {
-        _processManagerAppFixture.AppHostManager.ClearHostLog();
-        _orchestrationsAppFixture.AppHostManager.ClearHostLog();
+        ProcessManagerClientFixture.ProcessManagerAppManager.AppHostManager.ClearHostLog();
+        ProcessManagerClientFixture.OrchestrationsAppManager.AppHostManager.ClearHostLog();
 
         return Task.CompletedTask;
     }
 
     public Task DisposeAsync()
     {
-        _processManagerAppFixture.SetTestOutputHelper(null!);
-        _orchestrationsAppFixture.SetTestOutputHelper(null!);
+        ProcessManagerClientFixture.SetTestOutputHelper(null);
 
         return Task.CompletedTask;
     }
@@ -60,7 +54,18 @@ public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
     {
         // TODO: Implement test after implementation of shared Service Bus topic in app fixtures
         // Arrange
-        // var requestCalculatedDataClient = new RequestCalculatedDataClientV1();
+        // await using var serviceBusClient = new ServiceBusClient(
+        //     ProcessManagerClientFixture.IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
+        //     ProcessManagerClientFixture.IntegrationTestConfiguration.Credential);
+        // var serviceBusSender = serviceBusClient.CreateSender(ProcessManagerClientFixture.Brs026Subscription.TopicName);
+        // var serviceBusSenderFactoryMock = new Mock<IAzureClientFactory<ServiceBusSender>>();
+        // serviceBusSenderFactoryMock.Setup(
+        //         f =>
+        //             f.CreateClient(nameof(ProcessManagerServiceBusClientsOptions.TopicName)))
+        //     .Returns(serviceBusSender);
+        //
+        //
+        // var requestCalculatedDataClient = new RequestCalculatedDataClientV1(serviceBusSenderFactoryMock.Object);
         // var input = new RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1>(
         //     Guid.NewGuid().ToString(),
         //     new RequestCalculatedEnergyTimeSeriesInputV1("B1337"));

@@ -40,7 +40,7 @@ public class OrchestrationsAppFixture
         await OrchestrationsAppManager.DisposeAsync();
     }
 
-    public void SetTestOutputHelper(ITestOutputHelper testOutputHelper)
+    public void SetTestOutputHelper(ITestOutputHelper? testOutputHelper)
     {
         OrchestrationsAppManager.SetTestOutputHelper(testOutputHelper);
     }

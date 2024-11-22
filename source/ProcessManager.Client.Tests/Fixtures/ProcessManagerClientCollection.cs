@@ -24,7 +24,6 @@ namespace Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
 /// </summary>
 [CollectionDefinition(nameof(ProcessManagerClientCollection))]
 public class ProcessManagerClientCollection :
-    ICollectionFixture<ScenarioProcessManagerAppFixture>,
-    ICollectionFixture<ScenarioOrchestrationsAppFixture>
+    ICollectionFixture<ProcessManagerClientFixture>
 {
 }

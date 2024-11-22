@@ -43,7 +43,7 @@ public class HealthCheckEndpointTests : IAsyncLifetime
 
     public Task DisposeAsync()
     {
-        Fixture.SetTestOutputHelper(null!);
+        Fixture.SetTestOutputHelper(null);
 
         return Task.CompletedTask;
     }

@@ -14,39 +14,34 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Azure.Identity;
-using Azure.Messaging.ServiceBus.Administration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
-using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
-using Energinet.DataHub.ProcessManager.Orchestrations.Extensions.Options;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
+namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 
 /// <summary>
-/// Support testing Process Manager Orchestrations app and specifying configuration.
+/// Support testing Process Manager app and specifying configuration.
 /// This allows us to use multiple apps and coordinate their configuration.
 /// </summary>
-public class OrchestrationsAppManager : IAsyncDisposable
+public class ProcessManagerAppManager : IAsyncDisposable
 {
-    public OrchestrationsAppManager()
+    public ProcessManagerAppManager()
         : this(
-            new ProcessManagerDatabaseManager("OrchestrationsTest"),
+            new ProcessManagerDatabaseManager("ProcessManagerTest"),
             new IntegrationTestConfiguration(),
-            "OrchestrationsTest01",
-            8010)
+            "ProcessManagerTest01",
+            8000)
     {
     }
 
-    public OrchestrationsAppManager(
+    public ProcessManagerAppManager(
         ProcessManagerDatabaseManager databaseManager,
-        IntegrationTestConfiguration configuration,
+        IntegrationTestConfiguration integrationTestConfiguration,
         string taskHubName,
         int port)
     {
@@ -58,19 +53,12 @@ public class OrchestrationsAppManager : IAsyncDisposable
         Port = port;
 
         TestLogger = new TestDiagnosticsLogger();
-        IntegrationTestConfiguration = configuration;
+        IntegrationTestConfiguration = integrationTestConfiguration;
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
-
-        ServiceBusResourceProvider = new ServiceBusResourceProvider(
-            TestLogger,
-            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
-            IntegrationTestConfiguration.Credential);
     }
-
-    public ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
     public ITestDiagnosticsLogger TestLogger { get; }
 
@@ -93,11 +81,7 @@ public class OrchestrationsAppManager : IAsyncDisposable
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
 
-    /// <summary>
-    /// Start the orchestration app
-    /// </summary>
-    /// <param name="brs026Subscription">The BRS-026 Service Bus subscription. A new subscription will be created if not provided.</param>
-    public async Task StartAsync(SubscriptionProperties? brs026Subscription = null)
+    public async Task StartAsync()
     {
         // Clean up old Azurite storage
         CleanupAzuriteStorage();
@@ -108,19 +92,8 @@ public class OrchestrationsAppManager : IAsyncDisposable
         // Database
         await DatabaseManager.CreateDatabaseAsync();
 
-        // Process Manager topic
-        if (brs026Subscription is null)
-        {
-            var topicResource = await ServiceBusResourceProvider.BuildTopic("pm-topic")
-                .AddSubscription("brs-026-subscription")
-                .CreateAsync();
-            brs026Subscription = topicResource.Subscriptions.Single();
-        }
-
         // Prepare host settings
-        var appHostSettings = CreateAppHostSettings(
-            "ProcessManager.Orchestrations",
-            brs026Subscription);
+        var appHostSettings = CreateAppHostSettings("ProcessManager");
 
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
@@ -132,7 +105,6 @@ public class OrchestrationsAppManager : IAsyncDisposable
         AppHostManager.Dispose();
         AzuriteManager.Dispose();
         await DatabaseManager.DeleteDatabaseAsync();
-        await ServiceBusResourceProvider.DisposeAsync();
     }
 
     /// <summary>
@@ -182,9 +154,7 @@ public class OrchestrationsAppManager : IAsyncDisposable
 #endif
     }
 
-    private FunctionAppHostSettings CreateAppHostSettings(
-        string csprojName,
-        SubscriptionProperties brs026Subscription)
+    private FunctionAppHostSettings CreateAppHostSettings(string csprojName)
     {
         var buildConfiguration = GetBuildConfiguration();
 
@@ -217,16 +187,11 @@ public class OrchestrationsAppManager : IAsyncDisposable
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{ProcessManagerOptions.SectionName}__{nameof(ProcessManagerOptions.SqlDatabaseConnectionString)}",
             DatabaseManager.ConnectionString);
-        // => Service Bus
+
+        // Disable timer trigger (should be manually triggered in tests)
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}",
-            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ProcessManagerTopicOptions.SectionName}__{nameof(ProcessManagerTopicOptions.TopicName)}",
-            brs026Subscription.TopicName);
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ProcessManagerTopicOptions.SectionName}__{nameof(ProcessManagerTopicOptions.Brs026SubscriptionName)}",
-            brs026Subscription.SubscriptionName);
+            $"AzureWebJobs.StartScheduledOrchestrationInstances.Disabled",
+            "true");
 
         return appHostSettings;
     }
