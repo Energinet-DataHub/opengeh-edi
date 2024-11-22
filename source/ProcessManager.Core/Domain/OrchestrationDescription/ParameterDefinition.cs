@@ -22,8 +22,6 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescripti
 /// </summary>
 public class ParameterDefinition
 {
-    internal const string SerializedParameterDefinitionPropertyName = nameof(SerializedParameterDefinition);
-
     internal ParameterDefinition()
     {
         SerializedParameterDefinition = string.Empty;
@@ -31,12 +29,8 @@ public class ParameterDefinition
 
     /// <summary>
     /// The JSON schema defining the parameter type.
-    /// <remarks>
-    /// Parameter name "SerializedParameterDefinition" needs to be in sync with the Entity Framework configuration
-    /// (since it is private).
-    /// </remarks>
     /// </summary>
-    private string SerializedParameterDefinition { get; set; }
+    internal string SerializedParameterDefinition { get; private set; }
 
     /// <summary>
     /// Set the parameter definition by specifying its type.

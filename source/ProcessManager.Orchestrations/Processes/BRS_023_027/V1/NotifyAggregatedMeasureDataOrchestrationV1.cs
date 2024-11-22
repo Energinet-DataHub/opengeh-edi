@@ -30,6 +30,11 @@ internal class NotifyAggregatedMeasureDataOrchestrationV1
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context)
     {
+        // TODO: For demo purposes; decide if we want to continue injecting parameters
+        // OR we want to have a pattern where developers load any info they need from the databae, using the first activity.
+        // Currently we inject parameters when an orchestration is started.
+        // But 'context.InstanceId' contains the 'OrchestrationInstance.Id' so it is possible to load all
+        // information about an 'OrchestrationInstance' in activities and use any information (e.g. UserIdentity).
         var input = context.GetOrchestrationParameterValue<NotifyAggregatedMeasureDataInputV1>();
         if (input == null)
             return "Error: No input specified.";

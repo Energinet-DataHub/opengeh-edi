@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Api.Model;
+
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1.Models;
 
 public record RequestCalculatedEnergyTimeSeriesInputV1(
-    string BusinessReason);
+    string BusinessReason)
+        : IInputParameterDto;
