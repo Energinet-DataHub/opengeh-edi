@@ -12,14 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+namespace Energinet.DataHub.ProcessManager.Api.Model;
 
-public interface ICancelScheduledOrchestrationInstanceCommand
+/// <summary>
+/// A command executed by a user.
+/// Must be JSON serializable.
+/// </summary>
+public abstract record UserCommand
+        : OrchestrationInstanceCommand
 {
     /// <summary>
-    /// Cancel a scheduled orchestration instance.
+    /// Construct command.
     /// </summary>
-    Task CancelScheduledOrchestrationInstanceAsync(UserIdentity userIdentity, OrchestrationInstanceId id);
+    /// <param name="operatingIdentity">Identity of the user executing the command.</param>
+    protected UserCommand(UserIdentityDto operatingIdentity)
+        : base(operatingIdentity)
+    {
+    }
+
+    public new UserIdentityDto OperatingIdentity => (UserIdentityDto)base.OperatingIdentity;
 }

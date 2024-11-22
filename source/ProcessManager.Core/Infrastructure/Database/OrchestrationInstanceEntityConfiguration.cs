@@ -36,21 +36,43 @@ internal class OrchestrationInstanceEntityConfiguration : IEntityTypeConfigurati
             o => o.Lifecycle,
             b =>
             {
-                b.Property(pv => pv.State);
-                b.Property(pv => pv.TerminationState);
+                b.Property(l => l.State);
+                b.Property(l => l.TerminationState);
 
-                b.Property(pv => pv.CreatedAt);
-                b.Property(pv => pv.ScheduledToRunAt);
-                b.Property(pv => pv.QueuedAt);
-                b.Property(pv => pv.StartedAt);
-                b.Property(pv => pv.TerminatedAt);
+                b.OwnsOne(
+                    l => l.CreatedBy,
+                    lb =>
+                    {
+                        lb.Ignore(ct => ct.Value);
+
+                        lb.Property(ct => ct.IdentityType);
+                        lb.Property(ct => ct.ActorId);
+                        lb.Property(ct => ct.UserId);
+                    });
+
+                b.Property(l => l.CreatedAt);
+                b.Property(l => l.ScheduledToRunAt);
+                b.Property(l => l.QueuedAt);
+                b.Property(l => l.StartedAt);
+                b.Property(l => l.TerminatedAt);
+
+                b.OwnsOne(
+                    l => l.CanceledBy,
+                    lb =>
+                    {
+                        lb.Ignore(ct => ct.Value);
+
+                        lb.Property(ct => ct.IdentityType);
+                        lb.Property(ct => ct.ActorId);
+                        lb.Property(ct => ct.UserId);
+                    });
             });
 
         builder.OwnsOne(
             o => o.ParameterValue,
             b =>
             {
-                b.Property(pv => pv.SerializedParameterValue)
+                b.Property(l => l.SerializedParameterValue)
                     .HasColumnName(nameof(OrchestrationInstance.ParameterValue.SerializedParameterValue));
             });
 
@@ -71,13 +93,13 @@ internal class OrchestrationInstanceEntityConfiguration : IEntityTypeConfigurati
                     o => o.Lifecycle,
                     b =>
                     {
-                        b.Property(pv => pv.State);
-                        b.Property(pv => pv.TerminationState);
+                        b.Property(l => l.State);
+                        b.Property(l => l.TerminationState);
 
-                        b.Property(pv => pv.StartedAt);
-                        b.Property(pv => pv.TerminatedAt);
+                        b.Property(l => l.StartedAt);
+                        b.Property(l => l.TerminatedAt);
 
-                        b.Property(pv => pv.CanBeSkipped);
+                        b.Property(l => l.CanBeSkipped);
                     });
 
                 b.Property(s => s.Description);

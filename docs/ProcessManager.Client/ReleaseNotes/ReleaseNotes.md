@@ -1,5 +1,9 @@
 # ProcessManager.Client Release Notes
 
+## Version 0.11.0
+
+- Extend framework to require 'OperatingIdentity' when initiating commands (start, schedule, cancel).
+
 ## Version 0.10.0
 
 - Added 'RequestCalculatedDataClientV1'

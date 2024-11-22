@@ -31,10 +31,11 @@ internal static class OrchestrationInstanceMapperExtensions
             CustomState: entity.CustomState.Value);
     }
 
-    public static ApiModel.OrchestrationInstanceLifecycleStatesDto MapToDto(
+    public static ApiModel.OrchestrationInstanceLifecycleStateDto MapToDto(
         this DomainModel.OrchestrationInstanceLifecycleState entity)
     {
-        return new ApiModel.OrchestrationInstanceLifecycleStatesDto(
+        return new ApiModel.OrchestrationInstanceLifecycleStateDto(
+            CreatedBy: entity.CreatedBy.Value.MapToDto(),
             State: Enum
                 .TryParse<ApiModel.OrchestrationInstanceLifecycleStates>(
                     entity.State.ToString(),
@@ -49,11 +50,31 @@ internal static class OrchestrationInstanceMapperExtensions
                     out var terminationStateResult)
                 ? terminationStateResult
                 : null,
+            CanceledBy: entity.CanceledBy?.Value.MapToDto(),
             CreatedAt: entity.CreatedAt.ToDateTimeOffset(),
             ScheduledToRunAt: entity.ScheduledToRunAt?.ToDateTimeOffset(),
             QueuedAt: entity.QueuedAt?.ToDateTimeOffset(),
             StartedAt: entity.StartedAt?.ToDateTimeOffset(),
             TerminatedAt: entity.TerminatedAt?.ToDateTimeOffset());
+    }
+
+    public static ApiModel.IOperatingIdentityDto MapToDto(
+        this DomainModel.OperatingIdentity entity)
+    {
+        switch (entity)
+        {
+            case DomainModel.ActorIdentity actor:
+                return new ApiModel.ActorIdentityDto(
+                    ActorId: actor.ActorId.Value);
+
+            case DomainModel.UserIdentity user:
+                return new ApiModel.UserIdentityDto(
+                    UserId: user.UserId.Value,
+                    ActorId: user.ActorId.Value);
+
+            default:
+                throw new InvalidOperationException($"Invalid type '{entity.GetType()}'; cannot be mapped.");
+        }
     }
 
     public static ApiModel.StepInstanceDto MapToDto(
