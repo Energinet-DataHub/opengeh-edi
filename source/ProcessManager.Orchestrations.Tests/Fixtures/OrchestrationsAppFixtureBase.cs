@@ -30,10 +30,13 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 /// </summary>
 public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
 {
+    private readonly bool _disposeDatabase;
+
     public OrchestrationsAppFixtureBase(
         ProcessManagerDatabaseManager databaseManager,
         string taskHubName,
-        int port)
+        int port,
+        bool disposeDatabase = true)
     {
         DatabaseManager = databaseManager
             ?? throw new ArgumentNullException(nameof(databaseManager));
@@ -41,7 +44,7 @@ public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;
         Port = port;
-
+        _disposeDatabase = disposeDatabase;
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
@@ -94,7 +97,9 @@ public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
     {
         AppHostManager.Dispose();
         AzuriteManager.Dispose();
-        await DatabaseManager.DeleteDatabaseAsync();
+
+        if (_disposeDatabase)
+            await DatabaseManager.DeleteDatabaseAsync();
     }
 
     /// <summary>

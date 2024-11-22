@@ -18,8 +18,9 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
 public class OrchestrationInstanceLifecycleState
 {
-    internal OrchestrationInstanceLifecycleState(IClock clock, Instant? runAt)
+    internal OrchestrationInstanceLifecycleState(OperatingIdentity createdBy, IClock clock, Instant? runAt)
     {
+        CreatedBy = new OperatingIdentityComplexType(createdBy);
         CreatedAt = clock.GetCurrentInstant();
         ScheduledToRunAt = runAt;
 
@@ -39,6 +40,11 @@ public class OrchestrationInstanceLifecycleState
     public OrchestrationInstanceLifecycleStates State { get; private set; }
 
     public OrchestrationInstanceTerminationStates? TerminationState { get; private set; }
+
+    /// <summary>
+    /// The identity that caused this orchestration instance to be created.
+    /// </summary>
+    public OperatingIdentityComplexType CreatedBy { get; }
 
     /// <summary>
     /// The time when the orchestration instance was created (State => Pending).
@@ -68,6 +74,17 @@ public class OrchestrationInstanceLifecycleState
     /// </summary>
     public Instant? TerminatedAt { get; private set; }
 
+    /// <summary>
+    /// The identity that caused this orchestration instance to be canceled.
+    /// </summary>
+    public OperatingIdentityComplexType? CanceledBy { get; private set; }
+
+    internal string? CreatedByIdentityType { get; private set; }
+
+    internal Guid? CreatedByActorId { get; private set; }
+
+    internal Guid? CreatedByUserId { get; private set; }
+
     public bool IsPendingForScheduledStart()
     {
         return
@@ -93,7 +110,22 @@ public class OrchestrationInstanceLifecycleState
         StartedAt = clock.GetCurrentInstant();
     }
 
-    public void TransitionToTerminated(IClock clock, OrchestrationInstanceTerminationStates terminationState)
+    public void TransitionToSucceeded(IClock clock)
+    {
+        TransitionToTerminated(clock, OrchestrationInstanceTerminationStates.Succeeded);
+    }
+
+    public void TransitionToFailed(IClock clock)
+    {
+        TransitionToTerminated(clock, OrchestrationInstanceTerminationStates.Failed);
+    }
+
+    public void TransitionToUserCanceled(IClock clock, UserIdentity userIdentity)
+    {
+        TransitionToTerminated(clock, OrchestrationInstanceTerminationStates.UserCanceled, userIdentity);
+    }
+
+    private void TransitionToTerminated(IClock clock, OrchestrationInstanceTerminationStates terminationState, UserIdentity? userIdentity = default)
     {
         switch (terminationState)
         {
@@ -102,10 +134,15 @@ public class OrchestrationInstanceLifecycleState
                 if (State is not OrchestrationInstanceLifecycleStates.Running)
                     throw new InvalidOperationException($"Cannot change termination state to '{terminationState}' when '{State}'.");
                 break;
+
             case OrchestrationInstanceTerminationStates.UserCanceled:
                 if (!IsPendingForScheduledStart())
                     throw new InvalidOperationException("User cannot cancel orchestration instance.");
+                if (userIdentity == null)
+                    throw new InvalidOperationException("User identity must be specified.");
+                CanceledBy = new OperatingIdentityComplexType(userIdentity);
                 break;
+
             default:
                 throw new InvalidOperationException($"Unsupported termination state '{terminationState}'.");
         }

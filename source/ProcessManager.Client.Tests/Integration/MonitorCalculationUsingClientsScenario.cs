@@ -92,15 +92,17 @@ public class MonitorCalculationUsingClientsScenario : IAsyncLifetime
         // Step 1: Schedule new calculation orchestration instance
         var orchestrationInstanceId = await calculationClient
             .ScheduleNewCalculationAsync(
-                new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>(
-                    RunAt: DateTimeOffset.Parse("2024-11-01T06:19:10.0209567+01:00"),
-                    InputParameter: new NotifyAggregatedMeasureDataInputV1(
+                new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1>(
+                    operatingIdentity: new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance.UserIdentityDto(
+                        UserId: Guid.NewGuid(),
+                        ActorId: Guid.NewGuid()),
+                    runAt: DateTimeOffset.Parse("2024-11-01T06:19:10.0209567+01:00"),
+                    inputParameter: new NotifyAggregatedMeasureDataInputV1(
                         CalculationTypes.BalanceFixing,
                         GridAreaCodes: new[] { "543" },
                         PeriodStartDate: DateTimeOffset.Parse("2024-10-29T15:19:10.0151351+01:00"),
                         PeriodEndDate: DateTimeOffset.Parse("2024-10-29T16:19:10.0193962+01:00"),
-                        IsInternalCalculation: true,
-                        UserId: Guid.NewGuid())),
+                        IsInternalCalculation: true)),
                 CancellationToken.None);
 
         // Step 2: Trigger the scheduler to queue the calculation orchestration instance

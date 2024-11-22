@@ -38,10 +38,10 @@ internal class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigur
 
         builder.OwnsOne(
             o => o.ParameterDefinition,
-            pd =>
+            b =>
             {
-                pd.Property(ParameterDefinition.SerializedParameterDefinitionPropertyName)
-                    .HasColumnName(ParameterDefinition.SerializedParameterDefinitionPropertyName);
+                b.Property(pd => pd.SerializedParameterDefinition)
+                    .HasColumnName(nameof(OrchestrationDescription.ParameterDefinition.SerializedParameterDefinition));
             });
 
         builder.Property(o => o.HostName);

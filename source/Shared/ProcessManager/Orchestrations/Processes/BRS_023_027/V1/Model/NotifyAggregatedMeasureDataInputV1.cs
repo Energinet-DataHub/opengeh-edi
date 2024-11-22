@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Api.Model;
+
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
 /// <summary>
 /// An immutable input to start the orchestration instance for "BRS_023_027" V1.
 /// </summary>
-public sealed record NotifyAggregatedMeasureDataInputV1(
+public record NotifyAggregatedMeasureDataInputV1(
     CalculationTypes CalculationType,
     IReadOnlyCollection<string> GridAreaCodes,
     DateTimeOffset PeriodStartDate,
     DateTimeOffset PeriodEndDate,
-    bool IsInternalCalculation,
-    Guid UserId);
+    bool IsInternalCalculation)
+        : IInputParameterDto;

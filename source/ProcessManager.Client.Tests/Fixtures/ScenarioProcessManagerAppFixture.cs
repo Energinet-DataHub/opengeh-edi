@@ -31,7 +31,8 @@ public class ScenarioProcessManagerAppFixture
         : base(
             ScenarioAppFixturesConfiguration.Instance.DatabaseManager,
             ScenarioAppFixturesConfiguration.Instance.TaskHubName,
-            ScenarioAppFixturesConfiguration.Instance.ProcessManagerAppPort)
+            ScenarioAppFixturesConfiguration.Instance.ProcessManagerAppPort,
+            disposeDatabase: false) // Quickfix: Only dispose database in one of the scenario fixtures
     {
     }
 }

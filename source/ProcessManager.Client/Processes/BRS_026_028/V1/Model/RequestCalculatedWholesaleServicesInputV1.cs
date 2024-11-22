@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Api.Model;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
 
-public interface ICancelScheduledOrchestrationInstanceCommand
-{
-    /// <summary>
-    /// Cancel a scheduled orchestration instance.
-    /// </summary>
-    Task CancelScheduledOrchestrationInstanceAsync(UserIdentity userIdentity, OrchestrationInstanceId id);
-}
+public record RequestCalculatedWholesaleServicesInputV1()
+    : IInputParameterDto;
