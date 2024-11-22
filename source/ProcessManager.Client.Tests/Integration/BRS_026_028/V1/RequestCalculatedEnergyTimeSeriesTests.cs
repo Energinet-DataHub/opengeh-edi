@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+extern alias ClientTypes;
+
+using Azure.Messaging.ServiceBus;
+using ClientTypes::Energinet.DataHub.ProcessManager.Api.Model;
+using ClientTypes::Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
+using ClientTypes::Energinet.DataHub.ProcessManager.Client.Extensions.Options;
+using ClientTypes::Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1;
+using ClientTypes::Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1.Models;
 using Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
+using Microsoft.Extensions.Azure;
+using Moq;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration.BRS_026_028.V1;
@@ -54,24 +64,24 @@ public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
     {
         // TODO: Implement test after implementation of shared Service Bus topic in app fixtures
         // Arrange
-        // await using var serviceBusClient = new ServiceBusClient(
-        //     ProcessManagerClientFixture.IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
-        //     ProcessManagerClientFixture.IntegrationTestConfiguration.Credential);
-        // var serviceBusSender = serviceBusClient.CreateSender(ProcessManagerClientFixture.Brs026Subscription.TopicName);
-        // var serviceBusSenderFactoryMock = new Mock<IAzureClientFactory<ServiceBusSender>>();
-        // serviceBusSenderFactoryMock.Setup(
-        //         f =>
-        //             f.CreateClient(nameof(ProcessManagerServiceBusClientsOptions.TopicName)))
-        //     .Returns(serviceBusSender);
-        //
-        //
-        // var requestCalculatedDataClient = new RequestCalculatedDataClientV1(serviceBusSenderFactoryMock.Object);
-        // var input = new RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1>(
-        //     Guid.NewGuid().ToString(),
-        //     new RequestCalculatedEnergyTimeSeriesInputV1("B1337"));
-        //
-        // // Act
-        // await requestCalculatedDataClient.RequestCalculatedEnergyTimeSeriesAsync(input, CancellationToken.None);
+        await using var serviceBusClient = new ServiceBusClient(
+            ProcessManagerClientFixture.IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
+            ProcessManagerClientFixture.IntegrationTestConfiguration.Credential);
+        var serviceBusSender = serviceBusClient.CreateSender(ProcessManagerClientFixture.Brs026Subscription.TopicName);
+        var serviceBusSenderFactoryMock = new Mock<IAzureClientFactory<ServiceBusSender>>();
+        serviceBusSenderFactoryMock.Setup(
+                f =>
+                    f.CreateClient(nameof(ProcessManagerServiceBusClientsOptions.TopicName)))
+            .Returns(serviceBusSender);
+
+        var requestCalculatedDataClient = new RequestCalculatedDataClientV1(serviceBusSenderFactoryMock.Object);
+        var input = new MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1>(
+            new ActorIdentityDto(Guid.NewGuid()),
+            new RequestCalculatedEnergyTimeSeriesInputV1("B1337"),
+            "servicebus-message-id");
+
+        // Act
+        await requestCalculatedDataClient.RequestCalculatedEnergyTimeSeriesAsync(input, CancellationToken.None);
 
         // Assert
         await Task.CompletedTask;
