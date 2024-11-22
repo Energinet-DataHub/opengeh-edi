@@ -46,14 +46,14 @@ public class AggregatedMeasureDataXmlMessageParser(CimXmlSchemaProvider schemaPr
         foreach (var seriesElement in seriesElements)
         {
             var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
-            var marketEvaluationPointType = seriesElement.Element(ns + MarketEvaluationPointTypeElementName)?.Value ?? string.Empty;
-            var marketEvaluationSettlementMethod = seriesElement.Element(ns + MarketEvaluationPointSettlementMethodElementName)?.Value ?? string.Empty;
+            var marketEvaluationPointType = seriesElement.Element(ns + MarketEvaluationPointTypeElementName)?.Value;
+            var marketEvaluationSettlementMethod = seriesElement.Element(ns + MarketEvaluationPointSettlementMethodElementName)?.Value;
             var startDateAndOrTimeDateTime = seriesElement.Element(ns + StartElementName)?.Value ?? string.Empty;
-            var endDateAndOrTimeDateTime = seriesElement.Element(ns + EndElementName)?.Value ?? string.Empty;
-            var meteringGridAreaDomainId = seriesElement.Element(ns + GridAreaElementName)?.Value ?? string.Empty;
-            var energySupplierMarketParticipantId = seriesElement.Element(ns + EnergySupplierNumberElementName)?.Value ?? string.Empty;
-            var balanceResponsiblePartyMarketParticipantId = seriesElement.Element(ns + BalanceResponsibleNumberElementName)?.Value ?? string.Empty;
-            var settlementVersion = seriesElement.Element(ns + SettlementVersionElementName)?.Value ?? string.Empty;
+            var endDateAndOrTimeDateTime = seriesElement.Element(ns + EndElementName)?.Value;
+            var meteringGridAreaDomainId = seriesElement.Element(ns + GridAreaElementName)?.Value;
+            var energySupplierMarketParticipantId = seriesElement.Element(ns + EnergySupplierNumberElementName)?.Value;
+            var balanceResponsiblePartyMarketParticipantId = seriesElement.Element(ns + BalanceResponsibleNumberElementName)?.Value;
+            var settlementVersion = seriesElement.Element(ns + SettlementVersionElementName)?.Value;
 
             result.Add(new RequestAggregatedMeasureDataMessageSeries(
                 id,
