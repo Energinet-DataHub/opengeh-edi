@@ -36,7 +36,7 @@ internal class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigur
         builder.Property(o => o.CanBeScheduled);
         builder.Property(o => o.FunctionName);
 
-        builder.OwnsOne(
+        builder.ComplexProperty(
             o => o.ParameterDefinition,
             b =>
             {
