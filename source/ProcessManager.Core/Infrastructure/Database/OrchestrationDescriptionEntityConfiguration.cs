@@ -31,8 +31,16 @@ internal class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigur
                 id => id.Value,
                 dbValue => new OrchestrationDescriptionId(dbValue));
 
-        builder.Property(o => o.Name);
-        builder.Property(o => o.Version);
+        builder.ComplexProperty(
+            o => o.UniqueName,
+            b =>
+            {
+                b.Property(un => un.Name)
+                    .HasColumnName(nameof(OrchestrationDescriptionUniqueName.Name));
+                b.Property(un => un.Version)
+                    .HasColumnName(nameof(OrchestrationDescriptionUniqueName.Version));
+            });
+
         builder.Property(o => o.CanBeScheduled);
         builder.Property(o => o.FunctionName);
 

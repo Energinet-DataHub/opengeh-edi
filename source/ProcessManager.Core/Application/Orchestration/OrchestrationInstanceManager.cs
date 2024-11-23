@@ -40,15 +40,13 @@ internal class OrchestrationInstanceManager(
     /// <inheritdoc />
     public async Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(
         OperatingIdentity identity,
-        string name,
-        int version,
+        OrchestrationDescriptionUniqueName uniqueName,
         TParameter inputParameter,
         IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
         var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(
-            name,
-            version,
+            uniqueName,
             inputParameter,
             skipStepsBySequence).ConfigureAwait(false);
 
@@ -68,16 +66,14 @@ internal class OrchestrationInstanceManager(
     /// <inheritdoc />
     public async Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
         UserIdentity userIdentity,
-        string name,
-        int version,
+        OrchestrationDescriptionUniqueName uniqueName,
         TParameter inputParameter,
         Instant runAt,
         IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
         var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(
-            name,
-            version,
+            uniqueName,
             inputParameter,
             skipStepsBySequence).ConfigureAwait(false);
 
@@ -124,15 +120,14 @@ internal class OrchestrationInstanceManager(
     /// Validate orchestration description is known and that paramter value is valid according to its parameter definition.
     /// </summary>
     private async Task<OrchestrationDescription> GuardMatchingOrchestrationDescriptionAsync<TParameter>(
-        string name,
-        int version,
+        OrchestrationDescriptionUniqueName uniqueName,
         TParameter inputParameter,
         IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
-        var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(name, version, isEnabled: true).ConfigureAwait(false);
+        var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(uniqueName, isEnabled: true).ConfigureAwait(false);
         if (orchestrationDescription == null)
-            throw new InvalidOperationException($"No enabled orchestration description matches Name='{name}' and Version='{version}'.");
+            throw new InvalidOperationException($"No enabled orchestration description matches UniqueName='{uniqueName}'.");
 
         var isValidParameterValue = await orchestrationDescription.ParameterDefinition.IsValidParameterValueAsync(inputParameter).ConfigureAwait(false);
         if (isValidParameterValue == false)
