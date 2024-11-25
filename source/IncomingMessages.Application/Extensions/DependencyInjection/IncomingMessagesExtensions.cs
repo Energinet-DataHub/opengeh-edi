@@ -61,11 +61,11 @@ public static class IncomingMessagesExtensions
             .AddScoped<DelegateIncomingMessage>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
-            .AddScoped<IMarketMessageParser, AggregatedMeasureDataXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataXmlMessageParser>()
             .AddScoped<IMarketMessageParser, AggregatedMeasureDataJsonMessageParser>()
             .AddScoped<IMarketMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
             .AddScoped<IMarketMessageParser, WholesaleSettlementJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, WholesaleSettlementXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, OldWholesaleSettlementXmlMessageParser>()
             .AddScoped<IMarketMessageParser, WholesaleSettlementB2CJsonMessageParser>()
             .AddScoped<IMarketMessageParser, MeteredDataForMeasurementPointEbixMessageParser>()
             .AddScoped<MarketMessageParser>()
@@ -137,11 +137,17 @@ public static class IncomingMessagesExtensions
             .AddSingleton<JsonSchemaProvider>();
 
         services
-            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointJsonMessageParser>();
+            .AddTransient<IMessageParser, MeteredDateForMeasurementPointJsonMessageParser>();
         services
-            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointEbixMessageParser>();
+            .AddTransient<IMessageParser, MeteredDateForMeasurementPointEbixMessageParser>();
         services
-            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointXmlMessageParser>();
+            .AddTransient<IMessageParser, MeteredDateForMeasurementPointXmlMessageParser>();
+
+        services
+            .AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
+
+        services
+            .AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
 
         return services;
     }
