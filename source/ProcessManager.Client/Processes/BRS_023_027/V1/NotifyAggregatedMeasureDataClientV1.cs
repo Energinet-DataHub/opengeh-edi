@@ -37,7 +37,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
 
     /// <inheritdoc/>
     public async Task<Guid> ScheduleNewCalculationAsync(
-        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> requestDto,
+        ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1> command,
         CancellationToken cancellationToken)
     {
         // TODO:
@@ -46,8 +46,9 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
             "/api/processmanager/orchestrationinstance/brs_023_027/1");
+        var json = JsonSerializer.Serialize(command);
         request.Content = new StringContent(
-            JsonSerializer.Serialize(requestDto),
+            json,
             Encoding.UTF8,
             "application/json");
 

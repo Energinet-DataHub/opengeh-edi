@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-public record RequestCalculatedDataInputV1<TInput>(
-    string MessageId,
-    TInput Input)
-    where TInput : class;
+public record UserId(Guid Value);

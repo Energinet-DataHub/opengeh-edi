@@ -17,20 +17,29 @@ using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 /// <summary>
-/// Contains information about an orchestration instance including
-/// specific input parameter values.
+/// Command for starting an orchestration instance.
 /// Must be JSON serializable.
 /// </summary>
 /// <typeparam name="TInputParameterDto">Must be a JSON serializable type.</typeparam>
-/// <param name="Id"></param>
-/// <param name="Lifecycle">The high-level lifecycle states that all orchestration instances can go through.</param>
-/// <param name="ParameterValue">Contains the Durable Functions orchestration input parameter value.</param>
-/// <param name="Steps">Workflow steps the orchestration instance is going through.</param>
-/// <param name="CustomState">Any custom state of the orchestration instance.</param>
-public record OrchestrationInstanceTypedDto<TInputParameterDto>(
-    Guid Id,
-    OrchestrationInstanceLifecycleStateDto Lifecycle,
-    TInputParameterDto ParameterValue,
-    IReadOnlyCollection<StepInstanceDto> Steps,
-    string CustomState)
-        where TInputParameterDto : IInputParameterDto;
+public record StartOrchestrationInstanceCommand<TInputParameterDto>
+    : OrchestrationInstanceCommand
+    where TInputParameterDto : IInputParameterDto
+{
+    /// <summary>
+    /// Construct command.
+    /// </summary>
+    /// <param name="operatingIdentity">Identity executing the command.</param>
+    /// <param name="inputParameter">Contains the Durable Functions orchestration input parameter value.</param>
+    public StartOrchestrationInstanceCommand(
+        IOperatingIdentityDto operatingIdentity,
+        TInputParameterDto inputParameter)
+            : base(operatingIdentity)
+    {
+        InputParameter = inputParameter;
+    }
+
+    /// <summary>
+    /// Contains the Durable Functions orchestration input parameter value.
+    /// </summary>
+    public TInputParameterDto InputParameter { get; }
+}
