@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Microsoft.Extensions.Configuration;
@@ -134,7 +135,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
-            ["AZURE_STORAGE_ACCOUNT_URL"] = AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
+            [$"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
+                AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
             // TODO: fix this
             // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",

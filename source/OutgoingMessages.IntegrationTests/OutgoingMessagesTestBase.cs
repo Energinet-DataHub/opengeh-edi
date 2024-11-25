@@ -14,6 +14,7 @@
 
 using System.Text;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
@@ -24,6 +25,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.Dependenc
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
@@ -94,9 +96,7 @@ public class OutgoingMessagesTestBase : IDisposable
         string fileStorageReference)
     {
         var clientFactory = ServiceProvider.GetRequiredService<IAzureClientFactory<BlobServiceClient>>();
-
-        var blobServiceClient = clientFactory.CreateClient(string.Empty);
-
+        var blobServiceClient = clientFactory.CreateClient(BlobServiceClientConnectionOptions.DefaultClientName);
         var containerClient = blobServiceClient.GetBlobContainerClient(container);
         var blobClient = containerClient.GetBlobClient(fileStorageReference);
 
@@ -190,7 +190,9 @@ public class OutgoingMessagesTestBase : IDisposable
     private void BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
-        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
+        Environment.SetEnvironmentVariable(
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+            Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

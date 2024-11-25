@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.Dependenc
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -98,9 +99,7 @@ public class IncomingMessagesTestBase : IDisposable
         string fileStorageReference)
     {
         var clientFactory = ServiceProvider.GetRequiredService<IAzureClientFactory<BlobServiceClient>>();
-
-        var blobServiceClient = clientFactory.CreateClient(string.Empty);
-
+        var blobServiceClient = clientFactory.CreateClient(BlobServiceClientConnectionOptions.DefaultClientName);
         var containerClient = blobServiceClient.GetBlobContainerClient(container);
         var blobClient = containerClient.GetBlobClient(fileStorageReference);
 
@@ -159,7 +158,7 @@ public class IncomingMessagesTestBase : IDisposable
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
-            "AZURE_STORAGE_ACCOUNT_URL",
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()

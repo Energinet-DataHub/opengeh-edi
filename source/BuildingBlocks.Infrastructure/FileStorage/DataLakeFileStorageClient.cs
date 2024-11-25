@@ -31,7 +31,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
         IAzureClientFactory<BlobServiceClient> clientFactory,
         IOptions<BlobServiceClientConnectionOptions> options)
     {
-        _blobServiceClient = clientFactory.CreateClient(options.Value.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
+        _blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
     }
 
     public async Task UploadAsync(FileStorageReference reference, Stream stream)

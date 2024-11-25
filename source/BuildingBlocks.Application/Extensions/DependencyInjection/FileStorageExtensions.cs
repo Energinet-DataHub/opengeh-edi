@@ -23,20 +23,19 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class FileStorageExtensions
 {
-    private const string FileStorageName = "EDI blob file storage";
+    private const string HealthCheckName = "EDI blob file storage";
 
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         services
             .AddOptions<BlobServiceClientConnectionOptions>()
-            .Bind(configuration)
-            .Validate(
-                o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_URL),
-                $"{nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL)} must be set in configuration");
+            .Bind(configuration);
 
         var blobServiceClientConnectionOptions =
-            configuration.Get<BlobServiceClientConnectionOptions>()
+            configuration
+                .GetSection(BlobServiceClientConnectionOptions.SectionName)
+                .Get<BlobServiceClientConnectionOptions>()
             ?? throw new InvalidOperationException("Missing Blob Service Client Connection configuration.");
 
         services.AddAzureClients(
@@ -45,13 +44,13 @@ public static class FileStorageExtensions
                 builder.UseCredential(new DefaultAzureCredential());
 
                 builder
-                        .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL))
-                        .WithName(blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
+                    .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.StorageAccountUrl))
+                    .WithName(blobServiceClientConnectionOptions.ClientName);
             });
 
         services.TryAddBlobStorageHealthCheck(
-            FileStorageName,
-            blobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CLIENT_NAME);
+            HealthCheckName,
+            blobServiceClientConnectionOptions.ClientName);
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
 

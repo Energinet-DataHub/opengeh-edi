@@ -28,6 +28,7 @@ using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -124,7 +125,8 @@ public class TestBase : IDisposable
         string container,
         string fileStorageReference)
     {
-        var azuriteBlobUrl = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL");
+        var azuriteBlobUrl = Environment.GetEnvironmentVariable(
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}");
         var blobServiceClient = new BlobServiceClient(new Uri(azuriteBlobUrl!)); // Uses new client to avoid some form of caching or similar
 
         var containerClient = blobServiceClient.GetBlobContainerClient(container);
@@ -300,7 +302,9 @@ public class TestBase : IDisposable
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
-        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
+        Environment.SetEnvironmentVariable(
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+            Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

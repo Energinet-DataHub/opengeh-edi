@@ -22,6 +22,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -114,7 +115,10 @@ public class B2CWebApiFixture : IAsyncLifetime
         var appSettings = new Dictionary<string, string?>
         {
             { "DB_CONNECTION_STRING", dbConnectionString },
-            { "AZURE_STORAGE_ACCOUNT_URL", AzuriteManager.BlobStorageServiceUri.AbsoluteUri },
+            {
+                $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+                AzuriteManager.BlobStorageServiceUri.AbsoluteUri
+            },
             { "UserAuthentication:MitIdExternalMetadataAddress", "YourMitIdExternalMetadataAddress" },
             { "UserAuthentication:ExternalMetadataAddress", OpenIdJwtManager.ExternalMetadataAddress },
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },

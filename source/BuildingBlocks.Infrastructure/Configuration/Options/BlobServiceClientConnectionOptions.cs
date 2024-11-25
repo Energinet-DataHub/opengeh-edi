@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.ComponentModel.DataAnnotations;
+
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
 public class BlobServiceClientConnectionOptions
 {
-    public string AZURE_STORAGE_ACCOUNT_CLIENT_NAME { get; init; } = string.Empty;
+    public const string SectionName = "FileStorage";
 
-    public string AZURE_STORAGE_ACCOUNT_URL { get; init; } = string.Empty;
+    public const string DefaultClientName = "FileStorageClient";
+
+    [Required]
+    public string StorageAccountUrl { get; init; } = string.Empty;
+
+    [Required]
+    public string ClientName { get; init; } = DefaultClientName;
 }
