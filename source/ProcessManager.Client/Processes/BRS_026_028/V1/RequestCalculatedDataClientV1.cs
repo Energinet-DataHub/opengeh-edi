@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Dynamic;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Contracts;
@@ -30,12 +30,12 @@ public class RequestCalculatedDataClientV1(
 {
     private readonly ServiceBusSender _serviceBusSender = serviceBusFactory.CreateClient(nameof(ProcessManagerServiceBusClientsOptions.TopicName));
 
-    public async Task RequestCalculatedEnergyTimeSeriesAsync(RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1> input, CancellationToken cancellationToken)
+    public async Task RequestCalculatedEnergyTimeSeriesAsync(MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken cancellationToken)
     {
         var serviceBusMessage = CreateServiceBusMessage(
             "BRS_026",
             1,
-            input);
+            command);
 
         await SendServiceBusMessage(
                 serviceBusMessage,
@@ -43,34 +43,34 @@ public class RequestCalculatedDataClientV1(
             .ConfigureAwait(false);
     }
 
-    public async Task RequestCalculatedWholesaleServicesAsync(RequestCalculatedDataInputV1<object> input, CancellationToken cancellationToken)
+    public async Task RequestCalculatedWholesaleServicesAsync(MessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken cancellationToken)
     {
         var serviceBusMessage = CreateServiceBusMessage(
             "BRS_028",
             1,
-            input);
+            command);
 
         await SendServiceBusMessage(serviceBusMessage, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    private ServiceBusMessage CreateServiceBusMessage<TInput>(
+    private ServiceBusMessage CreateServiceBusMessage<TInputParameterDto>(
         string orchestrationName,
         int orchestrationVersion,
-        RequestCalculatedDataInputV1<TInput> input)
-    where TInput : class
+        MessageCommand<TInputParameterDto> command)
+    where TInputParameterDto : IInputParameterDto
     {
         var message = new StartOrchestrationDto
         {
             OrchestrationName = orchestrationName,
             OrchestrationVersion = orchestrationVersion,
-            JsonInput = JsonSerializer.Serialize(input.Input),
+            JsonInput = JsonSerializer.Serialize(command.InputParameter),
         };
 
         ServiceBusMessage serviceBusMessage = new(JsonFormatter.Default.Format(message))
         {
             Subject = orchestrationName,
-            MessageId = input.MessageId,
+            MessageId = command.MessageId,
             ContentType = "application/json",
         };
 

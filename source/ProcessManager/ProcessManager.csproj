@@ -31,13 +31,21 @@
     <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\ProcessManager\Api\Model\CancelScheduledOrchestrationInstanceCommand.cs" Link="Api\Model\CancelScheduledOrchestrationInstanceCommand.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\IInputParameterDto.cs" Link="Api\Model\IInputParameterDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceCommand.cs" Link="Api\Model\OrchestrationInstanceCommand.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceTypedDto.cs" Link="Api\Model\OrchestrationInstanceTypedDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\ActorIdentityDto.cs" Link="Api\Model\OrchestrationInstance\ActorIdentityDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OperatingIdentityDto.cs" Link="Api\Model\OrchestrationInstance\OperatingIdentityDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStateDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\StepInstanceDto.cs" Link="Api\Model\OrchestrationInstance\StepInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\StepInstanceLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\StepInstanceLifecycleStateDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\StepInstanceLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\StepInstanceLifecycleStates.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Api\Model\ScheduleOrchestrationInstanceDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\UserIdentityDto.cs" Link="Api\Model\OrchestrationInstance\UserIdentityDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceCommand.cs" Link="Api\Model\ScheduleOrchestrationInstanceCommand.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\StartOrchestrationInstanceCommand.cs" Link="Api\Model\StartOrchestrationInstanceCommand.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\UserCommand.cs" Link="Api\Model\UserCommand.cs" />
   </ItemGroup>
 </Project>

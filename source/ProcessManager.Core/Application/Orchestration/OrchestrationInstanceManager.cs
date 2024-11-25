@@ -39,22 +39,35 @@ internal class OrchestrationInstanceManager(
 
     /// <inheritdoc />
     public async Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(
+        OperatingIdentity identity,
         string name,
         int version,
         TParameter inputParameter,
         IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
-        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, inputParameter, skipStepsBySequence).ConfigureAwait(false);
+        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(
+            name,
+            version,
+            inputParameter,
+            skipStepsBySequence).ConfigureAwait(false);
 
-        var orchestrationInstance = await CreateOrchestrationInstanceAsync(inputParameter, orchestrationDescription, skipStepsBySequence).ConfigureAwait(false);
-        await RequestStartOfOrchestrationInstanceAsync(orchestrationDescription, orchestrationInstance).ConfigureAwait(false);
+        var orchestrationInstance = await CreateOrchestrationInstanceAsync(
+            identity,
+            orchestrationDescription,
+            inputParameter,
+            skipStepsBySequence).ConfigureAwait(false);
+
+        await RequestStartOfOrchestrationInstanceAsync(
+            orchestrationDescription,
+            orchestrationInstance).ConfigureAwait(false);
 
         return orchestrationInstance.Id;
     }
 
     /// <inheritdoc />
     public async Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
+        UserIdentity userIdentity,
         string name,
         int version,
         TParameter inputParameter,
@@ -62,11 +75,21 @@ internal class OrchestrationInstanceManager(
         IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
-        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, inputParameter, skipStepsBySequence).ConfigureAwait(false);
+        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(
+            name,
+            version,
+            inputParameter,
+            skipStepsBySequence).ConfigureAwait(false);
+
         if (orchestrationDescription.CanBeScheduled == false)
             throw new InvalidOperationException("Orchestration description cannot be scheduled.");
 
-        var orchestrationInstance = await CreateOrchestrationInstanceAsync(inputParameter, orchestrationDescription, skipStepsBySequence, runAt).ConfigureAwait(false);
+        var orchestrationInstance = await CreateOrchestrationInstanceAsync(
+            userIdentity,
+            orchestrationDescription,
+            inputParameter,
+            skipStepsBySequence,
+            runAt).ConfigureAwait(false);
 
         return orchestrationInstance.Id;
     }
@@ -86,14 +109,14 @@ internal class OrchestrationInstanceManager(
     }
 
     /// <inheritdoc />
-    public async Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id)
+    public async Task CancelScheduledOrchestrationInstanceAsync(UserIdentity userIdentity, OrchestrationInstanceId id)
     {
         var orchestrationInstance = await _repository.GetAsync(id).ConfigureAwait(false);
         if (!orchestrationInstance.Lifecycle.IsPendingForScheduledStart())
             throw new InvalidOperationException("Orchestration instance cannot be canceled.");
 
         // Transition lifecycle
-        orchestrationInstance.Lifecycle.TransitionToTerminated(_clock, OrchestrationInstanceTerminationStates.UserCanceled);
+        orchestrationInstance.Lifecycle.TransitionToUserCanceled(_clock, userIdentity);
         await _repository.UnitOfWork.CommitAsync().ConfigureAwait(false);
     }
 
@@ -129,13 +152,15 @@ internal class OrchestrationInstanceManager(
     }
 
     private async Task<OrchestrationInstance> CreateOrchestrationInstanceAsync<TParameter>(
-        TParameter inputParameter,
+        OperatingIdentity identity,
         OrchestrationDescription orchestrationDescription,
+        TParameter inputParameter,
         IReadOnlyCollection<int> skipStepsBySequence,
         Instant? runAt = default)
             where TParameter : class
     {
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
+            identity,
             orchestrationDescription,
             skipStepsBySequence,
             _clock,

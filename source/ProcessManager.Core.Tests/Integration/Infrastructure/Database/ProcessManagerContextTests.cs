@@ -78,6 +78,37 @@ public class ProcessManagerContextTests
             .BeEquivalentTo(existingOrchestrationInstance);
     }
 
+    [Fact]
+    public async Task Given_UserCanceledOrchestrationInstanceAddedToDbContext_WhenRetrievingFromDatabase_HasCorrectValues()
+    {
+        // Arrange
+        var userIdentity = new UserIdentity(new UserId(Guid.NewGuid()), new ActorId(Guid.NewGuid()));
+
+        var existingOrchestrationDescription = CreateOrchestrationDescription();
+        var existingOrchestrationInstance = CreateOrchestrationInstance(
+            existingOrchestrationDescription,
+            identity: userIdentity,
+            runAt: SystemClock.Instance.GetCurrentInstant());
+        existingOrchestrationInstance.Lifecycle.TransitionToUserCanceled(SystemClock.Instance, userIdentity);
+
+        await using (var writeDbContext = _fixture.DatabaseManager.CreateDbContext())
+        {
+            writeDbContext.OrchestrationDescriptions.Add(existingOrchestrationDescription);
+            writeDbContext.OrchestrationInstances.Add(existingOrchestrationInstance);
+            await writeDbContext.SaveChangesAsync();
+        }
+
+        // Act
+        await using var readDbContext = _fixture.DatabaseManager.CreateDbContext();
+        var orchestrationInstance = await readDbContext.OrchestrationInstances.FindAsync(existingOrchestrationInstance.Id);
+
+        // Assert
+        orchestrationInstance.Should()
+            .NotBeNull()
+            .And
+            .BeEquivalentTo(existingOrchestrationInstance);
+    }
+
     private static OrchestrationDescription CreateOrchestrationDescription()
     {
         var orchestrationDescription = new OrchestrationDescription(
@@ -95,12 +126,19 @@ public class ProcessManagerContextTests
         return orchestrationDescription;
     }
 
-    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription orchestrationDescription)
+    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription orchestrationDescription, OperatingIdentity? identity = default, Instant? runAt = default)
     {
+        var operatingIdentity = identity
+            ?? new UserIdentity(
+                new UserId(Guid.NewGuid()),
+                new ActorId(Guid.NewGuid()));
+
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
-            description: orchestrationDescription,
+            operatingIdentity,
+            orchestrationDescription,
             skipStepsBySequence: [3],
-            clock: SystemClock.Instance);
+            clock: SystemClock.Instance,
+            runAt);
 
         orchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
         {

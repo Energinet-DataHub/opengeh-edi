@@ -28,11 +28,12 @@ public class OrchestrationInstance
 
     private OrchestrationInstance(
         OrchestrationDescriptionId orchestrationDescriptionId,
+        OperatingIdentity identity,
         IClock clock,
         Instant? runAt = default)
     {
         Id = new OrchestrationInstanceId(Guid.NewGuid());
-        Lifecycle = new OrchestrationInstanceLifecycleState(clock, runAt);
+        Lifecycle = new OrchestrationInstanceLifecycleState(identity, clock, runAt);
         ParameterValue = new();
         CustomState = new OrchestrationInstanceCustomState(string.Empty);
 
@@ -86,6 +87,7 @@ public class OrchestrationInstance
     /// orchestration instance.
     /// </summary>
     internal static OrchestrationInstance CreateFromDescription(
+        OperatingIdentity identity,
         OrchestrationDescription.OrchestrationDescription description,
         IReadOnlyCollection<int> skipStepsBySequence,
         IClock clock,
@@ -106,6 +108,7 @@ public class OrchestrationInstance
 
         var orchestrationInstance = new OrchestrationInstance(
             description.Id,
+            identity,
             clock,
             runAt);
 
