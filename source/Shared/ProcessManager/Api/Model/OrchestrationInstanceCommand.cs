@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
+
 namespace Energinet.DataHub.ProcessManager.Api.Model;
 
-public sealed record ScheduleOrchestrationInstanceDto<TParameter>(
-    DateTimeOffset RunAt,
-    TParameter InputParameter)
-        where TParameter : class;
+/// <summary>
+/// A orchestration instance command executed by an identity.
+/// Must be JSON serializable.
+/// </summary>
+/// <param name="OperatingIdentity">The identity executing the command.</param>
+public abstract record OrchestrationInstanceCommand(
+    IOperatingIdentityDto OperatingIdentity);

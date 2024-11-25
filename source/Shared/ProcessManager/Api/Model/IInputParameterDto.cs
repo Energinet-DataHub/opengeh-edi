@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+namespace Energinet.DataHub.ProcessManager.Api.Model;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
-
-public interface ICancelScheduledOrchestrationInstanceCommand
-{
-    /// <summary>
-    /// Cancel a scheduled orchestration instance.
-    /// </summary>
-    Task CancelScheduledOrchestrationInstanceAsync(UserIdentity userIdentity, OrchestrationInstanceId id);
-}
+/// <summary>
+/// Marker interface for JSON serializable input parameters to an orchestration instance.
+/// </summary>
+public interface IInputParameterDto;

@@ -31,7 +31,8 @@ public class ScenarioOrchestrationsAppFixture
         : base(
             ScenarioAppFixturesConfiguration.Instance.DatabaseManager,
             ScenarioAppFixturesConfiguration.Instance.TaskHubName,
-            ScenarioAppFixturesConfiguration.Instance.OrchestrationsAppPort)
+            ScenarioAppFixturesConfiguration.Instance.OrchestrationsAppPort,
+            disposeDatabase: true) // Quickfix: Only dispose database in one of the scenario fixtures
     {
     }
 }

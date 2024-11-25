@@ -26,23 +26,26 @@ internal class NotifyAggregatedMeasureDataHandler(
     private readonly IStartOrchestrationInstanceCommands _manager = manager;
 
     public async Task<OrchestrationInstanceId> ScheduleNewCalculationAsync(
-        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto)
+        ScheduleOrchestrationInstanceCommand<NotifyAggregatedMeasureDataInputV1> command)
     {
         // TODO:
         // Server-side validation => Validate "period" is midnight values when given "timezone" etc.
         // See class Calculation and method IsValid in Wholesale.
 
         // Here we show how its possible, based on input, to decide certain steps should be skipped by the orchestration.
-        IReadOnlyCollection<int> skipStepsBySequence = dto.InputParameter.IsInternalCalculation
+        IReadOnlyCollection<int> skipStepsBySequence = command.InputParameter.IsInternalCalculation
             ? [NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepSequence]
             : [];
 
         var orchestrationInstanceId = await _manager
             .ScheduleNewOrchestrationInstanceAsync(
+                identity: new UserIdentity(
+                    new UserId(command.OperatingIdentity.UserId),
+                    new ActorId(command.OperatingIdentity.ActorId)),
                 name: "BRS_023_027",
                 version: 1,
-                inputParameter: dto.InputParameter,
-                runAt: dto.RunAt.ToInstant(),
+                inputParameter: command.InputParameter,
+                runAt: command.RunAt.ToInstant(),
                 skipStepsBySequence: skipStepsBySequence)
             .ConfigureAwait(false);
 
