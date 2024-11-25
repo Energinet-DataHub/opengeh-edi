@@ -51,7 +51,7 @@ public sealed class MessageParserTests
     {
         _marketMessageParser = new MarketMessageParser(
         [
-            new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+            new OldWholesaleSettlementXmlMessageParser(new List<IMessageParser>() { new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) }),
                 new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
                 new WholesaleSettlementB2CJsonMessageParser(_serializer),
         ]);
