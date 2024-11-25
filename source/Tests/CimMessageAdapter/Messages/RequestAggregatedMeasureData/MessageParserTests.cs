@@ -45,7 +45,7 @@ public sealed class MessageParserTests
 
     private readonly MarketMessageParser _marketMessageParser = new(
     [
-        new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+        new OldAggregatedMeasureDataXmlMessageParser(new List<IMessageParser> { new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) }),
         new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
         new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()),
     ]);
