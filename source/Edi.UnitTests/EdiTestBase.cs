@@ -48,7 +48,7 @@ public class EdiTestBase
         builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["DB_CONNECTION_STRING"] = _ediFixture.DatabaseManager.ConnectionString,
-            [$"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
+            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
                 "https://fake.fakeurl.com",
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });

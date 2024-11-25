@@ -116,7 +116,7 @@ public class B2CWebApiFixture : IAsyncLifetime
         {
             { "DB_CONNECTION_STRING", dbConnectionString },
             {
-                $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+                $"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
                 AzuriteManager.BlobStorageServiceUri.AbsoluteUri
             },
             { "UserAuthentication:MitIdExternalMetadataAddress", "YourMitIdExternalMetadataAddress" },
