@@ -15,34 +15,21 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
 
-public class AggregatedMeasureDataB2CJsonMessageParser : IMarketMessageParser
+public class AggregatedMeasureDataB2CJsonMessageParserBase(ISerializer serializer)
+    : B2CJsonMessageParserBase<RequestAggregatedMeasureDataDto>(serializer)
 {
-    private readonly ISerializer _serializer;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.B2CRequestAggregatedMeasureData;
 
-    public AggregatedMeasureDataB2CJsonMessageParser(ISerializer serializer)
+    public override DocumentFormat DocumentFormat => DocumentFormat.Json;
+
+    protected override IIncomingMessage MapIncomingMessage(RequestAggregatedMeasureDataDto incomingMessageDto)
     {
-        _serializer = serializer;
-    }
-
-    public DocumentFormat HandledFormat => DocumentFormat.Json;
-
-    public IncomingDocumentType DocumentType => IncomingDocumentType.B2CRequestAggregatedMeasureData;
-
-    public async Task<IncomingMarketMessageParserResult> ParseAsync(
-        IIncomingMarketMessageStream incomingMarketMessageStream,
-        CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
-
-        var requestAggregatedMeasureDataDto = await _serializer
-            .DeserializeAsync<RequestAggregatedMeasureDataDto>(incomingMarketMessageStream.Stream, cancellationToken)
-            .ConfigureAwait(false);
-
-        var series = requestAggregatedMeasureDataDto.Serie
+        var series = incomingMessageDto.Serie
             .Select(
                 serie => new RequestAggregatedMeasureDataMessageSeries(
                     serie.Id,
@@ -56,17 +43,17 @@ public class AggregatedMeasureDataB2CJsonMessageParser : IMarketMessageParser
                     serie.SettlementVersion)).ToList().AsReadOnly();
 
         var requestAggregatedMeasureData = new RequestAggregatedMeasureDataMessage(
-            requestAggregatedMeasureDataDto.SenderNumber,
-            requestAggregatedMeasureDataDto.SenderRoleCode,
-            requestAggregatedMeasureDataDto.ReceiverNumber,
-            requestAggregatedMeasureDataDto.ReceiverRoleCode,
-            requestAggregatedMeasureDataDto.BusinessReason,
-            requestAggregatedMeasureDataDto.MessageType,
-            requestAggregatedMeasureDataDto.MessageId,
-            requestAggregatedMeasureDataDto.CreatedAt,
-            requestAggregatedMeasureDataDto.BusinessType,
+            incomingMessageDto.SenderNumber,
+            incomingMessageDto.SenderRoleCode,
+            incomingMessageDto.ReceiverNumber,
+            incomingMessageDto.ReceiverRoleCode,
+            incomingMessageDto.BusinessReason,
+            incomingMessageDto.MessageType,
+            incomingMessageDto.MessageId,
+            incomingMessageDto.CreatedAt,
+            incomingMessageDto.BusinessType,
             series);
 
-        return new IncomingMarketMessageParserResult(requestAggregatedMeasureData);
+        return requestAggregatedMeasureData;
     }
 }
