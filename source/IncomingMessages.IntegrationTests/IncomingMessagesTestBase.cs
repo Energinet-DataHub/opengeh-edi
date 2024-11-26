@@ -35,6 +35,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjec
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NodaTime;
@@ -99,7 +100,8 @@ public class IncomingMessagesTestBase : IDisposable
         string fileStorageReference)
     {
         var clientFactory = ServiceProvider.GetRequiredService<IAzureClientFactory<BlobServiceClient>>();
-        var blobServiceClient = clientFactory.CreateClient(BlobServiceClientConnectionOptions.DefaultClientName);
+        var options = ServiceProvider.GetRequiredService<IOptions<BlobServiceClientConnectionOptions>>();
+        var blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
         var containerClient = blobServiceClient.GetBlobContainerClient(container);
         var blobClient = containerClient.GetBlobClient(fileStorageReference);
 
