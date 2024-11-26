@@ -34,7 +34,22 @@ public class WhenMeteredDataForMeasurementPointIsReceivedTests : BaseTestClass
                 fixture.EbixUri,
                 fixture.EbixGridAccessProviderCredentials,
                 output),
+            new EdiDriver(
+                fixture.DurableClient,
+                fixture.B2BClients.MeteredDataResponsible,
+                output),
             new EdiDatabaseDriver(fixture.ConnectionString));
+    }
+
+    [Fact]
+    public async Task Actor_can_send_metered_data_for_measurement_point_in_cim_to_datahub()
+    {
+        var messageId = await _meteredDataForMeasurementPointGridAccessProvider
+            .SendMeteredDataForMeasurementPointInCimAsync(CancellationToken.None);
+
+        await _meteredDataForMeasurementPointGridAccessProvider.ConfirmRequestIsReceivedAsync(
+            messageId,
+            CancellationToken.None);
     }
 
     [Fact]

@@ -140,6 +140,29 @@ internal sealed class EdiDriver
         return requestContent.MessageId;
     }
 
+    internal async Task<string> SendMeteredDataForMeasurementPointAsync(CancellationToken cancellationToken)
+    {
+        var b2bClient = await _httpClient;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/notifyvalidatedmeasuredata");
+        var contentType = "application/json";
+        var requestContent = await GetMeteredDataForMeasurementPointContentAsync(cancellationToken)
+            .ConfigureAwait(false);
+        request.Content = new StringContent(
+            requestContent.Content,
+            Encoding.UTF8,
+            contentType);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+        var meteredDataForMeasurementPointResponse = await b2bClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        if (meteredDataForMeasurementPointResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await meteredDataForMeasurementPointResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            throw new BadMeteredDataForMeasurementPointException($"responseContent: {responseContent}");
+        }
+
+        return requestContent.MessageId.ToString();
+    }
+
     internal async Task<Guid> RequestAggregatedMeasureDataAsync(bool withSyncError, CancellationToken cancellationToken)
     {
         var b2bClient = await _httpClient;
@@ -171,7 +194,7 @@ internal sealed class EdiDriver
         await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
     }
 
-    internal async Task StopOrchestrationForCalculationAsync(Guid calculationId, Instant createdAfter)
+    internal async Task SendMeteredDataForMeasurementPointAsync(Guid calculationId, Instant createdAfter)
     {
         var runningOrchestrationsResult = await _durableClient.ListInstancesAsync(
             new OrchestrationStatusQueryCondition
@@ -216,6 +239,18 @@ internal sealed class EdiDriver
             jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlementWithSyncError.json", cancellationToken)
                 .ConfigureAwait(false);
         }
+
+        jsonContent = jsonContent.Replace("{MessageId}", messageId.ToString(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+
+        return (messageId, jsonContent);
+    }
+
+    private static async Task<(Guid MessageId, string Content)> GetMeteredDataForMeasurementPointContentAsync(CancellationToken cancellationToken)
+    {
+        var messageId = Guid.NewGuid();
+        var jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlement.json", cancellationToken)
+            .ConfigureAwait(false);
 
         jsonContent = jsonContent.Replace("{MessageId}", messageId.ToString(), StringComparison.InvariantCulture);
         jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
