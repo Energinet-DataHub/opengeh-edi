@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus.Administration;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
@@ -35,22 +36,30 @@ public class ProcessManagerClientFixture : IAsyncLifetime
 
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
+        AzuriteManager = new AzuriteManager(useOAuth: true);
+
         OrchestrationsAppManager = new OrchestrationsAppManager(
             DatabaseManager,
             IntegrationTestConfiguration,
+            AzuriteManager,
             taskHubName,
-            8101);
+            8101,
+            false);
         ProcessManagerAppManager = new ProcessManagerAppManager(
             DatabaseManager,
             IntegrationTestConfiguration,
+            AzuriteManager,
             taskHubName,
-            8102);
+            8102,
+            false);
 
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             OrchestrationsAppManager.TestLogger,
             IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
             IntegrationTestConfiguration.Credential);
     }
+
+    public AzuriteManager AzuriteManager { get; }
 
     public ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
@@ -67,6 +76,9 @@ public class ProcessManagerClientFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        OrchestrationsAppManager.CleanupAzuriteStorage();
+        AzuriteManager.StartAzurite();
+
         var topicResource = await ServiceBusResourceProvider.BuildTopic("pm-topic")
             .AddSubscription("brs-026-subscription")
             .CreateAsync();
@@ -81,6 +93,7 @@ public class ProcessManagerClientFixture : IAsyncLifetime
         await OrchestrationsAppManager.DisposeAsync();
         await ProcessManagerAppManager.DisposeAsync();
         await ServiceBusResourceProvider.DisposeAsync();
+        AzuriteManager.Dispose();
     }
 
     public void SetTestOutputHelper(ITestOutputHelper? testOutputHelper)

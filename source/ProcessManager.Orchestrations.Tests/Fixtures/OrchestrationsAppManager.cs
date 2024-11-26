@@ -35,23 +35,30 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 /// </summary>
 public class OrchestrationsAppManager : IAsyncDisposable
 {
+    private readonly bool _manageAzurite;
+
     public OrchestrationsAppManager()
         : this(
             new ProcessManagerDatabaseManager("OrchestrationsTest"),
             new IntegrationTestConfiguration(),
+            new AzuriteManager(useOAuth: true),
             "OrchestrationsTest01",
-            8010)
+            8010,
+            manageAzurite: true)
     {
     }
 
     public OrchestrationsAppManager(
         ProcessManagerDatabaseManager databaseManager,
         IntegrationTestConfiguration configuration,
+        AzuriteManager azuriteManager,
         string taskHubName,
-        int port)
+        int port,
+        bool manageAzurite)
     {
+        _manageAzurite = manageAzurite;
         DatabaseManager = databaseManager
-            ?? throw new ArgumentNullException(nameof(databaseManager));
+                          ?? throw new ArgumentNullException(nameof(databaseManager));
         TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;
@@ -60,7 +67,7 @@ public class OrchestrationsAppManager : IAsyncDisposable
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = configuration;
 
-        AzuriteManager = new AzuriteManager(useOAuth: true);
+        AzuriteManager = azuriteManager;
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
 
@@ -99,11 +106,14 @@ public class OrchestrationsAppManager : IAsyncDisposable
     /// <param name="brs026Subscription">The BRS-026 Service Bus subscription. A new subscription will be created if not provided.</param>
     public async Task StartAsync(SubscriptionProperties? brs026Subscription = null)
     {
-        // Clean up old Azurite storage
-        CleanupAzuriteStorage();
+        if (_manageAzurite)
+        {
+            // Clean up old Azurite storage
+            CleanupAzuriteStorage();
 
-        // Storage emulator
-        AzuriteManager.StartAzurite();
+            // Storage emulator
+            AzuriteManager.StartAzurite();
+        }
 
         // Database
         await DatabaseManager.CreateDatabaseAsync();
@@ -130,7 +140,10 @@ public class OrchestrationsAppManager : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         AppHostManager.Dispose();
-        AzuriteManager.Dispose();
+
+        if (_manageAzurite)
+            AzuriteManager.Dispose();
+
         await DatabaseManager.DeleteDatabaseAsync();
         await ServiceBusResourceProvider.DisposeAsync();
     }
@@ -146,6 +159,41 @@ public class OrchestrationsAppManager : IAsyncDisposable
     public void SetTestOutputHelper(ITestOutputHelper? testOutputHelper)
     {
         TestLogger.TestOutputHelper = testOutputHelper;
+    }
+
+    /// <summary>
+    /// Cleanup Azurite storage to avoid situations where Durable Functions
+    /// would otherwise continue working on old orchestrations that e.g. failed in
+    /// previous runs.
+    /// </summary>
+    public void CleanupAzuriteStorage()
+    {
+        if (Directory.Exists("__blobstorage__"))
+            Directory.Delete("__blobstorage__", true);
+
+        if (Directory.Exists("__queuestorage__"))
+            Directory.Delete("__queuestorage__", true);
+
+        if (Directory.Exists("__tablestorage__"))
+            Directory.Delete("__tablestorage__", true);
+
+        if (File.Exists("__azurite_db_blob__.json"))
+            File.Delete("__azurite_db_blob__.json");
+
+        if (File.Exists("__azurite_db_blob_extent__.json"))
+            File.Delete("__azurite_db_blob_extent__.json");
+
+        if (File.Exists("__azurite_db_queue__.json"))
+            File.Delete("__azurite_db_queue__.json");
+
+        if (File.Exists("__azurite_db_queue_extent__.json"))
+            File.Delete("__azurite_db_queue_extent__.json");
+
+        if (File.Exists("__azurite_db_table__.json"))
+            File.Delete("__azurite_db_table__.json");
+
+        if (File.Exists("__azurite_db_table_extent__.json"))
+            File.Delete("__azurite_db_table_extent__.json");
     }
 
     private static void StartHost(FunctionAppHostManager hostManager)
@@ -234,40 +282,5 @@ public class OrchestrationsAppManager : IAsyncDisposable
             brs026Subscription.SubscriptionName);
 
         return appHostSettings;
-    }
-
-    /// <summary>
-    /// Cleanup Azurite storage to avoid situations where Durable Functions
-    /// would otherwise continue working on old orchestrations that e.g. failed in
-    /// previous runs.
-    /// </summary>
-    private void CleanupAzuriteStorage()
-    {
-        if (Directory.Exists("__blobstorage__"))
-            Directory.Delete("__blobstorage__", true);
-
-        if (Directory.Exists("__queuestorage__"))
-            Directory.Delete("__queuestorage__", true);
-
-        if (Directory.Exists("__tablestorage__"))
-            Directory.Delete("__tablestorage__", true);
-
-        if (File.Exists("__azurite_db_blob__.json"))
-            File.Delete("__azurite_db_blob__.json");
-
-        if (File.Exists("__azurite_db_blob_extent__.json"))
-            File.Delete("__azurite_db_blob_extent__.json");
-
-        if (File.Exists("__azurite_db_queue__.json"))
-            File.Delete("__azurite_db_queue__.json");
-
-        if (File.Exists("__azurite_db_queue_extent__.json"))
-            File.Delete("__azurite_db_queue_extent__.json");
-
-        if (File.Exists("__azurite_db_table__.json"))
-            File.Delete("__azurite_db_table__.json");
-
-        if (File.Exists("__azurite_db_table_extent__.json"))
-            File.Delete("__azurite_db_table_extent__.json");
     }
 }

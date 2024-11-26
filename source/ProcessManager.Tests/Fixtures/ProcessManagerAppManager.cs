@@ -30,23 +30,30 @@ namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 /// </summary>
 public class ProcessManagerAppManager : IAsyncDisposable
 {
+    private readonly bool _manageAzurite;
+
     public ProcessManagerAppManager()
         : this(
             new ProcessManagerDatabaseManager("ProcessManagerTest"),
             new IntegrationTestConfiguration(),
+            new AzuriteManager(useOAuth: true),
             "ProcessManagerTest01",
-            8000)
+            8000,
+            manageAzurite: true)
     {
     }
 
     public ProcessManagerAppManager(
         ProcessManagerDatabaseManager databaseManager,
         IntegrationTestConfiguration integrationTestConfiguration,
+        AzuriteManager azuriteManager,
         string taskHubName,
-        int port)
+        int port,
+        bool manageAzurite)
     {
+        _manageAzurite = manageAzurite;
         DatabaseManager = databaseManager
-            ?? throw new ArgumentNullException(nameof(databaseManager));
+                          ?? throw new ArgumentNullException(nameof(databaseManager));
         TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;
@@ -55,7 +62,7 @@ public class ProcessManagerAppManager : IAsyncDisposable
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = integrationTestConfiguration;
 
-        AzuriteManager = new AzuriteManager(useOAuth: true);
+        AzuriteManager = azuriteManager;
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
     }
@@ -83,11 +90,14 @@ public class ProcessManagerAppManager : IAsyncDisposable
 
     public async Task StartAsync()
     {
-        // Clean up old Azurite storage
-        CleanupAzuriteStorage();
+        if (_manageAzurite)
+        {
+            // Clean up old Azurite storage
+            CleanupAzuriteStorage();
 
-        // Storage emulator
-        AzuriteManager.StartAzurite();
+            // Storage emulator
+            AzuriteManager.StartAzurite();
+        }
 
         // Database
         await DatabaseManager.CreateDatabaseAsync();
@@ -103,7 +113,10 @@ public class ProcessManagerAppManager : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         AppHostManager.Dispose();
-        AzuriteManager.Dispose();
+
+        if (_manageAzurite)
+            AzuriteManager.Dispose();
+
         await DatabaseManager.DeleteDatabaseAsync();
     }
 
