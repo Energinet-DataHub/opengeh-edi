@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.FeatureFlag;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.FeatureManagement;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
-public static class FeatureFlagExtensions
+public static class BuildingBlockExtensions
 {
-    public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
+    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddFeatureManagement();
-        services.AddSingleton<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
-
+        services.AddServiceBusClientForApplication(configuration)
+            .AddFileStorage(configuration)
+            .AddFeatureFlags();
         return services;
     }
 }

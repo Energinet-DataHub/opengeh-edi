@@ -13,20 +13,18 @@
 // limitations under the License.
 
 using System.Text.Encodings.Web;
-using System.Text.Unicode;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
-public static class JavaScriptEncoderExtensions
+public static class SerializerExtensions
 {
-    public static IServiceCollection AddJavaScriptEncoder(this IServiceCollection services)
+    public static IServiceCollection AddSerializer(this IServiceCollection services)
     {
-        services.AddSingleton(
-            JavaScriptEncoder.Create(
-                UnicodeRanges.BasicLatin,
-                UnicodeRanges.Latin1Supplement,
-                UnicodeRanges.LatinExtendedA));
+        services.AddSingleton<ISerializer, Serializer>(
+            sp => new Serializer(sp.GetRequiredService<JavaScriptEncoder>()));
 
         return services;
     }

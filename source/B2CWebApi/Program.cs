@@ -14,7 +14,6 @@
 
 using System.Reflection;
 using Asp.Versioning;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
@@ -22,6 +21,7 @@ using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;

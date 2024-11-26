@@ -15,7 +15,7 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Azure;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
 public sealed class ServiceBusSenderFactoryStub : IAzureClientFactory<ServiceBusSender>
 {

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using Azure.Storage.Blobs;
-using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;

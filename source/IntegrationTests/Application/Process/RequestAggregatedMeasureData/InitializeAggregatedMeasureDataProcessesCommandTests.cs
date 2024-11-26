@@ -14,15 +14,15 @@
 
 using System.Reflection;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.BuildingBlocks.Tests;
-using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
+using Energinet.EDI.DataHub.BuildingBlocks.Tests;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;

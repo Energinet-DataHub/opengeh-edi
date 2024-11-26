@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Encodings.Web;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
-public static class SerializerExtensions
+public static class FeatureFlagExtensions
 {
-    public static IServiceCollection AddSerializer(this IServiceCollection services)
+    public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
     {
-        services.AddSingleton<ISerializer, Serializer>(
-            sp => new Serializer(sp.GetRequiredService<JavaScriptEncoder>()));
+        services.AddFeatureManagement();
+        services.AddSingleton<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
 
         return services;
     }

@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using System.Reflection;
 using System.Xml.Linq;
 using Dapper;
-using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -27,8 +26,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessa
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Channel;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit.Abstractions;

@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
 using FluentAssertions;
 using FluentAssertions.Primitives;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests;
+namespace Energinet.EDI.DataHub.BuildingBlocks.Tests;
 
 public static partial class FluentAssertionExtensions
 {
