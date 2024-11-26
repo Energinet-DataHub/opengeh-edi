@@ -24,14 +24,12 @@ public class OrchestrationDescription
     private readonly List<StepDescription> _steps;
 
     public OrchestrationDescription(
-        string name,
-        int version,
+        OrchestrationDescriptionUniqueName uniqueName,
         bool canBeScheduled,
         string functionName)
     {
         Id = new OrchestrationDescriptionId(Guid.NewGuid());
-        Name = name;
-        Version = version;
+        UniqueName = uniqueName;
         CanBeScheduled = canBeScheduled;
         FunctionName = functionName;
         ParameterDefinition = new();
@@ -55,14 +53,9 @@ public class OrchestrationDescription
     public OrchestrationDescriptionId Id { get; }
 
     /// <summary>
-    /// A name which combined with the <see cref="Version"/> uniquely identifies the orchestration.
+    /// Uniquely identifies a specific implementation of the orchestration.
     /// </summary>
-    public string Name { get; }
-
-    /// <summary>
-    /// A version which combined with the <see cref="Name"/> uniquely identifies the orchestration.
-    /// </summary>
-    public int Version { get; }
+    public OrchestrationDescriptionUniqueName UniqueName { get; }
 
     /// <summary>
     /// Specifies if the orchestration supports scheduling.

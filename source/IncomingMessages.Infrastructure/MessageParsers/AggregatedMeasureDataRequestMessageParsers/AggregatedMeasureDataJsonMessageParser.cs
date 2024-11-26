@@ -15,84 +15,62 @@
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
 
-public sealed class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaProvider)
-    : JsonParserBase(schemaProvider), IMarketMessageParser
+public class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
 {
     private const string SeriesElementName = "Series";
-    private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
-    private const string DocumentName = "RequestAggregatedMeasureData";
+    private const string MridElementName = "mRID";
+    private const string MarketEvaluationPointTypeElementName = "marketEvaluationPoint.type";
+    private const string MarketEvaluationPointSettlementMethodElementName = "marketEvaluationPoint.settlementMethod";
+    private const string StartElementName = "start_DateAndOrTime.dateTime";
+    private const string EndElementName = "end_DateAndOrTime.dateTime";
+    private const string GridAreaElementName = "meteringGridArea_Domain.mRID";
+    private const string EnergySupplierNumberElementName = "energySupplier_MarketParticipant.mRID";
+    private const string BalanceResponsibleNumberElementName = "balanceResponsibleParty_MarketParticipant.mRID";
+    private const string SettlementVersionElementName = "settlement_Series.version";
 
-    public DocumentFormat HandledFormat => DocumentFormat.Json;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
-    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
+    public override DocumentFormat DocumentFormat => DocumentFormat.Json;
 
-    public async Task<IncomingMarketMessageParserResult> ParseAsync(
-        IIncomingMarketMessageStream incomingMarketMessageStream,
-        CancellationToken cancellationToken)
+    protected override string HeaderElementName => "RequestAggregatedMeasureData_MarketDocument";
+
+    protected override string DocumentName => "RequestAggregatedMeasureData";
+
+    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(JsonDocument document, string senderNumber)
     {
-        ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
+        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
+        var transactions = new List<RequestAggregatedMeasureDataMessageSeries>();
 
-        var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
-        if (schema is null)
+        foreach (var transactionElement in transactionElements.EnumerateArray())
         {
-            return new IncomingMarketMessageParserResult(
-                new InvalidBusinessReasonOrVersion(DocumentName, "0"));
+            var transaction = ParseTransaction(transactionElement);
+
+            transactions.Add(transaction);
         }
 
-        try
-        {
-            var errors = await ValidateMessageAsync(schema, incomingMarketMessageStream).ConfigureAwait(false);
-
-            if (errors.Count > 0)
-            {
-                return new IncomingMarketMessageParserResult([.. errors]);
-            }
-
-            using var document = await JsonDocument
-                .ParseAsync(incomingMarketMessageStream.Stream, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-
-            var header = document.RootElement.GetProperty(HeaderElementName);
-            var seriesJson = header.GetProperty(SeriesElementName);
-
-            return ParseJsonData(MessageHeaderFrom(header), seriesJson);
-        }
-        catch (JsonException exception)
-        {
-            return InvalidJsonFailure(exception);
-        }
-        catch (ArgumentException argumentException)
-        {
-            return InvalidJsonFailure(argumentException);
-        }
-        catch (IOException e)
-        {
-            return InvalidJsonFailure(e);
-        }
-        catch (KeyNotFoundException e)
-        {
-            return InvalidJsonFailure(new KeyNotFoundException("Missing root element", e));
-        }
+        return transactions.AsReadOnly();
     }
 
-    private static RequestAggregatedMeasureDataMessageSeries SeriesFrom(JsonElement element)
+    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
-        return new RequestAggregatedMeasureDataMessageSeries(
-            element.GetProperty("mRID").ToString(),
-            GetPropertyWithValue(element, "marketEvaluationPoint.type"),
-            GetPropertyWithValue(element, "marketEvaluationPoint.settlementMethod"),
-            element.GetProperty("start_DateAndOrTime.dateTime").ToString(),
-            element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,
-            GetPropertyWithValue(element, "meteringGridArea_Domain.mRID"),
-            GetPropertyWithValue(element, "energySupplier_MarketParticipant.mRID"),
-            GetPropertyWithValue(element, "balanceResponsibleParty_MarketParticipant.mRID"),
-            GetPropertyWithValue(element, "settlement_Series.version"));
+        return new IncomingMarketMessageParserResult(
+            new RequestAggregatedMeasureDataMessage(
+                header.SenderId,
+                header.SenderRole,
+                header.ReceiverId,
+                header.ReceiverRole,
+                header.BusinessReason,
+                header.MessageType,
+                header.MessageId,
+                header.CreatedAt,
+                header.BusinessType,
+                transactions));
     }
 
     private static string? GetPropertyWithValue(JsonElement element, string propertyName)
@@ -100,18 +78,28 @@ public sealed class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider sc
         return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
     }
 
-    private static IncomingMarketMessageParserResult ParseJsonData(
-        MessageHeader header,
-        JsonElement seriesJson)
+    private RequestAggregatedMeasureDataMessageSeries ParseTransaction(JsonElement transactionElement)
     {
-        var series = new List<RequestAggregatedMeasureDataMessageSeries>();
+        var id = transactionElement.GetProperty(MridElementName).ToString();
+        var startDateTime = transactionElement.GetProperty("start_DateAndOrTime.dateTime").ToString();
+        var endDateTime = transactionElement.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null;
 
-        foreach (var jsonElement in seriesJson.EnumerateArray())
-        {
-            series.Add(SeriesFrom(jsonElement));
-        }
+        var meteringPointType = GetPropertyWithValue(transactionElement, MarketEvaluationPointTypeElementName);
+        var settlementMethod = GetPropertyWithValue(transactionElement, MarketEvaluationPointSettlementMethodElementName);
+        var gridArea = GetPropertyWithValue(transactionElement, GridAreaElementName);
+        var energySupplierId = GetPropertyWithValue(transactionElement, EnergySupplierNumberElementName);
+        var balanceResponsibleId = GetPropertyWithValue(transactionElement, BalanceResponsibleNumberElementName);
+        var settlementVersion = GetPropertyWithValue(transactionElement, SettlementVersionElementName);
 
-        return new IncomingMarketMessageParserResult(
-            RequestAggregatedMeasureDataMessageFactory.Create(header, series.AsReadOnly()));
+        return new RequestAggregatedMeasureDataMessageSeries(
+            id,
+            meteringPointType,
+            settlementMethod,
+            startDateTime,
+            endDateTime,
+            gridArea,
+            energySupplierId,
+            balanceResponsibleId,
+            settlementVersion);
     }
 }

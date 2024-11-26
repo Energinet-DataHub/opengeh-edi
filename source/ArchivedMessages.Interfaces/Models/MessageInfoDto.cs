@@ -22,8 +22,8 @@ public record MessageInfoDto(
     string? MessageId,
     string DocumentType,
     string SenderNumber,
-    string SenderRoleCode,
+    string? SenderRoleCode,
     string ReceiverNumber,
-    string ReceiverRoleCode,
+    string? ReceiverRoleCode,
     Instant CreatedAt,
     string? BusinessReason);
