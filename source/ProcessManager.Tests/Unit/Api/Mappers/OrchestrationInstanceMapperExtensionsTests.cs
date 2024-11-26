@@ -73,8 +73,7 @@ public class OrchestrationInstanceMapperExtensionsTests
     private static OrchestrationInstance CreateOrchestrationInstance(OperatingIdentity? createdBy = default)
     {
         var orchestrationDescription = new OrchestrationDescription(
-            name: "name",
-            version: 1,
+            uniqueName: new OrchestrationDescriptionUniqueName("name", 1),
             canBeScheduled: false,
             functionName: "functionName");
 

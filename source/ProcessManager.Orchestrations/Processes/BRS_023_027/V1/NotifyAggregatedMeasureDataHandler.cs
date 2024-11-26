@@ -42,8 +42,7 @@ internal class NotifyAggregatedMeasureDataHandler(
                 identity: new UserIdentity(
                     new UserId(command.OperatingIdentity.UserId),
                     new ActorId(command.OperatingIdentity.ActorId)),
-                name: "BRS_023_027",
-                version: 1,
+                uniqueName: new Brs_023_027_V1(),
                 inputParameter: command.InputParameter,
                 runAt: command.RunAt.ToInstant(),
                 skipStepsBySequence: skipStepsBySequence)

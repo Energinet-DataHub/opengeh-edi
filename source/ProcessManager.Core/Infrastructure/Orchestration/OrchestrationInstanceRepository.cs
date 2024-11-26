@@ -75,8 +75,8 @@ internal class OrchestrationInstanceRepository(
 
         var query = _context
             .OrchestrationDescriptions
-                .Where(x => x.Name == name)
-                .Where(x => version == null || x.Version == version)
+                .Where(x => x.UniqueName.Name == name)
+                .Where(x => version == null || x.UniqueName.Version == version)
             .Join(
                 _context.OrchestrationInstances,
                 description => description.Id,
