@@ -26,8 +26,9 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
 public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) : MessageParserBase<JsonSchema>()
 {
-    protected const string ValueElementName = "value";
-    protected const string IdentificationElementName = "mRID";
+    private const string ValueElementName = "value";
+    private const string IdentificationElementName = "mRID";
+    private const string SeriesElementName = "Series";
     private const string MessageTypeElementName = "type";
     private const string ProcessTypeElementName = "process.processType";
     private const string SenderIdentificationElementName = "sender_MarketParticipant.mRID";
@@ -65,11 +66,18 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         }
 
         var header = ParseHeader(document);
-        var transactions = ParseTransactions(document, header.SenderId);
+        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
+        var transactions = new List<IIncomingMessageSeries>();
+
+        foreach (var transactionElement in transactionElements.EnumerateArray())
+        {
+            transactions.Add(ParseTransaction(transactionElement, header.SenderId));
+        }
+
         return CreateResult(header, transactions);
     }
 
-    protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(JsonDocument document, string senderNumber);
+    protected abstract IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber);
 
     protected override async Task<(JsonSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
     {

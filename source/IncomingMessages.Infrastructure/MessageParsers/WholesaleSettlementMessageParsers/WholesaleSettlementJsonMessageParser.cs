@@ -23,7 +23,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.W
 
 public class WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
 {
-    private const string SeriesElementName = "Series";
     private const string MridElementName = "mRID";
     private const string StartElementName = "start_DateAndOrTime.dateTime";
     private const string EndElementName = "end_DateAndOrTime.dateTime";
@@ -43,42 +42,7 @@ public class WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvi
 
     protected override string DocumentName => "RequestWholesaleSettlement";
 
-    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(JsonDocument document, string senderNumber)
-    {
-        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
-        var transactions = new List<RequestWholesaleServicesSeries>();
-
-        foreach (var transactionElement in transactionElements.EnumerateArray())
-        {
-            var transaction = ParseTransaction(transactionElement);
-
-            transactions.Add(transaction);
-        }
-
-        return transactions.AsReadOnly();
-    }
-
-    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
-    {
-        return new IncomingMarketMessageParserResult(new RequestWholesaleServicesMessage(
-            header.SenderId,
-            header.SenderRole,
-            header.ReceiverId,
-            header.ReceiverRole,
-            header.BusinessReason,
-            header.MessageType,
-            header.MessageId,
-            header.CreatedAt,
-            header.BusinessType,
-            transactions));
-    }
-
-    private static string? GetPropertyWithValue(JsonElement element, string propertyName)
-    {
-        return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
-    }
-
-    private RequestWholesaleServicesSeries ParseTransaction(JsonElement transactionElement)
+    protected override IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber)
     {
         var id = transactionElement.GetProperty(MridElementName).ToString();
         var startDateTime = transactionElement.GetProperty(StartElementName).ToString();
@@ -113,5 +77,25 @@ public class WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvi
             resolution,
             chargeOwner,
             chargeTypes);
+    }
+
+    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
+    {
+        return new IncomingMarketMessageParserResult(new RequestWholesaleServicesMessage(
+            header.SenderId,
+            header.SenderRole,
+            header.ReceiverId,
+            header.ReceiverRole,
+            header.BusinessReason,
+            header.MessageType,
+            header.MessageId,
+            header.CreatedAt,
+            header.BusinessType,
+            transactions));
+    }
+
+    private static string? GetPropertyWithValue(JsonElement element, string propertyName)
+    {
+        return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
     }
 }
