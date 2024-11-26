@@ -62,9 +62,9 @@ public static class IncomingMessagesExtensions
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
             .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataXmlMessageParser>()
-            .AddScoped<IMarketMessageParser, AggregatedMeasureDataJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataJsonMessageParser>()
             .AddScoped<IMarketMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, WholesaleSettlementJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldWholesaleSettlementJsonMessageParser>()
             .AddScoped<IMarketMessageParser, OldWholesaleSettlementXmlMessageParser>()
             .AddScoped<IMarketMessageParser, WholesaleSettlementB2CJsonMessageParser>()
             .AddScoped<IMarketMessageParser, MeteredDataForMeasurementPointEbixMessageParser>()
@@ -136,18 +136,15 @@ public static class IncomingMessagesExtensions
             .AddSingleton<EbixSchemaProvider>()
             .AddSingleton<JsonSchemaProvider>();
 
-        services
-            .AddTransient<IMessageParser, MeteredDateForMeasurementPointJsonMessageParser>();
-        services
-            .AddTransient<IMessageParser, MeteredDateForMeasurementPointEbixMessageParser>();
-        services
-            .AddTransient<IMessageParser, MeteredDateForMeasurementPointXmlMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointJsonMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointEbixMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointXmlMessageParser>();
 
-        services
-            .AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
+        services.AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
+        services.AddTransient<IMessageParser, WholesaleSettlementJsonMessageParser>();
 
-        services
-            .AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
+        services.AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
+        services.AddTransient<IMessageParser, AggregatedMeasureDataJsonMessageParser>();
 
         return services;
     }
