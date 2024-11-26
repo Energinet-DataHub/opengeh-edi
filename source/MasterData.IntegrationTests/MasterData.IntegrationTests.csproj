@@ -25,7 +25,6 @@
     <ItemGroup>
         <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
         <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
-        <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
         <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />

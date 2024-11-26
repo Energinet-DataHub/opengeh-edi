@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using FluentAssertions;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;

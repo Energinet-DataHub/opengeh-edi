@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System.Net;
-using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.Azure.Functions.Worker;

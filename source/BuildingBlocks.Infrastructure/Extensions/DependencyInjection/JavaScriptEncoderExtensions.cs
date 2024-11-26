@@ -12,19 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
-public static class BuildingBlockExtensions
+public static class JavaScriptEncoderExtensions
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddJavaScriptEncoder(this IServiceCollection services)
     {
-        services.AddServiceBusClientForApplication(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags();
+        services.AddSingleton(
+            JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,
+                UnicodeRanges.Latin1Supplement,
+                UnicodeRanges.LatinExtendedA));
+
         return services;
     }
 }

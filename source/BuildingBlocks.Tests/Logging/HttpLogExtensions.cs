@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 
 public static class HttpLogExtensions
 {
