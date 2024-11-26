@@ -28,9 +28,11 @@ public static class FileStorageExtensions
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
+
         services
             .AddOptions<BlobServiceClientConnectionOptions>()
-            .Bind(configuration);
+            .BindConfiguration(BlobServiceClientConnectionOptions.SectionName)
+            .ValidateDataAnnotations();
 
         var blobServiceClientConnectionOptions =
             configuration
