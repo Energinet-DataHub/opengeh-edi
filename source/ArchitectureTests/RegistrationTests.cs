@@ -129,7 +129,7 @@ public class RegistrationTests
                 typeof(IMarketMessageParser),
                 new[]
                 {
-                typeof(WholesaleSettlementJsonMessageParser).Assembly,
+                typeof(OldWholesaleSettlementJsonMessageParser).Assembly,
                 });
     }
 

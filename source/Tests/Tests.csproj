@@ -94,6 +94,9 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\RequestWholesaleSettlementOneSmallOneBigSeries.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\InvalidRequestAggregatedMeasureData.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\VersionIndexOutOfRangeRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -118,9 +121,9 @@ limitations under the License.
       <None Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementTwoSeries.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Include="CimMessageAdapter\Messages\json\AggregatedMeasure\InvalidJsonAggregatedMeasureData.json">
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\InvalidJsonAggregatedMeasureData.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\AggregatedMeasure\BadVersionRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
