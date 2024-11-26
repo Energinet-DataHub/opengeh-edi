@@ -39,5 +39,11 @@ public sealed class SuppressOperationCanceledExceptionMiddleware(ILogger<UnHandl
             // It logs a warning message indicating that the request was cancelled.
             _logger.LogWarning(operationCanceledException, "Request was cancelled: {Ex}", operationCanceledException.Message);
         }
+
+        // Prevent ObjectDisposedException to be thrown on actor cancel.
+        catch (ObjectDisposedException objectDisposedException) when (objectDisposedException.ObjectName == "Collection")
+        {
+            _logger.LogWarning(objectDisposedException, "Disposed object was referenced: {Ex}", objectDisposedException.Message);
+        }
     }
 }
