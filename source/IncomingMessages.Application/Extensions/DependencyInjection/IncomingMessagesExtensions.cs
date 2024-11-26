@@ -63,10 +63,10 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
             .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataXmlMessageParser>()
             .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataB2CJsonMessageParser>()
             .AddScoped<IMarketMessageParser, OldWholesaleSettlementJsonMessageParser>()
             .AddScoped<IMarketMessageParser, OldWholesaleSettlementXmlMessageParser>()
-            .AddScoped<IMarketMessageParser, WholesaleSettlementB2CJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldWholesaleSettlementB2CJsonMessageParser>()
             .AddScoped<IMarketMessageParser, MeteredDataForMeasurementPointEbixMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
@@ -142,9 +142,11 @@ public static class IncomingMessagesExtensions
 
         services.AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
         services.AddTransient<IMessageParser, WholesaleSettlementJsonMessageParser>();
+        services.AddTransient<IMessageParser, WholesaleSettlementB2CJsonMessageParserBase>();
 
         services.AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
         services.AddTransient<IMessageParser, AggregatedMeasureDataJsonMessageParser>();
+        services.AddTransient<IMessageParser, AggregatedMeasureDataB2CJsonMessageParserBase>();
 
         return services;
     }
