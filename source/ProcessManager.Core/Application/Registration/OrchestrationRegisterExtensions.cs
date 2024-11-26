@@ -42,8 +42,7 @@ internal static class OrchestrationRegisterExtensions
         {
             var hostDescription = hostDescriptions
                 .SingleOrDefault(x =>
-                    x.Name == registerDescription.Name
-                    && x.Version == registerDescription.Version);
+                    x.UniqueName == registerDescription.UniqueName);
 
             if (hostDescription == null)
                 await register.DeregisterAsync(registerDescription).ConfigureAwait(false);
@@ -54,8 +53,7 @@ internal static class OrchestrationRegisterExtensions
         {
             var registerDescription = registerDescriptions
                 .SingleOrDefault(x =>
-                    x.Name == hostDescription.Name
-                    && x.Version == hostDescription.Version);
+                    x.UniqueName == hostDescription.UniqueName);
 
             if (registerDescription == null || registerDescription.IsEnabled == false)
                 await register.RegisterAsync(hostDescription, hostName).ConfigureAwait(false);
