@@ -204,6 +204,11 @@ public class OrchestrationsAppManager : IAsyncDisposable
         appHostSettings.ProcessEnvironmentVariables.Add(
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
+        // Make Orchestrator poll for updates every second (default is every 30 seconds) by overriding maxQueuePollingInterval
+        // (ref: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-bindings?tabs=python-v2%2Cisolated-process%2C2x-durable-functions&pivots=programming-language-csharp#hostjson-settings)
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "AzureFunctionsJobHost__extensions__durableTask__storageProvider__maxQueuePollingInterval",
+            "00:00:01");
 
         // ProcessManager
         // => Task Hub
