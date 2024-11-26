@@ -153,18 +153,19 @@ public class ArchivedMessageSearchController : ControllerBase
 
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
-        var messages = result.Messages.Select(
-            x => new ArchivedMessageResultV3(
-                x.RecordId,
-                x.Id.ToString(),
-                x.MessageId,
-                DocumentTypeMapper.ToDocumentType(x.DocumentType),
-                x.SenderNumber,
-                ActorRoleMapper.ToActorRole(x.SenderRoleCode),
-                x.ReceiverNumber,
-                ActorRoleMapper.ToActorRole(x.ReceiverRoleCode),
-                x.CreatedAt.ToDateTimeOffset(),
-                x.BusinessReason));
+        var messages = result.Messages
+            .Select(
+                x => new ArchivedMessageResultV3(
+                    x.RecordId,
+                    x.Id.ToString(),
+                    x.MessageId,
+                    DocumentTypeMapper.ToDocumentType(x.DocumentType),
+                    x.SenderNumber,
+                    ActorRoleMapper.ToActorRole(x.SenderRoleCode),
+                    x.ReceiverNumber,
+                    ActorRoleMapper.ToActorRole(x.ReceiverRoleCode),
+                    x.CreatedAt.ToDateTimeOffset(),
+                    x.BusinessReason));
         return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));
     }
 }

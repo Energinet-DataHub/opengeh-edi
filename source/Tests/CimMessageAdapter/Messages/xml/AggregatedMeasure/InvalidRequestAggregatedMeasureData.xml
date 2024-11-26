@@ -1,0 +1,57 @@
+{
+	"RequestAggregatedMeasureData_MarketDocument": {
+		"mRID": "123564789123564789123564789123564789",
+		"businessSector.type": {
+			"value": "23"
+		},
+		"createdDateTime": "2022-12-17T09:30:47Z",
+		"process.processType": {
+			"value": "D05"
+		},
+		"receiver_MarketParticipant.mRID": {
+			"codingScheme": "A10",
+			"value": "5790001330552"
+		},
+		"receiver_MarketParticipant.marketRole.type": {
+			"value": "DGL"
+		},
+		"sender_MarketParticipant.mRID": {
+			"codingScheme": "A10",
+			"value": "5799999933318"
+		},
+		"sender_MarketParticipant.marketRole.type": {
+			"value": "DDK"
+		},
+		"type": {
+			"value": "E74"
+		},
+		"Series": [
+			{
+				"mRID": "123353185",
+				"balanceResponsibleParty_MarketParticipant.mRID": {
+					"codingScheme": "A10",
+					"value": "5799999933318"
+				},
+				"end_DateAndOrTime.dateTime": "2022-07-22T22:00:00Z",
+				"energySupplier_MarketParticipant.mRID": {
+					"codingScheme": "A10",
+					"value": "5790001330552"
+				},
+				"marketEvaluationPoint.settlementMethod": {
+					"value": "D01"
+				},
+				"marketEvaluationPoint.type": {
+					"value": "E17"
+				},
+				"meteringGridArea_Domain.mRID": {
+					"codingScheme": "NDK",
+					"value": "244"
+				},
+				"start_DateAndOrTime.dateTime": "2022-06-17T22:00:00Z",
+        "settlement_Series.version": {
+          "value": "D01"
+        }
+      }
+		]
+	}
+}
