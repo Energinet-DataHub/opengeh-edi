@@ -70,7 +70,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
         <PackageReference Include="Dapper" Version="2.1.35" />
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.1" />
         <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="10.0.0" />
