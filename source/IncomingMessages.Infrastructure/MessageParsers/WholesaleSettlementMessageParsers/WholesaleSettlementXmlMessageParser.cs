@@ -12,42 +12,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Xml;
-using System.Xml.Schema;
+using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
 
-public class WholesaleSettlementXmlMessageParser : XmlBaseParser
+public class WholesaleSettlementXmlMessageParser(CimXmlSchemaProvider schemaProvider) : XmlMessageParserBase(schemaProvider)
 {
     private const string SeriesElementName = "Series";
-    private const string HeaderElementName = "RequestWholesaleSettlement_MarketDocument";
-
-    public WholesaleSettlementXmlMessageParser(CimXmlSchemaProvider schemaProvider)
-        : base(schemaProvider)
-    {
-    }
+    private const string MridElementName = "mRID";
+    private const string StartElementName = "start_DateAndOrTime.dateTime";
+    private const string EndElementName = "end_DateAndOrTime.dateTime";
+    private const string GridAreaElementName = "meteringGridArea_Domain.mRID";
+    private const string EnergySupplierElementName = "energySupplier_MarketParticipant.mRID";
+    private const string ChargeOwnerElementName = "chargeTypeOwner_MarketParticipant.mRID";
+    private const string SettlementVersionElementName = "settlement_Series.version";
+    private const string ResolutionElementName = "aggregationSeries_Period.resolution";
+    private const string ChargeElementName = "ChargeType";
+    private const string ChargeTypeElementName = "type";
 
     public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestWholesaleSettlement;
 
-    protected override async Task<IncomingMarketMessageParserResult> ParseXmlDataAsync(
-        XmlReader reader)
-    {
-        var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
-        var header = await MessageHeaderExtractor
-            .ExtractAsync(reader, root, HeaderElementName, SeriesElementName)
-            .ConfigureAwait(false);
+    protected override string RootPayloadElementName => "RequestWholesaleSettlement_MarketDocument";
 
-        var listOfSeries = new List<RequestWholesaleServicesSeries>();
-        await foreach (var series in ParseSeriesAsync(reader, root))
+    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
+    {
+        var seriesElements = document.Descendants(ns + SeriesElementName);
+        var result = new List<RequestWholesaleServicesSeries>();
+
+        foreach (var seriesElement in seriesElements)
         {
-            listOfSeries.Add(series);
+            var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
+            var startDateAndOrTimeDateTime = seriesElement.Element(ns + StartElementName)?.Value ?? string.Empty;
+            var endDateAndOrTimeDateTime = seriesElement.Element(ns + EndElementName)?.Value;
+            var gridArea = seriesElement.Element(ns + GridAreaElementName)?.Value;
+            var energySupplierId = seriesElement.Element(ns + EnergySupplierElementName)?.Value;
+            var chargeTypeOwnerId = seriesElement.Element(ns + ChargeOwnerElementName)?.Value;
+            var settlementVersion = seriesElement.Element(ns + SettlementVersionElementName)?.Value;
+            var resolution = seriesElement.Element(ns + ResolutionElementName)?.Value;
+
+            var chargeTypes = seriesElement.Descendants(ns + ChargeElementName)
+                .Select(e => new RequestWholesaleServicesChargeType(
+                    e.Element(ns + MridElementName)?.Value,
+                    e.Element(ns + ChargeTypeElementName)?.Value));
+
+            result.Add(new RequestWholesaleServicesSeries(
+                id,
+                startDateAndOrTimeDateTime,
+                endDateAndOrTimeDateTime,
+                gridArea,
+                energySupplierId,
+                settlementVersion,
+                resolution,
+                chargeTypeOwnerId,
+                chargeTypes.Select(a => a).ToList()));
         }
 
+        return result.AsReadOnly();
+    }
+
+    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
+    {
         return new IncomingMarketMessageParserResult(new RequestWholesaleServicesMessage(
             header.SenderId,
             header.SenderRole,
@@ -58,120 +87,6 @@ public class WholesaleSettlementXmlMessageParser : XmlBaseParser
             header.MessageId,
             header.CreatedAt,
             header.BusinessType,
-            listOfSeries.AsReadOnly()));
-    }
-
-    private async IAsyncEnumerable<RequestWholesaleServicesSeries> ParseSeriesAsync(
-        XmlReader reader,
-        RootElement rootElement)
-    {
-        var id = string.Empty;
-        var startDateAndOrTimeDateTime = string.Empty;
-        string? endDateAndOrTimeDateTime = null;
-        string? gridArea = null;
-        string? energySupplierId = null;
-        string? chargeTypeOwnerId = null;
-        string? settlementVersion = null;
-        string? resolution = null;
-        string? chargeType = null;
-        string? chargeId = null;
-        List<RequestWholesaleServicesChargeType> chargeTypes = new();
-        var ns = rootElement.DefaultNamespace;
-
-        await reader.AdvanceToAsync(SeriesElementName, ns).ConfigureAwait(false);
-
-        while (!reader.EOF)
-        {
-            if (reader.Is(SeriesElementName, ns, XmlNodeType.EndElement))
-            {
-                var series = new RequestWholesaleServicesSeries(
-                    id,
-                    startDateAndOrTimeDateTime,
-                    endDateAndOrTimeDateTime,
-                    gridArea,
-                    energySupplierId,
-                    settlementVersion,
-                    resolution,
-                    chargeTypeOwnerId,
-                    // clones the list
-                    chargeTypes.Select(a => a).ToList());
-
-                id = string.Empty;
-                startDateAndOrTimeDateTime = string.Empty;
-                endDateAndOrTimeDateTime = null;
-                gridArea = null;
-                energySupplierId = null;
-                chargeTypeOwnerId = null;
-                settlementVersion = null;
-                resolution = null;
-                chargeType = null;
-                chargeId = null;
-                chargeTypes.Clear();
-                yield return series;
-            }
-
-            if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
-                await reader.ReadToEndAsync().ConfigureAwait(false);
-
-            if (reader.Depth == 2 && reader.Is("mRID", ns))
-            {
-                id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("start_DateAndOrTime.dateTime", ns))
-            {
-                startDateAndOrTimeDateTime = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("end_DateAndOrTime.dateTime", ns))
-            {
-                endDateAndOrTimeDateTime = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("meteringGridArea_Domain.mRID", ns))
-            {
-                gridArea = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("energySupplier_MarketParticipant.mRID", ns))
-            {
-                energySupplierId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("chargeTypeOwner_MarketParticipant.mRID", ns))
-            {
-                chargeTypeOwnerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("settlement_Series.version", ns))
-            {
-                settlementVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("aggregationSeries_Period.resolution", ns))
-            {
-                resolution = reader.ReadString();
-            }
-            else if (reader.Depth == 3 && reader.Is("type", ns))
-            {
-                chargeType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Depth == 3 && reader.Is("mRID", ns))
-            {
-                chargeId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-
-            // We're at the end of a charge type element
-            else if (reader.Is("ChargeType", ns, XmlNodeType.EndElement))
-            {
-                // chargeId and chargeType are read, since these lives inside the ChargeType element
-                var chargeTypeOwner = new RequestWholesaleServicesChargeType(chargeId, chargeType);
-                chargeTypes.Add(chargeTypeOwner);
-
-                // Reset the current values, since we're done with this chargeType element
-                chargeType = null;
-                chargeId = null;
-
-                // Move to next element
-                await reader.ReadAsync().ConfigureAwait(false);
-            }
-            else
-            {
-                await reader.ReadAsync().ConfigureAwait(false);
-            }
-        }
+            transactions));
     }
 }

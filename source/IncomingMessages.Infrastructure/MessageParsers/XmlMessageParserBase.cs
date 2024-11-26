@@ -37,6 +37,8 @@ public abstract class XmlMessageParserBase(CimXmlSchemaProvider schemaProvider) 
     private const string BusinessSectorTypeElementName = "businessSector.type";
     private readonly CimXmlSchemaProvider _schemaProvider = schemaProvider;
 
+    public override DocumentFormat DocumentFormat => DocumentFormat.Xml;
+
     protected abstract string RootPayloadElementName { get; }
 
     private Collection<ValidationError> ValidationErrors { get; } = [];
