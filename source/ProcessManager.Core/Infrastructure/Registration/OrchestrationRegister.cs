@@ -41,14 +41,11 @@ internal class OrchestrationRegister(
     }
 
     /// <inheritdoc />
-    public Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool? isEnabled)
+    public Task<OrchestrationDescription?> GetOrDefaultAsync(OrchestrationDescriptionUniqueName uniqueName, bool? isEnabled)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
-
         return _context.OrchestrationDescriptions
             .SingleOrDefaultAsync(x =>
-                x.Name == name
-                && x.Version == version
+                x.UniqueName == uniqueName
                 && (isEnabled == null || x.IsEnabled == isEnabled));
     }
 
@@ -69,7 +66,7 @@ internal class OrchestrationRegister(
         ArgumentNullException.ThrowIfNull(orchestrationDescription);
         ArgumentException.ThrowIfNullOrWhiteSpace(hostName);
 
-        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version, isEnabled: null).ConfigureAwait(false);
+        var existing = await GetOrDefaultAsync(orchestrationDescription.UniqueName, isEnabled: null).ConfigureAwait(false);
         if (existing == null)
         {
             // Enfore certain values
@@ -90,7 +87,7 @@ internal class OrchestrationRegister(
     {
         ArgumentNullException.ThrowIfNull(orchestrationDescription);
 
-        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version, isEnabled: true).ConfigureAwait(false);
+        var existing = await GetOrDefaultAsync(orchestrationDescription.UniqueName, isEnabled: true).ConfigureAwait(false);
         if (existing == null)
             throw new InvalidOperationException("Orchestration description has not been registered or is not currently enabled.");
 

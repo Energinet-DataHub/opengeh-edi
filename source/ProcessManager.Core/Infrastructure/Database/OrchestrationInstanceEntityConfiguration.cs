@@ -32,6 +32,8 @@ internal class OrchestrationInstanceEntityConfiguration : IEntityTypeConfigurati
                 id => id.Value,
                 dbValue => new OrchestrationInstanceId(dbValue));
 
+        // Unfortunately we cannot use 'ComplexProperty' as it doesn't yet support nullability
+        // and we need to be able to set 'CanceledBy' as null.
         builder.OwnsOne(
             o => o.Lifecycle,
             b =>
@@ -68,7 +70,7 @@ internal class OrchestrationInstanceEntityConfiguration : IEntityTypeConfigurati
                     });
             });
 
-        builder.OwnsOne(
+        builder.ComplexProperty(
             o => o.ParameterValue,
             b =>
             {

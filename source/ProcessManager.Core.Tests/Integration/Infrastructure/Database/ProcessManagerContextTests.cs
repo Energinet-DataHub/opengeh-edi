@@ -112,8 +112,7 @@ public class ProcessManagerContextTests
     private static OrchestrationDescription CreateOrchestrationDescription()
     {
         var orchestrationDescription = new OrchestrationDescription(
-            name: "TestOrchestration",
-            version: 4,
+            uniqueName: new OrchestrationDescriptionUniqueName("TestOrchestration", 4),
             canBeScheduled: true,
             functionName: "TestOrchestrationFunction");
 
