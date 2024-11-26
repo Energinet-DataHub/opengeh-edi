@@ -32,8 +32,8 @@ public record ArchivedMessageResultV3(
     string? MessageId,
     DocumentType DocumentType,
     string SenderNumber,
-    ActorRole SenderRole,
+    ActorRole? SenderRole,
     string ReceiverNumber,
-    ActorRole ReceiverRole,
+    ActorRole? ReceiverRole,
     DateTimeOffset CreatedAt,
     string? BusinessReason);
