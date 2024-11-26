@@ -33,9 +33,9 @@ public static class ActorRoleMapper
         { ActorRole.DataHubAdministrator.Code, Models.ActorRole.DataHubAdministrator },
     };
 
-    public static Models.ActorRole ToActorRole(string actorRoleCode)
+    public static Models.ActorRole? ToActorRole(string? actorRoleCode)
     {
-        return ActorRoleMappings[actorRoleCode];
+        return actorRoleCode == null ? null : ActorRoleMappings[actorRoleCode];
     }
 
     public static string? ToActorRoleCode(Models.ActorRole? actorRole)
