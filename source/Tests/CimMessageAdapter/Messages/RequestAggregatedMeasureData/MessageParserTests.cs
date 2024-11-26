@@ -43,11 +43,18 @@ public sealed class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
-    private readonly MarketMessageParser _marketMessageParser = new(
-    [
+    private static readonly List<IMessageParser> _messageParsers = new()
+    {
         new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
         new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-        new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()),
+        new AggregatedMeasureDataB2CJsonMessageParserBase(new Serializer()),
+    };
+
+    private readonly MarketMessageParser _marketMessageParser = new(
+    [
+        new OldAggregatedMeasureDataXmlMessageParser(_messageParsers),
+        new OldAggregatedMeasureDataJsonMessageParser(_messageParsers),
+        new OldAggregatedMeasureDataB2CJsonMessageParser(_messageParsers),
     ]);
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
@@ -79,6 +86,10 @@ public sealed class MessageParserTests
             ],
             [
                 DocumentFormat.Xml, CreateBaseXmlMessage("VersionIndexOutOfRangeRequestAggregatedMeasureData.xml"),
+                nameof(InvalidMessageStructure),
+            ],
+            [
+                DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestAggregatedMeasureData.xml"),
                 nameof(InvalidMessageStructure),
             ],
             [
@@ -186,15 +197,9 @@ public sealed class MessageParserTests
         result.Errors.Should().Contain(error => error.GetType().Name == expectedError);
     }
 
-    private static MemoryStream CreateBaseXmlMessage(string fileName)
+    private static MemoryStream CreateBaseXmlMessage(string fileName, int addSeriesUntilMbSize = 0)
     {
-        var xmlDocument = XDocument.Load(
-            $"{PathToMessages}xml{SubPath}{fileName}");
-
-        var stream = new MemoryStream();
-        xmlDocument.Save(stream);
-
-        return stream;
+        return ReadTextFile($"{PathToMessages}xml{SubPath}{fileName}", addSeriesUntilMbSize);
     }
 
     private static MemoryStream CreateBaseJsonMessages(string fileName, int addSeriesUntilMbSize = 0)

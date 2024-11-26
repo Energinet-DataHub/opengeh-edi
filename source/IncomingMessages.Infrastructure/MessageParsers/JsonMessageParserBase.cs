@@ -48,7 +48,17 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         JsonSchema schemaResult,
         CancellationToken cancellationToken)
     {
-        var document = await JsonDocument.ParseAsync(marketMessage.Stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        JsonDocument document;
+        try
+        {
+            document = await JsonDocument.ParseAsync(marketMessage.Stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+        catch (JsonException exception)
+        {
+            AddValidationError(exception.Message);
+            return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
+        }
+
         if (IsValid(document, schemaResult) == false)
         {
             return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
@@ -107,6 +117,12 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         if (result.IsValid == false)
         {
             FindErrorsForInvalidEvaluation(result);
+        }
+
+        if (!jsonDocument.RootElement.EnumerateObject().Any())
+        {
+            AddValidationError("Document is empty");
+            return false;
         }
 
         return result.IsValid;

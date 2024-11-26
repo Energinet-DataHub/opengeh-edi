@@ -15,35 +15,23 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Json.Schema;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
 
-public class WholesaleSettlementB2CJsonMessageParser : IMarketMessageParser
+public class WholesaleSettlementB2CJsonMessageParserBase(ISerializer serializer)
+    : B2CJsonMessageParserBase<RequestWholesaleSettlementDto>(serializer)
 {
-    private readonly ISerializer _serializer;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.B2CRequestWholesaleSettlement;
 
-    public WholesaleSettlementB2CJsonMessageParser(
-        ISerializer serializer)
+    public override DocumentFormat DocumentFormat => DocumentFormat.Json;
+
+    protected override IIncomingMessage MapIncomingMessage(RequestWholesaleSettlementDto incomingMessageDto)
     {
-        _serializer = serializer;
-    }
-
-    public DocumentFormat HandledFormat => DocumentFormat.Json;
-
-    public IncomingDocumentType DocumentType => IncomingDocumentType.B2CRequestWholesaleSettlement;
-
-    public async Task<IncomingMarketMessageParserResult> ParseAsync(
-        IIncomingMarketMessageStream incomingMarketMessageStream,
-        CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
-
-        var requestWholesaleSettlementDto = await _serializer
-            .DeserializeAsync<RequestWholesaleSettlementDto>(incomingMarketMessageStream.Stream, cancellationToken)
-            .ConfigureAwait(false);
-
-        var seriesCollection = requestWholesaleSettlementDto.Series
+        var seriesCollection = incomingMessageDto.Series
             .Select(
                 series => new RequestWholesaleServicesSeries(
                     series.Id,
@@ -61,17 +49,17 @@ public class WholesaleSettlementB2CJsonMessageParser : IMarketMessageParser
             .AsReadOnly();
 
         var requestWholesaleServicesMessage = new RequestWholesaleServicesMessage(
-            requestWholesaleSettlementDto.SenderNumber,
-            requestWholesaleSettlementDto.SenderRoleCode,
-            requestWholesaleSettlementDto.ReceiverNumber,
-            requestWholesaleSettlementDto.ReceiverRoleCode,
-            requestWholesaleSettlementDto.BusinessReason,
-            requestWholesaleSettlementDto.MessageType,
-            requestWholesaleSettlementDto.MessageId,
-            requestWholesaleSettlementDto.CreatedAt,
-            requestWholesaleSettlementDto.BusinessType,
+            incomingMessageDto.SenderNumber,
+            incomingMessageDto.SenderRoleCode,
+            incomingMessageDto.ReceiverNumber,
+            incomingMessageDto.ReceiverRoleCode,
+            incomingMessageDto.BusinessReason,
+            incomingMessageDto.MessageType,
+            incomingMessageDto.MessageId,
+            incomingMessageDto.CreatedAt,
+            incomingMessageDto.BusinessType,
             seriesCollection);
 
-        return new IncomingMarketMessageParserResult(requestWholesaleServicesMessage);
+        return requestWholesaleServicesMessage;
     }
 }

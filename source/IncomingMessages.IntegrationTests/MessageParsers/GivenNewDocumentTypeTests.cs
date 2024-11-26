@@ -26,12 +26,12 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
 {
     private static readonly List<(IncomingDocumentType, DocumentFormat)> _unsupportedCombinationsOfIncomingDocumentTypeAndDocumentFormat = new()
     {
-        (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Xml),
-        (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Xml),
         (IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Ebix),
         (IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Ebix),
-        (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Ebix),
         (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Ebix),
+        (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Ebix),
+        (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Xml),
+        (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Xml),
     };
 
     public GivenNewIncomingDocumentTypeTests(IncomingMessagesTestFixture incomingMessagesTestFixture, ITestOutputHelper testOutputHelper)

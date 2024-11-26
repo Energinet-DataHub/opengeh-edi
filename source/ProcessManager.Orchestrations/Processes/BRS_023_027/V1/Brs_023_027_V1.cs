@@ -14,14 +14,7 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 
-/// <summary>
-/// Readonly access to the orchestration register.
-/// </summary>
-internal interface IOrchestrationRegisterQueries
-{
-    Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id);
-
-    Task<OrchestrationDescription?> GetOrDefaultAsync(OrchestrationDescriptionUniqueName uniqueName, bool? isEnabled);
-}
+public record Brs_023_027_V1()
+    : OrchestrationDescriptionUniqueName("BRS_023_027", 1);

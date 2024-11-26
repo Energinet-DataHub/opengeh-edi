@@ -49,11 +49,17 @@ public sealed class MessageParserTests
 
     public MessageParserTests()
     {
+        var messageParsers = new List<IMessageParser>()
+        {
+            new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+            new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
+            new WholesaleSettlementB2CJsonMessageParserBase(_serializer),
+        };
         _marketMessageParser = new MarketMessageParser(
         [
-            new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
-                new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-                new WholesaleSettlementB2CJsonMessageParser(_serializer),
+            new OldWholesaleSettlementXmlMessageParser(messageParsers),
+            new OldWholesaleSettlementJsonMessageParser(messageParsers),
+            new OldWholesaleSettlementB2CJsonMessageParser(messageParsers),
         ]);
     }
 
@@ -109,7 +115,11 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(new IncomingMarketMessageStream(message), format, IncomingDocumentType.RequestWholesaleSettlement, CancellationToken.None);
+        var result = await _marketMessageParser.ParseAsync(
+            new IncomingMarketMessageStream(message),
+            format,
+            IncomingDocumentType.RequestWholesaleSettlement,
+            CancellationToken.None);
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
@@ -177,7 +187,11 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _marketMessageParser.ParseAsync(new IncomingMarketMessageStream(message), format, IncomingDocumentType.RequestWholesaleSettlement, CancellationToken.None);
+        var result = await _marketMessageParser.ParseAsync(
+            new IncomingMarketMessageStream(message),
+            format,
+            IncomingDocumentType.RequestWholesaleSettlement,
+            CancellationToken.None);
 
         result.Success.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();

@@ -61,12 +61,12 @@ public static class IncomingMessagesExtensions
             .AddScoped<DelegateIncomingMessage>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
-            .AddScoped<IMarketMessageParser, AggregatedMeasureDataXmlMessageParser>()
-            .AddScoped<IMarketMessageParser, AggregatedMeasureDataJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, WholesaleSettlementJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, WholesaleSettlementXmlMessageParser>()
-            .AddScoped<IMarketMessageParser, WholesaleSettlementB2CJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataB2CJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldWholesaleSettlementJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, OldWholesaleSettlementXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, OldWholesaleSettlementB2CJsonMessageParser>()
             .AddScoped<IMarketMessageParser, MeteredDataForMeasurementPointEbixMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
@@ -136,12 +136,17 @@ public static class IncomingMessagesExtensions
             .AddSingleton<EbixSchemaProvider>()
             .AddSingleton<JsonSchemaProvider>();
 
-        services
-            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointJsonMessageParser>();
-        services
-            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointEbixMessageParser>();
-        services
-            .AddTransient<IMessageParser, Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.MeteredDateForMeasurementPointXmlMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointJsonMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointEbixMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointXmlMessageParser>();
+
+        services.AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
+        services.AddTransient<IMessageParser, WholesaleSettlementJsonMessageParser>();
+        services.AddTransient<IMessageParser, WholesaleSettlementB2CJsonMessageParserBase>();
+
+        services.AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
+        services.AddTransient<IMessageParser, AggregatedMeasureDataJsonMessageParser>();
+        services.AddTransient<IMessageParser, AggregatedMeasureDataB2CJsonMessageParserBase>();
 
         return services;
     }
