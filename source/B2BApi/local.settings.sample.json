@@ -6,8 +6,8 @@
     "B2C_TENANT_ID": "<Azure B2C tenant id>",
     "BACKEND_SERVICE_APP_ID": "<Backend service application id>",
     "DB_CONNECTION_STRING": "<SQL database connection string>",
-    "AZURE_STORAGE_ACCOUNT_URL": "<Azure storage account url>",
-    "AZURE_STORAGE_ACCOUNT_CLIENT_NAME": "<Azure storage account client name>",
+
+    "FileStorage__StorageAccountUrl": "<Azure storage account url>",
 
     "ServiceBus__ManageConnectionString": "<service bus connection string for shared service bus with manage permissions>",
     "ServiceBus__ListenConnectionString": "<service bus connection string for shared service bus with listener permissions>",
