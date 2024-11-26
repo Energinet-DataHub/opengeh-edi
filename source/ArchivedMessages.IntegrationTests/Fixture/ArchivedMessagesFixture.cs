@@ -131,8 +131,12 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public ServiceProvider BuildService(ITestOutputHelper? testOutputHelper = null)
     {
-        var builder = new ConfigurationBuilder();
-        builder.AddInMemoryCollection(new Dictionary<string, string?>
+        var services = new ServiceCollection();
+
+        if (testOutputHelper != null)
+            services.AddTestLogger(testOutputHelper);
+
+        var configuration = AddInMemoryConfigurations(services, new Dictionary<string, string?>()
         {
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
             [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
@@ -142,17 +146,22 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });
 
-        var services = new ServiceCollection();
-        var configuration = builder.Build();
-
-        if (testOutputHelper != null)
-            services.AddTestLogger(testOutputHelper);
-
         services
             .AddScoped<AuthenticatedActor>()
             .AddArchivedMessagesModule(configuration);
 
         return services.BuildServiceProvider();
+    }
+
+    public IConfiguration AddInMemoryConfigurations(IServiceCollection services, Dictionary<string, string?> configurations)
+    {
+        var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(configurations)
+                .Build();
+
+        services.AddScoped<IConfiguration>(_ => configuration);
+
+        return configuration;
     }
 
     public async Task<ArchivedMessageDto> CreateArchivedMessageAsync(
