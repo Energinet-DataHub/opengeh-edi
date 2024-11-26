@@ -30,8 +30,7 @@ public class RequestCalculatedEnergyTimeSeriesHandler(
     {
         await _commands.StartNewOrchestrationInstanceAsync(
                 identity: new ActorIdentity(new ActorId(Guid.NewGuid())), // TODO: Any call to commands must include identity information; see 'ScheduleOrchestrationInstanceDto' and 'CancelOrchestrationInstanceDto'
-                "BRS_026",
-                1,
+                uniqueName: new Brs_026_V1(),
                 input,
                 [])
             .ConfigureAwait(false);

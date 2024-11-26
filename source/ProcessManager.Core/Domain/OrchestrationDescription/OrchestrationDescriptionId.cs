@@ -14,4 +14,12 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
-public record OrchestrationDescriptionId(Guid Value);
+public record OrchestrationDescriptionId
+{
+    internal OrchestrationDescriptionId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+}
