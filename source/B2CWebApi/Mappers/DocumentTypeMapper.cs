@@ -25,9 +25,8 @@ public static class DocumentTypeMapper
         { Models.DocumentType.RejectRequestAggregatedMeasureData, DocumentType.RejectRequestAggregatedMeasureData.Name },
         { Models.DocumentType.RejectRequestWholesaleSettlement, DocumentType.RejectRequestWholesaleSettlement.Name },
         { Models.DocumentType.RequestAggregatedMeasureData, IncomingDocumentType.RequestAggregatedMeasureData.Name },
-        { Models.DocumentType.B2CRequestAggregatedMeasureData, IncomingDocumentType.B2CRequestAggregatedMeasureData.Name },
         { Models.DocumentType.RequestWholesaleSettlement, IncomingDocumentType.RequestWholesaleSettlement.Name },
-        { Models.DocumentType.B2CRequestWholesaleSettlement, IncomingDocumentType.B2CRequestWholesaleSettlement.Name },
+        { Models.DocumentType.B2CRequestWholesaleSettlement, IncomingDocumentType.RequestWholesaleSettlement.Name },
     };
 
     public static List<string>? FromDocumentTypes(IReadOnlyCollection<Models.DocumentType>? documentTypes)

@@ -214,7 +214,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
             incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 incomingMessageStream,
                 DocumentFormat.Json,
-                IncomingDocumentType.B2CRequestAggregatedMeasureData,
+                IncomingDocumentType.RequestAggregatedMeasureData,
                 DocumentFormat.Json,
                 CancellationToken.None);
 

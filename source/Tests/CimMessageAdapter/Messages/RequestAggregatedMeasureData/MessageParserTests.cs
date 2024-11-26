@@ -43,11 +43,18 @@ public sealed class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
+    private static readonly List<IMessageParser> _messageParsers = new()
+    {
+        new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+        new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
+        new AggregatedMeasureDataB2CJsonMessageParserBase(new Serializer()),
+    };
+
     private readonly MarketMessageParser _marketMessageParser = new(
     [
-        new OldAggregatedMeasureDataXmlMessageParser(new List<IMessageParser> { new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) }),
-        new OldAggregatedMeasureDataJsonMessageParser(new List<IMessageParser> { new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) }),
-        new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()),
+        new OldAggregatedMeasureDataXmlMessageParser(_messageParsers),
+        new OldAggregatedMeasureDataJsonMessageParser(_messageParsers),
+        new OldAggregatedMeasureDataB2CJsonMessageParser(_messageParsers),
     ]);
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
