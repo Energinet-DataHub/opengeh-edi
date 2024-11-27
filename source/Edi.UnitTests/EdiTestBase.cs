@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -47,6 +48,8 @@ public class EdiTestBase
         builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["DB_CONNECTION_STRING"] = _ediFixture.DatabaseManager.ConnectionString,
+            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
+                "https://fake.fakeurl.com",
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });
 

@@ -21,6 +21,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Xunit;
 using Xunit.Abstractions;
@@ -36,7 +37,7 @@ public class B2CWebApiFixture : IAsyncLifetime
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
         DatabaseManager = new EdiDatabaseManager("B2CWebApi");
-        AzuriteManager = new AzuriteManager();
+        AzuriteManager = new AzuriteManager(useOAuth: true);
         OpenIdJwtManager = new OpenIdJwtManager(IntegrationTestConfiguration.B2CSettings);
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             TestLogger,
@@ -114,7 +115,10 @@ public class B2CWebApiFixture : IAsyncLifetime
         var appSettings = new Dictionary<string, string?>
         {
             { "DB_CONNECTION_STRING", dbConnectionString },
-            { "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", AzuriteManager.FullConnectionString },
+            {
+                $"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+                AzuriteManager.BlobStorageServiceUri.AbsoluteUri
+            },
             { "UserAuthentication:MitIdExternalMetadataAddress", "YourMitIdExternalMetadataAddress" },
             { "UserAuthentication:ExternalMetadataAddress", OpenIdJwtManager.ExternalMetadataAddress },
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },
