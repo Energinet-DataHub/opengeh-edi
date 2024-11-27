@@ -30,6 +30,14 @@ namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 /// </summary>
 public class ProcessManagerAppManager : IAsyncDisposable
 {
+    /// <summary>
+    /// Durable Functions Task Hub Name
+    /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
+    /// </summary>
+    private readonly string _taskHubName;
+
+    private readonly int _appPort;
+    private readonly bool _manageDatabase;
     private readonly bool _manageAzurite;
 
     public ProcessManagerAppManager()
@@ -37,8 +45,9 @@ public class ProcessManagerAppManager : IAsyncDisposable
             new ProcessManagerDatabaseManager("ProcessManagerTest"),
             new IntegrationTestConfiguration(),
             new AzuriteManager(useOAuth: true),
-            "ProcessManagerTest01",
-            8000,
+            taskHubName: "ProcessManagerTest01",
+            appPort: 8000,
+            manageDatabase: true,
             manageAzurite: true)
     {
     }
@@ -48,39 +57,31 @@ public class ProcessManagerAppManager : IAsyncDisposable
         IntegrationTestConfiguration integrationTestConfiguration,
         AzuriteManager azuriteManager,
         string taskHubName,
-        int port,
+        int appPort,
+        bool manageDatabase,
         bool manageAzurite)
     {
-        _manageAzurite = manageAzurite;
-        DatabaseManager = databaseManager
-            ?? throw new ArgumentNullException(nameof(databaseManager));
-        TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
+        _taskHubName = string.IsNullOrWhiteSpace(taskHubName)
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;
-        Port = port;
+        _appPort = appPort;
+        _manageDatabase = manageDatabase;
+        _manageAzurite = manageAzurite;
 
+        DatabaseManager = databaseManager;
         TestLogger = new TestDiagnosticsLogger();
+
         IntegrationTestConfiguration = integrationTestConfiguration;
-
         AzuriteManager = azuriteManager;
-
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
     }
 
-    public ITestDiagnosticsLogger TestLogger { get; }
-
     public ProcessManagerDatabaseManager DatabaseManager { get; }
+
+    public ITestDiagnosticsLogger TestLogger { get; }
 
     [NotNull]
     public FunctionAppHostManager? AppHostManager { get; private set; }
-
-    /// <summary>
-    /// Durable Functions Task Hub Name
-    /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
-    /// </summary>
-    private string TaskHubName { get; }
-
-    private int Port { get; }
 
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
@@ -99,8 +100,8 @@ public class ProcessManagerAppManager : IAsyncDisposable
             AzuriteManager.StartAzurite();
         }
 
-        // Database
-        await DatabaseManager.CreateDatabaseAsync();
+        if (_manageDatabase)
+            await DatabaseManager.CreateDatabaseAsync();
 
         // Prepare host settings
         var appHostSettings = CreateAppHostSettings("ProcessManager");
@@ -117,7 +118,8 @@ public class ProcessManagerAppManager : IAsyncDisposable
         if (_manageAzurite)
             AzuriteManager.Dispose();
 
-        await DatabaseManager.DeleteDatabaseAsync();
+        if (_manageDatabase)
+            await DatabaseManager.DeleteDatabaseAsync();
     }
 
     /// <summary>
@@ -173,7 +175,7 @@ public class ProcessManagerAppManager : IAsyncDisposable
 
         var appHostSettings = HostConfigurationBuilder.CreateFunctionAppHostSettings();
         appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
-        appHostSettings.Port = Port;
+        appHostSettings.Port = _appPort;
 
         // It seems the host + worker is not ready if we use the default startup log message, so we override it here
         appHostSettings.HostStartedEvent = "Host lock lease acquired";
@@ -195,7 +197,7 @@ public class ProcessManagerAppManager : IAsyncDisposable
             AzuriteManager.FullConnectionString);
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(ProcessManagerTaskHubOptions.ProcessManagerTaskHubName),
-            TaskHubName);
+            _taskHubName);
         // => Database
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{ProcessManagerOptions.SectionName}__{nameof(ProcessManagerOptions.SqlDatabaseConnectionString)}",

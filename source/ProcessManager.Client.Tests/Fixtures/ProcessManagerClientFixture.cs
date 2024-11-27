@@ -31,39 +31,32 @@ public class ProcessManagerClientFixture : IAsyncLifetime
         var taskHubName = "ClientsTest01";
 
         DatabaseManager = new ProcessManagerDatabaseManager("ProcessManagerClientTests");
-
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
-
         AzuriteManager = new AzuriteManager(useOAuth: true);
 
         OrchestrationsAppManager = new OrchestrationsAppManager(
             DatabaseManager,
             IntegrationTestConfiguration,
             AzuriteManager,
-            taskHubName,
-            8101,
-            false);
+            taskHubName: taskHubName,
+            appPort: 8101,
+            manageDatabase: false,
+            manageAzurite: false);
+
         ProcessManagerAppManager = new ProcessManagerAppManager(
             DatabaseManager,
             IntegrationTestConfiguration,
             AzuriteManager,
-            taskHubName,
-            8102,
-            false);
+            taskHubName: taskHubName,
+            appPort: 8102,
+            manageDatabase: false,
+            manageAzurite: false);
 
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             OrchestrationsAppManager.TestLogger,
             IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
             IntegrationTestConfiguration.Credential);
     }
-
-    public AzuriteManager AzuriteManager { get; }
-
-    public ServiceBusResourceProvider ServiceBusResourceProvider { get; }
-
-    public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
-
-    public ProcessManagerDatabaseManager DatabaseManager { get; }
 
     public OrchestrationsAppManager OrchestrationsAppManager { get; }
 
@@ -72,10 +65,20 @@ public class ProcessManagerClientFixture : IAsyncLifetime
     [NotNull]
     public TopicResource? ProcessManagerTopic { get; private set; }
 
+    private ProcessManagerDatabaseManager DatabaseManager { get; }
+
+    private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
+
+    private AzuriteManager AzuriteManager { get; }
+
+    private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
+
     public async Task InitializeAsync()
     {
         OrchestrationsAppManager.CleanupAzuriteStorage();
         AzuriteManager.StartAzurite();
+
+        await DatabaseManager.CreateDatabaseAsync();
 
         ProcessManagerTopic = await ServiceBusResourceProvider.BuildTopic("pm-topic")
             .AddSubscription("brs-026-subscription")
@@ -90,8 +93,9 @@ public class ProcessManagerClientFixture : IAsyncLifetime
     {
         await OrchestrationsAppManager.DisposeAsync();
         await ProcessManagerAppManager.DisposeAsync();
-        await ServiceBusResourceProvider.DisposeAsync();
+        await DatabaseManager.DeleteDatabaseAsync();
         AzuriteManager.Dispose();
+        await ServiceBusResourceProvider.DisposeAsync();
     }
 
     public void SetTestOutputHelper(ITestOutputHelper? testOutputHelper)

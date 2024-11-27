@@ -34,6 +34,14 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 /// </summary>
 public class OrchestrationsAppManager : IAsyncDisposable
 {
+    /// <summary>
+    /// Durable Functions Task Hub Name
+    /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
+    /// </summary>
+    private readonly string _taskHubName;
+
+    private readonly int _appPort;
+    private readonly bool _manageDatabase;
     private readonly bool _manageAzurite;
 
     public OrchestrationsAppManager()
@@ -41,8 +49,9 @@ public class OrchestrationsAppManager : IAsyncDisposable
             new ProcessManagerDatabaseManager("OrchestrationsTest"),
             new IntegrationTestConfiguration(),
             new AzuriteManager(useOAuth: true),
-            "OrchestrationsTest01",
-            8010,
+            taskHubName: "OrchestrationsTest01",
+            appPort: 8010,
+            manageDatabase: true,
             manageAzurite: true)
     {
     }
@@ -52,52 +61,43 @@ public class OrchestrationsAppManager : IAsyncDisposable
         IntegrationTestConfiguration configuration,
         AzuriteManager azuriteManager,
         string taskHubName,
-        int port,
+        int appPort,
+        bool manageDatabase,
         bool manageAzurite)
     {
-        _manageAzurite = manageAzurite;
-        DatabaseManager = databaseManager
-            ?? throw new ArgumentNullException(nameof(databaseManager));
-        TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
+        _taskHubName = string.IsNullOrWhiteSpace(taskHubName)
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;
-        Port = port;
+        _appPort = appPort;
+        _manageDatabase = manageDatabase;
+        _manageAzurite = manageAzurite;
 
+        DatabaseManager = databaseManager;
         TestLogger = new TestDiagnosticsLogger();
+
         IntegrationTestConfiguration = configuration;
-
         AzuriteManager = azuriteManager;
-
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
-
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             TestLogger,
             IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
             IntegrationTestConfiguration.Credential);
     }
 
-    public ServiceBusResourceProvider ServiceBusResourceProvider { get; }
+    public ProcessManagerDatabaseManager DatabaseManager { get; }
 
     public ITestDiagnosticsLogger TestLogger { get; }
 
-    public ProcessManagerDatabaseManager DatabaseManager { get; }
-
     [NotNull]
     public FunctionAppHostManager? AppHostManager { get; private set; }
-
-    /// <summary>
-    /// Durable Functions Task Hub Name
-    /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
-    /// </summary>
-    private string TaskHubName { get; }
-
-    private int Port { get; }
 
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private AzuriteManager AzuriteManager { get; }
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
+
+    private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
     /// <summary>
     /// Start the orchestration app
@@ -114,8 +114,8 @@ public class OrchestrationsAppManager : IAsyncDisposable
             AzuriteManager.StartAzurite();
         }
 
-        // Database
-        await DatabaseManager.CreateDatabaseAsync();
+        if (_manageDatabase)
+            await DatabaseManager.CreateDatabaseAsync();
 
         // Process Manager topic
         if (brs026Subscription is null)
@@ -143,7 +143,9 @@ public class OrchestrationsAppManager : IAsyncDisposable
         if (_manageAzurite)
             AzuriteManager.Dispose();
 
-        await DatabaseManager.DeleteDatabaseAsync();
+        if (_manageDatabase)
+            await DatabaseManager.DeleteDatabaseAsync();
+
         await ServiceBusResourceProvider.DisposeAsync();
     }
 
@@ -237,7 +239,7 @@ public class OrchestrationsAppManager : IAsyncDisposable
 
         var appHostSettings = HostConfigurationBuilder.CreateFunctionAppHostSettings();
         appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
-        appHostSettings.Port = Port;
+        appHostSettings.Port = _appPort;
 
         // It seems the host + worker is not ready if we use the default startup log message, so we override it here
         appHostSettings.HostStartedEvent = "Host lock lease acquired";
@@ -264,7 +266,7 @@ public class OrchestrationsAppManager : IAsyncDisposable
             AzuriteManager.FullConnectionString);
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(ProcessManagerTaskHubOptions.ProcessManagerTaskHubName),
-            TaskHubName);
+            _taskHubName);
         // => Database
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{ProcessManagerOptions.SectionName}__{nameof(ProcessManagerOptions.SqlDatabaseConnectionString)}",
