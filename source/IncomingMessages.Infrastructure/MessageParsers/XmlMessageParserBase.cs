@@ -26,6 +26,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
 public abstract class XmlMessageParserBase(CimXmlSchemaProvider schemaProvider) : MessageParserBase<XmlSchema>
 {
+    private const string SeriesElementName = "Series";
     private const string MridElementName = "mRID";
     private const string TypeElementName = "type";
     private const string ProcessTypeElementName = "process.processType";
@@ -59,10 +60,18 @@ public abstract class XmlMessageParserBase(CimXmlSchemaProvider schemaProvider) 
         var ns = XNamespace.Get(@namespace);
 
         var header = ParseHeader(document, ns);
-        var transactions = ParseTransactions(document, ns, header.SenderId);
+        var seriesElements = document.Descendants(ns + SeriesElementName);
+        var transactions = new List<IIncomingMessageSeries>();
+
+        foreach (var seriesElement in seriesElements)
+        {
+            transactions.Add(ParseTransaction(seriesElement, ns, header.SenderId));
+        }
 
         return CreateResult(header, transactions);
     }
+
+    protected abstract IIncomingMessageSeries ParseTransaction(XElement seriesElement, XNamespace ns, string senderNumber);
 
     protected override async Task<(XmlSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
     {
@@ -95,8 +104,6 @@ public abstract class XmlMessageParserBase(CimXmlSchemaProvider schemaProvider) 
 
         return (xmlSchema, null);
     }
-
-    protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber);
 
     protected abstract IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions);
 
