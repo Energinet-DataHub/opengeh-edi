@@ -14,8 +14,6 @@
 
 using Azure.Storage.Blobs;
 using Dapper;
-using Energinet.DataHub.BuildingBlocks.Tests.Database;
-using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
@@ -24,8 +22,11 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -130,27 +131,37 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public ServiceProvider BuildService(ITestOutputHelper? testOutputHelper = null)
     {
-        var builder = new ConfigurationBuilder();
-        builder.AddInMemoryCollection(new Dictionary<string, string?>
+        var services = new ServiceCollection();
+
+        if (testOutputHelper != null)
+            services.AddTestLogger(testOutputHelper);
+
+        var configuration = AddInMemoryConfigurations(services, new Dictionary<string, string?>()
         {
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
-            ["AZURE_STORAGE_ACCOUNT_CONNECTION_STRING"] = AzuriteManager.BlobStorageConnectionString,
+            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
+                AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
             // TODO: fix this
             // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });
-
-        var services = new ServiceCollection();
-        var configuration = builder.Build();
-
-        if (testOutputHelper != null)
-            services.AddTestLogger(testOutputHelper);
 
         services
             .AddScoped<AuthenticatedActor>()
             .AddArchivedMessagesModule(configuration);
 
         return services.BuildServiceProvider();
+    }
+
+    public IConfiguration AddInMemoryConfigurations(IServiceCollection services, Dictionary<string, string?> configurations)
+    {
+        var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(configurations)
+                .Build();
+
+        services.AddScoped<IConfiguration>(_ => configuration);
+
+        return configuration;
     }
 
     public async Task<ArchivedMessageDto> CreateArchivedMessageAsync(

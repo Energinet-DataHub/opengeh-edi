@@ -14,17 +14,18 @@
 
 using System.Text;
 using Azure.Storage.Blobs;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
-using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
-using Energinet.DataHub.BuildingBlocks.Tests.Logging;
-using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
@@ -33,8 +34,10 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NodaTime;
@@ -75,25 +78,6 @@ public class OutgoingMessagesTestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected static async Task<string> GetFileContentFromFileStorageAsync(
-        string container,
-        string fileStorageReference)
-    {
-        var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
-        var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString); // Uses new client to avoid some form of caching or similar
-
-        var containerClient = blobServiceClient.GetBlobContainerClient(container);
-        var blobClient = containerClient.GetBlobClient(fileStorageReference);
-
-        var blobContent = await blobClient.DownloadAsync();
-
-        if (!blobContent.HasValue)
-            throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
-
-        var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
-        return fileStringContent;
-    }
-
     protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -105,6 +89,27 @@ public class OutgoingMessagesTestBase : IDisposable
         var stringContent = await streamReader.ReadToEndAsync();
 
         return stringContent;
+    }
+
+    protected async Task<string> GetFileContentFromFileStorageAsync(
+        string container,
+        string fileStorageReference)
+    {
+        var clientFactory = ServiceProvider.GetRequiredService<IAzureClientFactory<BlobServiceClient>>();
+        var options = ServiceProvider.GetRequiredService<IOptions<BlobServiceClientConnectionOptions>>();
+        var blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
+        var containerClient = blobServiceClient.GetBlobContainerClient(container);
+        var blobClient = containerClient.GetBlobClient(fileStorageReference);
+
+        var blobContent = await blobClient.DownloadAsync();
+
+        if (!blobContent.HasValue)
+        {
+            throw new InvalidOperationException(
+                $"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
+        }
+
+        return await GetStreamContentAsStringAsync(blobContent.Value.Content);
     }
 
     protected async Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(string messageId)
@@ -186,7 +191,9 @@ public class OutgoingMessagesTestBase : IDisposable
     private void BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
-        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", Fixture.AzuriteManager.BlobStorageConnectionString);
+        Environment.SetEnvironmentVariable(
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+            Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

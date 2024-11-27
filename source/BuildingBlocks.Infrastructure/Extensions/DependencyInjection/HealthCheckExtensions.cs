@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using Azure.Identity;
+using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
 public static class HealthCheckExtensions
 {
@@ -62,28 +64,16 @@ public static class HealthCheckExtensions
     public static IServiceCollection TryAddBlobStorageHealthCheck(
         this IServiceCollection services,
         string name,
-        string blobConnectionString)
+        string blobClientName)
     {
         services.TryAddHealthChecks(
             name,
             (key, builder) =>
             {
-                builder.AddAzureBlobStorage(blobConnectionString, name: key);
-            });
-
-        return services;
-    }
-
-    public static IServiceCollection TryAddBlobStorageHealthCheck(
-        this IServiceCollection services,
-        string name,
-        Uri storageAccountUri)
-    {
-        services.TryAddHealthChecks(
-            name,
-            (key, builder) =>
-            {
-                builder.AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: key);
+                builder.AddAzureBlobStorage(
+                    clientFactory: sp =>
+                        sp.GetRequiredService<IAzureClientFactory<BlobServiceClient>>().CreateClient(blobClientName),
+                    name: key);
             });
 
         return services;

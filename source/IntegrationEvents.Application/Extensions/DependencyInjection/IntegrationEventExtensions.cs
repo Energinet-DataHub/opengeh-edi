@@ -68,7 +68,6 @@ public static class IntegrationEventExtensions
                     var clientFactory = sp.GetRequiredService<IAzureClientFactory<BlobServiceClient>>();
                     return clientFactory.CreateClient(options.Value.ContainerName);
                 },
-                configureOptions: (_, _) => { }, // Necessary to hint compiler of which method overload to use
                 name: "dead-letter-logging");
 
         services
