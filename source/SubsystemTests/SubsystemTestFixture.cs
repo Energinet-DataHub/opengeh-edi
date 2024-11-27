@@ -39,11 +39,11 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal const string ActorRole = "metereddataresponsible";
 
     internal const string
-        EdiSubsystemTestCimEnergySupplierNumber =
+        EdiSubsystemTestCimGridAccessProviderNumber =
             "5790000701414"; // Corresponds to the EDI - SUBSYSTEM TEST NETVIRKSOMHED CIM" in the UI.
 
     internal const string
-        EdiSubsystemTestCimGridAccessProviderNumber =
+        EdiSubsystemTestCimEnergySupplierNumber =
             "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI. Same as B2BEnergySupplierAuthorizedHttpClient
 
     internal const string
