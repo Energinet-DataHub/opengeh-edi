@@ -23,7 +23,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.A
 
 public class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
 {
-    private const string SeriesElementName = "Series";
     private const string MridElementName = "mRID";
     private const string MarketEvaluationPointTypeElementName = "marketEvaluationPoint.type";
     private const string MarketEvaluationPointSettlementMethodElementName = "marketEvaluationPoint.settlementMethod";
@@ -42,19 +41,29 @@ public class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaPro
 
     protected override string DocumentName => "RequestAggregatedMeasureData";
 
-    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(JsonDocument document, string senderNumber)
+    protected override IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber)
     {
-        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
-        var transactions = new List<RequestAggregatedMeasureDataMessageSeries>();
+        var id = transactionElement.GetProperty(MridElementName).ToString();
+        var startDateTime = transactionElement.GetProperty(StartElementName).ToString();
+        var endDateTime = transactionElement.TryGetProperty(EndElementName, out var endDateProperty) ? endDateProperty.ToString() : null;
 
-        foreach (var transactionElement in transactionElements.EnumerateArray())
-        {
-            var transaction = ParseTransaction(transactionElement);
+        var meteringPointType = GetPropertyWithValue(transactionElement, MarketEvaluationPointTypeElementName);
+        var settlementMethod = GetPropertyWithValue(transactionElement, MarketEvaluationPointSettlementMethodElementName);
+        var gridArea = GetPropertyWithValue(transactionElement, GridAreaElementName);
+        var energySupplierId = GetPropertyWithValue(transactionElement, EnergySupplierNumberElementName);
+        var balanceResponsibleId = GetPropertyWithValue(transactionElement, BalanceResponsibleNumberElementName);
+        var settlementVersion = GetPropertyWithValue(transactionElement, SettlementVersionElementName);
 
-            transactions.Add(transaction);
-        }
-
-        return transactions.AsReadOnly();
+        return new RequestAggregatedMeasureDataMessageSeries(
+            id,
+            meteringPointType,
+            settlementMethod,
+            startDateTime,
+            endDateTime,
+            gridArea,
+            energySupplierId,
+            balanceResponsibleId,
+            settlementVersion);
     }
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
@@ -76,30 +85,5 @@ public class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaPro
     private static string? GetPropertyWithValue(JsonElement element, string propertyName)
     {
         return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
-    }
-
-    private RequestAggregatedMeasureDataMessageSeries ParseTransaction(JsonElement transactionElement)
-    {
-        var id = transactionElement.GetProperty(MridElementName).ToString();
-        var startDateTime = transactionElement.GetProperty("start_DateAndOrTime.dateTime").ToString();
-        var endDateTime = transactionElement.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null;
-
-        var meteringPointType = GetPropertyWithValue(transactionElement, MarketEvaluationPointTypeElementName);
-        var settlementMethod = GetPropertyWithValue(transactionElement, MarketEvaluationPointSettlementMethodElementName);
-        var gridArea = GetPropertyWithValue(transactionElement, GridAreaElementName);
-        var energySupplierId = GetPropertyWithValue(transactionElement, EnergySupplierNumberElementName);
-        var balanceResponsibleId = GetPropertyWithValue(transactionElement, BalanceResponsibleNumberElementName);
-        var settlementVersion = GetPropertyWithValue(transactionElement, SettlementVersionElementName);
-
-        return new RequestAggregatedMeasureDataMessageSeries(
-            id,
-            meteringPointType,
-            settlementMethod,
-            startDateTime,
-            endDateTime,
-            gridArea,
-            energySupplierId,
-            balanceResponsibleId,
-            settlementVersion);
     }
 }

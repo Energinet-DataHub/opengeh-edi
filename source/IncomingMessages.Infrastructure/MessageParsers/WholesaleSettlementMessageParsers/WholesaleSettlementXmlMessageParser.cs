@@ -39,40 +39,32 @@ public class WholesaleSettlementXmlMessageParser(CimXmlSchemaProvider schemaProv
 
     protected override string RootPayloadElementName => "RequestWholesaleSettlement_MarketDocument";
 
-    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
+    protected override IIncomingMessageSeries ParseTransaction(XElement seriesElement, XNamespace ns, string senderNumber)
     {
-        var seriesElements = document.Descendants(ns + SeriesElementName);
-        var result = new List<RequestWholesaleServicesSeries>();
+        var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
+        var startDateAndOrTimeDateTime = seriesElement.Element(ns + StartElementName)?.Value ?? string.Empty;
+        var endDateAndOrTimeDateTime = seriesElement.Element(ns + EndElementName)?.Value;
+        var gridArea = seriesElement.Element(ns + GridAreaElementName)?.Value;
+        var energySupplierId = seriesElement.Element(ns + EnergySupplierElementName)?.Value;
+        var chargeTypeOwnerId = seriesElement.Element(ns + ChargeOwnerElementName)?.Value;
+        var settlementVersion = seriesElement.Element(ns + SettlementVersionElementName)?.Value;
+        var resolution = seriesElement.Element(ns + ResolutionElementName)?.Value;
 
-        foreach (var seriesElement in seriesElements)
-        {
-            var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
-            var startDateAndOrTimeDateTime = seriesElement.Element(ns + StartElementName)?.Value ?? string.Empty;
-            var endDateAndOrTimeDateTime = seriesElement.Element(ns + EndElementName)?.Value;
-            var gridArea = seriesElement.Element(ns + GridAreaElementName)?.Value;
-            var energySupplierId = seriesElement.Element(ns + EnergySupplierElementName)?.Value;
-            var chargeTypeOwnerId = seriesElement.Element(ns + ChargeOwnerElementName)?.Value;
-            var settlementVersion = seriesElement.Element(ns + SettlementVersionElementName)?.Value;
-            var resolution = seriesElement.Element(ns + ResolutionElementName)?.Value;
+        var chargeTypes = seriesElement.Descendants(ns + ChargeElementName)
+            .Select(e => new RequestWholesaleServicesChargeType(
+                e.Element(ns + MridElementName)?.Value,
+                e.Element(ns + ChargeTypeElementName)?.Value));
 
-            var chargeTypes = seriesElement.Descendants(ns + ChargeElementName)
-                .Select(e => new RequestWholesaleServicesChargeType(
-                    e.Element(ns + MridElementName)?.Value,
-                    e.Element(ns + ChargeTypeElementName)?.Value));
-
-            result.Add(new RequestWholesaleServicesSeries(
-                id,
-                startDateAndOrTimeDateTime,
-                endDateAndOrTimeDateTime,
-                gridArea,
-                energySupplierId,
-                settlementVersion,
-                resolution,
-                chargeTypeOwnerId,
-                chargeTypes.Select(a => a).ToList()));
-        }
-
-        return result.AsReadOnly();
+        return new RequestWholesaleServicesSeries(
+            id,
+            startDateAndOrTimeDateTime,
+            endDateAndOrTimeDateTime,
+            gridArea,
+            energySupplierId,
+            settlementVersion,
+            resolution,
+            chargeTypeOwnerId,
+            chargeTypes.Select(a => a).ToList());
     }
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
