@@ -63,15 +63,11 @@ public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
     public async Task RequestCalculatedEnergyTimeSeries_WhenStartedUsingClient_CanMonitorLifecycle()
     {
         // Arrange
-        await using var serviceBusClient = new ServiceBusClient(
-            Fixture.IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
-            Fixture.IntegrationTestConfiguration.Credential);
-        var serviceBusSender = serviceBusClient.CreateSender(Fixture.Brs026Subscription.TopicName);
         var serviceBusSenderFactoryMock = new Mock<IAzureClientFactory<ServiceBusSender>>();
         serviceBusSenderFactoryMock.Setup(
                 f =>
                     f.CreateClient(nameof(ProcessManagerServiceBusClientsOptions.TopicName)))
-            .Returns(serviceBusSender);
+            .Returns(Fixture.ProcessManagerTopic.SenderClient);
 
         var requestCalculatedDataClient = new RequestCalculatedDataClientV1(serviceBusSenderFactoryMock.Object);
         var input = new MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1>(

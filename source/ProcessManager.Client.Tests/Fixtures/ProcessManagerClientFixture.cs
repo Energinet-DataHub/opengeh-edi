@@ -70,19 +70,19 @@ public class ProcessManagerClientFixture : IAsyncLifetime
     public ProcessManagerAppManager ProcessManagerAppManager { get; }
 
     [NotNull]
-    public SubscriptionProperties? Brs026Subscription { get; private set; }
+    public TopicResource? ProcessManagerTopic { get; private set; }
 
     public async Task InitializeAsync()
     {
         OrchestrationsAppManager.CleanupAzuriteStorage();
         AzuriteManager.StartAzurite();
 
-        var topicResource = await ServiceBusResourceProvider.BuildTopic("pm-topic")
+        ProcessManagerTopic = await ServiceBusResourceProvider.BuildTopic("pm-topic")
             .AddSubscription("brs-026-subscription")
             .CreateAsync();
-        Brs026Subscription = topicResource.Subscriptions.Single();
+        var brs026Subscription = ProcessManagerTopic.Subscriptions.Single();
 
-        await OrchestrationsAppManager.StartAsync(Brs026Subscription);
+        await OrchestrationsAppManager.StartAsync(brs026Subscription);
         await ProcessManagerAppManager.StartAsync();
     }
 
