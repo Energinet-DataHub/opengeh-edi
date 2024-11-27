@@ -62,7 +62,6 @@ public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
     [Fact]
     public async Task RequestCalculatedEnergyTimeSeries_WhenStartedUsingClient_CanMonitorLifecycle()
     {
-        // TODO: Implement test after implementation of shared Service Bus topic in app fixtures
         // Arrange
         await using var serviceBusClient = new ServiceBusClient(
             ProcessManagerClientFixture.IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
@@ -84,6 +83,7 @@ public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
         await requestCalculatedDataClient.RequestCalculatedEnergyTimeSeriesAsync(input, CancellationToken.None);
 
         // Assert
+        // TODO: Get orchestration instance status from PM Api based on message id
         await Task.CompletedTask;
     }
 }
