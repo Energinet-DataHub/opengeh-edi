@@ -23,7 +23,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.A
 
 public class AggregatedMeasureDataXmlMessageParser(CimXmlSchemaProvider schemaProvider) : XmlMessageParserBase(schemaProvider)
 {
-    private const string SeriesElementName = "Series";
     private const string MridElementName = "mRID";
     private const string MarketEvaluationPointTypeElementName = "marketEvaluationPoint.type";
     private const string MarketEvaluationPointSettlementMethodElementName = "marketEvaluationPoint.settlementMethod";
@@ -38,36 +37,28 @@ public class AggregatedMeasureDataXmlMessageParser(CimXmlSchemaProvider schemaPr
 
     protected override string RootPayloadElementName => "RequestAggregatedMeasureData_MarketDocument";
 
-    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
+    protected override IIncomingMessageSeries ParseTransaction(XElement seriesElement, XNamespace ns, string senderNumber)
     {
-        var seriesElements = document.Descendants(ns + SeriesElementName);
-        var result = new List<RequestAggregatedMeasureDataMessageSeries>();
+        var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
+        var marketEvaluationPointType = seriesElement.Element(ns + MarketEvaluationPointTypeElementName)?.Value;
+        var marketEvaluationSettlementMethod = seriesElement.Element(ns + MarketEvaluationPointSettlementMethodElementName)?.Value;
+        var startDateAndOrTimeDateTime = seriesElement.Element(ns + StartElementName)?.Value ?? string.Empty;
+        var endDateAndOrTimeDateTime = seriesElement.Element(ns + EndElementName)?.Value;
+        var meteringGridAreaDomainId = seriesElement.Element(ns + GridAreaElementName)?.Value;
+        var energySupplierMarketParticipantId = seriesElement.Element(ns + EnergySupplierNumberElementName)?.Value;
+        var balanceResponsiblePartyMarketParticipantId = seriesElement.Element(ns + BalanceResponsibleNumberElementName)?.Value;
+        var settlementVersion = seriesElement.Element(ns + SettlementVersionElementName)?.Value;
 
-        foreach (var seriesElement in seriesElements)
-        {
-            var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
-            var marketEvaluationPointType = seriesElement.Element(ns + MarketEvaluationPointTypeElementName)?.Value;
-            var marketEvaluationSettlementMethod = seriesElement.Element(ns + MarketEvaluationPointSettlementMethodElementName)?.Value;
-            var startDateAndOrTimeDateTime = seriesElement.Element(ns + StartElementName)?.Value ?? string.Empty;
-            var endDateAndOrTimeDateTime = seriesElement.Element(ns + EndElementName)?.Value;
-            var meteringGridAreaDomainId = seriesElement.Element(ns + GridAreaElementName)?.Value;
-            var energySupplierMarketParticipantId = seriesElement.Element(ns + EnergySupplierNumberElementName)?.Value;
-            var balanceResponsiblePartyMarketParticipantId = seriesElement.Element(ns + BalanceResponsibleNumberElementName)?.Value;
-            var settlementVersion = seriesElement.Element(ns + SettlementVersionElementName)?.Value;
-
-            result.Add(new RequestAggregatedMeasureDataMessageSeries(
-                id,
-                marketEvaluationPointType,
-                marketEvaluationSettlementMethod,
-                startDateAndOrTimeDateTime,
-                endDateAndOrTimeDateTime,
-                meteringGridAreaDomainId,
-                energySupplierMarketParticipantId,
-                balanceResponsiblePartyMarketParticipantId,
-                settlementVersion));
-        }
-
-        return result.AsReadOnly();
+        return new RequestAggregatedMeasureDataMessageSeries(
+            id,
+            marketEvaluationPointType,
+            marketEvaluationSettlementMethod,
+            startDateAndOrTimeDateTime,
+            endDateAndOrTimeDateTime,
+            meteringGridAreaDomainId,
+            energySupplierMarketParticipantId,
+            balanceResponsiblePartyMarketParticipantId,
+            settlementVersion);
     }
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
