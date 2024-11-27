@@ -77,7 +77,6 @@ public class OrchestrationsAppManager : IAsyncDisposable
 
         IntegrationTestConfiguration = configuration;
         AzuriteManager = azuriteManager;
-        HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             TestLogger,
             IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
@@ -94,8 +93,6 @@ public class OrchestrationsAppManager : IAsyncDisposable
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private AzuriteManager AzuriteManager { get; }
-
-    private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
 
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
@@ -237,7 +234,9 @@ public class OrchestrationsAppManager : IAsyncDisposable
     {
         var buildConfiguration = GetBuildConfiguration();
 
-        var appHostSettings = HostConfigurationBuilder.CreateFunctionAppHostSettings();
+        var appHostSettings = new FunctionAppHostConfigurationBuilder()
+            .CreateFunctionAppHostSettings();
+
         appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
         appHostSettings.Port = _appPort;
 

@@ -73,7 +73,6 @@ public class ProcessManagerAppManager : IAsyncDisposable
 
         IntegrationTestConfiguration = integrationTestConfiguration;
         AzuriteManager = azuriteManager;
-        HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
     }
 
     public ProcessManagerDatabaseManager DatabaseManager { get; }
@@ -86,8 +85,6 @@ public class ProcessManagerAppManager : IAsyncDisposable
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private AzuriteManager AzuriteManager { get; }
-
-    private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
 
     public async Task StartAsync()
     {
@@ -173,7 +170,9 @@ public class ProcessManagerAppManager : IAsyncDisposable
     {
         var buildConfiguration = GetBuildConfiguration();
 
-        var appHostSettings = HostConfigurationBuilder.CreateFunctionAppHostSettings();
+        var appHostSettings = new FunctionAppHostConfigurationBuilder()
+            .CreateFunctionAppHostSettings();
+
         appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
         appHostSettings.Port = _appPort;
 
