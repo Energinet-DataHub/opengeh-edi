@@ -35,26 +35,26 @@ namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration.BRS_026_028.
 public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
 {
     public RequestCalculatedEnergyTimeSeriesTests(
-        ProcessManagerClientFixture processManagerClientFixture,
+        ProcessManagerClientFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
-        ProcessManagerClientFixture = processManagerClientFixture;
-        ProcessManagerClientFixture.SetTestOutputHelper(testOutputHelper);
+        Fixture = fixture;
+        Fixture.SetTestOutputHelper(testOutputHelper);
     }
 
-    public ProcessManagerClientFixture ProcessManagerClientFixture { get; }
+    public ProcessManagerClientFixture Fixture { get; }
 
     public Task InitializeAsync()
     {
-        ProcessManagerClientFixture.ProcessManagerAppManager.AppHostManager.ClearHostLog();
-        ProcessManagerClientFixture.OrchestrationsAppManager.AppHostManager.ClearHostLog();
+        Fixture.ProcessManagerAppManager.AppHostManager.ClearHostLog();
+        Fixture.OrchestrationsAppManager.AppHostManager.ClearHostLog();
 
         return Task.CompletedTask;
     }
 
     public Task DisposeAsync()
     {
-        ProcessManagerClientFixture.SetTestOutputHelper(null);
+        Fixture.SetTestOutputHelper(null);
 
         return Task.CompletedTask;
     }
@@ -64,9 +64,9 @@ public class RequestCalculatedEnergyTimeSeriesTests : IAsyncLifetime
     {
         // Arrange
         await using var serviceBusClient = new ServiceBusClient(
-            ProcessManagerClientFixture.IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
-            ProcessManagerClientFixture.IntegrationTestConfiguration.Credential);
-        var serviceBusSender = serviceBusClient.CreateSender(ProcessManagerClientFixture.Brs026Subscription.TopicName);
+            Fixture.IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
+            Fixture.IntegrationTestConfiguration.Credential);
+        var serviceBusSender = serviceBusClient.CreateSender(Fixture.Brs026Subscription.TopicName);
         var serviceBusSenderFactoryMock = new Mock<IAzureClientFactory<ServiceBusSender>>();
         serviceBusSenderFactoryMock.Setup(
                 f =>
