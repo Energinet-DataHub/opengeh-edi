@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
-using Energinet.DataHub.EDI.Tests.DocumentValidation;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Tests.Fixtures;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 
-public class DocumentValidationFixture
+public interface IMessageParser
 {
-    public DocumentValidator Validator { get; } = new(new[]
-    {
-        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())) as IValidator,
-        new EbixValidator(new EbixSchemaProvider()) as IValidator,
-    });
+    IncomingDocumentType DocumentType { get; }
+
+    DocumentFormat DocumentFormat { get; }
+
+    Task<IncomingMarketMessageParserResult> ParseAsync(
+        IIncomingMarketMessageStream marketMessage,
+        CancellationToken cancellationToken);
 }

@@ -43,9 +43,4 @@ public interface IFeatureFlagManager
     /// Whether to use the RequestWholesaleServices process orchestration.
     /// </summary>
     Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync();
-
-    /// <summary>
-    /// Whether to use the new incoming message parser.
-    /// </summary>
-    Task<bool> UseNewIncomingMessageParserAsync();
 }

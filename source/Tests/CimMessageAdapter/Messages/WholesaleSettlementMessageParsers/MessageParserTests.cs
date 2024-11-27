@@ -19,11 +19,11 @@ using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM017;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -44,24 +44,14 @@ public sealed class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}wholesalesettlement{Path.DirectorySeparatorChar}";
 
-    private readonly MarketMessageParser _marketMessageParser;
-    private readonly Serializer _serializer = new();
-
-    public MessageParserTests()
+    private static readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers = new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
     {
-        var messageParsers = new List<IMessageParser>()
-        {
-            new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
-            new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-            new WholesaleSettlementB2CJsonMessageParserBase(_serializer),
-        };
-        _marketMessageParser = new MarketMessageParser(
-        [
-            new OldWholesaleSettlementXmlMessageParser(messageParsers),
-            new OldWholesaleSettlementJsonMessageParser(messageParsers),
-            new OldWholesaleSettlementB2CJsonMessageParser(messageParsers),
-        ]);
-    }
+        { (IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Xml), new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
+        { (IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Json), new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
+        { (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Json), new WholesaleSettlementB2CJsonMessageParser(new Serializer()) },
+    };
+
+    private readonly Serializer _serializer = new();
 
     public static IEnumerable<object[]> CreateMessagesWithTwoChargeTypes()
     {
@@ -115,11 +105,11 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var messageParser = _messageParsers[(IncomingDocumentType.RequestWholesaleSettlement, format)];
+        var result = await messageParser.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.RequestWholesaleSettlement,
             CancellationToken.None);
+
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
@@ -158,10 +148,9 @@ public sealed class MessageParserTests
         DocumentFormat format,
         Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var messageParser = _messageParsers[(IncomingDocumentType.RequestWholesaleSettlement, format)];
+        var result = await messageParser.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.RequestWholesaleSettlement,
             CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
@@ -187,10 +176,9 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var messageParser = _messageParsers[(IncomingDocumentType.RequestWholesaleSettlement, format)];
+        var result = await messageParser.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.RequestWholesaleSettlement,
             CancellationToken.None);
 
         result.Success.Should().BeFalse();
@@ -205,10 +193,9 @@ public sealed class MessageParserTests
         DocumentFormat format,
         Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var messageParser = _messageParsers[(IncomingDocumentType.RequestWholesaleSettlement, format)];
+        var result = await messageParser.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.RequestWholesaleSettlement,
             CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
@@ -275,11 +262,10 @@ public sealed class MessageParserTests
             DateTime.Now.ToUniversalTime().ToInstant());
 
         // Act
-        var result = await _marketMessageParser.ParseAsync(
+        var messageParser = _messageParsers[(IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Json)];
+        var result = await messageParser.ParseAsync(
             GenerateStreamFromString(
                 _serializer.Serialize(message)),
-            DocumentFormat.Json,
-            IncomingDocumentType.B2CRequestWholesaleSettlement,
             CancellationToken.None);
 
         // Assert

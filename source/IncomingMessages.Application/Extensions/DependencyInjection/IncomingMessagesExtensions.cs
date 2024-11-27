@@ -18,25 +18,23 @@ using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM016;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM017;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -61,14 +59,6 @@ public static class IncomingMessagesExtensions
             .AddScoped<DelegateIncomingMessage>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
-            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataXmlMessageParser>()
-            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, OldAggregatedMeasureDataB2CJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, OldWholesaleSettlementJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, OldWholesaleSettlementXmlMessageParser>()
-            .AddScoped<IMarketMessageParser, OldWholesaleSettlementB2CJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, MeteredDataForMeasurementPointEbixMessageParser>()
-            .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<ValidateIncomingMessage>()
             .AddSingleton<IProcessTypeValidator, ProcessTypeValidator>()
@@ -142,11 +132,11 @@ public static class IncomingMessagesExtensions
 
         services.AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
         services.AddTransient<IMessageParser, WholesaleSettlementJsonMessageParser>();
-        services.AddTransient<IMessageParser, WholesaleSettlementB2CJsonMessageParserBase>();
+        services.AddTransient<IMessageParser, WholesaleSettlementB2CJsonMessageParser>();
 
         services.AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
         services.AddTransient<IMessageParser, AggregatedMeasureDataJsonMessageParser>();
-        services.AddTransient<IMessageParser, AggregatedMeasureDataB2CJsonMessageParserBase>();
+        services.AddTransient<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>();
 
         return services;
     }

@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
-using Energinet.DataHub.EDI.Tests.DocumentValidation;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas;
 
-namespace Energinet.DataHub.EDI.Tests.Fixtures;
-
-public class DocumentValidationFixture
+public abstract class SchemaProvider : ISchemaProvider
 {
-    public DocumentValidator Validator { get; } = new(new[]
-    {
-        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())) as IValidator,
-        new EbixValidator(new EbixSchemaProvider()) as IValidator,
-    });
+    public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version, CancellationToken cancellationToken);
+
+    protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location, CancellationToken cancellationToken);
 }
