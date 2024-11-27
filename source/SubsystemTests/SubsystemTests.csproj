@@ -132,6 +132,9 @@
       <EmbeddedResource Include="Messages\ebix\MeteredDataForMeasurementPoint.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\MeteredDataForMeasurementPoint.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>

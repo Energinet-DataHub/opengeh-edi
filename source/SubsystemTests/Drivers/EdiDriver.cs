@@ -249,7 +249,7 @@ internal sealed class EdiDriver
     private static async Task<(Guid MessageId, string Content)> GetMeteredDataForMeasurementPointContentAsync(CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid();
-        var jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlement.json", cancellationToken)
+        var jsonContent = await File.ReadAllTextAsync("Messages/json/MeteredDataForMeasurementPoint.json", cancellationToken)
             .ConfigureAwait(false);
 
         jsonContent = jsonContent.Replace("{MessageId}", messageId.ToString(), StringComparison.InvariantCulture);
