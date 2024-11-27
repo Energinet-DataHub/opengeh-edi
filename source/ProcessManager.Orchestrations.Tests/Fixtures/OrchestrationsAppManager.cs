@@ -14,7 +14,6 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Azure.Identity;
 using Azure.Messaging.ServiceBus.Administration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
@@ -58,7 +57,7 @@ public class OrchestrationsAppManager : IAsyncDisposable
     {
         _manageAzurite = manageAzurite;
         DatabaseManager = databaseManager
-                          ?? throw new ArgumentNullException(nameof(databaseManager));
+            ?? throw new ArgumentNullException(nameof(databaseManager));
         TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;

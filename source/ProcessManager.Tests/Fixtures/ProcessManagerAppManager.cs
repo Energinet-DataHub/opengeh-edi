@@ -53,7 +53,7 @@ public class ProcessManagerAppManager : IAsyncDisposable
     {
         _manageAzurite = manageAzurite;
         DatabaseManager = databaseManager
-                          ?? throw new ArgumentNullException(nameof(databaseManager));
+            ?? throw new ArgumentNullException(nameof(databaseManager));
         TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;
