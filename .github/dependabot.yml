@@ -8,3 +8,9 @@ updates:
     directory: /source
     schedule:
       interval: weekly
+    groups:
+      minor-or-patch-updates:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
