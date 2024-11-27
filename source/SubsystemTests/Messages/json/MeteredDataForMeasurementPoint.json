@@ -1,6 +1,6 @@
 ﻿{
   "NotifyValidatedMeasureData_MarketDocument": {
-    "mRID": "111131835",
+    "mRID": "{MessageId}",
     "businessSector.type": {
       "value": "23"
     },
@@ -17,7 +17,7 @@
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
-      "value": "5799999933318"
+      "value": "5790000701414"
     },
     "sender_MarketParticipant.marketRole.type": {
       "value": "MDR"
@@ -27,7 +27,7 @@
     },
     "Series": [
       {
-        "mRID": "4413675032_5080574373",
+        "mRID": "{TransactionId}",
         "marketEvaluationPoint.mRID": {
           "codingScheme": "A10",
           "value": "571313000000002000"

@@ -36,7 +36,7 @@ public class WhenMeteredDataForMeasurementPointIsReceivedTests : BaseTestClass
                 output),
             new EdiDriver(
                 fixture.DurableClient,
-                fixture.B2BClients.MeteredDataResponsible,
+                fixture.B2BClients.GridAccessProvider,
                 output),
             new EdiDatabaseDriver(fixture.ConnectionString));
     }
