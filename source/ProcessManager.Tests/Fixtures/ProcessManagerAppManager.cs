@@ -22,83 +22,100 @@ using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
+namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 
 /// <summary>
-/// Support testing Process Manager Orchestrations app and specifying configuration using inheritance.
-/// This allows us to use multiple fixtures and coordinate their configuration.
+/// Support testing Process Manager app and specifying configuration.
+/// This allows us to use multiple apps and coordinate their configuration.
 /// </summary>
-public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
+public class ProcessManagerAppManager : IAsyncDisposable
 {
-    private readonly bool _disposeDatabase;
-
-    public OrchestrationsAppFixtureBase(
-        ProcessManagerDatabaseManager databaseManager,
-        string taskHubName,
-        int port,
-        bool disposeDatabase = true)
-    {
-        DatabaseManager = databaseManager
-            ?? throw new ArgumentNullException(nameof(databaseManager));
-        TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
-            ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
-            : taskHubName;
-        Port = port;
-        _disposeDatabase = disposeDatabase;
-        TestLogger = new TestDiagnosticsLogger();
-        IntegrationTestConfiguration = new IntegrationTestConfiguration();
-
-        AzuriteManager = new AzuriteManager(useOAuth: true);
-
-        HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
-    }
-
-    public ITestDiagnosticsLogger TestLogger { get; }
-
-    public ProcessManagerDatabaseManager DatabaseManager { get; }
-
-    [NotNull]
-    public FunctionAppHostManager? AppHostManager { get; private set; }
-
     /// <summary>
     /// Durable Functions Task Hub Name
     /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
     /// </summary>
-    private string TaskHubName { get; }
+    private readonly string _taskHubName;
 
-    private int Port { get; }
+    private readonly int _appPort;
+    private readonly bool _manageDatabase;
+    private readonly bool _manageAzurite;
+
+    public ProcessManagerAppManager()
+        : this(
+            new ProcessManagerDatabaseManager("ProcessManagerTest"),
+            new IntegrationTestConfiguration(),
+            new AzuriteManager(useOAuth: true),
+            taskHubName: "ProcessManagerTest01",
+            appPort: 8000,
+            manageDatabase: true,
+            manageAzurite: true)
+    {
+    }
+
+    public ProcessManagerAppManager(
+        ProcessManagerDatabaseManager databaseManager,
+        IntegrationTestConfiguration integrationTestConfiguration,
+        AzuriteManager azuriteManager,
+        string taskHubName,
+        int appPort,
+        bool manageDatabase,
+        bool manageAzurite)
+    {
+        _taskHubName = string.IsNullOrWhiteSpace(taskHubName)
+            ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
+            : taskHubName;
+        _appPort = appPort;
+        _manageDatabase = manageDatabase;
+        _manageAzurite = manageAzurite;
+
+        DatabaseManager = databaseManager;
+        TestLogger = new TestDiagnosticsLogger();
+
+        IntegrationTestConfiguration = integrationTestConfiguration;
+        AzuriteManager = azuriteManager;
+    }
+
+    public ProcessManagerDatabaseManager DatabaseManager { get; }
+
+    public ITestDiagnosticsLogger TestLogger { get; }
+
+    [NotNull]
+    public FunctionAppHostManager? AppHostManager { get; private set; }
 
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private AzuriteManager AzuriteManager { get; }
 
-    private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
-
-    public async Task InitializeAsync()
+    public async Task StartAsync()
     {
-        // Clean up old Azurite storage
-        CleanupAzuriteStorage();
+        if (_manageAzurite)
+        {
+            // Clean up old Azurite storage
+            CleanupAzuriteStorage();
 
-        // Storage emulator
-        AzuriteManager.StartAzurite();
+            // Storage emulator
+            AzuriteManager.StartAzurite();
+        }
 
-        // Database
-        await DatabaseManager.CreateDatabaseAsync();
+        if (_manageDatabase)
+            await DatabaseManager.CreateDatabaseAsync();
 
         // Prepare host settings
-        var appHostSettings = CreateAppHostSettings("ProcessManager.Orchestrations");
+        var appHostSettings = CreateAppHostSettings("ProcessManager");
 
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
         StartHost(AppHostManager);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         AppHostManager.Dispose();
-        AzuriteManager.Dispose();
 
-        if (_disposeDatabase)
+        if (_manageAzurite)
+            AzuriteManager.Dispose();
+
+        if (_manageDatabase)
             await DatabaseManager.DeleteDatabaseAsync();
     }
 
@@ -110,7 +127,7 @@ public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
     /// </summary>
     /// <param name="testOutputHelper">If a xUnit test is active, this should be the instance of xUnit's <see cref="ITestOutputHelper"/>;
     /// otherwise it should be 'null'.</param>
-    public void SetTestOutputHelper(ITestOutputHelper testOutputHelper)
+    public void SetTestOutputHelper(ITestOutputHelper? testOutputHelper)
     {
         TestLogger.TestOutputHelper = testOutputHelper;
     }
@@ -153,9 +170,11 @@ public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
     {
         var buildConfiguration = GetBuildConfiguration();
 
-        var appHostSettings = HostConfigurationBuilder.CreateFunctionAppHostSettings();
+        var appHostSettings = new FunctionAppHostConfigurationBuilder()
+            .CreateFunctionAppHostSettings();
+
         appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
-        appHostSettings.Port = Port;
+        appHostSettings.Port = _appPort;
 
         // It seems the host + worker is not ready if we use the default startup log message, so we override it here
         appHostSettings.HostStartedEvent = "Host lock lease acquired";
@@ -177,11 +196,16 @@ public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
             AzuriteManager.FullConnectionString);
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(ProcessManagerTaskHubOptions.ProcessManagerTaskHubName),
-            TaskHubName);
+            _taskHubName);
         // => Database
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{ProcessManagerOptions.SectionName}__{nameof(ProcessManagerOptions.SqlDatabaseConnectionString)}",
             DatabaseManager.ConnectionString);
+
+        // Disable timer trigger (should be manually triggered in tests)
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"AzureWebJobs.StartScheduledOrchestrationInstances.Disabled",
+            "true");
 
         return appHostSettings;
     }
