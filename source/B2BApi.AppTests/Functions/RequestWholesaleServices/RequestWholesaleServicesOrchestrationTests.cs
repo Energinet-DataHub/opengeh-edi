@@ -14,13 +14,13 @@
 
 using System.Diagnostics;
 using System.Net;
-using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;

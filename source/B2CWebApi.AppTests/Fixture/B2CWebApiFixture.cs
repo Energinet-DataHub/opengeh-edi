@@ -14,7 +14,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
-using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.OpenIdJwt;
@@ -23,6 +22,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Xunit;
 using Xunit.Abstractions;
 

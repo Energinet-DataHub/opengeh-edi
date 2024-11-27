@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

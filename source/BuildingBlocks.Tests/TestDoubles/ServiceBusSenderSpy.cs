@@ -14,7 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
 public sealed class ServiceBusSenderSpy : ServiceBusSender
 {

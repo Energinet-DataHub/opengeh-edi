@@ -121,9 +121,7 @@ public class IncomingMessageReceiver
         var entityTypeMapping = new Dictionary<IncomingDocumentType, AuditLogEntityType>
         {
             { IncomingDocumentType.RequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
-            { IncomingDocumentType.B2CRequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
             { IncomingDocumentType.RequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
-            { IncomingDocumentType.B2CRequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
         };
 
         entityTypeMapping.TryGetValue(incomingDocumentType, out var affectedEntityType);

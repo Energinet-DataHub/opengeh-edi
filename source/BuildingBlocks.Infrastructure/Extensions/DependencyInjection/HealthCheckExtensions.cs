@@ -17,12 +17,10 @@ using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
-using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
 public static class HealthCheckExtensions
 {
