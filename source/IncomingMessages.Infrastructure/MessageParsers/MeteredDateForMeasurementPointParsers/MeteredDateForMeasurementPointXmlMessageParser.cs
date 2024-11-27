@@ -21,7 +21,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
 
-public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider schemaProvider) : XmlMessageParserBase(schemaProvider)
+public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider schemaProvider)
+    : XmlMessageParserBase(schemaProvider)
 {
     private const string SeriesElementName = "Series";
     private const string MridElementName = "mRID";
@@ -44,71 +45,68 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
 
     protected override string RootPayloadElementName => "NotifyValidatedMeasureData_MarketDocument";
 
-    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
+    protected override IIncomingMessageSeries ParseTransaction(
+        XElement seriesElement,
+        XNamespace ns,
+        string senderNumber)
     {
-        var seriesElements = document.Descendants(ns + SeriesElementName);
-        var result = new List<MeteredDataForMeasurementPointSeries>();
+        var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
+        var meteringPointLocationId = seriesElement.Element(ns + MeteringPointDomainLocationElementName)?.Value;
+        var meteringPointType = seriesElement.Element(ns + TypeOfMeteringPointElementName)?.Value;
+        var productNumber = seriesElement.Element(ns + ProductElementName)?.Value;
+        var registrationDateAndOrTime = seriesElement.Element(ns + RegistrationDateAndOrTimeElementName)?.Value;
+        var productUnitType = seriesElement.Element(ns + UnitTypeElementName)?.Value;
 
-        foreach (var seriesElement in seriesElements)
-        {
-            var id = seriesElement.Element(ns + MridElementName)?.Value ?? string.Empty;
-            var meteringPointLocationId = seriesElement.Element(ns + MeteringPointDomainLocationElementName)?.Value;
-            var meteringPointType = seriesElement.Element(ns + TypeOfMeteringPointElementName)?.Value;
-            var productNumber = seriesElement.Element(ns + ProductElementName)?.Value;
-            var registrationDateAndOrTime = seriesElement.Element(ns + RegistrationDateAndOrTimeElementName)?.Value;
-            var productUnitType = seriesElement.Element(ns + UnitTypeElementName)?.Value;
-
-            var periodElement = seriesElement.Element(ns + PeriodElementName);
-            var resolution = periodElement?.Element(ns + ResolutionElementName)?.Value;
-            var startDateAndOrTimeDateTime =
-                periodElement
-                    ?.Element(ns + TimeIntervalElementName)
-                    ?.Element(ns + StartElementName)
-                    ?.Value ?? string.Empty;
-            var endDateAndOrTimeDateTime = periodElement
+        var periodElement = seriesElement.Element(ns + PeriodElementName);
+        var resolution = periodElement?.Element(ns + ResolutionElementName)?.Value;
+        var startDateAndOrTimeDateTime =
+            periodElement
                 ?.Element(ns + TimeIntervalElementName)
-                ?.Element(ns + EndElementName)
-                ?.Value;
+                ?.Element(ns + StartElementName)
+                ?.Value ?? string.Empty;
+        var endDateAndOrTimeDateTime = periodElement
+            ?.Element(ns + TimeIntervalElementName)
+            ?.Element(ns + EndElementName)
+            ?.Value;
 
-            var energyObservations = seriesElement
-                .Descendants(ns + PointElementName)
-                .Select(
-                    e => new EnergyObservation(
-                        e.Element(ns + PositionElementName)?.Value,
-                        e.Element(ns + QuantityElementName)?.Value,
-                        e.Element(ns + QualityElementName)?.Value))
-                .ToList();
+        var energyObservations = seriesElement
+            .Descendants(ns + PointElementName)
+            .Select(
+                e => new EnergyObservation(
+                    e.Element(ns + PositionElementName)?.Value,
+                    e.Element(ns + QuantityElementName)?.Value,
+                    e.Element(ns + QualityElementName)?.Value))
+            .ToList();
 
-            result.Add(
-                new MeteredDataForMeasurementPointSeries(
-                    id,
-                    resolution,
-                    startDateAndOrTimeDateTime,
-                    endDateAndOrTimeDateTime,
-                    productNumber,
-                    registrationDateAndOrTime,
-                    productUnitType,
-                    meteringPointType,
-                    meteringPointLocationId,
-                    senderNumber,
-                    energyObservations));
-        }
-
-        return result.AsReadOnly();
+        return new MeteredDataForMeasurementPointSeries(
+            id,
+            resolution,
+            startDateAndOrTimeDateTime,
+            endDateAndOrTimeDateTime,
+            productNumber,
+            registrationDateAndOrTime,
+            productUnitType,
+            meteringPointType,
+            meteringPointLocationId,
+            senderNumber,
+            energyObservations);
     }
 
-    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
+    protected override IncomingMarketMessageParserResult CreateResult(
+        MessageHeader header,
+        IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
-        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessage(
-            header.MessageId,
-            header.MessageType,
-            header.CreatedAt,
-            header.SenderId,
-            header.ReceiverId,
-            header.SenderRole,
-            header.BusinessReason,
-            header.ReceiverRole,
-            header.BusinessType,
-            transactions));
+        return new IncomingMarketMessageParserResult(
+            new MeteredDataForMeasurementPointMessage(
+                header.MessageId,
+                header.MessageType,
+                header.CreatedAt,
+                header.SenderId,
+                header.ReceiverId,
+                header.SenderRole,
+                header.BusinessReason,
+                header.ReceiverRole,
+                header.BusinessType,
+                transactions));
     }
 }

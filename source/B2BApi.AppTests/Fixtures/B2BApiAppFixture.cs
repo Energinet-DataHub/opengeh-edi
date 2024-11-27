@@ -397,8 +397,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Document storage
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING),
-            AzuriteManager.FullConnectionString);
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+            AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         // Dead-letter logging
         appHostSettings.ProcessEnvironmentVariables.Add(

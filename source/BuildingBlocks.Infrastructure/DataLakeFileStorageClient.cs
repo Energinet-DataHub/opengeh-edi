@@ -17,7 +17,10 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
@@ -25,9 +28,11 @@ public class DataLakeFileStorageClient : IFileStorageClient
 {
     private readonly BlobServiceClient _blobServiceClient;
 
-    public DataLakeFileStorageClient(BlobServiceClient blobServiceClient)
+    public DataLakeFileStorageClient(
+        IAzureClientFactory<BlobServiceClient> clientFactory,
+        IOptions<BlobServiceClientConnectionOptions> options)
     {
-        _blobServiceClient = blobServiceClient;
+        _blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
     }
 
     public async Task UploadAsync(FileStorageReference reference, Stream stream)
