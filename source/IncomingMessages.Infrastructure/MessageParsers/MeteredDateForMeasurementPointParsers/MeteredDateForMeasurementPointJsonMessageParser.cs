@@ -23,7 +23,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.M
 
 public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
 {
-    private const string SeriesElementName = "Series";
+    private const string ValueElementName = "value";
+    private const string MridElementName = "mRID";
     private const string MeteringPointIdentificationElementName = "marketEvaluationPoint.mRID";
     private const string MeteringPointTypeElementName = "marketEvaluationPoint.type";
     private const string ProductNumberElementName = "product";
@@ -47,41 +48,9 @@ public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider 
 
     protected override string DocumentName => "NotifyValidatedMeasureData";
 
-    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(JsonDocument document, string senderNumber)
+    protected override IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber)
     {
-        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
-        var transactions = new List<MeteredDataForMeasurementPointSeries>();
-
-        foreach (var transactionElement in transactionElements.EnumerateArray())
-        {
-            var transaction = ParseTransaction(senderNumber, transactionElement);
-
-            transactions.Add(transaction);
-        }
-
-        return transactions.AsReadOnly();
-    }
-
-    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
-    {
-        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessage(
-            header.MessageId,
-            header.MessageType,
-            header.CreatedAt,
-            header.SenderId,
-            header.ReceiverId,
-            header.SenderRole,
-            header.BusinessReason,
-            header.ReceiverRole,
-            header.BusinessType,
-            transactions));
-    }
-
-    private static MeteredDataForMeasurementPointSeries ParseTransaction(
-        string senderNumber,
-        JsonElement transactionElement)
-    {
-        var id = transactionElement.GetProperty(IdentificationElementName).ToString() ?? string.Empty;
+        var id = transactionElement.GetProperty(MridElementName).ToString() ?? string.Empty;
         var meteringPointLocationId = transactionElement.GetProperty(MeteringPointIdentificationElementName)
             .GetProperty(ValueElementName)
             .ToString();
@@ -125,5 +94,20 @@ public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider 
             meteringPointLocationId,
             senderNumber,
             energyObservations);
+    }
+
+    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
+    {
+        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessage(
+            header.MessageId,
+            header.MessageType,
+            header.CreatedAt,
+            header.SenderId,
+            header.ReceiverId,
+            header.SenderRole,
+            header.BusinessReason,
+            header.ReceiverRole,
+            header.BusinessType,
+            transactions));
     }
 }
