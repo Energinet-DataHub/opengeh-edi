@@ -38,12 +38,6 @@ jobs:
     if: ${{ needs.changes.outputs.dotnet == 'true' || needs.changes.outputs.db_migrations == 'true' }}
     uses: ./.github/workflows/ci-dotnet.yml
 
-  ci_processmanager_client:
-    needs: changes
-    if: ${{ needs.changes.outputs.processmanager_client == 'true' }}
-    uses: ./.github/workflows/processmanager-client-bundle-publish.yml
-    secrets: inherit
-
   render_c4model_views:
     needs: changes
     if: ${{ needs.changes.outputs.render_c4model_views == 'true' }}
@@ -64,7 +58,6 @@ jobs:
       [
         ci_base,
         ci_dotnet,
-        ci_processmanager_client,
         render_c4model_views
       ]
     if: |
