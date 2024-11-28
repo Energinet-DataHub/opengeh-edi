@@ -129,7 +129,7 @@ public class PeekMessage
             authenticatedActor.ActorNumber,
             authenticatedActor.ActorRole,
             timestamp,
-            outgoingMessageBundle.BusinessReason,
+            BusinessReason.FromName(outgoingMessageBundle.BusinessReason).Code,
             ArchivedMessageTypeDto.OutgoingMessage,
             marketDocumentStream,
             outgoingMessageBundle.RelatedToMessageId);
