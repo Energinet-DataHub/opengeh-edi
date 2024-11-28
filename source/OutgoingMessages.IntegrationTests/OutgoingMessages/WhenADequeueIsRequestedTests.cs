@@ -15,7 +15,7 @@
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
@@ -75,7 +75,7 @@ public class WhenADequeueIsRequestedTests : OutgoingMessagesTestBase
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
-        var context = GetService<ActorMessageQueueContext>();
+        var context = GetService<IActorMessageQueueContext>();
         await context.SaveChangesAsync();
 
         ClearDbContextCaches();
@@ -114,7 +114,7 @@ public class WhenADequeueIsRequestedTests : OutgoingMessagesTestBase
             .Build();
 
         await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
-        var context = GetService<ActorMessageQueueContext>();
+        var context = GetService<IActorMessageQueueContext>();
         await context.SaveChangesAsync();
 
         ClearDbContextCaches();

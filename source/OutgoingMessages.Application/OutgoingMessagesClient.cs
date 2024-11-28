@@ -14,10 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
@@ -33,7 +30,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     private readonly PeekMessage _peekMessage;
     private readonly DequeueMessage _dequeueMessage;
     private readonly EnqueueMessage _enqueueMessage;
-    private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly IActorMessageQueueContext _actorMessageQueueContext;
     private readonly IClock _clock;
     private readonly ISerializer _serializer;
 
@@ -41,7 +38,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         PeekMessage peekMessage,
         DequeueMessage dequeueMessage,
         EnqueueMessage enqueueMessage,
-        ActorMessageQueueContext actorMessageQueueContext,
+        IActorMessageQueueContext actorMessageQueueContext,
         IClock clock,
         ISerializer serializer)
     {

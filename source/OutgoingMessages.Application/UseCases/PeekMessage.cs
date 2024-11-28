@@ -16,14 +16,13 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.ApplicationInsights;
 using NodaTime;
@@ -39,7 +38,7 @@ public class PeekMessage
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
-    private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly IActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
     private readonly IClock _clock;
     private readonly IBundleRepository _bundleRepository;
@@ -51,7 +50,7 @@ public class PeekMessage
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
         IOutgoingMessageRepository outgoingMessageRepository,
-        ActorMessageQueueContext actorMessageQueueContext,
+        IActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessagesClient archivedMessageClient,
         IClock clock,
         IBundleRepository bundleRepository,
