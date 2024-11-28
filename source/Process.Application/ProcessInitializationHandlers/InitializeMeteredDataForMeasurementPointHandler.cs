@@ -37,7 +37,7 @@ public class InitializeMeteredDataForMeasurementPointHandler(
 
     public Task ProcessAsync(byte[] processInitializationData)
     {
-        var marketMessage = _serializer.Deserialize<InitializeAggregatedMeasureDataProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
+        var marketMessage = _serializer.Deserialize<InitializeMeteredDataForMeasurementPointMessageProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
         _logger.LogInformation("Received InitializeAggregatedMeasureDataProcess for message {MessageId}", marketMessage.MessageId);
         // Nothing to see here yet.
         return Task.CompletedTask;

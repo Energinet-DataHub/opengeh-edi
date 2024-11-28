@@ -184,7 +184,7 @@ internal sealed class EbixDriver : IDisposable
         return response.MessageId;
     }
 
-    public async Task<string> SendMeteredDataForMeasurementPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
+    public async Task<string> SendMeteredDataForMeasurementPointWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
