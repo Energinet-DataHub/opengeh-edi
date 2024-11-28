@@ -274,7 +274,7 @@ public class QuantityQualitiesFactorTests
         CalculatedQuantityQuality expectedCalculatedQuantityQuality)
     {
         // Act
-        var actual = QuantityQualitiesFactor.CreateQuantityQuality(
+        var actual = QuantityQualitiesFactory.CreateQuantityQuality(
             price,
             qualities,
             chargeType);

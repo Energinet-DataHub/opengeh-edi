@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTabl
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 
-public class QuantityQualitiesFactor
+public class QuantityQualitiesFactory
 {
     /// <summary>
     /// Quantity quality mappings is defined by the business.

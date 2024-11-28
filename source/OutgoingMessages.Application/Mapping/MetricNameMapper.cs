@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 
 public static class MetricNameMapper
 {

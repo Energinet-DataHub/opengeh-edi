@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Application;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 using FluentAssertions;
 using Xunit;
 
