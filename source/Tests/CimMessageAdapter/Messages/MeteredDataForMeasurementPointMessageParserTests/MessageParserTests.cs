@@ -15,12 +15,12 @@
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;

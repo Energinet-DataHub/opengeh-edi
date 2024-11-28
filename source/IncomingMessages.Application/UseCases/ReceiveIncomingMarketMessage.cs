@@ -19,9 +19,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
@@ -31,7 +31,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 
 public class ReceiveIncomingMarketMessage
 {
-    private readonly MarketMessageParser _marketMessageParser;
     private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
     private readonly IFeatureFlagManager _featureFlagManager;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
@@ -44,7 +43,6 @@ public class ReceiveIncomingMarketMessage
     private readonly AuthenticatedActor _actorAuthenticator;
 
     public ReceiveIncomingMarketMessage(
-        MarketMessageParser marketMessageParser,
         IEnumerable<IMessageParser> messageParsers,
         IFeatureFlagManager featureFlagManager,
         ValidateIncomingMessage validateIncomingMessage,
@@ -56,7 +54,6 @@ public class ReceiveIncomingMarketMessage
         IClock clock,
         AuthenticatedActor actorAuthenticator)
     {
-        _marketMessageParser = marketMessageParser;
         _messageParsers = messageParsers
             .ToDictionary(
                 parser => (parser.DocumentType, parser.DocumentFormat),
@@ -111,8 +108,8 @@ public class ReceiveIncomingMarketMessage
         }
 
         await _delegateIncomingMessage
-                .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
-                .ConfigureAwait(false);
+            .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
+            .ConfigureAwait(false);
 
         var validationResult = await _validateIncomingMessage
             .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, incomingDocumentFormat, cancellationToken)
@@ -129,8 +126,8 @@ public class ReceiveIncomingMarketMessage
 
         var result = await _incomingMessageReceiver
             .ReceiveAsync(
-                    incomingMarketMessageParserResult.IncomingMessage,
-                    cancellationToken)
+                incomingMarketMessageParserResult.IncomingMessage,
+                cancellationToken)
             .ConfigureAwait(false);
 
         if (result.Success)
@@ -156,16 +153,12 @@ public class ReceiveIncomingMarketMessage
         IncomingDocumentType documentType,
         CancellationToken cancellationToken)
     {
-        if (await _featureFlagManager.UseNewIncomingMessageParserAsync().ConfigureAwait(false))
+        if (_messageParsers.TryGetValue((documentType, documentFormat), out var messageParser))
         {
-            if (_messageParsers.TryGetValue((documentType, documentFormat), out var messageParser))
-            {
-                return await messageParser.ParseAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
-            }
+            return await messageParser.ParseAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
         }
 
-        return await _marketMessageParser.ParseAsync(incomingMarketMessageStream, documentFormat, documentType, cancellationToken)
-            .ConfigureAwait(false);
+        throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{documentType}'");
     }
 
     private async Task ArchiveIncomingMessageAsync(
@@ -176,19 +169,20 @@ public class ReceiveIncomingMarketMessage
     {
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessageDto(
-                incomingMessage.MessageId,
-                incomingDocumentType.Name,
-                authenticatedActor.ActorNumber,
-                authenticatedActor.ActorRole,
-                // For RequestAggregatedMeteringData and RequestWholesaleServices,
-                // the receiver is Metered Data Administrator
-                DataHubDetails.DataHubActorNumber,
-                ActorRole.MeteredDataAdministrator,
-                _clock.GetCurrentInstant(),
-                incomingMessage.BusinessReason,
-                ArchivedMessageTypeDto.IncomingMessage,
-                incomingMarketMessageStream),
-            cancellationToken).ConfigureAwait(false);
+                new ArchivedMessageDto(
+                    incomingMessage.MessageId,
+                    incomingDocumentType.Name,
+                    authenticatedActor.ActorNumber,
+                    authenticatedActor.ActorRole,
+                    // For RequestAggregatedMeteringData and RequestWholesaleServices,
+                    // the receiver is Metered Data Administrator
+                    DataHubDetails.DataHubActorNumber,
+                    ActorRole.MeteredDataAdministrator,
+                    _clock.GetCurrentInstant(),
+                    incomingMessage.BusinessReason,
+                    ArchivedMessageTypeDto.IncomingMessage,
+                    incomingMarketMessageStream),
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 }

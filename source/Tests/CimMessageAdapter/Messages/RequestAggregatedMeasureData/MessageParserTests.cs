@@ -13,17 +13,16 @@
 // limitations under the License.
 
 using System.Text;
-using System.Xml.Linq;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM016;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -43,19 +42,12 @@ public sealed class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
-    private static readonly List<IMessageParser> _messageParsers = new()
+    private static readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers = new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
     {
-        new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
-        new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-        new AggregatedMeasureDataB2CJsonMessageParserBase(new Serializer()),
+        { (IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Xml), new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
+        { (IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Json), new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
+        { (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Json), new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()) },
     };
-
-    private readonly MarketMessageParser _marketMessageParser = new(
-    [
-        new OldAggregatedMeasureDataXmlMessageParser(_messageParsers),
-        new OldAggregatedMeasureDataJsonMessageParser(_messageParsers),
-        new OldAggregatedMeasureDataB2CJsonMessageParser(_messageParsers),
-    ]);
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
     {
@@ -111,10 +103,9 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var messageParser = _messageParsers[(IncomingDocumentType.RequestAggregatedMeasureData, format)];
+        var result = await messageParser.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
@@ -150,10 +141,9 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateB2CMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed_b2c_messages(DocumentFormat format, Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(
+        var messageParser = _messageParsers[(IncomingDocumentType.B2CRequestAggregatedMeasureData, format)];
+        var result = await messageParser.ParseAsync(
             new IncomingMarketMessageStream(message),
-            format,
-            IncomingDocumentType.B2CRequestAggregatedMeasureData,
             CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
@@ -189,7 +179,10 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
-        var result = await _marketMessageParser.ParseAsync(new IncomingMarketMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
+        var messageParser = _messageParsers[(IncomingDocumentType.RequestAggregatedMeasureData, format)];
+        var result = await messageParser.ParseAsync(
+            new IncomingMarketMessageStream(message),
+            CancellationToken.None);
 
         result.Success.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();

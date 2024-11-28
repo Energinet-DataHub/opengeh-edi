@@ -18,8 +18,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -37,7 +37,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
                                                                + $"Schemas{Path.DirectorySeparatorChar}"
                                                                + $"urn-entsoe-eu-wgedi-codelists.schema.json";
 
-    private readonly MarketMessageParser _marketMessageParser;
+    private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
 
     public IncomingWholesaleServiceTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
@@ -46,7 +46,11 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None,  ActorRole.FromCode("DDQ")));
 
-        _marketMessageParser = GetService<MarketMessageParser>();
+        var messageParsers = GetService<IEnumerable<IMessageParser>>();
+        _messageParsers = messageParsers
+            .ToDictionary(
+                parser => (parser.DocumentType, parser.DocumentFormat),
+                parser => parser);
         _validateIncomingMessage = GetService<ValidateIncomingMessage>();
     }
 
@@ -177,11 +181,13 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 
     private async Task<(RequestWholesaleServicesMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseWholesaleServicesMessageAsync(Stream message)
     {
-        var messageParser = await _marketMessageParser.ParseAsync(
-            new IncomingMarketMessageStream(message),
-            DocumentFormat.Xml,
-            IncomingDocumentType.RequestWholesaleSettlement,
-            CancellationToken.None);
-        return (IncomingMessage: (RequestWholesaleServicesMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
+        if (_messageParsers.TryGetValue((IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Xml), out var messageParser))
+        {
+            var messageParserResult = await messageParser.ParseAsync(new IncomingMarketMessageStream(message), CancellationToken.None).ConfigureAwait(false);
+
+            return (IncomingMessage: (RequestWholesaleServicesMessage?)messageParserResult.IncomingMessage, ParserResult: messageParserResult);
+        }
+
+        throw new NotSupportedException($"No message parser found for message format '{DocumentFormat.Xml}' and document type '{IncomingDocumentType.RequestWholesaleSettlement}'");
     }
 }

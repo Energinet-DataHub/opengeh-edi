@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
 
