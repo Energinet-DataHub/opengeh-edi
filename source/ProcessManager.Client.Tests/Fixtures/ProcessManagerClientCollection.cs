@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Tests.Fixtures;
-
 namespace Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
 
 /// <summary>
@@ -24,7 +22,6 @@ namespace Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
 /// </summary>
 [CollectionDefinition(nameof(ProcessManagerClientCollection))]
 public class ProcessManagerClientCollection :
-    ICollectionFixture<ScenarioProcessManagerAppFixture>,
-    ICollectionFixture<ScenarioOrchestrationsAppFixture>
+    ICollectionFixture<ProcessManagerClientFixture>
 {
 }
