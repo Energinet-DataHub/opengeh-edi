@@ -19,9 +19,10 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
-internal sealed class MeteredDataForMeasurementPointRequestDsl(EbixDriver ebix, EdiDatabaseDriver ediDatabaseDriver)
+internal sealed class MeteredDataForMeasurementPointRequestDsl(EbixDriver ebix, EdiDriver ediDriver, EdiDatabaseDriver ediDatabaseDriver)
 {
     private readonly EbixDriver _ebix = ebix;
+    private readonly EdiDriver _ediDriver = ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver = ediDatabaseDriver;
 
     public async Task<string> SendMeteredDataForMeasurementPointInEbixAsync(CancellationToken cancellationToken)
@@ -41,12 +42,17 @@ internal sealed class MeteredDataForMeasurementPointRequestDsl(EbixDriver ebix, 
     public async Task<string> SendMeteredDataForMeasurementPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
     {
         return await _ebix
-            .SendMeteredDataForMeasurementPointInEbixWithAlreadyUsedMessageIdAsync(cancellationToken)
+            .SendMeteredDataForMeasurementPointWithAlreadyUsedMessageIdAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 
     public void ConfirmResponseContainsValidationError(string response, string errorMessage, CancellationToken none)
     {
         response.Should().BeEquivalentTo(errorMessage);
+    }
+
+    public async Task<string> SendMeteredDataForMeasurementPointInCimAsync(CancellationToken cancellationToken)
+    {
+        return await _ediDriver.SendMeteredDataForMeasurementPointAsync(cancellationToken);
     }
 }
