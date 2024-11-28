@@ -15,7 +15,6 @@
 using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
@@ -132,7 +131,7 @@ public class WholesaleAmountPerChargeQuery(
                         p.Quantity,
                         p.Price,
                         p.Amount,
-                        QuantityQualitiesFactor.CreateQuantityQuality(p.Price, p.Qualities, chargeType)))
+                        QuantityQualitiesFactory.CreateQuantityQuality(p.Price, p.Qualities, chargeType)))
                 .ToList()
                 .AsReadOnly()));
     }

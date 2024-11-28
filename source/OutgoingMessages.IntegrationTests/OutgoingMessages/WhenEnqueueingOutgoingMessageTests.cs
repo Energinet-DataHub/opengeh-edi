@@ -23,7 +23,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;

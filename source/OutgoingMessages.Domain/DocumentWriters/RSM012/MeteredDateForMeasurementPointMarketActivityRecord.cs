@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
-public class MessageCategory : EnumerationType
-{
-    public static readonly MessageCategory None = new(nameof(None));
-    public static readonly MessageCategory Aggregations = new(nameof(Aggregations));
-    public static readonly MessageCategory TimeSeries = new(nameof(TimeSeries));
+public record MeteredDateForMeasurementPointMarketActivityRecord(
+    string TransactionId,
+    string MarketEvaluationPointNumber,
+    string MarketEvaluationPointType,
+    string? OriginalTransactionIdReferenceId,
+    string Product,
+    string QuantityMeasureUnit,
+    string RegistrationDateTime,
+    string Resolution,
+    string StartedDateTime,
+    string EndedDateTime,
+    IReadOnlyList<PointActivityRecord> Points);
 
-    // Message category can not be peeked
-
-    private MessageCategory(string name)
-        : base(name)
-    {
-    }
-}
+public record PointActivityRecord(int Position, string? Quality, int? Quantity);

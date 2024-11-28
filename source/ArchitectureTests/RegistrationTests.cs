@@ -33,7 +33,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;

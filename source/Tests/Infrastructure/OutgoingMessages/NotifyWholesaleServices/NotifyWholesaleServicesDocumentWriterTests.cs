@@ -39,19 +39,11 @@ using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Set
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
-public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<DocumentValidationFixture>
+public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixture documentValidation)
+    : IClassFixture<DocumentValidationFixture>
 {
-    private readonly DocumentValidationFixture _documentValidation;
-    private readonly MessageRecordParser _parser;
-    private readonly WholesaleServicesSeriesBuilder _wholesaleServicesSeriesBuilder;
-
-    public NotifyWholesaleServicesDocumentWriterTests(
-        DocumentValidationFixture documentValidation)
-    {
-        _documentValidation = documentValidation;
-        _parser = new MessageRecordParser(new Serializer());
-        _wholesaleServicesSeriesBuilder = new WholesaleServicesSeriesBuilder();
-    }
+    private readonly MessageRecordParser _parser = new(new Serializer());
+    private readonly WholesaleServicesSeriesBuilder _wholesaleServicesSeriesBuilder = new();
 
     public static IEnumerable<object[]> AllDocumentFormatsWithMeteringPointTypes()
     {
@@ -505,7 +497,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         // Assert
         var assertions = await new AssertNotifyWholesaleServicesEbixDocument(
-                AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator))
+                AssertEbixDocument.Document(document.Stream, "ns0", documentValidation.Validator))
             .HasStructureValidationErrorsAsync(
             [
                 $"The value '{messageId.Value}' is invalid according to its datatype",
@@ -549,7 +541,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     {
          if (documentFormat == DocumentFormat.Xml)
          {
-             var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
+             var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", documentValidation.Validator);
              return new AssertNotifyWholesaleServicesXmlDocument(assertXmlDocument);
          }
 
@@ -560,7 +552,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
          if (documentFormat == DocumentFormat.Ebix)
          {
-             var assertEbixDocument = AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator);
+             var assertEbixDocument = AssertEbixDocument.Document(document.Stream, "ns0", documentValidation.Validator);
              return new AssertNotifyWholesaleServicesEbixDocument(assertEbixDocument);
          }
 

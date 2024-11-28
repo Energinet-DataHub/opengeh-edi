@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
-public class MessageCategory : EnumerationType
+/// <summary>
+/// Wrapper for the actor message queue context.
+/// </summary>
+public interface IActorMessageQueueContext
 {
-    public static readonly MessageCategory None = new(nameof(None));
-    public static readonly MessageCategory Aggregations = new(nameof(Aggregations));
-    public static readonly MessageCategory TimeSeries = new(nameof(TimeSeries));
-
-    // Message category can not be peeked
-
-    private MessageCategory(string name)
-        : base(name)
-    {
-    }
+    /// <summary>
+    /// Saves all changes on the wrapped context async.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
