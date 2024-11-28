@@ -173,4 +173,4 @@ jobs:
       use_azure_functions_tools: ${{ matrix.tests_filter_expression.use_azure_functions_tools }}
       aspnetcore_test_contentroot_variable_name: ${{ matrix.tests_filter_expression.contentroot_variable_name }}
       aspnetcore_test_contentroot_variable_value: ${{ matrix.tests_filter_expression.contentroot_variable_value }}
-      azure_functions_core_tools_version: 4.0.5801
+      azure_functions_core_tools_version: 4.0.6594
