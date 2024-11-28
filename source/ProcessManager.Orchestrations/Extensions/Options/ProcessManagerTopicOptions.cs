@@ -31,12 +31,12 @@ public class ProcessManagerTopicOptions
     /// <summary>
     /// Name of the ProcessManager Service Bus topic
     /// </summary>
-    //[Required] // TODO: Removed required for now since tests cannot be run (yet)
+    [Required]
     public string TopicName { get; } = string.Empty;
 
     /// <summary>
     /// Name of the subscription for BRS026 to the ProcessManager Service Bus topic
     /// </summary>
-    //[Required] // TODO: Removed required for now since tests cannot be run (yet)
+    [Required]
     public string Brs026SubscriptionName { get; } = string.Empty;
 }
