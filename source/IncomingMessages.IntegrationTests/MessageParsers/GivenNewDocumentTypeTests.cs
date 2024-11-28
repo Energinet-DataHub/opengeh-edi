@@ -14,7 +14,7 @@
 
 using System.Reflection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -69,7 +69,6 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
         DocumentFormat documentFormat)
     {
         // Arrange
-        var marketMessageParser = GetService<MarketMessageParser>();
         var messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
             parser => (parser.DocumentType, parser.DocumentFormat),
             parser => parser);
@@ -83,11 +82,7 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
                 return await messageParser.ParseAsync(incomingMarketMessageStream, CancellationToken.None).ConfigureAwait(false);
             }
 
-            return await marketMessageParser.ParseAsync(
-                incomingMarketMessageStream,
-                documentFormat,
-                incomingDocumentType,
-                CancellationToken.None);
+            throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{incomingDocumentType}'");
         };
 
         if (messageParsers.TryGetValue((incomingDocumentType, documentFormat), out var messageParser))
