@@ -14,7 +14,7 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using FluentAssertions;
 using Json.Schema;
 using NodaTime;

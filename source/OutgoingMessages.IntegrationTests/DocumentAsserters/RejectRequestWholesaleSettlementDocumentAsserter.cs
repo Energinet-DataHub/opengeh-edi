@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.Tests.DocumentValidation;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;

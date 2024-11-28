@@ -18,12 +18,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using NodaTime;
 using Xunit.Abstractions;
@@ -32,7 +31,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessag
 
 public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessagesTestBase
 {
-    private readonly MarketMessageParser _marketMessageParser;
     private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ActorIdentity _actorIdentity;
@@ -42,7 +40,6 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         ITestOutputHelper testOutputHelper)
         : base(incomingMessagesTestFixture, testOutputHelper)
     {
-        _marketMessageParser = GetService<MarketMessageParser>();
         _messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
             parser => (parser.DocumentType, parser.DocumentFormat),
             parser => parser);
@@ -618,12 +615,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
             return (IncomingMessage: (MeteredDataForMeasurementPointMessage?)result.IncomingMessage, ParserResult: result);
         }
 
-        var messageMarketParser = await _marketMessageParser.ParseAsync(
-            incomingMarketMessageStream,
-            documentFormat,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
-            CancellationToken.None);
-        return (IncomingMessage: (MeteredDataForMeasurementPointMessage?)messageMarketParser.IncomingMessage, ParserResult: messageMarketParser);
+        throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{IncomingDocumentType.MeteredDataForMeasurementPoint}'");
     }
 
     private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)

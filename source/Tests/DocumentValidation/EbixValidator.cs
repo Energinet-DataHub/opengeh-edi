@@ -14,7 +14,7 @@
 
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas;
 
 namespace Energinet.DataHub.EDI.Tests.DocumentValidation;
 

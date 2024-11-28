@@ -19,12 +19,10 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -38,14 +36,17 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
 
 public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 {
-    private readonly MarketMessageParser _marketMessageParser;
+    private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
     private readonly ProcessContext _processContext;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
 
     public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _marketMessageParser = GetService<MarketMessageParser>();
+        _messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
+            parser => (parser.DocumentType, parser.DocumentFormat),
+            parser => parser);
+
         _processContext = GetService<ProcessContext>();
 
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -682,12 +683,14 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
     private async Task<(RequestAggregatedMeasureDataMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(Stream message)
     {
-        var messageParser = await _marketMessageParser.ParseAsync(
-            new IncomingMarketMessageStream(message),
-            DocumentFormat.Xml,
-            IncomingDocumentType.RequestAggregatedMeasureData,
-            CancellationToken.None);
-        return (IncomingMessage: (RequestAggregatedMeasureDataMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
+        var incomingMarketMessageStream = new IncomingMarketMessageStream(message);
+        if (_messageParsers.TryGetValue((IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Xml), out var messageParser))
+        {
+            var result = await messageParser.ParseAsync(incomingMarketMessageStream, CancellationToken.None).ConfigureAwait(false);
+            return (IncomingMessage: (RequestAggregatedMeasureDataMessage?)result.IncomingMessage, ParserResult: result);
+        }
+
+        throw new NotSupportedException($"No message parser found for message format '{DocumentFormat.Xml}' and document type '{IncomingDocumentType.RequestAggregatedMeasureData}'");
     }
 
     private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)
