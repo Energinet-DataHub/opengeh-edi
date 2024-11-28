@@ -14,8 +14,8 @@
 
 using System.Diagnostics;
 using System.Net;
+using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
-using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices;

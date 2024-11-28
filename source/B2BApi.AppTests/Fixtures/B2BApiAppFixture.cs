@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
@@ -24,7 +25,6 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
-using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
@@ -73,8 +73,8 @@ public class B2BApiAppFixture : IAsyncLifetime
         AzuriteManager = new AzuriteManager(useOAuth: true);
         LogStopwatch(stopwatch, nameof(AzuriteManager));
 
-        CleanupAzuriteStorage();
-        LogStopwatch(stopwatch, nameof(CleanupAzuriteStorage));
+        AzuriteManager.CleanupAzuriteStorage();
+        LogStopwatch(stopwatch, nameof(AzuriteManager.CleanupAzuriteStorage));
 
         DurableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
@@ -303,41 +303,6 @@ public class B2BApiAppFixture : IAsyncLifetime
 #else
         return "Release";
 #endif
-    }
-
-    /// <summary>
-    /// Cleanup Azurite storage to avoid situations where Durable Functions
-    /// would otherwise continue working on old orchestrations that e.g. failed in
-    /// previous runs.
-    /// </summary>
-    private void CleanupAzuriteStorage()
-    {
-        if (Directory.Exists("__blobstorage__"))
-            Directory.Delete("__blobstorage__", true);
-
-        if (Directory.Exists("__queuestorage__"))
-            Directory.Delete("__queuestorage__", true);
-
-        if (Directory.Exists("__tablestorage__"))
-            Directory.Delete("__tablestorage__", true);
-
-        if (File.Exists("__azurite_db_blob__.json"))
-            File.Delete("__azurite_db_blob__.json");
-
-        if (File.Exists("__azurite_db_blob_extent__.json"))
-            File.Delete("__azurite_db_blob_extent__.json");
-
-        if (File.Exists("__azurite_db_queue__.json"))
-            File.Delete("__azurite_db_queue__.json");
-
-        if (File.Exists("__azurite_db_queue_extent__.json"))
-            File.Delete("__azurite_db_queue_extent__.json");
-
-        if (File.Exists("__azurite_db_table__.json"))
-            File.Delete("__azurite_db_table__.json");
-
-        if (File.Exists("__azurite_db_table_extent__.json"))
-            File.Delete("__azurite_db_table_extent__.json");
     }
 
     private void CreateRequiredContainers()
