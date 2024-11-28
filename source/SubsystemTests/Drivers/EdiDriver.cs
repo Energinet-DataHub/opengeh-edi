@@ -17,7 +17,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Xml;
-using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
+using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 using Energinet.DataHub.EDI.SubsystemTests.Logging;
