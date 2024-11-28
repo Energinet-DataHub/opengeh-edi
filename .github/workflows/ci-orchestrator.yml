@@ -23,7 +23,7 @@ jobs:
   # License and Markdown Check
   #
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v14
     secrets:
       dh3serviceaccount_privatekey: ${{ secrets.dh3serviceaccount_privatekey }}
 
