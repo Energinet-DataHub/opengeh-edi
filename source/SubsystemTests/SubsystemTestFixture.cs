@@ -39,6 +39,10 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal const string ActorRole = "metereddataresponsible";
 
     internal const string
+        EdiSubsystemTestCimGridAccessProviderNumber =
+            "5790000701414"; // Corresponds to the EDI - SUBSYSTEM TEST NETVIRKSOMHED CIM" in the UI.
+
+    internal const string
         EdiSubsystemTestCimEnergySupplierNumber =
             "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI. Same as B2BEnergySupplierAuthorizedHttpClient
 
@@ -99,6 +103,9 @@ public class SubsystemTestFixture : IAsyncLifetime
             MeteredDataResponsible: CreateLazyB2BHttpClient(new B2BCredentials(
                 GetConfigurationValue<string>(root, "METERED_DATA_RESPONSIBLE_CLIENT_ID"),
                 GetConfigurationValue<string>(root, "METERED_DATA_RESPONSIBLE_CLIENT_SECRET"))),
+            GridAccessProvider: CreateLazyB2BHttpClient(new B2BCredentials(
+                GetConfigurationValue<string>(root, "GRID_ACCESS_PROVIDER_CLIENT_ID"),
+                GetConfigurationValue<string>(root, "GRID_ACCESS_PROVIDER_CLIENT_SECRET"))),
             EnergySupplier: CreateLazyB2BHttpClient(new B2BCredentials(
                     GetConfigurationValue<string>(root, "ENERGY_SUPPLIER_CLIENT_ID"),
                     GetConfigurationValue<string>(root, "ENERGY_SUPPLIER_CLIENT_SECRET"))),
@@ -313,6 +320,7 @@ public class SubsystemTestFixture : IAsyncLifetime
 
 public record B2BClients(
     AsyncLazy<HttpClient> MeteredDataResponsible,
+    AsyncLazy<HttpClient> GridAccessProvider,
     AsyncLazy<HttpClient> EnergySupplier,
     AsyncLazy<HttpClient> SystemOperator) : IAsyncDisposable
 {
@@ -320,6 +328,8 @@ public record B2BClients(
     {
         if (MeteredDataResponsible is { IsStarted: true, Task.IsFaulted: false })
             (await MeteredDataResponsible).Dispose();
+        if (GridAccessProvider is { IsStarted: true, Task.IsFaulted: false })
+            (await GridAccessProvider).Dispose();
         if (EnergySupplier is { IsStarted: true, Task.IsFaulted: false })
             (await EnergySupplier).Dispose();
         if (SystemOperator is { IsStarted: true, Task.IsFaulted: false })

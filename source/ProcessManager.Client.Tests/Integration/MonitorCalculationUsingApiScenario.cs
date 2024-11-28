@@ -33,33 +33,26 @@ namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration;
 public class MonitorCalculationUsingApiScenario : IAsyncLifetime
 {
     public MonitorCalculationUsingApiScenario(
-        ScenarioProcessManagerAppFixture processManagerAppFixture,
-        ScenarioOrchestrationsAppFixture orchestrationsAppFixture,
+        ProcessManagerClientFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
-        ProcessManagerAppFixture = processManagerAppFixture;
-        ProcessManagerAppFixture.SetTestOutputHelper(testOutputHelper);
-
-        OrchestrationsAppFixture = orchestrationsAppFixture;
-        OrchestrationsAppFixture.SetTestOutputHelper(testOutputHelper);
+        Fixture = fixture;
+        Fixture.SetTestOutputHelper(testOutputHelper);
     }
 
-    private ScenarioProcessManagerAppFixture ProcessManagerAppFixture { get; }
-
-    private ScenarioOrchestrationsAppFixture OrchestrationsAppFixture { get; }
+    public ProcessManagerClientFixture Fixture { get; }
 
     public Task InitializeAsync()
     {
-        ProcessManagerAppFixture.AppHostManager.ClearHostLog();
-        OrchestrationsAppFixture.AppHostManager.ClearHostLog();
+        Fixture.ProcessManagerAppManager.AppHostManager.ClearHostLog();
+        Fixture.OrchestrationsAppManager.AppHostManager.ClearHostLog();
 
         return Task.CompletedTask;
     }
 
     public Task DisposeAsync()
     {
-        ProcessManagerAppFixture.SetTestOutputHelper(null!);
-        OrchestrationsAppFixture.SetTestOutputHelper(null!);
+        Fixture.SetTestOutputHelper(null);
 
         return Task.CompletedTask;
     }
@@ -89,7 +82,7 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
             "application/json");
 
         // Step 1: Schedule new calculation orchestration instance
-        using var scheduleResponse = await OrchestrationsAppFixture.AppHostManager
+        using var scheduleResponse = await Fixture.OrchestrationsAppManager.AppHostManager
             .HttpClient
             .SendAsync(scheduleRequest);
         scheduleResponse.EnsureSuccessStatusCode();
@@ -98,7 +91,7 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
             .ReadFromJsonAsync<Guid>();
 
         // Step 2: Trigger the scheduler to queue the calculation orchestration instance
-        await ProcessManagerAppFixture.AppHostManager
+        await Fixture.ProcessManagerAppManager.AppHostManager
             .TriggerFunctionAsync("StartScheduledOrchestrationInstances");
 
         // Step 3: Query until terminated with succeeded
@@ -109,7 +102,7 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
                     HttpMethod.Get,
                     $"/api/processmanager/orchestrationinstance/{calculationId}");
 
-                using var queryResponse = await ProcessManagerAppFixture.AppHostManager
+                using var queryResponse = await Fixture.ProcessManagerAppManager.AppHostManager
                     .HttpClient
                     .SendAsync(queryRequest);
                 queryResponse.EnsureSuccessStatusCode();

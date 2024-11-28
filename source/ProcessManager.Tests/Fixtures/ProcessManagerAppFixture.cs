@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 
@@ -20,13 +20,27 @@ namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 /// Support testing Process Manager Orchestrations app using default fixture configuration.
 /// </summary>
 public class ProcessManagerAppFixture
-    : ProcessManagerAppFixtureBase
+    : IAsyncLifetime
 {
     public ProcessManagerAppFixture()
-        : base(
-            databaseManager: new ProcessManagerDatabaseManager("ProcessManagerTest"),
-            taskHubName: "ProcessManagerTest01",
-            port: 8000)
     {
+        ProcessManagerAppManager = new ProcessManagerAppManager();
+    }
+
+    public ProcessManagerAppManager ProcessManagerAppManager { get; }
+
+    public async Task InitializeAsync()
+    {
+        await ProcessManagerAppManager.StartAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await ProcessManagerAppManager.DisposeAsync();
+    }
+
+    public void SetTestOutputHelper(ITestOutputHelper? testOutputHelper)
+    {
+        ProcessManagerAppManager.SetTestOutputHelper(testOutputHelper);
     }
 }

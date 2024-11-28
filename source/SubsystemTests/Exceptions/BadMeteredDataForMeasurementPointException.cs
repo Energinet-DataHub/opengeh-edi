@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
+namespace Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 
-/// <summary>
-/// A xUnit collection fixture for ensuring tests don't run in parallel.
-///
-/// xUnit documentation of collection fixtures:
-///  * https://xunit.net/docs/shared-context#collection-fixture
-/// </summary>
-[CollectionDefinition(nameof(ProcessManagerClientCollection))]
-public class ProcessManagerClientCollection :
-    ICollectionFixture<ProcessManagerClientFixture>
+public class BadMeteredDataForMeasurementPointException : Exception
 {
+    public BadMeteredDataForMeasurementPointException(string message)
+        : base(message)
+    {
+    }
+
+    public BadMeteredDataForMeasurementPointException()
+    {
+    }
+
+    public BadMeteredDataForMeasurementPointException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

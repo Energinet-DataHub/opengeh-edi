@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
@@ -30,16 +31,19 @@ public class IncomingMessageReceiver
 {
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly IAuditLogger _auditLogger;
+    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly ILogger<IncomingMessageReceiver> _logger;
 
     public IncomingMessageReceiver(
         ILogger<IncomingMessageReceiver> logger,
         IIncomingMessageClient incomingMessageClient,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IFeatureFlagManager featureFlagManager)
     {
         _logger = logger;
         _incomingMessageClient = incomingMessageClient;
         _auditLogger = auditLogger;
+        _featureFlagManager = featureFlagManager;
     }
 
     [Function(nameof(IncomingMessageReceiver))]
@@ -52,6 +56,17 @@ public class IncomingMessageReceiver
     {
         ArgumentNullException.ThrowIfNull(request);
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
+
+        if (!await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))
+        {
+            /*
+             * The HTTP 403 Forbidden client error response status code indicates that the server understood the request
+             * but refused to process it. This status is similar to 401, except that for 403 Forbidden responses,
+             * authenticating or re-authenticating makes no difference. The request failure is tied to application logic,
+             * such as insufficient permissions to a resource or action.
+             */
+            return request.CreateResponse(HttpStatusCode.Forbidden);
+        }
 
         using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync(cancellationToken).ConfigureAwait(false);
         var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
@@ -122,6 +137,7 @@ public class IncomingMessageReceiver
         {
             { IncomingDocumentType.RequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
             { IncomingDocumentType.RequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
+            { IncomingDocumentType.MeteredDataForMeasurementPoint, AuditLogEntityType.MeteredDataForMeasurementPointReceived },
         };
 
         entityTypeMapping.TryGetValue(incomingDocumentType, out var affectedEntityType);
@@ -145,6 +161,9 @@ public class IncomingMessageReceiver
             // If the incomingDocumentTypeName is not a valid IncomingDocumentType, we do not log a affectedEntityType
             affectedEntityType = null;
         }
+
+        // Do not log the message if it is a MeteredDataForMeasurementPointReceived message
+        if (affectedEntityType == AuditLogEntityType.MeteredDataForMeasurementPointReceived) return;
 
         var incomingMessage = await new StreamReader(incomingMarketMessageStream.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         await _auditLogger.LogWithCommitAsync(
