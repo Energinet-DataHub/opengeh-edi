@@ -12,20 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using NodaTime;
+using NodaTime.Text;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandlers;
 
+[SuppressMessage(
+    "StyleCop.CSharp.ReadabilityRules",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "Readability")]
 public class InitializeMeteredDataForMeasurementPointHandler(
-    IMediator mediator,
+    IOutgoingMessagesClient outgoingMessagesClient,
     ISerializer serializer,
     ILogger<InitializeMeteredDataForMeasurementPointHandler> logger)
     : IProcessInitializationHandler
 {
-    private readonly IMediator _mediator = mediator;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly ISerializer _serializer = serializer;
     private readonly ILogger<InitializeMeteredDataForMeasurementPointHandler> _logger = logger;
 
@@ -35,11 +46,39 @@ public class InitializeMeteredDataForMeasurementPointHandler(
         return processTypeToInitialize.Equals(nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto), StringComparison.Ordinal);
     }
 
-    public Task ProcessAsync(byte[] processInitializationData)
+    public async Task ProcessAsync(byte[] processInitializationData)
     {
-        var marketMessage = _serializer.Deserialize<InitializeMeteredDataForMeasurementPointMessageProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
+        var marketMessage =
+            _serializer.Deserialize<InitializeMeteredDataForMeasurementPointMessageProcessDto>(
+                System.Text.Encoding.UTF8.GetString(processInitializationData));
         _logger.LogInformation("Received InitializeAggregatedMeasureDataProcess for message {MessageId}", marketMessage.MessageId);
-        // Nothing to see here yet.
-        return Task.CompletedTask;
+
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(
+                new MeteredDataForMeasurementPointMessageProcessDto(
+                    EventId.From(marketMessage.MessageId),
+                    new Actor(ActorNumber.Create("1234"), ActorRole.MeteredDataResponsible),
+                    BusinessReason.FromName(marketMessage.BusinessReason),
+                    marketMessage.Series.Select(
+                            s => new MeteredDataForMeasurementPointMessageSeriesDto(
+                                s.TransactionId,
+                                Resolution.FromName(s.Resolution!),
+                                InstantPattern.ExtendedIso.Parse(s.StartDateTime).Value,
+                                s.EndDateTime != null
+                                    ? InstantPattern.ExtendedIso.Parse(s.EndDateTime).Value
+                                    : null,
+                                s.ProductNumber,
+                                s.ProductUnitType,
+                                s.MeteringPointType,
+                                s.MeteringPointLocationId,
+                                s.DelegatedGridAreaCodes,
+                                s.EnergyObservations.Select(
+                                        o => new EnergyObservationDto(
+                                            o.Position,
+                                            o.EnergyQuantity,
+                                            o.QuantityQuality))
+                                    .ToList()))
+                        .ToList()),
+                CancellationToken.None)
+            .ConfigureAwait(false);
     }
 }

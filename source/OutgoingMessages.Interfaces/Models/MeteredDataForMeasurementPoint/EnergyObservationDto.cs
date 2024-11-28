@@ -12,18 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 
-public class MessageCategory : EnumerationType
-{
-    public static readonly MessageCategory None = new(nameof(None));
-    public static readonly MessageCategory Aggregations = new(nameof(Aggregations));
-    public static readonly MessageCategory TimeSeries = new(nameof(TimeSeries));
-
-    // Message category can not be peeked
-
-    private MessageCategory(string name)
-        : base(name)
-    {
-    }
-}
+public readonly record struct EnergyObservationDto(
+    string? Position,
+    string? EnergyQuantity,
+    string? QuantityQuality);
