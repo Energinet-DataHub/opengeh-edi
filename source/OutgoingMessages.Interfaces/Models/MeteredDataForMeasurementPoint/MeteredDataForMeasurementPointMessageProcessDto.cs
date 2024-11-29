@@ -30,7 +30,7 @@ public sealed class MeteredDataForMeasurementPointMessageProcessDto : OutgoingMe
             eventId,
             businessReason.Name,
             receiver.ActorRole,
-            new ExternalId(Guid.Parse(eventId.Value)),
+            new ExternalId(Guid.NewGuid()),
             null)
     {
         Series = series;

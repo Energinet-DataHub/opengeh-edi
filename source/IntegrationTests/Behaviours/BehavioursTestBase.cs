@@ -345,13 +345,13 @@ public class BehavioursTestBase : IDisposable
         await serviceScope.ServiceProvider.GetRequiredService<IIntegrationEventHandler>().HandleAsync(integrationEvent);
     }
 
-    protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
+    protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat, MessageCategory messageCategory)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var authenticatedActor = scope.ServiceProvider.GetRequiredService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole));
-        var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, MessageCategory.Aggregations, actorRole, documentFormat), CancellationToken.None);
+        var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, messageCategory, actorRole, documentFormat), CancellationToken.None);
         return peekResult;
     }
 
@@ -362,13 +362,18 @@ public class BehavioursTestBase : IDisposable
         var timeoutAt = DateTime.UtcNow.AddMinutes(1);
         while (DateTime.UtcNow < timeoutAt)
         {
-            var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat);
+            foreach (var messageCategory in EnumerationType.GetAll<MessageCategory>())
+            {
+                var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat, messageCategory);
 
-            if (peekResult is null)
-                break;
+                if (peekResult is null)
+                    break;
 
-            peekResults.Add(peekResult);
-            await WhenActorDequeuesMessage(peekResult.MessageId.Value, actorNumber, actorRole);
+                peekResults.Add(peekResult);
+                await WhenActorDequeuesMessage(peekResult.MessageId.Value, actorNumber, actorRole);
+            }
+
+            break;
         }
 
         return peekResults;

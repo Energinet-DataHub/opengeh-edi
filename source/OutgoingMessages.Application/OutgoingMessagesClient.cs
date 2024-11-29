@@ -221,6 +221,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _clock.GetCurrentInstant());
 
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return messageId.Value;
     }

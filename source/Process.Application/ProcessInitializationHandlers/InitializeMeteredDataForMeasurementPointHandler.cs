@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -53,32 +54,39 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                 System.Text.Encoding.UTF8.GetString(processInitializationData));
         _logger.LogInformation("Received InitializeAggregatedMeasureDataProcess for message {MessageId}", marketMessage.MessageId);
 
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(
-                new MeteredDataForMeasurementPointMessageProcessDto(
-                    EventId.From(marketMessage.MessageId),
-                    new Actor(ActorNumber.Create("1234"), ActorRole.MeteredDataResponsible),
-                    BusinessReason.FromName(marketMessage.BusinessReason),
-                    marketMessage.Series.Select(
-                            s => new MeteredDataForMeasurementPointMessageSeriesDto(
-                                s.TransactionId,
-                                Resolution.FromName(s.Resolution!),
-                                InstantPattern.ExtendedIso.Parse(s.StartDateTime).Value,
-                                s.EndDateTime != null
-                                    ? InstantPattern.ExtendedIso.Parse(s.EndDateTime).Value
-                                    : null,
-                                s.ProductNumber,
-                                s.ProductUnitType,
-                                s.MeteringPointType,
-                                s.MeteringPointLocationId,
-                                s.DelegatedGridAreaCodes,
-                                s.EnergyObservations.Select(
-                                        o => new EnergyObservationDto(
-                                            o.Position,
-                                            o.EnergyQuantity,
-                                            o.QuantityQuality))
-                                    .ToList()))
-                        .ToList()),
-                CancellationToken.None)
-            .ConfigureAwait(false);
+        foreach (var series in marketMessage.Series)
+        {
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(
+                    new MeteredDataForMeasurementPointMessageProcessDto(
+                        EventId.From(marketMessage.MessageId),
+                        new Actor(series.RequestedByActor.ActorNumber, series.RequestedByActor.ActorRole),
+                        BusinessReason.FromCode(marketMessage.BusinessReason),
+                        marketMessage.Series.Select(
+                                s => new MeteredDataForMeasurementPointMessageSeriesDto(
+                                    s.TransactionId,
+                                    Resolution.FromCode(s.Resolution!),
+                                    InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
+                                        .Parse(s.StartDateTime)
+                                        .Value,
+                                    s.EndDateTime != null
+                                        ? InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
+                                            .Parse(s.EndDateTime)
+                                            .Value
+                                        : null,
+                                    s.ProductNumber,
+                                    s.ProductUnitType,
+                                    s.MeteringPointType,
+                                    s.MeteringPointLocationId,
+                                    s.DelegatedGridAreaCodes,
+                                    s.EnergyObservations.Select(
+                                            o => new EnergyObservationDto(
+                                                o.Position,
+                                                o.EnergyQuantity,
+                                                o.QuantityQuality))
+                                        .ToList()))
+                            .ToList()),
+                    CancellationToken.None)
+                .ConfigureAwait(false);
+        }
     }
 }
