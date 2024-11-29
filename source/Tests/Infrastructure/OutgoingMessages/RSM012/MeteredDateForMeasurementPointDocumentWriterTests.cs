@@ -45,7 +45,7 @@ public class MeteredDateForMeasurementPointDocumentWriterTests()
         // Act
         var document = await WriteDocument(
             messageBuilder.BuildHeader(),
-            messageBuilder.BuildWholesaleCalculation(),
+            messageBuilder.BuildMeteredDataForMeasurementPoint(),
             DocumentFormat.FromName(documentFormat));
 
         // Assert

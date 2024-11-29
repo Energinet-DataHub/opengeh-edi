@@ -32,7 +32,7 @@ public class MeteredDateForMeasurementPointBuilder
             SampleData.TimeStamp);
     }
 
-    public MeteredDateForMeasurementPointMarketActivityRecord BuildWholesaleCalculation()
+    public MeteredDateForMeasurementPointMarketActivityRecord BuildMeteredDataForMeasurementPoint()
     {
         return new MeteredDateForMeasurementPointMarketActivityRecord(
             SampleData.TransactionId.Value,
