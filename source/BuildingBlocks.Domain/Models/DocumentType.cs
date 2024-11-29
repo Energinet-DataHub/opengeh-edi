@@ -20,6 +20,7 @@ public class DocumentType : EnumerationType
     public static readonly DocumentType RejectRequestAggregatedMeasureData = new(nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
     public static readonly DocumentType NotifyWholesaleServices = new(nameof(NotifyWholesaleServices), MessageCategory.Aggregations);
     public static readonly DocumentType RejectRequestWholesaleSettlement = new(nameof(RejectRequestWholesaleSettlement), MessageCategory.Aggregations);
+    public static readonly DocumentType MeteredDataForMeasurementPoint = new(nameof(MeteredDataForMeasurementPoint), MessageCategory.TimeSeries);
 
     public static readonly DocumentType NotifyValidatedMeasureData = new(
         nameof(NotifyValidatedMeasureData),
