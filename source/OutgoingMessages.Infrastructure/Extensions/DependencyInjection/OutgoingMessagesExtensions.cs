@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggreg
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -74,6 +75,8 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, MeteredDateForMeasurementPointCimJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, MeteredDateForMeasurementPointCimXmlDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         // MessageEnqueueingConfiguration
