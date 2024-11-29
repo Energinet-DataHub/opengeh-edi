@@ -300,7 +300,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var expectedFileStorageReference = $"{receiver.ReceiverNumber.Value}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
         var assertProperties = new Dictionary<string, Action<object?>>
         {
-            { "BusinessReason", businessReason => businessReason.Should().Be(outgoingMessage.BusinessReason) },
+            { "BusinessReason", businessReason => businessReason.Should().Be(BusinessReason.FromName(outgoingMessage.BusinessReason).Code) },
             { "CreatedAt", createdAt => createdAt.Should().Be(expectedTimestamp) },
             { "DocumentType", documentType => documentType.Should().Be(outgoingMessage.DocumentType.Name) },
             { "EventIds", eventIds => eventIds.Should().Be(expectedEventId.Value) },
