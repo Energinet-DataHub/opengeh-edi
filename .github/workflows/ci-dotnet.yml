@@ -15,151 +15,303 @@
 name: CI dotnet
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      job_context:
+        description: The context of the job
+        type: string
+        required: false
 
 jobs:
-  # Build all projects within solution
-  dotnet_ci_build:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
-    with:
-      solution_file_path: source/Edi.Repository.sln
+  print_context:
+    name: Print job context
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print context
+        run: |
+          echo "Job context: ${{ inputs.job_context }}"
+
+  build_artifact:
+    name: Build artifact ${{ matrix.artifact.name }}
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_FOLDER_PATH: ${{ github.workspace }}/output
+      RELEASE_VERSION: dotnet_${{ github.event.pull_request.number }}
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact:
+          - name: B2B API
+            should_build: ${{ fromJson(inputs.job_context).b2bapi == 'true' }}
+            project_name: b2bapi
+            path: source/B2BApi/B2BApi.csproj
+            outputpath: functions/b2bapi
+          - name: B2C WebAPI
+            should_build: ${{ fromJson(inputs.job_context).b2capi == 'true' }}
+            project_name: b2capi
+            path: source/B2CWebApi/B2CWebApi.csproj
+            outputpath: functions/b2capi
+    steps:
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ env.RELEASE_VERSION }}-${{ matrix.artifact.project_name}} # Cache per PR
+
+      - name: Echo ${{matrix.artifact.should_build}}
+        run: echo ${{matrix.artifact.should_build}}
+
+      - name: Checkout repository
+        if: ${{ matrix.artifact.should_build == true }}
+        uses: actions/checkout@v4
+
+      - name: Build ${{ matrix.artifact.name }}
+        if: ${{ matrix.artifact.should_build == true }}
+        run: |
+          dotnet publish \
+            '${{ matrix.artifact.path }}' \
+            --configuration Release \
+            --output '${{ env.RELEASE_FOLDER_PATH }}/${{ matrix.artifact.outputpath }}'
+
+      - name: Zip files for prerelease
+        if: ${{ github.event_name == 'pull_request' && matrix.artifact.should_build == true }}
+        uses: thedoctor0/zip-release@0.6.2
+        with:
+          type: zip
+          filename: dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
+          directory: ${{ env.RELEASE_FOLDER_PATH }}
+
+      - name: Create pre-release
+        if: ${{ github.event_name == 'pull_request' && matrix.artifact.should_build == true }}
+        uses: Energinet-Datahub/.github/.github/actions/github-create-release@v14
+        with:
+          repo_token: ${{ github.token }}
+          automatic_release_tag: ${{ env.RELEASE_VERSION }}_${{ matrix.artifact.project_name}}
+          prerelease: true
+          title: ${{ env.RELEASE_VERSION }}_${{ matrix.artifact.project_name}}
+          files: |
+            ${{ env.RELEASE_FOLDER_PATH }}/dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
+
+  build_testsuite:
+    name: Build ${{ matrix.testproject.name }}
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: dotnet_${{ github.event.pull_request.number }}
+      outputpath: ${{ github.workspace }}/source/Tests/bin/Release/net8.0
+    strategy:
+      fail-fast: false
+      matrix:
+        testproject:
+          - name: ArchitectureTests
+            path: .\source\ArchitectureTests\ArchitectureTests.csproj
+          - name: Tests
+            path: .\source\Tests\Tests.csproj
+          - name: ProcessManager.Core.Tests
+            path: .\source\ProcessManager.Core.Tests\ProcessManager.Core.Tests.csproj
+          - name: ProcessManager.Orchestrations.Tests
+            path: .\source\ProcessManager.Orchestrations.Tests\ProcessManager.Orchestrations.Tests.csproj
+          - name: ProcessManager.Tests
+            path: .\source\ProcessManager.Tests\ProcessManager.Tests.csproj
+          # - name: ProcessManager.SubsystemTests
+          #   path: .\source\ProcessManager.SubsystemTests\ProcessManager.SubsystemTests.csproj
+          - name: B2BApi.AppTests
+            path: .\source\B2BApi.AppTests\B2BApi.AppTests.csproj
+          - name: B2CWebApi.AppTests
+            path: .\source\B2CWebApi.AppTests\B2CWebApi.AppTests.csproj
+          - name: IntegrationTests
+            path: .\source\IntegrationTests\IntegrationTests.csproj
+          - name: ArchivedMessages.IntegrationTests
+            path: .\source\ArchivedMessages.IntegrationTests\ArchivedMessages.IntegrationTests.csproj
+          - name: IntegrationEvents.IntegrationTests
+            path: .\source\IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj
+          - name: MasterData.IntegrationTests
+            path: .\source\MasterData.IntegrationTests\MasterData.IntegrationTests.csproj
+          - name: IncomingMessages.IntegrationTests
+            path: .\source\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj
+          - name: OutgoingMessages.IntegrationTests
+            path: .\source\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj
+          - name: Edi.UnitTests
+            path: .\source\Edi.UnitTests\Edi.UnitTests.csproj
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ env.RELEASE_VERSION }}-${{ matrix.testproject.name}} # Cache per PR
+
+      - name: Build ${{ matrix.testproject.name }}
+        run: |
+          dotnet publish \
+            '${{ matrix.testproject.path }}' \
+            --configuration Release \
+            --output '${{ env.outputpath }}'
+
+          ls source/Tests/bin/Release/net8.0
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edi-tests-${{ matrix.testproject.name }}
+          path: ${{ env.outputpath }}/*
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: build_testsuite
+    name: Merge test artifacts
+    steps:
+      - name: Merge artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: dotnet-tests-outputs
+          delete-merged: true
+          retention-days: 7
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
-  tests:
+  unit_tests:
+    needs: [
+      merge,
+      build_testsuite
+    ]
     strategy:
       fail-fast: false
       matrix:
         tests_filter_expression:
-          - name: Architecture Tests
-            paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
+          - name: ArchitectureTests
+            paths: Energinet.DataHub.EDI.ArchitectureTests.dll
           - name: Tests
-            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
+            paths: Energinet.DataHub.EDI.Tests.dll
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@kerbou/2524-build-brs-pipeline
     with:
+      download_artifact_name: dotnet-tests-outputs
       download_attempt_limit: 30
       azure_functions_core_tools_version: 4.0.5413
       # Matrix parameters
       job_name: ${{ matrix.tests_filter_expression.name }}
-      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
+      tests_dll_file_path: /${{ matrix.tests_filter_expression.paths }}
 
-  # Tests that require the integration test environment
+  # Tests that require the integration test environment.
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   integration_tests:
+    needs: [
+      merge,
+      build_testsuite
+    ]
     strategy:
       fail-fast: false
       matrix:
         tests_filter_expression:
           - name: ProcessManager Tests
-            paths: \source\ProcessManager.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Tests.dll
+            paths: Energinet.DataHub.ProcessManager.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: ProcessManager Orchestrations Tests
-            paths: \source\ProcessManager.Orchestrations.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll
+            paths: Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: ProcessManager Core Tests
-            paths: \source\ProcessManager.Core.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Core.Tests.dll
+            paths: Energinet.DataHub.ProcessManager.Core.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
-          - name: ProcessManager Subsystem Tests
-            paths: \source\ProcessManager.SubsystemTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.SubsystemTests.dll
-            filter: empty # Means skip
-            use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip
+          # - name: ProcessManager Subsystem Tests
+          #   paths: \source\ProcessManager.SubsystemTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.SubsystemTests.dll
+          #   filter: empty # Means skip
+          #   use_azure_functions_tools: true
+          #   contentroot_variable_name: empty # Means skip
 
           - name: B2BApi AppTests
-            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
+            paths: Energinet.DataHub.EDI.B2BApi.AppTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: B2CWebApi AppTests
-            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2CWebApi.AppTests.dll
+            paths: Energinet.DataHub.EDI.B2CWebApi.AppTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IntegrationEvents - BalanceFixing
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IntegrationEvents)&(DisplayName~BalanceFixing)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IntegrationEvents - Other
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IntegrationEvents)&(DisplayName!~BalanceFixing)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - Other
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName!~Behaviours.IncomingRequests)&(DisplayName!~Behaviours.IntegrationEvents)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - CalculationResults
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.CalculationResults)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Other
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName!~IntegrationTests.Behaviours)&(DisplayName!~IntegrationTests.CalculationResults)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: ArchivedMessages - integration tests
-            paths: \source\ArchivedMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: IntegrationEvents - integration tests
-            paths: \source\IntegrationEvents.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: MasterData - integration tests
-            paths: \source\MasterData.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.MasterData.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.MasterData.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: IncomingMessages - integration tests
-            paths: \source\IncomingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: OutgoingMessages - integration tests
-            paths: \source\OutgoingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.dll
+            paths: Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Edi - integration/unit tests
-            paths: \source\Edi.UnitTests\bin\Release\net8.0\Energinet.DataHub.Wholesale.Edi.UnitTests.dll
+            paths: Energinet.DataHub.Wholesale.Edi.UnitTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@kerbou/2524-build-brs-pipeline
     with:
+      download_artifact_name: dotnet-tests-outputs
       download_attempt_limit: 20
       azure_functions_core_tools_version: 4.0.5413
       azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
@@ -170,7 +322,7 @@ jobs:
       run_integration_tests: true
       # Matrix parameters
       job_name: ${{ matrix.tests_filter_expression.name }}
-      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
+      tests_dll_file_path: /${{ matrix.tests_filter_expression.paths }}
       tests_filter_expression: ${{ matrix.tests_filter_expression.filter }}
       use_azure_functions_tools: ${{ matrix.tests_filter_expression.use_azure_functions_tools }}
       aspnetcore_test_contentroot_variable_name: ${{ matrix.tests_filter_expression.contentroot_variable_name }}

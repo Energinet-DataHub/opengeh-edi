@@ -18,19 +18,13 @@ name: Detect changes
 # This workflow will determine which categories of jobs should be executed,
 # based on detected changes.
 # It should be used by the 'ci-orchestrator.yml' and 'cd.yml' to ensure they both use
-# the same path's to detect changes.
+# the same path's to detect changes
 
 on:
   workflow_call:
     outputs:
-      dotnet:
-        value: ${{ jobs.changes.outputs.dotnet }}
-      db_migrations:
-        value: ${{ jobs.changes.outputs.db_migrations }}
-      processmanager_client:
-        value: ${{ jobs.changes.outputs.processmanager_client }}
-      render_c4model_views:
-        value: ${{ jobs.changes.outputs.render_c4model_views }}
+      job_context:
+        value: ${{ jobs.changes.outputs.job_context }}
 
 jobs:
   changes:
@@ -38,10 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
-      dotnet: ${{ steps.filter.outputs.dotnet }}
-      db_migrations: ${{ steps.filter.outputs.db_migrations }}
-      processmanager_client: ${{ steps.filter.outputs.processmanager_client }}
-      render_c4model_views: ${{ steps.filter.outputs.render_c4model_views }}
+      job_context: "{
+        'b2bapi': '${{ steps.filter.outputs.b2bapi }}',
+        'b2capi': '${{ steps.filter.outputs.b2capi }}',
+        'render_c4model_views': '${{ steps.filter.outputs.render_c4model_views }}'
+        }"
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
       - name: Checkout repository
@@ -53,17 +48,10 @@ jobs:
         id: filter
         with:
           filters: |
-            dotnet:
-              - '.github/actions/dotnet-*/**'
-              - '.github/workflows/**'
-              - 'source/**'
-              - 'source/!(ApplyDBMigrationsApp/**)**'
-            db_migrations:
-              - 'source/ApplyDBMigrationsApp/**'
-            processmanager_client:
-              - 'docs/ProcessManager.Client/**'
-              - 'source/ProcessManager.Client*/**'
-              - '.github/workflows/processmanager-client-bundle-publish.yml'
+            b2bapi:
+              - 'source/B2BApi/**/*'
+            b2capi:
+              - 'source/B2CWebApi/**/*'
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
