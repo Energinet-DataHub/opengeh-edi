@@ -63,11 +63,6 @@ public static class HostFactory
                 (context, services) =>
                 {
                     services
-                        .Configure((Action<WorkerOptions>)(options =>
-                        {
-                            options.EnableUserCodeException = true;
-                        }))
-
                         // Logging
                         .AddApplicationInsightsForIsolatedWorker(SubsystemName)
 
