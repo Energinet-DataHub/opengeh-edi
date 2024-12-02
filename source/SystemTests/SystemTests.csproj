@@ -11,7 +11,7 @@
   <ItemGroup>
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
       <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.4" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
       <PackageReference Include="FluentAssertions" Version="6.12.2" />
