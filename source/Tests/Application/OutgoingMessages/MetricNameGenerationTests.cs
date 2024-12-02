@@ -47,6 +47,13 @@ public class MetricNameGenerationTests
         "NotifyWholesaleServicesResponse",
         "RejectRequestWholesaleSettlement",
         "MeteredDataForMeasurementPoint",
+        "MeteredDataForMeasurementPointResponse",
+    ];
+
+    private static readonly DocumentType[] _doesNotHaveIncomingMessageResponse =
+    [
+        DocumentType.RejectRequestWholesaleSettlement,
+        DocumentType.RejectRequestAggregatedMeasureData
     ];
 
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(
@@ -78,13 +85,15 @@ public class MetricNameGenerationTests
         {
             foreach (var documentType in documentTypes)
             {
+                // Most documents are logged as an outgoing message and as a response to an incoming message
                 names.Add(MetricNameMapper.MessageGenerationMetricName(
                     documentType,
                     documentFormat,
                     false));
-                if (documentType.Name.Contains("Notify"))
+
+                // Some documents are only logged as an outgoing message
+                if (!_doesNotHaveIncomingMessageResponse.Contains(documentType))
                 {
-                    // We're logging a response of a request as a separate message generation, even though it's the same document
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
                         documentFormat,
