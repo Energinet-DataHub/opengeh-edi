@@ -14,6 +14,7 @@
 
 using System.Globalization;
 using System.Xml;
+using System.Xml.Linq;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Xml;
 
@@ -30,7 +31,9 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
             "E66"),
         parser)
 {
-    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
+    protected override async Task WriteMarketActivityRecordsAsync(
+        IReadOnlyCollection<string> marketActivityPayloads,
+        XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
@@ -38,52 +41,39 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
         foreach (var wholesaleCalculationSeries in ParseFrom<MeteredDateForMeasurementPointMarketActivityRecord>(
                      marketActivityPayloads))
         {
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
+            var seriesElement = new XElement(
+                "Series",
+                new XElement("mRID", wholesaleCalculationSeries.TransactionId),
+                new XElement(
+                    "originalTransactionIDReference_Series.mRID",
+                    wholesaleCalculationSeries.OriginalTransactionIdReferenceId),
+                new XElement(
+                    "marketEvaluationPoint.mRID",
+                    new XAttribute("codingScheme", "A10"),
+                    wholesaleCalculationSeries.MarketEvaluationPointNumber),
+                new XElement("marketEvaluationPoint.type", wholesaleCalculationSeries.MarketEvaluationPointType),
+                new XElement("registration_DateAndOrTime.dateTime", wholesaleCalculationSeries.RegistrationDateTime),
+                new XElement("product", wholesaleCalculationSeries.Product),
+                new XElement("quantity_Measure_Unit.name", wholesaleCalculationSeries.QuantityMeasureUnit),
+                new XElement(
+                    "Period",
+                    new XElement("resolution", wholesaleCalculationSeries.Resolution),
+                    new XElement(
+                        "timeInterval",
+                        new XElement("start", wholesaleCalculationSeries.StartedDateTime),
+                        new XElement("end", wholesaleCalculationSeries.EndedDateTime)),
+                    wholesaleCalculationSeries.Points.Select(CreatePointElement)));
 
-            // tabbed content Series
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, wholesaleCalculationSeries.TransactionId).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReferenceId, writer).ConfigureAwait(false);
-
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "marketEvaluationPoint.mRID", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
-            writer.WriteValue(wholesaleCalculationSeries.MarketEvaluationPointNumber);
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "marketEvaluationPoint.type", null, wholesaleCalculationSeries.MarketEvaluationPointType).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "registration_DateAndOrTime.dateTime", null, wholesaleCalculationSeries.RegistrationDateTime).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, wholesaleCalculationSeries.Product).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityMeasureUnit).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
-
-            // tabbed content Period
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "resolution", null, wholesaleCalculationSeries.Resolution).ConfigureAwait(false);
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "timeInterval", null).ConfigureAwait(false);
-
-            // tabbed content timeInterval
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "start", null, wholesaleCalculationSeries.StartedDateTime).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "end", null, wholesaleCalculationSeries.EndedDateTime).ConfigureAwait(false);
-
-            // closing off timeInterval
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-
-            foreach (var point in wholesaleCalculationSeries.Points)
-            {
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Point", null).ConfigureAwait(false);
-
-                // tabbed content Point
-                await WriteElementAsync("position", point.Position.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
-                await WriteElementIfHasValueAsync("quantity", point.Quantity?.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
-                await WriteElementIfHasValueAsync("quality", point.Quality, writer).ConfigureAwait(false);
-
-                // closing off Point
-                await writer.WriteEndElementAsync().ConfigureAwait(false);
-            }
-
-            // closing off Period
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
-
-            // closing off series tag
-            await writer.WriteEndElementAsync().ConfigureAwait(false);
+            await seriesElement.WriteToAsync(writer, CancellationToken.None).ConfigureAwait(false);
         }
+    }
+
+    private XElement CreatePointElement(PointActivityRecord point)
+    {
+        return new XElement(
+            "Point",
+            new XElement("position", point.Position.ToString(NumberFormatInfo.InvariantInfo)),
+            new XElement("quantity", point.Quantity?.ToString(NumberFormatInfo.InvariantInfo)),
+            new XElement("quality", point.Quality));
     }
 }
