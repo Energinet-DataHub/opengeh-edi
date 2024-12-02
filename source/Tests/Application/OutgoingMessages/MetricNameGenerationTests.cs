@@ -31,7 +31,8 @@ public class MetricNameGenerationTests
         "NotifyWholesaleServices",
         "NotifyWholesaleServicesResponse",
         "RejectRequestWholesaleSettlement",
-        "MeteredDataForMeasurementPoint",
+        "NotifyValidatedMeasureData",
+        "NotifyValidatedMeasureDataResponse",
     ];
 
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(
