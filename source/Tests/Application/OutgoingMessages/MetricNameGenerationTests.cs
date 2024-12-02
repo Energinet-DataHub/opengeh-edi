@@ -46,11 +46,11 @@ public class MetricNameGenerationTests
         "NotifyWholesaleServices",
         "NotifyWholesaleServicesResponse",
         "RejectRequestWholesaleSettlement",
-        "MeteredDataForMeasurementPoint",
-        "MeteredDataForMeasurementPointResponse",
+        "NotifyValidatedMeasureData",
+        "NotifyValidatedMeasureDataResponse",
     ];
 
-    private static readonly DocumentType[] _doesNotHaveIncomingMessageResponse =
+    private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
     [
         DocumentType.RejectRequestWholesaleSettlement,
         DocumentType.RejectRequestAggregatedMeasureData
@@ -92,7 +92,7 @@ public class MetricNameGenerationTests
                     false));
 
                 // Some documents are only logged as an outgoing message
-                if (!_doesNotHaveIncomingMessageResponse.Contains(documentType))
+                if (!_isOnlyTriggeredByIncomingMessage.Contains(documentType))
                 {
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
