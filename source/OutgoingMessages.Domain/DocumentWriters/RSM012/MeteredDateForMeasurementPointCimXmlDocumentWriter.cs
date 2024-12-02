@@ -37,43 +37,53 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
     {
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
-
+        XNamespace @namespace = "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1";
         foreach (var wholesaleCalculationSeries in ParseFrom<MeteredDateForMeasurementPointMarketActivityRecord>(
                      marketActivityPayloads))
         {
             var seriesElement = new XElement(
-                "Series",
-                new XElement("mRID", wholesaleCalculationSeries.TransactionId),
+                @namespace + "Series",
+                new XElement(@namespace + "mRID", wholesaleCalculationSeries.TransactionId),
                 new XElement(
-                    "originalTransactionIDReference_Series.mRID",
+                    @namespace + "originalTransactionIDReference_Series.mRID",
                     wholesaleCalculationSeries.OriginalTransactionIdReferenceId),
                 new XElement(
-                    "marketEvaluationPoint.mRID",
+                    @namespace + "marketEvaluationPoint.mRID",
                     new XAttribute("codingScheme", "A10"),
                     wholesaleCalculationSeries.MarketEvaluationPointNumber),
-                new XElement("marketEvaluationPoint.type", wholesaleCalculationSeries.MarketEvaluationPointType),
-                new XElement("registration_DateAndOrTime.dateTime", wholesaleCalculationSeries.RegistrationDateTime),
-                new XElement("product", wholesaleCalculationSeries.Product),
-                new XElement("quantity_Measure_Unit.name", wholesaleCalculationSeries.QuantityMeasureUnit),
+                new XElement(@namespace + "marketEvaluationPoint.type", wholesaleCalculationSeries.MarketEvaluationPointType),
+                new XElement(@namespace + "registration_DateAndOrTime.dateTime", wholesaleCalculationSeries.RegistrationDateTime),
+                new XElement(@namespace + "product", wholesaleCalculationSeries.Product),
+                new XElement(@namespace + "quantity_Measure_Unit.name", wholesaleCalculationSeries.QuantityMeasureUnit),
                 new XElement(
-                    "Period",
-                    new XElement("resolution", wholesaleCalculationSeries.Resolution),
+                    @namespace + "Period",
+                    new XElement(@namespace + "resolution", wholesaleCalculationSeries.Resolution),
                     new XElement(
-                        "timeInterval",
-                        new XElement("start", wholesaleCalculationSeries.StartedDateTime),
-                        new XElement("end", wholesaleCalculationSeries.EndedDateTime)),
-                    wholesaleCalculationSeries.Points.Select(CreatePointElement)));
+                        @namespace + "timeInterval",
+                        new XElement(@namespace + "start", wholesaleCalculationSeries.StartedDateTime),
+                        new XElement(@namespace + "end", wholesaleCalculationSeries.EndedDateTime)),
+                    wholesaleCalculationSeries.Points.Select(x => CreatePointElement(x, @namespace))));
 
             await seriesElement.WriteToAsync(writer, CancellationToken.None).ConfigureAwait(false);
         }
     }
 
-    private XElement CreatePointElement(PointActivityRecord point)
+    private XElement CreatePointElement(PointActivityRecord point, XNamespace @namespace)
     {
-        return new XElement(
-            "Point",
-            new XElement("position", point.Position.ToString(NumberFormatInfo.InvariantInfo)),
-            new XElement("quantity", point.Quantity?.ToString(NumberFormatInfo.InvariantInfo)),
-            new XElement("quality", point.Quality));
+        var pointElement = new XElement(
+            @namespace + "Point",
+            new XElement(@namespace + "position", point.Position.ToString(NumberFormatInfo.InvariantInfo)));
+
+        if (point.Quantity != null)
+        {
+            pointElement.Add(new XElement(@namespace + "quantity", point.Quantity?.ToString(NumberFormatInfo.InvariantInfo)));
+        }
+
+        if (point.Quality != null)
+        {
+            pointElement.Add(new XElement(@namespace + "quality", point.Quality?.ToString(NumberFormatInfo.InvariantInfo)));
+        }
+
+        return pointElement;
     }
 }
