@@ -102,8 +102,7 @@ public sealed class WholesaleServicesRequestValidatorTests : EdiTestBase
         var validationErrors = await _sut.ValidateAsync(request);
 
         // Assert
-        validationErrors.Should().HaveCountGreaterThanOrEqualTo(2);
-        validationErrors.Select(e => e.ErrorCode).Should().Contain(["D66", "D66"]);
+        validationErrors.Where(x => x.ErrorCode == "D66").Should().HaveCount(2);
     }
 
     [Fact]
