@@ -85,7 +85,7 @@ public class MetricNameGenerationTests
         {
             foreach (var documentType in documentTypes)
             {
-                // Most documents are logged as an outgoing message and as a response to an incoming message
+                // Most documents are logged as an outgoing message and as a response to a corresponding incoming message
                 names.Add(MetricNameMapper.MessageGenerationMetricName(
                     documentType,
                     documentFormat,
