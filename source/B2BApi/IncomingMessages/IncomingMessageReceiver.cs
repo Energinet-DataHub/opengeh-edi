@@ -137,7 +137,7 @@ public class IncomingMessageReceiver
         {
             { IncomingDocumentType.RequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
             { IncomingDocumentType.RequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
-            { IncomingDocumentType.MeteredDataForMeasurementPoint, AuditLogEntityType.MeteredDataForMeasurementPointReceived },
+            { IncomingDocumentType.NotifyValidatedMeasureData, AuditLogEntityType.MeteredDataForMeasurementPointReceived },
         };
 
         entityTypeMapping.TryGetValue(incomingDocumentType, out var affectedEntityType);

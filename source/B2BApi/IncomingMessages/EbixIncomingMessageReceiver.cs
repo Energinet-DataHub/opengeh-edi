@@ -62,7 +62,7 @@ public sealed class EbixIncomingMessageReceiver(
             .ReceiveIncomingMarketMessageAsync(
                 incomingMarketMessageStream,
                 incomingDocumentFormat: DocumentFormat.Ebix,
-                IncomingDocumentType.MeteredDataForMeasurementPoint,
+                IncomingDocumentType.NotifyValidatedMeasureData,
                 responseDocumentFormat: DocumentFormat.Ebix,
                 cancellationToken)
             .ConfigureAwait(false);

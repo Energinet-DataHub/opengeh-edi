@@ -38,7 +38,7 @@ public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider 
     private const string QuantityElementName = "quantity";
     private const string RegistrationDateAndOrTimeElementName = "registration_DateAndOrTime.dateTime";
 
-    public override IncomingDocumentType DocumentType => IncomingDocumentType.MeteredDataForMeasurementPoint;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.NotifyValidatedMeasureData;
 
     public override DocumentFormat DocumentFormat => DocumentFormat.Json;
 

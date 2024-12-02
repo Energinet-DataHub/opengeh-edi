@@ -27,7 +27,7 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter : IDocumentWrite
 
     public bool HandlesType(DocumentType documentType)
     {
-        return documentType == DocumentType.MeteredDataForMeasurementPoint;
+        return documentType == DocumentType.NotifyValidatedMeasureData;
     }
 
     public Task<MarketDocumentStream> WriteAsync(
