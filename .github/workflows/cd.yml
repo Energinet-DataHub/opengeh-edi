@@ -34,7 +34,7 @@ jobs:
   dotnet_promote_prerelease:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' || needs.changes.outputs.db_migrations == 'true'}}
-    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v14
     with:
       release_name_prefix: dotnet
 
@@ -49,10 +49,10 @@ jobs:
     needs: [dotnet_promote_prerelease, changes]
     steps:
       - name: Find associated pull request
-        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v13
+        uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v14
         id: find_pull_request
 
-      - uses: Energinet-DataHub/.github/.github/actions/github-create-token@v13
+      - uses: Energinet-DataHub/.github/.github/actions/github-create-token@v14
         name: Generate Github token
         id: generate_token
         with:
@@ -76,7 +76,7 @@ jobs:
     if: |
       always() &&
       contains(needs.*.result, 'failure')
-    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v14
     with:
       team_name: Mosaic
       subject: "Deployment dispatch failed: EDI"
