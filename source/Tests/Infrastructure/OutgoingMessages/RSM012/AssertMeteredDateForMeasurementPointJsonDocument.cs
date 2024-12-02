@@ -30,8 +30,9 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
     public AssertMeteredDateForMeasurementPointJsonDocument(Stream documentStream)
     {
         _document = JsonDocument.Parse(documentStream);
-        var temp = _document.RootElement.GetRawText();
         _root = _document.RootElement.GetProperty("NotifyValidatedMeasureData_MarketDocument");
+
+        Assert.Equal("E66", _root.GetProperty("type").GetProperty("value").ToString());
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasMessageId(string expectedMessageId)

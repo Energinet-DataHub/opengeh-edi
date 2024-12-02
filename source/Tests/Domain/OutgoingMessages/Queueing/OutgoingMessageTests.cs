@@ -55,7 +55,7 @@ public class OutgoingMessageTests
         new RejectRequestWholesaleSettlementCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new MeteredDateForMeasurementPointCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
-        new MeteredDateForMeasurementPointCimXmlDocumentWriter(),
+        new MeteredDateForMeasurementPointCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     ];
 
     /// <summary>
@@ -90,6 +90,7 @@ public class OutgoingMessageTests
                     GetHeader(),
                     new List<string> { serializedContent },
                     CancellationToken.None);
+
                 // Assert
                 await act.Should().NotThrowAsync();
             }
