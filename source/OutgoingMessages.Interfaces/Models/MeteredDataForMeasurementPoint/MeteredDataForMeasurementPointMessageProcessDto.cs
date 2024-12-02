@@ -24,7 +24,7 @@ public sealed class MeteredDataForMeasurementPointMessageProcessDto : OutgoingMe
         BusinessReason businessReason,
         IReadOnlyCollection<MeteredDataForMeasurementPointMessageSeriesDto> series)
         : base(
-            DocumentType.NotifyValidatedMeasureData,
+            DocumentType.MeteredDataForMeasurementPoint,
             receiver.ActorNumber,
             null,
             eventId,

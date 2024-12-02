@@ -18,15 +18,14 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 
 public sealed record MeteredDataForMeasurementPointMessageSeriesDto(
-    string TransactionId,
-    Resolution? Resolution,
-    Instant StartDateTime,
-    Instant? EndDateTime,
-    string? ProductNumber,
-    string? ProductUnitType,
-    string? MeteringPointType,
-    string? MeteringPointLocationId,
-    // DelegatedGridAreaCodes is a list of grid area codes that the requester is allowed to submit measurements for
-    IReadOnlyCollection<string>? DelegatedGridAreaCodes,
-    //RequestedByActor RequestedByActor,
+    TransactionId TransactionId,
+    string MarketEvaluationPointNumber,
+    string MarketEvaluationPointType,
+    string? OriginalTransactionIdReferenceId,
+    string Product,
+    string QuantityMeasureUnit,
+    string RegistrationDateTime,
+    Resolution Resolution,
+    Instant StartedDateTime,
+    Instant EndedDateTime,
     IReadOnlyCollection<EnergyObservationDto> EnergyObservations);

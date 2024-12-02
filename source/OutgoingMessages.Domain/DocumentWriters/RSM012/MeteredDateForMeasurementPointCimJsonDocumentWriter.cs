@@ -66,24 +66,30 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
         var meteredDataForMeasurementPoints = new Collection<MeteredDataForMeasurementPoint>();
         foreach (var transaction in transactions)
         {
-            var activityRecord = _parser.From<MeteredDateForMeasurementPointMarketActivityRecord>(transaction);
-            meteredDataForMeasurementPoints.Add(new MeteredDataForMeasurementPoint(
-                activityRecord.TransactionId,
-                activityRecord.MarketEvaluationPointNumber,
-                activityRecord.MarketEvaluationPointType,
-                activityRecord.OriginalTransactionIdReferenceId,
-                activityRecord.Product,
-                activityRecord.QuantityMeasureUnit,
-                activityRecord.RegistrationDateTime,
-                new Period(
-                    activityRecord.Resolution,
-                    new TimeInterval(
-                        activityRecord.StartedDateTime,
-                        activityRecord.EndedDateTime),
-                    activityRecord.Points.Select(p => new Point(
-                        p.Position,
-                        p.Quality,
-                        p.Quantity)).ToList())));
+            var activityRecords = _parser.From<List<MeteredDateForMeasurementPointMarketActivityRecord>>(transaction);
+            foreach (var activityRecord in activityRecords)
+            {
+                meteredDataForMeasurementPoints.Add(
+                    new MeteredDataForMeasurementPoint(
+                        activityRecord.TransactionId,
+                        activityRecord.MarketEvaluationPointNumber,
+                        activityRecord.MarketEvaluationPointType,
+                        activityRecord.OriginalTransactionIdReferenceId,
+                        activityRecord.Product,
+                        activityRecord.QuantityMeasureUnit,
+                        activityRecord.RegistrationDateTime,
+                        new Period(
+                            activityRecord.Resolution.Code,
+                            new TimeInterval(
+                                activityRecord.StartedDateTime,
+                                activityRecord.EndedDateTime),
+                            activityRecord.EnergyObservations.Select(
+                                    p => new Point(
+                                        p.Position,
+                                        p.Quality,
+                                        p.Quantity))
+                                .ToList())));
+            }
         }
 
         return new Document(
@@ -206,7 +212,7 @@ internal class TimeInterval(string startedDateTime, string endedDateTime)
     public ValueObject<string> EndedDateTime { get; init; } = ValueObject<string>.Create(endedDateTime);
 }
 
-internal class Point(int position, string? quality, int? quantity)
+internal class Point(int position, string? quality, decimal? quantity)
 {
     [JsonPropertyName("position")]
     public ValueObject<int> Position { get; init; } = ValueObject<int>.Create(position);
@@ -217,7 +223,7 @@ internal class Point(int position, string? quality, int? quantity)
 
     [JsonPropertyName("quantity")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? Quantity { get; init; } = quantity == null ? null : quantity;
+    public decimal? Quantity { get; init; } = quantity == null ? null : quantity;
 }
 
 internal class ValueObject<T>(T value)

@@ -15,6 +15,6 @@
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 
 public readonly record struct EnergyObservationDto(
-    string? Position,
-    string? EnergyQuantity,
-    string? QuantityQuality);
+    int? Position,
+    decimal? Quantity,
+    string? Quality);

@@ -63,7 +63,13 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                         BusinessReason.FromCode(marketMessage.BusinessReason),
                         marketMessage.Series.Select(
                                 s => new MeteredDataForMeasurementPointMessageSeriesDto(
-                                    s.TransactionId,
+                                    TransactionId.From(s.TransactionId),
+                                    s.MeteringPointType!,
+                                    s.MeteringPointLocationId!,
+                                    null,
+                                    s.ProductNumber!,
+                                    s.ProductUnitType!,
+                                    marketMessage.CreatedAt,
                                     Resolution.FromCode(s.Resolution!),
                                     InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
                                         .Parse(s.StartDateTime)
@@ -72,16 +78,11 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                                         ? InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
                                             .Parse(s.EndDateTime)
                                             .Value
-                                        : null,
-                                    s.ProductNumber,
-                                    s.ProductUnitType,
-                                    s.MeteringPointType,
-                                    s.MeteringPointLocationId,
-                                    s.DelegatedGridAreaCodes,
+                                        : throw new ArgumentNullException(),
                                     s.EnergyObservations.Select(
                                             o => new EnergyObservationDto(
-                                                o.Position,
-                                                o.EnergyQuantity,
+                                                o.Position != null ? int.Parse(o.Position) : throw new ArgumentNullException(nameof(o.Position)),
+                                                o.EnergyQuantity != null ? decimal.Parse(o.EnergyQuantity) : throw new ArgumentNullException(nameof(o.EnergyQuantity)),
                                                 o.QuantityQuality))
                                         .ToList()))
                             .ToList()),

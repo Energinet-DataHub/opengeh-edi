@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
@@ -61,7 +62,7 @@ public class GivenMeteredDataForMeasurementPointTests : MeteredDataForMeasuremen
         var peekResults = await WhenActorPeeksAllMessages(
             currentActor.ActorNumber,
             currentActor.ActorRole,
-            DocumentFormat.Xml);
+            DocumentFormat.Json);
 
         // Assert
         PeekResultDto peekResult;
@@ -74,5 +75,10 @@ public class GivenMeteredDataForMeasurementPointTests : MeteredDataForMeasuremen
         }
 
         peekResult.Bundle.Should().NotBeNull("peek result should contain a document stream");
+
+        using (var reader = new StreamReader(peekResult.Bundle, Encoding.UTF8))
+        {
+            (await reader.ReadToEndAsync()).Should().Be("foo");
+        }
     }
 }

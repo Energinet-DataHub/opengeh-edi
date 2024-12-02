@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
 public record MeteredDateForMeasurementPointMarketActivityRecord(
@@ -22,9 +24,9 @@ public record MeteredDateForMeasurementPointMarketActivityRecord(
     string Product,
     string QuantityMeasureUnit,
     string RegistrationDateTime,
-    string Resolution,
+    Resolution Resolution,
     string StartedDateTime,
     string EndedDateTime,
-    IReadOnlyList<PointActivityRecord> Points);
+    IReadOnlyList<PointActivityRecord> EnergyObservations);
 
-public record PointActivityRecord(int Position, string? Quality, int? Quantity);
+public record PointActivityRecord(int Position, string? Quality, decimal? Quantity);
