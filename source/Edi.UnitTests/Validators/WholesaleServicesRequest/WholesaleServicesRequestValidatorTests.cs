@@ -83,14 +83,16 @@ public sealed class WholesaleServicesRequestValidatorTests : EdiTestBase
         // Arrange
         var now = SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset();
 
+        var startToYearsAgo = now.AddYears(-2);
+        var endToYearsAgo = now.AddYears(-2).AddMonths(1);
         var request = new WholesaleServicesRequestBuilder()
             .WithPeriodStart(
-                new LocalDateTime(now.Year - 2, now.Month, 1, 17, 45, 12)
+                new LocalDateTime(startToYearsAgo.Year, startToYearsAgo.Month, 1, 17, 45, 12)
                     .InZoneStrictly(DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!)
                     .ToInstant()
                     .ToString())
             .WithPeriodEnd(
-                new LocalDateTime(now.Year - 2, now.Month + 1, 1, 8, 13, 56)
+                new LocalDateTime(endToYearsAgo.Year, endToYearsAgo.Month, 1, 8, 13, 56)
                     .InZoneStrictly(DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!)
                     .ToInstant()
                     .ToString())
