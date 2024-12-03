@@ -28,7 +28,22 @@ public record RequestWholesaleServicesMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage
+{
+    public IReadOnlyCollection<string> AllowedMessageTypes => ["D21"];
+
+    public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
+    [
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.Correction,
+    ];
+
+    public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [
+        ActorRole.EnergySupplier,
+        ActorRole.GridAccessProvider,
+        ActorRole.SystemOperator,
+    ];
+}
 
 public record RequestWholesaleServicesSeries(
     string TransactionId,

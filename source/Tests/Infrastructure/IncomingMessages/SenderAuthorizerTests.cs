@@ -93,7 +93,7 @@ public class SenderAuthorizerTests
             senderRole);
         var sut = CreateSut(authenticatedActor);
 
-        var incomingMessage = new MeteredDataForMeasurementPointMessage(
+        var incomingMessage = new MeteredDataForMeasurementPointMessageBase(
             "MessageId",
             "MessageType",
             "CreatedAt",
@@ -120,7 +120,7 @@ public class SenderAuthorizerTests
             senderRole);
         var sut = CreateSut(authenticatedActor);
 
-        var incomingMessage = new MeteredDataForMeasurementPointMessage(
+        var incomingMessage = new MeteredDataForMeasurementPointMessageBase(
             "MessageId",
             "MessageType",
             "CreatedAt",

@@ -58,7 +58,7 @@ public class IncomingMessagePublisher
             case RequestWholesaleServicesMessage wholesaleSettlementMessage:
                 await SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
                 break;
-            case MeteredDataForMeasurementPointMessage meteredDataForMeasurementPointMessage:
+            case MeteredDataForMeasurementPointMessageBase meteredDataForMeasurementPointMessage:
                 await SendInitializeMeteredDataForMeasurementPointMessageProcessAsync(InitializeMeteredDataForMeasurementPointProcessDtoFactory.Create(meteredDataForMeasurementPointMessage, _authenticatedActor), cancellationToken).ConfigureAwait(false);
                 break;
             default:

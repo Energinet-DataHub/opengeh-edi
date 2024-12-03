@@ -21,17 +21,44 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
 /// <summary>
 /// Represents the message for metered data for measurement point known as RSM-012.
 /// </summary>
-public record MeteredDataForMeasurementPointMessage(
-    string MessageId,
-    string MessageType,
-    string CreatedAt,
-    string SenderNumber,
-    string ReceiverNumber,
-    string SenderRoleCode,
-    string BusinessReason,
-    string ReceiverRoleCode,
-    string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage;
+public class MeteredDataForMeasurementPointMessageBase(
+    string messageId,
+    string messageType,
+    string createdAt,
+    string senderNumber,
+    string receiverNumber,
+    string senderRoleCode,
+    string businessReason,
+    string receiverRoleCode,
+    string? businessType,
+    IReadOnlyCollection<IIncomingMessageSeries> series) : IIncomingMessage
+{
+    public string MessageId { get; } = messageId;
+
+    public string ReceiverNumber { get; } = receiverNumber;
+
+    public string ReceiverRoleCode { get; } = receiverRoleCode;
+
+    public string SenderNumber { get; } = senderNumber;
+
+    public string SenderRoleCode { get; } = senderRoleCode;
+
+    public string BusinessReason { get; } = businessReason;
+
+    public string MessageType { get; } = messageType;
+
+    public string CreatedAt { get; } = createdAt;
+
+    public string? BusinessType { get; } = businessType;
+
+    public IReadOnlyCollection<IIncomingMessageSeries> Series { get; } = series;
+
+    public IReadOnlyCollection<string> AllowedMessageTypes => ["E66"];
+
+    public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons => [Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PeriodicMetering];
+
+    public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [ActorRole.MeteredDataResponsible];
+}
 
 public record MeteredDataForMeasurementPointSeries(
     string TransactionId,

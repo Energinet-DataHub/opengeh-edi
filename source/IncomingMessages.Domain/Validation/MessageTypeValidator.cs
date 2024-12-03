@@ -19,32 +19,12 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 
 public class MessageTypeValidator : IMessageTypeValidator
 {
-    private static readonly IReadOnlyCollection<string> _aggregatedMeasureDataWhiteList = new[] { "E74" };
-    private static readonly IReadOnlyCollection<string> _wholesaleServicesWhiteList = new[] { "D21" };
-    private static readonly IReadOnlyCollection<string> _meteredDataForMeasurementPointWhiteList = new[] { "E66" };
-
-    public async Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
+    public Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        return await Task.FromResult(
-                message switch
-                {
-                    RequestAggregatedMeasureDataMessage ramdm =>
-                        _aggregatedMeasureDataWhiteList.Contains(ramdm.MessageType)
-                            ? Result.Succeeded()
-                            : Result.Failure(
-                                new NotSupportedMessageType(ramdm.MessageType)),
-                    RequestWholesaleServicesMessage rwsm =>
-                        _wholesaleServicesWhiteList.Contains(rwsm.MessageType)
-                            ? Result.Succeeded()
-                            : Result.Failure(new NotSupportedMessageType(rwsm.MessageType)),
-                    MeteredDataForMeasurementPointMessage mdfmpm =>
-                        _meteredDataForMeasurementPointWhiteList.Contains(mdfmpm.MessageType)
-                            ? Result.Succeeded()
-                            : Result.Failure(new NotSupportedMessageType(mdfmpm.MessageType)),
-                    _ => throw new InvalidOperationException($"The baw's on the slates! {message.GetType().Name}"),
-                })
-            .ConfigureAwait(false);
+        return Task.FromResult(message.AllowedMessageTypes.Contains(message.MessageType)
+            ? Result.Succeeded()
+            : Result.Failure(new NotSupportedMessageType(message.MessageType)));
     }
 }

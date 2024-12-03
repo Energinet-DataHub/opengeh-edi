@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 
 /// <summary>
@@ -68,4 +71,10 @@ public interface IIncomingMessage
     /// Series of the incoming message
     /// </summary>
     IReadOnlyCollection<IIncomingMessageSeries> Series { get; }
+
+    public IReadOnlyCollection<string> AllowedMessageTypes { get; }
+
+    public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons { get; }
+
+    public IReadOnlyCollection<ActorRole> AllowedSenderRoles { get; }
 }

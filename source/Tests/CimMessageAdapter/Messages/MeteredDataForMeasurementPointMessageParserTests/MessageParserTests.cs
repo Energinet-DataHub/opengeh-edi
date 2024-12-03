@@ -84,7 +84,7 @@ public sealed class MessageParserTests
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
-        var marketMessage = (MeteredDataForMeasurementPointMessage)result.IncomingMessage!;
+        var marketMessage = (MeteredDataForMeasurementPointMessageBase)result.IncomingMessage!;
         marketMessage.Should().NotBeNull();
         marketMessage.MessageId.Should().Be("111131835");
         marketMessage.MessageType.Should().Be("E66");

@@ -28,7 +28,24 @@ public record RequestAggregatedMeasureDataMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage
+{
+    public IReadOnlyCollection<string> AllowedMessageTypes => ["E74"];
+
+    public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
+    [
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PreliminaryAggregation,
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.BalanceFixing,
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.Correction,
+    ];
+
+    public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [
+        ActorRole.EnergySupplier,
+        ActorRole.MeteredDataResponsible,
+        ActorRole.BalanceResponsibleParty,
+    ];
+}
 
 public record RequestAggregatedMeasureDataMessageSeries(
     string TransactionId,

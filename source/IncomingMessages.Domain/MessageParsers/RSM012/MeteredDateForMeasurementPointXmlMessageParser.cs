@@ -95,7 +95,7 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
         IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
         return new IncomingMarketMessageParserResult(
-            new MeteredDataForMeasurementPointMessage(
+            new MeteredDataForMeasurementPointMessageBase(
                 header.MessageId,
                 header.MessageType,
                 header.CreatedAt,
