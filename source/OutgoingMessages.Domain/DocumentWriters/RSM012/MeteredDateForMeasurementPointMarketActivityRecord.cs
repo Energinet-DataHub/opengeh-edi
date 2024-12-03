@@ -27,4 +27,7 @@ public record MeteredDateForMeasurementPointMarketActivityRecord(
     string EndedDateTime,
     IReadOnlyList<PointActivityRecord> Points);
 
-public record PointActivityRecord(int Position, string? Quality, int? Quantity);
+public record PointActivityRecord(
+    int Position,
+    string? Quality,
+    int? Quantity);

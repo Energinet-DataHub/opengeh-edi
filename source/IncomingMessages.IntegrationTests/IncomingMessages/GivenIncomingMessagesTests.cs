@@ -68,9 +68,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         {
             { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Xml, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Json, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.json") },
+            { DocumentFormat.Ebix, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Xml, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Json, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.json") },
         };
 
         return data;
@@ -409,7 +409,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             DocumentFormat.Ebix,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            IncomingDocumentType.NotifyValidatedMeasureData,
             DocumentFormat.Ebix,
             CancellationToken.None);
 

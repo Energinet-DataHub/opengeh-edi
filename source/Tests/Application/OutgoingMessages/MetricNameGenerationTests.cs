@@ -21,7 +21,22 @@ namespace Energinet.DataHub.EDI.Tests.Application.OutgoingMessages;
 
 public class MetricNameGenerationTests
 {
-    // The following values has to be hardcoded, since they are hardcoded in the terraform defining the dashboard
+    // The following values have to be hardcoded, since they are hardcoded in the terraform defining the dashboard.
+    // When a new document type is introduced, the following needs to be inserted into to the terraform script:
+    // {
+    //     "resourceMetadata": {
+    //         "id": "${appi_sharedres_id}"
+    //     },
+    //     "name": "MeteredDataForMeasurementPoint{format}",
+    //     "aggregationType": 7,
+    //     "namespace": "azure.applicationinsights",
+    //     "metricVisualization": {
+    //         "displayName": "MeteredDataForMeasurementPoint{format}"
+    //     }
+    // }
+    // replace {format} with the supported formats for the new document type.
+    // and include this link to the file: https://github.com/Energinet-DataHub/dh3-infrastructure/blob/main/edi/terraform/main/dashboard-templates/edi_monitor.tpl
+    // Look for RejectRequestWholesaleSettlement in the script for an example.
     private static readonly string[] _formats = ["Json", "Xml", "Ebix" ];
     private static readonly string[] _documentMetrics =
     [
@@ -31,7 +46,14 @@ public class MetricNameGenerationTests
         "NotifyWholesaleServices",
         "NotifyWholesaleServicesResponse",
         "RejectRequestWholesaleSettlement",
-        "MeteredDataForMeasurementPoint",
+        "NotifyValidatedMeasureData",
+        "NotifyValidatedMeasureDataResponse",
+    ];
+
+    private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
+    [
+        DocumentType.RejectRequestWholesaleSettlement,
+        DocumentType.RejectRequestAggregatedMeasureData
     ];
 
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(
@@ -63,13 +85,15 @@ public class MetricNameGenerationTests
         {
             foreach (var documentType in documentTypes)
             {
+                // Most documents are logged as an outgoing message and as a response to a corresponding incoming message
                 names.Add(MetricNameMapper.MessageGenerationMetricName(
                     documentType,
                     documentFormat,
                     false));
-                if (documentType.Name.Contains("Notify"))
+
+                // Some documents are only logged as an outgoing message
+                if (!_isOnlyTriggeredByIncomingMessage.Contains(documentType))
                 {
-                    // We're logging a response of a request as a separate message generation, even though it's the same document
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
                         documentFormat,
