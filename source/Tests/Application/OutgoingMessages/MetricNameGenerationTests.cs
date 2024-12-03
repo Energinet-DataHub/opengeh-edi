@@ -48,8 +48,6 @@ public class MetricNameGenerationTests
         "RejectRequestWholesaleSettlement",
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",
-        "NotifyValidatedMeasureData",
-        "NotifyValidatedMeasureDataResponse",
     ];
 
     private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
