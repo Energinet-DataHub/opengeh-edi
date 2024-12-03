@@ -12,29 +12,78 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+using System.Globalization;
+using System.Xml;
+using System.Xml.Linq;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Xml;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
-public class MeteredDateForMeasurementPointCimXmlDocumentWriter : IDocumentWriter
+public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
+    IMessageRecordParser parser)
+    : CimXmlDocumentWriter(
+        new DocumentDetails(
+            "NotifyValidatedMeasureData_MarketDocument",
+            "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1 urn-ediel-org-measure-notifyvalidatedmeasuredata-0-1.xsd",
+            "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1",
+            "cim",
+            "E66"),
+        parser)
 {
-    public bool HandlesFormat(DocumentFormat format)
+    protected override async Task WriteMarketActivityRecordsAsync(
+        IReadOnlyCollection<string> marketActivityPayloads,
+        XmlWriter writer)
     {
-        return format == DocumentFormat.Xml;
+        ArgumentNullException.ThrowIfNull(marketActivityPayloads);
+        ArgumentNullException.ThrowIfNull(writer);
+        XNamespace @namespace = "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1";
+        foreach (var wholesaleCalculationSeries in ParseFrom<MeteredDateForMeasurementPointMarketActivityRecord>(
+                     marketActivityPayloads))
+        {
+            var seriesElement = new XElement(
+                @namespace + "Series",
+                new XElement(@namespace + "mRID", wholesaleCalculationSeries.TransactionId),
+                new XElement(
+                    @namespace + "originalTransactionIDReference_Series.mRID",
+                    wholesaleCalculationSeries.OriginalTransactionIdReferenceId),
+                new XElement(
+                    @namespace + "marketEvaluationPoint.mRID",
+                    new XAttribute("codingScheme", "A10"),
+                    wholesaleCalculationSeries.MarketEvaluationPointNumber),
+                new XElement(@namespace + "marketEvaluationPoint.type", wholesaleCalculationSeries.MarketEvaluationPointType),
+                new XElement(@namespace + "registration_DateAndOrTime.dateTime", wholesaleCalculationSeries.RegistrationDateTime),
+                new XElement(@namespace + "product", wholesaleCalculationSeries.Product),
+                new XElement(@namespace + "quantity_Measure_Unit.name", wholesaleCalculationSeries.QuantityMeasureUnit),
+                new XElement(
+                    @namespace + "Period",
+                    new XElement(@namespace + "resolution", wholesaleCalculationSeries.Resolution),
+                    new XElement(
+                        @namespace + "timeInterval",
+                        new XElement(@namespace + "start", wholesaleCalculationSeries.StartedDateTime),
+                        new XElement(@namespace + "end", wholesaleCalculationSeries.EndedDateTime)),
+                    wholesaleCalculationSeries.Points.Select(x => CreatePointElement(x, @namespace))));
+
+            await seriesElement.WriteToAsync(writer, CancellationToken.None).ConfigureAwait(false);
+        }
     }
 
-    public bool HandlesType(DocumentType documentType)
+    private XElement CreatePointElement(PointActivityRecord point, XNamespace @namespace)
     {
-        return documentType == DocumentType.NotifyValidatedMeasureData;
-    }
+        var pointElement = new XElement(
+            @namespace + "Point",
+            new XElement(@namespace + "position", point.Position.ToString(NumberFormatInfo.InvariantInfo)));
 
-    public Task<MarketDocumentStream> WriteAsync(
-        OutgoingMessageHeader header,
-        IReadOnlyCollection<string> marketActivityRecords,
-        CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
+        if (point.Quantity != null)
+        {
+            pointElement.Add(new XElement(@namespace + "quantity", point.Quantity?.ToString(NumberFormatInfo.InvariantInfo)));
+        }
+
+        if (point.Quality != null)
+        {
+            pointElement.Add(new XElement(@namespace + "quality", point.Quality?.ToString(NumberFormatInfo.InvariantInfo)));
+        }
+
+        return pointElement;
     }
 }
