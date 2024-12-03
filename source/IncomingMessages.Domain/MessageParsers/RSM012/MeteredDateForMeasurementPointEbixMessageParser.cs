@@ -37,7 +37,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
     private const string QuantityQuality = "QuantityQuality";
     private const string IntervalEnergyObservation = "IntervalEnergyObservation";
 
-    public override IncomingDocumentType DocumentType => IncomingDocumentType.MeteredDataForMeasurementPoint;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.NotifyValidatedMeasureData;
 
     public override DocumentFormat DocumentFormat => DocumentFormat.Ebix;
 

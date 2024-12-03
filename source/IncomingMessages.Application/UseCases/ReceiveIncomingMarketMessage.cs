@@ -144,7 +144,7 @@ public class ReceiveIncomingMarketMessage
 
     private static bool ShouldArchive(IncomingDocumentType documentType)
     {
-        return documentType != IncomingDocumentType.MeteredDataForMeasurementPoint;
+        return documentType != IncomingDocumentType.NotifyValidatedMeasureData;
     }
 
     private async Task<IncomingMarketMessageParserResult> ParseIncomingMessageAsync(

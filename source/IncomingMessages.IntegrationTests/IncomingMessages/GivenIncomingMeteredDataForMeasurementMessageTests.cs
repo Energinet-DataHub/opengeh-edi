@@ -609,13 +609,13 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         DocumentFormat documentFormat)
     {
         var incomingMarketMessageStream = new IncomingMarketMessageStream(message);
-        if (_messageParsers.TryGetValue((IncomingDocumentType.MeteredDataForMeasurementPoint, documentFormat), out var messageParser))
+        if (_messageParsers.TryGetValue((IncomingDocumentType.NotifyValidatedMeasureData, documentFormat), out var messageParser))
         {
             var result = await messageParser.ParseAsync(incomingMarketMessageStream, CancellationToken.None).ConfigureAwait(false);
             return (IncomingMessage: (MeteredDataForMeasurementPointMessageBase?)result.IncomingMessage, ParserResult: result);
         }
 
-        throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{IncomingDocumentType.MeteredDataForMeasurementPoint}'");
+        throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{IncomingDocumentType.NotifyValidatedMeasureData}'");
     }
 
     private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)

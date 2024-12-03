@@ -384,7 +384,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            IncomingDocumentType.NotifyValidatedMeasureData,
             documentFormat,
             CancellationToken.None);
 
@@ -431,7 +431,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            IncomingDocumentType.NotifyValidatedMeasureData,
             documentFormat,
             CancellationToken.None);
 
@@ -480,7 +480,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            IncomingDocumentType.NotifyValidatedMeasureData,
             documentFormat,
             CancellationToken.None);
 
@@ -529,7 +529,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
-            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            IncomingDocumentType.NotifyValidatedMeasureData,
             documentFormat,
             CancellationToken.None);
 

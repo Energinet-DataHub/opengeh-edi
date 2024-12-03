@@ -39,7 +39,7 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
     private const string QualityElementName = "quality";
     private const string RegistrationDateAndOrTimeElementName = "registration_DateAndOrTime.dateTime";
 
-    public override IncomingDocumentType DocumentType => IncomingDocumentType.MeteredDataForMeasurementPoint;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.NotifyValidatedMeasureData;
 
     protected override string RootPayloadElementName => "NotifyValidatedMeasureData_MarketDocument";
 
