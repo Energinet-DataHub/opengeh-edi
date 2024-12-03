@@ -88,7 +88,7 @@ public class MeteredDateForMeasurementPointDocumentWriterTests()
         return new MeteredDateForMeasurementPointCimJsonDocumentWriter(
                 _parser,
                 serviceProvider.GetRequiredService<JavaScriptEncoder>())
-            .WriteAsync(header, new[] { records }, CancellationToken.None);
+            .WriteAsync(header, [records], CancellationToken.None);
     }
 
     private IAssertMeteredDateForMeasurementPointDocumentDocument AssertDocument(

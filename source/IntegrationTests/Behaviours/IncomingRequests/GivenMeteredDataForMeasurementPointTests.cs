@@ -44,14 +44,20 @@ public class GivenMeteredDataForMeasurementPointTests : MeteredDataForMeasuremen
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
 
+        var transactionIdPrefix = Guid.NewGuid().ToString("N");
+
         await GivenReceivedMeteredDataForMeasurementPoint(
             documentFormat: DocumentFormat.Xml,
             senderActorNumber: currentActor.ActorNumber,
             [
-                ("12356478912356478912356478912356478",
+                ($"{transactionIdPrefix}-1",
                     InstantPattern.General.Parse("2024-11-28T13:51:42Z").Value,
                     InstantPattern.General.Parse("2024-11-29T09:15:28Z").Value,
                     Resolution.Hourly),
+                ($"{transactionIdPrefix}-2",
+                    InstantPattern.General.Parse("2024-11-24T18:51:58Z").Value,
+                    InstantPattern.General.Parse("2024-11-25T03:39:45Z").Value,
+                    Resolution.QuarterHourly),
             ]);
 
         await WhenMeteredDataForMeasurementPointProcessIsInitialized(senderSpy.LatestMessage!);
@@ -65,20 +71,17 @@ public class GivenMeteredDataForMeasurementPointTests : MeteredDataForMeasuremen
             DocumentFormat.Json);
 
         // Assert
-        PeekResultDto peekResult;
-        using (new AssertionScope())
+        using var foo = new AssertionScope();
+        foreach (var peekResultDto in peekResults)
         {
-            peekResult = peekResults
-                .Should()
-                .ContainSingle("there should be one message given the MDFMP incoming message")
-                .Subject;
-        }
+            peekResultDto.Bundle.Should().NotBeNull("peek result should contain a document stream");
 
-        peekResult.Bundle.Should().NotBeNull("peek result should contain a document stream");
+            using var reader = new StreamReader(peekResultDto.Bundle, Encoding.UTF8);
+            var document = await reader.ReadToEndAsync();
 
-        using (var reader = new StreamReader(peekResult.Bundle, Encoding.UTF8))
-        {
-            (await reader.ReadToEndAsync()).Should().Be("foo");
+            document.Should().Contain($"\"mRID\": \"{transactionIdPrefix}");
+            document.Should().Contain("\"Point\": [");
+            document.Should().Contain("\"quantity\": 1005");
         }
     }
 }
