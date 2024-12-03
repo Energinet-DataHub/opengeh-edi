@@ -22,20 +22,22 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
-public class MeteredDateForMeasurementPointDocumentWriterTests()
+public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidationFixture documentValidation)
     : IClassFixture<DocumentValidationFixture>
 {
     private readonly MessageRecordParser _parser = new(new Serializer());
     private readonly MeteredDateForMeasurementPointBuilder _meteredDateForMeasurementPointBuilder = new();
+    private readonly DocumentValidationFixture _documentValidation = documentValidation;
 
     [Theory]
-    //[InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
@@ -79,10 +81,10 @@ public class MeteredDateForMeasurementPointDocumentWriterTests()
     {
         var records = _parser.From(meteredDateForMeasurementPointMarketActivityRecord);
 
-        // if (documentFormat == DocumentFormat.Xml)
-        // {
-        //     return new MeteredDateForMeasurementPointCimXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
-        // }
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            return new MeteredDateForMeasurementPointCimXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+        }
 
         var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
         return new MeteredDateForMeasurementPointCimJsonDocumentWriter(
@@ -95,10 +97,12 @@ public class MeteredDateForMeasurementPointDocumentWriterTests()
         MarketDocumentStream document,
         DocumentFormat documentFormat)
     {
-        // if (documentFormat == DocumentFormat.Xml)
-        // {
-        //     return new AssertMeteredDateForMeasurementPointXmlDocument(document.Stream);
-        // }
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
+            return new AssertMeteredDateForMeasurementPointXmlDocument(assertXmlDocument);
+        }
+
         return new AssertMeteredDateForMeasurementPointJsonDocument(document.Stream);
     }
 }
