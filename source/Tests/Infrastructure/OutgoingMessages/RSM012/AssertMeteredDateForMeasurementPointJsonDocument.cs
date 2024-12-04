@@ -16,6 +16,7 @@ using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+using FluentAssertions;
 using Json.Schema;
 using Xunit;
 
@@ -165,7 +166,7 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
     {
         var schema = await _schemas.GetSchemaAsync<JsonSchema>("NOTIFYVALIDATEDMEASUREDATA", "0", CancellationToken.None).ConfigureAwait(false);
         var validationResult = IsValid(_document, schema!);
-        Assert.True(validationResult.IsValid, string.Join("\n", validationResult.Errors));
+        validationResult.IsValid.Should().BeTrue(string.Join("\n", validationResult.Errors));
         return this;
     }
 

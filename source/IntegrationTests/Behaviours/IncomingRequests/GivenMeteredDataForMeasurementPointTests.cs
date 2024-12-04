@@ -15,6 +15,7 @@
 using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -25,17 +26,20 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
-public class GivenMeteredDataForMeasurementPointTests : MeteredDataForMeasurementPointBehaviourTestBase
+public sealed class GivenMeteredDataForMeasurementPointTests(
+    IntegrationTestFixture integrationTestFixture,
+    ITestOutputHelper testOutputHelper)
+    : MeteredDataForMeasurementPointBehaviourTestBase(integrationTestFixture, testOutputHelper)
 {
-    public GivenMeteredDataForMeasurementPointTests(
-        IntegrationTestFixture integrationTestFixture,
-        ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
-    {
-    }
+    public static TheoryData<DocumentFormat> PeekFormats =>
+    [
+        DocumentFormat.Json,
+        DocumentFormat.Xml,
+    ];
 
-    [Fact]
-    public async Task When_ActorPeeksAllMessages_Then_ReceivesOneDocumentWithCorrectContent()
+    [Theory]
+    [MemberData(nameof(PeekFormats))]
+    public async Task When_ActorPeeksAllMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat peekFormat)
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
@@ -68,20 +72,15 @@ public class GivenMeteredDataForMeasurementPointTests : MeteredDataForMeasuremen
         var peekResults = await WhenActorPeeksAllMessages(
             currentActor.ActorNumber,
             currentActor.ActorRole,
-            DocumentFormat.Json);
+            peekFormat);
 
         // Assert
-        using var foo = new AssertionScope();
         foreach (var peekResultDto in peekResults)
         {
-            peekResultDto.Bundle.Should().NotBeNull("peek result should contain a document stream");
-
-            using var reader = new StreamReader(peekResultDto.Bundle, Encoding.UTF8);
-            var document = await reader.ReadToEndAsync();
-
-            document.Should().Contain($"\"mRID\": \"{transactionIdPrefix}");
-            document.Should().Contain("\"Point\": [");
-            document.Should().Contain("\"quantity\": 1005");
+            await ThenNotifyValidatedMeasureDataDocumentIsCorrect(
+                peekResultDto.Bundle,
+                peekFormat,
+                new NotifyValidatedMeasureDataDocumentAssertionInput());
         }
     }
 }

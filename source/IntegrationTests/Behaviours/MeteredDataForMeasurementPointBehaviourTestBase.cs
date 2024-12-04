@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -77,5 +78,21 @@ public abstract class MeteredDataForMeasurementPointBehaviourTestBase : Behaviou
     protected async Task WhenMeteredDataForMeasurementPointProcessIsInitialized(ServiceBusMessage serviceBusMessage)
     {
         await InitializeProcess(serviceBusMessage, nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto));
+    }
+
+    protected async Task ThenNotifyValidatedMeasureDataDocumentIsCorrect(
+        Stream? peekResultDocumentStream,
+        DocumentFormat documentFormat,
+        NotifyValidatedMeasureDataDocumentAssertionInput assertionInput)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
+        using var assertionScope = new AssertionScope();
+
+        await NotifyValidatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
     }
 }
