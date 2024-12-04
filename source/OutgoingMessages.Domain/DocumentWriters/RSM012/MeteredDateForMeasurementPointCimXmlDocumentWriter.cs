@@ -56,7 +56,7 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
                 new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.QuantityMeasureUnit),
                 new XElement(
                     @namespace + "Period",
-                    new XElement(@namespace + "resolution", activityRecord.Resolution),
+                    new XElement(@namespace + "resolution", activityRecord.Resolution.Code),
                     new XElement(
                         @namespace + "timeInterval",
                         new XElement(@namespace + "start", activityRecord.StartedDateTime),
