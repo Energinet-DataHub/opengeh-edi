@@ -58,34 +58,36 @@ public class InitializeMeteredDataForMeasurementPointHandler(
         {
             await _outgoingMessagesClient.EnqueueAndCommitAsync(
                     new MeteredDataForMeasurementPointMessageProcessDto(
-                        EventId.From(marketMessage.MessageId),
+                        EventId.From(Guid.NewGuid()),
                         new Actor(series.RequestedByActor.ActorNumber, series.RequestedByActor.ActorRole),
                         BusinessReason.FromCode(marketMessage.BusinessReason),
-                        marketMessage.Series.Select(
-                                s => new MeteredDataForMeasurementPointMessageSeriesDto(
-                                    TransactionId.From(s.TransactionId),
-                                    s.MeteringPointType!,
-                                    s.MeteringPointLocationId!,
-                                    null,
-                                    s.ProductNumber!,
-                                    s.ProductUnitType!,
-                                    marketMessage.CreatedAt,
-                                    Resolution.FromCode(s.Resolution!),
-                                    InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
-                                        .Parse(s.StartDateTime)
-                                        .Value,
-                                    s.EndDateTime != null
-                                        ? InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
-                                            .Parse(s.EndDateTime)
-                                            .Value
-                                        : throw new ArgumentNullException(),
-                                    s.EnergyObservations.Select(
-                                            o => new EnergyObservationDto(
-                                                o.Position != null ? int.Parse(o.Position) : throw new ArgumentNullException(nameof(o.Position)),
-                                                o.EnergyQuantity != null ? decimal.Parse(o.EnergyQuantity) : throw new ArgumentNullException(nameof(o.EnergyQuantity)),
-                                                o.QuantityQuality))
-                                        .ToList()))
-                            .ToList()),
+                        new MeteredDataForMeasurementPointMessageSeriesDto(
+                            TransactionId.From(series.TransactionId),
+                            series.MeteringPointType!,
+                            series.MeteringPointLocationId!,
+                            null,
+                            series.ProductNumber!,
+                            series.ProductUnitType!,
+                            marketMessage.CreatedAt,
+                            Resolution.FromCode(series.Resolution!),
+                            InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
+                                .Parse(series.StartDateTime)
+                                .Value,
+                            series.EndDateTime != null
+                                ? InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
+                                    .Parse(series.EndDateTime)
+                                    .Value
+                                : throw new ArgumentNullException(),
+                            series.EnergyObservations.Select(
+                                    o => new EnergyObservationDto(
+                                        o.Position != null
+                                            ? int.Parse(o.Position)
+                                            : throw new ArgumentNullException(nameof(o.Position)),
+                                        o.EnergyQuantity != null
+                                            ? decimal.Parse(o.EnergyQuantity)
+                                            : throw new ArgumentNullException(nameof(o.EnergyQuantity)),
+                                        o.QuantityQuality))
+                                .ToList())),
                     CancellationToken.None)
                 .ConfigureAwait(false);
         }

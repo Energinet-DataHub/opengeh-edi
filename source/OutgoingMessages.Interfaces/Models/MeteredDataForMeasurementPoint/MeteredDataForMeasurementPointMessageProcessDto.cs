@@ -16,25 +16,20 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 
-public sealed class MeteredDataForMeasurementPointMessageProcessDto : OutgoingMessageDto
+public sealed class MeteredDataForMeasurementPointMessageProcessDto(
+    EventId eventId,
+    Actor receiver,
+    BusinessReason businessReason,
+    MeteredDataForMeasurementPointMessageSeriesDto series)
+    : OutgoingMessageDto(
+        DocumentType.MeteredDataForMeasurementPoint,
+        receiver.ActorNumber,
+        null,
+        eventId,
+        businessReason.Name,
+        receiver.ActorRole,
+        new ExternalId(Guid.NewGuid()),
+        null)
 {
-    public MeteredDataForMeasurementPointMessageProcessDto(
-        EventId eventId,
-        Actor receiver,
-        BusinessReason businessReason,
-        IReadOnlyCollection<MeteredDataForMeasurementPointMessageSeriesDto> series)
-        : base(
-            DocumentType.MeteredDataForMeasurementPoint,
-            receiver.ActorNumber,
-            null,
-            eventId,
-            businessReason.Name,
-            receiver.ActorRole,
-            new ExternalId(Guid.NewGuid()),
-            null)
-    {
-        Series = series;
-    }
-
-    public IReadOnlyCollection<MeteredDataForMeasurementPointMessageSeriesDto> Series { get; }
+    public MeteredDataForMeasurementPointMessageSeriesDto Series { get; } = series;
 }

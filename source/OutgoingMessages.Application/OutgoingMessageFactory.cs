@@ -401,7 +401,7 @@ public static class OutgoingMessageFactory
             gridAreaCode: null,
             externalId: message.ExternalId,
             calculationId: null,
-            message.Series.OrderBy(s => s.StartedDateTime).First().StartedDateTime);
+            message.Series.StartedDateTime);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

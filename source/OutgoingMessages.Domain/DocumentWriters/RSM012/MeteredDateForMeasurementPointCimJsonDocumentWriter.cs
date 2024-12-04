@@ -64,32 +64,28 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
         ArgumentNullException.ThrowIfNull(transactions);
 
         var meteredDataForMeasurementPoints = new Collection<MeteredDataForMeasurementPoint>();
-        foreach (var transaction in transactions)
+        foreach (var activityRecord in transactions.Select(t => _parser.From<MeteredDateForMeasurementPointMarketActivityRecord>(t)))
         {
-            var activityRecords = _parser.From<List<MeteredDateForMeasurementPointMarketActivityRecord>>(transaction);
-            foreach (var activityRecord in activityRecords)
-            {
-                meteredDataForMeasurementPoints.Add(
-                    new MeteredDataForMeasurementPoint(
-                        activityRecord.TransactionId,
-                        activityRecord.MarketEvaluationPointNumber,
-                        activityRecord.MarketEvaluationPointType,
-                        activityRecord.OriginalTransactionIdReferenceId,
-                        activityRecord.Product,
-                        activityRecord.QuantityMeasureUnit,
-                        activityRecord.RegistrationDateTime,
-                        new Period(
-                            activityRecord.Resolution.Code,
-                            new TimeInterval(
-                                activityRecord.StartedDateTime,
-                                activityRecord.EndedDateTime),
-                            activityRecord.EnergyObservations.Select(
-                                    p => new Point(
-                                        p.Position,
-                                        p.Quality,
-                                        p.Quantity))
-                                .ToList())));
-            }
+            meteredDataForMeasurementPoints.Add(
+                new MeteredDataForMeasurementPoint(
+                    activityRecord.TransactionId,
+                    activityRecord.MarketEvaluationPointNumber,
+                    activityRecord.MarketEvaluationPointType,
+                    activityRecord.OriginalTransactionIdReferenceId,
+                    activityRecord.Product,
+                    activityRecord.QuantityMeasureUnit,
+                    activityRecord.RegistrationDateTime,
+                    new Period(
+                        activityRecord.Resolution.Code,
+                        new TimeInterval(
+                            activityRecord.StartedDateTime,
+                            activityRecord.EndedDateTime),
+                        activityRecord.EnergyObservations.Select(
+                                p => new Point(
+                                    p.Position,
+                                    p.Quality,
+                                    p.Quantity))
+                            .ToList())));
         }
 
         return new Document(
