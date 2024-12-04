@@ -53,11 +53,17 @@ public class MeteredDataForMeasurementPointMessageBase(
 
     public IReadOnlyCollection<IIncomingMessageSeries> Series { get; } = series;
 
-    public IReadOnlyCollection<string> AllowedMessageTypes => ["E66"];
+    public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageType.ValidatedMeteredData,
+    ];
 
-    public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons => [Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PeriodicMetering];
+    public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons => [
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PeriodicMetering,
+    ];
 
-    public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [ActorRole.MeteredDataResponsible];
+    public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [
+        ActorRole.MeteredDataResponsible,
+    ];
 }
 
 public record MeteredDataForMeasurementPointSeries(

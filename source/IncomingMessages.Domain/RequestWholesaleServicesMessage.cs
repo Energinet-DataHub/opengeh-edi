@@ -30,7 +30,9 @@ public record RequestWholesaleServicesMessage(
     string? BusinessType,
     IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage
 {
-    public IReadOnlyCollection<string> AllowedMessageTypes => ["D21"];
+    public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageType.RequestForAggregatedBillingInformation,
+    ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
     [

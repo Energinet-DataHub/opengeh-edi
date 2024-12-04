@@ -23,7 +23,7 @@ public class MessageTypeValidator : IMessageTypeValidator
     {
         ArgumentNullException.ThrowIfNull(message);
 
-        return Task.FromResult(message.AllowedMessageTypes.Contains(message.MessageType)
+        return Task.FromResult(message.AllowedMessageTypes.Select(x => x.Code).Contains(message.MessageType)
             ? Result.Succeeded()
             : Result.Failure(new NotSupportedMessageType(message.MessageType)));
     }

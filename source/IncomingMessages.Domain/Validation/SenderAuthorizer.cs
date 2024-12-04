@@ -68,10 +68,12 @@ public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAu
             return;
         }
 
-        if (message.AllowedSenderRoles.Contains(ActorRole.FromCode(message.SenderRoleCode)) == false)
+        if (message.AllowedSenderRoles.Contains(ActorRole.FromCode(message.SenderRoleCode)))
         {
-            _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+            return;
         }
+
+        _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
     }
 
     private bool AllSeriesAreDelegatedToSender(bool allSeriesAreDelegated)

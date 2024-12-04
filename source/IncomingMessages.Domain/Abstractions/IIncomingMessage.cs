@@ -72,7 +72,7 @@ public interface IIncomingMessage
     /// </summary>
     IReadOnlyCollection<IIncomingMessageSeries> Series { get; }
 
-    public IReadOnlyCollection<string> AllowedMessageTypes { get; }
+    public IReadOnlyCollection<MessageType> AllowedMessageTypes { get; }
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons { get; }
 

@@ -30,7 +30,9 @@ public record RequestAggregatedMeasureDataMessage(
     string? BusinessType,
     IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage
 {
-    public IReadOnlyCollection<string> AllowedMessageTypes => ["E74"];
+    public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageType.RequestAggregatedMeteredData,
+    ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
     [
