@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
-public record MeteredDateForMeasurementPointMarketActivityRecord(
+public sealed record MeteredDateForMeasurementPointMarketActivityRecord(
     string TransactionId,
     string MarketEvaluationPointNumber,
     string MarketEvaluationPointType,
@@ -29,4 +29,4 @@ public record MeteredDateForMeasurementPointMarketActivityRecord(
     string EndedDateTime,
     IReadOnlyList<PointActivityRecord> EnergyObservations);
 
-public record PointActivityRecord(int Position, string? Quality, decimal? Quantity);
+public sealed record PointActivityRecord(int Position, string? Quality, decimal? Quantity);

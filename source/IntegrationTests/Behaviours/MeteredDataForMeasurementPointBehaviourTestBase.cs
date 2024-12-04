@@ -55,7 +55,7 @@ public abstract class MeteredDataForMeasurementPointBehaviourTestBase : Behaviou
             incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 incomingMessageStream,
                 documentFormat,
-                IncomingDocumentType.MeteredDataForMeasurementPoint,
+                IncomingDocumentType.NotifyValidatedMeasureData,
                 documentFormat,
                 CancellationToken.None);
 
@@ -67,7 +67,7 @@ public abstract class MeteredDataForMeasurementPointBehaviourTestBase : Behaviou
         using var scope = new AssertionScope();
         response.IsErrorResponse
             .Should()
-            .BeFalse("because the response should not have an error. Actual response: {0}", response.MessageBody);
+            .BeFalse("the response should not have an error. Actual response: {0}", response.MessageBody);
 
         response.MessageBody.Should().BeEmpty();
 

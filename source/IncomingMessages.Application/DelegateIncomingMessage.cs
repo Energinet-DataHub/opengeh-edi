@@ -156,7 +156,7 @@ public class DelegateIncomingMessage
             { IncomingDocumentType.B2CRequestAggregatedMeasureData, ProcessType.RequestEnergyResults },
             { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
-            { IncomingDocumentType.MeteredDataForMeasurementPoint, ProcessType.IncomingMeteredDataForMeasurementPoint },
+            { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeasurementPoint },
         };
 
         if (documentTypeToProcessTypeMap.TryGetValue(incomingDocumentType, out var processType))

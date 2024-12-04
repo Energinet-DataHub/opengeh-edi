@@ -38,7 +38,7 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
 
     public bool HandlesType(DocumentType documentType)
     {
-        return documentType == DocumentType.MeteredDataForMeasurementPoint;
+        return documentType == DocumentType.NotifyValidatedMeasureData;
     }
 
     public async Task<MarketDocumentStream> WriteAsync(
