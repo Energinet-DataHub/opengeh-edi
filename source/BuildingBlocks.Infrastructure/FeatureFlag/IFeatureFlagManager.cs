@@ -30,6 +30,11 @@ public interface IFeatureFlagManager
     Task<bool> UsePeekMessagesAsync();
 
     /// <summary>
+    /// Whether to disallow actors to peek time series messages.
+    /// </summary>
+    Task<bool> UsePeekTimeSeriesMessagesAsync();
+
+    /// <summary>
     /// Whether to send RequestForAggregatedMeasuredData to Wholesale or handle it in EDI.
     /// </summary>
     Task<bool> RequestStaysInEdiAsync();
