@@ -85,7 +85,7 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                                             : throw new ArgumentNullException(nameof(o.Position)),
                                         o.EnergyQuantity != null
                                             ? decimal.Parse(o.EnergyQuantity)
-                                            : throw new ArgumentNullException(nameof(o.EnergyQuantity)),
+                                            : null,
                                         o.QuantityQuality))
                                 .ToList())),
                     CancellationToken.None)
