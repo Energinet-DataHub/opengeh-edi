@@ -45,8 +45,8 @@ public class MeteredDateForMeasurementPointBuilder
             SampleData.QuantityMeasureUnit,
             SampleData.RegistrationDateTime,
             Resolution.FromCode(SampleData.Resolution),
-            InstantPattern.General.Parse(SampleData.StartedDateTime).Value,
-            InstantPattern.General.Parse(SampleData.EndedDateTime).Value,
+            InstantPattern.CreateWithInvariantCulture("yyyy-MM-ddTHH:mm'Z'").Parse(SampleData.StartedDateTime).Value,
+            InstantPattern.CreateWithInvariantCulture("yyyy-MM-ddTHH:mm'Z'").Parse(SampleData.EndedDateTime).Value,
             SampleData.Points);
     }
 }

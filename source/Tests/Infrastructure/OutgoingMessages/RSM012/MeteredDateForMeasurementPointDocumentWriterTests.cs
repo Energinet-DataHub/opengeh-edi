@@ -39,7 +39,7 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
+    public async Task Can_create_notifyValidatedMeasureData_document(string documentFormat)
     {
         // Arrange
         var messageBuilder = _meteredDateForMeasurementPointBuilder;
