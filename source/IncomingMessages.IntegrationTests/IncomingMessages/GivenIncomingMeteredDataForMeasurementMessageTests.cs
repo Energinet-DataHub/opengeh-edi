@@ -604,7 +604,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         messageParser.ParserResult.Success.Should().BeFalse();
     }
 
-    private async Task<(MeteredDataForMeasurementPointMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(
+    private async Task<(MeteredDataForMeasurementPointMessageBase? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(
         Stream message,
         DocumentFormat documentFormat)
     {
@@ -612,7 +612,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         if (_messageParsers.TryGetValue((IncomingDocumentType.NotifyValidatedMeasureData, documentFormat), out var messageParser))
         {
             var result = await messageParser.ParseAsync(incomingMarketMessageStream, CancellationToken.None).ConfigureAwait(false);
-            return (IncomingMessage: (MeteredDataForMeasurementPointMessage?)result.IncomingMessage, ParserResult: result);
+            return (IncomingMessage: (MeteredDataForMeasurementPointMessageBase?)result.IncomingMessage, ParserResult: result);
         }
 
         throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{IncomingDocumentType.NotifyValidatedMeasureData}'");
