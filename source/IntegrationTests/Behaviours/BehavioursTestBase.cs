@@ -362,15 +362,24 @@ public class BehavioursTestBase : IDisposable
         var timeoutAt = DateTime.UtcNow.AddMinutes(1);
         while (DateTime.UtcNow < timeoutAt)
         {
+            var thereWasNothingToPeek = true;
             foreach (var messageCategory in EnumerationType.GetAll<MessageCategory>())
             {
                 var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat, messageCategory);
 
                 if (peekResult is null)
+                {
                     break;
+                }
 
+                thereWasNothingToPeek = false;
                 peekResults.Add(peekResult);
                 await WhenActorDequeuesMessage(peekResult.MessageId.Value, actorNumber, actorRole);
+            }
+
+            if (thereWasNothingToPeek)
+            {
+                break;
             }
         }
 
