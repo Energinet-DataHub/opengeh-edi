@@ -59,12 +59,12 @@ public class InitializeMeteredDataForMeasurementPointHandler(
             await _outgoingMessagesClient.EnqueueAndCommitAsync(
                     new MeteredDataForMeasurementPointMessageProcessDto(
                         EventId.From(Guid.NewGuid()),
-                        new Actor(series.RequestedByActor.ActorNumber, series.RequestedByActor.ActorRole),
+                        new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),
                         BusinessReason.FromCode(marketMessage.BusinessReason),
                         new MeteredDataForMeasurementPointMessageSeriesDto(
                             TransactionId.From(series.TransactionId),
-                            series.MeteringPointType!,
                             series.MeteringPointLocationId!,
+                            series.MeteringPointType!,
                             null,
                             series.ProductNumber!,
                             series.ProductUnitType!,

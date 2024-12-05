@@ -70,8 +70,8 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(
-            currentActor.ActorNumber,
-            currentActor.ActorRole,
+            ActorNumber.Create("8100000000115"),
+            ActorRole.EnergySupplier,
             peekFormat);
 
         // Assert

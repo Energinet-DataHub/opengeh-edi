@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
@@ -25,8 +26,8 @@ public sealed record MeteredDateForMeasurementPointMarketActivityRecord(
     string QuantityMeasureUnit,
     string RegistrationDateTime,
     Resolution Resolution,
-    string StartedDateTime,
-    string EndedDateTime,
+    Instant StartedDateTime,
+    Instant EndedDateTime,
     IReadOnlyList<PointActivityRecord> EnergyObservations);
 
 public sealed record PointActivityRecord(int Position, string? Quality, decimal? Quantity);

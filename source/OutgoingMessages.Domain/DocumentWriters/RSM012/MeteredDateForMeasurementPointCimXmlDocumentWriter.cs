@@ -59,8 +59,8 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
                     new XElement(@namespace + "resolution", activityRecord.Resolution.Code),
                     new XElement(
                         @namespace + "timeInterval",
-                        new XElement(@namespace + "start", activityRecord.StartedDateTime),
-                        new XElement(@namespace + "end", activityRecord.EndedDateTime)),
+                        new XElement(@namespace + "start", activityRecord.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)),
+                        new XElement(@namespace + "end", activityRecord.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))),
                     activityRecord.EnergyObservations.Select(x => CreatePointElement(x, @namespace))));
 
             await seriesElement.WriteToAsync(writer, CancellationToken.None).ConfigureAwait(false);

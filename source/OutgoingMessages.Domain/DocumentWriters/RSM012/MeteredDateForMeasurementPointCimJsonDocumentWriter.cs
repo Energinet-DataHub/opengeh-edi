@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -78,8 +79,8 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
                     new Period(
                         activityRecord.Resolution.Code,
                         new TimeInterval(
-                            activityRecord.StartedDateTime,
-                            activityRecord.EndedDateTime),
+                            activityRecord.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture),
+                            activityRecord.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)),
                         activityRecord.EnergyObservations.Select(
                                 p => new Point(
                                     p.Position,
@@ -172,6 +173,7 @@ internal class MeteredDataForMeasurementPoint(
     public ValueObject<string> MeteringPointType { get; init; } = ValueObject<string>.Create(marketEvaluationPointType);
 
     [JsonPropertyName("originalTransactionIDReference_Series.mRID")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? OriginalTransactionIdReferenceId { get; init; } = originalTransactionIdReferenceId; //TODO: what does this field represent?
 
     [JsonPropertyName("product")]

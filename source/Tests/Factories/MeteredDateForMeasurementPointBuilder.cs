@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
@@ -44,8 +45,8 @@ public class MeteredDateForMeasurementPointBuilder
             SampleData.QuantityMeasureUnit,
             SampleData.RegistrationDateTime,
             Resolution.FromCode(SampleData.Resolution),
-            SampleData.StartedDateTime,
-            SampleData.EndedDateTime,
+            InstantPattern.General.Parse(SampleData.StartedDateTime).Value,
+            InstantPattern.General.Parse(SampleData.EndedDateTime).Value,
             SampleData.Points);
     }
 }
