@@ -20,11 +20,11 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
 public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
 {
-    public static InitializeMeteredDataForMeasurementPointMessageProcessDto Create(MeteredDataForMeasurementPointMessage meteredDataForMeasurementPointMessage, AuthenticatedActor authenticatedActor)
+    public static InitializeMeteredDataForMeasurementPointMessageProcessDto Create(MeteredDataForMeasurementPointMessageBase meteredDataForMeasurementPointMessageBase, AuthenticatedActor authenticatedActor)
     {
-        ArgumentNullException.ThrowIfNull(meteredDataForMeasurementPointMessage);
+        ArgumentNullException.ThrowIfNull(meteredDataForMeasurementPointMessageBase);
 
-        var series = meteredDataForMeasurementPointMessage.Series
+        var series = meteredDataForMeasurementPointMessageBase.Series
             .Cast<MeteredDataForMeasurementPointSeries>()
             .Select(
                 series =>
@@ -54,11 +54,11 @@ public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
             .ToList().AsReadOnly();
 
         return new InitializeMeteredDataForMeasurementPointMessageProcessDto(
-            meteredDataForMeasurementPointMessage.MessageId,
-            meteredDataForMeasurementPointMessage.MessageType,
-            meteredDataForMeasurementPointMessage.CreatedAt,
-            meteredDataForMeasurementPointMessage.BusinessReason,
-            meteredDataForMeasurementPointMessage.BusinessType,
+            meteredDataForMeasurementPointMessageBase.MessageId,
+            meteredDataForMeasurementPointMessageBase.MessageType,
+            meteredDataForMeasurementPointMessageBase.CreatedAt,
+            meteredDataForMeasurementPointMessageBase.BusinessReason,
+            meteredDataForMeasurementPointMessageBase.BusinessType,
             series);
     }
 }

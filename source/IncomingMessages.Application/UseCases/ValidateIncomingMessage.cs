@@ -21,36 +21,17 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.Transac
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 
-public class ValidateIncomingMessage
+public class ValidateIncomingMessage(
+    ISenderAuthorizer senderAuthorizer,
+    IReceiverValidator receiverValidator,
+    IMessageIdRepository messageIdRepository,
+    IMessageTypeValidator messageTypeValidator,
+    IProcessTypeValidator processTypeValidator,
+    IBusinessTypeValidator businessTypeValidator,
+    ITransactionIdRepository transactionIdRepository)
 {
     private const int MaxMessageIdLength = 36;
     private const int MaxTransactionIdLength = 36;
-
-    private readonly ISenderAuthorizer _senderAuthorizer;
-    private readonly IReceiverValidator _receiverValidator;
-    private readonly IMessageIdRepository _messageIdRepository;
-    private readonly IMessageTypeValidator _messageTypeValidator;
-    private readonly IProcessTypeValidator _processTypeValidator;
-    private readonly IBusinessTypeValidator _businessTypeValidator;
-    private readonly ITransactionIdRepository _transactionIdRepository;
-
-    public ValidateIncomingMessage(
-        ISenderAuthorizer senderAuthorizer,
-        IReceiverValidator receiverValidator,
-        IMessageIdRepository messageIdRepository,
-        IMessageTypeValidator messageTypeValidator,
-        IProcessTypeValidator processTypeValidator,
-        IBusinessTypeValidator businessTypeValidator,
-        ITransactionIdRepository transactionIdRepository)
-    {
-        _senderAuthorizer = senderAuthorizer;
-        _receiverValidator = receiverValidator;
-        _messageIdRepository = messageIdRepository;
-        _messageTypeValidator = messageTypeValidator;
-        _processTypeValidator = processTypeValidator;
-        _businessTypeValidator = businessTypeValidator;
-        _transactionIdRepository = transactionIdRepository;
-    }
 
     public async Task<Result> ValidateAsync(
         IIncomingMessage incomingMessage,
@@ -85,7 +66,7 @@ public class ValidateIncomingMessage
     {
         var allSeriesAreDelegated = message.Series.Count > 0 && message.Series.All(s => s.IsDelegated);
 
-        var result = await _senderAuthorizer
+        var result = await senderAuthorizer
             .AuthorizeAsync(message, allSeriesAreDelegated)
             .ConfigureAwait(false);
 
@@ -94,7 +75,7 @@ public class ValidateIncomingMessage
 
     private async Task<IReadOnlyCollection<ValidationError>> VerifyReceiverAsync(IIncomingMessage message)
     {
-        var receiverVerification = await _receiverValidator
+        var receiverVerification = await receiverValidator
             .VerifyAsync(message.ReceiverNumber, message.ReceiverRoleCode)
             .ConfigureAwait(false);
 
@@ -116,7 +97,7 @@ public class ValidateIncomingMessage
         {
             errors.Add(new InvalidMessageIdSize(message.MessageId));
         }
-        else if (await _messageIdRepository
+        else if (await messageIdRepository
                      .MessageIdExistsAsync(message.SenderNumber, message.MessageId, cancellationToken)
                      .ConfigureAwait(false))
         {
@@ -130,7 +111,7 @@ public class ValidateIncomingMessage
         IIncomingMessage message,
         CancellationToken cancellationToken)
     {
-        var result = await _messageTypeValidator.ValidateAsync(message, cancellationToken)
+        var result = await messageTypeValidator.ValidateAsync(message, cancellationToken)
             .ConfigureAwait(false);
         return result.Errors;
     }
@@ -140,7 +121,7 @@ public class ValidateIncomingMessage
         DocumentFormat documentFormat,
         CancellationToken cancellationToken)
     {
-        var result = await _processTypeValidator.ValidateAsync(message, documentFormat, cancellationToken)
+        var result = await processTypeValidator.ValidateAsync(message, documentFormat, cancellationToken)
             .ConfigureAwait(false);
         return result.Errors;
     }
@@ -149,7 +130,7 @@ public class ValidateIncomingMessage
         IIncomingMessage message,
         CancellationToken cancellationToken)
     {
-        var result = await _businessTypeValidator.ValidateAsync(message.BusinessType, cancellationToken)
+        var result = await businessTypeValidator.ValidateAsync(message.BusinessType, cancellationToken)
             .ConfigureAwait(false);
         return result.Errors;
     }
@@ -208,7 +189,7 @@ public class ValidateIncomingMessage
         string transactionId,
         CancellationToken cancellationToken)
     {
-        return await _transactionIdRepository
+        return await transactionIdRepository
             .TransactionIdExistsAsync(senderNumber, transactionId, cancellationToken)
             .ConfigureAwait(false);
     }

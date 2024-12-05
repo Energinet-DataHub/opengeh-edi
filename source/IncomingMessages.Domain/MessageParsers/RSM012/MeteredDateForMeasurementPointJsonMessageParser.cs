@@ -96,7 +96,7 @@ public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider 
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
-        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessage(
+        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessageBase(
             header.MessageId,
             header.MessageType,
             header.CreatedAt,
