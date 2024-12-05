@@ -38,31 +38,30 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
         XNamespace @namespace = "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1";
-        foreach (var wholesaleCalculationSeries in ParseFrom<MeteredDateForMeasurementPointMarketActivityRecord>(
-                     marketActivityPayloads))
+        foreach (var activityRecord in ParseFrom<MeteredDateForMeasurementPointMarketActivityRecord>(marketActivityPayloads))
         {
             var seriesElement = new XElement(
                 @namespace + "Series",
-                new XElement(@namespace + "mRID", wholesaleCalculationSeries.TransactionId),
+                new XElement(@namespace + "mRID", activityRecord.TransactionId),
                 new XElement(
                     @namespace + "originalTransactionIDReference_Series.mRID",
-                    wholesaleCalculationSeries.OriginalTransactionIdReferenceId),
+                    activityRecord.OriginalTransactionIdReferenceId),
                 new XElement(
                     @namespace + "marketEvaluationPoint.mRID",
                     new XAttribute("codingScheme", "A10"),
-                    wholesaleCalculationSeries.MarketEvaluationPointNumber),
-                new XElement(@namespace + "marketEvaluationPoint.type", wholesaleCalculationSeries.MarketEvaluationPointType),
-                new XElement(@namespace + "registration_DateAndOrTime.dateTime", wholesaleCalculationSeries.RegistrationDateTime),
-                new XElement(@namespace + "product", wholesaleCalculationSeries.Product),
-                new XElement(@namespace + "quantity_Measure_Unit.name", wholesaleCalculationSeries.QuantityMeasureUnit),
+                    activityRecord.MarketEvaluationPointNumber),
+                new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType),
+                new XElement(@namespace + "registration_DateAndOrTime.dateTime", activityRecord.RegistrationDateTime),
+                new XElement(@namespace + "product", activityRecord.Product),
+                new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.QuantityMeasureUnit),
                 new XElement(
                     @namespace + "Period",
-                    new XElement(@namespace + "resolution", wholesaleCalculationSeries.Resolution),
+                    new XElement(@namespace + "resolution", activityRecord.Resolution.Code),
                     new XElement(
                         @namespace + "timeInterval",
-                        new XElement(@namespace + "start", wholesaleCalculationSeries.StartedDateTime),
-                        new XElement(@namespace + "end", wholesaleCalculationSeries.EndedDateTime)),
-                    wholesaleCalculationSeries.Points.Select(x => CreatePointElement(x, @namespace))));
+                        new XElement(@namespace + "start", activityRecord.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)),
+                        new XElement(@namespace + "end", activityRecord.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))),
+                    activityRecord.EnergyObservations.Select(x => CreatePointElement(x, @namespace))));
 
             await seriesElement.WriteToAsync(writer, CancellationToken.None).ConfigureAwait(false);
         }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -64,26 +65,28 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
         ArgumentNullException.ThrowIfNull(transactions);
 
         var meteredDataForMeasurementPoints = new Collection<MeteredDataForMeasurementPoint>();
-        foreach (var transaction in transactions)
+        foreach (var activityRecord in transactions.Select(t => _parser.From<MeteredDateForMeasurementPointMarketActivityRecord>(t)))
         {
-            var activityRecord = _parser.From<MeteredDateForMeasurementPointMarketActivityRecord>(transaction);
-            meteredDataForMeasurementPoints.Add(new MeteredDataForMeasurementPoint(
-                activityRecord.TransactionId,
-                activityRecord.MarketEvaluationPointNumber,
-                activityRecord.MarketEvaluationPointType,
-                activityRecord.OriginalTransactionIdReferenceId,
-                activityRecord.Product,
-                activityRecord.QuantityMeasureUnit,
-                activityRecord.RegistrationDateTime,
-                new Period(
-                    activityRecord.Resolution,
-                    new TimeInterval(
-                        activityRecord.StartedDateTime,
-                        activityRecord.EndedDateTime),
-                    activityRecord.Points.Select(p => new Point(
-                        p.Position,
-                        p.Quality,
-                        p.Quantity)).ToList())));
+            meteredDataForMeasurementPoints.Add(
+                new MeteredDataForMeasurementPoint(
+                    activityRecord.TransactionId,
+                    activityRecord.MarketEvaluationPointNumber,
+                    activityRecord.MarketEvaluationPointType,
+                    activityRecord.OriginalTransactionIdReferenceId,
+                    activityRecord.Product,
+                    activityRecord.QuantityMeasureUnit,
+                    activityRecord.RegistrationDateTime,
+                    new Period(
+                        activityRecord.Resolution.Code,
+                        new TimeInterval(
+                            activityRecord.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture),
+                            activityRecord.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)),
+                        activityRecord.EnergyObservations.Select(
+                                p => new Point(
+                                    p.Position,
+                                    p.Quality,
+                                    p.Quantity))
+                            .ToList())));
         }
 
         return new Document(
@@ -170,6 +173,7 @@ internal class MeteredDataForMeasurementPoint(
     public ValueObject<string> MeteringPointType { get; init; } = ValueObject<string>.Create(marketEvaluationPointType);
 
     [JsonPropertyName("originalTransactionIDReference_Series.mRID")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? OriginalTransactionIdReferenceId { get; init; } = originalTransactionIdReferenceId; //TODO: what does this field represent?
 
     [JsonPropertyName("product")]
@@ -206,7 +210,7 @@ internal class TimeInterval(string startedDateTime, string endedDateTime)
     public ValueObject<string> EndedDateTime { get; init; } = ValueObject<string>.Create(endedDateTime);
 }
 
-internal class Point(int position, string? quality, int? quantity)
+internal class Point(int position, string? quality, decimal? quantity)
 {
     [JsonPropertyName("position")]
     public ValueObject<int> Position { get; init; } = ValueObject<int>.Create(position);
@@ -217,7 +221,7 @@ internal class Point(int position, string? quality, int? quantity)
 
     [JsonPropertyName("quantity")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? Quantity { get; init; } = quantity == null ? null : quantity;
+    public decimal? Quantity { get; init; } = quantity == null ? null : quantity;
 }
 
 internal class ValueObject<T>(T value)

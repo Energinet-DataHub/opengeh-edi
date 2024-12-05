@@ -13,21 +13,23 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 
-public sealed record MeteredDateForMeasurementPointMarketActivityRecord(
-    string TransactionId,
-    string MarketEvaluationPointNumber,
-    string MarketEvaluationPointType,
-    string? OriginalTransactionIdReferenceId,
-    string Product,
-    string QuantityMeasureUnit,
-    string RegistrationDateTime,
-    Resolution Resolution,
-    Instant StartedDateTime,
-    Instant EndedDateTime,
-    IReadOnlyList<PointActivityRecord> EnergyObservations);
-
-public sealed record PointActivityRecord(int Position, string? Quality, decimal? Quantity);
+public sealed class MeteredDataForMeasurementPointMessageProcessDto(
+    EventId eventId,
+    Actor receiver,
+    BusinessReason businessReason,
+    MeteredDataForMeasurementPointMessageSeriesDto series)
+    : OutgoingMessageDto(
+        DocumentType.NotifyValidatedMeasureData,
+        receiver.ActorNumber,
+        null,
+        eventId,
+        businessReason.Name,
+        receiver.ActorRole,
+        new ExternalId(Guid.NewGuid()),
+        null)
+{
+    public MeteredDataForMeasurementPointMessageSeriesDto Series { get; } = series;
+}

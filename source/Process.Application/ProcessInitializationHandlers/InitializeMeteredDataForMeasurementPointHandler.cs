@@ -12,20 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using NodaTime;
+using NodaTime.Text;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandlers;
 
+[SuppressMessage(
+    "StyleCop.CSharp.ReadabilityRules",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "Readability")]
 public class InitializeMeteredDataForMeasurementPointHandler(
-    IMediator mediator,
+    IOutgoingMessagesClient outgoingMessagesClient,
     ISerializer serializer,
     ILogger<InitializeMeteredDataForMeasurementPointHandler> logger)
     : IProcessInitializationHandler
 {
-    private readonly IMediator _mediator = mediator;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly ISerializer _serializer = serializer;
     private readonly ILogger<InitializeMeteredDataForMeasurementPointHandler> _logger = logger;
 
@@ -35,11 +47,49 @@ public class InitializeMeteredDataForMeasurementPointHandler(
         return processTypeToInitialize.Equals(nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto), StringComparison.Ordinal);
     }
 
-    public Task ProcessAsync(byte[] processInitializationData)
+    public async Task ProcessAsync(byte[] processInitializationData)
     {
-        var marketMessage = _serializer.Deserialize<InitializeMeteredDataForMeasurementPointMessageProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
+        var marketMessage =
+            _serializer.Deserialize<InitializeMeteredDataForMeasurementPointMessageProcessDto>(
+                System.Text.Encoding.UTF8.GetString(processInitializationData));
         _logger.LogInformation("Received InitializeAggregatedMeasureDataProcess for message {MessageId}", marketMessage.MessageId);
-        // Nothing to see here yet.
-        return Task.CompletedTask;
+
+        foreach (var series in marketMessage.Series)
+        {
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(
+                    new MeteredDataForMeasurementPointMessageProcessDto(
+                        EventId.From(Guid.NewGuid()),
+                        new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),
+                        BusinessReason.FromCode(marketMessage.BusinessReason),
+                        new MeteredDataForMeasurementPointMessageSeriesDto(
+                            TransactionId.From(series.TransactionId),
+                            series.MeteringPointLocationId!,
+                            series.MeteringPointType!,
+                            null,
+                            series.ProductNumber!,
+                            series.ProductUnitType!,
+                            marketMessage.CreatedAt,
+                            Resolution.FromCode(series.Resolution!),
+                            InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
+                                .Parse(series.StartDateTime)
+                                .Value,
+                            series.EndDateTime != null
+                                ? InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
+                                    .Parse(series.EndDateTime)
+                                    .Value
+                                : throw new ArgumentNullException(),
+                            series.EnergyObservations.Select(
+                                    o => new EnergyObservationDto(
+                                        o.Position != null
+                                            ? int.Parse(o.Position)
+                                            : throw new ArgumentNullException(nameof(o.Position)),
+                                        o.EnergyQuantity != null
+                                            ? decimal.Parse(o.EnergyQuantity)
+                                            : throw new ArgumentNullException(nameof(o.EnergyQuantity)),
+                                        o.QuantityQuality))
+                                .ToList())),
+                    CancellationToken.None)
+                .ConfigureAwait(false);
+        }
     }
 }

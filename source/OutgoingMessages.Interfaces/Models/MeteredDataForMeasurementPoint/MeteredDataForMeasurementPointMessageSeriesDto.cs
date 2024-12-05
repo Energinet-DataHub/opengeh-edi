@@ -15,10 +15,10 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 
-public sealed record MeteredDateForMeasurementPointMarketActivityRecord(
-    string TransactionId,
+public sealed record MeteredDataForMeasurementPointMessageSeriesDto(
+    TransactionId TransactionId,
     string MarketEvaluationPointNumber,
     string MarketEvaluationPointType,
     string? OriginalTransactionIdReferenceId,
@@ -28,6 +28,4 @@ public sealed record MeteredDateForMeasurementPointMarketActivityRecord(
     Resolution Resolution,
     Instant StartedDateTime,
     Instant EndedDateTime,
-    IReadOnlyList<PointActivityRecord> EnergyObservations);
-
-public sealed record PointActivityRecord(int Position, string? Quality, decimal? Quantity);
+    IReadOnlyCollection<EnergyObservationDto> EnergyObservations);
