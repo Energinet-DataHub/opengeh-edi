@@ -97,17 +97,17 @@ public class PeekRequestListener
             return noContentResponse;
         }
 
-        if (!await _featureFlagManager.UsePeekTimeSeriesMessagesAsync().ConfigureAwait(false))
+        var parsedMessageCategory = messageCategory != null && desiredDocumentFormat != DocumentFormat.Ebix
+            ? EnumerationType.FromName<MessageCategory>(messageCategory)
+            : MessageCategory.None;
+
+        if (parsedMessageCategory == MessageCategory.TimeSeries && !await _featureFlagManager.UsePeekTimeSeriesMessagesAsync().ConfigureAwait(false))
         {
             var noContentResponse = HttpResponseData.CreateResponse(request);
             noContentResponse.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
             noContentResponse.StatusCode = HttpStatusCode.NoContent;
             return noContentResponse;
         }
-
-        var parsedMessageCategory = messageCategory != null && desiredDocumentFormat != DocumentFormat.Ebix
-            ? EnumerationType.FromName<MessageCategory>(messageCategory)
-            : MessageCategory.None;
 
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
                 new PeekRequestDto(
