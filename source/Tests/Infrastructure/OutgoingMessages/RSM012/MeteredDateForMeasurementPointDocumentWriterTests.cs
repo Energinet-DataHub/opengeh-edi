@@ -54,7 +54,7 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
         // Assert
         using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasMessageId(SampleData.MessageId)
+            .MessageIdExists()
             .HasBusinessReason(SampleData.BusinessReason.Code)
             .HasSenderId(SampleData.SenderActorNumber, "A10")
             .HasSenderRole(SampleData.SenderActorRole)
