@@ -101,6 +101,14 @@ public class PeekRequestListener
             ? EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
 
+        if (parsedMessageCategory == MessageCategory.TimeSeries && !await _featureFlagManager.UsePeekTimeSeriesMessagesAsync().ConfigureAwait(false))
+        {
+            var noContentResponse = HttpResponseData.CreateResponse(request);
+            noContentResponse.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
+            noContentResponse.StatusCode = HttpStatusCode.NoContent;
+            return noContentResponse;
+        }
+
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
                 new PeekRequestDto(
                     _authenticatedActor.CurrentActorIdentity.ActorNumber,
