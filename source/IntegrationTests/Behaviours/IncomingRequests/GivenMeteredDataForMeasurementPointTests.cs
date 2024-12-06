@@ -80,7 +80,17 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
             await ThenNotifyValidatedMeasureDataDocumentIsCorrect(
                 peekResultDto.Bundle,
                 peekFormat,
-                new NotifyValidatedMeasureDataDocumentAssertionInput());
+                new NotifyValidatedMeasureDataDocumentAssertionInput(
+                    new RequiredDocumentFields(
+                        "E23",
+                        "8100000000115",
+                        "A10",
+                        "5790001330552",
+                        "A10",
+                        "DGL",
+                        "DDQ",
+                        "2024-07-01T14:57:09Z"),
+                    null));
         }
     }
 }

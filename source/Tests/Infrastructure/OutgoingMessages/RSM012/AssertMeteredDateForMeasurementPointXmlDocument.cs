@@ -29,7 +29,7 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
         _documentAsserter.HasValue("type", "E66");
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasMessageId(string expectedMessageId)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists()
     {
         _documentAsserter.ElementExists("mRID");
         return this;

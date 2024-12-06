@@ -12,8 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
+
+public readonly record struct RequiredDocumentFields(
+    string BusinessReasonCode,
+    string ReceiverId,
+    string ReceiverScheme,
+    string SenderId,
+    string SenderScheme,
+    string SenderRole,
+    string ReceiverRole,
+    string Timestamp);
 
 public class NotifyValidatedMeasureDataDocumentAssertionInput
 {
+    public NotifyValidatedMeasureDataDocumentAssertionInput(
+        RequiredDocumentFields requiredDocumentFields,
+        RequiredSeriesFields? requiredSeriesFields)
+    {
+        RequiredDocumentFields = requiredDocumentFields;
+        RequiredSeriesFields = requiredSeriesFields;
+    }
+
+    public RequiredDocumentFields RequiredDocumentFields { get; }
+
+    public RequiredSeriesFields? RequiredSeriesFields { get; }
 }
+
+public sealed record RequiredSeriesFields(
+    TransactionId TransactionId,
+    string MeteringPointNumber,
+    string MeteringPointScheme,
+    string MeteringPointType,
+    string QuantityMeasureUnit,
+    string Resolution,
+    string StartedDateTime,
+    string EndedDateTime,
+    IReadOnlyList<PointActivityRecord> Points);

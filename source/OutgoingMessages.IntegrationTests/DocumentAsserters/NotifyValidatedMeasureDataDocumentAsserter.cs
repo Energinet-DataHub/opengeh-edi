@@ -52,6 +52,34 @@ public class NotifyValidatedMeasureDataDocumentAsserter
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 
+        asserter
+            .MessageIdExists()
+            .HasBusinessReason(assertionInput.RequiredDocumentFields.BusinessReasonCode)
+            .HasSenderId(
+                assertionInput.RequiredDocumentFields.SenderId,
+                assertionInput.RequiredDocumentFields.SenderScheme)
+            .HasSenderRole(assertionInput.RequiredDocumentFields.SenderRole)
+            .HasReceiverId(
+                assertionInput.RequiredDocumentFields.ReceiverId,
+                assertionInput.RequiredDocumentFields.ReceiverScheme)
+            .HasReceiverRole(assertionInput.RequiredDocumentFields.ReceiverRole)
+            .HasTimestamp(assertionInput.RequiredDocumentFields.Timestamp);
+
+        if (assertionInput.RequiredSeriesFields != null)
+        {
+            asserter
+                .HasTransactionId(assertionInput.RequiredSeriesFields.TransactionId)
+                .HasMeteringPointNumber(
+                    assertionInput.RequiredSeriesFields.MeteringPointNumber,
+                    assertionInput.RequiredSeriesFields.MeteringPointScheme)
+                .HasMeteringPointType(assertionInput.RequiredSeriesFields.MeteringPointType)
+                .HasQuantityMeasureUnit(assertionInput.RequiredSeriesFields.QuantityMeasureUnit)
+                .HasResolution(assertionInput.RequiredSeriesFields.Resolution)
+                .HasStartedDateTime(assertionInput.RequiredSeriesFields.StartedDateTime)
+                .HasEndedDateTime(assertionInput.RequiredSeriesFields.EndedDateTime)
+                .HasPoints(assertionInput.RequiredSeriesFields.Points);
+        }
+
         await asserter
             .DocumentIsValidAsync();
     }

@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using FluentAssertions;
 using Json.Schema;
+using Namotion.Reflection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
@@ -36,9 +37,9 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         Assert.Equal("E66", _root.GetProperty("type").GetProperty("value").ToString());
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasMessageId(string expectedMessageId)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists()
     {
-        Assert.Equal(expectedMessageId, _root.GetProperty("mRID").ToString());
+        Assert.True(_root.TryGetProperty("mRID", out _));
         return this;
     }
 

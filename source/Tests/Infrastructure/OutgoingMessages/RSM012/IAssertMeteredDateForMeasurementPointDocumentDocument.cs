@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
 public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 {
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasMessageId(string expectedMessageId);
+    IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists();
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode);
 
