@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Text.Encodings.Web;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
@@ -63,13 +64,13 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
             .HasTransactionId(SampleData.TransactionId)
             .HasMeteringPointNumber(SampleData.MeteringPointNumber, "A10")
             .HasMeteringPointType(SampleData.MeteringPointType)
-            .HasOriginalTransactionIdReferenceId(SampleData.OriginalTransactionIdReferenceId)
+            .HasOriginalTransactionIdReferenceId(SampleData.OriginalTransactionIdReferenceId?.Value)
             .HasProduct(SampleData.Product)
-            .HasQuantityMeasureUnit(SampleData.QuantityMeasureUnit)
-            .HasRegistrationDateTime(SampleData.RegistrationDateTime)
-            .HasResolution(SampleData.Resolution)
-            .HasStartedDateTime(SampleData.StartedDateTime)
-            .HasEndedDateTime(SampleData.EndedDateTime)
+            .HasQuantityMeasureUnit(SampleData.QuantityMeasureUnit.Code)
+            .HasRegistrationDateTime(SampleData.RegistrationDateTime.ToString())
+            .HasResolution(SampleData.Resolution.Code)
+            .HasStartedDateTime(SampleData.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasEndedDateTime(SampleData.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
             .HasPoints(SampleData.Points)
             .DocumentIsValidAsync();
     }
