@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -26,6 +27,10 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
+[SuppressMessage(
+    "StyleCop.CSharp.ReadabilityRules",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "Readability")]
 public sealed class GivenMeteredDataForMeasurementPointTests(
     IntegrationTestFixture integrationTestFixture,
     ITestOutputHelper testOutputHelper)
@@ -77,6 +82,12 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         // Assert
         foreach (var peekResultDto in peekResults)
         {
+            // This is not pretty, but it works for now
+            var foo = new StreamReader(peekResultDto.Bundle);
+            var content = await foo.ReadToEndAsync();
+            var isTransOne = content.Contains($"{transactionIdPrefix}-1");
+            peekResultDto.Bundle.Position = 0;
+
             await ThenNotifyValidatedMeasureDataDocumentIsCorrect(
                 peekResultDto.Bundle,
                 peekFormat,
@@ -90,7 +101,27 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                         "DGL",
                         "DDQ",
                         "2024-07-01T14:57:09Z"),
-                    null));
+                    isTransOne
+                        ? new RequiredSeriesFields(
+                            TransactionId.From(string.Join(string.Empty, $"{transactionIdPrefix}-1".Reverse())),
+                            "579999993331812345",
+                            "A10",
+                            "E17",
+                            "KWH",
+                            "PT1H",
+                            "2024-11-28T13:51Z",
+                            "2024-11-29T09:15Z",
+                            [])
+                        : new RequiredSeriesFields(
+                            TransactionId.From(string.Join(string.Empty, $"{transactionIdPrefix}-2".Reverse())),
+                            "579999993331812345",
+                            "A10",
+                            "E17",
+                            "KWH",
+                            "PT15M",
+                            "2024-11-24T18:51Z",
+                            "2024-11-25T03:39Z",
+                            [])));
         }
     }
 }
