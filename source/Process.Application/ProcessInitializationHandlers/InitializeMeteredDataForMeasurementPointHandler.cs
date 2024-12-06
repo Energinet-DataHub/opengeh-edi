@@ -67,8 +67,8 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                             series.MeteringPointType!,
                             null,
                             series.ProductNumber!,
-                            series.ProductUnitType!,
-                            marketMessage.CreatedAt,
+                            MeasurementUnit.FromCode(series.ProductUnitType!),
+                            InstantPattern.General.Parse(marketMessage.CreatedAt).Value,
                             Resolution.FromCode(series.Resolution!),
                             InstantPattern.Create("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)
                                 .Parse(series.StartDateTime)

@@ -37,16 +37,16 @@ public class MeteredDateForMeasurementPointBuilder
     public MeteredDateForMeasurementPointMarketActivityRecord BuildMeteredDataForMeasurementPoint()
     {
         return new MeteredDateForMeasurementPointMarketActivityRecord(
-            SampleData.TransactionId.Value,
+            SampleData.TransactionId,
             SampleData.MeteringPointNumber,
             SampleData.MeteringPointType,
             SampleData.OriginalTransactionIdReferenceId,
             SampleData.Product,
             SampleData.QuantityMeasureUnit,
             SampleData.RegistrationDateTime,
-            Resolution.FromCode(SampleData.Resolution),
-            InstantPattern.CreateWithInvariantCulture("yyyy-MM-ddTHH:mm'Z'").Parse(SampleData.StartedDateTime).Value,
-            InstantPattern.CreateWithInvariantCulture("yyyy-MM-ddTHH:mm'Z'").Parse(SampleData.EndedDateTime).Value,
+            SampleData.Resolution,
+            SampleData.StartedDateTime,
+            SampleData.EndedDateTime,
             SampleData.Points);
     }
 }

@@ -47,19 +47,19 @@ internal static class SampleData
 
     public static string MeteringPointType => "E17";
 
-    public static string? OriginalTransactionIdReferenceId => "C1875000";
+    public static TransactionId? OriginalTransactionIdReferenceId => TransactionId.From("C1875000");
 
     public static string Product => "8716867000030";
 
-    public static string QuantityMeasureUnit => MeasurementUnit.Kwh.Code;
+    public static MeasurementUnit QuantityMeasureUnit => MeasurementUnit.Kwh;
 
-    public static string RegistrationDateTime => "2022-12-17T07:30:00Z";
+    public static Instant RegistrationDateTime => InstantPattern.General.Parse("2022-12-17T07:30:00Z").Value;
 
-    public static string Resolution => "PT1H";
+    public static Resolution Resolution => Resolution.Hourly;
 
-    public static string StartedDateTime => "2022-08-15T22:00Z";
+    public static Instant StartedDateTime => InstantPattern.General.Parse("2022-08-15T22:00:00Z").Value;
 
-    public static string EndedDateTime => "2022-08-15T04:00Z";
+    public static Instant EndedDateTime => InstantPattern.General.Parse("2022-08-15T04:00:00Z").Value;
 
     public static IReadOnlyList<PointActivityRecord> Points => new List<PointActivityRecord>
     {

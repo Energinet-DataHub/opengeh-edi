@@ -69,13 +69,13 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
         {
             meteredDataForMeasurementPoints.Add(
                 new MeteredDataForMeasurementPoint(
-                    activityRecord.TransactionId,
+                    activityRecord.TransactionId.Value,
                     activityRecord.MarketEvaluationPointNumber,
                     activityRecord.MarketEvaluationPointType,
-                    activityRecord.OriginalTransactionIdReferenceId,
+                    activityRecord.OriginalTransactionIdReferenceId?.Value,
                     activityRecord.Product,
-                    activityRecord.QuantityMeasureUnit,
-                    activityRecord.RegistrationDateTime,
+                    activityRecord.QuantityMeasureUnit.Code,
+                    activityRecord.RegistrationDateTime.ToString(),
                     new Period(
                         activityRecord.Resolution.Code,
                         new TimeInterval(
