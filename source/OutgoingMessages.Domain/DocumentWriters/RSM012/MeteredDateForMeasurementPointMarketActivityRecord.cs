@@ -18,13 +18,13 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
 public sealed record MeteredDateForMeasurementPointMarketActivityRecord(
-    string TransactionId,
+    TransactionId TransactionId,
     string MarketEvaluationPointNumber,
     string MarketEvaluationPointType,
-    string? OriginalTransactionIdReferenceId,
+    TransactionId? OriginalTransactionIdReferenceId,
     string Product,
-    string QuantityMeasureUnit,
-    string RegistrationDateTime,
+    MeasurementUnit QuantityMeasureUnit,
+    Instant RegistrationDateTime,
     Resolution Resolution,
     Instant StartedDateTime,
     Instant EndedDateTime,

@@ -42,10 +42,10 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
         {
             var seriesElement = new XElement(
                 @namespace + "Series",
-                new XElement(@namespace + "mRID", activityRecord.TransactionId),
+                new XElement(@namespace + "mRID", activityRecord.TransactionId.Value),
                 new XElement(
                     @namespace + "originalTransactionIDReference_Series.mRID",
-                    activityRecord.OriginalTransactionIdReferenceId),
+                    activityRecord.OriginalTransactionIdReferenceId?.Value),
                 new XElement(
                     @namespace + "marketEvaluationPoint.mRID",
                     new XAttribute("codingScheme", "A10"),
@@ -53,7 +53,7 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
                 new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType),
                 new XElement(@namespace + "registration_DateAndOrTime.dateTime", activityRecord.RegistrationDateTime),
                 new XElement(@namespace + "product", activityRecord.Product),
-                new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.QuantityMeasureUnit),
+                new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.QuantityMeasureUnit.Code),
                 new XElement(
                     @namespace + "Period",
                     new XElement(@namespace + "resolution", activityRecord.Resolution.Code),
