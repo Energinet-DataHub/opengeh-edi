@@ -14,10 +14,10 @@
 
 using System.Collections.Immutable;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
-using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
@@ -110,10 +110,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion
-        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
+        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationCompletedAsync(
             actualOrchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(5));
 
@@ -206,10 +206,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion
-        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
+        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationCompletedAsync(
             actualOrchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(5));
 
@@ -301,7 +301,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for running and expected history
         JArray? actualHistory = null;
@@ -359,7 +359,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(wholesaleCalculationCompletedEventMessage);
-        var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // Assert
         using var assertionScope = new AssertionScope();
@@ -423,7 +423,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(energyCalculationCompletedEventMessage);
-        var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // Assert
         using var assertionScope = new AssertionScope();

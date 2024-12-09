@@ -14,8 +14,8 @@
 
 using System.Diagnostics;
 using System.Net;
+using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
-using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices;
@@ -88,13 +88,13 @@ public class RequestWholesaleServicesOrchestrationTests : IAsyncLifetime
         await httpResponse.EnsureSuccessStatusCodeWithLogAsync(Fixture.TestLogger);
 
         // => Wait for orchestration to start
-        var startedOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(
+        var startedOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(
             createdTimeFrom: beforeOrchestrationCreated.ToDateTimeUtc(),
             name: nameof(RequestWholesaleServicesOrchestration));
         startedOrchestrationStatus.Should().NotBeNull();
 
         // => Wait for orchestration to complete
-        var completedOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
+        var completedOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationCompletedAsync(
             startedOrchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(5));
         completedOrchestrationStatus.Should().NotBeNull();
