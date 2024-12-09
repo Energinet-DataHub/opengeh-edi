@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
@@ -55,6 +56,7 @@ public class IncomingMessageReceiver
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        var stopwatch = Stopwatch.StartNew();
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
         if (!await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))
@@ -112,6 +114,9 @@ public class IncomingMessageReceiver
 
         var httpResponseData = await CreateResponseAsync(request, httpStatusCode, documentFormat, responseMessage)
             .ConfigureAwait(false);
+
+        stopwatch.Stop();
+        _logger.LogInformation($"IncomingMessage Execution time: {stopwatch.ElapsedMilliseconds} ms");
 
         return httpResponseData;
     }

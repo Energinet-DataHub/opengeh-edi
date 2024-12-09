@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -78,12 +79,18 @@ public class ReceiveIncomingMarketMessage
     {
         ArgumentNullException.ThrowIfNull(documentType);
         ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
+        var stopwatch = Stopwatch.StartNew();
+
         var incomingMarketMessageParserResult = await ParseIncomingMessageAsync(
                 incomingMarketMessageStream,
                 incomingDocumentFormat,
                 documentType,
                 cancellationToken)
             .ConfigureAwait(false);
+
+        stopwatch.Stop();
+        _logger.LogInformation($"IncomingMessage Parsing execution time: {stopwatch.ElapsedMilliseconds} ms");
+
         if (incomingMarketMessageParserResult.Errors.Count != 0
             || incomingMarketMessageParserResult.IncomingMessage == null)
         {
@@ -99,21 +106,30 @@ public class ReceiveIncomingMarketMessage
 
         if (ShouldArchive(documentType))
         {
+            stopwatch.Restart();
             await ArchiveIncomingMessageAsync(
                     incomingMarketMessageStream,
                     incomingMarketMessageParserResult.IncomingMessage,
                     documentType,
                     cancellationToken)
                 .ConfigureAwait(false);
+            stopwatch.Stop();
+            _logger.LogInformation($"IncomingMessage Archiving execution time: {stopwatch.ElapsedMilliseconds} ms");
         }
 
+        stopwatch.Restart();
         await _delegateIncomingMessage
             .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        _logger.LogInformation($"IncomingMessage Delegation execution time: {stopwatch.ElapsedMilliseconds} ms");
 
+        stopwatch.Restart();
         var validationResult = await _validateIncomingMessage
             .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, incomingDocumentFormat, cancellationToken)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        _logger.LogInformation($"IncomingMessage Validation execution time: {stopwatch.ElapsedMilliseconds} ms");
 
         if (!validationResult.Success)
         {
@@ -124,11 +140,14 @@ public class ReceiveIncomingMarketMessage
             return _responseFactory.From(validationResult, responseDocumentFormat);
         }
 
+        stopwatch.Restart();
         var result = await _incomingMessageReceiver
             .ReceiveAsync(
                 incomingMarketMessageParserResult.IncomingMessage,
                 cancellationToken)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        _logger.LogInformation($"IncomingMessage Receiving execution time: {stopwatch.ElapsedMilliseconds} ms");
 
         if (result.Success)
         {
