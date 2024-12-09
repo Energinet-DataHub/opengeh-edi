@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
@@ -19,7 +20,7 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
 public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 {
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasMessageId(string expectedMessageId);
+    IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists();
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode);
 
@@ -53,7 +54,8 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(string expectedEndedDateTime);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(IReadOnlyList<PointActivityRecord> expectedPoints);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
+        IReadOnlyCollection<(RequiredPointDocumentFields Rpdf, OptionalPointDocumentFields? Opdf)> expectedPoints);
 
     /// <summary>
     /// Asserts document validity

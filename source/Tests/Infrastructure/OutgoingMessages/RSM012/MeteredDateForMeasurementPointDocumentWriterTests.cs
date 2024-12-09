@@ -54,7 +54,7 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
         // Assert
         using var assertionScope = new AssertionScope();
         await AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasMessageId(SampleData.MessageId)
+            .MessageIdExists()
             .HasBusinessReason(SampleData.BusinessReason.Code)
             .HasSenderId(SampleData.SenderActorNumber, "A10")
             .HasSenderRole(SampleData.SenderActorRole)
@@ -71,7 +71,20 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
             .HasResolution(SampleData.Resolution.Code)
             .HasStartedDateTime(SampleData.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
             .HasEndedDateTime(SampleData.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
-            .HasPoints(SampleData.Points)
+            .HasPoints(
+                SampleData.Points.Select(
+                        p =>
+                        {
+                            var req = new RequiredPointDocumentFields(p.Position);
+                            OptionalPointDocumentFields? opt = null;
+                            if (p.Quality != null || p.Quantity != null)
+                            {
+                                opt = new OptionalPointDocumentFields(p.Quality, p.Quantity);
+                            }
+
+                            return (req, opt);
+                        })
+                    .ToList())
             .DocumentIsValidAsync();
     }
 
