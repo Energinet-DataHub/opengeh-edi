@@ -148,30 +148,40 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(IReadOnlyList<PointActivityRecord> expectedPoints)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
+        IReadOnlyCollection<(RequiredPointDocumentFields Rpdf, OptionalPointDocumentFields? Opdf)> expectedPoints)
     {
         var pointsInDocument = _documentAsserter
             .GetElements("Series[1]/Period/Point")!;
 
+        var expectedPointsAsList = expectedPoints.ToList();
+
         pointsInDocument.Should().HaveSameCount(expectedPoints);
 
-        for (var i = 0; i < expectedPoints.Count; i++)
+        for (var i = 0; i < expectedPointsAsList.Count; i++)
         {
-            var expectedPoint = expectedPoints[i];
+            var (requiredPointDocumentFields, optionalPointDocumentFields) = expectedPointsAsList[i];
 
             _documentAsserter
-                .HasValue($"Series[1]/Period/Point[{i + 1}]/position", expectedPoint.Position.ToString());
+                .HasValue($"Series[1]/Period/Point[{i + 1}]/position", requiredPointDocumentFields.Position.ToString());
 
-            if (expectedPoint.Quantity != null)
+            if (optionalPointDocumentFields == null)
             {
-                _documentAsserter
-                    .HasValue($"Series[1]/Period/Point[{i + 1}]/quantity", expectedPoint.Quantity!.ToString()!);
+                continue;
             }
 
-            if (expectedPoint.Quality != null)
+            if (optionalPointDocumentFields.Quantity != null)
             {
                 _documentAsserter
-                    .HasValue($"Series[1]/Period/Point[{i + 1}]/quality", expectedPoint.Quality);
+                    .HasValue(
+                        $"Series[1]/Period/Point[{i + 1}]/quantity",
+                        optionalPointDocumentFields.Quantity!.ToString()!);
+            }
+
+            if (optionalPointDocumentFields.Quality != null)
+            {
+                _documentAsserter
+                    .HasValue($"Series[1]/Period/Point[{i + 1}]/quality", optionalPointDocumentFields.Quality);
             }
         }
 

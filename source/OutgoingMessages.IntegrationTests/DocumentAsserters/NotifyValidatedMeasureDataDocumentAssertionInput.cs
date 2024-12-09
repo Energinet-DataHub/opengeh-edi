@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 
@@ -51,4 +51,4 @@ public sealed record RequiredSeriesFields(
     string Resolution,
     string StartedDateTime,
     string EndedDateTime,
-    IReadOnlyList<PointActivityRecord> Points);
+    IReadOnlyList<(RequiredPointDocumentFields, OptionalPointDocumentFields?)> Points);

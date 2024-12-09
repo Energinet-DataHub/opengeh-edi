@@ -76,8 +76,8 @@ public class NotifyValidatedMeasureDataDocumentAsserter
                 .HasQuantityMeasureUnit(assertionInput.RequiredSeriesFields.QuantityMeasureUnit)
                 .HasResolution(assertionInput.RequiredSeriesFields.Resolution)
                 .HasStartedDateTime(assertionInput.RequiredSeriesFields.StartedDateTime)
-                .HasEndedDateTime(assertionInput.RequiredSeriesFields.EndedDateTime);
-            //.HasPoints(assertionInput.RequiredSeriesFields.Points);
+                .HasEndedDateTime(assertionInput.RequiredSeriesFields.EndedDateTime)
+                .HasPoints(assertionInput.RequiredSeriesFields.Points);
         }
 
         await asserter

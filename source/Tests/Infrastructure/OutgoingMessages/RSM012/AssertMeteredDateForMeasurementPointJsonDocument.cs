@@ -145,19 +145,43 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(IReadOnlyList<PointActivityRecord> expectedPoints)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
+        IReadOnlyCollection<(RequiredPointDocumentFields Rpdf, OptionalPointDocumentFields? Opdf)> expectedPoints)
     {
         var points = FirstTimeSeriesPeriodElement().GetProperty("Point").EnumerateArray().ToList();
-        Assert.Equal(expectedPoints.Count, points.Count);
+        var expectedPointsList = expectedPoints.ToList();
 
-        for (var i = 0; i < expectedPoints.Count; i++)
+        points.Should().HaveCount(expectedPoints.Count);
+
+        for (var i = 0; i < expectedPointsList.Count; i++)
         {
-            var expectedPoint = expectedPoints[i];
+            var (requiredPointDocumentFields, optionalPointDocumentFields) = expectedPointsList[i];
             var actualPoint = points[i];
 
-            Assert.Equal(expectedPoint.Position, actualPoint.GetProperty("position").GetProperty("value").GetInt32());
-            // Assert.Equal(expectedPoint.Quality, actualPoint.TryGetProperty("quality", out var quality) ? quality.GetProperty("value").GetString() : null);
-            Assert.Equal(expectedPoint.Quantity, actualPoint.TryGetProperty("quantity", out var quantity) ? quantity.GetInt32() : null);
+            actualPoint.GetProperty("position")
+                .GetProperty("value")
+                .GetInt32()
+                .Should()
+                .Be(requiredPointDocumentFields.Position);
+
+            if (optionalPointDocumentFields == null)
+            {
+                continue;
+            }
+
+            if (optionalPointDocumentFields.Quality != null)
+            {
+                actualPoint.GetProperty("quality")
+                    .GetProperty("value")
+                    .GetString()
+                    .Should()
+                    .Be(optionalPointDocumentFields.Quality);
+            }
+
+            if (optionalPointDocumentFields.Quantity != null)
+            {
+                actualPoint.GetProperty("quantity").GetDecimal().Should().Be(optionalPointDocumentFields.Quantity);
+            }
         }
 
         return this;

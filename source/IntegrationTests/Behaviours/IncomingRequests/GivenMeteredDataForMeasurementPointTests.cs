@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -111,7 +112,9 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                             "PT1H",
                             "2024-11-28T13:51Z",
                             "2024-11-29T09:15Z",
-                            [])
+                            Enumerable.Range(1, 24)
+                                .Select(i => (new RequiredPointDocumentFields(i), (OptionalPointDocumentFields?)null))
+                                .ToList())
                         : new RequiredSeriesFields(
                             TransactionId.From(string.Join(string.Empty, $"{transactionIdPrefix}-2".Reverse())),
                             "579999993331812345",
@@ -121,7 +124,9 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                             "PT15M",
                             "2024-11-24T18:51Z",
                             "2024-11-25T03:39Z",
-                            [])));
+                            Enumerable.Range(1, 96)
+                                .Select(i => (new RequiredPointDocumentFields(i), (OptionalPointDocumentFields?)null))
+                                .ToList())));
         }
     }
 }
