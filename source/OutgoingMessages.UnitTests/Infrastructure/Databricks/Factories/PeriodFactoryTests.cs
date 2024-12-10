@@ -35,12 +35,13 @@ public class PeriodFactoryTests
         // Arrange
         var dateAsInstant = InstantPattern.ExtendedIso.Parse(date).Value;
         var domainResolution = Resolution.FromName(resolution);
+        var expectedDate = InstantPattern.ExtendedIso.Parse(expected).Value;
 
         // Act
-        var mappedDate = PeriodFactory.GetEndDateWithResolutionOffset(domainResolution, dateAsInstant);
+        var actual = PeriodFactory.GetEndDateWithResolutionOffset(domainResolution, dateAsInstant);
 
         // Assert
-        mappedDate.Should().Be(InstantPattern.ExtendedIso.Parse(expected).Value);
+        actual.Should().Be(expectedDate);
     }
 
     [Theory]
@@ -59,11 +60,12 @@ public class PeriodFactoryTests
         // Arrange
         var dateAsInstant = InstantPattern.ExtendedIso.Parse(date).Value;
         var domainResolution = Resolution.FromName(resolution);
+        var expectedDate = InstantPattern.ExtendedIso.Parse(expected).Value;
 
         // Act
-        var mappedDate = PeriodFactory.GetEndDateWithResolutionOffset(domainResolution, dateAsInstant);
+        var actual = PeriodFactory.GetEndDateWithResolutionOffset(domainResolution, dateAsInstant);
 
         // Assert
-        mappedDate.Should().Be(InstantPattern.ExtendedIso.Parse(expected).Value);
+        actual.Should().Be(expectedDate);
     }
 }
