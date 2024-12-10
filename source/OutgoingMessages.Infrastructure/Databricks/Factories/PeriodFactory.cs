@@ -69,14 +69,9 @@ public static class PeriodFactory
             case var res when res == Resolution.Hourly:
                 return timeForLatestPoint.Plus(Duration.FromHours(1));
             case var res when res == Resolution.Daily:
-                return timeForLatestPoint.Plus(Duration.FromDays(1));
+                return EnsureMidnight(timeForLatestPoint, daysToAdd: 1);
             case var res when res == Resolution.Monthly:
-                {
-                    var timeForLatestPointInLocalTime = timeForLatestPoint.InZone(_dkTimeZone).LocalDateTime;
-                    var endAtMidnightInLocalTime = timeForLatestPointInLocalTime.PlusMonths(1).Date.AtMidnight();
-                    var endAtMidnightInUtc = endAtMidnightInLocalTime.InZoneStrictly(_dkTimeZone);
-                    return endAtMidnightInUtc.ToInstant();
-                }
+                return EnsureMidnight(timeForLatestPoint, monthsToAdd: 1);
 
             default:
                 throw new ArgumentOutOfRangeException(
@@ -84,5 +79,15 @@ public static class PeriodFactory
                     resolution,
                     "Unknown resolution");
         }
+    }
+
+    private static Instant EnsureMidnight(Instant date, int daysToAdd = 0, int monthsToAdd = 0)
+    {
+        var localDate = date.InZone(_dkTimeZone).LocalDateTime;
+        var midnight = localDate
+            .PlusMonths(monthsToAdd)
+            .PlusDays(daysToAdd).Date
+            .AtMidnight();
+        return midnight.InZoneStrictly(_dkTimeZone).ToInstant();
     }
 }

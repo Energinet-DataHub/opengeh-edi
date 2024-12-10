@@ -42,6 +42,7 @@ public static class MetaTests
         var integrationEventsIntegrationTestsAssembly = Assembly.GetAssembly(typeof(IntegrationEventsFixture));
         var masterDataIntegrationTestsAssembly = Assembly.GetAssembly(typeof(MasterDataFixture));
         var incomingMessageIntegrationTestsAssembly = Assembly.GetAssembly(typeof(IncomingMessagesTestFixture));
+        var outgoingMessagesUnitTestsAssembly = Assembly.GetAssembly(typeof(OutgoingMessages.UnitTests.Infrastructure.Databricks.Factories.PeriodFactoryTests));
 
         var allTypes = new[]
         {
@@ -50,6 +51,7 @@ public static class MetaTests
             integrationEventsIntegrationTestsAssembly,
             masterDataIntegrationTestsAssembly,
             incomingMessageIntegrationTestsAssembly,
+            outgoingMessagesUnitTestsAssembly,
         }.SelectMany(x => x?.GetTypes()!);
 
         var allTestNames = allTypes.Where(

@@ -206,6 +206,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MasterData.Domain", "Master
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchivedMessages.Domain", "ArchivedMessages.Domain\ArchivedMessages.Domain.csproj", "{5DBB75FB-38DC-47ED-987B-255A2D48186C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.UnitTests", "OutgoingMessages.UnitTests\OutgoingMessages.UnitTests.csproj", "{2A087DB2-8A23-489C-979D-AE8D1783B52A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -452,6 +454,10 @@ Global
 		{5DBB75FB-38DC-47ED-987B-255A2D48186C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DBB75FB-38DC-47ED-987B-255A2D48186C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DBB75FB-38DC-47ED-987B-255A2D48186C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A087DB2-8A23-489C-979D-AE8D1783B52A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A087DB2-8A23-489C-979D-AE8D1783B52A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A087DB2-8A23-489C-979D-AE8D1783B52A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A087DB2-8A23-489C-979D-AE8D1783B52A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -548,6 +554,7 @@ Global
 		{0E787394-5AD2-4920-900F-E802EDB726B6} = {ED4BC8EC-5C20-4250-B2DD-9FEAEF726D8E}
 		{4A238A51-ED28-4039-8046-ED7B1336C614} = {ED4BC8EC-5C20-4250-B2DD-9FEAEF726D8E}
 		{5DBB75FB-38DC-47ED-987B-255A2D48186C} = {0B7C34CA-1AC7-4D94-B44B-5357EFE13F88}
+		{2A087DB2-8A23-489C-979D-AE8D1783B52A} = {75A9EB8E-EEE3-443B-B497-F624E454DC22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C390B97-896A-4AAD-8609-3C20E80966D2}
