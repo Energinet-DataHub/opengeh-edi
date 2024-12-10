@@ -30,7 +30,29 @@ public class PeriodFactoryTests
     // From winter time to summer time
     [InlineData("2024-03-30T23:00:00.000", nameof(Resolution.Daily), "2024-03-31T22:00:00Z")]
     [InlineData("2024-02-29T23:00:00.000", nameof(Resolution.Monthly), "2024-03-31T22:00:00Z")]
-    public void Given_DataAndResolution_When_Mapping_Then_ReturnsExpectedDate(string date, string resolution, string expected)
+    public void Given_SummerWinterTimeChangeDate_When_Mapping_Then_ReturnsExpectedDateWithSummerWinterTimeCorrection(string date, string resolution, string expected)
+    {
+        // Arrange
+        var dateAsInstant = InstantPattern.ExtendedIso.Parse(date).Value;
+        var domainResolution = Resolution.FromName(resolution);
+
+        // Act
+        var mappedDate = PeriodFactory.GetEndDateWithResolutionOffset(domainResolution, dateAsInstant);
+
+        // Assert
+        mappedDate.Should().Be(InstantPattern.ExtendedIso.Parse(expected).Value);
+    }
+
+    [Theory]
+
+    // From summer time to winter time
+    [InlineData("2021-10-31T02:00:00.000", nameof(Resolution.QuarterHourly), "2021-10-31T02:15:00Z")]
+    [InlineData("2021-10-31T02:00:00.000", nameof(Resolution.Hourly), "2021-10-31T03:00:00Z")]
+
+    // From winter time to summer time
+    [InlineData("2024-03-31T03:00:00.000", nameof(Resolution.Daily), "2024-03-31T03:15:00Z")]
+    [InlineData("2024-03-31T03:00:00.000", nameof(Resolution.Monthly), "2024-03-31T04:00:00Z")]
+    public void Given_SummerWinterTimeChangeDate_When_Mapping_Then_ReturnsExpectedDateWithNoCorrection(string date, string resolution, string expected)
     {
         // Arrange
         var dateAsInstant = InstantPattern.ExtendedIso.Parse(date).Value;
