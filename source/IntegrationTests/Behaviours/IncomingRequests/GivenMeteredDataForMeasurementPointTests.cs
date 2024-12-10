@@ -106,7 +106,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                         "DDQ",
                         "2024-07-01T14:57:09Z"),
                     new OptionalHeaderDocumentFields(
-                        null,
+                        "23",
                         [
                             isTransOne
                             ? new AssertSeriesDocumentFieldsInput(

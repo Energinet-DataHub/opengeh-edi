@@ -79,6 +79,29 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         return this;
     }
 
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessSectorType(
+        string? expectedBusinessSectorType)
+    {
+        if (expectedBusinessSectorType is null)
+        {
+            _root
+                .TryGetProperty("businessSector.type", out _)
+                .Should()
+                .BeFalse("property 'businessSector.type' should not be present");
+
+            return this;
+        }
+
+        _root
+            .GetProperty("businessSector.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedBusinessSectorType);
+
+        return this;
+    }
+
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId)

@@ -54,6 +54,7 @@ public class NotifyValidatedMeasureDataDocumentAsserter
 
         var requiredHeaderDocumentFields = assertionInput.RequiredHeaderDocumentFields;
 
+        // Required fields
         asserter
             .MessageIdExists()
             .HasBusinessReason(requiredHeaderDocumentFields.BusinessReasonCode)
@@ -69,12 +70,14 @@ public class NotifyValidatedMeasureDataDocumentAsserter
 
         var optionalHeaderDocumentFields = assertionInput.OptionalHeaderDocumentFields;
 
-        // asserter.HasBusinessSectorType(optionalHeaderDocumentFields.BusinessSectorType);
+        // Optional fields
+        asserter.HasBusinessSectorType(optionalHeaderDocumentFields.BusinessSectorType);
 
         foreach (var assertSeriesDocumentFieldsInput in optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput)
         {
             var (seriesIndex, requiredSeriesFields, optionalSeriesFields) = assertSeriesDocumentFieldsInput;
 
+            // Required series fields
             asserter
                 .HasTransactionId(seriesIndex, requiredSeriesFields.TransactionId)
                 .HasMeteringPointNumber(
@@ -83,11 +86,13 @@ public class NotifyValidatedMeasureDataDocumentAsserter
                     requiredSeriesFields.MeteringPointScheme)
                 .HasMeteringPointType(seriesIndex, requiredSeriesFields.MeteringPointType)
                 .HasQuantityMeasureUnit(seriesIndex, requiredSeriesFields.QuantityMeasureUnit)
+                // Required period fields
                 .HasResolution(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.Resolution)
                 .HasStartedDateTime(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.StartedDateTime)
                 .HasEndedDateTime(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.EndedDateTime)
                 .HasPoints(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.Points.ToList().AsReadOnly());
 
+            // Optional series fields
             asserter
                 .HasOriginalTransactionIdReferenceId(seriesIndex, optionalSeriesFields.OriginalTransactionIdReferenceId)
                 .HasRegistrationDateTime(seriesIndex, optionalSeriesFields.RegistrationDateTime)

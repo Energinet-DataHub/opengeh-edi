@@ -32,6 +32,8 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasTimestamp(string expectedTimestamp);
 
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessSectorType(string? expectedBusinessSectorType);
+
     IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId);

@@ -72,6 +72,21 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
         return this;
     }
 
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessSectorType(
+        string? expectedBusinessSectorType)
+    {
+        if (expectedBusinessSectorType == null)
+        {
+            _documentAsserter.IsNotPresent("businessSector.type");
+        }
+        else
+        {
+            _documentAsserter.HasValue("businessSector.type", expectedBusinessSectorType);
+        }
+
+        return this;
+    }
+
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId)
