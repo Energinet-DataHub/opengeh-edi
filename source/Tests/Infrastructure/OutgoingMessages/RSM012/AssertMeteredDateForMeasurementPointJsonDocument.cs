@@ -39,7 +39,7 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists()
     {
-        Assert.True(_root.TryGetProperty("mRID", out _));
+        _root.TryGetProperty("mRID", out _).Should().BeTrue("property 'mRID' should be present");
         return this;
     }
 
