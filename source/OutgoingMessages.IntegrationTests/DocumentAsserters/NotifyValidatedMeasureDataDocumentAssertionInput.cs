@@ -29,7 +29,7 @@ public readonly record struct RequiredHeaderDocumentFields(
 
 public sealed record OptionalHeaderDocumentFields(
     string? BusinessSectorType,
-    AssertSeriesDocumentFieldsInput? AssertSeriesDocumentFieldsInput);
+    IReadOnlyCollection<AssertSeriesDocumentFieldsInput> AssertSeriesDocumentFieldsInput);
 
 public sealed record NotifyValidatedMeasureDataDocumentAssertionInput(
     RequiredHeaderDocumentFields RequiredHeaderDocumentFields,

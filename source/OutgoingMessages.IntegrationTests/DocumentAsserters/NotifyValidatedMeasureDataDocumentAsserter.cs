@@ -71,10 +71,9 @@ public class NotifyValidatedMeasureDataDocumentAsserter
 
         // asserter.HasBusinessSectorType(optionalHeaderDocumentFields.BusinessSectorType);
 
-        if (optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput != null)
+        foreach (var assertSeriesDocumentFieldsInput in optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput)
         {
-            var (seriesIndex, requiredSeriesFields, optionalSeriesFields) =
-                optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput;
+            var (seriesIndex, requiredSeriesFields, optionalSeriesFields) = assertSeriesDocumentFieldsInput;
 
             asserter
                 .HasTransactionId(seriesIndex, requiredSeriesFields.TransactionId)

@@ -107,7 +107,8 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                         "2024-07-01T14:57:09Z"),
                     new OptionalHeaderDocumentFields(
                         null,
-                        isTransOne
+                        [
+                            isTransOne
                             ? new AssertSeriesDocumentFieldsInput(
                                 1,
                                 new RequiredSeriesFields(
@@ -155,7 +156,8 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                                     "2022-12-17T09:30:47Z",
                                     null,
                                     null,
-                                    "8716867000030")))));
+                                    "8716867000030")),
+                        ])));
         }
     }
 }
