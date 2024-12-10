@@ -69,6 +69,14 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
         int seriesIndex,
         string expectedEndedDateTime);
 
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasInDomain(
+        int seriesIndex,
+        string? expectedInDomain);
+
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasOutDomain(
+        int seriesIndex,
+        string? expectedOutDomain);
+
     IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
         int seriesIndex,
         IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints);

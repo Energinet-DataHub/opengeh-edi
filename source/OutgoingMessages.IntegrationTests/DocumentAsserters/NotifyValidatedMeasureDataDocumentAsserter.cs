@@ -91,9 +91,9 @@ public class NotifyValidatedMeasureDataDocumentAsserter
             asserter
                 .HasOriginalTransactionIdReferenceId(seriesIndex, optionalSeriesFields.OriginalTransactionIdReferenceId)
                 .HasRegistrationDateTime(seriesIndex, optionalSeriesFields.RegistrationDateTime)
-                .HasProduct(seriesIndex, optionalSeriesFields.Product);
-            // .HasRegistrationDateTime(optionalSeriesFields.InDomain)
-            // .HasRegistrationDateTime(optionalSeriesFields.OutDomain)
+                .HasProduct(seriesIndex, optionalSeriesFields.Product)
+                .HasInDomain(seriesIndex, optionalSeriesFields.InDomain)
+                .HasOutDomain(seriesIndex, optionalSeriesFields.OutDomain);
         }
 
         await asserter

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 
@@ -175,6 +174,34 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
     {
         _documentAsserter
             .HasValue($"Series[{seriesIndex}]/Period/timeInterval/end", expectedEndedDateTime);
+        return this;
+    }
+
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasInDomain(int seriesIndex, string? expectedInDomain)
+    {
+        if (expectedInDomain is null)
+        {
+            _documentAsserter.IsNotPresent($"Series[{seriesIndex}]/in_Domain.mRID");
+            return this;
+        }
+
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/in_Domain.mRID", expectedInDomain);
+
+        return this;
+    }
+
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasOutDomain(
+        int seriesIndex,
+        string? expectedOutDomain)
+    {
+        if (expectedOutDomain is null)
+        {
+            _documentAsserter.IsNotPresent($"Series[{seriesIndex}]/out_Domain.mRID");
+            return this;
+        }
+
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/out_Domain.mRID", expectedOutDomain);
+
         return this;
     }
 

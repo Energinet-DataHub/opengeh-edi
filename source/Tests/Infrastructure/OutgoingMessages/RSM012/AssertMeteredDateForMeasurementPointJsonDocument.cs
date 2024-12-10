@@ -15,10 +15,8 @@
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using FluentAssertions;
 using Json.Schema;
-using Namotion.Reflection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
@@ -237,6 +235,48 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
             .GetString()
             .Should()
             .Be(expectedEndedDateTime);
+
+        return this;
+    }
+
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasInDomain(int seriesIndex, string? expectedInDomain)
+    {
+        if (expectedInDomain is null)
+        {
+            GetTimeSeriesElement(seriesIndex)
+                .TryGetProperty("in_Domain.mRID", out _)
+                .Should()
+                .BeFalse("property 'in_Domain.mRID' should not be present");
+
+            return this;
+        }
+
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("in_Domain.mRID")
+            .GetString()
+            .Should()
+            .Be(expectedInDomain);
+
+        return this;
+    }
+
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasOutDomain(int seriesIndex, string? expectedOutDomain)
+    {
+        if (expectedOutDomain is null)
+        {
+            GetTimeSeriesElement(seriesIndex)
+                .TryGetProperty("out_Domain.mRID", out _)
+                .Should()
+                .BeFalse("property 'out_Domain.mRID' should not be present");
+
+            return this;
+        }
+
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("out_Domain.mRID")
+            .GetString()
+            .Should()
+            .Be(expectedOutDomain);
 
         return this;
     }
