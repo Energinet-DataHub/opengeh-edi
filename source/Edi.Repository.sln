@@ -206,7 +206,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MasterData.Domain", "Master
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchivedMessages.Domain", "ArchivedMessages.Domain\ArchivedMessages.Domain.csproj", "{5DBB75FB-38DC-47ED-987B-255A2D48186C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurgoingMessages.UnitTests", "OurgoingMessages.UnitTests\OurgoingMessages.UnitTests.csproj", "{2A087DB2-8A23-489C-979D-AE8D1783B52A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.UnitTests", "OutgoingMessages.UnitTests\OutgoingMessages.UnitTests.csproj", "{2A087DB2-8A23-489C-979D-AE8D1783B52A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
