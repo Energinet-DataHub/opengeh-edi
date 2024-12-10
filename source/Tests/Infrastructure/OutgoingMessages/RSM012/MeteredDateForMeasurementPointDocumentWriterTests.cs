@@ -61,17 +61,22 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
             .HasReceiverId(SampleData.ReceiverActorNumber, "A10")
             .HasReceiverRole(SampleData.ReceiverActorRole)
             .HasTimestamp(SampleData.TimeStamp.ToString())
-            .HasTransactionId(SampleData.TransactionId)
-            .HasMeteringPointNumber(SampleData.MeteringPointNumber, "A10")
-            .HasMeteringPointType(SampleData.MeteringPointType)
-            .HasOriginalTransactionIdReferenceId(SampleData.OriginalTransactionIdReferenceId?.Value)
-            .HasProduct(SampleData.Product)
-            .HasQuantityMeasureUnit(SampleData.QuantityMeasureUnit.Code)
-            .HasRegistrationDateTime(SampleData.RegistrationDateTime.ToString())
-            .HasResolution(SampleData.Resolution.Code)
-            .HasStartedDateTime(SampleData.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
-            .HasEndedDateTime(SampleData.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasTransactionId(1, SampleData.TransactionId)
+            .HasMeteringPointNumber(1, SampleData.MeteringPointNumber, "A10")
+            .HasMeteringPointType(1, SampleData.MeteringPointType)
+            .HasOriginalTransactionIdReferenceId(1, SampleData.OriginalTransactionIdReferenceId?.Value)
+            .HasProduct(1, SampleData.Product)
+            .HasQuantityMeasureUnit(1, SampleData.QuantityMeasureUnit.Code)
+            .HasRegistrationDateTime(1, SampleData.RegistrationDateTime.ToString())
+            .HasResolution(1, SampleData.Resolution.Code)
+            .HasStartedDateTime(
+                1,
+                SampleData.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasEndedDateTime(
+                1,
+                SampleData.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
             .HasPoints(
+                1,
                 SampleData.Points.Select(
                         p => new AssertPointDocumentFieldsInput(
                             new RequiredPointDocumentFields(p.Position),

@@ -73,99 +73,117 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(TransactionId expectedTransactionId)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(
+        int seriesIndex,
+        TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.Value);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/mRID", expectedTransactionId.Value);
         return this;
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointNumber(
+        int seriesIndex,
         string expectedMeteringPointNumber,
         string expectedSchemeCode)
     {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.mRID", expectedMeteringPointNumber);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/marketEvaluationPoint.mRID", expectedMeteringPointNumber);
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(string expectedMeteringPointType)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(
+        int seriesIndex,
+        string expectedMeteringPointType)
     {
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/marketEvaluationPoint.type", expectedMeteringPointType);
         return this;
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasOriginalTransactionIdReferenceId(
+        int seriesIndex,
         string? expectedOriginalTransactionIdReferenceId)
     {
         if (expectedOriginalTransactionIdReferenceId == null)
         {
-            _documentAsserter.IsNotPresent("Series[1]/originalTransactionIDReference_Series.mRID");
+            _documentAsserter.IsNotPresent($"Series[{seriesIndex}]/originalTransactionIDReference_Series.mRID");
         }
         else
         {
             _documentAsserter.HasValue(
-                "Series[1]/originalTransactionIDReference_Series.mRID",
+                $"Series[{seriesIndex}]/originalTransactionIDReference_Series.mRID",
                 expectedOriginalTransactionIdReferenceId);
         }
 
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string? expectedProduct)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct)
     {
         if (expectedProduct is null)
         {
-            _documentAsserter.IsNotPresent("Series[1]/product");
+            _documentAsserter.IsNotPresent($"Series[{seriesIndex}]/product");
             return this;
         }
 
-        _documentAsserter.HasValue("Series[1]/product", expectedProduct);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/product", expectedProduct);
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(string expectedQuantityMeasureUnit)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(
+        int seriesIndex,
+        string expectedQuantityMeasureUnit)
     {
-        _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", expectedQuantityMeasureUnit);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/quantity_Measure_Unit.name", expectedQuantityMeasureUnit);
         return this;
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(
+        int seriesIndex,
         string? expectedRegistrationDateTime)
     {
         if (expectedRegistrationDateTime is null)
         {
-            _documentAsserter.IsNotPresent("Series[1]/registration_DateAndOrTime.dateTime");
+            _documentAsserter.IsNotPresent($"Series[{seriesIndex}]/registration_DateAndOrTime.dateTime");
             return this;
         }
 
-        _documentAsserter.HasValue("Series[1]/registration_DateAndOrTime.dateTime", expectedRegistrationDateTime);
+        _documentAsserter.HasValue(
+            $"Series[{seriesIndex}]/registration_DateAndOrTime.dateTime",
+            expectedRegistrationDateTime);
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(string expectedResolution)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(
+        int seriesIndex,
+        string expectedResolution)
     {
-        _documentAsserter.HasValue("Series[1]/Period/resolution", expectedResolution);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/Period/resolution", expectedResolution);
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(string expectedStartedDateTime)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(
+        int seriesIndex,
+        string expectedStartedDateTime)
     {
         _documentAsserter
-            .HasValue("Series[1]/Period/timeInterval/start", expectedStartedDateTime);
+            .HasValue($"Series[{seriesIndex}]/Period/timeInterval/start", expectedStartedDateTime);
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(string expectedEndedDateTime)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(
+        int seriesIndex,
+        string expectedEndedDateTime)
     {
         _documentAsserter
-            .HasValue("Series[1]/Period/timeInterval/end", expectedEndedDateTime);
+            .HasValue($"Series[{seriesIndex}]/Period/timeInterval/end", expectedEndedDateTime);
         return this;
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
+        int seriesIndex,
         IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints)
     {
         var pointsInDocument = _documentAsserter
-            .GetElements("Series[1]/Period/Point")!;
+            .GetElements($"Series[{seriesIndex}]/Period/Point")!;
 
         pointsInDocument.Should().HaveSameCount(expectedPoints);
 
@@ -174,28 +192,32 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
             var (requiredPointDocumentFields, optionalPointDocumentFields) = expectedPoints[i];
 
             _documentAsserter
-                .HasValue($"Series[1]/Period/Point[{i + 1}]/position", requiredPointDocumentFields.Position.ToString());
+                .HasValue(
+                    $"Series[{seriesIndex}]/Period/Point[{i + 1}]/position",
+                    requiredPointDocumentFields.Position.ToString());
 
             if (optionalPointDocumentFields.Quantity != null)
             {
                 _documentAsserter
                     .HasValue(
-                        $"Series[1]/Period/Point[{i + 1}]/quantity",
+                        $"Series[{seriesIndex}]/Period/Point[{i + 1}]/quantity",
                         optionalPointDocumentFields.Quantity!.ToString()!);
             }
             else
             {
-                AssertElementNotPresent($"Series[1]/Period/Point[{i + 1}]/quantity");
+                AssertElementNotPresent($"Series[{seriesIndex}]/Period/Point[{i + 1}]/quantity");
             }
 
             if (optionalPointDocumentFields.Quality != null)
             {
                 _documentAsserter
-                    .HasValue($"Series[1]/Period/Point[{i + 1}]/quality", optionalPointDocumentFields.Quality);
+                    .HasValue(
+                        $"Series[{seriesIndex}]/Period/Point[{i + 1}]/quality",
+                        optionalPointDocumentFields.Quality);
             }
             else
             {
-                AssertElementNotPresent($"Series[1]/Period/Point[{i + 1}]/quality");
+                AssertElementNotPresent($"Series[{seriesIndex}]/Period/Point[{i + 1}]/quality");
             }
         }
 

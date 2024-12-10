@@ -109,6 +109,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                         null,
                         isTransOne
                             ? new AssertSeriesDocumentFieldsInput(
+                                1,
                                 new RequiredSeriesFields(
                                     TransactionId.From(string.Join(string.Empty, transactionId1.Reverse())),
                                     "579999993331812345",
@@ -132,6 +133,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                                     null,
                                     "8716867000030"))
                             : new AssertSeriesDocumentFieldsInput(
+                                1,
                                 new RequiredSeriesFields(
                                     TransactionId.From(string.Join(string.Empty, transactionId2.Reverse())),
                                     "579999993331812345",

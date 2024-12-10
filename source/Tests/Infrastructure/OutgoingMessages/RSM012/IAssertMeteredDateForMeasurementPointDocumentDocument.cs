@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
@@ -34,27 +32,45 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasTimestamp(string expectedTimestamp);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(TransactionId expectedTransactionId);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(
+        int seriesIndex,
+        TransactionId expectedTransactionId);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointNumber(string expectedMeteringPointNumber, string expectedSchemeCode);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointNumber(
+        int seriesIndex,
+        string expectedMeteringPointNumber,
+        string expectedSchemeCode);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(string expectedMeteringPointType);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(
+        int seriesIndex,
+        string expectedMeteringPointType);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasOriginalTransactionIdReferenceId(string? expectedOriginalTransactionIdReferenceId);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasOriginalTransactionIdReferenceId(
+        int seriesIndex,
+        string? expectedOriginalTransactionIdReferenceId);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string? expectedProduct);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(string expectedQuantityMeasureUnit);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(
+        int seriesIndex,
+        string expectedQuantityMeasureUnit);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(string? expectedRegistrationDateTime);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(
+        int seriesIndex,
+        string? expectedRegistrationDateTime);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(string expectedResolution);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(int seriesIndex, string expectedResolution);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(string expectedStartedDateTime);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(
+        int seriesIndex,
+        string expectedStartedDateTime);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(string expectedEndedDateTime);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(
+        int seriesIndex,
+        string expectedEndedDateTime);
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
+        int seriesIndex,
         IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints);
 
     /// <summary>

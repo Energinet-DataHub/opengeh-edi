@@ -36,6 +36,7 @@ public sealed record NotifyValidatedMeasureDataDocumentAssertionInput(
     OptionalHeaderDocumentFields OptionalHeaderDocumentFields);
 
 public sealed record AssertSeriesDocumentFieldsInput(
+    int SeriesIndex,
     RequiredSeriesFields RequiredSeriesFields,
     OptionalSeriesFields OptionalSeriesFields);
 

@@ -73,24 +73,26 @@ public class NotifyValidatedMeasureDataDocumentAsserter
 
         if (optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput != null)
         {
-            var (requiredSeriesFields, optionalSeriesFields) =
+            var (seriesIndex, requiredSeriesFields, optionalSeriesFields) =
                 optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput;
-            asserter
-                .HasTransactionId(requiredSeriesFields.TransactionId)
-                .HasMeteringPointNumber(
-                    requiredSeriesFields.MeteringPointNumber,
-                    requiredSeriesFields.MeteringPointScheme)
-                .HasMeteringPointType(requiredSeriesFields.MeteringPointType)
-                .HasQuantityMeasureUnit(requiredSeriesFields.QuantityMeasureUnit)
-                .HasResolution(requiredSeriesFields.RequiredPeriodDocumentFields.Resolution)
-                .HasStartedDateTime(requiredSeriesFields.RequiredPeriodDocumentFields.StartedDateTime)
-                .HasEndedDateTime(requiredSeriesFields.RequiredPeriodDocumentFields.EndedDateTime)
-                .HasPoints(requiredSeriesFields.RequiredPeriodDocumentFields.Points.ToList().AsReadOnly());
 
             asserter
-                .HasOriginalTransactionIdReferenceId(optionalSeriesFields.OriginalTransactionIdReferenceId)
-                .HasRegistrationDateTime(optionalSeriesFields.RegistrationDateTime)
-                .HasProduct(optionalSeriesFields.Product);
+                .HasTransactionId(seriesIndex, requiredSeriesFields.TransactionId)
+                .HasMeteringPointNumber(
+                    seriesIndex,
+                    requiredSeriesFields.MeteringPointNumber,
+                    requiredSeriesFields.MeteringPointScheme)
+                .HasMeteringPointType(seriesIndex, requiredSeriesFields.MeteringPointType)
+                .HasQuantityMeasureUnit(seriesIndex, requiredSeriesFields.QuantityMeasureUnit)
+                .HasResolution(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.Resolution)
+                .HasStartedDateTime(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.StartedDateTime)
+                .HasEndedDateTime(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.EndedDateTime)
+                .HasPoints(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.Points.ToList().AsReadOnly());
+
+            asserter
+                .HasOriginalTransactionIdReferenceId(seriesIndex, optionalSeriesFields.OriginalTransactionIdReferenceId)
+                .HasRegistrationDateTime(seriesIndex, optionalSeriesFields.RegistrationDateTime)
+                .HasProduct(seriesIndex, optionalSeriesFields.Product);
             // .HasRegistrationDateTime(optionalSeriesFields.InDomain)
             // .HasRegistrationDateTime(optionalSeriesFields.OutDomain)
         }
