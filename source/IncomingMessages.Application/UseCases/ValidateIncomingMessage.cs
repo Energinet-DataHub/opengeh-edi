@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 
@@ -28,7 +30,8 @@ public class ValidateIncomingMessage(
     IMessageTypeValidator messageTypeValidator,
     IProcessTypeValidator processTypeValidator,
     IBusinessTypeValidator businessTypeValidator,
-    ITransactionIdRepository transactionIdRepository)
+    ITransactionIdRepository transactionIdRepository,
+    ILogger<ValidateIncomingMessage> logger)
 {
     private const int MaxMessageIdLength = 36;
     private const int MaxTransactionIdLength = 36;
@@ -54,8 +57,11 @@ public class ValidateIncomingMessage(
         // It is slightly annoying since all we do is FirstOrDefaultAsync which we await.
         // And read access shouldn't be that much of a problem wrt concurrency.
         // It is also a bit silly to have this as a separate call, but it works.
+        var stopwatch = Stopwatch.StartNew();
         var transactionIdErrors =
             await CheckTransactionIdsAsync(incomingMessage, cancellationToken).ConfigureAwait(false);
+        stopwatch.Stop();
+        logger.LogInformation($"ValidateIncomingMessage CheckTransactionIdsAsync execution time: {stopwatch.ElapsedMilliseconds} ms");
 
         var allErrors = errors.Concat(transactionIdErrors).ToArray();
 
@@ -64,20 +70,26 @@ public class ValidateIncomingMessage(
 
     private async Task<IReadOnlyCollection<ValidationError>> AuthorizeSenderAsync(IIncomingMessage message)
     {
+        var stopwatch = Stopwatch.StartNew();
         var allSeriesAreDelegated = message.Series.Count > 0 && message.Series.All(s => s.IsDelegated);
 
         var result = await senderAuthorizer
             .AuthorizeAsync(message, allSeriesAreDelegated)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        logger.LogInformation($"ValidateIncomingMessage AuthorizeSenderAsync execution time: {stopwatch.ElapsedMilliseconds} ms");
 
         return result.Errors;
     }
 
     private async Task<IReadOnlyCollection<ValidationError>> VerifyReceiverAsync(IIncomingMessage message)
     {
+        var stopwatch = Stopwatch.StartNew();
         var receiverVerification = await receiverValidator
             .VerifyAsync(message.ReceiverNumber, message.ReceiverRoleCode)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        logger.LogInformation($"ValidateIncomingMessage VerifyReceiverAsync execution time: {stopwatch.ElapsedMilliseconds} ms");
 
         return receiverVerification.Errors;
     }
@@ -86,6 +98,7 @@ public class ValidateIncomingMessage(
         IIncomingMessage message,
         CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
         var errors = new List<ValidationError>();
 
         if (string.IsNullOrEmpty(message.MessageId))
@@ -104,6 +117,9 @@ public class ValidateIncomingMessage(
             errors.Add(new DuplicateMessageIdDetected(message.MessageId));
         }
 
+        stopwatch.Stop();
+        logger.LogInformation($"ValidateIncomingMessage CheckMessageIdAsync execution time: {stopwatch.ElapsedMilliseconds} ms");
+
         return errors;
     }
 
@@ -111,8 +127,11 @@ public class ValidateIncomingMessage(
         IIncomingMessage message,
         CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
         var result = await messageTypeValidator.ValidateAsync(message, cancellationToken)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        logger.LogInformation($"ValidateIncomingMessage CheckMessageTypeAsync execution time: {stopwatch.ElapsedMilliseconds} ms");
         return result.Errors;
     }
 
@@ -121,8 +140,11 @@ public class ValidateIncomingMessage(
         DocumentFormat documentFormat,
         CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
         var result = await processTypeValidator.ValidateAsync(message, documentFormat, cancellationToken)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        logger.LogInformation($"ValidateIncomingMessage CheckBusinessReasonAsync execution time: {stopwatch.ElapsedMilliseconds} ms");
         return result.Errors;
     }
 
@@ -130,8 +152,11 @@ public class ValidateIncomingMessage(
         IIncomingMessage message,
         CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
         var result = await businessTypeValidator.ValidateAsync(message.BusinessType, cancellationToken)
             .ConfigureAwait(false);
+        stopwatch.Stop();
+        logger.LogInformation($"ValidateIncomingMessage CheckBusinessTypeAsync execution time: {stopwatch.ElapsedMilliseconds} ms");
         return result.Errors;
     }
 
