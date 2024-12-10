@@ -44,6 +44,8 @@ public class PeriodFactoryTests
     }
 
     [Theory]
+    [InlineData("2021-10-26T22:00:00Z", nameof(Resolution.Daily), "2021-10-27T22:00:00Z")]
+    [InlineData("2021-07-31T22:00:00Z", nameof(Resolution.Monthly), "2021-08-31T22:00:00Z")]
 
     // From summer time to winter time
     [InlineData("2021-10-31T02:00:00Z", nameof(Resolution.QuarterHourly), "2021-10-31T02:15:00Z")]
@@ -52,7 +54,7 @@ public class PeriodFactoryTests
     // From winter time to summer time
     [InlineData("2024-03-31T03:00:00Z", nameof(Resolution.QuarterHourly), "2024-03-31T03:15:00Z")]
     [InlineData("2024-03-31T03:00:00Z", nameof(Resolution.Hourly), "2024-03-31T04:00:00Z")]
-    public void Given_SummerWinterTimeChangeDate_When_Mapping_Then_ReturnsExpectedDateWithNoCorrection(string date, string resolution, string expected)
+    public void Given_DatesWithoutSummerWinterTimeChange_When_Mapping_Then_ReturnsExpectedDateWithNoCorrection(string date, string resolution, string expected)
     {
         // Arrange
         var dateAsInstant = InstantPattern.ExtendedIso.Parse(date).Value;
