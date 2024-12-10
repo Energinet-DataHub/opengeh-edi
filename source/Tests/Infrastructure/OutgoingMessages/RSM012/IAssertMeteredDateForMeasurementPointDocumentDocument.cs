@@ -42,11 +42,11 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasOriginalTransactionIdReferenceId(string? expectedOriginalTransactionIdReferenceId);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string expectedProduct);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string? expectedProduct);
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(string expectedQuantityMeasureUnit);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(string expectedRegistrationDateTime);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(string? expectedRegistrationDateTime);
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(string expectedResolution);
 
@@ -55,7 +55,7 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
     IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(string expectedEndedDateTime);
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
-        IReadOnlyCollection<(RequiredPointDocumentFields Rpdf, OptionalPointDocumentFields? Opdf)> expectedPoints);
+        IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints);
 
     /// <summary>
     /// Asserts document validity

@@ -14,7 +14,6 @@
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
-public sealed record OptionalPointDocumentFields(string? Quality, decimal? Quantity)
-{
-    public static OptionalPointDocumentFields NoOptionalFields() => new(null, null);
-}
+public sealed record AssertPointDocumentFieldsInput(
+    RequiredPointDocumentFields Required,
+    OptionalPointDocumentFields Optional);

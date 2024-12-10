@@ -73,17 +73,9 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
             .HasEndedDateTime(SampleData.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
             .HasPoints(
                 SampleData.Points.Select(
-                        p =>
-                        {
-                            var req = new RequiredPointDocumentFields(p.Position);
-                            OptionalPointDocumentFields? opt = null;
-                            if (p.Quality != null || p.Quantity != null)
-                            {
-                                opt = new OptionalPointDocumentFields(p.Quality, p.Quantity);
-                            }
-
-                            return (req, opt);
-                        })
+                        p => new AssertPointDocumentFieldsInput(
+                            new RequiredPointDocumentFields(p.Position),
+                            new OptionalPointDocumentFields(p.Quality, p.Quantity)))
                     .ToList())
             .DocumentIsValidAsync();
     }

@@ -52,32 +52,47 @@ public class NotifyValidatedMeasureDataDocumentAsserter
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 
+        var requiredHeaderDocumentFields = assertionInput.RequiredHeaderDocumentFields;
+
         asserter
             .MessageIdExists()
-            .HasBusinessReason(assertionInput.RequiredDocumentFields.BusinessReasonCode)
+            .HasBusinessReason(requiredHeaderDocumentFields.BusinessReasonCode)
             .HasSenderId(
-                assertionInput.RequiredDocumentFields.SenderId,
-                assertionInput.RequiredDocumentFields.SenderScheme)
-            .HasSenderRole(assertionInput.RequiredDocumentFields.SenderRole)
+                requiredHeaderDocumentFields.SenderId,
+                requiredHeaderDocumentFields.SenderScheme)
+            .HasSenderRole(requiredHeaderDocumentFields.SenderRole)
             .HasReceiverId(
-                assertionInput.RequiredDocumentFields.ReceiverId,
-                assertionInput.RequiredDocumentFields.ReceiverScheme)
-            .HasReceiverRole(assertionInput.RequiredDocumentFields.ReceiverRole)
-            .HasTimestamp(assertionInput.RequiredDocumentFields.Timestamp);
+                requiredHeaderDocumentFields.ReceiverId,
+                requiredHeaderDocumentFields.ReceiverScheme)
+            .HasReceiverRole(requiredHeaderDocumentFields.ReceiverRole)
+            .HasTimestamp(requiredHeaderDocumentFields.Timestamp);
 
-        if (assertionInput.RequiredSeriesFields != null)
+        var optionalHeaderDocumentFields = assertionInput.OptionalHeaderDocumentFields;
+
+        // asserter.HasBusinessSectorType(optionalHeaderDocumentFields.BusinessSectorType);
+
+        if (optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput != null)
         {
+            var (requiredSeriesFields, optionalSeriesFields) =
+                optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput;
             asserter
-                .HasTransactionId(assertionInput.RequiredSeriesFields.TransactionId)
+                .HasTransactionId(requiredSeriesFields.TransactionId)
                 .HasMeteringPointNumber(
-                    assertionInput.RequiredSeriesFields.MeteringPointNumber,
-                    assertionInput.RequiredSeriesFields.MeteringPointScheme)
-                .HasMeteringPointType(assertionInput.RequiredSeriesFields.MeteringPointType)
-                .HasQuantityMeasureUnit(assertionInput.RequiredSeriesFields.QuantityMeasureUnit)
-                .HasResolution(assertionInput.RequiredSeriesFields.Resolution)
-                .HasStartedDateTime(assertionInput.RequiredSeriesFields.StartedDateTime)
-                .HasEndedDateTime(assertionInput.RequiredSeriesFields.EndedDateTime)
-                .HasPoints(assertionInput.RequiredSeriesFields.Points);
+                    requiredSeriesFields.MeteringPointNumber,
+                    requiredSeriesFields.MeteringPointScheme)
+                .HasMeteringPointType(requiredSeriesFields.MeteringPointType)
+                .HasQuantityMeasureUnit(requiredSeriesFields.QuantityMeasureUnit)
+                .HasResolution(requiredSeriesFields.RequiredPeriodDocumentFields.Resolution)
+                .HasStartedDateTime(requiredSeriesFields.RequiredPeriodDocumentFields.StartedDateTime)
+                .HasEndedDateTime(requiredSeriesFields.RequiredPeriodDocumentFields.EndedDateTime)
+                .HasPoints(requiredSeriesFields.RequiredPeriodDocumentFields.Points.ToList().AsReadOnly());
+
+            asserter
+                .HasOriginalTransactionIdReferenceId(optionalSeriesFields.OriginalTransactionIdReferenceId)
+                .HasRegistrationDateTime(optionalSeriesFields.RegistrationDateTime)
+                .HasProduct(optionalSeriesFields.Product);
+            // .HasRegistrationDateTime(optionalSeriesFields.InDomain)
+            // .HasRegistrationDateTime(optionalSeriesFields.OutDomain)
         }
 
         await asserter

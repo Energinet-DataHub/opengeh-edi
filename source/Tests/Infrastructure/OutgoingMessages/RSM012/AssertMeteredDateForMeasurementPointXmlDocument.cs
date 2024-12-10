@@ -110,8 +110,14 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string expectedProduct)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string? expectedProduct)
     {
+        if (expectedProduct is null)
+        {
+            _documentAsserter.IsNotPresent("Series[1]/product");
+            return this;
+        }
+
         _documentAsserter.HasValue("Series[1]/product", expectedProduct);
         return this;
     }
@@ -122,8 +128,15 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(string expectedRegistrationDateTime)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(
+        string? expectedRegistrationDateTime)
     {
+        if (expectedRegistrationDateTime is null)
+        {
+            _documentAsserter.IsNotPresent("Series[1]/registration_DateAndOrTime.dateTime");
+            return this;
+        }
+
         _documentAsserter.HasValue("Series[1]/registration_DateAndOrTime.dateTime", expectedRegistrationDateTime);
         return this;
     }
@@ -149,26 +162,19 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
-        IReadOnlyCollection<(RequiredPointDocumentFields Rpdf, OptionalPointDocumentFields? Opdf)> expectedPoints)
+        IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints)
     {
         var pointsInDocument = _documentAsserter
             .GetElements("Series[1]/Period/Point")!;
 
-        var expectedPointsAsList = expectedPoints.ToList();
-
         pointsInDocument.Should().HaveSameCount(expectedPoints);
 
-        for (var i = 0; i < expectedPointsAsList.Count; i++)
+        for (var i = 0; i < expectedPoints.Count; i++)
         {
-            var (requiredPointDocumentFields, optionalPointDocumentFields) = expectedPointsAsList[i];
+            var (requiredPointDocumentFields, optionalPointDocumentFields) = expectedPoints[i];
 
             _documentAsserter
                 .HasValue($"Series[1]/Period/Point[{i + 1}]/position", requiredPointDocumentFields.Position.ToString());
-
-            if (optionalPointDocumentFields == null)
-            {
-                continue;
-            }
 
             if (optionalPointDocumentFields.Quantity != null)
             {
@@ -177,15 +183,28 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
                         $"Series[1]/Period/Point[{i + 1}]/quantity",
                         optionalPointDocumentFields.Quantity!.ToString()!);
             }
+            else
+            {
+                AssertElementNotPresent($"Series[1]/Period/Point[{i + 1}]/quantity");
+            }
 
             if (optionalPointDocumentFields.Quality != null)
             {
                 _documentAsserter
                     .HasValue($"Series[1]/Period/Point[{i + 1}]/quality", optionalPointDocumentFields.Quality);
             }
+            else
+            {
+                AssertElementNotPresent($"Series[1]/Period/Point[{i + 1}]/quality");
+            }
         }
 
         return this;
+
+        void AssertElementNotPresent(string xpath)
+        {
+            _documentAsserter.IsNotPresent(xpath);
+        }
     }
 
     public async Task<IAssertMeteredDateForMeasurementPointDocumentDocument> DocumentIsValidAsync()

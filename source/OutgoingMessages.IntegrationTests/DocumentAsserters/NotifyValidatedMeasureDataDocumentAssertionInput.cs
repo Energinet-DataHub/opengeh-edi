@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 
-public readonly record struct RequiredDocumentFields(
+public readonly record struct RequiredHeaderDocumentFields(
     string BusinessReasonCode,
     string ReceiverId,
     string ReceiverScheme,
@@ -27,20 +27,17 @@ public readonly record struct RequiredDocumentFields(
     string ReceiverRole,
     string Timestamp);
 
-public class NotifyValidatedMeasureDataDocumentAssertionInput
-{
-    public NotifyValidatedMeasureDataDocumentAssertionInput(
-        RequiredDocumentFields requiredDocumentFields,
-        RequiredSeriesFields? requiredSeriesFields)
-    {
-        RequiredDocumentFields = requiredDocumentFields;
-        RequiredSeriesFields = requiredSeriesFields;
-    }
+public sealed record OptionalHeaderDocumentFields(
+    string? BusinessSectorType,
+    AssertSeriesDocumentFieldsInput? AssertSeriesDocumentFieldsInput);
 
-    public RequiredDocumentFields RequiredDocumentFields { get; }
+public sealed record NotifyValidatedMeasureDataDocumentAssertionInput(
+    RequiredHeaderDocumentFields RequiredHeaderDocumentFields,
+    OptionalHeaderDocumentFields OptionalHeaderDocumentFields);
 
-    public RequiredSeriesFields? RequiredSeriesFields { get; }
-}
+public sealed record AssertSeriesDocumentFieldsInput(
+    RequiredSeriesFields RequiredSeriesFields,
+    OptionalSeriesFields OptionalSeriesFields);
 
 public sealed record RequiredSeriesFields(
     TransactionId TransactionId,
@@ -48,7 +45,17 @@ public sealed record RequiredSeriesFields(
     string MeteringPointScheme,
     string MeteringPointType,
     string QuantityMeasureUnit,
+    RequiredPeriodDocumentFields RequiredPeriodDocumentFields);
+
+public sealed record OptionalSeriesFields(
+    string? OriginalTransactionIdReferenceId,
+    string? RegistrationDateTime,
+    string? InDomain,
+    string? OutDomain,
+    string? Product);
+
+public sealed record RequiredPeriodDocumentFields(
     string Resolution,
     string StartedDateTime,
     string EndedDateTime,
-    IReadOnlyList<(RequiredPointDocumentFields, OptionalPointDocumentFields?)> Points);
+    IReadOnlyCollection<AssertPointDocumentFieldsInput> Points);

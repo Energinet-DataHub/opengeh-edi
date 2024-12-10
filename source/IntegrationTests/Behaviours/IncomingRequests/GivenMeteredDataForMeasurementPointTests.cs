@@ -56,15 +56,18 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
 
         var transactionIdPrefix = Guid.NewGuid().ToString("N");
 
+        var transactionId1 = $"{transactionIdPrefix}-1";
+        var transactionId2 = $"{transactionIdPrefix}-2";
+
         await GivenReceivedMeteredDataForMeasurementPoint(
             documentFormat: DocumentFormat.Xml,
             senderActorNumber: currentActor.ActorNumber,
             [
-                ($"{transactionIdPrefix}-1",
+                (transactionId1,
                     InstantPattern.General.Parse("2024-11-28T13:51:42Z").Value,
                     InstantPattern.General.Parse("2024-11-29T09:15:28Z").Value,
                     Resolution.Hourly),
-                ($"{transactionIdPrefix}-2",
+                (transactionId2,
                     InstantPattern.General.Parse("2024-11-24T18:51:58Z").Value,
                     InstantPattern.General.Parse("2024-11-25T03:39:45Z").Value,
                     Resolution.QuarterHourly),
@@ -86,14 +89,14 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
             // This is not pretty, but it works for now
             var foo = new StreamReader(peekResultDto.Bundle);
             var content = await foo.ReadToEndAsync();
-            var isTransOne = content.Contains($"{transactionIdPrefix}-1");
+            var isTransOne = content.Contains(transactionId1);
             peekResultDto.Bundle.Position = 0;
 
             await ThenNotifyValidatedMeasureDataDocumentIsCorrect(
                 peekResultDto.Bundle,
                 peekFormat,
                 new NotifyValidatedMeasureDataDocumentAssertionInput(
-                    new RequiredDocumentFields(
+                    new RequiredHeaderDocumentFields(
                         "E23",
                         "8100000000115",
                         "A10",
@@ -102,31 +105,55 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                         "DGL",
                         "DDQ",
                         "2024-07-01T14:57:09Z"),
-                    isTransOne
-                        ? new RequiredSeriesFields(
-                            TransactionId.From(string.Join(string.Empty, $"{transactionIdPrefix}-1".Reverse())),
-                            "579999993331812345",
-                            "A10",
-                            "E17",
-                            "KWH",
-                            "PT1H",
-                            "2024-11-28T13:51Z",
-                            "2024-11-29T09:15Z",
-                            Enumerable.Range(1, 24)
-                                .Select(i => (new RequiredPointDocumentFields(i), (OptionalPointDocumentFields?)null))
-                                .ToList())
-                        : new RequiredSeriesFields(
-                            TransactionId.From(string.Join(string.Empty, $"{transactionIdPrefix}-2".Reverse())),
-                            "579999993331812345",
-                            "A10",
-                            "E17",
-                            "KWH",
-                            "PT15M",
-                            "2024-11-24T18:51Z",
-                            "2024-11-25T03:39Z",
-                            Enumerable.Range(1, 96)
-                                .Select(i => (new RequiredPointDocumentFields(i), (OptionalPointDocumentFields?)null))
-                                .ToList())));
+                    new OptionalHeaderDocumentFields(
+                        null,
+                        isTransOne
+                            ? new AssertSeriesDocumentFieldsInput(
+                                new RequiredSeriesFields(
+                                    TransactionId.From(string.Join(string.Empty, transactionId1.Reverse())),
+                                    "579999993331812345",
+                                    "A10",
+                                    "E17",
+                                    "KWH",
+                                    new RequiredPeriodDocumentFields(
+                                        "PT1H",
+                                        "2024-11-28T13:51Z",
+                                        "2024-11-29T09:15Z",
+                                        Enumerable.Range(1, 24)
+                                            .Select(
+                                                i => new AssertPointDocumentFieldsInput(
+                                                    new RequiredPointDocumentFields(i),
+                                                    new OptionalPointDocumentFields("A03", 1000 + i)))
+                                            .ToList())),
+                                new OptionalSeriesFields(
+                                    transactionId1,
+                                    "2022-12-17T09:30:47Z",
+                                    null,
+                                    null,
+                                    "8716867000030"))
+                            : new AssertSeriesDocumentFieldsInput(
+                                new RequiredSeriesFields(
+                                    TransactionId.From(string.Join(string.Empty, transactionId2.Reverse())),
+                                    "579999993331812345",
+                                    "A10",
+                                    "E17",
+                                    "KWH",
+                                    new RequiredPeriodDocumentFields(
+                                        "PT15M",
+                                        "2024-11-24T18:51Z",
+                                        "2024-11-25T03:39Z",
+                                        Enumerable.Range(1, 96)
+                                            .Select(
+                                                i => new AssertPointDocumentFieldsInput(
+                                                    new RequiredPointDocumentFields(i),
+                                                    new OptionalPointDocumentFields("A03", 1000 + i)))
+                                            .ToList())),
+                                new OptionalSeriesFields(
+                                    transactionId2,
+                                    "2022-12-17T09:30:47Z",
+                                    null,
+                                    null,
+                                    "8716867000030")))));
         }
     }
 }
