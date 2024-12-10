@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Databricks.Factories;
 using FluentAssertions;
 using Xunit;
 
@@ -43,7 +42,7 @@ public static class MetaTests
         var integrationEventsIntegrationTestsAssembly = Assembly.GetAssembly(typeof(IntegrationEventsFixture));
         var masterDataIntegrationTestsAssembly = Assembly.GetAssembly(typeof(MasterDataFixture));
         var incomingMessageIntegrationTestsAssembly = Assembly.GetAssembly(typeof(IncomingMessagesTestFixture));
-        var outgoingMessagesUnitTestsAssembly = Assembly.GetAssembly(typeof(PeriodFactoryTests));
+        var outgoingMessagesUnitTestsAssembly = Assembly.GetAssembly(typeof(OutgoingMessages.UnitTests.Infrastructure.Databricks.Factories.PeriodFactoryTests));
 
         var allTypes = new[]
         {
