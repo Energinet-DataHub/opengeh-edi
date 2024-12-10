@@ -41,6 +41,7 @@
       "OutgoingMessages.Infrastructure\\OutgoingMessages.Infrastructure.csproj",
       "OutgoingMessages.IntegrationTests\\OutgoingMessages.IntegrationTests.csproj",
       "OutgoingMessages.Interfaces\\OutgoingMessages.Interfaces.csproj",
+      "OutgoingMessages.UnitTests\\OutgoingMessages.UnitTests.csproj",
       "Process.Application\\Process.Application.csproj",
       "Process.Domain\\Process.Domain.csproj",
       "Process.Infrastructure\\Process.Infrastructure.csproj",
