@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="7.1.1" />
     <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="11.0.0" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
       <PrivateAssets>all</PrivateAssets>
@@ -15,7 +16,7 @@
     </PackageReference>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="3.0.1" />
-    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.4" />
+    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.1.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

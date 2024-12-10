@@ -17,7 +17,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Xml;
-using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
+using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 using Energinet.DataHub.EDI.SubsystemTests.Logging;
@@ -184,14 +184,14 @@ internal sealed class EdiDriver
 
     internal async Task<DurableOrchestrationStatus> WaitForOrchestrationStartedAsync(Instant orchestrationStartedAfter)
     {
-        var orchestration = await _durableClient.WaitForOrchestrationStatusAsync(orchestrationStartedAfter.ToDateTimeUtc());
+        var orchestration = await _durableClient.WaitForOrchestationStartedAsync(orchestrationStartedAfter.ToDateTimeUtc());
 
         return orchestration;
     }
 
     internal async Task WaitForOrchestrationCompletedAsync(string orchestrationInstanceId)
     {
-        await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
+        await _durableClient.WaitForOrchestrationCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
     }
 
     internal async Task SendMeteredDataForMeasurementPointAsync(Guid calculationId, Instant createdAfter)
