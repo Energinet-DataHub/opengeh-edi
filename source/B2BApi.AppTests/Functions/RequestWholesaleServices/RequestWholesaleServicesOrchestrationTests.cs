@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Net;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices;
@@ -51,6 +52,7 @@ public class RequestWholesaleServicesOrchestrationTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
+        Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         await Task.CompletedTask;
     }
 
@@ -68,7 +70,7 @@ public class RequestWholesaleServicesOrchestrationTests : IAsyncLifetime
     /// - The peeked messages all have the correct document type.
     /// </summary>
     [Fact]
-    public async Task Given_RequestWholesaleServices_When_RequestWholesaleServicesOrchestrationIsCompleted_Then_EnqueuedMessagesCanBePeeked()
+    public async Task Given_RequestWholesaleServices_When_RequestIsReceived_Then_ServiceBusMessageIsSentToProcessManagerTopic()
     {
         // Arrange
         EnableRequestWholesaleServicesOrchestrationFeature();
@@ -77,46 +79,28 @@ public class RequestWholesaleServicesOrchestrationTests : IAsyncLifetime
             ActorNumber.Create("5790000701278"),
             ActorRole.EnergySupplier);
 
-        var amountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
-        await ClearAndAddDatabricksData(amountPerChargeDescription);
+        var transactionId = Guid.NewGuid().ToString();
 
         // Test steps:
         // => HTTP POST: RequestWholesaleServices
-        var beforeOrchestrationCreated = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(30));
-        using var httpRequest = await Fixture.CreateRequestWholesaleServicesHttpRequestAsync(energySupplier);
+        using var httpRequest = await Fixture.CreateRequestWholesaleServicesHttpRequestAsync(energySupplier, transactionId);
         using var httpResponse = await Fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
         await httpResponse.EnsureSuccessStatusCodeWithLogAsync(Fixture.TestLogger);
 
-        // => Wait for orchestration to start
-        var startedOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(
-            createdTimeFrom: beforeOrchestrationCreated.ToDateTimeUtc(),
-            name: nameof(RequestWholesaleServicesOrchestration));
-        startedOrchestrationStatus.Should().NotBeNull();
+        // => Assert service bus message is sent to Process Manager topic
+        var verifyServiceBusMessage = await Fixture.ServiceBusListenerMock
+            .When(
+                msg =>
+                {
+                    var messageIdMatch = msg.MessageId == transactionId;
+                    var subjectMatch = msg.Subject == "Brs_028";
 
-        // => Wait for orchestration to complete
-        var completedOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationCompletedAsync(
-            startedOrchestrationStatus.InstanceId,
-            TimeSpan.FromMinutes(5));
-        completedOrchestrationStatus.Should().NotBeNull();
+                    return messageIdMatch && subjectMatch;
+                })
+            .VerifyOnceAsync();
 
-        // Assert activities
-        // => Assert enqueued messages in orchestrator
-        using (new AssertionScope())
-        {
-            completedOrchestrationStatus.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
-            completedOrchestrationStatus.Output.ToString()
-                .Should().Contain("AcceptedMessagesCount=33")
-                .And.Contain("RejectedMessagesCount=0");
-        }
-
-         // => HTTP GET: Peek messages
-        var peekedDocuments = await PeekAllMessages(energySupplier);
-
-        using var assertionScope = new AssertionScope();
-        peekedDocuments.Should()
-            .HaveCount(33)
-            .And.AllSatisfy(
-                peekedDocument => peekedDocument.Should().Contain("NotifyWholesaleServices_MarketDocument"));
+        var messageReceived = verifyServiceBusMessage.Wait(TimeSpan.FromSeconds(30));
+        messageReceived.Should().BeTrue("because a Brs_028 message should be sent to the Process Manager topic");
     }
 
     private async Task<IReadOnlyCollection<string>> PeekAllMessages(Actor actor)

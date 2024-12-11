@@ -25,19 +25,13 @@ public class InitializeAggregatedMeasureDataHandler : IProcessInitializationHand
 {
     private readonly IMediator _mediator;
     private readonly ISerializer _serializer;
-    private readonly IFeatureFlagManager _featureFlagManager;
-    private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
 
     public InitializeAggregatedMeasureDataHandler(
         IMediator mediator,
-        ISerializer serializer,
-        IFeatureFlagManager featureFlagManager,
-        IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter)
+        ISerializer serializer)
     {
         _mediator = mediator;
         _serializer = serializer;
-        _featureFlagManager = featureFlagManager;
-        _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
     }
 
     public bool CanHandle(string processTypeToInitialize)
@@ -50,15 +44,6 @@ public class InitializeAggregatedMeasureDataHandler : IProcessInitializationHand
     {
         var marketMessage = _serializer.Deserialize<InitializeAggregatedMeasureDataProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
 
-        if (await _featureFlagManager.UseRequestWholesaleServicesProcessOrchestrationAsync().ConfigureAwait(false))
-        {
-            await _requestProcessOrchestrationStarter
-                .StartRequestAggregatedMeasureDataOrchestrationAsync(marketMessage, CancellationToken.None)
-                .ConfigureAwait(false);
-        }
-        else
-        {
-            await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
-        }
+        await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
     }
 }

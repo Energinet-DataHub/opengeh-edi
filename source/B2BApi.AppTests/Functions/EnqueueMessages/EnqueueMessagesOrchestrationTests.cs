@@ -106,7 +106,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
+        await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
@@ -202,7 +202,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
+        await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
@@ -297,7 +297,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
+        await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
@@ -358,7 +358,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(wholesaleCalculationCompletedEventMessage);
+        await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(wholesaleCalculationCompletedEventMessage);
         var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // Assert
@@ -422,7 +422,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(energyCalculationCompletedEventMessage);
+        await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(energyCalculationCompletedEventMessage);
         var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // Assert

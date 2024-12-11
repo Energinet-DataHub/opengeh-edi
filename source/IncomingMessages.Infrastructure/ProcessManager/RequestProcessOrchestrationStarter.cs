@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
 public class RequestProcessOrchestrationStarter(
     IProcessManagerMessageClient processManagerMessageClient,

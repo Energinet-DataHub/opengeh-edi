@@ -25,7 +25,8 @@ public static class HttpRequestExtensions
 {
     public static Task<HttpRequestMessage> CreateRequestWholesaleServicesHttpRequestAsync(
         this B2BApiAppFixture fixture,
-        Actor actor)
+        Actor actor,
+        string? transactionId = null)
     {
         var documentPath = actor.ActorRole.Name switch
         {
@@ -70,7 +71,8 @@ public static class HttpRequestExtensions
         string filePath,
         string documentType,
         string contentType,
-        Actor actor)
+        Actor actor,
+        string? transactionId = null)
     {
         HttpRequestMessage? request = null;
         try
@@ -80,7 +82,7 @@ public static class HttpRequestExtensions
                 .Replace("{ActorNumber}", actor.ActorNumber.Value)
                 .Replace("{ActorRole}", actor.ActorRole.Code)
                 .Replace("{MessageId}", Guid.NewGuid().ToString())
-                .Replace("{TransactionId}", Guid.NewGuid().ToString());
+                .Replace("{TransactionId}", transactionId ?? Guid.NewGuid().ToString());
 
             request = await CreateHttpRequestAsync(
                 fixture,

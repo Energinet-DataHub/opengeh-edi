@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.Process.Interfaces;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
 public interface IRequestProcessOrchestrationStarter
 {
