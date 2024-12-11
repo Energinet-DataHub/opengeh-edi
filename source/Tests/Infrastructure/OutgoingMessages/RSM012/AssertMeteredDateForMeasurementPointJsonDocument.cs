@@ -41,6 +41,12 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         return this;
     }
 
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasNoSeriesElements()
+    {
+        _root.TryGetProperty("Series", out _).Should().BeFalse("property 'Series' should not be present");
+        return this;
+    }
+
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode)
     {
         Assert.Equal(expectedBusinessReasonCode, _root.GetProperty("process.processType").GetProperty("value").ToString());
@@ -360,7 +366,10 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
     {
         var schema = await _schemas.GetSchemaAsync<JsonSchema>("NOTIFYVALIDATEDMEASUREDATA", "0", CancellationToken.None).ConfigureAwait(false);
         var validationResult = IsValid(_document, schema!);
-        validationResult.IsValid.Should().BeTrue(string.Join("\n", validationResult.Errors));
+        validationResult.IsValid.Should()
+            .BeTrue(
+                $"the following errors were unexpected:\n\n{string.Join("\n", validationResult.Errors)}\n\nfor the document\n\n{_document.RootElement}");
+
         return this;
     }
 
@@ -370,31 +379,28 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.Hierarchical, });
         if (result.IsValid == false)
         {
-            errors.Add(FindErrorsForInvalidEvaluation(result));
+            errors.AddRange(FindErrorsForInvalidEvaluation(result).Where(e => !string.IsNullOrEmpty(e)));
         }
 
         return (result.IsValid, errors);
     }
 
-    private string FindErrorsForInvalidEvaluation(EvaluationResults result)
+    private IEnumerable<string> FindErrorsForInvalidEvaluation(EvaluationResults result)
     {
-        if (!result.IsValid)
+        var errors = new List<string>();
+
+        if (result is { IsValid: false, Errors: not null })
         {
-            foreach (var detail in result.Details)
-            {
-                return FindErrorsForInvalidEvaluation(detail);
-            }
+            var propertyName = result.InstanceLocation.ToString();
+            errors.AddRange(result.Errors.Select(error => $"{propertyName}: {error}"));
         }
 
-        if (!result.HasErrors || result.Errors == null) return string.Empty;
-
-        var propertyName = result.InstanceLocation.ToString();
-        foreach (var error in result.Errors)
+        foreach (var detail in result.Details)
         {
-            return $"{propertyName}: {error}";
+            errors.AddRange(FindErrorsForInvalidEvaluation(detail));
         }
 
-        return string.Empty;
+        return errors;
     }
 
     private JsonElement GetTimeSeriesElement(int seriesIndex) =>

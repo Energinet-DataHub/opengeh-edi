@@ -49,4 +49,18 @@ public class MeteredDateForMeasurementPointBuilder
             SampleData.EndedDateTime,
             SampleData.Points);
     }
+
+    public MeteredDateForMeasurementPointMarketActivityRecord BuildMinimalMeteredDataForMeasurementPoint() =>
+        new(
+            SampleData.TransactionId,
+            SampleData.MeteringPointNumber,
+            SampleData.MeteringPointType,
+            null,
+            null,
+            SampleData.QuantityMeasureUnit,
+            null,
+            SampleData.Resolution,
+            SampleData.StartedDateTime,
+            SampleData.EndedDateTime,
+            SampleData.MinimalPoints);
 }

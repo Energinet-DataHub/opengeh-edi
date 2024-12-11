@@ -40,7 +40,7 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Can_create_notifyValidatedMeasureData_document(string documentFormat)
+    public async Task Can_create_maximal_notifyValidatedMeasureData_document(string documentFormat)
     {
         // Arrange
         var messageBuilder = _meteredDateForMeasurementPointBuilder;
@@ -85,23 +85,102 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
             .DocumentIsValidAsync();
     }
 
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Can_create_minimal_series_notifyValidatedMeasureData_document(string documentFormat)
+    {
+        // Arrange
+        var messageBuilder = _meteredDateForMeasurementPointBuilder;
+
+        // Act
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildMinimalMeteredDataForMeasurementPoint(),
+            DocumentFormat.FromName(documentFormat));
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .MessageIdExists()
+            .HasBusinessReason(SampleData.BusinessReason.Code)
+            .HasSenderId(SampleData.SenderActorNumber, "A10")
+            .HasSenderRole(SampleData.SenderActorRole)
+            .HasReceiverId(SampleData.ReceiverActorNumber, "A10")
+            .HasReceiverRole(SampleData.ReceiverActorRole)
+            .HasTimestamp(SampleData.TimeStamp.ToString())
+            .HasTransactionId(1, SampleData.TransactionId)
+            .HasMeteringPointNumber(1, SampleData.MeteringPointNumber, "A10")
+            .HasMeteringPointType(1, SampleData.MeteringPointType)
+            .HasOriginalTransactionIdReferenceId(1, null)
+            .HasProduct(1, null)
+            .HasQuantityMeasureUnit(1, SampleData.QuantityMeasureUnit.Code)
+            .HasRegistrationDateTime(1, null)
+            .HasResolution(1, SampleData.Resolution.Code)
+            .HasStartedDateTime(
+                1,
+                SampleData.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasEndedDateTime(
+                1,
+                SampleData.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasPoints(
+                1,
+                SampleData.MinimalPoints.Select(
+                        p => new AssertPointDocumentFieldsInput(
+                            new RequiredPointDocumentFields(p.Position),
+                            OptionalPointDocumentFields.NoOptionalFields()))
+                    .ToList())
+            .DocumentIsValidAsync();
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Can_create_no_series_notifyValidatedMeasureData_document(string documentFormat)
+    {
+        // Arrange
+        var messageBuilder = _meteredDateForMeasurementPointBuilder;
+
+        // Act
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            null,
+            DocumentFormat.FromName(documentFormat));
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .MessageIdExists()
+            .HasBusinessReason(SampleData.BusinessReason.Code)
+            .HasSenderId(SampleData.SenderActorNumber, "A10")
+            .HasSenderRole(SampleData.SenderActorRole)
+            .HasReceiverId(SampleData.ReceiverActorNumber, "A10")
+            .HasReceiverRole(SampleData.ReceiverActorRole)
+            .HasTimestamp(SampleData.TimeStamp.ToString())
+            .HasNoSeriesElements()
+            .DocumentIsValidAsync();
+    }
+
     private Task<MarketDocumentStream> WriteDocument(
         OutgoingMessageHeader header,
-        MeteredDateForMeasurementPointMarketActivityRecord meteredDateForMeasurementPointMarketActivityRecord,
+        MeteredDateForMeasurementPointMarketActivityRecord? meteredDateForMeasurementPointMarketActivityRecord,
         DocumentFormat documentFormat)
     {
-        var records = _parser.From(meteredDateForMeasurementPointMarketActivityRecord);
+        var records = meteredDateForMeasurementPointMarketActivityRecord is null
+            ? null
+            : _parser.From(meteredDateForMeasurementPointMarketActivityRecord);
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new MeteredDateForMeasurementPointCimXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new MeteredDateForMeasurementPointCimXmlDocumentWriter(_parser)
+                .WriteAsync(header, records is null ? [] : [records]);
         }
 
         var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
         return new MeteredDateForMeasurementPointCimJsonDocumentWriter(
                 _parser,
                 serviceProvider.GetRequiredService<JavaScriptEncoder>())
-            .WriteAsync(header, [records], CancellationToken.None);
+            .WriteAsync(header, records is null ? [] : [records], CancellationToken.None);
     }
 
     private IAssertMeteredDateForMeasurementPointDocumentDocument AssertDocument(
