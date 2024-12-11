@@ -64,11 +64,11 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
     {
         ArgumentNullException.ThrowIfNull(transactions);
 
-        var meteredDataForMeasurementPoints = new Collection<MeteredDataForMeasurementPoint>();
+        var meteredDataForMeasurementSeries = new Collection<MeteredDataForMeasurementSeries>();
         foreach (var activityRecord in transactions.Select(t => _parser.From<MeteredDateForMeasurementPointMarketActivityRecord>(t)))
         {
-            meteredDataForMeasurementPoints.Add(
-                new MeteredDataForMeasurementPoint(
+            meteredDataForMeasurementSeries.Add(
+                new MeteredDataForMeasurementSeries(
                     activityRecord.TransactionId.Value,
                     activityRecord.MarketEvaluationPointNumber,
                     activityRecord.MarketEvaluationPointType,
@@ -100,7 +100,7 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
                 header.SenderId,
                 header.SenderRole,
                 TypeCode,
-                meteredDataForMeasurementPoints.Count == 0 ? null : meteredDataForMeasurementPoints));
+                meteredDataForMeasurementSeries.Count == 0 ? null : meteredDataForMeasurementSeries));
     }
 }
 
@@ -120,7 +120,7 @@ internal class MeteredDateForMeasurementPoint(
     string senderId,
     string senderRole,
     string typeCode,
-    IReadOnlyCollection<MeteredDataForMeasurementPoint>? meteredDataForMeasurementPoints)
+    IReadOnlyCollection<MeteredDataForMeasurementSeries>? meteredDataForMeasurementSeries)
 {
     [JsonPropertyName("mRID")]
     public string MessageId { get; init; } = messageId;
@@ -151,11 +151,11 @@ internal class MeteredDateForMeasurementPoint(
 
     [JsonPropertyName("Series")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyCollection<MeteredDataForMeasurementPoint>? MeteredDataForMeasurementPoints { get; init; } =
-        meteredDataForMeasurementPoints;
+    public IReadOnlyCollection<MeteredDataForMeasurementSeries>? MeteredDataForMeasurementSeries { get; init; } =
+        meteredDataForMeasurementSeries;
 }
 
-internal class MeteredDataForMeasurementPoint(
+internal class MeteredDataForMeasurementSeries(
     string transactionId,
     string marketEvaluationPointNumber,
     string marketEvaluationPointType,
