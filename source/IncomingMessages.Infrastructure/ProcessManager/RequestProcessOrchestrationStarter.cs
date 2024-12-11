@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
@@ -38,10 +39,42 @@ public class RequestProcessOrchestrationStarter(
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
         {
+            var resolution = transaction.Resolution != null
+                ? Resolution.TryGetNameFromCode(transaction.Resolution, fallbackValue: transaction.Resolution)
+                : null;
+
+            var settlementVersion = transaction.SettlementVersion is not null
+                ? SettlementVersion.TryGetNameFromCode(transaction.SettlementVersion, fallbackValue: transaction.SettlementVersion)
+                : null;
+
+            var chargeTypes = transaction.ChargeTypes.Select(
+                ct =>
+                {
+                    var chargeType = ct.Type != null
+                        ? ChargeType.TryGetNameFromCode(ct.Type, fallbackValue: ct.Type)
+                        : null;
+
+                    return new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInputV1(
+                        ChargeType: chargeType,
+                        ChargeCode: ct.Id);
+                })
+                .ToList();
+
             var startCommand = new RequestCalculatedWholesaleServicesCommandV1(
-                actorIdentity,
-                new RequestCalculatedWholesaleServicesInputV1(),
-                transaction.Id);
+                operatingIdentity: actorIdentity,
+                inputParameter: new RequestCalculatedWholesaleServicesInputV1(
+                    RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
+                    RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
+                    BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),
+                    Resolution: resolution,
+                    PeriodStart: transaction.StartDateTime,
+                    PeriodEnd: transaction.EndDateTime,
+                    EnergySupplierNumber: transaction.EnergySupplierId,
+                    ChargeOwnerNumber: transaction.ChargeOwner,
+                    GridAreas: transaction.GridAreas,
+                    SettlementVersion: settlementVersion,
+                    ChargeTypes: chargeTypes),
+                messageId: transaction.Id);
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
@@ -61,11 +94,33 @@ public class RequestProcessOrchestrationStarter(
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
         {
+            var meteringPointType = transaction.MeteringPointType is not null
+                ? MeteringPointType.TryGetNameFromCode(transaction.MeteringPointType, fallbackValue: transaction.MeteringPointType)
+                : null;
+
+            var settlementMethod = transaction.SettlementMethod is not null
+                ? SettlementMethod.TryGetNameFromCode(transaction.SettlementMethod, fallbackValue: transaction.SettlementMethod)
+                : null;
+
+            var settlementVersion = transaction.SettlementVersion is not null
+                ? SettlementVersion.TryGetNameFromCode(transaction.SettlementVersion, fallbackValue: transaction.SettlementVersion)
+                : null;
+
             var startCommand = new StartRequestCalculatedEnergyTimeSeriesCommandV1(
-                actorIdentity,
-                new RequestCalculatedEnergyTimeSeriesInputV1(
-                    BusinessReason: initializeProcessDto.BusinessReason),
-                transaction.Id.Value);
+                operatingIdentity: actorIdentity,
+                inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
+                    RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
+                    RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
+                    BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),
+                    PeriodStart: transaction.StartDateTime,
+                    PeriodEnd: transaction.EndDateTime,
+                    EnergySupplierNumber: transaction.EnergySupplierNumber,
+                    BalanceResponsibleNumber: transaction.BalanceResponsibleNumber,
+                    GridAreas: transaction.GridAreas,
+                    MeteringPointType: meteringPointType,
+                    SettlementMethod: settlementMethod,
+                    SettlementVersion: settlementVersion),
+                messageId: transaction.Id.Value);
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
