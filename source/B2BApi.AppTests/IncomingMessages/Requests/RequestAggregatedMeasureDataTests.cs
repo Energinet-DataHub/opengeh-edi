@@ -90,6 +90,6 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
 
     private void EnableRequestAggregatedMeasureDataOrchestrationFeature()
     {
-        Fixture.EnsureAppHostUsesFeatureFlagValue(useRequestWholesaleServicesOrchestration: true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(useRequestAggregatedMeasureDataOrchestration: true);
     }
 }

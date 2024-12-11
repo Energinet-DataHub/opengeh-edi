@@ -17,10 +17,10 @@
     },
     "sender_MarketParticipant.mRID": {
       "codingScheme": "A10",
-      "value": "5790000392551"
+      "value": "{ActorNumber}"
     },
     "sender_MarketParticipant.marketRole.type": {
-      "value": "DDQ"
+      "value": "{ActorRole}"
     },
     "type": {
       "value": "E74"

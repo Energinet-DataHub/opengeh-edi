@@ -50,7 +50,7 @@ public static class HttpRequestExtensions
     {
         var documentPath = actor.ActorRole.Name switch
         {
-            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/json/RequestAggregatedMeasureData.json",
+            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/json/RequestAggregatedMeasureDataForEnergySupplier.json",
             _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
         };
 
