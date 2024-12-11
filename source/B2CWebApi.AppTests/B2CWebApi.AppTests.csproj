@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.1" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.14.1" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -42,6 +43,7 @@
       <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
+      <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
     </ItemGroup>
 

@@ -84,24 +84,26 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
             string.Join(", ", frontendUser.Roles));
 
         var actorRole = ActorRole.FromName(marketRole);
-        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: actorRole);
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: actorRole, actorId);
 
         return Task.FromResult<FrontendUser?>(frontendUser);
     }
 
-    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, ActorRole role)
+    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, ActorRole role, Guid actorId)
     {
         var restriction = accessAllData ? Restriction.None : Restriction.Owned;
 
         _logger.LogInformation(
-            "Set authenticated actor, actor number: {ActorNumber}, role: {ActorRole}, restriction: {Restriction})",
+            "Set authenticated actor, actor number: {ActorNumber}, role: {ActorRole}, restriction: {Restriction}, actor id: {ActorId})",
             actorNumber.Value,
             role,
-            restriction);
+            restriction,
+            actorId);
 
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
             actorNumber: actorNumber,
             restriction: restriction,
-            actorRole: role));
+            actorRole: role,
+            actorId: actorId));
     }
 }

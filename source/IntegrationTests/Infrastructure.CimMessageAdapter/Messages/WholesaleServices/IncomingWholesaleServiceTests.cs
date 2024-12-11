@@ -44,7 +44,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         : base(integrationTestFixture, testOutputHelper)
     {
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None,  ActorRole.FromCode("DDQ")));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None,  ActorRole.FromCode("DDQ"), Guid.Parse("00000000-0000-0000-0000-000000000001")));
 
         var messageParsers = GetService<IEnumerable<IMessageParser>>();
         _messageParsers = messageParsers
@@ -112,7 +112,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
     {
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None,  ActorRole.FromCode(role)));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None,  ActorRole.FromCode(role), Guid.Parse("00000000-0000-0000-0000-000000000001")));
 
         await using var message = BusinessMessageBuilder
             .RequestWholesaleServices()

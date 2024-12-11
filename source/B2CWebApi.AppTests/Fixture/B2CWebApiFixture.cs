@@ -23,6 +23,8 @@ using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
+using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -76,7 +78,12 @@ public class B2CWebApiFixture : IAsyncLifetime
         var incomingMessagesQueue = await ServiceBusResourceProvider.BuildQueue(IncomingMessagesQueueName)
             .CreateAsync();
 
-        var appSettings = GetWebApiAppSettings(incomingMessagesQueue.Name);
+        var processManagerTopic = await ServiceBusResourceProvider.BuildTopic("process-manager")
+            .CreateAsync();
+
+        var appSettings = GetWebApiAppSettings(
+            incomingMessagesQueue.Name,
+            processManagerTopic.Name);
 
         B2CWebApiApplicationFactory.AppSettings = appSettings;
 
@@ -106,7 +113,7 @@ public class B2CWebApiFixture : IAsyncLifetime
         TestLogger.TestOutputHelper = testOutputHelper;
     }
 
-    private Dictionary<string, string?> GetWebApiAppSettings(string incomingMessagesQueueName)
+    private Dictionary<string, string?> GetWebApiAppSettings(string incomingMessagesQueueName, string processManagerTopicName)
     {
         var dbConnectionString = DatabaseManager.ConnectionString;
         if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
@@ -124,7 +131,8 @@ public class B2CWebApiFixture : IAsyncLifetime
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },
             { "UserAuthentication:BackendBffAppId", OpenIdJwtManager.TestBffAppId },
             { $"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", ServiceBusResourceProvider.FullyQualifiedNamespace },
-            { "IncomingMessages:QueueName", incomingMessagesQueueName },
+            { $"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", processManagerTopicName },
+            { $"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
         };

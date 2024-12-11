@@ -48,4 +48,9 @@ public interface IFeatureFlagManager
     /// Whether to use the RequestWholesaleServices process orchestration.
     /// </summary>
     Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync();
+
+    /// <summary>
+    /// Whether to use the RequestAggregatedMeasureData process orchestration.
+    /// </summary>
+    Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
 }

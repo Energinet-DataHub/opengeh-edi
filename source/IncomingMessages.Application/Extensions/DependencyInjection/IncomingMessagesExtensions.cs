@@ -32,10 +32,13 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -114,7 +117,12 @@ public static class IncomingMessagesExtensions
                 sp => sp.GetRequiredService<IOptions<IncomingMessagesQueueOptions>>().Value.QueueName,
                 _ => defaultAzureCredential,
                 "Dead-letter (incoming messages)",
-                [HealthChecksConstants.StatusHealthCheckTag]);
+                [HealthChecksConstants.StatusHealthCheckTag])
+            .AddAzureServiceBusTopic(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.TopicName,
+                tokenCredentialFactory: _ => defaultAzureCredential,
+                name: "ProcessManager topic");
 
         /*
         // RegisterSchemaProviders
@@ -137,6 +145,12 @@ public static class IncomingMessagesExtensions
         services.AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
         services.AddTransient<IMessageParser, AggregatedMeasureDataJsonMessageParser>();
         services.AddTransient<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>();
+
+        /*
+         * Process Manager
+         */
+        services.AddTransient<IRequestProcessOrchestrationStarter, RequestProcessOrchestrationStarter>();
+        services.AddProcessManagerMessageClient();
 
         return services;
     }

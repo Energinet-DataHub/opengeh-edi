@@ -38,6 +38,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -75,6 +76,8 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WarehouseId), Guid.NewGuid().ToString());
         Environment.SetEnvironmentVariable($"{EdiDatabricksOptions.SectionName}__{nameof(EdiDatabricksOptions.CatalogName)}", "FakeCatalogName");
         Environment.SetEnvironmentVariable($"{nameof(DeltaTableOptions.DatabricksCatalogName)}", "FakeCatalogName");
+
+        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", "FakeTopicName");
 
         // Dead-letter logging
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}", TestEnvironment.CreateFakeStorageUrl());

@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
 
@@ -41,6 +43,7 @@ public class InitializeAggregatedMeasureDataHandler : IProcessInitializationHand
     public async Task ProcessAsync(byte[] processInitializationData)
     {
         var marketMessage = _serializer.Deserialize<InitializeAggregatedMeasureDataProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
+
         await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
     }
 }

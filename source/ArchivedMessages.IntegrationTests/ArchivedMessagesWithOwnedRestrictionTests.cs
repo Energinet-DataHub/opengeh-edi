@@ -34,7 +34,8 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
     private readonly ActorIdentity _authenticatedActor = new(
         ActorNumber.Create("1234512345888"),
         Restriction.Owned,
-        ActorRole.EnergySupplier);
+        ActorRole.EnergySupplier,
+        Guid.Parse("00000000-0000-0000-0000-000000000001"));
 
     public ArchivedMessagesWithOwnedRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {

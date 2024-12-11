@@ -19,11 +19,17 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
 public sealed class ServiceBusSenderFactoryStub : IAzureClientFactory<ServiceBusSender>
 {
+    public static readonly ServiceBusSenderSpy DefaultSenderSpy = new("Default");
+
     private readonly IList<ServiceBusSenderSpy> _senders = [];
 
     public ServiceBusSender CreateClient(string name)
     {
-        return _senders.First(a => a.QueueOrTopicName.Equals(name, StringComparison.OrdinalIgnoreCase));
+        var senderSpy = _senders.FirstOrDefault(a => a.QueueOrTopicName.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        // Use a default service bus sender spy if no spy is registered with the given name
+        return senderSpy
+               ?? DefaultSenderSpy;
     }
 
     public void AddSenderSpy(ServiceBusSenderSpy senderSpy)

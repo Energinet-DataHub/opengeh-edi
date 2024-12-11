@@ -21,11 +21,13 @@ public class ActorIdentity
     public ActorIdentity(
         ActorNumber actorNumber,
         Restriction restriction,
-        ActorRole actorRole)
+        ActorRole actorRole,
+        Guid? actorId)
     {
         ActorNumber = actorNumber;
         Restriction = restriction;
         ActorRole = actorRole;
+        ActorId = actorId;
     }
 
     public ActorNumber ActorNumber { get; }
@@ -33,6 +35,8 @@ public class ActorIdentity
     public Restriction Restriction { get; set; }
 
     public ActorRole ActorRole { get; set; }
+
+    public Guid? ActorId { get; set; }
 
     public bool HasRole(ActorRole role)
     {
