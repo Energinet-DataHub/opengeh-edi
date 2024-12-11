@@ -43,6 +43,26 @@ public static class HttpRequestExtensions
             transactionId);
     }
 
+    public static Task<HttpRequestMessage> CreateRequestAggregatedMeasureDataHttpRequestAsync(
+        this B2BApiAppFixture fixture,
+        Actor actor,
+        string? transactionId = null)
+    {
+        var documentPath = actor.ActorRole.Name switch
+        {
+            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/json/RequestAggregatedMeasureData.json",
+            _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
+        };
+
+        return CreateIncomingMessageHttpRequestAsync(
+            fixture,
+            documentPath,
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
+            "application/json",
+            actor,
+            transactionId);
+    }
+
     public static Task<HttpRequestMessage> CreatePeekHttpRequestAsync(
         this B2BApiAppFixture fixture,
         Actor actor)
