@@ -40,7 +40,7 @@ public class RequestProcessOrchestrationStarter(
         foreach (var transaction in initializeProcessDto.Series)
         {
             var startCommand = new RequestCalculatedWholesaleServicesCommandV1(
-                new ActorIdentityDto(actorId),
+                actorIdentity,
                 new RequestCalculatedWholesaleServicesInputV1(),
                 initializeProcessDto.MessageId);
 
