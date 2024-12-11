@@ -38,6 +38,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.Transac
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -116,7 +117,12 @@ public static class IncomingMessagesExtensions
                 sp => sp.GetRequiredService<IOptions<IncomingMessagesQueueOptions>>().Value.QueueName,
                 _ => defaultAzureCredential,
                 "Dead-letter (incoming messages)",
-                [HealthChecksConstants.StatusHealthCheckTag]);
+                [HealthChecksConstants.StatusHealthCheckTag])
+            .AddAzureServiceBusTopic(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.TopicName,
+                tokenCredentialFactory: _ => defaultAzureCredential,
+                name: "ProcessManager topic");
 
         /*
         // RegisterSchemaProviders
