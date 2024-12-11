@@ -84,6 +84,8 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
             peekFormat);
 
         // Assert
+        peekResults.Should().HaveCount(2);
+
         foreach (var peekResultDto in peekResults)
         {
             // This is not pretty, but it works for now
