@@ -23,7 +23,11 @@ public sealed class ServiceBusSenderFactoryStub : IAzureClientFactory<ServiceBus
 
     public ServiceBusSender CreateClient(string name)
     {
-        return _senders.First(a => a.QueueOrTopicName.Equals(name, StringComparison.OrdinalIgnoreCase));
+        var senderSpy = _senders.FirstOrDefault(a => a.QueueOrTopicName.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        // Default to an empty spy if no spy is registered with the given name
+        return senderSpy
+               ?? new ServiceBusSenderSpy(name);
     }
 
     public void AddSenderSpy(ServiceBusSenderSpy senderSpy)

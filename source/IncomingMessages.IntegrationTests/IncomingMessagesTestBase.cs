@@ -59,9 +59,7 @@ public class IncomingMessagesTestBase : IDisposable
 
         Fixture.DatabaseManager.CleanupDatabase();
         Fixture.CleanupFileStorage();
-        var serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-        serviceBusSenderFactoryStub.AddSenderSpy(new ServiceBusSenderSpy(nameof(ProcessManagerServiceBusClientOptions.TopicName)));
-        _serviceBusSenderFactoryStub = serviceBusSenderFactoryStub;
+        _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         BuildServices(testOutputHelper);
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
