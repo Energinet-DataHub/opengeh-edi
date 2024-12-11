@@ -40,20 +40,43 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
         XNamespace @namespace = "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1";
         foreach (var activityRecord in ParseFrom<MeteredDateForMeasurementPointMarketActivityRecord>(marketActivityPayloads))
         {
-            var seriesElement = new XElement(
-                @namespace + "Series",
-                new XElement(@namespace + "mRID", activityRecord.TransactionId.Value),
-                new XElement(
+            var seriesElement = new XElement(@namespace + "Series");
+            seriesElement.Add(new XElement(@namespace + "mRID", activityRecord.TransactionId.Value));
+
+            if (activityRecord.OriginalTransactionIdReferenceId is not null)
+            {
+                seriesElement.Add(
+                    new XElement(
                     @namespace + "originalTransactionIDReference_Series.mRID",
-                    activityRecord.OriginalTransactionIdReferenceId?.Value),
+                    activityRecord.OriginalTransactionIdReferenceId?.Value));
+            }
+
+            seriesElement.Add(
                 new XElement(
                     @namespace + "marketEvaluationPoint.mRID",
                     new XAttribute("codingScheme", "A10"),
-                    activityRecord.MarketEvaluationPointNumber),
-                new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType),
-                new XElement(@namespace + "registration_DateAndOrTime.dateTime", activityRecord.RegistrationDateTime),
-                new XElement(@namespace + "product", activityRecord.Product),
-                new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.QuantityMeasureUnit.Code),
+                    activityRecord.MarketEvaluationPointNumber));
+
+            seriesElement.Add(
+                new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType));
+
+            if (activityRecord.RegistrationDateTime is not null)
+            {
+                seriesElement.Add(
+                    new XElement(
+                        @namespace + "registration_DateAndOrTime.dateTime",
+                        activityRecord.RegistrationDateTime));
+            }
+
+            if (activityRecord.Product is not null)
+            {
+                seriesElement.Add(new XElement(@namespace + "product", activityRecord.Product));
+            }
+
+            seriesElement.Add(
+                new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.QuantityMeasureUnit.Code));
+
+            seriesElement.Add(
                 new XElement(
                     @namespace + "Period",
                     new XElement(@namespace + "resolution", activityRecord.Resolution.Code),

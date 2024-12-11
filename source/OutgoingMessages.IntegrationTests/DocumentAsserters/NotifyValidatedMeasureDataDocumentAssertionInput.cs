@@ -12,8 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 
-public class NotifyValidatedMeasureDataDocumentAssertionInput
-{
-}
+public readonly record struct RequiredHeaderDocumentFields(
+    string BusinessReasonCode,
+    string ReceiverId,
+    string ReceiverScheme,
+    string SenderId,
+    string SenderScheme,
+    string SenderRole,
+    string ReceiverRole,
+    string Timestamp);
+
+public sealed record OptionalHeaderDocumentFields(
+    string? BusinessSectorType,
+    IReadOnlyCollection<AssertSeriesDocumentFieldsInput> AssertSeriesDocumentFieldsInput);
+
+public sealed record NotifyValidatedMeasureDataDocumentAssertionInput(
+    RequiredHeaderDocumentFields RequiredHeaderDocumentFields,
+    OptionalHeaderDocumentFields OptionalHeaderDocumentFields);
+
+public sealed record AssertSeriesDocumentFieldsInput(
+    int SeriesIndex,
+    RequiredSeriesFields RequiredSeriesFields,
+    OptionalSeriesFields OptionalSeriesFields);
+
+public sealed record RequiredSeriesFields(
+    TransactionId TransactionId,
+    string MeteringPointNumber,
+    string MeteringPointScheme,
+    string MeteringPointType,
+    string QuantityMeasureUnit,
+    RequiredPeriodDocumentFields RequiredPeriodDocumentFields);
+
+public sealed record OptionalSeriesFields(
+    string? OriginalTransactionIdReferenceId,
+    string? RegistrationDateTime,
+    string? InDomain,
+    string? OutDomain,
+    string? Product);
+
+public sealed record RequiredPeriodDocumentFields(
+    string Resolution,
+    string StartedDateTime,
+    string EndedDateTime,
+    IReadOnlyCollection<AssertPointDocumentFieldsInput> Points);
