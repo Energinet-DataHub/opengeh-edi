@@ -67,7 +67,7 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
         var transactionId = Guid.NewGuid().ToString();
 
         // Test steps:
-        // => HTTP POST: RequestWholesaleServices
+        // => HTTP POST: RequestAggregatedMeasureData
         using var httpRequest = await Fixture.CreateRequestAggregatedMeasureDataHttpRequestAsync(energySupplier, transactionId);
         using var httpResponse = await Fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
         await httpResponse.EnsureSuccessStatusCodeWithLogAsync(Fixture.TestLogger);
