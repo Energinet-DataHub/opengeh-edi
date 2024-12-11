@@ -41,7 +41,7 @@ public class RequestProcessOrchestrationStarter(
             var startCommand = new RequestCalculatedWholesaleServicesCommandV1(
                 actorIdentity,
                 new RequestCalculatedWholesaleServicesInputV1(),
-                initializeProcessDto.MessageId);
+                transaction.Id);
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);

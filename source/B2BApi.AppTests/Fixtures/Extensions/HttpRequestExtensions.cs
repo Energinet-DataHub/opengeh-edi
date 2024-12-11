@@ -39,7 +39,8 @@ public static class HttpRequestExtensions
             documentPath,
             IncomingDocumentType.RequestWholesaleSettlement.Name,
             "application/xml",
-            actor);
+            actor,
+            transactionId);
     }
 
     public static Task<HttpRequestMessage> CreatePeekHttpRequestAsync(
@@ -72,7 +73,7 @@ public static class HttpRequestExtensions
         string documentType,
         string contentType,
         Actor actor,
-        string? transactionId = null)
+        string? transactionId)
     {
         HttpRequestMessage? request = null;
         try

@@ -92,8 +92,8 @@ public class RequestWholesaleServicesOrchestrationTests : IAsyncLifetime
             .When(
                 msg =>
                 {
-                    var messageIdMatch = msg.MessageId == transactionId;
-                    var subjectMatch = msg.Subject == "Brs_028";
+                    var messageIdMatch = msg.MessageId.Equals(transactionId);
+                    var subjectMatch = msg.Subject.Equals("Brs_028");
 
                     return messageIdMatch && subjectMatch;
                 })
