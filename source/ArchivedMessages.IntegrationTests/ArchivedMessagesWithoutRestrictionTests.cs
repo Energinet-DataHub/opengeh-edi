@@ -38,7 +38,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     private readonly ActorIdentity _authenticatedActor = new(
         ActorNumber.Create("1234512345811"),
         Restriction.None,
-        ActorRole.MeteredDataAdministrator);
+        ActorRole.MeteredDataAdministrator,
+        Guid.Parse("00000000-0000-0000-0000-000000000001"));
 
     public ArchivedMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {

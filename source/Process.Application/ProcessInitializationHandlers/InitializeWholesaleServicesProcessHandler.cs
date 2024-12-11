@@ -53,7 +53,7 @@ public class InitializeWholesaleServicesProcessHandler : IProcessInitializationH
         if (await _featureFlagManager.UseRequestWholesaleServicesProcessOrchestrationAsync().ConfigureAwait(false))
         {
             await _requestProcessOrchestrationStarter
-                .StartRequestWholesaleServicesOrchestrationAsync(marketMessage)
+                .StartRequestWholesaleServicesOrchestrationAsync(marketMessage, CancellationToken.None)
                 .ConfigureAwait(false);
         }
         else

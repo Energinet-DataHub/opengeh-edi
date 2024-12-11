@@ -18,5 +18,11 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
 
 public interface IRequestProcessOrchestrationStarter
 {
-    Task StartRequestWholesaleServicesOrchestrationAsync(InitializeWholesaleServicesProcessDto initializeProcessDto);
+    Task StartRequestWholesaleServicesOrchestrationAsync(
+        InitializeWholesaleServicesProcessDto initializeProcessDto,
+        CancellationToken cancellationToken);
+
+    Task StartRequestAggregatedMeasureDataOrchestrationAsync(
+        InitializeAggregatedMeasureDataProcessDto initializeProcessDto,
+        CancellationToken cancellationToken);
 }

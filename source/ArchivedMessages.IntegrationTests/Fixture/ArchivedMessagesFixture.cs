@@ -112,7 +112,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
                 new ActorIdentity(
                     ActorNumber.Create("1234512345888"),
                     restriction: Restriction.None,
-                    ActorRole.MeteredDataAdministrator));
+                    ActorRole.MeteredDataAdministrator,
+                    Guid.Parse("00000000-0000-0000-0000-000000000001")));
 
         ArchivedMessagesClient = Services.GetRequiredService<IArchivedMessagesClient>();
     }

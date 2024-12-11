@@ -34,5 +34,6 @@ public interface IMarketActorAuthenticator
     /// </summary>
     /// <param name="actorNumber">Actor number, typically found from the external id in the `azp` claim</param>
     /// <param name="actorRole">User role, typically found from the `role` claim</param>
-    bool Authenticate(ActorNumber? actorNumber, ActorRole? actorRole);
+    /// <param name="actorId">Actor id, typically found in the `azp` claim</param>
+    bool Authenticate(ActorNumber? actorNumber, ActorRole? actorRole, string? actorId);
 }

@@ -12,23 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions;
 
 public class RequestProcessOrchestrationStarter(
-    IDurableClientFactory durableClientFactory) : IRequestProcessOrchestrationStarter
+    IProcessManagerMessageClient processManagerMessageClient,
+    AuthenticatedActor authenticatedActor) : IRequestProcessOrchestrationStarter
 {
-    private readonly IDurableClientFactory _durableClientFactory = durableClientFactory;
+    private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
+    private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
-    public async Task StartRequestWholesaleServicesOrchestrationAsync(InitializeWholesaleServicesProcessDto initializeProcessDto)
+    public Task StartRequestWholesaleServicesOrchestrationAsync(
+        InitializeWholesaleServicesProcessDto initializeProcessDto,
+        CancellationToken cancellationToken)
     {
-        var durableTaskClient = _durableClientFactory.CreateClient();
+        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
 
-        await durableTaskClient
-            .StartNewAsync("RequestWholesaleServicesOrchestration", initializeProcessDto)
-            .ConfigureAwait(false);
+        var startCommand = new RequestCalculatedWholesaleServicesCommandV1(
+            new ActorIdentityDto(actorId),
+            new RequestCalculatedWholesaleServicesInputV1(),
+            initializeProcessDto.MessageId);
+
+        return _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+    }
+
+    public Task StartRequestAggregatedMeasureDataOrchestrationAsync(
+        InitializeAggregatedMeasureDataProcessDto initializeProcessDto,
+        CancellationToken cancellationToken)
+    {
+        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
+
+        var startCommand = new StartRequestCalculatedEnergyTimeSeriesCommandV1(
+            new ActorIdentityDto(actorId),
+            new RequestCalculatedEnergyTimeSeriesInputV1(
+                BusinessReason: initializeProcessDto.BusinessReason),
+            initializeProcessDto.MessageId);
+
+        return _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+    }
+
+    private Guid GetAuthenticatedActorId(string messageId)
+    {
+        if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
+            throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");
+
+        return actorIdentity?.ActorId
+               ?? throw new InvalidOperationException($"Current actor id was null when initializing process (MessageId={messageId})");
     }
 }

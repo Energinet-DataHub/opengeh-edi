@@ -39,6 +39,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasur
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using MediatR;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
@@ -92,12 +93,8 @@ public static class ProcessExtensions
 
         // DurableClientFactory and RequestProcessOrchestrationStarter
         services.AddTransient<IRequestProcessOrchestrationStarter, RequestProcessOrchestrationStarter>();
-        services.AddDurableClientFactory(options =>
-        {
-            options.ConnectionName = "OrchestrationsStorageConnectionString";
-            options.TaskHub = configuration["OrchestrationsTaskHubName"]!;
-            options.IsExternalClient = true;
-        });
+        // TODO: Add service bus client?
+        services.AddProcessManagerMessageClient();
 
         // RequestedAggregatedMeasureDataConfiguration
         services
