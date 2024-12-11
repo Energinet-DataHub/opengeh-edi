@@ -29,33 +29,51 @@ public class RequestProcessOrchestrationStarter(
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
-    public Task StartRequestWholesaleServicesOrchestrationAsync(
+    public async Task StartRequestWholesaleServicesOrchestrationAsync(
         InitializeWholesaleServicesProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
         var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
+        var actorIdentity = new ActorIdentityDto(actorId);
 
-        var startCommand = new RequestCalculatedWholesaleServicesCommandV1(
-            new ActorIdentityDto(actorId),
-            new RequestCalculatedWholesaleServicesInputV1(),
-            initializeProcessDto.MessageId);
+        var startProcessTasks = new List<Task>();
+        foreach (var transaction in initializeProcessDto.Series)
+        {
+            var startCommand = new RequestCalculatedWholesaleServicesCommandV1(
+                new ActorIdentityDto(actorId),
+                new RequestCalculatedWholesaleServicesInputV1(),
+                initializeProcessDto.MessageId);
 
-        return _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            // TODO: Handle resiliency. Could use something like Polly to retry if failing?
+            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            startProcessTasks.Add(startProcessTask);
+        }
+
+        await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    public Task StartRequestAggregatedMeasureDataOrchestrationAsync(
+    public async Task StartRequestAggregatedMeasureDataOrchestrationAsync(
         InitializeAggregatedMeasureDataProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
         var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
+        var actorIdentity = new ActorIdentityDto(actorId);
 
-        var startCommand = new StartRequestCalculatedEnergyTimeSeriesCommandV1(
-            new ActorIdentityDto(actorId),
-            new RequestCalculatedEnergyTimeSeriesInputV1(
-                BusinessReason: initializeProcessDto.BusinessReason),
-            initializeProcessDto.MessageId);
+        var startProcessTasks = new List<Task>();
+        foreach (var transaction in initializeProcessDto.Series)
+        {
+            var startCommand = new StartRequestCalculatedEnergyTimeSeriesCommandV1(
+                actorIdentity,
+                new RequestCalculatedEnergyTimeSeriesInputV1(
+                    BusinessReason: initializeProcessDto.BusinessReason),
+                transaction.Id.Value);
 
-        return _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            // TODO: Handle resiliency. Could use something like Polly to retry if failing?
+            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            startProcessTasks.Add(startProcessTask);
+        }
+
+        await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
     private Guid GetAuthenticatedActorId(string messageId)
