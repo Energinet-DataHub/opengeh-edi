@@ -20,8 +20,6 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 {
     IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists();
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasNoSeriesElements();
-
     IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode);
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasSenderId(string expectedSenderId, string expectedSchemeCode);

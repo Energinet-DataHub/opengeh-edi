@@ -41,12 +41,6 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasNoSeriesElements()
-    {
-        _root.TryGetProperty("Series", out _).Should().BeFalse("property 'Series' should not be present");
-        return this;
-    }
-
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode)
     {
         Assert.Equal(expectedBusinessReasonCode, _root.GetProperty("process.processType").GetProperty("value").ToString());

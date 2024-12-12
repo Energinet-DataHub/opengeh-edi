@@ -100,7 +100,7 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
                 header.SenderId,
                 header.SenderRole,
                 TypeCode,
-                meteredDataForMeasurementSeries.Count == 0 ? null : meteredDataForMeasurementSeries));
+                meteredDataForMeasurementSeries));
     }
 }
 
@@ -120,7 +120,7 @@ internal class MeteredDateForMeasurementPoint(
     string senderId,
     string senderRole,
     string typeCode,
-    IReadOnlyCollection<MeteredDataForMeasurementSeries>? meteredDataForMeasurementSeries)
+    IReadOnlyCollection<MeteredDataForMeasurementSeries> meteredDataForMeasurementSeries)
 {
     [JsonPropertyName("mRID")]
     public string MessageId { get; init; } = messageId;
@@ -150,8 +150,7 @@ internal class MeteredDateForMeasurementPoint(
     public ValueObject<string> Type { get; init; } = ValueObject<string>.Create(typeCode);
 
     [JsonPropertyName("Series")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyCollection<MeteredDataForMeasurementSeries>? MeteredDataForMeasurementSeries { get; init; } =
+    public IReadOnlyCollection<MeteredDataForMeasurementSeries> MeteredDataForMeasurementSeries { get; init; } =
         meteredDataForMeasurementSeries;
 }
 

@@ -34,12 +34,6 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasNoSeriesElements()
-    {
-        _documentAsserter.IsNotPresent("Series[1]");
-        return this;
-    }
-
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode)
     {
         _documentAsserter.HasValue("process.processType", expectedBusinessReasonCode);

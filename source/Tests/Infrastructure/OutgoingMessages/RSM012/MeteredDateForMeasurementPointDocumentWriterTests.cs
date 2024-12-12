@@ -136,6 +136,11 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
+    /*
+     * We do not expect that we ever have to create any of these,
+     * but in case something goes wrong, we need to be able to create them,
+     * in order for the actors to empty their queues
+     */
     public async Task Can_create_no_series_notifyValidatedMeasureData_document(string documentFormat)
     {
         // Arrange
@@ -157,7 +162,6 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
             .HasReceiverId(SampleData.ReceiverActorNumber, "A10")
             .HasReceiverRole(SampleData.ReceiverActorRole)
             .HasTimestamp(SampleData.TimeStamp.ToString())
-            .HasNoSeriesElements()
             .DocumentIsValidAsync();
     }
 

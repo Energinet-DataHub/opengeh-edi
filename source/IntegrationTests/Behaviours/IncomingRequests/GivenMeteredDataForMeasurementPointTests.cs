@@ -162,4 +162,33 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                         ])));
         }
     }
+
+    [Theory]
+    [MemberData(nameof(PeekFormats))]
+    public async Task AndGiven_MessageIsEmpty_When_ActorPeeksAllMessages_Then_ReceivesNoMessages(
+        DocumentFormat peekFormat)
+    {
+        // Arrange
+        var senderSpy = CreateServiceBusSenderSpy();
+        var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
+
+        await GivenReceivedMeteredDataForMeasurementPoint(
+            documentFormat: DocumentFormat.Xml,
+            senderActorNumber: currentActor.ActorNumber,
+            []);
+
+        await WhenMeteredDataForMeasurementPointProcessIsInitialized(senderSpy.LatestMessage!);
+
+        // Act
+        var peekResults = await WhenActorPeeksAllMessages(
+            ActorNumber.Create("8100000000115"),
+            ActorRole.EnergySupplier,
+            peekFormat);
+
+        // Assert
+        peekResults.Should().BeEmpty();
+    }
 }
