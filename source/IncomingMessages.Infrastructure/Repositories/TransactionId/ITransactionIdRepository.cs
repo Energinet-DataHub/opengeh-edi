@@ -20,12 +20,12 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.Tra
 public interface ITransactionIdRepository
 {
     /// <summary>
-    /// Checks if <paramref name="transactionId"/> is already registered by the sender <paramref name="senderId"/>
+    /// Returns a list of existing <paramref name="transactionIds"/> if they already is registered by the sender <paramref name="senderId"/>
     /// </summary>
     /// <param name="senderId"></param>
-    /// <param name="transactionId"></param>
+    /// <param name="transactionIds"></param>
     /// <param name="cancellationToken"></param>
-    Task<bool> TransactionIdExistsAsync(string senderId, string transactionId, CancellationToken cancellationToken);
+    Task<IReadOnlyList<string>> TransactionIdExistsAsync(string senderId, IReadOnlyCollection<string> transactionIds, CancellationToken cancellationToken);
 
     /// <summary>
     /// Store transaction ids for the specified sender

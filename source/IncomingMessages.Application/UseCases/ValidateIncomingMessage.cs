@@ -171,12 +171,9 @@ public class ValidateIncomingMessage(
         {
             var transactionId = series.TransactionId;
 
-            var errorsForSeries = await CheckTransactionIdAsync(
+            var errorsForSeries = CheckTransactionId(
                     transactionId,
-                    message.SenderNumber,
-                    transactionIdsToBeStored,
-                    cancellationToken)
-                .ConfigureAwait(false);
+                    transactionIdsToBeStored);
 
             if (errorsForSeries is null)
             {
@@ -188,34 +185,40 @@ public class ValidateIncomingMessage(
             }
         }
 
+        var duplicatedTransactionIds = await TransactionIdIsDuplicatedAsync(
+                message.SenderNumber,
+                transactionIdsToBeStored,
+                cancellationToken)
+            .ConfigureAwait(false);
+        foreach (var duplicatedTransactionId in duplicatedTransactionIds)
+        {
+            errors.Add(new DuplicateTransactionIdDetected(duplicatedTransactionId));
+        }
+
         return errors;
     }
 
-    private async Task<ValidationError?> CheckTransactionIdAsync(
+    private ValidationError? CheckTransactionId(
         string transactionId,
-        string senderNumber,
-        IReadOnlyCollection<string> transactionIdsToBeStored,
-        CancellationToken cancellationToken)
+        IReadOnlyCollection<string> transactionIdsToBeStored)
     {
         return transactionId switch
         {
             _ when string.IsNullOrEmpty(transactionId) => new EmptyTransactionId(),
             _ when transactionId.Length > MaxTransactionIdLength => new InvalidTransactionIdSize(transactionId),
-            _ when await TransactionIdIsDuplicatedAsync(senderNumber, transactionId, cancellationToken)
-                .ConfigureAwait(false) => new DuplicateTransactionIdDetected(transactionId),
             _ when transactionIdsToBeStored.Contains(transactionId) =>
                 new DuplicateTransactionIdDetected(transactionId),
             _ => null,
         };
     }
 
-    private async Task<bool> TransactionIdIsDuplicatedAsync(
+    private async Task<IReadOnlyList<string>> TransactionIdIsDuplicatedAsync(
         string senderNumber,
-        string transactionId,
+        IReadOnlyList<string> transactionIds,
         CancellationToken cancellationToken)
     {
         return await transactionIdRepository
-            .TransactionIdExistsAsync(senderNumber, transactionId, cancellationToken)
+            .TransactionIdExistsAsync(senderNumber, transactionIds, cancellationToken)
             .ConfigureAwait(false);
     }
 }
