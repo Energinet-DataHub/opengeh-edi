@@ -33,8 +33,13 @@ jobs:
         tests_filter_expression:
           - name: Architecture Tests
             paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
+
           - name: Tests
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
+
+          - name: OutgoingMessages Unit Tests
+            paths: \source\OutgoingMessages.UnitTests\bin\Release\net8.0\Energinet.DataHub.EDI.OutgoingMessages.UnitTests.dll
+
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
       download_attempt_limit: 30
