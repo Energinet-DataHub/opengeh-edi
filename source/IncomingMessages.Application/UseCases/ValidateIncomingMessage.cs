@@ -185,10 +185,8 @@ public class ValidateIncomingMessage(
             }
         }
 
-        var duplicatedTransactionIds = await TransactionIdIsDuplicatedAsync(
-                message.SenderNumber,
-                transactionIdsToBeStored,
-                cancellationToken)
+        var duplicatedTransactionIds = await transactionIdRepository
+            .GetDuplicatedTransactionIdsAsync(message.SenderNumber, transactionIdsToBeStored, cancellationToken)
             .ConfigureAwait(false);
         foreach (var duplicatedTransactionId in duplicatedTransactionIds)
         {
@@ -210,15 +208,5 @@ public class ValidateIncomingMessage(
                 new DuplicateTransactionIdDetected(transactionId),
             _ => null,
         };
-    }
-
-    private async Task<IReadOnlyList<string>> TransactionIdIsDuplicatedAsync(
-        string senderNumber,
-        IReadOnlyList<string> transactionIds,
-        CancellationToken cancellationToken)
-    {
-        return await transactionIdRepository
-            .TransactionIdExistsAsync(senderNumber, transactionIds, cancellationToken)
-            .ConfigureAwait(false);
     }
 }

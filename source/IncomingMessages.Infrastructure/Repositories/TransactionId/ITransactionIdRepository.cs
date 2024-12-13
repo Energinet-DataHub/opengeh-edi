@@ -25,7 +25,7 @@ public interface ITransactionIdRepository
     /// <param name="senderId"></param>
     /// <param name="transactionIds"></param>
     /// <param name="cancellationToken"></param>
-    Task<IReadOnlyList<string>> TransactionIdExistsAsync(string senderId, IReadOnlyCollection<string> transactionIds, CancellationToken cancellationToken);
+    Task<IReadOnlyList<string>> GetDuplicatedTransactionIdsAsync(string senderId, IReadOnlyCollection<string> transactionIds, CancellationToken cancellationToken);
 
     /// <summary>
     /// Store transaction ids for the specified sender

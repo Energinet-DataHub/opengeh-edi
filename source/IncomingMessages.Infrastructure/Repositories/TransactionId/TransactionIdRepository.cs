@@ -26,17 +26,17 @@ public class TransactionIdRepository : ITransactionIdRepository
         _incomingMessagesContext = incomingMessagesContext;
     }
 
-    public async Task<IReadOnlyList<string>> TransactionIdExistsAsync(
+    public async Task<IReadOnlyList<string>> GetDuplicatedTransactionIdsAsync(
         string senderId,
         IReadOnlyCollection<string> transactionIds,
         CancellationToken cancellationToken)
     {
-        var transactionIdsForSender = await GetTransactionFromDbAsync(senderId, transactionIds, cancellationToken)
+        var duplicatedTransactionIdsForSender = await GetDuplicatedTransactionsFromDbAsync(senderId, transactionIds, cancellationToken)
             .ConfigureAwait(false);
         if (!transactionIds.Any())
-            transactionIdsForSender = GetTransactionFromInMemoryCollection(senderId, transactionIds);
+            duplicatedTransactionIdsForSender = GetDuplicatedTransactionsFromInMemoryCollection(senderId, transactionIds);
 
-        return transactionIdsForSender.Select(x => x.TransactionId).ToList();
+        return duplicatedTransactionIdsForSender.Select(x => x.TransactionId).ToList();
     }
 
     public async Task AddAsync(
@@ -52,7 +52,7 @@ public class TransactionIdRepository : ITransactionIdRepository
         }
     }
 
-    private IReadOnlyList<TransactionIdForSender> GetTransactionFromInMemoryCollection(
+    private IReadOnlyList<TransactionIdForSender> GetDuplicatedTransactionsFromInMemoryCollection(
         string senderId,
         IReadOnlyCollection<string> transactionIds)
     {
@@ -63,7 +63,7 @@ public class TransactionIdRepository : ITransactionIdRepository
             .ToList();
     }
 
-    private async Task<IReadOnlyList<TransactionIdForSender>> GetTransactionFromDbAsync(
+    private async Task<IReadOnlyList<TransactionIdForSender>> GetDuplicatedTransactionsFromDbAsync(
         string senderId,
         IReadOnlyCollection<string> transactionIds,
         CancellationToken cancellationToken)
