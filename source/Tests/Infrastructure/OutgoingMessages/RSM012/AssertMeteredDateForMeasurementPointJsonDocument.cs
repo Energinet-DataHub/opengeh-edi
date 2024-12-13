@@ -15,7 +15,6 @@
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using FluentAssertions;
 using Json.Schema;
 using Xunit;
@@ -36,9 +35,9 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         Assert.Equal("E66", _root.GetProperty("type").GetProperty("value").ToString());
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasMessageId(string expectedMessageId)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists()
     {
-        Assert.Equal(expectedMessageId, _root.GetProperty("mRID").ToString());
+        _root.TryGetProperty("mRID", out _).Should().BeTrue("property 'mRID' should be present");
         return this;
     }
 
@@ -80,93 +79,291 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(TransactionId expectedTransactionId)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessSectorType(
+        string? expectedBusinessSectorType)
     {
-        Assert.Equal(expectedTransactionId.Value, FirstTimeSeriesElement().GetProperty("mRID").GetString());
+        if (expectedBusinessSectorType is null)
+        {
+            _root
+                .TryGetProperty("businessSector.type", out _)
+                .Should()
+                .BeFalse("property 'businessSector.type' should not be present");
+
+            return this;
+        }
+
+        _root
+            .GetProperty("businessSector.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedBusinessSectorType);
+
+        return this;
+    }
+
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(
+        int seriesIndex,
+        TransactionId expectedTransactionId)
+    {
+        Assert.Equal(expectedTransactionId.Value, GetTimeSeriesElement(seriesIndex).GetProperty("mRID").GetString());
         return this;
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointNumber(
+        int seriesIndex,
         string expectedMeteringPointNumber,
         string expectedSchemeCode)
     {
-        Assert.Equal(expectedMeteringPointNumber, FirstTimeSeriesElement().GetProperty("marketEvaluationPoint.mRID").GetProperty("value").GetString());
-        Assert.Equal(expectedSchemeCode, FirstTimeSeriesElement().GetProperty("marketEvaluationPoint.mRID").GetProperty("codingScheme").GetString());
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("marketEvaluationPoint.mRID")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedMeteringPointNumber);
+
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("marketEvaluationPoint.mRID")
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(expectedSchemeCode);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(string expectedMeteringPointType)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(
+        int seriesIndex,
+        string expectedMeteringPointType)
     {
-        Assert.Equal(expectedMeteringPointType, FirstTimeSeriesElement().GetProperty("marketEvaluationPoint.type").GetProperty("value").GetString());
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("marketEvaluationPoint.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedMeteringPointType);
+
         return this;
     }
 
     public IAssertMeteredDateForMeasurementPointDocumentDocument HasOriginalTransactionIdReferenceId(
+        int seriesIndex,
         string? expectedOriginalTransactionIdReferenceId)
     {
-        Assert.Equal(expectedOriginalTransactionIdReferenceId, FirstTimeSeriesElement().GetProperty("originalTransactionIDReference_Series.mRID").GetString());
+        if (expectedOriginalTransactionIdReferenceId is null)
+        {
+            GetTimeSeriesElement(seriesIndex)
+                .TryGetProperty("originalTransactionIDReference_Series.mRID", out _)
+                .Should()
+                .BeFalse("property 'originalTransactionIDReference_Series.mRID' should not be present");
+
+            return this;
+        }
+
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("originalTransactionIDReference_Series.mRID")
+            .GetString()
+            .Should()
+            .Be(expectedOriginalTransactionIdReferenceId);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string expectedProduct)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct)
     {
-        Assert.Equal(expectedProduct, FirstTimeSeriesElement().GetProperty("product").GetString());
+        if (expectedProduct is null)
+        {
+            GetTimeSeriesElement(seriesIndex)
+                .TryGetProperty("product", out _)
+                .Should()
+                .BeFalse("property 'product' should not be present");
+
+            return this;
+        }
+
+        GetTimeSeriesElement(seriesIndex).GetProperty("product").GetString().Should().Be(expectedProduct);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(string expectedQuantityMeasureUnit)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(
+        int seriesIndex,
+        string expectedQuantityMeasureUnit)
     {
-        Assert.Equal(expectedQuantityMeasureUnit, FirstTimeSeriesElement().GetProperty("quantity_Measure_Unit.name").GetProperty("value").GetString());
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("quantity_Measure_Unit.name")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedQuantityMeasureUnit);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(string expectedRegistrationDateTime)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(
+        int seriesIndex,
+        string? expectedRegistrationDateTime)
     {
-        Assert.Equal(expectedRegistrationDateTime, FirstTimeSeriesElement().GetProperty("registration_DateAndOrTime.dateTime").GetString());
+        if (expectedRegistrationDateTime is null)
+        {
+            GetTimeSeriesElement(seriesIndex)
+                .TryGetProperty("registration_DateAndOrTime.dateTime", out _)
+                .Should()
+                .BeFalse("property 'registration_DateAndOrTime.dateTime' should not be present");
+
+            return this;
+        }
+
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("registration_DateAndOrTime.dateTime")
+            .GetString()
+            .Should()
+            .Be(expectedRegistrationDateTime);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(string expectedResolution)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(
+        int seriesIndex,
+        string expectedResolution)
     {
-        Assert.Equal(expectedResolution, FirstTimeSeriesPeriodElement().GetProperty("resolution").GetString());
+        GetTimeSeriesPeriodElement(seriesIndex).GetProperty("resolution").GetString().Should().Be(expectedResolution);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(string expectedStartedDateTime)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(
+        int seriesIndex,
+        string expectedStartedDateTime)
     {
-        Assert.Equal(expectedStartedDateTime, FirstTimeSeriesPeriodElement().GetProperty("timeInterval").GetProperty("start").GetProperty("value").GetString());
+        GetTimeSeriesPeriodElement(seriesIndex)
+            .GetProperty("timeInterval")
+            .GetProperty("start")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedStartedDateTime);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(string expectedEndedDateTime)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(
+        int seriesIndex,
+        string expectedEndedDateTime)
     {
-        Assert.Equal(expectedEndedDateTime, FirstTimeSeriesPeriodElement().GetProperty("timeInterval").GetProperty("end").GetProperty("value").GetString());
+        GetTimeSeriesPeriodElement(seriesIndex)
+            .GetProperty("timeInterval")
+            .GetProperty("end")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedEndedDateTime);
+
         return this;
     }
 
-    public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(IReadOnlyList<PointActivityRecord> expectedPoints)
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasInDomain(int seriesIndex, string? expectedInDomain)
     {
-        var points = FirstTimeSeriesPeriodElement().GetProperty("Point").EnumerateArray().ToList();
-        Assert.Equal(expectedPoints.Count, points.Count);
+        if (expectedInDomain is null)
+        {
+            GetTimeSeriesElement(seriesIndex)
+                .TryGetProperty("in_Domain.mRID", out _)
+                .Should()
+                .BeFalse("property 'in_Domain.mRID' should not be present");
+
+            return this;
+        }
+
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("in_Domain.mRID")
+            .GetString()
+            .Should()
+            .Be(expectedInDomain);
+
+        return this;
+    }
+
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasOutDomain(int seriesIndex, string? expectedOutDomain)
+    {
+        if (expectedOutDomain is null)
+        {
+            GetTimeSeriesElement(seriesIndex)
+                .TryGetProperty("out_Domain.mRID", out _)
+                .Should()
+                .BeFalse("property 'out_Domain.mRID' should not be present");
+
+            return this;
+        }
+
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("out_Domain.mRID")
+            .GetString()
+            .Should()
+            .Be(expectedOutDomain);
+
+        return this;
+    }
+
+    public IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
+        int seriesIndex,
+        IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints)
+    {
+        var points = GetTimeSeriesPeriodElement(seriesIndex).GetProperty("Point").EnumerateArray().ToList();
+
+        points.Should().HaveCount(expectedPoints.Count);
 
         for (var i = 0; i < expectedPoints.Count; i++)
         {
-            var expectedPoint = expectedPoints[i];
+            var (requiredPointDocumentFields, optionalPointDocumentFields) = expectedPoints[i];
             var actualPoint = points[i];
 
-            Assert.Equal(expectedPoint.Position, actualPoint.GetProperty("position").GetProperty("value").GetInt32());
-            // Assert.Equal(expectedPoint.Quality, actualPoint.TryGetProperty("quality", out var quality) ? quality.GetProperty("value").GetString() : null);
-            Assert.Equal(expectedPoint.Quantity, actualPoint.TryGetProperty("quantity", out var quantity) ? quantity.GetInt32() : null);
+            actualPoint.GetProperty("position")
+                .GetProperty("value")
+                .GetInt32()
+                .Should()
+                .Be(requiredPointDocumentFields.Position);
+
+            if (optionalPointDocumentFields.Quality != null)
+            {
+                actualPoint.GetProperty("quality")
+                    .GetProperty("value")
+                    .GetString()
+                    .Should()
+                    .Be(optionalPointDocumentFields.Quality);
+            }
+            else
+            {
+                AssertPropertyNotPresent(actualPoint, "quality");
+            }
+
+            if (optionalPointDocumentFields.Quantity != null)
+            {
+                actualPoint.GetProperty("quantity").GetDecimal().Should().Be(optionalPointDocumentFields.Quantity);
+            }
+            else
+            {
+                AssertPropertyNotPresent(actualPoint, "quantity");
+            }
         }
 
         return this;
+
+        void AssertPropertyNotPresent(JsonElement actualPoint, string propertyName)
+        {
+            actualPoint.TryGetProperty(propertyName, out _)
+                .Should()
+                .BeFalse($"property '{propertyName}' should not be present");
+        }
     }
 
     public async Task<IAssertMeteredDateForMeasurementPointDocumentDocument> DocumentIsValidAsync()
     {
         var schema = await _schemas.GetSchemaAsync<JsonSchema>("NOTIFYVALIDATEDMEASUREDATA", "0", CancellationToken.None).ConfigureAwait(false);
         var validationResult = IsValid(_document, schema!);
-        validationResult.IsValid.Should().BeTrue(string.Join("\n", validationResult.Errors));
+        validationResult.IsValid.Should()
+            .BeTrue(
+                $"the following errors were unexpected:\n\n{string.Join("\n", validationResult.Errors)}\n\nfor the document\n\n{_document.RootElement}");
+
         return this;
     }
 
@@ -176,40 +373,33 @@ public class AssertMeteredDateForMeasurementPointJsonDocument : IAssertMeteredDa
         var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.Hierarchical, });
         if (result.IsValid == false)
         {
-            errors.Add(FindErrorsForInvalidEvaluation(result));
+            errors.AddRange(FindErrorsForInvalidEvaluation(result).Where(e => !string.IsNullOrEmpty(e)));
         }
 
         return (result.IsValid, errors);
     }
 
-    private string FindErrorsForInvalidEvaluation(EvaluationResults result)
+    private IEnumerable<string> FindErrorsForInvalidEvaluation(EvaluationResults result)
     {
-        if (!result.IsValid)
+        var errors = new List<string>();
+
+        if (result is { IsValid: false, Errors: not null })
         {
-            foreach (var detail in result.Details)
-            {
-                return FindErrorsForInvalidEvaluation(detail);
-            }
+            var propertyName = result.InstanceLocation.ToString();
+            errors.AddRange(result.Errors.Select(error => $"{propertyName}: {error}"));
         }
 
-        if (!result.HasErrors || result.Errors == null) return string.Empty;
-
-        var propertyName = result.InstanceLocation.ToString();
-        foreach (var error in result.Errors)
+        foreach (var detail in result.Details)
         {
-            return $"{propertyName}: {error}";
+            errors.AddRange(FindErrorsForInvalidEvaluation(detail));
         }
 
-        return string.Empty;
+        return errors;
     }
 
-    private JsonElement FirstTimeSeriesElement()
-    {
-        return _root.GetProperty("Series").EnumerateArray().ToList()[0];
-    }
+    private JsonElement GetTimeSeriesElement(int seriesIndex) =>
+        _root.GetProperty("Series").EnumerateArray().ToList()[seriesIndex - 1];
 
-    private JsonElement FirstTimeSeriesPeriodElement()
-    {
-        return _root.GetProperty("Series").EnumerateArray().ToList()[0].GetProperty("Period");
-    }
+    private JsonElement GetTimeSeriesPeriodElement(int seriesIndex) =>
+        _root.GetProperty("Series").EnumerateArray().ToList()[seriesIndex - 1].GetProperty("Period");
 }
