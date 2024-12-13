@@ -59,7 +59,9 @@ public class IncomingMessageReceiver
         var stopwatch = Stopwatch.StartNew();
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
-        if (!await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))
+        if (incomingDocumentTypeName != null &&
+            incomingDocumentTypeName.Equals(IncomingDocumentType.NotifyValidatedMeasureData.Name, StringComparison.OrdinalIgnoreCase)
+            && !await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request
