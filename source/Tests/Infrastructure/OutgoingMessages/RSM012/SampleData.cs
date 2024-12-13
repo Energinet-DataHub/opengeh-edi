@@ -71,5 +71,7 @@ internal static class SampleData
         new(6, "A02", null),
     };
 
+    public static IReadOnlyList<PointActivityRecord> MinimalPoints => [new(2, null, null)];
+
     #endregion
 }

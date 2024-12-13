@@ -13,13 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
 public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 {
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasMessageId(string expectedMessageId);
+    IAssertMeteredDateForMeasurementPointDocumentDocument MessageIdExists();
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode);
 
@@ -33,27 +32,56 @@ public interface IAssertMeteredDateForMeasurementPointDocumentDocument
 
     IAssertMeteredDateForMeasurementPointDocumentDocument HasTimestamp(string expectedTimestamp);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(TransactionId expectedTransactionId);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasBusinessSectorType(string? expectedBusinessSectorType);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointNumber(string expectedMeteringPointNumber, string expectedSchemeCode);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasTransactionId(
+        int seriesIndex,
+        TransactionId expectedTransactionId);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(string expectedMeteringPointType);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointNumber(
+        int seriesIndex,
+        string expectedMeteringPointNumber,
+        string expectedSchemeCode);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasOriginalTransactionIdReferenceId(string? expectedOriginalTransactionIdReferenceId);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasMeteringPointType(
+        int seriesIndex,
+        string expectedMeteringPointType);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(string expectedProduct);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasOriginalTransactionIdReferenceId(
+        int seriesIndex,
+        string? expectedOriginalTransactionIdReferenceId);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(string expectedQuantityMeasureUnit);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(string expectedRegistrationDateTime);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasQuantityMeasureUnit(
+        int seriesIndex,
+        string expectedQuantityMeasureUnit);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(string expectedResolution);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasRegistrationDateTime(
+        int seriesIndex,
+        string? expectedRegistrationDateTime);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(string expectedStartedDateTime);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasResolution(int seriesIndex, string expectedResolution);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(string expectedEndedDateTime);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasStartedDateTime(
+        int seriesIndex,
+        string expectedStartedDateTime);
 
-    IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(IReadOnlyList<PointActivityRecord> expectedPoints);
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasEndedDateTime(
+        int seriesIndex,
+        string expectedEndedDateTime);
+
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasInDomain(
+        int seriesIndex,
+        string? expectedInDomain);
+
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasOutDomain(
+        int seriesIndex,
+        string? expectedOutDomain);
+
+    IAssertMeteredDateForMeasurementPointDocumentDocument HasPoints(
+        int seriesIndex,
+        IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints);
 
     /// <summary>
     /// Asserts document validity
