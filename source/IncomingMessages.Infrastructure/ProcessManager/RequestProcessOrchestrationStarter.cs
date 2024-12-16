@@ -141,24 +141,35 @@ public class RequestProcessOrchestrationStarter(
         var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
         var actorIdentity = new ActorIdentityDto(actorId);
 
-        var datePattern = "yyyy-MM-ddTHH:mm'Z'";
-
+        var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
         {
-            await _processManagerMessageClient.StartNewOrchestrationInstanceAsync(
+            var meteringPointType = transaction.MeteringPointType is not null
+                ? MeteringPointType.TryGetNameFromCode(transaction.MeteringPointType, fallbackValue: transaction.MeteringPointType)
+                : null;
+
+            var productUnitType = transaction.ProductUnitType is not null
+                ? MeasurementUnit.TryGetNameFromCode(transaction.ProductUnitType, fallbackValue: transaction.ProductUnitType)
+                : null;
+
+            var resolution = transaction.Resolution is not null
+                ? Resolution.TryGetNameFromCode(transaction.Resolution, fallbackValue: transaction.Resolution)
+                : null;
+
+            var startCommand =
                 new StartForwardMeteredDataCommandV1(
                     operatingIdentity: actorIdentity,
                     new MeteredDataForMeasurementPointMessageInputV1(
                         AuthenticatedActorId: actorId,
                         TransactionId: transaction.TransactionId,
                         MeteringPointId: transaction.MeteringPointLocationId,
-                        MeteringPointType: transaction.MeteringPointType,
+                        MeteringPointType: meteringPointType,
                         ProductNumber: transaction.ProductNumber,
-                        MeasureUnit: MeasurementUnit.FromCode(transaction.ProductUnitType!).Code,
+                        MeasureUnit: productUnitType,
                         RegistrationDateTime: InstantPattern.General.Parse(initializeProcessDto.CreatedAt).Value.ToString(),
-                        Resolution: Resolution.FromCode(transaction.Resolution!).Code,
-                        StartDateTime: InstantPattern.Create(datePattern, CultureInfo.InvariantCulture).Parse(transaction.StartDateTime).Value.ToString(),
-                        EndDateTime: transaction.EndDateTime != null ? InstantPattern.Create(datePattern, CultureInfo.InvariantCulture).Parse(transaction.EndDateTime).Value.ToString() : throw new ArgumentNullException(),
+                        Resolution: resolution,
+                        StartDateTime: transaction.StartDateTime,
+                        EndDateTime: transaction.EndDateTime,
                         GridAccessProviderNumber: transaction.RequestedByActor.ActorNumber.Value,
                         DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
                         EnergyObservations:
@@ -170,10 +181,13 @@ public class RequestProcessOrchestrationStarter(
                                             EnergyQuantity: energyObservation.EnergyQuantity,
                                             QuantityQuality: energyObservation.QuantityQuality))
                                     .ToList())),
-                    initializeProcessDto.MessageId),
-                CancellationToken.None)
-                .ConfigureAwait(false);
+                    initializeProcessDto.MessageId);
+
+            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, CancellationToken.None);
+            startProcessTasks.Add(startProcessTask);
         }
+
+        await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
     private Guid GetAuthenticatedActorId(string messageId)

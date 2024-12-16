@@ -14,11 +14,13 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 using FluentAssertions;
@@ -241,6 +243,130 @@ public class RequestProcessOrchestrationStarterTests
                 MeteringPointType: expectedMeteringPointType?.Name,
                 SettlementMethod: expectedSettlementMethod?.Name,
                 SettlementVersion: expectedSettlementVersion?.Name),
+            messageId: expectedTransactionId);
+
+        actualCommand.Should()
+            .NotBeNull()
+            .And.BeEquivalentTo(expectedCommand);
+    }
+
+    [Theory]
+    [InlineData("571313101700011887", "E17", "2023-05-31T22:00:00Z", "8716867000030", "Kwh", "PT1H")]
+    [InlineData(null, null, null, null, null, null)]
+    public async Task Given_MeteredDataForMeasurementPoint_When_StartMeteredDataForMeasurementCalled_Then_ProcessManagerMessageClientIsCalled(
+        string? expectedMeteringPointId,
+        string? expectedMeteringPointType,
+        string? expectedEndDate,
+        string? expectedProductNumber,
+        string? expectedMeasureUnit,
+        string? expectedResolution)
+    {
+        // Arrange
+        // => Setup input
+        var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+
+        var expectedBusinessReason = BusinessReason.PeriodicMetering;
+        var expectedTransactionId = MessageId.Create("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
+        var expectedStart = "2023-04-30T22:00:00Z";
+        var expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
+        var expectedPosition = "1";
+        var expectedEnergyQuantity = "A03";
+        var expectedQuantityQuality = "1001";
+
+        var meteringPointType = expectedMeteringPointType is not null
+            ? MeteringPointType.FromCode(expectedMeteringPointType)
+            : null;
+        var productUnitType = expectedMeasureUnit is not null
+            ? MeasurementUnit.FromCode(expectedMeasureUnit)
+            : null;
+        var resolution = expectedResolution is not null
+            ? Resolution.FromCode(expectedResolution)
+            : null;
+
+        var initializeProcessDto = new InitializeMeteredDataForMeasurementPointMessageProcessDto(
+            MessageId: expectedTransactionId,
+            MessageType: "E66",
+            CreatedAt: expectedRegistrationDateFrom,
+            BusinessReason: expectedBusinessReason.Code,
+            BusinessType: "23",
+            Series:
+            [
+                new InitializeMeteredDataForMeasurementPointMessageSeries(
+                    TransactionId: expectedTransactionId,
+                    Resolution: resolution?.Code,
+                    StartDateTime: expectedStart,
+                    EndDateTime: expectedEndDate,
+                    ProductNumber: expectedProductNumber,
+                    ProductUnitType: productUnitType?.Code,
+                    MeteringPointType: meteringPointType?.Code,
+                    MeteringPointLocationId: expectedMeteringPointId,
+                    DelegatedGridAreaCodes: null,
+                    RequestedByActor: requestedByActor,
+                    EnergyObservations:
+                    [
+                        new InitializeEnergyObservation(
+                            Position: expectedPosition,
+                            EnergyQuantity: expectedEnergyQuantity,
+                            QuantityQuality: expectedQuantityQuality)
+                    ])
+            ]);
+
+        // => Setup Process Manager client and callback
+        var processManagerClient = new Mock<IProcessManagerMessageClient>();
+        MessageCommand<MeteredDataForMeasurementPointMessageInputV1>? actualCommand = null;
+        processManagerClient.Setup(
+                client => client.StartNewOrchestrationInstanceAsync(
+                    It.IsAny<StartForwardMeteredDataCommandV1>(),
+                    It.IsAny<CancellationToken>()))
+            .Callback((MessageCommand<MeteredDataForMeasurementPointMessageInputV1> command, CancellationToken token) => actualCommand = command);
+
+        // => Setup authenticated actor
+        var expectedActorId = Guid.NewGuid();
+        var authenticatedActor = new AuthenticatedActor();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+            ActorNumber.Create("1234567890123"),
+            Restriction.None,
+            ActorRole.GridAccessProvider,
+            expectedActorId));
+
+        var sut = new RequestProcessOrchestrationStarter(
+            processManagerClient.Object,
+            authenticatedActor);
+
+        // Act
+        await sut.StartMeteredDataForMeasurementPointOrchestrationAsync(
+            initializeProcessDto,
+            CancellationToken.None);
+
+        // Assert
+        processManagerClient.Verify(
+            client => client.StartNewOrchestrationInstanceAsync(
+                It.IsAny<StartForwardMeteredDataCommandV1>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        var expectedCommand = new StartForwardMeteredDataCommandV1(
+            operatingIdentity: new ActorIdentityDto(expectedActorId),
+            inputParameter: new MeteredDataForMeasurementPointMessageInputV1(
+                AuthenticatedActorId: expectedActorId,
+                TransactionId: expectedTransactionId,
+                MeteringPointId: expectedMeteringPointId,
+                MeteringPointType: meteringPointType?.Name,
+                ProductNumber: expectedProductNumber,
+                MeasureUnit: expectedMeasureUnit,
+                RegistrationDateTime: expectedRegistrationDateFrom,
+                Resolution: resolution?.Name,
+                StartDateTime: expectedStart,
+                EndDateTime: expectedEndDate,
+                GridAccessProviderNumber: requestedByActor.ActorNumber.Value,
+                DelegatedGridAreaCodes: null,
+                EnergyObservations:
+                [
+                    new ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.EnergyObservation(
+                        Position: expectedPosition,
+                        EnergyQuantity: expectedEnergyQuantity,
+                        QuantityQuality: expectedQuantityQuality)
+                ]),
             messageId: expectedTransactionId);
 
         actualCommand.Should()
