@@ -193,16 +193,16 @@ public class B2BApiAppFixture : IAsyncLifetime
             .CreateAsync();
         LogStopwatch(stopwatch, nameof(IntegrationEventsTopicResource));
 
-        var processManagerTopic = await ServiceBusResourceProvider
+        ProcessManagerTopicResource = await ServiceBusResourceProvider
             .BuildTopic("process-manager")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", topic.Name))
             .AddSubscription("process-manager-subscription")
             .CreateAsync();
-        LogStopwatch(stopwatch, nameof(processManagerTopic));
+        LogStopwatch(stopwatch, nameof(ProcessManagerTopicResource));
         await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
-            topicName: processManagerTopic.Name,
-            subscriptionName: processManagerTopic.Subscriptions.Single().SubscriptionName);
+            topicName: ProcessManagerTopicResource.Name,
+            subscriptionName: ProcessManagerTopicResource.Subscriptions.Single().SubscriptionName);
 
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
