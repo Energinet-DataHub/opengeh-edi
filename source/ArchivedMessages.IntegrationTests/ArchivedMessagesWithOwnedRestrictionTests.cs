@@ -28,6 +28,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 [Collection(nameof(ArchivedMessagesCollection))]
 public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
 {
+    private static readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
 
@@ -35,7 +36,7 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
         ActorNumber.Create("1234512345888"),
         Restriction.Owned,
         ActorRole.EnergySupplier,
-        Guid.Parse("00000000-0000-0000-0000-000000000001"));
+        _actorId);
 
     public ArchivedMessagesWithOwnedRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {

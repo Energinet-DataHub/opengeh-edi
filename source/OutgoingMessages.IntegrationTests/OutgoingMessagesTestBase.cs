@@ -50,6 +50,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests;
 [Collection(nameof(OutgoingMessagesIntegrationTestCollection))]
 public class OutgoingMessagesTestBase : IDisposable
 {
+    private readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private ServiceCollection? _services;
     private bool _disposed;
 
@@ -61,7 +62,7 @@ public class OutgoingMessagesTestBase : IDisposable
         Fixture.CleanupFileStorage();
         BuildServices(testOutputHelper);
         AuthenticatedActor = GetService<AuthenticatedActor>();
-        AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, Guid.Parse("00000000-0000-0000-0000-000000000001")));
+        AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, _actorId));
     }
 
     protected OutgoingMessagesTestFixture Fixture { get; }
@@ -152,7 +153,7 @@ public class OutgoingMessagesTestBase : IDisposable
 
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.Owned, actorRole ?? ActorRole.EnergySupplier, Guid.Parse("00000000-0000-0000-0000-000000000001")));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.Owned, actorRole ?? ActorRole.EnergySupplier, _actorId));
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 

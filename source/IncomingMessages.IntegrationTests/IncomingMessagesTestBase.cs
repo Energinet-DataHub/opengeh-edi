@@ -64,8 +64,10 @@ public class IncomingMessagesTestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.EnergySupplier, Guid.Parse("00000000-0000-0000-0000-000000000001")));
+            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.EnergySupplier, ActorId));
     }
+
+    protected Guid ActorId => Guid.Parse("00000000-0000-0000-0000-000000000001");
 
     protected IncomingMessagesTestFixture Fixture { get; }
 
