@@ -128,13 +128,9 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeasurementPointMessageProcessDto);
 
-        var serviceBusMessage =
-            new ServiceBusMessage(
-                _serializer.Serialize(initializeMeteredDataForMeasurementPointMessageProcessDto))
-            {
-                Subject = nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto),
-            };
-
-        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        await _requestProcessOrchestrationStarter.StartMeteredDataForMeasurementPointOrchestrationAsync(
+            initializeMeteredDataForMeasurementPointMessageProcessDto,
+            cancellationToken)
+        .ConfigureAwait(false);
     }
 }

@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
+using System.Globalization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
@@ -128,6 +132,48 @@ public class RequestProcessOrchestrationStarter(
         }
 
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
+    }
+
+    public async Task StartMeteredDataForMeasurementPointOrchestrationAsync(
+        InitializeMeteredDataForMeasurementPointMessageProcessDto initializeProcessDto,
+        CancellationToken cancellationToken)
+    {
+        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
+        var actorIdentity = new ActorIdentityDto(actorId);
+
+        var datePattern = "yyyy-MM-ddTHH:mm'Z'";
+
+        foreach (var transaction in initializeProcessDto.Series)
+        {
+            await _processManagerMessageClient.StartNewOrchestrationInstanceAsync(
+                new StartForwardMeteredDataCommandV1(
+                    operatingIdentity: actorIdentity,
+                    new MeteredDataForMeasurementPointMessageInputV1(
+                        AuthenticatedActorId: actorId,
+                        TransactionId: transaction.TransactionId,
+                        MeteringPointId: transaction.MeteringPointLocationId,
+                        MeteringPointType: transaction.MeteringPointType,
+                        ProductNumber: transaction.ProductNumber,
+                        MeasureUnit: MeasurementUnit.FromCode(transaction.ProductUnitType!).Code,
+                        RegistrationDateTime: InstantPattern.General.Parse(initializeProcessDto.CreatedAt).Value.ToString(),
+                        Resolution: Resolution.FromCode(transaction.Resolution!).Code,
+                        StartDateTime: InstantPattern.Create(datePattern, CultureInfo.InvariantCulture).Parse(transaction.StartDateTime).Value.ToString(),
+                        EndDateTime: transaction.EndDateTime != null ? InstantPattern.Create(datePattern, CultureInfo.InvariantCulture).Parse(transaction.EndDateTime).Value.ToString() : throw new ArgumentNullException(),
+                        GridAccessProviderNumber: transaction.RequestedByActor.ActorNumber.Value,
+                        DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
+                        EnergyObservations:
+                            new ReadOnlyCollection<EnergyObservation>(
+                                transaction.EnergyObservations
+                                    .Select(energyObservation =>
+                                        new EnergyObservation(
+                                            Position: energyObservation.Position,
+                                            EnergyQuantity: energyObservation.EnergyQuantity,
+                                            QuantityQuality: energyObservation.QuantityQuality))
+                                    .ToList())),
+                    initializeProcessDto.MessageId),
+                CancellationToken.None)
+                .ConfigureAwait(false);
+        }
     }
 
     private Guid GetAuthenticatedActorId(string messageId)

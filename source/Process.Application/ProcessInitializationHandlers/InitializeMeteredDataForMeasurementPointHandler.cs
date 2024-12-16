@@ -19,9 +19,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
+using Energinet.DataHub.ProcessManager.Client;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using NodaTime.Text;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
@@ -33,11 +32,13 @@ namespace Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandler
     Justification = "Readability")]
 public class InitializeMeteredDataForMeasurementPointHandler(
     IOutgoingMessagesClient outgoingMessagesClient,
+    IProcessManagerMessageClient processManagerMessageClient,
     ISerializer serializer,
     ILogger<InitializeMeteredDataForMeasurementPointHandler> logger)
     : IProcessInitializationHandler
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
+    private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly ISerializer _serializer = serializer;
     private readonly ILogger<InitializeMeteredDataForMeasurementPointHandler> _logger = logger;
 
