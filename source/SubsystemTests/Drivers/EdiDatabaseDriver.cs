@@ -319,9 +319,12 @@ internal sealed class EdiDatabaseDriver
         await connection.OpenAsync();
 
         var enqueuedMessagesCount = await connection.ExecuteScalarAsync<int>(
-            sql: @"SELECT COUNT(B.[Id]) FROM [Bundles]
-                        WHERE [DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
-	                    AND RelatedToMessageId like 'perf_test_%'");
+            sql: """
+                 SELECT COUNT([Id])
+                 FROM [Bundles]
+                 WHERE [DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
+                 AND RelatedToMessageId like 'perf_test_%'
+                 """);
 
         return enqueuedMessagesCount;
     }
