@@ -229,7 +229,7 @@ internal sealed class EdiDatabaseDriver
             deleteOutgoingMessagesCommand.CommandText = @"
                 DELETE FROM [MarketDocuments] WHERE [BundleId] IN (SELECT [Id] FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%');
                 DELETE FROM [OutgoingMessages] WHERE [AssignedBundleId] IN (SELECT [Id] FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%');
-                DELETE FROM [Bundles] WHERE RelatedToMessageId like 'perf_test_%';
+                DELETE FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%';
                 ";
 
             deleteOutgoingMessagesCommand.Connection = connection;
