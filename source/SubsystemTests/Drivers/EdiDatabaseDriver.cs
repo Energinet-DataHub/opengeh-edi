@@ -227,9 +227,9 @@ internal sealed class EdiDatabaseDriver
         await using (var deleteOutgoingMessagesCommand = new SqlCommand())
         {
             deleteOutgoingMessagesCommand.CommandText = @"
-                DELETE FROM [MarketDocuments] WHERE BundleId IN (SELECT Id FROM [Bundles] WHERE RelatedToMessageId like 'perf_test_%');
-                DELETE FROM [OutgoingMessages] WHERE [AssignedBundleId] = (SELECT Id FROM [Bundles] WHERE RelatedToMessageId like 'perf_test_%');
-                DELETE FROM [Bundles] WHERE RelatedToMessageId like 'perf_test_%';
+                DELETE FROM [MarketDocuments] WHERE [BundleId] IN (SELECT [Id] FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%');
+                DELETE FROM [OutgoingMessages] WHERE [AssignedBundleId] IN (SELECT [Id] FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%');
+                DELETE FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%';
                 ";
 
             deleteOutgoingMessagesCommand.Connection = connection;
