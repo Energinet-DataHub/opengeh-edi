@@ -216,6 +216,29 @@ internal sealed class EdiDatabaseDriver
         }
     }
 
+    /// <summary>
+    /// Delete outgoing messages for previuse performance test.
+    /// </summary>
+    internal async Task DeleteOutgoingMessagesForFromLoadTestAsync()
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync().ConfigureAwait(false);
+        await using (var deleteOutgoingMessagesCommand = new SqlCommand())
+        {
+            deleteOutgoingMessagesCommand.CommandText = @"
+                DELETE FROM [MarketDocuments] WHERE BundleId IN (SELECT Id FROM [Bundles] WHERE RelatedToMessageId like 'perf_test_%');
+                DELETE FROM [OutgoingMessages] WHERE [AssignedBundleId] = (SELECT Id FROM [Bundles] WHERE RelatedToMessageId like 'perf_test_%');
+                DELETE FROM [Bundles] WHERE RelatedToMessageId like 'perf_test_%';
+                ";
+
+            deleteOutgoingMessagesCommand.Connection = connection;
+            deleteOutgoingMessagesCommand.CommandTimeout = (int)TimeSpan.FromMinutes(2).TotalSeconds;
+
+            await deleteOutgoingMessagesCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        }
+    }
+
     internal async Task<(bool Success, string? Payload)>
         GetOutboxMessageAsync(
             Instant createdAfter,
@@ -285,6 +308,20 @@ internal sealed class EdiDatabaseDriver
                         INNER JOIN [OutgoingMessages] OM ON B.[Id] = OM.[AssignedBundleId]
                         WHERE OM.[CalculationId] = @CalculationId",
             param: new { CalculationId = calculationId, });
+
+        return enqueuedMessagesCount;
+    }
+
+    internal async Task<double> CountEnqueuedNotifyValidatedMeasureDataMessagesFromLoadTestAsync()
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var enqueuedMessagesCount = await connection.ExecuteScalarAsync<int>(
+            sql: @"SELECT COUNT(B.[Id]) FROM [Bundles]
+                        WHERE [DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
+	                    AND RelatedToMessageId like 'perf_test_%'");
 
         return enqueuedMessagesCount;
     }

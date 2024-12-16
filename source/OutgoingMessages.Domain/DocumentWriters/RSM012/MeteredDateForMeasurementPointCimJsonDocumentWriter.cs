@@ -64,18 +64,18 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
     {
         ArgumentNullException.ThrowIfNull(transactions);
 
-        var meteredDataForMeasurementPoints = new Collection<MeteredDataForMeasurementPoint>();
+        var meteredDataForMeasurementSeries = new Collection<MeteredDataForMeasurementSeries>();
         foreach (var activityRecord in transactions.Select(t => _parser.From<MeteredDateForMeasurementPointMarketActivityRecord>(t)))
         {
-            meteredDataForMeasurementPoints.Add(
-                new MeteredDataForMeasurementPoint(
+            meteredDataForMeasurementSeries.Add(
+                new MeteredDataForMeasurementSeries(
                     activityRecord.TransactionId.Value,
                     activityRecord.MarketEvaluationPointNumber,
                     activityRecord.MarketEvaluationPointType,
                     activityRecord.OriginalTransactionIdReferenceId?.Value,
                     activityRecord.Product,
                     activityRecord.QuantityMeasureUnit.Code,
-                    activityRecord.RegistrationDateTime.ToString(),
+                    activityRecord.RegistrationDateTime?.ToString(),
                     new Period(
                         activityRecord.Resolution.Code,
                         new TimeInterval(
@@ -100,7 +100,7 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
                 header.SenderId,
                 header.SenderRole,
                 TypeCode,
-                meteredDataForMeasurementPoints));
+                meteredDataForMeasurementSeries));
     }
 }
 
@@ -120,7 +120,7 @@ internal class MeteredDateForMeasurementPoint(
     string senderId,
     string senderRole,
     string typeCode,
-    IReadOnlyCollection<MeteredDataForMeasurementPoint> meteredDataForMeasurementPoints)
+    IReadOnlyCollection<MeteredDataForMeasurementSeries> meteredDataForMeasurementSeries)
 {
     [JsonPropertyName("mRID")]
     public string MessageId { get; init; } = messageId;
@@ -150,17 +150,18 @@ internal class MeteredDateForMeasurementPoint(
     public ValueObject<string> Type { get; init; } = ValueObject<string>.Create(typeCode);
 
     [JsonPropertyName("Series")]
-    public IReadOnlyCollection<MeteredDataForMeasurementPoint> MeteredDataForMeasurementPoints { get; init; } = meteredDataForMeasurementPoints;
+    public IReadOnlyCollection<MeteredDataForMeasurementSeries> MeteredDataForMeasurementSeries { get; init; } =
+        meteredDataForMeasurementSeries;
 }
 
-internal class MeteredDataForMeasurementPoint(
+internal class MeteredDataForMeasurementSeries(
     string transactionId,
     string marketEvaluationPointNumber,
     string marketEvaluationPointType,
     string? originalTransactionIdReferenceId,
-    string product,
+    string? product,
     string quantityMeasureUnit,
-    string registrationDateTime,
+    string? registrationDateTime,
     Period period)
 {
     [JsonPropertyName("mRID")]
@@ -177,13 +178,15 @@ internal class MeteredDataForMeasurementPoint(
     public string? OriginalTransactionIdReferenceId { get; init; } = originalTransactionIdReferenceId; //TODO: what does this field represent?
 
     [JsonPropertyName("product")]
-    public string Product { get; init; } = product;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Product { get; init; } = product;
 
     [JsonPropertyName("quantity_Measure_Unit.name")]
     public ValueObject<string> QuantityMeasureUnit { get; init; } = ValueObject<string>.Create(quantityMeasureUnit);
 
     [JsonPropertyName("registration_DateAndOrTime.dateTime")]
-    public string RegistrationDateTime { get; init; } = registrationDateTime;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RegistrationDateTime { get; init; } = registrationDateTime;
 
     [JsonPropertyName("Period")]
     public Period Period { get; init; } = period;

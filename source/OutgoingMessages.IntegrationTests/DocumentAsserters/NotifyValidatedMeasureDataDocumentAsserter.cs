@@ -52,6 +52,55 @@ public class NotifyValidatedMeasureDataDocumentAsserter
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 
+        var requiredHeaderDocumentFields = assertionInput.RequiredHeaderDocumentFields;
+
+        // Required fields
+        asserter
+            .MessageIdExists()
+            .HasBusinessReason(requiredHeaderDocumentFields.BusinessReasonCode)
+            .HasSenderId(
+                requiredHeaderDocumentFields.SenderId,
+                requiredHeaderDocumentFields.SenderScheme)
+            .HasSenderRole(requiredHeaderDocumentFields.SenderRole)
+            .HasReceiverId(
+                requiredHeaderDocumentFields.ReceiverId,
+                requiredHeaderDocumentFields.ReceiverScheme)
+            .HasReceiverRole(requiredHeaderDocumentFields.ReceiverRole)
+            .HasTimestamp(requiredHeaderDocumentFields.Timestamp);
+
+        var optionalHeaderDocumentFields = assertionInput.OptionalHeaderDocumentFields;
+
+        // Optional fields
+        asserter.HasBusinessSectorType(optionalHeaderDocumentFields.BusinessSectorType);
+
+        foreach (var assertSeriesDocumentFieldsInput in optionalHeaderDocumentFields.AssertSeriesDocumentFieldsInput)
+        {
+            var (seriesIndex, requiredSeriesFields, optionalSeriesFields) = assertSeriesDocumentFieldsInput;
+
+            // Required series fields
+            asserter
+                .HasTransactionId(seriesIndex, requiredSeriesFields.TransactionId)
+                .HasMeteringPointNumber(
+                    seriesIndex,
+                    requiredSeriesFields.MeteringPointNumber,
+                    requiredSeriesFields.MeteringPointScheme)
+                .HasMeteringPointType(seriesIndex, requiredSeriesFields.MeteringPointType)
+                .HasQuantityMeasureUnit(seriesIndex, requiredSeriesFields.QuantityMeasureUnit)
+                // Required period fields
+                .HasResolution(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.Resolution)
+                .HasStartedDateTime(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.StartedDateTime)
+                .HasEndedDateTime(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.EndedDateTime)
+                .HasPoints(seriesIndex, requiredSeriesFields.RequiredPeriodDocumentFields.Points.ToList().AsReadOnly());
+
+            // Optional series fields
+            asserter
+                .HasOriginalTransactionIdReferenceId(seriesIndex, optionalSeriesFields.OriginalTransactionIdReferenceId)
+                .HasRegistrationDateTime(seriesIndex, optionalSeriesFields.RegistrationDateTime)
+                .HasProduct(seriesIndex, optionalSeriesFields.Product)
+                .HasInDomain(seriesIndex, optionalSeriesFields.InDomain)
+                .HasOutDomain(seriesIndex, optionalSeriesFields.OutDomain);
+        }
+
         await asserter
             .DocumentIsValidAsync();
     }

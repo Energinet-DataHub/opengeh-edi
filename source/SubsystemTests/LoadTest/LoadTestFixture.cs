@@ -61,7 +61,8 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
 
         LoadTestCalculationId = GetConfigurationValue<Guid>(
             configuration,
-            "LOAD_TEST_CALCULATION_ID");
+            "LOAD_TEST_CALCULATION_ID",
+            defaultValue: Guid.Empty);
 
         MinimumEnqueuedMessagesCount = GetConfigurationValue<int>(
             configuration,
