@@ -65,6 +65,9 @@
       <None Update="TestData\CalculationResults\wholesale_calculation_results.amounts_per_charge_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="TestData\Messages\json\RequestAggregatedMeasureDataForEnergySupplier.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
   </ItemGroup>
 
   <ItemDefinitionGroup>

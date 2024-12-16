@@ -34,6 +34,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Option
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.RevisionLog.Integration.Options;
 using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -137,7 +138,10 @@ public class B2BApiAppFixture : IAsyncLifetime
     /// Topic resource for integration events.
     /// </summary>
     [NotNull]
-    public TopicResource? TopicResource { get; private set; }
+    public TopicResource? IntegrationEventsTopicResource { get; private set; }
+
+    [NotNull]
+    public TopicResource? ProcessManagerTopicResource { get; private set; }
 
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
 
@@ -179,7 +183,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(CreateAppHostSettings));
 
         // ServiceBus entities
-        TopicResource = await ServiceBusResourceProvider
+        IntegrationEventsTopicResource = await ServiceBusResourceProvider
             .BuildTopic("integration-events")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IntegrationEventsOptions.SectionName}__{nameof(IntegrationEventsOptions.TopicName)}", topic.Name))
@@ -187,7 +191,18 @@ public class B2BApiAppFixture : IAsyncLifetime
             .Do(subscription => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IntegrationEventsOptions.SectionName}__{nameof(IntegrationEventsOptions.SubscriptionName)}", subscription.SubscriptionName))
             .CreateAsync();
-        LogStopwatch(stopwatch, nameof(TopicResource));
+        LogStopwatch(stopwatch, nameof(IntegrationEventsTopicResource));
+
+        ProcessManagerTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("process-manager")
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", topic.Name))
+            .AddSubscription("process-manager-subscription")
+            .CreateAsync();
+        LogStopwatch(stopwatch, nameof(ProcessManagerTopicResource));
+        await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
+            topicName: ProcessManagerTopicResource.Name,
+            subscriptionName: ProcessManagerTopicResource.Subscriptions.Single().SubscriptionName);
 
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
@@ -263,11 +278,13 @@ public class B2BApiAppFixture : IAsyncLifetime
     }
 
     public void EnsureAppHostUsesFeatureFlagValue(
-        bool useRequestWholesaleServicesOrchestration = false)
+        bool useRequestWholesaleServicesOrchestration = false,
+        bool useRequestAggregatedMeasureDataOrchestration = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
         });
     }
 

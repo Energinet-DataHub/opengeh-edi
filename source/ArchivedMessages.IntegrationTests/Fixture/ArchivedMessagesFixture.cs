@@ -38,6 +38,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 
 public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 {
+    private readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private bool _disposed;
 
     public AzuriteManager AzuriteManager { get; } = new(true);
@@ -112,7 +113,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
                 new ActorIdentity(
                     ActorNumber.Create("1234512345888"),
                     restriction: Restriction.None,
-                    ActorRole.MeteredDataAdministrator));
+                    ActorRole.MeteredDataAdministrator,
+                    _actorId));
 
         ArchivedMessagesClient = Services.GetRequiredService<IArchivedMessagesClient>();
     }

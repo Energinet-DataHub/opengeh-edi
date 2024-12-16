@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
-using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
 
@@ -25,19 +24,13 @@ public class InitializeWholesaleServicesProcessHandler : IProcessInitializationH
 {
     private readonly IMediator _mediator;
     private readonly ISerializer _serializer;
-    private readonly IFeatureFlagManager _featureFlagManager;
-    private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
 
     public InitializeWholesaleServicesProcessHandler(
         IMediator mediator,
-        ISerializer serializer,
-        IFeatureFlagManager featureFlagManager,
-        IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter)
+        ISerializer serializer)
     {
         _mediator = mediator;
         _serializer = serializer;
-        _featureFlagManager = featureFlagManager;
-        _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
     }
 
     public bool CanHandle(string processTypeToInitialize)
@@ -50,15 +43,6 @@ public class InitializeWholesaleServicesProcessHandler : IProcessInitializationH
     {
         var marketMessage = _serializer.Deserialize<InitializeWholesaleServicesProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
 
-        if (await _featureFlagManager.UseRequestWholesaleServicesProcessOrchestrationAsync().ConfigureAwait(false))
-        {
-            await _requestProcessOrchestrationStarter
-                .StartRequestWholesaleServicesOrchestrationAsync(marketMessage)
-                .ConfigureAwait(false);
-        }
-        else
-        {
-            await _mediator.Send(new InitializeWholesaleServicesProcessesCommand(marketMessage)).ConfigureAwait(false);
-        }
+        await _mediator.Send(new InitializeWholesaleServicesProcessesCommand(marketMessage)).ConfigureAwait(false);
     }
 }

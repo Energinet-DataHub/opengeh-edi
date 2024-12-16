@@ -50,7 +50,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         _processContext = GetService<ProcessContext>();
 
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDQ")));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDQ"), ActorId));
 
         _validateIncomingMessage = GetService<ValidateIncomingMessage>();
     }
@@ -217,7 +217,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("0192837465019"), Restriction.None, ActorRole.GridAccessProvider));
+            new ActorIdentity(ActorNumber.Create("0192837465019"), Restriction.None, ActorRole.GridAccessProvider, ActorId));
 
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
@@ -240,7 +240,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         // RESET TEST CLASS!
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234567890123"), Restriction.None, ActorRole.FromCode("DDQ")));
+            new ActorIdentity(ActorNumber.Create("1234567890123"), Restriction.None, ActorRole.FromCode("DDQ"), ActorId));
     }
 
     [Fact]
@@ -643,7 +643,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     private InitializeAggregatedMeasureDataProcessDto CreateMarketMessageWithAuthentication(RequestAggregatedMeasureDataMessage message, string knownSenderId, string knownSenderRole)
     {
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  ActorRole.FromCode(knownSenderRole)));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  ActorRole.FromCode(knownSenderRole), ActorId));
 
         var series = message.Series
             .Cast<RequestAggregatedMeasureDataMessageSeries>()

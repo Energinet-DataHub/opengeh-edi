@@ -69,7 +69,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Json;
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole, ActorId));
 
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
@@ -136,7 +136,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Json;
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole, ActorId));
 
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
@@ -204,7 +204,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Json;
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole, ActorId));
 
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
@@ -270,7 +270,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Json;
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole, ActorId));
 
         var energySupplier = requestDataForEnergySupplierId != null
             ? ActorNumber.Create(requestDataForEnergySupplierId)
@@ -362,7 +362,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Ebix;
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole));
+            new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole, ActorId));
 
         var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
                 documentFormat,
@@ -418,7 +418,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Ebix;
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole));
+            new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole, ActorId));
 
         var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -458,7 +458,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Ebix;
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole));
+            new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole, ActorId));
 
         var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -514,7 +514,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         _clockStub.SetCurrentInstant(now);
 
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole));
+            new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole, ActorId));
         var documentFormat = DocumentFormat.Ebix;
 
         var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(

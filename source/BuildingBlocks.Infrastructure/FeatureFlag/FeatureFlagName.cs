@@ -44,4 +44,9 @@ public enum FeatureFlagName
     /// Whether to use orchestration for handling RequestWholesaleServices processes.
     /// </summary>
     UseRequestWholesaleServicesProcessOrchestration,
+
+    /// <summary>
+    /// Whether to use orchestration for handling RequestAggregatedMeasureData processes.
+    /// </summary>
+    UseRequestAggregatedMeasureDataProcessOrchestration,
 }

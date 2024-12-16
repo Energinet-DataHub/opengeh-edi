@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,8 +64,10 @@ public class IncomingMessagesTestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.EnergySupplier));
+            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.EnergySupplier, ActorId));
     }
+
+    protected Guid ActorId => Guid.Parse("00000000-0000-0000-0000-000000000001");
 
     protected IncomingMessagesTestFixture Fixture { get; }
 
@@ -172,6 +175,8 @@ public class IncomingMessagesTestBase : IDisposable
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] =
                         "Fake",
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] =
+                        "Fake",
+                    [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.TopicName)}"] =
                         "Fake",
                 })
             .Build();

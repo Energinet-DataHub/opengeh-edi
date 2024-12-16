@@ -31,6 +31,8 @@ public class SenderAuthorizerTests
      * We should probably do something about that. Eventually. Maybe.
      */
 
+    private readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+
     [Fact]
     public async Task
         Given_UnauthorisedUser_When_ValidatingSenderForAggregatedMeasureData_Then_SenderRoleTypeIsNotAuthorizedError()
@@ -139,7 +141,7 @@ public class SenderAuthorizerTests
 
     private AuthenticatedActor CreateAuthenticatedActor(ActorNumber actorNumber, ActorRole actorRole)
     {
-        var actorIdentity = new ActorIdentity(actorNumber, Restriction.Owned, actorRole);
+        var actorIdentity = new ActorIdentity(actorNumber, Restriction.Owned, actorRole, _actorId);
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(actorIdentity);
 

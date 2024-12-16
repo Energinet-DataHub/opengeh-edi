@@ -123,6 +123,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 public class BehavioursTestBase : IDisposable
 {
     private const string MockServiceBusName = "mock-name";
+    private readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
     private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
@@ -153,7 +154,7 @@ public class BehavioursTestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator));
+            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator, _actorId));
     }
 
     private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
@@ -242,7 +243,7 @@ public class BehavioursTestBase : IDisposable
 
     protected void GivenAuthenticatedActorIs(ActorNumber actorNumber, ActorRole actorRole)
     {
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole));
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole, _actorId));
     }
 
     protected void GivenNowIs(int year, int month, int day)
@@ -350,7 +351,7 @@ public class BehavioursTestBase : IDisposable
         await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var authenticatedActor = scope.ServiceProvider.GetRequiredService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole, _actorId));
         var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, messageCategory, actorRole, documentFormat), CancellationToken.None);
         return peekResult;
     }

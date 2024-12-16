@@ -32,13 +32,15 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 [Collection(nameof(ArchivedMessagesCollection))]
 public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 {
+    private static readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
 
     private readonly ActorIdentity _authenticatedActor = new(
         ActorNumber.Create("1234512345811"),
         Restriction.None,
-        ActorRole.MeteredDataAdministrator);
+        ActorRole.MeteredDataAdministrator,
+        _actorId);
 
     public ArchivedMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {

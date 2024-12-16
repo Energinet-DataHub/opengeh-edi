@@ -50,10 +50,10 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
                 .ConfigureAwait(false)
             : null;
 
-        return Authenticate(actorNumber, role);
+        return Authenticate(actorNumber, role, actorIdFromAzp);
     }
 
-    public bool Authenticate(ActorNumber? actorNumber, ActorRole? actorRole)
+    public bool Authenticate(ActorNumber? actorNumber, ActorRole? actorRole, string? actorId)
     {
         if (actorNumber is null)
         {
@@ -70,7 +70,19 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
             return false;
         }
 
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole: actorRole));
+        var actorIdGuid = Guid.TryParse(actorId, out var guidParseResult) ? guidParseResult : (Guid?)null;
+        if (actorIdGuid is null)
+        {
+            // This is only possible in the case of certificate authentication (ebIX), since the actor number above
+            // is retrieved from the actor id in case of token authentication.
+            _logger.LogWarning("Authenticated market actor identity has no valid actor id (ActorId={ActorId}, ActorNumber={ActorNumber}, ActorRole={ActorRole}).", actorId, actorNumber.Value, actorRole.Code);
+        }
+
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+            actorNumber,
+            Restriction.Owned,
+            actorRole: actorRole,
+            actorIdGuid));
         return true;
     }
 

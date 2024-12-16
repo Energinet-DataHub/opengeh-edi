@@ -45,7 +45,11 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
             parser => parser);
 
         var authenticatedActor = GetService<AuthenticatedActor>();
-        _actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDM"));
+        _actorIdentity = new ActorIdentity(
+            ActorNumber.Create("1234567890123"),
+            restriction: Restriction.None,
+            ActorRole.FromCode("DDM"),
+            ActorId);
         authenticatedActor.SetAuthenticatedActor(_actorIdentity);
 
         _validateIncomingMessage = GetService<ValidateIncomingMessage>();
@@ -293,7 +297,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         var documentFormat = DocumentFormat.Ebix;
         var authenticatedActor = GetService<AuthenticatedActor>();
         var invalidSenderRole = ActorRole.EnergySupplier;
-        var actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  invalidSenderRole);
+        var actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None, invalidSenderRole, ActorId);
         authenticatedActor.SetAuthenticatedActor(actorIdentity);
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,

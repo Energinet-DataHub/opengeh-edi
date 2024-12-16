@@ -25,7 +25,8 @@ public static class HttpRequestExtensions
 {
     public static Task<HttpRequestMessage> CreateRequestWholesaleServicesHttpRequestAsync(
         this B2BApiAppFixture fixture,
-        Actor actor)
+        Actor actor,
+        string? transactionId = null)
     {
         var documentPath = actor.ActorRole.Name switch
         {
@@ -38,7 +39,28 @@ public static class HttpRequestExtensions
             documentPath,
             IncomingDocumentType.RequestWholesaleSettlement.Name,
             "application/xml",
-            actor);
+            actor,
+            transactionId);
+    }
+
+    public static Task<HttpRequestMessage> CreateRequestAggregatedMeasureDataHttpRequestAsync(
+        this B2BApiAppFixture fixture,
+        Actor actor,
+        string? transactionId = null)
+    {
+        var documentPath = actor.ActorRole.Name switch
+        {
+            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/json/RequestAggregatedMeasureDataForEnergySupplier.json",
+            _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
+        };
+
+        return CreateIncomingMessageHttpRequestAsync(
+            fixture,
+            documentPath,
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
+            "application/json",
+            actor,
+            transactionId);
     }
 
     public static Task<HttpRequestMessage> CreatePeekHttpRequestAsync(
@@ -70,7 +92,8 @@ public static class HttpRequestExtensions
         string filePath,
         string documentType,
         string contentType,
-        Actor actor)
+        Actor actor,
+        string? transactionId)
     {
         HttpRequestMessage? request = null;
         try
@@ -80,7 +103,7 @@ public static class HttpRequestExtensions
                 .Replace("{ActorNumber}", actor.ActorNumber.Value)
                 .Replace("{ActorRole}", actor.ActorRole.Code)
                 .Replace("{MessageId}", Guid.NewGuid().ToString())
-                .Replace("{TransactionId}", Guid.NewGuid().ToString());
+                .Replace("{TransactionId}", transactionId ?? Guid.NewGuid().ToString());
 
             request = await CreateHttpRequestAsync(
                 fixture,
