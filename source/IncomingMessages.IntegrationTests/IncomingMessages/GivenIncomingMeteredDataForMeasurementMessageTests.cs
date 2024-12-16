@@ -162,6 +162,37 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
+    public async Task When_MultipleTransactionsWithSameIdAsExisting_Then_ResultContainExceptedValidationError()
+    {
+        var documentFormat = DocumentFormat.Ebix;
+        var existingTransactionIdForSender = "123456";
+        var newTransactionIdForSender = "654321";
+        await StoreTransactionIdForActorAsync(existingTransactionIdForSender, _actorIdentity.ActorNumber.Value);
+        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+            documentFormat,
+            _actorIdentity.ActorNumber,
+            [
+                (existingTransactionIdForSender,
+                    Instant.FromUtc(2024, 1, 1, 0, 0),
+                    Instant.FromUtc(2024, 1, 2, 0, 0),
+                    Resolution.QuarterHourly),
+                (newTransactionIdForSender,
+                    Instant.FromUtc(2024, 1, 1, 0, 0),
+                    Instant.FromUtc(2024, 1, 2, 0, 0),
+                    Resolution.QuarterHourly),
+            ]);
+
+        var (incomingMessage, _) = await ParseMessageAsync(message.Stream, documentFormat);
+        var result = await _validateIncomingMessage.ValidateAsync(
+            incomingMessage!,
+            documentFormat,
+            CancellationToken.None);
+
+        result.Success.Should().BeFalse();
+        result.Errors.Should().Contain(error => error is DuplicateTransactionIdDetected);
+    }
+
+    [Fact]
     public async Task When_TransactionIdIsEmpty_Then_ResultContainExceptedValidationError()
     {
         var documentFormat = DocumentFormat.Ebix;
@@ -620,6 +651,17 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         }
 
         throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{IncomingDocumentType.NotifyValidatedMeasureData}'");
+    }
+
+    private async Task StoreTransactionIdForActorAsync(string existingTransactionIdForSender, string senderActorNumber)
+    {
+        var databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
+        using var dbConnection = await databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        await dbConnection.ExecuteAsync(
+                "INSERT INTO [dbo].[TransactionRegistry] ([TransactionId], [SenderId]) VALUES (@TransactionId, @SenderId)",
+                new { TransactionId = existingTransactionIdForSender, SenderId = senderActorNumber })
+            .ConfigureAwait(false);
     }
 
     private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)

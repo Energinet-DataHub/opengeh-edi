@@ -20,6 +20,7 @@ public sealed class MeteredDataForMeasurementPointMessageProcessDto(
     EventId eventId,
     Actor receiver,
     BusinessReason businessReason,
+    MessageId relatedToMessageId,
     MeteredDataForMeasurementPointMessageSeriesDto series)
     : OutgoingMessageDto(
         DocumentType.NotifyValidatedMeasureData,
@@ -29,7 +30,7 @@ public sealed class MeteredDataForMeasurementPointMessageProcessDto(
         businessReason.Name,
         receiver.ActorRole,
         new ExternalId(Guid.NewGuid()),
-        null)
+        relatedToMessageId)
 {
     public MeteredDataForMeasurementPointMessageSeriesDto Series { get; } = series;
 }

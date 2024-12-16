@@ -26,15 +26,17 @@ public class TransactionIdRepository : ITransactionIdRepository
         _incomingMessagesContext = incomingMessagesContext;
     }
 
-    public async Task<bool> TransactionIdExistsAsync(
+    public async Task<IReadOnlyList<string>> GetDuplicatedTransactionIdsAsync(
         string senderId,
-        string transactionId,
+        IReadOnlyCollection<string> transactionIds,
         CancellationToken cancellationToken)
     {
-        var transaction = await GetTransactionFromDbAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false)
-                          ?? GetTransactionFromInMemoryCollection(senderId, transactionId);
+        var duplicatedTransactionIdsForSender = await GetDuplicatedTransactionsFromDbAsync(senderId, transactionIds, cancellationToken)
+            .ConfigureAwait(false);
+        if (!transactionIds.Any())
+            duplicatedTransactionIdsForSender = GetDuplicatedTransactionsFromInMemoryCollection(senderId, transactionIds);
 
-        return transaction != null;
+        return duplicatedTransactionIdsForSender.Select(x => x.TransactionId).ToList();
     }
 
     public async Task AddAsync(
@@ -50,19 +52,26 @@ public class TransactionIdRepository : ITransactionIdRepository
         }
     }
 
-    private TransactionIdForSender? GetTransactionFromInMemoryCollection(string senderId, string transactionId)
+    private IReadOnlyList<TransactionIdForSender> GetDuplicatedTransactionsFromInMemoryCollection(
+        string senderId,
+        IReadOnlyCollection<string> transactionIds)
     {
         return _incomingMessagesContext.TransactionIdForSenders.Local
-            .FirstOrDefault(x => x.TransactionId == transactionId && x.SenderId == senderId);
+            .Where(
+                transactionIdForSender => transactionIds.Contains(transactionIdForSender.TransactionId)
+                                          && transactionIdForSender.SenderId == senderId)
+            .ToList();
     }
 
-    private async Task<TransactionIdForSender?> GetTransactionFromDbAsync(string senderId, string transactionId, CancellationToken cancellationToken)
+    private async Task<IReadOnlyList<TransactionIdForSender>> GetDuplicatedTransactionsFromDbAsync(
+        string senderId,
+        IReadOnlyCollection<string> transactionIds,
+        CancellationToken cancellationToken)
     {
         return await _incomingMessagesContext.TransactionIdForSenders
-            .FirstOrDefaultAsync(
-                transactionIdForSender => transactionIdForSender.TransactionId == transactionId
-                     && transactionIdForSender.SenderId == senderId,
-                cancellationToken)
+            .Where(transactionIdForSender => transactionIds.Contains(transactionIdForSender.TransactionId)
+                                             && transactionIdForSender.SenderId == senderId)
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 }
