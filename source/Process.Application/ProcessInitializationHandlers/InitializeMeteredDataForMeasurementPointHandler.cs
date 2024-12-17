@@ -60,7 +60,7 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                     new MeteredDataForMeasurementPointMessageProcessDto(
                         EventId.From(Guid.NewGuid()),
                         marketMessage.MessageId.Contains("perf_test")
-                            ? new Actor(ActorNumber.Create("579000282425"), ActorRole.EnergySupplier)
+                            ? new Actor(ActorNumber.Create("5790000282425"), ActorRole.EnergySupplier)
                             : new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),
                         BusinessReason.FromCode(marketMessage.BusinessReason),
                         MessageId.Create(marketMessage.MessageId),
