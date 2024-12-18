@@ -128,7 +128,7 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeasurementPointMessageProcessDto);
 
-        await _requestProcessOrchestrationStarter.StartMeteredDataForMeasurementPointOrchestrationAsync(
+        await _requestProcessOrchestrationStarter.StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
             initializeMeteredDataForMeasurementPointMessageProcessDto,
             cancellationToken)
         .ConfigureAwait(false);
