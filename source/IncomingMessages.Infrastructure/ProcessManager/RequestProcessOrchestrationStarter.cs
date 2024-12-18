@@ -134,7 +134,7 @@ public class RequestProcessOrchestrationStarter(
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    public async Task StartMeteredDataForMeasurementPointOrchestrationAsync(
+    public async Task StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
         InitializeMeteredDataForMeasurementPointMessageProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
