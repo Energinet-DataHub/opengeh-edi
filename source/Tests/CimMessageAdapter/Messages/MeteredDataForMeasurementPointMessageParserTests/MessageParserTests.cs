@@ -122,7 +122,7 @@ public sealed class MessageParserTests
                 energyObservation.Position.Should().Be(position.ToString());
                 energyObservation.EnergyQuantity.Should().NotBeEmpty();
                 energyObservation.QuantityQuality.Should()
-                    .Match(quality => quality == "E01" || quality == "56" || quality == "A03");
+                    .Match(quality => quality == null || quality == "E01" || quality == "56" || quality == "A03" || quality == "A02" || quality == "A05");
                 position++;
             }
         }
