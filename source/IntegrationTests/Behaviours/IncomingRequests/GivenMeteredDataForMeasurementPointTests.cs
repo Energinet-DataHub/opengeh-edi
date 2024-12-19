@@ -37,15 +37,26 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
     ITestOutputHelper testOutputHelper)
     : MeteredDataForMeasurementPointBehaviourTestBase(integrationTestFixture, testOutputHelper)
 {
-    public static TheoryData<DocumentFormat> PeekFormats =>
-    [
-        DocumentFormat.Json,
-        DocumentFormat.Xml,
-    ];
+    public static TheoryData<DocumentFormat, DocumentFormat> RequestAndPeekFormatPairs
+    {
+        get
+        {
+            var data = new TheoryData<DocumentFormat, DocumentFormat>();
+            foreach (var requestFormat in (DocumentFormat[])[DocumentFormat.Json, DocumentFormat.Xml])
+            {
+                foreach (var peekFormat in (DocumentFormat[])[DocumentFormat.Json, DocumentFormat.Xml])
+                {
+                    data.Add(requestFormat, peekFormat);
+                }
+            }
+
+            return data;
+        }
+    }
 
     [Theory]
-    [MemberData(nameof(PeekFormats))]
-    public async Task When_ActorPeeksAllMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat peekFormat)
+    [MemberData(nameof(RequestAndPeekFormatPairs))]
+    public async Task When_ActorPeeksAllMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat requestFormat, DocumentFormat peekFormat)
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
@@ -60,7 +71,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         var transactionId2 = $"{transactionIdPrefix}-2";
 
         await GivenReceivedMeteredDataForMeasurementPoint(
-            documentFormat: DocumentFormat.Xml,
+            documentFormat: requestFormat,
             senderActorNumber: currentActor.ActorNumber,
             [
                 (transactionId1,
@@ -164,8 +175,9 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
     }
 
     [Theory]
-    [MemberData(nameof(PeekFormats))]
+    [MemberData(nameof(RequestAndPeekFormatPairs))]
     public async Task AndGiven_MessageIsEmpty_When_ActorPeeksAllMessages_Then_ReceivesNoMessages(
+        DocumentFormat requestFormat,
         DocumentFormat peekFormat)
     {
         // Arrange
@@ -176,7 +188,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
 
         await GivenReceivedMeteredDataForMeasurementPoint(
-            documentFormat: DocumentFormat.Xml,
+            documentFormat: requestFormat,
             senderActorNumber: currentActor.ActorNumber,
             []);
 

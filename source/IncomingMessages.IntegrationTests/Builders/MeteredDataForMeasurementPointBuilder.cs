@@ -62,6 +62,18 @@ public static class MeteredDataForMeasurementPointBuilder
                 receiverNumber,
                 schema ?? "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1");
         }
+        else if (format == DocumentFormat.Json)
+        {
+            content = GetJson(
+                senderActorNumber,
+                series,
+                messageType,
+                processType,
+                businessType,
+                messageId,
+                senderRole,
+                receiverNumber);
+        }
         else
         {
             throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported document format");
@@ -189,6 +201,94 @@ public static class MeteredDataForMeasurementPointBuilder
 </cim:NotifyValidatedMeasureData_MarketDocument>");
         return doc.OuterXml;
     }
+
+    private static string GetJson(
+        ActorNumber senderActorNumber,
+        IReadOnlyCollection<(string TransactionId, Instant PeriodStart, Instant PeriodEnd, Resolution Resolution)>
+            series,
+        string messageType,
+        string processType,
+        string businessType,
+        string messageId,
+        string senderRole,
+        string receiverNumber) =>
+        $$"""
+          {
+            "NotifyValidatedMeasureData_MarketDocument": {
+              "mRID": "{{messageId}}",
+              "businessSector.type": {
+                "value": "{{businessType}}"
+              },
+              "createdDateTime": "2022-12-17T09:30:47Z",
+              "process.processType": {
+          	     "value": "{{processType}}"
+              },
+              "receiver_MarketParticipant.mRID": {
+          	   "codingScheme": "A10",
+          	     "value": "{{receiverNumber}}"
+              },
+              "receiver_MarketParticipant.marketRole.type": {
+          	     "value": "DGL"
+              },
+              "sender_MarketParticipant.mRID": {
+          	     "codingScheme": "A10",
+          	     "value": "{{senderActorNumber.Value}}"
+              },
+              "sender_MarketParticipant.marketRole.type": {
+          	     "value": "{{senderRole}}"
+              },
+              "type": {
+          	     "value": "{{messageType}}"
+              },
+              "Series": [
+                {{string.Join(",\n", series.Select(s =>
+                    $$"""
+                      {
+                        "mRID": "{{s.TransactionId}}",
+                        "marketEvaluationPoint.mRID": {
+                        "codingScheme": "A10",
+                          "value": "579999993331812345"
+                        },
+                        "marketEvaluationPoint.type": {
+                          "value": "E17"
+                        },
+                        "originalTransactionIDReference_Series.mRID": "C1875000",
+                        "product": "8716867000030",
+                        "quantity_Measure_Unit.name": {
+                          "value": "KWH"
+                        },
+                        "registration_DateAndOrTime.dateTime": "2022-12-17T07:30:00Z",
+                        "Period": {
+                          "resolution": "{{s.Resolution.Code}}",
+                          "timeInterval": {
+                            "start": {
+                              "value": "{{s.PeriodStart.ToString("yyyy-MM-ddTHH:mm'Z'", null)}}"
+                            },
+                            "end": {
+                              "value": "{{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", null)}}"
+                            }
+                          },
+                          "Point": [
+                            {{string.Join(",\n", GetEnergyObservations(s.Resolution).Select(e =>
+                                $$"""
+                                  {
+                                    "position": {
+                                      "value": {{e.Position}}
+                                    },
+                                    "quality": {
+                                      "value": "A03"
+                                    },
+                                    "quantity": {{e.Quantity}}
+                                  }
+                                  """))}}
+                          ]
+                        }
+                      }
+                      """))}}
+              ]
+            }
+          }
+          """;
 
     private static ReadOnlyCollection<(int Position, int Quantity)> GetEnergyObservations(Resolution resolution)
     {
