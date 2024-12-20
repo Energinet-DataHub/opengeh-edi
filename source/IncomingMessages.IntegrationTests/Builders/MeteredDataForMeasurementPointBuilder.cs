@@ -22,10 +22,6 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 
-[SuppressMessage(
-    "StyleCop.CSharp.MaintainabilityRules",
-    "SA1407:Arithmetic expressions should declare precedence",
-    Justification = "Conflicting with another rule")]
 public static class MeteredDataForMeasurementPointBuilder
 {
     public static IncomingMarketMessageStream CreateIncomingMessage(

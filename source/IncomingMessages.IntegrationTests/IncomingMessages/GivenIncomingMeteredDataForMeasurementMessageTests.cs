@@ -373,7 +373,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         result.Errors.Should().Contain(error => error is InvalidMessageStructure);
     }
 
-    [Theory(Skip = "We do not support eBix anymore")]
+    [Theory]
     [InlineData("E23")]
     [InlineData("D42")]
     public async Task When_ProcessTypeIsAllowedForEbix_Then_ValidationSucceed(string allowedProcessType)
