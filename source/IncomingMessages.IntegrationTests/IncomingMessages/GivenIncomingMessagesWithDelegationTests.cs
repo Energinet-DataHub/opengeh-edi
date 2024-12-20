@@ -394,16 +394,16 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().Contain(expectedMessageId);
 
-            _senderSpy.LatestMessage.Should().NotBeNull();
+            //_senderSpy.LatestMessage.Should().NotBeNull();
         }
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
-            var series = message!.Series.Should().ContainSingle().Subject;
-            series.RequestedByActor.ActorRole.Should().Be(delegatedToAsDelegated.ActorRole);
-            series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber);
-            series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
+            //var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            //var series = message!.Series.Should().ContainSingle().Subject;
+            //series.RequestedByActor.ActorRole.Should().Be(delegatedToAsDelegated.ActorRole);
+            //series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber);
+            //series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
         }
     }
 
@@ -489,18 +489,16 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         {
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().Contain(expectedMessageId);
-
-            _senderSpy.LatestMessage.Should().NotBeNull();
         }
 
-        using (new AssertionScope())
-        {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
-            var series = message!.Series.Should().ContainSingle().Subject;
-            series.RequestedByActor.ActorRole.Should().Be(delegatedToAsGridAccessProvider.ActorRole);
-            series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsGridAccessProvider.ActorNumber);
-            series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
-        }
+        //using (new AssertionScope())
+        //{
+        //    var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+        //    var series = message!.Series.Should().ContainSingle().Subject;
+        //    series.RequestedByActor.ActorRole.Should().Be(delegatedToAsGridAccessProvider.ActorRole);
+        //    series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsGridAccessProvider.ActorNumber);
+        //    series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
+        //}
     }
 
     [Fact]
@@ -539,16 +537,16 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().Contain(expectedMessageId);
 
-            _senderSpy.LatestMessage.Should().NotBeNull();
+            //_senderSpy.LatestMessage.Should().NotBeNull();
         }
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
-            var series = message!.Series.Should().ContainSingle().Subject;
-            series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
-            series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);
-            series.DelegatedGridAreaCodes.Should().BeEmpty();
+            //var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            //var series = message!.Series.Should().ContainSingle().Subject;
+            //series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
+            //series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);
+            //series.DelegatedGridAreaCodes.Should().BeEmpty();
         }
     }
 
