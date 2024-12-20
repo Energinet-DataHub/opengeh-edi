@@ -136,13 +136,7 @@ public static class MeteredDataForMeasurementPointBuilder
             <ns0:MeteringPointDomainLocation>
                 <ns0:Identification schemeAgencyIdentifier=""9"">571313000000002000</ns0:Identification>
             </ns0:MeteringPointDomainLocation>
-        {string.Join("\n", GetEnergyObservations().Select(e => $@"
-            <ns0:IntervalEnergyObservation>
-                <ns0:Position>{e.Position}</ns0:Position>
-                <ns0:EnergyQuantity>{e.Quantity}</ns0:EnergyQuantity>
-                <ns0:QuantityQuality listAgencyIdentifier=""260"">E01</ns0:QuantityQuality>
-            </ns0:IntervalEnergyObservation>
-        "))}
+        {EnergyObservationEbixBuilder(GetEnergyObservations())}
     </ns0:PayloadEnergyTimeSeries>
     "))}
 </ns0:DK_MeteredDataTimeSeries>");
@@ -336,6 +330,40 @@ public static class MeteredDataForMeasurementPointBuilder
                     }
 
                     builder.AppendLine("</cim:Point>");
+
+                    return builder.ToString();
+                }));
+    }
+
+    private static string EnergyObservationEbixBuilder(
+        IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> observations)
+    {
+        return string.Join(
+            "\n",
+            observations.Select(
+                e =>
+                {
+                    var builder = new StringBuilder();
+                    builder.AppendLine("<ns0:IntervalEnergyObservation>");
+                    builder.AppendLine($"<ns0:Position>{e.Position}</ns0:Position>");
+
+                    if (e.Quantity.HasValue)
+                    {
+                        builder.AppendLine(
+                            $"<ns0:EnergyQuantity>{e.Quantity.Value.ToString(CultureInfo.InvariantCulture)}</ns0:EnergyQuantity>");
+                    }
+                    else
+                    {
+                        builder.AppendLine("<ns0:QuantityMissing>true</ns0:QuantityMissing>");
+                    }
+
+                    if (e.Quality != null)
+                    {
+                        builder.AppendLine(
+                            "<ns0:QuantityQuality listAgencyIdentifier=\"260\">E01</ns0:QuantityQuality>");
+                    }
+
+                    builder.AppendLine("</ns0:IntervalEnergyObservation>");
 
                     return builder.ToString();
                 }));
