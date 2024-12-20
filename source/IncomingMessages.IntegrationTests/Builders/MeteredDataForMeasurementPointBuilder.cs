@@ -246,7 +246,7 @@ public static class MeteredDataForMeasurementPointBuilder
                       {
                         "mRID": "{{s.TransactionId}}",
                         "marketEvaluationPoint.mRID": {
-                        "codingScheme": "A10",
+                          "codingScheme": "A10",
                           "value": "579999993331812345"
                         },
                         "marketEvaluationPoint.type": {
