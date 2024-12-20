@@ -121,51 +121,37 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                     new OptionalHeaderDocumentFields(
                         "23",
                         [
-                            isTransOne
-                            ? new AssertSeriesDocumentFieldsInput(
+                            new AssertSeriesDocumentFieldsInput(
                                 1,
                                 new RequiredSeriesFields(
-                                    TransactionId.From(string.Join(string.Empty, transactionId1.Reverse())),
+                                    TransactionId.From(
+                                        string.Join(
+                                            string.Empty,
+                                            isTransOne ? transactionId1.Reverse() : transactionId2.Reverse())),
                                     "579999993331812345",
                                     "A10",
                                     "E17",
                                     "KWH",
                                     new RequiredPeriodDocumentFields(
-                                        "PT1H",
-                                        "2024-11-28T13:51Z",
-                                        "2024-11-29T09:15Z",
-                                        Enumerable.Range(1, 24)
-                                            .Select(
-                                                i => new AssertPointDocumentFieldsInput(
-                                                    new RequiredPointDocumentFields(i),
-                                                    new OptionalPointDocumentFields("A03", 1000 + i)))
-                                            .ToList())),
+                                        isTransOne ? "PT1H" : "PT15M",
+                                        isTransOne ? "2024-11-28T13:51Z" : "2024-11-24T18:51Z",
+                                        isTransOne ? "2024-11-29T09:15Z" : "2024-11-25T03:39Z",
+                                        [
+                                            new AssertPointDocumentFieldsInput(
+                                                new RequiredPointDocumentFields(1),
+                                                new OptionalPointDocumentFields(null, null)),
+                                            new AssertPointDocumentFieldsInput(
+                                                new RequiredPointDocumentFields(2),
+                                                new OptionalPointDocumentFields("A03", null)),
+                                            new AssertPointDocumentFieldsInput(
+                                                new RequiredPointDocumentFields(3),
+                                                new OptionalPointDocumentFields(null, 123.456m)),
+                                            new AssertPointDocumentFieldsInput(
+                                                new RequiredPointDocumentFields(4),
+                                                new OptionalPointDocumentFields("A03", 654.321m)),
+                                        ])),
                                 new OptionalSeriesFields(
-                                    transactionId1,
-                                    "2022-12-17T09:30:47Z",
-                                    null,
-                                    null,
-                                    "8716867000030"))
-                            : new AssertSeriesDocumentFieldsInput(
-                                1,
-                                new RequiredSeriesFields(
-                                    TransactionId.From(string.Join(string.Empty, transactionId2.Reverse())),
-                                    "579999993331812345",
-                                    "A10",
-                                    "E17",
-                                    "KWH",
-                                    new RequiredPeriodDocumentFields(
-                                        "PT15M",
-                                        "2024-11-24T18:51Z",
-                                        "2024-11-25T03:39Z",
-                                        Enumerable.Range(1, 96)
-                                            .Select(
-                                                i => new AssertPointDocumentFieldsInput(
-                                                    new RequiredPointDocumentFields(i),
-                                                    new OptionalPointDocumentFields("A03", 1000 + i)))
-                                            .ToList())),
-                                new OptionalSeriesFields(
-                                    transactionId2,
+                                    isTransOne ? transactionId1 : transactionId2,
                                     "2022-12-17T09:30:47Z",
                                     null,
                                     null,

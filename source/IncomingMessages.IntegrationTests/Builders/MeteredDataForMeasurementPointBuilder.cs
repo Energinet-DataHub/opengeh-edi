@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -21,6 +22,10 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 
+[SuppressMessage(
+    "StyleCop.CSharp.MaintainabilityRules",
+    "SA1407:Arithmetic expressions should declare precedence",
+    Justification = "Conflicting with another rule")]
 public static class MeteredDataForMeasurementPointBuilder
 {
     public static IncomingMarketMessageStream CreateIncomingMessage(
@@ -131,7 +136,7 @@ public static class MeteredDataForMeasurementPointBuilder
             <ns0:MeteringPointDomainLocation>
                 <ns0:Identification schemeAgencyIdentifier=""9"">571313000000002000</ns0:Identification>
             </ns0:MeteringPointDomainLocation>
-        {string.Join("\n", GetEnergyObservations(s.Resolution).Select(e => $@"
+        {string.Join("\n", GetEnergyObservations().Select(e => $@"
             <ns0:IntervalEnergyObservation>
                 <ns0:Position>{e.Position}</ns0:Position>
                 <ns0:EnergyQuantity>{e.Quantity}</ns0:EnergyQuantity>
@@ -188,13 +193,7 @@ public static class MeteredDataForMeasurementPointBuilder
                     <cim:end>{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", null)}</cim:end>
                 </cim:timeInterval>
 
-            {string.Join("\n", GetEnergyObservations(s.Resolution).Select(e => $@"
-                <cim:Point>
-                    <cim:position>{e.Position}</cim:position>
-                    <cim:quantity>{e.Quantity}</cim:quantity>
-                    <cim:quality>A03</cim:quality>
-                </cim:Point>
-        "))}
+            {EnergyObservationXmlBuilder(GetEnergyObservations())}
         </cim:Period>
     </cim:Series>
     "))}
@@ -269,18 +268,7 @@ public static class MeteredDataForMeasurementPointBuilder
                             }
                           },
                           "Point": [
-                            {{string.Join(",\n", GetEnergyObservations(s.Resolution).Select(e =>
-                                $$"""
-                                  {
-                                    "position": {
-                                      "value": {{e.Position}}
-                                    },
-                                    "quality": {
-                                      "value": "A03"
-                                    },
-                                    "quantity": {{e.Quantity}}
-                                  }
-                                  """))}}
+                            {{EnergyObservationJsonBuilder(GetEnergyObservations())}}
                           ]
                         }
                       }
@@ -290,16 +278,72 @@ public static class MeteredDataForMeasurementPointBuilder
           }
           """;
 
-    private static ReadOnlyCollection<(int Position, int Quantity)> GetEnergyObservations(Resolution resolution)
+    private static IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> GetEnergyObservations() =>
+    [
+        (1, null, null),
+        (2, "A03", null),
+        (3, null, 123.456m),
+        (4, "A03", 654.321m),
+    ];
+
+    private static string EnergyObservationJsonBuilder(
+        IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> observations)
     {
-        var observations = new List<(int Position, int Quantity)>();
-        var intervalsPerDay = resolution == Resolution.QuarterHourly ? 96 : 24;
+        return string.Join(
+            ",\n",
+            observations.Select(
+                e =>
+                {
+                    var builder = new StringBuilder();
+                    builder.Append($"{{ \"position\": {{ \"value\": {e.Position} }}");
 
-        for (var i = 1; i <= intervalsPerDay; i++)
-        {
-            observations.Add((i, 1000 + i));
-        }
+                    if (e.Quality != null)
+                    {
+                        builder.Append($", \"quality\": {{ \"value\": \"{e.Quality}\" }}");
+                    }
 
-        return observations.AsReadOnly();
+                    if (e.Quantity.HasValue)
+                    {
+                        builder.Append($", \"quantity\": {e.Quantity.Value.ToString(CultureInfo.InvariantCulture)}");
+                    }
+
+                    builder.Append(" }");
+                    return builder.ToString();
+                }));
+    }
+
+    private static string EnergyObservationXmlBuilder(
+        IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> observations)
+    {
+        // <cim:Point>
+        // <cim:position>{e.Position}</cim:position>
+        // <cim:quantity>{e.Quantity}</cim:quantity>
+        // <cim:quality>A03</cim:quality>
+        // </cim:Point>
+
+        return string.Join(
+            "\n",
+            observations.Select(
+                e =>
+                {
+                    var builder = new StringBuilder();
+                    builder.AppendLine("<cim:Point>");
+                    builder.AppendLine($"<cim:position>{e.Position}</cim:position>");
+
+                    if (e.Quantity.HasValue)
+                    {
+                        builder.AppendLine(
+                            $"<cim:quantity>{e.Quantity.Value.ToString(CultureInfo.InvariantCulture)}</cim:quantity>");
+                    }
+
+                    if (e.Quality != null)
+                    {
+                        builder.AppendLine($"<cim:quality>{e.Quality}</cim:quality>");
+                    }
+
+                    builder.AppendLine("</cim:Point>");
+
+                    return builder.ToString();
+                }));
     }
 }
