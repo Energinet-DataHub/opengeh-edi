@@ -233,7 +233,7 @@ internal sealed class EdiDatabaseDriver
                 ";
 
             deleteOutgoingMessagesCommand.Connection = connection;
-            deleteOutgoingMessagesCommand.CommandTimeout = (int)TimeSpan.FromMinutes(2).TotalSeconds;
+            deleteOutgoingMessagesCommand.CommandTimeout = (int)TimeSpan.FromMinutes(4).TotalSeconds;
 
             await deleteOutgoingMessagesCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
