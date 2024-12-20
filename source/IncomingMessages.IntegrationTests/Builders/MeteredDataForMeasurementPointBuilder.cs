@@ -315,12 +315,6 @@ public static class MeteredDataForMeasurementPointBuilder
     private static string EnergyObservationXmlBuilder(
         IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> observations)
     {
-        // <cim:Point>
-        // <cim:position>{e.Position}</cim:position>
-        // <cim:quantity>{e.Quantity}</cim:quantity>
-        // <cim:quality>A03</cim:quality>
-        // </cim:Point>
-
         return string.Join(
             "\n",
             observations.Select(
