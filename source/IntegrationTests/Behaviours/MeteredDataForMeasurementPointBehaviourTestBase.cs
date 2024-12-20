@@ -67,9 +67,13 @@ public abstract class MeteredDataForMeasurementPointBehaviourTestBase : Behaviou
         }
 
         using var scope = new AssertionScope();
+        incomingMessageStream.Stream.Position = 0;
+        using var reader = new StreamReader(incomingMessageStream.Stream);
         response.IsErrorResponse
             .Should()
-            .BeFalse("the response should not have an error. Actual response: {0}", response.MessageBody);
+            .BeFalse(
+                "the response should not have an error. Actual response: {0}",
+                response.MessageBody + "\n\n\n" + await reader.ReadToEndAsync());
 
         response.MessageBody.Should().BeEmpty();
 

@@ -121,8 +121,30 @@ public sealed class MessageParserTests
                 energyObservation.Should().NotBeNull();
                 energyObservation.Position.Should().Be(position.ToString());
                 energyObservation.EnergyQuantity.Should().NotBeEmpty();
-                energyObservation.QuantityQuality.Should()
-                    .Match(quality => quality == "E01" || quality == "56" || quality == "A03");
+
+                if (format != DocumentFormat.Ebix)
+                {
+                    energyObservation.QuantityQuality.Should()
+                        .Match(
+                            quality => quality == null
+                                       || quality == "A01"
+                                       || quality == "A02"
+                                       || quality == "A03"
+                                       || quality == "A04"
+                                       || quality == "A05"
+                                       || quality == "A06");
+                }
+                else
+                {
+                    energyObservation.QuantityQuality.Should()
+                        .Match(
+                            quality => quality == null
+                                       || quality == "56"
+                                       || quality == "D01"
+                                       || quality == "36"
+                                       || quality == "E01");
+                }
+
                 position++;
             }
         }

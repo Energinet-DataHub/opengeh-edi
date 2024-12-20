@@ -84,10 +84,10 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                             series.EnergyObservations.Select(
                                     o => new EnergyObservationDto(
                                         o.Position != null
-                                            ? int.Parse(o.Position)
+                                            ? int.Parse(o.Position, CultureInfo.InvariantCulture)
                                             : throw new ArgumentNullException(nameof(o.Position)),
                                         o.EnergyQuantity != null
-                                            ? decimal.Parse(o.EnergyQuantity)
+                                            ? decimal.Parse(o.EnergyQuantity, CultureInfo.InvariantCulture)
                                             : null,
                                         o.QuantityQuality))
                                 .ToList())),
