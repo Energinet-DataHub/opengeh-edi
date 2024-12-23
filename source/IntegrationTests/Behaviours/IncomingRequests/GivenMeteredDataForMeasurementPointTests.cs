@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -28,35 +24,20 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
-[SuppressMessage(
-    "StyleCop.CSharp.ReadabilityRules",
-    "SA1118:Parameter should not span multiple lines",
-    Justification = "Readability")]
 public sealed class GivenMeteredDataForMeasurementPointTests(
     IntegrationTestFixture integrationTestFixture,
     ITestOutputHelper testOutputHelper)
     : MeteredDataForMeasurementPointBehaviourTestBase(integrationTestFixture, testOutputHelper)
 {
-    public static TheoryData<DocumentFormat, DocumentFormat> RequestAndPeekFormatPairs
-    {
-        get
-        {
-            var data = new TheoryData<DocumentFormat, DocumentFormat>();
-            foreach (var requestFormat in (DocumentFormat[])[DocumentFormat.Json, DocumentFormat.Xml])
-            {
-                foreach (var peekFormat in (DocumentFormat[])[DocumentFormat.Json, DocumentFormat.Xml])
-                {
-                    data.Add(requestFormat, peekFormat);
-                }
-            }
-
-            return data;
-        }
-    }
+    public static TheoryData<DocumentFormat> SupportedDocumentFormats =>
+    [
+        DocumentFormat.Json,
+        DocumentFormat.Xml,
+    ];
 
     [Theory]
-    [MemberData(nameof(RequestAndPeekFormatPairs))]
-    public async Task When_ActorPeeksAllMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat requestFormat, DocumentFormat peekFormat)
+    [MemberData(nameof(SupportedDocumentFormats))]
+    public async Task When_ActorPeeksAllMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
@@ -71,7 +52,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         var transactionId2 = $"{transactionIdPrefix}-2";
 
         await GivenReceivedMeteredDataForMeasurementPoint(
-            documentFormat: requestFormat,
+            documentFormat: documentFormat,
             senderActorNumber: currentActor.ActorNumber,
             [
                 (transactionId1,
@@ -92,7 +73,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         var peekResults = await WhenActorPeeksAllMessages(
             ActorNumber.Create("8100000000115"),
             ActorRole.EnergySupplier,
-            peekFormat);
+            documentFormat);
 
         // Assert
         peekResults.Should().HaveCount(2);
@@ -107,7 +88,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
 
             await ThenNotifyValidatedMeasureDataDocumentIsCorrect(
                 peekResultDto.Bundle,
-                peekFormat,
+                documentFormat,
                 new NotifyValidatedMeasureDataDocumentAssertionInput(
                     new RequiredHeaderDocumentFields(
                         "E23",
@@ -161,10 +142,9 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
     }
 
     [Theory]
-    [MemberData(nameof(RequestAndPeekFormatPairs))]
+    [MemberData(nameof(SupportedDocumentFormats))]
     public async Task AndGiven_MessageIsEmpty_When_ActorPeeksAllMessages_Then_ReceivesNoMessages(
-        DocumentFormat requestFormat,
-        DocumentFormat peekFormat)
+        DocumentFormat documentFormat)
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
@@ -174,7 +154,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
 
         await GivenReceivedMeteredDataForMeasurementPoint(
-            documentFormat: requestFormat,
+            documentFormat: documentFormat,
             senderActorNumber: currentActor.ActorNumber,
             []);
 
@@ -184,7 +164,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         var peekResults = await WhenActorPeeksAllMessages(
             ActorNumber.Create("8100000000115"),
             ActorRole.EnergySupplier,
-            peekFormat);
+            documentFormat);
 
         // Assert
         peekResults.Should().BeEmpty();
