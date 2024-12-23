@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -48,6 +49,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
     public IArchivedMessagesClient ArchivedMessagesClient { get; set; } = null!;
 
     public ServiceProvider Services { get; private set; } = null!;
+
+    public ServiceCollection? ServiceCollection { get; private set; } = null!;
 
     public void CleanupDatabase()
     {
@@ -133,12 +136,12 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public ServiceProvider BuildService(ITestOutputHelper? testOutputHelper = null)
     {
-        var services = new ServiceCollection();
+        ServiceCollection = new ServiceCollection();
 
         if (testOutputHelper != null)
-            services.AddTestLogger(testOutputHelper);
+            ServiceCollection.AddTestLogger(testOutputHelper);
 
-        var configuration = AddInMemoryConfigurations(services, new Dictionary<string, string?>()
+        var configuration = AddInMemoryConfigurations(ServiceCollection, new Dictionary<string, string?>()
         {
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
             [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
@@ -148,11 +151,11 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });
 
-        services
+        ServiceCollection
             .AddScoped<AuthenticatedActor>()
             .AddArchivedMessagesModule(configuration);
 
-        return services.BuildServiceProvider();
+        return ServiceCollection.BuildServiceProvider();
     }
 
     public IConfiguration AddInMemoryConfigurations(IServiceCollection services, Dictionary<string, string?> configurations)
@@ -228,6 +231,16 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
         var fileStorageFile = await blobClient.DownloadAsync(reference, CancellationToken.None).ConfigureAwait(false);
         return new ArchivedMessageStreamDto(fileStorageFile);
+    }
+
+    public IServiceCollection GetServiceCollectionClone()
+    {
+        if (ServiceCollection == null)
+            throw new InvalidOperationException("ServiceCollection is not yet initialized");
+
+        var serviceCollectionClone = new ServiceCollection { ServiceCollection };
+
+        return serviceCollectionClone;
     }
 
     protected virtual void Dispose(bool disposing)
