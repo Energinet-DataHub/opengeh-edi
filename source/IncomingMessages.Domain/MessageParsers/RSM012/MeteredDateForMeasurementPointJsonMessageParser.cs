@@ -52,31 +52,48 @@ public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider 
         var meteringPointLocationId = transactionElement.GetProperty(MeteringPointIdentificationElementName)
             .GetProperty(ValueElementName)
             .ToString();
+
         var meteringPointType =
             transactionElement.GetProperty(MeteringPointTypeElementName).GetProperty(ValueElementName).ToString();
+
         var registrationDateAndOrTime =
             transactionElement.GetProperty(RegistrationDateAndOrTimeElementName).ToString();
+
         var productNumber =
             transactionElement.GetProperty(ProductNumberElementName).ToString();
+
         var productUnitType =
             transactionElement.GetProperty(ProductUnitTypeElementName).GetProperty(ValueElementName).ToString();
+
         var periodElement = transactionElement.GetProperty(PeriodElementName);
         var resolution = periodElement.GetProperty(ResolutionElementName).ToString();
         var startDateAndOrTimeDateTime = periodElement.GetProperty(TimeIntervalElementName).GetProperty(StartElementName).GetProperty(ValueElementName).ToString();
         var endDateAndOrTimeDateTime = periodElement.GetProperty(TimeIntervalElementName).GetProperty(EndElementName).GetProperty(ValueElementName).ToString();
 
         var energyObservations = new List<EnergyObservation>();
-        JsonElement? pointsElements = transactionElement.TryGetProperty(PointElementName, out var pointsElement)
+        JsonElement? pointsElements = periodElement.TryGetProperty(PointElementName, out var pointsElement)
             ? pointsElement
             : null;
+
         if (pointsElements != null)
         {
             foreach (var pointElement in pointsElements.Value.EnumerateArray())
             {
-                energyObservations.Add(new EnergyObservation(
-                    pointElement.GetProperty(PositionElementName).GetProperty(ValueElementName).ToString(),
-                    pointElement.GetProperty(QualityElementName).GetProperty(ValueElementName).ToString(),
-                    pointElement.GetProperty(QuantityElementName).ToString()));
+                var position = pointElement.GetProperty(PositionElementName).GetProperty(ValueElementName).ToString();
+                string? quality = null;
+                string? quantity = null;
+
+                if (pointElement.TryGetProperty(QualityElementName, out var qualityElement))
+                {
+                    quality = qualityElement.GetProperty(ValueElementName).ToString();
+                }
+
+                if (pointElement.TryGetProperty(QuantityElementName, out var quantityElement))
+                {
+                    quantity = quantityElement.ToString();
+                }
+
+                energyObservations.Add(new EnergyObservation(position, quantity, quality));
             }
         }
 
