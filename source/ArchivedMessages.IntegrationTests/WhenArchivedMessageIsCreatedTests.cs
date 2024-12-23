@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
+using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Data.SqlClient;
@@ -30,25 +31,44 @@ using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.ArchivedMessages;
+namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
-public class WhenArchivedMessageIsCreatedTests : TestBase
+[Collection(nameof(ArchivedMessagesCollection))]
+public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
 {
+    private static readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private readonly IArchivedMessagesClient _archivedMessagesClient;
+    private readonly ArchivedMessagesFixture _fixture;
+    private readonly ActorIdentity _authenticatedActor = new(
+        ActorNumber.Create("1234512345811"),
+        Restriction.None,
+        ActorRole.MeteredDataAdministrator,
+        _actorId);
 
-    public WhenArchivedMessageIsCreatedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public WhenArchivedMessageIsCreatedTests(ArchivedMessagesFixture archivedMessagesFixture, ITestOutputHelper testOutputHelper)
     {
-        _archivedMessagesClient = GetService<IArchivedMessagesClient>();
+        _fixture = archivedMessagesFixture;
+        var services = _fixture.BuildService(testOutputHelper);
+        services.GetRequiredService<AuthenticatedActor>().SetAuthenticatedActor(_authenticatedActor);
+        _archivedMessagesClient = services.GetRequiredService<IArchivedMessagesClient>();
+    }
+
+    public Task InitializeAsync()
+    {
+        _fixture.CleanupDatabase();
+        _fixture.CleanupFileStorage();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task Archived_document_can_be_retrieved_by_id()
+    public async Task Given_ArchivedDocument_When_Created_Then_CanBeRetrieved()
     {
-        var correctArchivedMessage = CreateArchivedMessage();
-        await ArchiveMessage(CreateArchivedMessage());
-        await ArchiveMessage(correctArchivedMessage);
-        await ArchiveMessage(CreateArchivedMessage());
+        var correctArchivedMessage = await CreateArchivedMessageAsync();
 
         var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
 
@@ -56,14 +76,12 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     }
 
     [Fact]
-    public async Task Archived_document_can_be_retrieved_with_correct_content()
+    public async Task Given_ArchivedDocument_When_Created_Then_RetrievedWithCorrectContent()
     {
         // Arrange
         var correctDocumentContent = "correct document content";
-        var correctArchivedMessage = CreateArchivedMessage(documentContent: correctDocumentContent);
-        await ArchiveMessage(CreateArchivedMessage(documentContent: "incorrect document content"));
-        await ArchiveMessage(correctArchivedMessage);
-        await ArchiveMessage(CreateArchivedMessage(documentContent: "incorrect document content"));
+        var correctArchivedMessage = await CreateArchivedMessageAsync(documentContent: correctDocumentContent);
+        await CreateArchivedMessageAsync(documentContent: "incorrect document content");
 
         // Act
         var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
@@ -78,7 +96,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     [Theory]
     [InlineData(ArchivedMessageTypeDto.IncomingMessage)]
     [InlineData(ArchivedMessageTypeDto.OutgoingMessage)]
-    public async Task Archived_document_is_saved_at_correct_path(ArchivedMessageTypeDto archivedMessageType)
+    public async Task Given_ArchivedDocument_When_Created_Then_IsSavedAtCorrectPath(ArchivedMessageTypeDto archivedMessageType)
     {
         var messageId = MessageId.New();
         var senderNumber = "1122334455667788";
@@ -87,7 +105,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             month = 01,
             date = 25;
 
-        var archivedMessage = CreateArchivedMessage(
+        var archivedMessage = await CreateArchivedMessageAsync(
             archivedMessageType: archivedMessageType,
             messageId: messageId.Value,
             senderNumber: senderNumber,
@@ -99,8 +117,6 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         var expectedActorNumber = archivedMessageType == ArchivedMessageTypeDto.IncomingMessage ? senderNumber : receiverNumber;
         var expectedFileStorageReference = $"{expectedActorNumber}/{year:000}/{month:00}/{date:00}/{archivedMessage.Id.Value:N}";
 
-        await ArchiveMessage(archivedMessage);
-
         var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.Value);
 
         using var assertionScope = new AssertionScope();
@@ -109,48 +125,34 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     }
 
     [Fact]
-    public async Task Id_has_to_be_unique_in_database()
+    public async Task Given_ArchivedDocument_When_Created_Then_IdHasToBeUniqueInDatabase()
     {
-        var archivedMessage = CreateArchivedMessage();
         var serviceProviderWithoutFileStorage = BuildServiceProviderWithoutFileStorage();
         var clientWithoutFileStorage = serviceProviderWithoutFileStorage.GetRequiredService<IArchivedMessagesClient>();
-
-        await clientWithoutFileStorage.CreateAsync(archivedMessage, CancellationToken.None);
-        var createDuplicateArchivedMessage = new Func<Task>(() => clientWithoutFileStorage.CreateAsync(archivedMessage, CancellationToken.None));
+        var archivedMessageDto = new ArchivedMessageDto(
+            Guid.NewGuid().ToString(),
+            new[] { EventId.From(Guid.NewGuid()) },
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            ActorNumber.Create("1234512345123"),
+            ActorRole.EnergySupplier,
+            ActorNumber.Create("1234512345128"),
+            ActorRole.EnergySupplier,
+            Instant.FromUtc(2023, 01, 01, 0, 0),
+            BusinessReason.BalanceFixing.Name,
+            ArchivedMessageTypeDto.OutgoingMessage,
+            new ArchivedMessageStreamDto(new MemoryStream()));
+        await clientWithoutFileStorage.CreateAsync(archivedMessageDto, CancellationToken.None);
+        var createDuplicateArchivedMessage = new Func<Task>(() => clientWithoutFileStorage.CreateAsync(archivedMessageDto, CancellationToken.None));
 
         await createDuplicateArchivedMessage.Should().ThrowAsync<SqlException>();
     }
 
     [Fact]
-    public async Task Id_has_to_be_unique_in_file_storage()
-    {
-        var archivedMessage = CreateArchivedMessage();
-
-        await ArchiveMessage(archivedMessage);
-        var createDuplicateArchivedMessage = () => ArchiveMessage(archivedMessage);
-
-        await createDuplicateArchivedMessage.Should().ThrowAsync<Azure.RequestFailedException>();
-    }
-
-    [Fact]
-    public async Task Adding_archived_message_with_existing_message_id_creates_new_archived_message()
+    public async Task Given_ArchivedMessage_When_CreatedWithSameMessageId_Then_ArchivedMessageIsCreated()
     {
         var messageId = "MessageId";
-        var archivedMessage1 = CreateArchivedMessage(messageId: messageId);
-        var archivedMessage2 = CreateArchivedMessage(messageId: messageId);
-
-        await ArchiveMessage(archivedMessage1);
-
-        try
-        {
-            await ArchiveMessage(archivedMessage2);
-        }
-#pragma warning disable CA1031  // We want to catch all exceptions
-        catch
-#pragma warning restore CA1031
-        {
-            Assert.Fail("We should be able to save multiple messages with the same message id");
-        }
+        await CreateArchivedMessageAsync(messageId: messageId);
+        await CreateArchivedMessageAsync(messageId: messageId);
 
         var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQueryDto(new SortedCursorBasedPaginationDto()), CancellationToken.None);
 
@@ -159,7 +161,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    private static ArchivedMessageDto CreateArchivedMessage(
+    private async Task<ArchivedMessageDto> CreateArchivedMessageAsync(
         ArchivedMessageTypeDto? archivedMessageType = null,
         string? messageId = null,
         string? documentContent = null,
@@ -167,9 +169,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         string? receiverNumber = null,
         Instant? timestamp = null)
     {
-#pragma warning disable CA2000 // Don't dispose stream
-        var documentStream = new MarketDocumentWriterMemoryStream();
-#pragma warning restore CA2000
+        var documentStream = new MemoryStream();
 
         if (!string.IsNullOrEmpty(documentContent))
         {
@@ -181,32 +181,37 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             streamWriter.Flush();
         }
 
-        return new ArchivedMessageDto(
-            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
-            new[] { EventId.From(Guid.NewGuid()) },
-            DocumentType.NotifyAggregatedMeasureData.Name,
-            ActorNumber.Create(senderNumber ?? "1234512345123"),
-            ActorRole.EnergySupplier,
-            ActorNumber.Create(receiverNumber ?? "1234512345128"),
-            ActorRole.EnergySupplier,
-            timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
-            BusinessReason.BalanceFixing.Name,
+        return await _fixture.CreateArchivedMessageAsync(
             archivedMessageType ?? ArchivedMessageTypeDto.OutgoingMessage,
-            new MarketDocumentStream(documentStream));
-    }
-
-    private async Task ArchiveMessage(ArchivedMessageDto archivedMessage)
-    {
-        await _archivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
+            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
+            documentContent,
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            BusinessReason.BalanceFixing.Name,
+            ActorNumber.Create(senderNumber ?? "1234512345123").Value,
+            ActorRole.EnergySupplier,
+            ActorNumber.Create(receiverNumber ?? "1234512345128").Value,
+            ActorRole.EnergySupplier,
+            timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0));
     }
 
     private ServiceProvider BuildServiceProviderWithoutFileStorage()
     {
-        var serviceCollectionWithoutFileStorage = GetServiceCollectionClone();
+        var serviceCollectionWithoutFileStorage = _fixture.GetServiceCollectionClone();
         serviceCollectionWithoutFileStorage.RemoveAll<IFileStorageClient>();
         serviceCollectionWithoutFileStorage.AddScoped<IFileStorageClient, FileStorageClientStub>();
 
         var dependenciesWithoutFileStorage = serviceCollectionWithoutFileStorage.BuildServiceProvider();
         return dependenciesWithoutFileStorage;
+    }
+
+    private async Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(string messageId)
+    {
+        using var connection =
+            await _fixture.Services.GetRequiredService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var fileStorageReference = await connection.ExecuteScalarAsync<string>(
+            $"SELECT FileStorageReference FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+        return fileStorageReference;
     }
 }
