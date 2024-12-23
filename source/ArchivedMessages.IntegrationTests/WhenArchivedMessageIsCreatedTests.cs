@@ -66,7 +66,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Archived_document_can_be_retrieved_by_id()
+    public async Task Given_ArchivedDocument_When_Created_Then_CanBeRetrieved()
     {
         var correctArchivedMessage = await CreateArchivedMessageAsync();
 
@@ -76,7 +76,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Archived_document_can_be_retrieved_with_correct_content()
+    public async Task Given_ArchivedDocument_When_Created_Then_RetrievedWithCorrectContent()
     {
         // Arrange
         var correctDocumentContent = "correct document content";
@@ -96,7 +96,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
     [Theory]
     [InlineData(ArchivedMessageTypeDto.IncomingMessage)]
     [InlineData(ArchivedMessageTypeDto.OutgoingMessage)]
-    public async Task Archived_document_is_saved_at_correct_path(ArchivedMessageTypeDto archivedMessageType)
+    public async Task Given_ArchivedDocument_When_Created_Then_IsSavedAtCorrectPath(ArchivedMessageTypeDto archivedMessageType)
     {
         var messageId = MessageId.New();
         var senderNumber = "1122334455667788";
@@ -125,7 +125,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Id_has_to_be_unique_in_database()
+    public async Task Given_ArchivedDocument_When_Created_Then_IdHasToBeUniqueInDatabase()
     {
         var serviceProviderWithoutFileStorage = BuildServiceProviderWithoutFileStorage();
         var clientWithoutFileStorage = serviceProviderWithoutFileStorage.GetRequiredService<IArchivedMessagesClient>();
@@ -148,7 +148,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Adding_archived_message_with_existing_message_id_creates_new_archived_message()
+    public async Task Given_ArchivedMessage_When_CreatedWithSameMessageId_Then_ArchivedMessageIsCreated()
     {
         var messageId = "MessageId";
         await CreateArchivedMessageAsync(messageId: messageId);
