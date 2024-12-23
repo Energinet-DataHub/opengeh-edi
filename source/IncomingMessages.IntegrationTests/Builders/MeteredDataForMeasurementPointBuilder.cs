@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Xml;
@@ -73,7 +72,8 @@ public static class MeteredDataForMeasurementPointBuilder
                 businessType,
                 messageId,
                 senderRole,
-                receiverNumber);
+                receiverNumber,
+                schema ?? "NotifyValidatedMeasureData_MarketDocument");
         }
         else
         {
@@ -200,10 +200,11 @@ public static class MeteredDataForMeasurementPointBuilder
         string businessType,
         string messageId,
         string senderRole,
-        string receiverNumber) =>
+        string receiverNumber,
+        string schema) =>
         $$"""
           {
-            "NotifyValidatedMeasureData_MarketDocument": {
+            "{{schema}}": {
               "mRID": "{{messageId}}",
               "businessSector.type": {
                 "value": "{{businessType}}"
