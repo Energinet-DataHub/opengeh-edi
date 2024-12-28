@@ -19,9 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using MediatR;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using NodaTime.Text;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
