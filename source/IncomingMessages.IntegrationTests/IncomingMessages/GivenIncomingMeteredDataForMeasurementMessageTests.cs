@@ -59,7 +59,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_ReceiverIdIsDatahub_Then_ValidationSucceed()
     {
         var validDataHubReceiverId = "5790001330552";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -85,7 +85,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_ReceiverIdIsNotDatahub_Then_ResultContainExceptedValidationError()
     {
         var invalidDataHubReceiverId = "5790001330052";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -110,7 +110,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_SenderIdDoesNotMatchTheAuthenticatedUser_Then_ResultContainExceptedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var invalidSenderId = ActorNumber.Create("5790001330550");
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -135,7 +135,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_MultipleTransactionsWithSameId_Then_ResultContainExceptedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var duplicatedTransactionId = "123456";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -164,7 +164,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_MultipleTransactionsWithSameIdAsExisting_Then_ResultContainExceptedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var existingTransactionIdForSender = "123456";
         var newTransactionIdForSender = "654321";
         await StoreTransactionIdForActorAsync(existingTransactionIdForSender, _actorIdentity.ActorNumber.Value);
@@ -195,7 +195,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_TransactionIdIsEmpty_Then_ResultContainExceptedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var emptyTransactionId = string.Empty;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -220,7 +220,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_MessageIdIsEmpty_Then_ResultContainExceptedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var emptyMessageId = string.Empty;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -246,7 +246,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_MessageIdAlreadyExists_Then_ResultContainExceptedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var existingMessageId = "123564789";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -271,7 +271,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_SenderRoleInMessageIsMeteredDataResponsible_Then_ValidationSucceed()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var validSenderRoleInMessage = ActorRole.MeteredDataResponsible;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -294,7 +294,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_AuthenticatedSenderRoleIsIncorrect_Then_ResultContainExceptedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var authenticatedActor = GetService<AuthenticatedActor>();
         var invalidSenderRole = ActorRole.EnergySupplier;
         var actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None, invalidSenderRole, ActorId);
@@ -319,8 +319,8 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_BusinessProcessIsIncorrect_Then_ResultContainExceptedValidationError()
     {
-        var invalidBusinessProcess = "un:unece:260:data:EEM-DK_DataTimeSeries:v3";
-        var documentFormat = DocumentFormat.Ebix;
+        var invalidBusinessProcess = "urn:ediel.org:measure:notifywholesaleservices:0:2";
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -339,7 +339,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_SchemaIsIncorrect_Then_ResultContainExceptedValidationError()
     {
         var invalidSchema = "EEM-DK_MeteredDataTimeSeries:v3";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -358,7 +358,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_ProcessTypeIsNotAllowed_Then_ResultContainExceptedValidationError()
     {
         var notAllowedProcessType = "1880";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -447,7 +447,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_MessageTypeIsNotAllowed_Then_ResultContainExceptedValidationError()
     {
         var notAllowedMessageType = "1880";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -469,7 +469,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_MessageTypeIsAllowed_Then_ResultContainExceptedValidationError()
     {
         var allowedMessageType = "E66";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -487,7 +487,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_MessageIdIs35Characters_Then_ValidationSucceed()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var validMessageId = "12356478912356478912356478912356478";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -509,10 +509,10 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_MessageIdExceed35Characters_Then_ExpectedValidationError()
+    public async Task When_MessageIdExceed35Characters_Then_NoValidationError()
     {
         var invalidMessageId = "123564789123564789123564789123564789_123564789123564789123564789123564789";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -526,14 +526,14 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
 
         var messageParser = await ParseMessageAsync(message.Stream, documentFormat);
 
-        messageParser.ParserResult.Errors.Should().Contain(error => error is InvalidMessageStructure);
-        messageParser.ParserResult.Success.Should().BeFalse();
+        messageParser.ParserResult.Errors.Should().BeEmpty();
+        messageParser.ParserResult.Success.Should().BeTrue();
     }
 
     [Fact]
     public async Task When_TransactionIdIsLessThen35Characters_Then_ValidationSucceed()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var validTransactionId = "1235647891235647891235647891";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -557,7 +557,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_TransactionIdIs35Characters_Then_ValidationSucceed()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var validTransactionId = "12356478912356478912356478912356478";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
@@ -578,10 +578,10 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_TransactionIdExceed35Characters_Then_ExpectedValidationError()
+    public async Task When_TransactionIdExceed35Characters_Then_NoValidationError()
     {
         var invalidTransactionId = "123564789123564789123564789123564789_123564789123564789123564789123564789";
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -594,14 +594,14 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
 
         var messageParser = await ParseMessageAsync(message.Stream, documentFormat);
 
-        messageParser.ParserResult.Errors.Should().Contain(error => error is InvalidMessageStructure);
-        messageParser.ParserResult.Success.Should().BeFalse();
+        messageParser.ParserResult.Errors.Should().BeEmpty();
+        messageParser.ParserResult.Success.Should().BeTrue();
     }
 
     [Fact]
     public async Task When_BusinessTypeIsAllowed_Then_ValidationSucceed()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -624,7 +624,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_BusinessTypeIsNotAllowed_Then_ExpectedValidationError()
     {
-        var documentFormat = DocumentFormat.Ebix;
+        var documentFormat = DocumentFormat.Xml;
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
@@ -632,7 +632,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
                 ("555555555",
                     Instant.FromUtc(2024, 1, 1, 0, 0), Instant.FromUtc(2024, 1, 2, 0, 0), Resolution.QuarterHourly),
             ],
-            businessType: "27");
+            businessType: "42");
 
         var messageParser = await ParseMessageAsync(message.Stream, documentFormat);
         messageParser.ParserResult.Errors.Should().Contain(error => error is InvalidMessageStructure);

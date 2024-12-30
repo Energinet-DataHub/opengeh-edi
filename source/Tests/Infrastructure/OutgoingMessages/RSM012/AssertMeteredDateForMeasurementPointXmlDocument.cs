@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
@@ -238,12 +239,12 @@ public class AssertMeteredDateForMeasurementPointXmlDocument : IAssertMeteredDat
                     $"Series[{seriesIndex}]/Period/Point[{i + 1}]/position",
                     requiredPointDocumentFields.Position.ToString());
 
-            if (optionalPointDocumentFields.Quantity != null)
+            if (optionalPointDocumentFields.Quantity.HasValue)
             {
                 _documentAsserter
                     .HasValue(
                         $"Series[{seriesIndex}]/Period/Point[{i + 1}]/quantity",
-                        optionalPointDocumentFields.Quantity!.ToString()!);
+                        optionalPointDocumentFields.Quantity.Value.ToString(CultureInfo.InvariantCulture));
             }
             else
             {
