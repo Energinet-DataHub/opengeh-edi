@@ -53,7 +53,7 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
     public async Task After_load_test()
     {
         var enqueuedMessagesCount = await _ediDatabaseDriver.CountEnqueuedNotifyValidatedMeasureDataMessagesFromLoadTestAsync();
-        _logger.WriteLine($"Enqueued messages count: {enqueuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
+        _logger.WriteLine($"Enqueued messages count: {enqueuedMessagesCount}");
 
         _fixture.TelemetryClient.GetMetric(ForwardMeteredEnqueuedAmountMetric).TrackValue(enqueuedMessagesCount);
 
