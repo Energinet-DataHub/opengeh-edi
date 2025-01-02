@@ -43,7 +43,8 @@ public class PeriodValidatorTests
 
     public PeriodValidatorTests()
     {
-        _now = Instant.FromUtc(2024, 5, 31, 22, 0, 0);
+        var now = SystemClock.Instance.GetCurrentInstant();
+        _now = Instant.FromUtc(now.InUtc().Year, 5, 31, 22, 0, 0);
         _sut = new PeriodValidationRule(new PeriodValidationHelper(_dateTimeZone!, new MockClock(() => _now)));
     }
 
