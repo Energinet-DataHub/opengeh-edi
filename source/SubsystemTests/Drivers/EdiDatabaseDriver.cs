@@ -219,11 +219,11 @@ internal sealed class EdiDatabaseDriver
     /// <summary>
     /// Delete outgoing messages for previuse performance test.
     /// </summary>
-    internal async Task DeleteOutgoingMessagesForFromLoadTestAsync()
+    internal async Task DeleteOutgoingMessagesForFromLoadTestAsync(CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
 
-        await connection.OpenAsync().ConfigureAwait(false);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
         await using (var deleteOutgoingMessagesCommand = new SqlCommand())
         {
             deleteOutgoingMessagesCommand.CommandText = @"
@@ -235,8 +235,26 @@ internal sealed class EdiDatabaseDriver
             deleteOutgoingMessagesCommand.Connection = connection;
             deleteOutgoingMessagesCommand.CommandTimeout = (int)TimeSpan.FromMinutes(4).TotalSeconds;
 
-            await deleteOutgoingMessagesCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+            await deleteOutgoingMessagesCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
+    }
+
+    internal async Task<IList<string>> GetOutgoingMessagesFileStorageReferencesForFromLoadTestAsync(CancellationToken cancellationToken)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var query = """
+                    SELECT [FileStorageReference] 
+                    FROM [OutgoingMessages] 
+                    WHERE [AssignedBundleId] IN (
+                        SELECT [Id] 
+                        FROM [Bundles] 
+                        WHERE [RelatedToMessageId] LIKE 'perf_test_%')
+                    """;
+
+        var result = await connection.QueryAsync<string>(query).ConfigureAwait(false);
+        return result.ToList();
     }
 
     internal async Task<(bool Success, string? Payload)>

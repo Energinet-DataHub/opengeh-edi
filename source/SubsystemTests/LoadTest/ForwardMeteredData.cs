@@ -35,18 +35,20 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
     private readonly LoadTestFixture _fixture;
     private readonly ITestOutputHelper _logger;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
+    private readonly EdiFileStorageDriver _ediFileStorageDriver;
 
     public ForwardMeteredData(LoadTestFixture fixture, ITestOutputHelper logger)
     {
         _fixture = fixture;
         _logger = logger;
         _ediDatabaseDriver = new EdiDatabaseDriver(_fixture.DatabaseConnectionString);
+        _ediFileStorageDriver = new EdiFileStorageDriver(_fixture.FileStorageConnectionString);
     }
 
     [Fact]
     public async Task Before_load_test()
     {
-        await _ediDatabaseDriver.DeleteOutgoingMessagesForFromLoadTestAsync();
+        await CleanUp();
     }
 
     [Fact]
@@ -61,5 +63,14 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
         enqueuedMessagesCount.Should().BeGreaterThanOrEqualTo(
             _fixture.MinimumEnqueuedMessagesCount,
             $"because the system should be performant enough to enqueue at least {_fixture.MinimumEnqueuedMessagesCount} messages during the load test");
+
+        await CleanUp();
+    }
+
+    private async Task CleanUp()
+    {
+        var outgoingMessagesFileStorageReferences = await _ediDatabaseDriver.GetOutgoingMessagesFileStorageReferencesForFromLoadTestAsync(CancellationToken.None);
+        await _ediFileStorageDriver.DeleteOutgoingMessagesIfExistsAsync(outgoingMessagesFileStorageReferences, CancellationToken.None);
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForFromLoadTestAsync(CancellationToken.None);
     }
 }
