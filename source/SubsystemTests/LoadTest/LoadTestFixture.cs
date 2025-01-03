@@ -51,7 +51,7 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             GetConfigurationValue<string>(configuration, "mssql-data-url"),
             GetConfigurationValue<string>(configuration, "mssql-edi-database-name"));
 
-        FileStorageConnectionString = GetConfigurationValue<string>(configuration, "FileStorage__StorageAccountUrl");
+        FileStorageConnectionString = GetConfigurationValue<string>(configuration, "FILE_STORAGE_ACCOUNT_URL");
 
         _serviceBusClient = new ServiceBusClient(
             $"{GetConfigurationValue<string>(configuration, "sb-domain-relay-namespace-name")}.servicebus.windows.net",
