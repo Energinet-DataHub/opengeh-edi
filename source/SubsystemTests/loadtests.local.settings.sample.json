@@ -1,0 +1,5 @@
+﻿{
+  "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
+  "INTERNAL_KEYVAULT_NAME": "<INTERNAL_KEYVAULT_NAME>",
+  "FileStorage__StorageAccountUrl": "<FileStorage__StorageAccountUrl>"
+}

@@ -34,6 +34,7 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
     public LoadTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
+            .AddJsonFile("loadtests.test001.settings.json", true)
             .AddEnvironmentVariables();
 
         var baseConfiguration = configurationBuilder.Build();
@@ -49,6 +50,8 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
         DatabaseConnectionString = SubsystemTestFixture.BuildDbConnectionString(
             GetConfigurationValue<string>(configuration, "mssql-data-url"),
             GetConfigurationValue<string>(configuration, "mssql-edi-database-name"));
+
+        FileStorageConnectionString = GetConfigurationValue<string>(configuration, "FileStorage__StorageAccountUrl");
 
         _serviceBusClient = new ServiceBusClient(
             $"{GetConfigurationValue<string>(configuration, "sb-domain-relay-namespace-name")}.servicebus.windows.net",
@@ -99,6 +102,8 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
     internal IntegrationEventPublisher IntegrationEventPublisher { get; }
 
     internal string DatabaseConnectionString { get; }
+
+    internal string FileStorageConnectionString { get; }
 
     internal TelemetryClient TelemetryClient { get; }
 
