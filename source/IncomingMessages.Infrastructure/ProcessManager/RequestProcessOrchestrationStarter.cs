@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
-using System.Globalization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;

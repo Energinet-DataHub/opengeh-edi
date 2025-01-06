@@ -41,7 +41,6 @@ public class InitializeAggregatedMeasureDataHandler : IProcessInitializationHand
     public async Task ProcessAsync(byte[] processInitializationData)
     {
         var marketMessage = _serializer.Deserialize<InitializeAggregatedMeasureDataProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
-
         await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
     }
 }

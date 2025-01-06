@@ -197,8 +197,10 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
+            () => Assert.Null(message),
             () => Assert.Empty(transactionIds),
             () => Assert.Empty(messageIds));
 
