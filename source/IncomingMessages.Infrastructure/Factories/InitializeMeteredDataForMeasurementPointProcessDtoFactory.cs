@@ -38,6 +38,7 @@ public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
                         ProductUnitType: series.ProductUnitType,
                         MeteringPointType: series.MeteringPointType,
                         MeteringPointLocationId: series.MeteringPointLocationId,
+                        RegisteredAt: series.RegisteredAt,
                         DelegatedGridAreaCodes: series.DelegatedGridAreas,
                         RequestedByActor: RequestedByActor.From(
                             authenticatedActor.CurrentActorIdentity.ActorNumber,

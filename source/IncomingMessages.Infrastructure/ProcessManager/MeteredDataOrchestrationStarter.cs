@@ -50,6 +50,10 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                 ? Resolution.TryGetNameFromCode(transaction.Resolution, fallbackValue: transaction.Resolution)
                 : null;
 
+            var registeredAt = transaction.RegisteredAt is not null
+                ? InstantPattern.General.Parse(transaction.RegisteredAt).Value.ToString()
+                : null;
+
             var startCommand =
                 new StartForwardMeteredDataCommandV1(
                     operatingIdentity: actorIdentity,
@@ -60,7 +64,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                         MeteringPointType: meteringPointType,
                         ProductNumber: transaction.ProductNumber,
                         MeasureUnit: productUnitType,
-                        RegistrationDateTime: InstantPattern.General.Parse(initializeProcessDto.CreatedAt).Value.ToString(),
+                        RegistrationDateTime: registeredAt ?? throw new ArgumentNullException("RegistrationDateTime is only allowed to be null in Ebix."),
                         Resolution: resolution,
                         StartDateTime: transaction.StartDateTime,
                         EndDateTime: transaction.EndDateTime,

@@ -299,6 +299,7 @@ public class RequestProcessOrchestrationStarterTests
                     ProductUnitType: productUnitType?.Code,
                     MeteringPointType: meteringPointType?.Code,
                     MeteringPointLocationId: expectedMeteringPointId,
+                    RegisteredAt: expectedRegistrationDateFrom,
                     DelegatedGridAreaCodes: null,
                     RequestedByActor: requestedByActor,
                     EnergyObservations:
