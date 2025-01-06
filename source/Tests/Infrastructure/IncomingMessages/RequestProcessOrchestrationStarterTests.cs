@@ -328,7 +328,7 @@ public class RequestProcessOrchestrationStarterTests
             ActorRole.GridAccessProvider,
             expectedActorId));
 
-        var sut = new RequestProcessOrchestrationStarter(
+        var sut = new MeteredDataOrchestrationStarter(
             processManagerClient.Object,
             authenticatedActor);
 

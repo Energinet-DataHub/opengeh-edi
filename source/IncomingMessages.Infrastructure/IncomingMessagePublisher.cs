@@ -33,6 +33,7 @@ public class IncomingMessagePublisher
     private readonly ISerializer _serializer;
     private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
+    private readonly MeteredDataOrchestrationStarter _meteredDataOrchestrationStarter;
     private readonly ServiceBusSender _sender;
 
     public IncomingMessagePublisher(
@@ -41,7 +42,8 @@ public class IncomingMessagePublisher
         IAzureClientFactory<ServiceBusSender> senderFactory,
         ISerializer serializer,
         IFeatureFlagManager featureFlagManager,
-        IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter)
+        IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter,
+        MeteredDataOrchestrationStarter meteredDataOrchestrationStarter)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
@@ -49,6 +51,7 @@ public class IncomingMessagePublisher
         _serializer = serializer;
         _featureFlagManager = featureFlagManager;
         _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
+        _meteredDataOrchestrationStarter = meteredDataOrchestrationStarter;
 
         _sender = senderFactory.CreateClient(options.Value.QueueName);
     }
@@ -128,7 +131,7 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeasurementPointMessageProcessDto);
 
-        await _requestProcessOrchestrationStarter.StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
+        await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
             initializeMeteredDataForMeasurementPointMessageProcessDto,
             cancellationToken)
         .ConfigureAwait(false);

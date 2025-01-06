@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
@@ -127,62 +124,6 @@ public class RequestProcessOrchestrationStarter(
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
-            startProcessTasks.Add(startProcessTask);
-        }
-
-        await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
-    }
-
-    public async Task StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
-        InitializeMeteredDataForMeasurementPointMessageProcessDto initializeProcessDto,
-        CancellationToken cancellationToken)
-    {
-        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
-        var actorIdentity = new ActorIdentityDto(actorId);
-
-        var startProcessTasks = new List<Task>();
-        foreach (var transaction in initializeProcessDto.Series)
-        {
-            var meteringPointType = transaction.MeteringPointType is not null
-                ? MeteringPointType.TryGetNameFromCode(transaction.MeteringPointType, fallbackValue: transaction.MeteringPointType)
-                : null;
-
-            var productUnitType = transaction.ProductUnitType is not null
-                ? MeasurementUnit.TryGetNameFromCode(transaction.ProductUnitType, fallbackValue: transaction.ProductUnitType)
-                : null;
-
-            var resolution = transaction.Resolution is not null
-                ? Resolution.TryGetNameFromCode(transaction.Resolution, fallbackValue: transaction.Resolution)
-                : null;
-
-            var startCommand =
-                new StartForwardMeteredDataCommandV1(
-                    operatingIdentity: actorIdentity,
-                    new MeteredDataForMeasurementPointMessageInputV1(
-                        AuthenticatedActorId: actorId,
-                        TransactionId: transaction.TransactionId,
-                        MeteringPointId: transaction.MeteringPointLocationId,
-                        MeteringPointType: meteringPointType,
-                        ProductNumber: transaction.ProductNumber,
-                        MeasureUnit: productUnitType,
-                        RegistrationDateTime: InstantPattern.General.Parse(initializeProcessDto.CreatedAt).Value.ToString(),
-                        Resolution: resolution,
-                        StartDateTime: transaction.StartDateTime,
-                        EndDateTime: transaction.EndDateTime,
-                        GridAccessProviderNumber: transaction.RequestedByActor.ActorNumber.Value,
-                        DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
-                        EnergyObservations:
-                            new ReadOnlyCollection<EnergyObservation>(
-                                transaction.EnergyObservations
-                                    .Select(energyObservation =>
-                                        new EnergyObservation(
-                                            Position: energyObservation.Position,
-                                            EnergyQuantity: energyObservation.EnergyQuantity,
-                                            QuantityQuality: energyObservation.QuantityQuality))
-                                    .ToList())),
-                    initializeProcessDto.MessageId);
-
-            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, CancellationToken.None);
             startProcessTasks.Add(startProcessTask);
         }
 

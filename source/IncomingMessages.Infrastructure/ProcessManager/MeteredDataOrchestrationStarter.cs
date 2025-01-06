@@ -1,0 +1,95 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Collections.ObjectModel;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
+using NodaTime.Text;
+
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
+
+public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient processManagerMessageClient, AuthenticatedActor authenticatedActor)
+{
+    private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
+    private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
+
+    public async Task StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
+        InitializeMeteredDataForMeasurementPointMessageProcessDto initializeProcessDto,
+        CancellationToken cancellationToken)
+    {
+        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
+        var actorIdentity = new ActorIdentityDto(actorId);
+
+        var startProcessTasks = new List<Task>();
+        foreach (var transaction in initializeProcessDto.Series)
+        {
+            var meteringPointType = transaction.MeteringPointType is not null
+                ? MeteringPointType.TryGetNameFromCode(transaction.MeteringPointType, fallbackValue: transaction.MeteringPointType)
+                : null;
+
+            var productUnitType = transaction.ProductUnitType is not null
+                ? MeasurementUnit.TryGetNameFromCode(transaction.ProductUnitType, fallbackValue: transaction.ProductUnitType)
+                : null;
+
+            var resolution = transaction.Resolution is not null
+                ? Resolution.TryGetNameFromCode(transaction.Resolution, fallbackValue: transaction.Resolution)
+                : null;
+
+            var startCommand =
+                new StartForwardMeteredDataCommandV1(
+                    operatingIdentity: actorIdentity,
+                    new MeteredDataForMeasurementPointMessageInputV1(
+                        AuthenticatedActorId: actorId,
+                        TransactionId: transaction.TransactionId,
+                        MeteringPointId: transaction.MeteringPointLocationId,
+                        MeteringPointType: meteringPointType,
+                        ProductNumber: transaction.ProductNumber,
+                        MeasureUnit: productUnitType,
+                        RegistrationDateTime: InstantPattern.General.Parse(initializeProcessDto.CreatedAt).Value.ToString(),
+                        Resolution: resolution,
+                        StartDateTime: transaction.StartDateTime,
+                        EndDateTime: transaction.EndDateTime,
+                        GridAccessProviderNumber: transaction.RequestedByActor.ActorNumber.Value,
+                        DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
+                        EnergyObservations:
+                            new ReadOnlyCollection<EnergyObservation>(
+                                transaction.EnergyObservations
+                                    .Select(energyObservation =>
+                                        new EnergyObservation(
+                                            Position: energyObservation.Position,
+                                            EnergyQuantity: energyObservation.EnergyQuantity,
+                                            QuantityQuality: energyObservation.QuantityQuality))
+                                    .ToList())),
+                    initializeProcessDto.MessageId);
+
+            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, CancellationToken.None);
+            startProcessTasks.Add(startProcessTask);
+        }
+
+        await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
+    }
+
+    private Guid GetAuthenticatedActorId(string messageId)
+    {
+        if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
+            throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");
+
+        return actorIdentity?.ActorId
+               ?? throw new InvalidOperationException($"Current actor id was null when initializing process (MessageId={messageId})");
+    }
+}
