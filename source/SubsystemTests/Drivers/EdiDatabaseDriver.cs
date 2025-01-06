@@ -202,6 +202,7 @@ internal sealed class EdiDatabaseDriver
             // where EventId = @CalculationId in the OutgoingMessages table and outgoingmessages
             // has a foreign key to the Bundles table
             deleteOutgoingMessagesCommand.CommandText = @"
+                DELETE FROM [ArchivedMessages] WHERE MessageId IN (SELECT MessageID FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = @CalculationId));
                 DELETE FROM [MarketDocuments] WHERE BundleId IN (SELECT Id FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = @CalculationId));
                 DELETE FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = @CalculationId);
                 DELETE FROM [OutgoingMessages] WHERE CalculationId = @CalculationId;
@@ -239,7 +240,8 @@ internal sealed class EdiDatabaseDriver
         }
     }
 
-    internal async Task<IList<string>> GetOutgoingMessagesFileStorageReferencesForFromLoadTestAsync(CancellationToken cancellationToken)
+    internal async Task<IList<string>> GetOutgoingMessagesFileStorageReferencesForFromMeteredDataLoadTestAsync(
+        CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
@@ -254,6 +256,45 @@ internal sealed class EdiDatabaseDriver
                     """;
 
         var result = await connection.QueryAsync<string>(query).ConfigureAwait(false);
+        return result.ToList();
+    }
+
+    internal async Task<IList<string>> GetOutgoingMessagesFileStorageReferencesForFromCalculationAsync(
+        Guid calculationId,
+        CancellationToken cancellationToken)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var query = """
+                    SELECT [FileStorageReference] 
+                    FROM [OutgoingMessages] 
+                    WHERE [CalculationId] = @CalculationId
+                    """;
+
+        var result = await connection
+            .QueryAsync<string>(query, new { CalculationId = calculationId })
+            .ConfigureAwait(false);
+        return result.ToList();
+    }
+
+    internal async Task<IList<string>> GetArchivedMessagesFileStorageReferencesForFromCalculationAsync(
+        Guid calculationId,
+        CancellationToken cancellationToken)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var query = """
+                    SELECT A.FileStorageReference FROM [dbo].[ArchivedMessages] A
+                    INNER JOIN [Bundles] B ON A.MessageID = B.MessageId
+                    INNER JOIN [OutgoingMessages] OM ON B.[Id] = OM.[AssignedBundleId]
+                    WHERE OM.[CalculationId] = @CalculationId
+                    """;
+
+        var result = await connection
+            .QueryAsync<string>(query, new { CalculationId = calculationId })
+            .ConfigureAwait(false);
         return result.ToList();
     }
 

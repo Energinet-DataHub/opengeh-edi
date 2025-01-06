@@ -69,8 +69,8 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
 
     private async Task CleanUp()
     {
-        var outgoingMessagesFileStorageReferences = await _ediDatabaseDriver.GetOutgoingMessagesFileStorageReferencesForFromLoadTestAsync(CancellationToken.None);
-        await _ediFileStorageDriver.DeleteOutgoingMessagesIfExistsAsync(outgoingMessagesFileStorageReferences, CancellationToken.None);
+        var outgoingMessagesFileStorageReferences = await _ediDatabaseDriver.GetOutgoingMessagesFileStorageReferencesForFromMeteredDataLoadTestAsync(CancellationToken.None);
+        await _ediFileStorageDriver.DeleteFilesByReferencesIfExistsAsync(outgoingMessagesFileStorageReferences, FileStorageContainerReference.Outgoing, CancellationToken.None);
         await _ediDatabaseDriver.DeleteOutgoingMessagesForFromLoadTestAsync(CancellationToken.None);
     }
 }

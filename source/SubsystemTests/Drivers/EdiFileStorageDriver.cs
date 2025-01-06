@@ -26,9 +26,9 @@ public class EdiFileStorageDriver(string connectionString)
         new Uri(connectionString),
         new DefaultAzureCredential());
 
-    public async Task DeleteOutgoingMessagesIfExistsAsync(IList<string> fileStorageReferences, CancellationToken cancellationToken)
+    public async Task DeleteFilesByReferencesIfExistsAsync(IList<string> fileStorageReferences, FileStorageContainerReference containerReference, CancellationToken cancellationToken)
     {
-        var container = _blobServiceClient.GetBlobContainerClient("outgoing");
+        var container = _blobServiceClient.GetBlobContainerClient(containerReference.Name);
         var blobBatchClient = _blobServiceClient.GetBlobBatchClient();
         var blobUris = fileStorageReferences
             .Select(reference => container.GetBlobClient(reference).Uri)
@@ -55,4 +55,12 @@ public class EdiFileStorageDriver(string connectionString)
             }
         }
     }
+}
+
+public class FileStorageContainerReference(string name)
+{
+    public static readonly FileStorageContainerReference Outgoing = new("outgoing");
+    public static readonly FileStorageContainerReference Archived = new("archived");
+
+    public string Name { get; } = name;
 }
