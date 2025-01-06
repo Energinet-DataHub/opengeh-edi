@@ -44,9 +44,10 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
     }
 
     [Fact]
-    public async Task Before_load_test()
+    public Task Before_load_test()
     {
-        await CleanUp();
+        // Nothing to do before the load test
+        return Task.CompletedTask;
     }
 
     [Fact]
@@ -67,6 +68,6 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
 
     private async Task CleanUp()
     {
-        await _ediDatabaseDriver.DeleteOutgoingMessagesForFromLoadTestAsync(CancellationToken.None);
+        await _ediDatabaseDriver.MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync(CancellationToken.None);
     }
 }
