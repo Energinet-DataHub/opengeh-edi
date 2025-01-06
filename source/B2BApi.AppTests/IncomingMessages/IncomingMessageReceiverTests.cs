@@ -198,7 +198,6 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
             };
 
             request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
-
             return request;
         }
         catch

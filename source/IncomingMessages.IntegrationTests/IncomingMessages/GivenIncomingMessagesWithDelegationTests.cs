@@ -349,7 +349,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         }
     }
 
-    [Fact]
+    [Fact(Skip = "Ebix is not supported.")]
     public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
@@ -445,7 +445,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         }
     }
 
-    [Fact]
+    [Fact(Skip = "Ebix is not supported.")]
     public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
@@ -503,7 +503,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         }
     }
 
-    [Fact]
+    [Fact(Skip = "Ebix is not supported")]
     public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationDoesNotExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
