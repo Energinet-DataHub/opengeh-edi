@@ -269,8 +269,8 @@ public class RequestProcessOrchestrationStarterTests
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
         var expectedPosition = "1";
-        var expectedEnergyQuantity = "A03";
-        var expectedQuantityQuality = "1001";
+        var expectedEnergyQuantity = "1001";
+        var expectedQuantityQuality = "A03";
 
         var meteringPointType = expectedMeteringPointType is not null
             ? MeteringPointType.FromCode(expectedMeteringPointType)
@@ -324,7 +324,7 @@ public class RequestProcessOrchestrationStarterTests
         var expectedActorId = Guid.NewGuid();
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
-            ActorNumber.Create("1234567890123"),
+            ActorNumber.Create("1111111111111"),
             Restriction.None,
             ActorRole.GridAccessProvider,
             expectedActorId));
