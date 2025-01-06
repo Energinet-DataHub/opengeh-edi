@@ -132,5 +132,15 @@ public class IncomingMessagePublisher
             initializeMeteredDataForMeasurementPointMessageProcessDto,
             cancellationToken)
         .ConfigureAwait(false);
+
+        // Temporary until ProcessManager is ready
+        var serviceBusMessage =
+            new ServiceBusMessage(
+                _serializer.Serialize(initializeMeteredDataForMeasurementPointMessageProcessDto))
+            {
+                Subject = nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto),
+            };
+
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }

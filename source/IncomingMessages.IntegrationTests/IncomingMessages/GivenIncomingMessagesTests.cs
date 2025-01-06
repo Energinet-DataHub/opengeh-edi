@@ -130,8 +130,10 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
+            () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
     }
@@ -164,44 +166,44 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         messageIds.Should().ContainSingle();
     }
 
-    //[Theory]
-    //[MemberData(nameof(ValidIncomingRequestMessages))]
-    //public async Task AndGiven_ServiceBusFails_When_MessageIsReceived_Then_TransactionAndMessageIdsAreNotSaved(
-    //    DocumentFormat format,
-    //    IncomingDocumentType incomingDocumentType,
-    //    ActorRole actorRole,
-    //    IncomingMarketMessageStream incomingMarketMessageStream)
-    //{
-    //    // Assert
-    //    var authenticatedActor = GetService<AuthenticatedActor>();
-    //    var senderActorNumber = ActorNumber.Create("5799999933318");
-    //    authenticatedActor.SetAuthenticatedActor(
-    //        new ActorIdentity(
-    //            senderActorNumber,
-    //            Restriction.Owned,
-    //            actorRole,
-    //            ActorId));
+    [Theory]
+    [MemberData(nameof(ValidIncomingRequestMessages))]
+    public async Task AndGiven_ServiceBusFails_When_MessageIsReceived_Then_TransactionAndMessageIdsAreNotSaved(
+        DocumentFormat format,
+        IncomingDocumentType incomingDocumentType,
+        ActorRole actorRole,
+        IncomingMarketMessageStream incomingMarketMessageStream)
+    {
+        // Assert
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(
+                senderActorNumber,
+                Restriction.Owned,
+                actorRole,
+                ActorId));
 
-    //    _senderSpy.ShouldFail = true;
+        _senderSpy.ShouldFail = true;
 
-    //    // Act & Assert
-    //    await Assert.ThrowsAsync<ServiceBusException>(
-    //        () => _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
-    //            incomingMarketMessageStream,
-    //            format,
-    //            incomingDocumentType,
-    //            format,
-    //            CancellationToken.None));
+        // Act & Assert
+        await Assert.ThrowsAsync<ServiceBusException>(
+            () => _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+                incomingMarketMessageStream,
+                format,
+                incomingDocumentType,
+                format,
+                CancellationToken.None));
 
-    //    var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
-    //    var messageIds = await GetMessageIdsAsync(senderActorNumber);
+        var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+        var messageIds = await GetMessageIdsAsync(senderActorNumber);
 
-    //    Assert.Multiple(
-    //        () => Assert.Empty(transactionIds),
-    //        () => Assert.Empty(messageIds));
+        Assert.Multiple(
+            () => Assert.Empty(transactionIds),
+            () => Assert.Empty(messageIds));
 
-    //    _senderSpy.ShouldFail = false;
-    //}
+        _senderSpy.ShouldFail = false;
+    }
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
@@ -250,13 +252,13 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.NotNull(results),
+            () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
-
-        // TODO: Assert Process started
     }
 
     [Theory]
