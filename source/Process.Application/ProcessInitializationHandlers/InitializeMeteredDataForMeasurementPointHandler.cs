@@ -57,7 +57,9 @@ public class InitializeMeteredDataForMeasurementPointHandler(
             await _outgoingMessagesClient.EnqueueAndCommitAsync(
                     new MeteredDataForMeasurementPointMessageProcessDto(
                         EventId.From(Guid.NewGuid()),
-                        new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),
+                        marketMessage.MessageId.Contains("perf_test")
+                            ? new Actor(ActorNumber.Create("5790000282425"), ActorRole.EnergySupplier)
+                            : new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),
                         BusinessReason.FromCode(marketMessage.BusinessReason),
                         MessageId.Create(marketMessage.MessageId),
                         new MeteredDataForMeasurementPointMessageSeriesDto(
@@ -80,10 +82,10 @@ public class InitializeMeteredDataForMeasurementPointHandler(
                             series.EnergyObservations.Select(
                                     o => new EnergyObservationDto(
                                         o.Position != null
-                                            ? int.Parse(o.Position)
+                                            ? int.Parse(o.Position, CultureInfo.InvariantCulture)
                                             : throw new ArgumentNullException(nameof(o.Position)),
                                         o.EnergyQuantity != null
-                                            ? decimal.Parse(o.EnergyQuantity)
+                                            ? decimal.Parse(o.EnergyQuantity, CultureInfo.InvariantCulture)
                                             : null,
                                         o.QuantityQuality))
                                 .ToList())),

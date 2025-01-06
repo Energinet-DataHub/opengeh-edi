@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -61,6 +61,19 @@ public static class MeteredDataForMeasurementPointBuilder
                 senderRole,
                 receiverNumber,
                 schema ?? "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1");
+        }
+        else if (format == DocumentFormat.Json)
+        {
+            content = GetJson(
+                senderActorNumber,
+                series,
+                messageType,
+                processType,
+                businessType,
+                messageId,
+                senderRole,
+                receiverNumber,
+                schema ?? "NotifyValidatedMeasureData_MarketDocument");
         }
         else
         {
@@ -119,13 +132,7 @@ public static class MeteredDataForMeasurementPointBuilder
             <ns0:MeteringPointDomainLocation>
                 <ns0:Identification schemeAgencyIdentifier=""9"">571313000000002000</ns0:Identification>
             </ns0:MeteringPointDomainLocation>
-        {string.Join("\n", GetEnergyObservations(s.Resolution).Select(e => $@"
-            <ns0:IntervalEnergyObservation>
-                <ns0:Position>{e.Position}</ns0:Position>
-                <ns0:EnergyQuantity>{e.Quantity}</ns0:EnergyQuantity>
-                <ns0:QuantityQuality listAgencyIdentifier=""260"">E01</ns0:QuantityQuality>
-            </ns0:IntervalEnergyObservation>
-        "))}
+        {EnergyObservationEbixBuilder(GetEnergyObservations())}
     </ns0:PayloadEnergyTimeSeries>
     "))}
 </ns0:DK_MeteredDataTimeSeries>");
@@ -176,13 +183,7 @@ public static class MeteredDataForMeasurementPointBuilder
                     <cim:end>{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", null)}</cim:end>
                 </cim:timeInterval>
 
-            {string.Join("\n", GetEnergyObservations(s.Resolution).Select(e => $@"
-                <cim:Point>
-                    <cim:position>{e.Position}</cim:position>
-                    <cim:quantity>{e.Quantity}</cim:quantity>
-                    <cim:quality>A03</cim:quality>
-                </cim:Point>
-        "))}
+            {EnergyObservationXmlBuilder(GetEnergyObservations())}
         </cim:Period>
     </cim:Series>
     "))}
@@ -190,16 +191,178 @@ public static class MeteredDataForMeasurementPointBuilder
         return doc.OuterXml;
     }
 
-    private static ReadOnlyCollection<(int Position, int Quantity)> GetEnergyObservations(Resolution resolution)
+    private static string GetJson(
+        ActorNumber senderActorNumber,
+        IReadOnlyCollection<(string TransactionId, Instant PeriodStart, Instant PeriodEnd, Resolution Resolution)>
+            series,
+        string messageType,
+        string processType,
+        string businessType,
+        string messageId,
+        string senderRole,
+        string receiverNumber,
+        string schema) =>
+        $$"""
+          {
+            "{{schema}}": {
+              "mRID": "{{messageId}}",
+              "businessSector.type": {
+                "value": "{{businessType}}"
+              },
+              "createdDateTime": "2022-12-17T09:30:47Z",
+              "process.processType": {
+          	     "value": "{{processType}}"
+              },
+              "receiver_MarketParticipant.mRID": {
+          	   "codingScheme": "A10",
+          	     "value": "{{receiverNumber}}"
+              },
+              "receiver_MarketParticipant.marketRole.type": {
+          	     "value": "DGL"
+              },
+              "sender_MarketParticipant.mRID": {
+          	     "codingScheme": "A10",
+          	     "value": "{{senderActorNumber.Value}}"
+              },
+              "sender_MarketParticipant.marketRole.type": {
+          	     "value": "{{senderRole}}"
+              },
+              "type": {
+          	     "value": "{{messageType}}"
+              },
+              "Series": [
+                {{string.Join(",\n", series.Select(s =>
+                    $$"""
+                      {
+                        "mRID": "{{s.TransactionId}}",
+                        "marketEvaluationPoint.mRID": {
+                          "codingScheme": "A10",
+                          "value": "579999993331812345"
+                        },
+                        "marketEvaluationPoint.type": {
+                          "value": "E17"
+                        },
+                        "originalTransactionIDReference_Series.mRID": "C1875000",
+                        "product": "8716867000030",
+                        "quantity_Measure_Unit.name": {
+                          "value": "KWH"
+                        },
+                        "registration_DateAndOrTime.dateTime": "2022-12-17T07:30:00Z",
+                        "Period": {
+                          "resolution": "{{s.Resolution.Code}}",
+                          "timeInterval": {
+                            "start": {
+                              "value": "{{s.PeriodStart.ToString("yyyy-MM-ddTHH:mm'Z'", null)}}"
+                            },
+                            "end": {
+                              "value": "{{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", null)}}"
+                            }
+                          },
+                          "Point": [
+                            {{EnergyObservationJsonBuilder(GetEnergyObservations())}}
+                          ]
+                        }
+                      }
+                      """))}}
+              ]
+            }
+          }
+          """;
+
+    private static IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> GetEnergyObservations() =>
+    [
+        (1, null, null),
+        (2, "A03", null),
+        (3, null, 123.456m),
+        (4, "A03", 654.321m),
+    ];
+
+    private static string EnergyObservationJsonBuilder(
+        IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> observations)
     {
-        var observations = new List<(int Position, int Quantity)>();
-        var intervalsPerDay = resolution == Resolution.QuarterHourly ? 96 : 24;
+        return string.Join(
+            ",\n",
+            observations.Select(
+                e =>
+                {
+                    var builder = new StringBuilder();
+                    builder.Append($"{{ \"position\": {{ \"value\": {e.Position} }}");
 
-        for (var i = 1; i <= intervalsPerDay; i++)
-        {
-            observations.Add((i, 1000 + i));
-        }
+                    if (e.Quality != null)
+                    {
+                        builder.Append($", \"quality\": {{ \"value\": \"{e.Quality}\" }}");
+                    }
 
-        return observations.AsReadOnly();
+                    if (e.Quantity.HasValue)
+                    {
+                        builder.Append($", \"quantity\": {e.Quantity.Value.ToString(CultureInfo.InvariantCulture)}");
+                    }
+
+                    builder.Append(" }");
+                    return builder.ToString();
+                }));
+    }
+
+    private static string EnergyObservationXmlBuilder(
+        IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> observations)
+    {
+        return string.Join(
+            "\n",
+            observations.Select(
+                e =>
+                {
+                    var builder = new StringBuilder();
+                    builder.AppendLine("<cim:Point>");
+                    builder.AppendLine($"<cim:position>{e.Position}</cim:position>");
+
+                    if (e.Quantity.HasValue)
+                    {
+                        builder.AppendLine(
+                            $"<cim:quantity>{e.Quantity.Value.ToString(CultureInfo.InvariantCulture)}</cim:quantity>");
+                    }
+
+                    if (e.Quality != null)
+                    {
+                        builder.AppendLine($"<cim:quality>{e.Quality}</cim:quality>");
+                    }
+
+                    builder.AppendLine("</cim:Point>");
+
+                    return builder.ToString();
+                }));
+    }
+
+    private static string EnergyObservationEbixBuilder(
+        IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> observations)
+    {
+        return string.Join(
+            "\n",
+            observations.Select(
+                e =>
+                {
+                    var builder = new StringBuilder();
+                    builder.AppendLine("<ns0:IntervalEnergyObservation>");
+                    builder.AppendLine($"<ns0:Position>{e.Position}</ns0:Position>");
+
+                    if (e.Quantity.HasValue)
+                    {
+                        builder.AppendLine(
+                            $"<ns0:EnergyQuantity>{e.Quantity.Value.ToString(CultureInfo.InvariantCulture)}</ns0:EnergyQuantity>");
+                    }
+                    else
+                    {
+                        builder.AppendLine("<ns0:QuantityMissing>true</ns0:QuantityMissing>");
+                    }
+
+                    if (e.Quality != null)
+                    {
+                        builder.AppendLine(
+                            "<ns0:QuantityQuality listAgencyIdentifier=\"260\">E01</ns0:QuantityQuality>");
+                    }
+
+                    builder.AppendLine("</ns0:IntervalEnergyObservation>");
+
+                    return builder.ToString();
+                }));
     }
 }
