@@ -43,6 +43,7 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
     private readonly EdiDriver _ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly WholesaleDriver _wholesaleDriver;
+    private readonly EdiFileStorageDriver _ediFileStorageDriver;
 
     public LoadTestHelper(LoadTestFixture fixture, ITestOutputHelper logger)
     {
@@ -55,12 +56,13 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
             logger);
         _ediDatabaseDriver = new EdiDatabaseDriver(_fixture.DatabaseConnectionString);
         _wholesaleDriver = new WholesaleDriver(_fixture.IntegrationEventPublisher, _fixture.EdiInboxClient);
+        _ediFileStorageDriver = new EdiFileStorageDriver(_fixture.FileStorageConnectionString);
     }
 
     [Fact]
     public async Task Before_load_test()
     {
-        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
+        await CleanUp();
         await CalculationCompletedDsl.StartEnqueueMessagesOrchestration(
             _logger,
             _wholesaleDriver,
@@ -89,5 +91,25 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
         dequeuedMessagesCount.Should().BeGreaterThanOrEqualTo(
             _fixture.MinimumDequeuedMessagesCount,
             $"because the system should be performant enough to dequeue at least {_fixture.MinimumDequeuedMessagesCount} messages during the load test");
+
+        await CleanUp();
+    }
+
+    private async Task CleanUp()
+    {
+        var outgoingMessagesTask = _ediDatabaseDriver
+            .GetOutgoingMessagesFileStorageReferencesForFromCalculationAsync(_fixture.LoadTestCalculationId, CancellationToken.None);
+
+        var archivedMessagesTask = _ediDatabaseDriver
+            .GetArchivedMessagesFileStorageReferencesForFromCalculationAsync(_fixture.LoadTestCalculationId, CancellationToken.None);
+
+        var outgoingMessagesFileStorageReferences = await outgoingMessagesTask;
+        var archivedMessagesFileStorageReferences = await archivedMessagesTask;
+
+        var deleteOutgoingFilesTask = _ediFileStorageDriver.DeleteFilesByReferencesIfExistsAsync(outgoingMessagesFileStorageReferences, FileStorageContainerReference.Outgoing, CancellationToken.None);
+        var deleteArchivedFilesTask = _ediFileStorageDriver.DeleteFilesByReferencesIfExistsAsync(archivedMessagesFileStorageReferences, FileStorageContainerReference.Archived, CancellationToken.None);
+        var deleteOutgoingMessagesTask = _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
+
+        await Task.WhenAll(deleteOutgoingFilesTask, deleteArchivedFilesTask, deleteOutgoingMessagesTask);
     }
 }
