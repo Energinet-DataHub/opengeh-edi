@@ -239,24 +239,6 @@ internal sealed class EdiDatabaseDriver
         }
     }
 
-    internal async Task<IList<string>> GetOutgoingMessagesFileStorageReferencesForFromLoadTestAsync(CancellationToken cancellationToken)
-    {
-        await using var connection = new SqlConnection(_connectionString);
-        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-
-        var query = """
-                    SELECT [FileStorageReference] 
-                    FROM [OutgoingMessages] 
-                    WHERE [AssignedBundleId] IN (
-                        SELECT [Id] 
-                        FROM [Bundles] 
-                        WHERE [RelatedToMessageId] LIKE 'perf_test_%')
-                    """;
-
-        var result = await connection.QueryAsync<string>(query).ConfigureAwait(false);
-        return result.ToList();
-    }
-
     internal async Task<(bool Success, string? Payload)>
         GetOutboxMessageAsync(
             Instant createdAfter,
