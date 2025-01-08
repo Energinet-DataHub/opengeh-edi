@@ -15,6 +15,9 @@
 using Azure.Core;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -22,7 +25,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 
 public static class EdiTopicExtensions
 {
-    public static IServiceCollection AddEdiTopic(this IServiceCollection services, TokenCredential credential)
+    public static IServiceCollection AddEnqueueMessagesFromProcessManager(this IServiceCollection services, TokenCredential credential)
     {
         services
             .AddOptions<EdiTopicOptions>()
@@ -53,6 +56,11 @@ public static class EdiTopicExtensions
                 subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs026SubscriptionName,
                 tokenCredentialFactory: _ => credential,
                 name: "BRS-028 Subscription");
+
+        services
+            .AddTransient<EnqueueBrs021AndBrs023Handler>()
+            .AddTransient<EnqueueBrs026Handler>()
+            .AddTransient<EnqueueBrs028Handler>();
 
         return services;
     }
