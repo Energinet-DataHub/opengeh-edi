@@ -15,7 +15,7 @@
 using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Model;
 
 /// <summary>
 /// An immutable input to start the enqueue messages activity.

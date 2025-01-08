@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Activities;
 
 public class GetGridAreaOwnersActivity(IMasterDataClient masterDataClient)
 {

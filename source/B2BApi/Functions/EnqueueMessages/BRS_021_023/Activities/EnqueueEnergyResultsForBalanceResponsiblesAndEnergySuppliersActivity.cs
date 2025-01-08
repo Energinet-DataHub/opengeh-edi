@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Model;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
@@ -21,25 +21,25 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Activities;
 
 /// <summary>
-/// Enqueue energy results for Balance Responsibles as outgoing messages for the given calculation id.
+/// Enqueue energy results for Balance Responsibles and Energy Suppliers as outgoing messages for the given calculation id.
 /// </summary>
-public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
-    ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity> logger,
+public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
+    ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     EnergyResultEnumerator energyResultEnumerator)
     : EnqueueEnergyResultsBaseActivity(logger, serviceScopeFactory, energyResultEnumerator)
 {
-    private readonly ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity> _logger = logger;
+    private readonly ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity> _logger = logger;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
-    [Function(nameof(EnqueueEnergyResultsForBalanceResponsiblesActivity))]
+    [Function(nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity))]
     public Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
-        var query = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(
+        var query = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
             _logger,
             _energyResultEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
@@ -50,10 +50,10 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
 
     protected override Task EnqueueAndCommitEnergyResult<TOutgoingMessage>(IOutgoingMessagesClient outgoingMessagesClient, TOutgoingMessage outgoingMessageDto)
     {
-        return outgoingMessageDto is EnergyResultPerBalanceResponsibleMessageDto perBalanceResponsibleMessageDto
-            ? outgoingMessagesClient.EnqueueAndCommitAsync(perBalanceResponsibleMessageDto, CancellationToken.None)
+        return outgoingMessageDto is EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto perEnergySupplierPerBalanceResponsibleMessageDto
+            ? outgoingMessagesClient.EnqueueAndCommitAsync(perEnergySupplierPerBalanceResponsibleMessageDto, CancellationToken.None)
             : throw new ArgumentException(
-                $"The outgoing message dto is not of the expected type {typeof(EnergyResultPerBalanceResponsibleMessageDto).FullName}",
+                $"The outgoing message dto is not of the expected type {typeof(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto).FullName}",
                 nameof(outgoingMessageDto));
     }
 }
