@@ -21,16 +21,16 @@ using Polly;
 
 namespace Energinet.DataHub.EDI.B2BApi.DataRetention;
 
-public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
+public class ExecuteDataRetentionsWhenAnHourHasPassed : INotificationHandler<AnHourHasPassed>
 {
     private readonly IReadOnlyCollection<IDataRetention> _dataRetentions;
-    private readonly ILogger<ExecuteDataRetentionsWhenADayHasPassed> _logger;
+    private readonly ILogger<ExecuteDataRetentionsWhenAnHourHasPassed> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly int _jobsExecutionTimeLimitInSeconds;
 
-    public ExecuteDataRetentionsWhenADayHasPassed(
+    public ExecuteDataRetentionsWhenAnHourHasPassed(
         IEnumerable<IDataRetention> dataRetentions,
-        ILogger<ExecuteDataRetentionsWhenADayHasPassed> logger,
+        ILogger<ExecuteDataRetentionsWhenAnHourHasPassed> logger,
         IServiceScopeFactory serviceScopeFactory,
         int executionTimeLimitInSeconds = 25 * 60)
     {
@@ -40,7 +40,7 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
         _jobsExecutionTimeLimitInSeconds = executionTimeLimitInSeconds;
     }
 
-    public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
+    public async Task Handle(AnHourHasPassed notification, CancellationToken cancellationToken)
     {
         var taskMap = new Dictionary<Task, IDataRetention>();
         List<IServiceScope> serviceScopes = [];

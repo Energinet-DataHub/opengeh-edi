@@ -40,9 +40,9 @@ public class ExecuteDataRetentionsTests : TestBase
         var cancellationToken = new CancellationTokenSource().Token;
         var notification = new ADayHasPassed(GetService<IClock>().GetCurrentInstant());
 
-        var sut = new ExecuteDataRetentionsWhenADayHasPassed(
+        var sut = new ExecuteDataRetentionsWhenAnHourHasPassed(
             GetServices<IDataRetention>(),
-            GetService<ILogger<ExecuteDataRetentionsWhenADayHasPassed>>(),
+            GetService<ILogger<ExecuteDataRetentionsWhenAnHourHasPassed>>(),
             GetService<IServiceScopeFactory>());
 
         // Act
@@ -62,9 +62,9 @@ public class ExecuteDataRetentionsTests : TestBase
         var cancellationToken = new CancellationTokenSource().Token;
         var notification = new ADayHasPassed(GetService<IClock>().GetCurrentInstant());
 
-        var sut = new ExecuteDataRetentionsWhenADayHasPassed(
+        var sut = new ExecuteDataRetentionsWhenAnHourHasPassed(
             GetServices<IDataRetention>(),
-            GetService<ILogger<ExecuteDataRetentionsWhenADayHasPassed>>(),
+            GetService<ILogger<ExecuteDataRetentionsWhenAnHourHasPassed>>(),
             GetService<IServiceScopeFactory>(),
             executionTimeLimitInSeconds: 1);
 

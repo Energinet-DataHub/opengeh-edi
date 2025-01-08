@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.DataRetention;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 
-public static class DataRetentionExtensions
+public class AnHourHasPassed : INotification
 {
-    public static IServiceCollection AddDataRetention(this IServiceCollection services)
+    public AnHourHasPassed(Instant now)
     {
-        services.AddTransient<INotificationHandler<AnHourHasPassed>, ExecuteDataRetentionsWhenAnHourHasPassed>();
-
-        return services;
+        Now = now;
     }
+
+    public Instant Now { get; }
 }

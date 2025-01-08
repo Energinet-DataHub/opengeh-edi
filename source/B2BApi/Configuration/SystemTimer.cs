@@ -41,4 +41,10 @@ public class SystemTimer
     {
         return _mediator.Publish(new ADayHasPassed(_clock.GetCurrentInstant()));
     }
+
+    [Function("AnHourHasPassed")]
+    public Task AnHourHasPassedAsync([TimerTrigger("0 0 * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+    {
+        return _mediator.Publish(new AnHourHasPassed(_clock.GetCurrentInstant()));
+    }
 }
