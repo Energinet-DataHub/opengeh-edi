@@ -198,7 +198,7 @@ public class RequestProcessOrchestrationStarterTests
         MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1>? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
-                    It.IsAny<StartRequestCalculatedEnergyTimeSeriesCommandV1>(),
+                    It.IsAny<RequestCalculatedEnergyTimeSeriesCommandV1>(),
                     It.IsAny<CancellationToken>()))
             .Callback((MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken token) => actualCommand = command);
 
@@ -223,11 +223,11 @@ public class RequestProcessOrchestrationStarterTests
         // Assert
         processManagerClient.Verify(
             client => client.StartNewOrchestrationInstanceAsync(
-                It.IsAny<StartRequestCalculatedEnergyTimeSeriesCommandV1>(),
+                It.IsAny<RequestCalculatedEnergyTimeSeriesCommandV1>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
 
-        var expectedCommand = new StartRequestCalculatedEnergyTimeSeriesCommandV1(
+        var expectedCommand = new RequestCalculatedEnergyTimeSeriesCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
             inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
                 RequestedForActorNumber: requestedByActor.ActorNumber.Value,
