@@ -17,7 +17,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 
-public class EnqueueBrs_028_Handler(ILogger<EnqueueBrs_028_Handler> logger) : EnqueueValidatedMessagesHandlerBase<RequestCalculatedWholesaleServicesInputV1, RequestCalculatedWholesaleServicesRejectedV1>(logger)
+public class EnqueueBrs_028_Handler(ILogger<EnqueueBrs_028_Handler> logger)
+    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedWholesaleServicesInputV1, RequestCalculatedWholesaleServicesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
 
