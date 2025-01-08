@@ -44,10 +44,9 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
     }
 
     [Fact]
-    public Task Before_load_test()
+    public async Task Before_load_test()
     {
-        // Nothing to do before the load test
-        return Task.CompletedTask;
+        await CleanUp();
     }
 
     [Fact]
