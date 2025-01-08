@@ -230,6 +230,7 @@ internal sealed class EdiDatabaseDriver
                     UPDATE Bundles
                     SET DequeuedAt = DATEADD(DAY, -1, DATEADD(MONTH, -1, GETDATE()))
                     WHERE [RelatedToMessageId] like 'perf_test_%'
+                    AND DequeuedAt is null
                 """;
 
             updateBundles.Connection = connection;
@@ -324,6 +325,7 @@ internal sealed class EdiDatabaseDriver
                  FROM [Bundles]
                  WHERE [DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
                  AND RelatedToMessageId like 'perf_test_%'
+                 AND DequeuedAt is null
                  """);
 
         return enqueuedMessagesCount;
