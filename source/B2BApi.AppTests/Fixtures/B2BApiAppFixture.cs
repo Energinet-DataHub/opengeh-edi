@@ -25,6 +25,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
@@ -224,6 +225,21 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (incoming-messages)");
+
+        ProcessManagerTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("edi")
+                .Do(topic => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.Name)}", topic.Name))
+            .AddSubscription("enqueue-brs-021-023-subscription")
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs021AndBrs023SubscriptionName)}", s.SubscriptionName))
+            .AddSubscription("enqueue-brs-026-subscription")
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs026SubscriptionName)}", s.SubscriptionName))
+            .AddSubscription("enqueue-brs-028-subscription")
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs028SubscriptionName)}", s.SubscriptionName))
+            .CreateAsync();
 
         // => Receive messages on Wholesale Inbox Queue
         await ServiceBusListenerMock.AddQueueListenerAsync(wholesaleInboxQueueResource.Name);

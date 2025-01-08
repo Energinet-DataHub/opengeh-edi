@@ -43,19 +43,19 @@ public static class EdiTopicExtensions
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
                 subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs021AndBrs023SubscriptionName,
                 tokenCredentialFactory: _ => credential,
-                name: "BRS-021/023 Subscription")
+                name: "Enqueue BRS-021/023 Subscription")
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
                 subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs026SubscriptionName,
                 tokenCredentialFactory: _ => credential,
-                name: "BRS-026 Subscription")
+                name: "Enqueue BRS-026 Subscription")
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
                 subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs026SubscriptionName,
                 tokenCredentialFactory: _ => credential,
-                name: "BRS-028 Subscription");
+                name: "Enqueue BRS-028 Subscription");
 
         services
             .AddTransient<EnqueueBrs021AndBrs023Handler>()
