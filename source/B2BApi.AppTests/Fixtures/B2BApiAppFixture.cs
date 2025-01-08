@@ -144,6 +144,9 @@ public class B2BApiAppFixture : IAsyncLifetime
     [NotNull]
     public TopicResource? ProcessManagerTopicResource { get; private set; }
 
+    [NotNull]
+    public TopicResource? EdiTopicResource { get; private set; }
+
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
 
     public DatabricksSchemaManager EdiDatabricksSchemaManager { get; }
@@ -226,7 +229,7 @@ public class B2BApiAppFixture : IAsyncLifetime
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (incoming-messages)");
 
-        ProcessManagerTopicResource = await ServiceBusResourceProvider
+        EdiTopicResource = await ServiceBusResourceProvider
             .BuildTopic("edi")
                 .Do(topic => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.Name)}", topic.Name))
