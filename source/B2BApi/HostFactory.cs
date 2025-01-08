@@ -103,7 +103,10 @@ public static class HostFactory
                         .AddOutboxContext(context.Configuration)
                         .AddOutboxClient<OutboxContext>()
                         .AddOutboxProcessor<OutboxContext>()
-                        .AddOutboxRetention();
+                        .AddOutboxRetention()
+
+                        // EDI Topic
+                        .AddEdiTopic();
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>
