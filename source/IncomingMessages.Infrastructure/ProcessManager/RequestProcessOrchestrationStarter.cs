@@ -106,7 +106,7 @@ public class RequestProcessOrchestrationStarter(
                 ? SettlementVersion.TryGetNameFromCode(transaction.SettlementVersion, fallbackValue: transaction.SettlementVersion)
                 : null;
 
-            var startCommand = new StartRequestCalculatedEnergyTimeSeriesCommandV1(
+            var startCommand = new RequestCalculatedEnergyTimeSeriesCommandV1(
                 operatingIdentity: actorIdentity,
                 inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
                     RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
