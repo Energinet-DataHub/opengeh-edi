@@ -475,7 +475,7 @@ public class BehavioursTestBase : IDisposable
         _services = [];
         _services.AddScoped<IConfiguration>(_ => config);
 
-        _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenAnHourHasPassed>()
+        _services.AddTransient<INotificationHandler<AnHourHasPassed>, ExecuteDataRetentionsWhenAnHourHasPassed>()
             .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
