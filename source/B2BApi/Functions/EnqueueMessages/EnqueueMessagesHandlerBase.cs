@@ -19,11 +19,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
+/// <summary>
+/// Base handler for enqueuing messages. Handles converting the <see cref="ServiceBusReceivedMessage"/> into
+/// the expected <see cref="EnqueueMessagesDto"/> type.
+/// </summary>
+/// <param name="logger"></param>
 public abstract class EnqueueMessagesHandlerBase(
     ILogger logger)
 {
     private readonly ILogger _logger = logger;
 
+    /// <summary>
+    /// Enqueue the received service bus message sent from the Process Manager subsystem.
+    /// The service bus message body must be of the type <see cref="EnqueueMessagesDto"/>.
+    /// </summary>
+    /// <param name="message"></param>
     public async Task EnqueueAsync(ServiceBusReceivedMessage message)
     {
         using var serviceBusMessageLoggerScope = _logger.BeginScope(new
@@ -39,6 +49,16 @@ public abstract class EnqueueMessagesHandlerBase(
         var jsonMessage = message.Body.ToString();
 
         var enqueueMessagesDto = EnqueueMessagesDto.Parser.ParseJson(jsonMessage);
+
+        if (enqueueMessagesDto is null)
+        {
+            _logger.LogError(
+                "Failed to parse service bus message body as JSON to type \"{EnqueueMessagesDto}\". Actual body value as string:\n{Body}",
+                nameof(EnqueueMessagesDto),
+                jsonMessage);
+            throw new ArgumentException($"Enqueue handler cannot parse received service bus message body to type \"{nameof(EnqueueMessagesDto)}\"", nameof(message.Body));
+        }
+
         using var enqueueMessagesLoggerScope = _logger.BeginScope(new
         {
             EnqueueMessages = new

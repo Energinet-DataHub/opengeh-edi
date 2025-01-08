@@ -17,6 +17,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 
+/// <summary>
+/// Enqueue messages for BRS-023 (NotifyAggregatedMeasureData) and BRS-027 (NotifyWholesaleServices).
+/// The <see cref="EnqueueMessagesDto"/><see cref="EnqueueMessagesDto.JsonInput"/> must be of type <see cref="object"/>.
+/// </summary>
+/// <param name="logger"></param>
 public class EnqueueBrs_023_027_Handler(ILogger<EnqueueBrs_023_027_Handler> logger)
     : EnqueueMessagesHandlerBase(logger)
 {
@@ -28,7 +33,7 @@ public class EnqueueBrs_023_027_Handler(ILogger<EnqueueBrs_023_027_Handler> logg
             "Received enqueue messages for BRS 021/023. Data: {JsonInput}",
             enqueueMessagesDto.JsonInput);
 
-        // TODO: Deserialize to actual input type instead of object
+        // TODO: Deserialize to actual input type instead of object (replace "object" type in summary as well)
         var input = DeserializeJsonInput<object>(enqueueMessagesDto);
 
         // TODO: Call actual logic that enqueues messages (starts orchestration)

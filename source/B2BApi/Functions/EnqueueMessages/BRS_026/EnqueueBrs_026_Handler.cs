@@ -17,6 +17,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 
+/// <summary>
+/// Enqueue accepted/rejected messages for BRS-026 (RequestAggregatedMeasureData).
+/// </summary>
+/// <param name="logger"></param>
 public class EnqueueBrs_026_Handler(ILogger<EnqueueBrs_026_Handler> logger)
     : EnqueueValidatedMessagesHandlerBase<RequestCalculatedEnergyTimeSeriesInputV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
 {

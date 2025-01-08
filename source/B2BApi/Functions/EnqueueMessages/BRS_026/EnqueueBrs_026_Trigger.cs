@@ -20,6 +20,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 
+/// <summary>
+/// Service Bus Trigger to enqueue messages for BRS-026 (RequestAggregatedMeasureData),
+/// received from the Process Manager subsystem.
+/// </summary>
+/// <param name="logger"></param>
+/// <param name="enqueueBrs026Handler"></param>
 public class EnqueueBrs_026_Trigger(
     ILogger<EnqueueBrs_026_Trigger> logger,
     EnqueueBrs_026_Handler enqueueBrs026Handler)
