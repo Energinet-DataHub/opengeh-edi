@@ -22,10 +22,10 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 
 public class EnqueueBrs_023_027_Trigger(
     ILogger<EnqueueBrs_023_027_Trigger> logger,
-    EnqueueBrs_023_027_Handler brs023027Handler)
+    EnqueueBrs_023_027_Handler handler)
 {
     private readonly ILogger<EnqueueBrs_023_027_Trigger> _logger = logger;
-    private readonly EnqueueBrs_023_027_Handler _handler = brs023027Handler;
+    private readonly EnqueueBrs_023_027_Handler _handler = handler;
 
     [Function(nameof(EnqueueBrs_023_027_Trigger))]
     public async Task RunAsync(
