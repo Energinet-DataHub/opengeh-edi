@@ -15,11 +15,15 @@
 using System.Text.Json;
 using AutoFixture;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
+using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Google.Protobuf;
 using Xunit;
 using Xunit.Abstractions;
@@ -92,8 +96,15 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         // Then accepted message is enqueued
         // TODO: Actually check for enqueued messages when the BRS is implemented
 
-        await Task.Delay(TimeSpan.FromSeconds(5));
+        var didFinish = await Awaiter.TryWaitUntilConditionAsync(
+            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueBrs_026_Trigger)}"),
+            timeLimit: TimeSpan.FromSeconds(30));
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-        hostLog.Should().ContainMatch("Received enqueue accepted message(s) for BRS 026*");
+        var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
+
+        using var assertionScope = new AssertionScope();
+        didFinish.Should().BeTrue($"because the {nameof(EnqueueBrs_026_Trigger)} should have been executed");
+        appThrewException.Should().BeFalse();
+        hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 026*");
     }
 }
