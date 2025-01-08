@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Model;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
@@ -22,7 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Activities;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 
 public class EnqueueWholesaleResultsForTotalAmountsActivity(
     ILogger<EnqueueWholesaleResultsForTotalAmountsActivity> logger,

@@ -13,51 +13,49 @@
 // limitations under the License.
 
 using System.Diagnostics;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Model;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Activities;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 
-public abstract class EnqueueWholesaleResultsBaseActivity(
+public abstract class EnqueueEnergyResultsBaseActivity(
     ILogger logger,
     IServiceScopeFactory serviceScopeFactory,
-    WholesaleResultEnumerator wholesaleResultEnumerator)
+    EnergyResultEnumerator energyResultEnumerator)
 {
     private readonly ILogger _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
+    private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
-    protected async Task<int> EnqueueWholesaleResults<TQueryResult>(EnqueueMessagesForActorInput input, WholesaleResultQueryBase<TQueryResult> query)
+    protected async Task<int> EnqueueEnergyResults<TQueryResult>(EnqueueMessagesInput input, EnergyResultQueryBase<TQueryResult> query)
         where TQueryResult : OutgoingMessageDto
     {
         var numberOfHandledResults = 0;
         var numberOfFailedResults = 0;
 
         _logger.LogInformation(
-            "Starting enqueuing messages for wholesale query, type: {QueryType}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
+            "Starting enqueuing messages for energy query, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
             query.GetType().Name,
-            input.Actor,
             input.CalculationId,
             input.EventId);
 
         var activityStopwatch = Stopwatch.StartNew();
         var databricksStopwatch = Stopwatch.StartNew();
-        await foreach (var queryResult in _wholesaleResultEnumerator.GetAsync(query))
+        await foreach (var queryResult in _energyResultEnumerator.GetAsync(query))
         {
             databricksStopwatch.Stop();
             // Only log databricks query time if it took more than 1 second
             if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
             {
                 _logger.LogInformation(
-                    "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
+                    "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                     databricksStopwatch.Elapsed,
                     query.GetType().Name,
                     queryResult.Result?.ExternalId.Value,
-                    input.Actor,
                     input.CalculationId,
                     input.EventId);
             }
@@ -68,7 +66,8 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
                 try
                 {
                     var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                    await EnqueueAndCommitWholesaleResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
+
+                    await EnqueueAndCommitEnergyResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
 
                     numberOfHandledResults++;
                 }
@@ -77,10 +76,9 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
                     numberOfFailedResults++;
                     _logger.LogWarning(
                         ex,
-                        "Enqueue and commit threw exception for wholesale result, query type: {QueryType}, external id: {ExternalId}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
+                        "Enqueue and commit threw exception for energy result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                         query.GetType().Name,
                         queryResult.Result?.ExternalId.Value,
-                        input.Actor,
                         input.CalculationId,
                         input.EventId);
                 }
@@ -94,20 +92,19 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
         }
 
         _logger.LogInformation(
-            "Finished enqueuing messages for wholesale query, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
+            "Finished enqueuing messages for energy query, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
             activityStopwatch.Elapsed,
             numberOfHandledResults,
             numberOfFailedResults,
             query.GetType().Name,
-            input.Actor,
             input.CalculationId,
             input.EventId);
 
         return numberOfFailedResults > 0
-            ? throw new Exception($"Enqueue messages activity failed. Actor='{input.Actor}' CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}' NumberOfHandledResults='{numberOfHandledResults}'")
+            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}' NumberOfHandledResults='{numberOfHandledResults}'")
             : numberOfHandledResults;
     }
 
-    protected abstract Task EnqueueAndCommitWholesaleResult<T>(IOutgoingMessagesClient outgoingMessagesClient, T queryResult)
+    protected abstract Task EnqueueAndCommitEnergyResult<T>(IOutgoingMessagesClient outgoingMessagesClient, T queryResult)
         where T : OutgoingMessageDto;
 }

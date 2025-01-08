@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Model;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Google.Protobuf;
@@ -21,7 +21,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023.Activities;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 
 public class SendActorMessagesEnqueuedActivity
 {

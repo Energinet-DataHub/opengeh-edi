@@ -18,26 +18,26 @@ using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 
-public class EnqueueBrs021AndBrs023Trigger(
-    ILogger<EnqueueBrs021AndBrs023Trigger> logger,
-    EnqueueBrs021AndBrs023Handler enqueueBrs021AndBrs023Handler)
+public class EnqueueBrs_028_Trigger(
+    ILogger<EnqueueBrs_028_Trigger> logger,
+    EnqueueBrs_028_Handler enqueueBrs028Handler)
 {
-    private readonly ILogger<EnqueueBrs021AndBrs023Trigger> _logger = logger;
-    private readonly EnqueueBrs021AndBrs023Handler _handler = enqueueBrs021AndBrs023Handler;
+    private readonly ILogger<EnqueueBrs_028_Trigger> _logger = logger;
+    private readonly EnqueueBrs_028_Handler _enqueueBrs028Handler = enqueueBrs028Handler;
 
-    [Function(nameof(EnqueueBrs021AndBrs023Trigger))]
+    [Function(nameof(EnqueueBrs_028_Trigger))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
-            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs021AndBrs023SubscriptionName)}%",
+            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {
-        _logger.LogInformation("Enqueue BRS-021/023 messages service bus message received");
+        _logger.LogInformation("Enqueue BRS-028 messages service bus message received");
 
-        await _handler.EnqueueAsync(message)
+        await _enqueueBrs028Handler.EnqueueAsync(message)
             .ConfigureAwait(false);
     }
 }

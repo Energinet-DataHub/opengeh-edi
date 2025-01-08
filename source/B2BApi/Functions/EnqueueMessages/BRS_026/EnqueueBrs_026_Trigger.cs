@@ -20,18 +20,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 
-public class EnqueueBrs026Trigger(
-    ILogger<EnqueueBrs026Trigger> logger,
-    EnqueueBrs026Handler enqueueBrs026Handler)
+public class EnqueueBrs_026_Trigger(
+    ILogger<EnqueueBrs_026_Trigger> logger,
+    EnqueueBrs_026_Handler enqueueBrs026Handler)
 {
-    private readonly ILogger<EnqueueBrs026Trigger> _logger = logger;
-    private readonly EnqueueBrs026Handler _enqueueBrs026Handler = enqueueBrs026Handler;
+    private readonly ILogger<EnqueueBrs_026_Trigger> _logger = logger;
+    private readonly EnqueueBrs_026_Handler _enqueueBrs026Handler = enqueueBrs026Handler;
 
-    [Function(nameof(EnqueueBrs026Trigger))]
+    [Function(nameof(EnqueueBrs_026_Trigger))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
-            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs026SubscriptionName)}%",
+            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_026_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {

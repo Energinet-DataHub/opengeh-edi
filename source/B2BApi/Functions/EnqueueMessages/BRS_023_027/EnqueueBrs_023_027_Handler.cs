@@ -15,9 +15,9 @@
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 
-public class EnqueueBrs021AndBrs023Handler(ILogger<EnqueueBrs021AndBrs023Handler> logger) : EnqueueMessagesHandlerBase(logger)
+public class EnqueueBrs_023_027_Handler(ILogger<EnqueueBrs_023_027_Handler> logger) : EnqueueMessagesHandlerBase(logger)
 {
     private readonly ILogger _logger = logger;
 

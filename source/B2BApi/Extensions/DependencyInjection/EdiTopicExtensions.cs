@@ -15,7 +15,7 @@
 using Azure.Core;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021_023;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,26 +41,26 @@ public static class EdiTopicExtensions
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
-                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs021AndBrs023SubscriptionName,
+                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_023_027_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
                 name: "Enqueue BRS-021/023 Subscription")
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
-                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs026SubscriptionName,
+                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_026_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
                 name: "Enqueue BRS-026 Subscription")
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
-                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs026SubscriptionName,
+                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_026_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
                 name: "Enqueue BRS-028 Subscription");
 
         services
-            .AddTransient<EnqueueBrs021AndBrs023Handler>()
-            .AddTransient<EnqueueBrs026Handler>()
-            .AddTransient<EnqueueBrs028Handler>();
+            .AddTransient<EnqueueBrs_023_027_Handler>()
+            .AddTransient<EnqueueBrs_026_Handler>()
+            .AddTransient<EnqueueBrs_028_Handler>();
 
         return services;
     }

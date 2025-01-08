@@ -230,15 +230,15 @@ public class B2BApiAppFixture : IAsyncLifetime
             .BuildTopic("edi")
                 .Do(topic => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.Name)}", topic.Name))
-            .AddSubscription("enqueue-brs-021-023-subscription")
+            .AddSubscription("enqueue-brs-023-027-subscription")
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
-                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs021AndBrs023SubscriptionName)}", s.SubscriptionName))
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_023_027_SubscriptionName)}", s.SubscriptionName))
             .AddSubscription("enqueue-brs-026-subscription")
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
-                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs026SubscriptionName)}", s.SubscriptionName))
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_026_SubscriptionName)}", s.SubscriptionName))
             .AddSubscription("enqueue-brs-028-subscription")
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
-                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs028SubscriptionName)}", s.SubscriptionName))
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
 
         // => Receive messages on Wholesale Inbox Queue
