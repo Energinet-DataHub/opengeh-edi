@@ -37,7 +37,7 @@ public class EnqueueBrs028Handler(ILogger<EnqueueBrs028Handler> logger) : Enqueu
             "Received enqueue rejected message(s) for BRS 028. Data: {0}",
             rejectedMessagesData);
 
-        // TODO: Call actual logic that enqueues rejected message instead
+        // TODO: Call actual logic that enqueues rejected message
         await Task.CompletedTask.ConfigureAwait(false);
     }
 }

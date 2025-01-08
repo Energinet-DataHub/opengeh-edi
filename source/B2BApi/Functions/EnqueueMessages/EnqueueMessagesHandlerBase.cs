@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Microsoft.Extensions.Logging;
@@ -57,4 +58,20 @@ public abstract class EnqueueMessagesHandlerBase(
     }
 
     protected abstract Task EnqueueMessagesAsync(EnqueueMessagesDto enqueueMessagesDto);
+
+    protected TData DeserializeJsonInput<TData>(EnqueueMessagesDto message)
+    {
+        var deserializeResult = JsonSerializer.Deserialize<TData>(message.JsonInput);
+
+        if (deserializeResult == null)
+        {
+            _logger.LogError(
+                "Failed to deserialize EnqueueMessagesDto.JsonInput to type \"{Type}\". Actual JSON value:\n{JsonInput}",
+                typeof(TData).Name,
+                message.JsonInput);
+            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueMessagesDto)}.{nameof(message.JsonInput)} to type {typeof(TData).Name}", nameof(message.JsonInput));
+        }
+
+        return deserializeResult;
+    }
 }

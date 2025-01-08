@@ -25,13 +25,11 @@ public abstract class EnqueueValidatedMessagesHandlerBase<TAcceptedData, TReject
         switch (enqueueMessagesDto.MessageType)
         {
             case "Accepted":
-                var acceptedData = JsonSerializer.Deserialize<TAcceptedData>(enqueueMessagesDto.JsonInput)
-                    ?? throw new ArgumentException($"Cannot deserialize json to accepted message with type {typeof(TAcceptedData).Name}", nameof(enqueueMessagesDto.JsonInput));
+                var acceptedData = DeserializeJsonInput<TAcceptedData>(enqueueMessagesDto);
                 return EnqueueAcceptedMessagesAsync(acceptedData);
 
             case "Rejected":
-                var rejectedData = JsonSerializer.Deserialize<TRejectedData>(enqueueMessagesDto.JsonInput)
-                    ?? throw new ArgumentException($"Cannot deserialize json to rejected message with type {typeof(TRejectedData).Name}", nameof(enqueueMessagesDto.JsonInput));
+                var rejectedData = DeserializeJsonInput<TRejectedData>(enqueueMessagesDto);
                 return EnqueueRejectedMessagesAsync(rejectedData);
 
             default:
