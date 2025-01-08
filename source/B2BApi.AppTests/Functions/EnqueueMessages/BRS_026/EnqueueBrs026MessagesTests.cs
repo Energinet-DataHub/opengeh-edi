@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Text.Json;
-using AutoFixture;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;

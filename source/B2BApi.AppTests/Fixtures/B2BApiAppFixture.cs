@@ -234,12 +234,15 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .Do(topic => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.Name)}", topic.Name))
             .AddSubscription("enqueue-brs-023-027-subscription")
+                .AddSubjectFilter("Enqueue_brs_023_027")
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_023_027_SubscriptionName)}", s.SubscriptionName))
             .AddSubscription("enqueue-brs-026-subscription")
+                .AddSubjectFilter("Enqueue_brs_026")
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_026_SubscriptionName)}", s.SubscriptionName))
             .AddSubscription("enqueue-brs-028-subscription")
+                .AddSubjectFilter("Enqueue_brs_028")
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
