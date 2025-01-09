@@ -354,7 +354,7 @@ public class TestBase : IDisposable
             .AddLogging()
             .AddScoped<IClock>(_ => new ClockStub());
 
-        _services.AddTransient<INotificationHandler<AnHourHasPassed>, ExecuteDataRetentionsWhenAnHourHasPassed>()
+        _services.AddTransient<ExecuteDataRetentionJobs>()
             .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)

@@ -38,15 +38,14 @@ public class ExecuteDataRetentionsTests : TestBase
     {
         // Arrange
         var cancellationToken = new CancellationTokenSource().Token;
-        var notification = new AnHourHasPassed(GetService<IClock>().GetCurrentInstant());
 
-        var sut = new ExecuteDataRetentionsWhenAnHourHasPassed(
+        var sut = new ExecuteDataRetentionJobs(
             GetServices<IDataRetention>(),
-            GetService<ILogger<ExecuteDataRetentionsWhenAnHourHasPassed>>(),
+            GetService<ILogger<ExecuteDataRetentionJobs>>(),
             GetService<IServiceScopeFactory>());
 
         // Act
-        var act = () => sut.Handle(notification, cancellationToken);
+        var act = () => sut.CleanupAsync(cancellationToken);
 
         // Assert
         await act.Should().NotThrowAsync();
@@ -60,16 +59,15 @@ public class ExecuteDataRetentionsTests : TestBase
     {
         // Arrange
         var cancellationToken = new CancellationTokenSource().Token;
-        var notification = new AnHourHasPassed(GetService<IClock>().GetCurrentInstant());
 
-        var sut = new ExecuteDataRetentionsWhenAnHourHasPassed(
+        var sut = new ExecuteDataRetentionJobs(
             GetServices<IDataRetention>(),
-            GetService<ILogger<ExecuteDataRetentionsWhenAnHourHasPassed>>(),
+            GetService<ILogger<ExecuteDataRetentionJobs>>(),
             GetService<IServiceScopeFactory>(),
             executionTimeLimitInSeconds: 1);
 
         // Act
-        var act = () => sut.Handle(notification, cancellationToken);
+        var act = () => sut.CleanupAsync(cancellationToken);
 
         // Assert
         await act.Should().NotThrowAsync();
