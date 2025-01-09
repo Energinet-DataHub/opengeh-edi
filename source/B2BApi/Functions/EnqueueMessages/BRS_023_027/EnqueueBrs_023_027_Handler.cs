@@ -31,7 +31,7 @@ public class EnqueueBrs_023_027_Handler(
     protected override async Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages)
     {
         _logger.LogInformation(
-            "Received enqueue actor messages for BRS 021/023. Data: {JsonData}",
+            "Received enqueue actor messages for BRS 023/027. Data: {JsonData}",
             enqueueActorMessages.JsonData);
 
         // TODO: Deserialize to actual input type instead of object (replace "object" type in summary as well)

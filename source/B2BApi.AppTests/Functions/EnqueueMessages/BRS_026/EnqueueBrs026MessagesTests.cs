@@ -67,13 +67,13 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             OrchestrationName = "Brs_026",
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
-            DataType = "Accepted",
+            DataType = nameof(RequestCalculatedEnergyTimeSeriesAcceptedV1),
             JsonData = JsonSerializer.Serialize(enqueueMessagesData),
         };
 
         var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))
         {
-            Subject = "Enqueue_brs_026",
+            Subject = $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
             ContentType = "application/json",
             MessageId = "a-message-id",
         };

@@ -28,7 +28,7 @@ public class EdiTopicOptions
 
     /// <summary>
     /// Enqueue BRS 023/027 messages subscription name, retrieved from application settings. The Process Manager
-    /// uses this to signal EDI to enqueue messages for BRS 021/023.
+    /// uses this to signal EDI to enqueue messages for BRS 023/027.
     /// </summary>
     [Required(AllowEmptyStrings = false)]
     public string EnqueueBrs_023_027_SubscriptionName { get; set; } = string.Empty;

@@ -60,20 +60,20 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // => Given enqueue BRS-028 service bus message
         var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
-            BusinessReason: BusinessReason.BalanceFixing.Code);
+            BusinessReason: BusinessReason.WholesaleFixing.Code);
 
         var enqueueActorMessages = new EnqueueActorMessages
         {
             OrchestrationName = "Brs_028",
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
-            DataType = "Accepted",
+            DataType = nameof(RequestCalculatedWholesaleServicesAcceptedV1),
             JsonData = JsonSerializer.Serialize(enqueueMessagesData),
         };
 
         var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))
         {
-            Subject = "Enqueue_brs_028",
+            Subject = $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
             ContentType = "application/json",
             MessageId = "a-message-id",
         };

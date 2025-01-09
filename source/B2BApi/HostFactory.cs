@@ -109,7 +109,7 @@ public static class HostFactory
                         .AddOutboxRetention()
 
                         // Enqueue messages from PM (using Edi Topic)
-                        .AddEnqueueMessagesFromProcessManager(azureCredential);
+                        .AddEnqueueActorMessagesFromProcessManager(azureCredential);
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>

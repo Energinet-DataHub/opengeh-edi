@@ -41,7 +41,7 @@ public class EnqueueBrs_023_027_Trigger(
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {
-        _logger.LogInformation("Enqueue BRS-021/023 messages service bus message received");
+        _logger.LogInformation("Enqueue BRS-023/027 messages service bus message received");
 
         await _handler.EnqueueAsync(message)
             .ConfigureAwait(false);

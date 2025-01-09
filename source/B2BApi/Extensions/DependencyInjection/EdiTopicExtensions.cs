@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 
 public static class EdiTopicExtensions
 {
-    public static IServiceCollection AddEnqueueMessagesFromProcessManager(this IServiceCollection services, TokenCredential credential)
+    public static IServiceCollection AddEnqueueActorMessagesFromProcessManager(this IServiceCollection services, TokenCredential credential)
     {
         services
             .AddOptions<EdiTopicOptions>()
@@ -43,7 +43,7 @@ public static class EdiTopicExtensions
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
                 subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_023_027_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
-                name: "Enqueue BRS-021/023 Subscription")
+                name: "Enqueue BRS-023/027 Subscription")
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
@@ -53,7 +53,7 @@ public static class EdiTopicExtensions
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
-                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_026_SubscriptionName,
+                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_028_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
                 name: "Enqueue BRS-028 Subscription");
 
