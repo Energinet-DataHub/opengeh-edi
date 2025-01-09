@@ -73,13 +73,13 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             SettlementMethod: null,
             SettlementVersion: null);
 
-        var enqueueMessages = new EnqueueMessagesDto
+        var enqueueMessages = new EnqueueMessagesCommand
         {
             OrchestrationName = "Brs_026",
             OrchestrationVersion = 1,
-            EnqueuedByActorId = actorId,
-            MessageType = "Accepted",
-            JsonInput = JsonSerializer.Serialize(enqueueMessagesData),
+            OrchestrationStartedByActorId = actorId,
+            DataType = "Accepted",
+            JsonData = JsonSerializer.Serialize(enqueueMessagesData),
         };
 
         var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueMessages))

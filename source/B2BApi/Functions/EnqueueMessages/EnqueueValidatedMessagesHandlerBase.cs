@@ -20,20 +20,20 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
 public abstract class EnqueueValidatedMessagesHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueMessagesHandlerBase(logger)
 {
-    protected override Task EnqueueMessagesAsync(EnqueueMessagesDto enqueueMessagesDto)
+    protected override Task EnqueueMessagesAsync(EnqueueMessagesCommand enqueueMessages)
     {
-        switch (enqueueMessagesDto.MessageType)
+        switch (enqueueMessages.DataType)
         {
             case "Accepted":
-                var acceptedData = DeserializeJsonInput<TAcceptedData>(enqueueMessagesDto);
+                var acceptedData = DeserializeJsonInput<TAcceptedData>(enqueueMessages);
                 return EnqueueAcceptedMessagesAsync(acceptedData);
 
             case "Rejected":
-                var rejectedData = DeserializeJsonInput<TRejectedData>(enqueueMessagesDto);
+                var rejectedData = DeserializeJsonInput<TRejectedData>(enqueueMessages);
                 return EnqueueRejectedMessagesAsync(rejectedData);
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(enqueueMessagesDto.MessageType), enqueueMessagesDto.MessageType, "Unknown message type. Message type should be \"Accepted\" or \"Rejected\".");
+                throw new ArgumentOutOfRangeException(nameof(enqueueMessages.DataType), enqueueMessages.DataType, "Unknown data type. Data type should be \"Accepted\" or \"Rejected\".");
         }
     }
 
