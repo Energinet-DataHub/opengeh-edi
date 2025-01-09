@@ -57,23 +57,12 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
     [Fact]
     public async Task Given_EnqueueAcceptedBrs026Message_When_MessageIsReceived_Then_AcceptedMessagesIsEnqueued()
     {
-        // Given enqueue BRS-026 service bus message
+        // => Given enqueue BRS-026 service bus message
         var actorId = Guid.NewGuid().ToString();
-        var energySupplierNumber = "11111111111";
-        var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesInputV1(
-            RequestedForActorNumber: energySupplierNumber,
-            RequestedForActorRole: ActorRole.EnergySupplier.Code,
-            BusinessReason: BusinessReason.BalanceFixing.Code,
-            PeriodStart: "2024-01-31T23:00:00Z",
-            PeriodEnd: "2024-04-31T23:00:00Z",
-            EnergySupplierNumber: energySupplierNumber,
-            BalanceResponsibleNumber: null,
-            GridAreas: ["804"],
-            MeteringPointType: null,
-            SettlementMethod: null,
-            SettlementVersion: null);
+        var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
+            BusinessReason: BusinessReason.BalanceFixing.Code);
 
-        var enqueueMessages = new EnqueueMessagesCommand
+        var enqueueActorMessages = new EnqueueActorMessages
         {
             OrchestrationName = "Brs_026",
             OrchestrationVersion = 1,
@@ -82,17 +71,17 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             JsonData = JsonSerializer.Serialize(enqueueMessagesData),
         };
 
-        var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueMessages))
+        var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))
         {
             Subject = "Enqueue_brs_026",
             ContentType = "application/json",
             MessageId = "a-message-id",
         };
 
-        // When message is received
+        // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
-        // Then accepted message is enqueued
+        // => Then accepted message is enqueued
         // TODO: Actually check for enqueued messages when the BRS is implemented
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(

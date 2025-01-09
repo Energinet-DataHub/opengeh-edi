@@ -48,49 +48,49 @@ public abstract class EnqueueMessagesHandlerBase(
 
         var jsonMessage = message.Body.ToString();
 
-        var enqueueMessages = EnqueueMessagesCommand.Parser.ParseJson(jsonMessage);
+        var enqueueActorMessages = EnqueueActorMessages.Parser.ParseJson(jsonMessage);
 
-        if (enqueueMessages is null)
+        if (enqueueActorMessages is null)
         {
             _logger.LogError(
                 "Failed to parse service bus message body as JSON to type \"{EnqueueMessagesDto}\". Actual body value as string:\n{Body}",
-                nameof(EnqueueMessagesCommand),
+                nameof(EnqueueActorMessages),
                 jsonMessage);
-            throw new ArgumentException($"Enqueue handler cannot parse received service bus message body to type \"{nameof(EnqueueMessagesCommand)}\"", nameof(message.Body));
+            throw new ArgumentException($"Enqueue handler cannot parse received service bus message body to type \"{nameof(EnqueueActorMessages)}\"", nameof(message.Body));
         }
 
-        using var enqueueMessagesLoggerScope = _logger.BeginScope(new
+        using var enqueueActorMessagesLoggerScope = _logger.BeginScope(new
         {
             EnqueueMessages = new
             {
-                enqueueMessages.OrchestrationName,
-                enqueueMessages.OrchestrationVersion,
+                enqueueActorMessages.OrchestrationName,
+                enqueueActorMessages.OrchestrationVersion,
                 OperatingIdentity = new
                 {
-                    ActorId = enqueueMessages.OrchestrationStartedByActorId,
-                    UserId = enqueueMessages.OrchestrationStartedByUserId,
+                    ActorId = enqueueActorMessages.OrchestrationStartedByActorId,
+                    UserId = enqueueActorMessages.OrchestrationStartedByUserId,
                 },
-                enqueueMessages.DataType,
+                enqueueActorMessages.DataType,
             },
         });
 
-        await EnqueueMessagesAsync(enqueueMessages)
+        await EnqueueMessagesAsync(enqueueActorMessages)
             .ConfigureAwait(false);
     }
 
-    protected abstract Task EnqueueMessagesAsync(EnqueueMessagesCommand enqueueMessages);
+    protected abstract Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages);
 
-    protected TData DeserializeJsonInput<TData>(EnqueueMessagesCommand enqueueMessages)
+    protected TData DeserializeJsonInput<TData>(EnqueueActorMessages enqueueActorMessages)
     {
-        var deserializeResult = JsonSerializer.Deserialize<TData>(enqueueMessages.JsonData);
+        var deserializeResult = JsonSerializer.Deserialize<TData>(enqueueActorMessages.JsonData);
 
         if (deserializeResult == null)
         {
             _logger.LogError(
                 "Failed to deserialize EnqueueMessagesDto.JsonInput to type \"{Type}\". Actual JSON value:\n{JsonInput}",
                 typeof(TData).Name,
-                enqueueMessages.JsonData);
-            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueMessagesCommand)}.{nameof(enqueueMessages.JsonData)} to type {typeof(TData).Name}", nameof(enqueueMessages.JsonData));
+                enqueueActorMessages.JsonData);
+            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueActorMessages)}.{nameof(enqueueActorMessages.JsonData)} to type {typeof(TData).Name}", nameof(enqueueActorMessages.JsonData));
         }
 
         return deserializeResult;

@@ -20,24 +20,23 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
 public abstract class EnqueueValidatedMessagesHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueMessagesHandlerBase(logger)
 {
-    protected override Task EnqueueMessagesAsync(EnqueueMessagesCommand enqueueMessages)
+    protected override Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages)
     {
-        switch (enqueueMessages.DataType)
+        if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {
-            case "Accepted":
-                var acceptedData = DeserializeJsonInput<TAcceptedData>(enqueueMessages);
-                return EnqueueAcceptedMessagesAsync(acceptedData);
-
-            case "Rejected":
-                var rejectedData = DeserializeJsonInput<TRejectedData>(enqueueMessages);
-                return EnqueueRejectedMessagesAsync(rejectedData);
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(enqueueMessages.DataType), enqueueMessages.DataType, "Unknown data type. Data type should be \"Accepted\" or \"Rejected\".");
+            var acceptedData = DeserializeJsonInput<TAcceptedData>(enqueueActorMessages);
+            return EnqueueAcceptedMessagesAsync(acceptedData);
         }
+        else if (enqueueActorMessages.DataType == typeof(TRejectedData).Name)
+        {
+            var rejectedData = DeserializeJsonInput<TRejectedData>(enqueueActorMessages);
+            return EnqueueRejectedMessagesAsync(rejectedData);
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(enqueueActorMessages.DataType), enqueueActorMessages.DataType, "EnqueueActorMessages contains an invalid data type.");
     }
 
-    protected abstract Task EnqueueAcceptedMessagesAsync(TAcceptedData acceptedMessagesData);
+    protected abstract Task EnqueueAcceptedMessagesAsync(TAcceptedData acceptedData);
 
-    protected abstract Task EnqueueRejectedMessagesAsync(TRejectedData rejectedMessagesData);
+    protected abstract Task EnqueueRejectedMessagesAsync(TRejectedData rejectedData);
 }

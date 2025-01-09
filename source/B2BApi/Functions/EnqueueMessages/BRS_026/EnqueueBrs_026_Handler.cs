@@ -21,26 +21,27 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 /// Enqueue accepted/rejected messages for BRS-026 (RequestAggregatedMeasureData).
 /// </summary>
 /// <param name="logger"></param>
-public class EnqueueBrs_026_Handler(ILogger<EnqueueBrs_026_Handler> logger)
-    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedEnergyTimeSeriesInputV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
+public class EnqueueBrs_026_Handler(
+    ILogger<EnqueueBrs_026_Handler> logger)
+    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedEnergyTimeSeriesInputV1 acceptedMessagesData)
+    protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 026. Data: {0}",
-            acceptedMessagesData);
+            acceptedData);
 
         // TODO: Call actual logic that enqueues accepted messages instead
         await Task.CompletedTask.ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedMessagesData)
+    protected override async Task EnqueueRejectedMessagesAsync(RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedData)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 026. Data: {0}",
-            rejectedMessagesData);
+            rejectedData);
 
         // TODO: Call actual logic that enqueues rejected message
         await Task.CompletedTask.ConfigureAwait(false);
