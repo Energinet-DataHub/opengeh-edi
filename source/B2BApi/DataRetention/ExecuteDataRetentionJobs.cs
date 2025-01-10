@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
 
 namespace Energinet.DataHub.EDI.B2BApi.DataRetention;
 
-public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayHasPassed>
+public class ExecuteDataRetentionJobs
 {
     private readonly IReadOnlyCollection<IDataRetention> _dataRetentions;
-    private readonly ILogger<ExecuteDataRetentionsWhenADayHasPassed> _logger;
+    private readonly ILogger<ExecuteDataRetentionJobs> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly int _jobsExecutionTimeLimitInSeconds;
 
-    public ExecuteDataRetentionsWhenADayHasPassed(
+    public ExecuteDataRetentionJobs(
         IEnumerable<IDataRetention> dataRetentions,
-        ILogger<ExecuteDataRetentionsWhenADayHasPassed> logger,
+        ILogger<ExecuteDataRetentionJobs> logger,
         IServiceScopeFactory serviceScopeFactory,
         int executionTimeLimitInSeconds = 25 * 60)
     {
@@ -40,7 +38,7 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
         _jobsExecutionTimeLimitInSeconds = executionTimeLimitInSeconds;
     }
 
-    public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
+    public async Task CleanupAsync(CancellationToken cancellationToken)
     {
         var taskMap = new Dictionary<Task, IDataRetention>();
         List<IServiceScope> serviceScopes = [];
