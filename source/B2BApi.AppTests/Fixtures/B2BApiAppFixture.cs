@@ -25,6 +25,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
@@ -143,6 +144,9 @@ public class B2BApiAppFixture : IAsyncLifetime
     [NotNull]
     public TopicResource? ProcessManagerTopicResource { get; private set; }
 
+    [NotNull]
+    public TopicResource? EdiTopicResource { get; private set; }
+
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
 
     public DatabricksSchemaManager EdiDatabricksSchemaManager { get; }
@@ -224,6 +228,24 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (incoming-messages)");
+
+        EdiTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("edi")
+                .Do(topic => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.Name)}", topic.Name))
+            .AddSubscription("enqueue-brs-023-027-subscription")
+                .AddSubjectFilter("Enqueue_brs_023_027")
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_023_027_SubscriptionName)}", s.SubscriptionName))
+            .AddSubscription("enqueue-brs-026-subscription")
+                .AddSubjectFilter("Enqueue_brs_026")
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_026_SubscriptionName)}", s.SubscriptionName))
+            .AddSubscription("enqueue-brs-028-subscription")
+                .AddSubjectFilter("Enqueue_brs_028")
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}", s.SubscriptionName))
+            .CreateAsync();
 
         // => Receive messages on Wholesale Inbox Queue
         await ServiceBusListenerMock.AddQueueListenerAsync(wholesaleInboxQueueResource.Name);

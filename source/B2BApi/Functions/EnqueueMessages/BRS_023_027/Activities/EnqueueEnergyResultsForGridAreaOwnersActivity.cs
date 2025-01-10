@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
@@ -22,7 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 
 /// <summary>
 /// Enqueue energy results for Grid Area Owners as outgoing messages for the given calculation id.

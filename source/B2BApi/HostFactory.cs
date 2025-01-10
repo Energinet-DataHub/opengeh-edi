@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
@@ -62,6 +63,8 @@ public static class HostFactory
             .ConfigureServices(
                 (context, services) =>
                 {
+                    var azureCredential = new DefaultAzureCredential();
+
                     services
                         // Logging
                         .AddApplicationInsightsForIsolatedWorker(SubsystemName)
@@ -103,7 +106,10 @@ public static class HostFactory
                         .AddOutboxContext(context.Configuration)
                         .AddOutboxClient<OutboxContext>()
                         .AddOutboxProcessor<OutboxContext>()
-                        .AddOutboxRetention();
+                        .AddOutboxRetention()
+
+                        // Enqueue messages from PM (using Edi Topic)
+                        .AddEnqueueActorMessagesFromProcessManager(azureCredential);
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>
