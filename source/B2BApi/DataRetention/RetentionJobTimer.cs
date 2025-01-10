@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.DataRetention;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using MediatR;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.B2BApi.DataRetention;
 
-public static class DataRetentionExtensions
+public class RetentionJobTimer(ExecuteDataRetentionJobs executeDataRetentionJobs)
 {
-    public static IServiceCollection AddDataRetention(this IServiceCollection services)
-    {
-        services.AddTransient<ExecuteDataRetentionJobs>();
+    private readonly ExecuteDataRetentionJobs _executeDataRetentionJobs = executeDataRetentionJobs;
 
-        return services;
+    [Function("RetentionJobTimer")]
+    public async Task RunAsync([TimerTrigger("0 0 10-23 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+    {
+        var cancellationToken = context.InstanceServices.GetRequiredService<CancellationToken>();
+        await _executeDataRetentionJobs.CleanupAsync(cancellationToken).ConfigureAwait(false);
     }
 }

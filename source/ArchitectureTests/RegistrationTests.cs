@@ -109,7 +109,7 @@ public class RegistrationTests
                 typeof(INotificationHandler<>),
                 new[]
                 {
-                typeof(ExecuteDataRetentionsWhenADayHasPassed).Assembly,
+                typeof(ExecuteDataRetentionJobs).Assembly,
                 typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
                 typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
                 typeof(Wholesale.Edi.AggregatedTimeSeriesRequestHandler).Assembly,
