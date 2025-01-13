@@ -44,35 +44,7 @@ public class DocumentFactory
 
         if (bundle.DocumentType == DocumentType.Acknowledgement)
         {
-            if (bundle.OutgoingMessages.Count != 1)
-            {
-                throw new OutgoingMessageException(
-                    $"Could not handle document type {bundle.DocumentType} in format {documentFormat} due to invalid number of messages");
-            }
-
-            if (documentFormat == DocumentFormat.Json)
-            {
-                return _acknowledgementJsonDocumentWriter.WriteAsync(
-                    new OutgoingMessageHeader(
-                        bundle.BusinessReason,
-                        bundle.SenderId.Value,
-                        bundle.SenderRole.Code,
-                        bundle.Receiver.Number.Value,
-                        bundle.DocumentReceiver.ActorRole.Code,
-                        bundle.MessageId.Value,
-                        timestamp),
-                    bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).Single(),
-                    cancellationToken);
-            }
-
-            if (documentFormat == DocumentFormat.Xml)
-            {
-            }
-            else
-            {
-                throw new OutgoingMessageException(
-                    $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
-            }
+            return WriteAcknowledgementAsync(bundle, documentFormat, timestamp, cancellationToken);
         }
 
         var documentWriter =
@@ -92,5 +64,42 @@ public class DocumentFactory
                 timestamp),
             bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList(),
             cancellationToken);
+    }
+
+    private Task<MarketDocumentStream> WriteAcknowledgementAsync(
+        OutgoingMessageBundle bundle,
+        DocumentFormat documentFormat,
+        Instant timestamp,
+        CancellationToken cancellationToken)
+    {
+        if (bundle.OutgoingMessages.Count != 1)
+        {
+            throw new OutgoingMessageException(
+                $"Could not handle document type {bundle.DocumentType} in format {documentFormat} due to invalid number of messages");
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            return _acknowledgementJsonDocumentWriter.WriteAsync(
+                new OutgoingMessageHeader(
+                    bundle.BusinessReason,
+                    bundle.SenderId.Value,
+                    bundle.SenderRole.Code,
+                    bundle.Receiver.Number.Value,
+                    bundle.DocumentReceiver.ActorRole.Code,
+                    bundle.MessageId.Value,
+                    timestamp),
+                bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).Single(),
+                cancellationToken);
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            throw new OutgoingMessageException(
+                $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
+        }
+
+        throw new OutgoingMessageException(
+            $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
     }
 }
