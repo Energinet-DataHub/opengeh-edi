@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +19,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
 public abstract class EnqueueValidatedMessagesHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueMessagesHandlerBase(logger)
 {
-    protected override Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages)
+    protected override Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {

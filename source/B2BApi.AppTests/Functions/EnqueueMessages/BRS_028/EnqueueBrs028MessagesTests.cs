@@ -62,13 +62,15 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
             BusinessReason: BusinessReason.WholesaleFixing.Code);
 
-        var enqueueActorMessages = new EnqueueActorMessages
+        var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = "Brs_028",
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             DataType = nameof(RequestCalculatedWholesaleServicesAcceptedV1),
-            JsonData = JsonSerializer.Serialize(enqueueMessagesData),
+            Data = JsonSerializer.Serialize(enqueueMessagesData),
+            DataFormat = "application/json",
+            OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 
         var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))

@@ -15,6 +15,7 @@
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
@@ -46,17 +47,51 @@ public abstract class EnqueueMessagesHandlerBase(
             },
         });
 
-        var jsonMessage = message.Body.ToString();
+        var bodyFormat = message.GetBodyFormat();
+        var majorVersion = message.GetMajorVersion();
+        if (majorVersion == EnqueueActorMessagesV1.MajorVersion)
+        {
+            await HandleV1Async(message, bodyFormat).ConfigureAwait(false);
+        }
+    }
 
-        var enqueueActorMessages = EnqueueActorMessages.Parser.ParseJson(jsonMessage);
+    protected abstract Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages);
+
+    protected TData DeserializeJsonInput<TData>(EnqueueActorMessagesV1 enqueueActorMessages)
+    {
+        var deserializeResult = JsonSerializer.Deserialize<TData>(enqueueActorMessages.Data);
+
+        if (deserializeResult == null)
+        {
+            _logger.LogError(
+                "Failed to deserialize EnqueueActorMessagesV1.Data to type \"{Type}\". Actual JSON value:\n{Data}",
+                typeof(TData).Name,
+                enqueueActorMessages.Data);
+            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueActorMessagesV1)}.{nameof(enqueueActorMessages.Data)} to type {typeof(TData).Name}", nameof(enqueueActorMessages.Data));
+        }
+
+        return deserializeResult;
+    }
+
+    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage, string messageBodyFormat)
+    {
+        var enqueueActorMessages = messageBodyFormat switch
+        {
+            "application/json" => EnqueueActorMessagesV1.Parser.ParseJson(serviceBusMessage.Body.ToString()),
+            "application/octet-stream" => EnqueueActorMessagesV1.Parser.ParseFrom(serviceBusMessage.Body),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(messageBodyFormat),
+                messageBodyFormat,
+                $"Unhandled message body format (MessageId={serviceBusMessage.MessageId}, Subject={serviceBusMessage.Subject})"),
+        };
 
         if (enqueueActorMessages is null)
         {
             _logger.LogError(
                 "Failed to parse service bus message body as JSON to type \"{EnqueueMessagesDto}\". Actual body value as string:\n{Body}",
-                nameof(EnqueueActorMessages),
-                jsonMessage);
-            throw new ArgumentException($"Enqueue handler cannot parse received service bus message body to type \"{nameof(EnqueueActorMessages)}\"", nameof(message.Body));
+                nameof(EnqueueActorMessagesV1),
+                serviceBusMessage.Body.ToString());
+            throw new ArgumentException($"Enqueue handler cannot parse received service bus message body to type \"{nameof(EnqueueActorMessagesV1)}\"", nameof(serviceBusMessage.Body));
         }
 
         using var enqueueActorMessagesLoggerScope = _logger.BeginScope(new
@@ -76,23 +111,5 @@ public abstract class EnqueueMessagesHandlerBase(
 
         await EnqueueMessagesAsync(enqueueActorMessages)
             .ConfigureAwait(false);
-    }
-
-    protected abstract Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages);
-
-    protected TData DeserializeJsonInput<TData>(EnqueueActorMessages enqueueActorMessages)
-    {
-        var deserializeResult = JsonSerializer.Deserialize<TData>(enqueueActorMessages.JsonData);
-
-        if (deserializeResult == null)
-        {
-            _logger.LogError(
-                "Failed to deserialize EnqueueMessagesDto.JsonInput to type \"{Type}\". Actual JSON value:\n{JsonInput}",
-                typeof(TData).Name,
-                enqueueActorMessages.JsonData);
-            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueActorMessages)}.{nameof(enqueueActorMessages.JsonData)} to type {typeof(TData).Name}", nameof(enqueueActorMessages.JsonData));
-        }
-
-        return deserializeResult;
     }
 }
