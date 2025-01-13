@@ -18,32 +18,32 @@ using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 
 /// <summary>
-/// Service Bus Trigger to enqueue messages for BRS-026 (RequestAggregatedMeasureData),
+/// Service Bus Trigger to enqueue messages for BRS-028 (RequestWholesaleServices),
 /// received from the Process Manager subsystem.
 /// </summary>
 /// <param name="logger"></param>
-/// <param name="enqueueBrs026Handler"></param>
-public class EnqueueBrs_026_Trigger(
-    ILogger<EnqueueBrs_026_Trigger> logger,
-    EnqueueBrs_026_Handler enqueueBrs026Handler)
+/// <param name="handler"></param>
+public class EnqueueTrigger_Brs_028(
+    ILogger<EnqueueTrigger_Brs_028> logger,
+    EnqueueHandler_Brs_028_V1 handler)
 {
-    private readonly ILogger<EnqueueBrs_026_Trigger> _logger = logger;
-    private readonly EnqueueBrs_026_Handler _enqueueBrs026Handler = enqueueBrs026Handler;
+    private readonly ILogger<EnqueueTrigger_Brs_028> _logger = logger;
+    private readonly EnqueueHandler_Brs_028_V1 _handler = handler;
 
-    [Function(nameof(EnqueueBrs_026_Trigger))]
+    [Function(nameof(EnqueueTrigger_Brs_028))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
-            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_026_SubscriptionName)}%",
+            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {
-        _logger.LogInformation("Enqueue BRS-026 messages service bus message received");
+        _logger.LogInformation("Enqueue BRS-028 messages service bus message received");
 
-        await _enqueueBrs026Handler.EnqueueAsync(message)
+        await _handler.EnqueueAsync(message)
             .ConfigureAwait(false);
     }
 }

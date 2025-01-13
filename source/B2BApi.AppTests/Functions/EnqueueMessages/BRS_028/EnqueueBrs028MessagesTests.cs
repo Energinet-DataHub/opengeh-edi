@@ -85,13 +85,13 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // TODO: Actually check for enqueued messages when the BRS is implemented
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
-            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueBrs_028_Trigger)}"),
+            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_028)}"),
             timeLimit: TimeSpan.FromSeconds(30));
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
         var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
 
         using var assertionScope = new AssertionScope();
-        didFinish.Should().BeTrue($"because the {nameof(EnqueueBrs_028_Trigger)} should have been executed");
+        didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_028)} should have been executed");
         appThrewException.Should().BeFalse();
         hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 028*");
     }

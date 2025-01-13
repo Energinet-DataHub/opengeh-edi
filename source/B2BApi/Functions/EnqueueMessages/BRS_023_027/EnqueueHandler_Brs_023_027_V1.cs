@@ -22,8 +22,8 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 /// The <see cref="EnqueueMessagesDto"/><see cref="EnqueueMessagesDto.JsonInput"/> must be of type <see cref="object"/>.
 /// </summary>
 /// <param name="logger"></param>
-public class EnqueueBrs_023_027_Handler(
-    ILogger<EnqueueBrs_023_027_Handler> logger)
+public class EnqueueHandler_Brs_023_027_V1(
+    ILogger<EnqueueHandler_Brs_023_027_V1> logger)
     : EnqueueMessagesHandlerBase(logger)
 {
     private readonly ILogger _logger = logger;

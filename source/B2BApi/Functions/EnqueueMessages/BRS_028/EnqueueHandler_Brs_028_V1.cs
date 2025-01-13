@@ -12,35 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 
 /// <summary>
-/// Enqueue accepted/rejected messages for BRS-026 (RequestAggregatedMeasureData).
+/// Enqueue accepted/rejected messages for BRS-028 (RequestWholesaleServices).
 /// </summary>
 /// <param name="logger"></param>
-public class EnqueueBrs_026_Handler(
-    ILogger<EnqueueBrs_026_Handler> logger)
-    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
+public class EnqueueHandler_Brs_028_V1(
+    ILogger<EnqueueHandler_Brs_028_V1> logger)
+    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1, RequestCalculatedWholesaleServicesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData)
+    protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedWholesaleServicesAcceptedV1 acceptedData)
     {
         _logger.LogInformation(
-            "Received enqueue accepted message(s) for BRS 026. Data: {0}",
+            "Received enqueue accepted message(s) for BRS 028. Data: {0}",
             acceptedData);
 
         // TODO: Call actual logic that enqueues accepted messages instead
         await Task.CompletedTask.ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedData)
+    protected override async Task EnqueueRejectedMessagesAsync(RequestCalculatedWholesaleServicesRejectedV1 rejectedData)
     {
         _logger.LogInformation(
-            "Received enqueue rejected message(s) for BRS 026. Data: {0}",
+            "Received enqueue rejected message(s) for BRS 028. Data: {0}",
             rejectedData);
 
         // TODO: Call actual logic that enqueues rejected message
