@@ -24,7 +24,7 @@ public class RetentionJobTimer(ExecuteDataRetentionJobs executeDataRetentionJobs
     [Function("RetentionJobTimer")]
     public async Task RunAsync([TimerTrigger("0 0 10-23 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
     {
-        var cancellationToken = context.InstanceServices.GetRequiredService<CancellationToken>();
+        var cancellationToken = context.CancellationToken;
         await _executeDataRetentionJobs.CleanupAsync(cancellationToken).ConfigureAwait(false);
     }
 }
