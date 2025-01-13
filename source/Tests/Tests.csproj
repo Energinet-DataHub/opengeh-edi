@@ -71,6 +71,9 @@ limitations under the License.
       <None Update="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+        <None Update="Infrastructure\OutgoingMessages\RSM009\Acknowledgement-assembly-model.schema.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -117,6 +120,12 @@ limitations under the License.
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementOneSmallOneBigSeries.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+        <EmbeddedResource Include="Infrastructure\OutgoingMessages\RSM009\urn-entsoe-eu-local-extension-types.schema.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Infrastructure\OutgoingMessages\RSM009\urn-entsoe-eu-wgedi-codelists.schema.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementTwoSeries.xml">

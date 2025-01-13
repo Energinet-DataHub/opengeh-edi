@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
@@ -21,10 +22,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 
 public class DocumentFactory
 {
+    private readonly AcknowledgementJsonDocumentWriter _acknowledgementJsonDocumentWriter;
     private readonly IReadOnlyCollection<IDocumentWriter> _documentWriters;
 
-    public DocumentFactory(IEnumerable<IDocumentWriter> documentWriters)
+    public DocumentFactory(
+        IEnumerable<IDocumentWriter> documentWriters,
+        AcknowledgementJsonDocumentWriter acknowledgementJsonDocumentWriter)
     {
+        _acknowledgementJsonDocumentWriter = acknowledgementJsonDocumentWriter;
         _documentWriters = documentWriters.ToList();
     }
 
@@ -36,6 +41,39 @@ public class DocumentFactory
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(bundle);
+
+        if (bundle.DocumentType == DocumentType.Acknowledgement)
+        {
+            if (bundle.OutgoingMessages.Count != 1)
+            {
+                throw new OutgoingMessageException(
+                    $"Could not handle document type {bundle.DocumentType} in format {documentFormat} due to invalid number of messages");
+            }
+
+            if (documentFormat == DocumentFormat.Json)
+            {
+                return _acknowledgementJsonDocumentWriter.WriteAsync(
+                    new OutgoingMessageHeader(
+                        bundle.BusinessReason,
+                        bundle.SenderId.Value,
+                        bundle.SenderRole.Code,
+                        bundle.Receiver.Number.Value,
+                        bundle.DocumentReceiver.ActorRole.Code,
+                        bundle.MessageId.Value,
+                        timestamp),
+                    bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).Single(),
+                    cancellationToken);
+            }
+
+            if (documentFormat == DocumentFormat.Xml)
+            {
+            }
+            else
+            {
+                throw new OutgoingMessageException(
+                    $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
+            }
+        }
 
         var documentWriter =
             _documentWriters.FirstOrDefault(
