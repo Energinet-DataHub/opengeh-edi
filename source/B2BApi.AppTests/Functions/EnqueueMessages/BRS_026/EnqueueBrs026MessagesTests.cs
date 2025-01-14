@@ -82,7 +82,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
         // => Then accepted message is enqueued
-        // TODO: Actually check for enqueued messages when the BRS is implemented
+        // TODO: Actually check for enqueued messages and PM notification when the BRS is implemented
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
             () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_026)}"),
