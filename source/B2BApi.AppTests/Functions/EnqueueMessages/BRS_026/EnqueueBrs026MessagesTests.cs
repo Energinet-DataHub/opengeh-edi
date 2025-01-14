@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
@@ -73,15 +74,9 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 
-        var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))
-        {
-            Subject = $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            ContentType = "application/json",
-            MessageId = "a-message-id",
-        };
-
-        serviceBusMessage.ApplicationProperties.Add("MajorVersion", nameof(EnqueueActorMessagesV1));
-        serviceBusMessage.ApplicationProperties.Add("BodyFormat", "application/json");
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
+            idempotencyKey: "a-message-id");
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
