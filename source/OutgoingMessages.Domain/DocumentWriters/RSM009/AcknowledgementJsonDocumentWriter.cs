@@ -238,7 +238,7 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
             writer,
             "received_MarketDocument.createdDateTime",
             acknowledgementRecord.ReceivedMarketDocumentCreatedDateTime?.ToString(
-                "yyyy-MM-ddTHH:mm'Z'",
+                "yyyy-MM-ddTHH:mm:ss'Z'",
                 CultureInfo.InvariantCulture));
 
         WritePropertyIfNotNull(
@@ -246,10 +246,10 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
             "received_MarketDocument.mRID",
             acknowledgementRecord.ReceivedMarketDocumentTransactionId?.Value);
 
-        WritePropertyIfNotNull(
+        WriteValueObjectIfNotNull(
             writer,
             "received_MarketDocument.process.processType",
-            acknowledgementRecord.ReceivedMarketDocumentProcessProcessType?.Name);
+            acknowledgementRecord.ReceivedMarketDocumentProcessProcessType);
 
         WritePropertyIfNotNull(
             writer,
@@ -261,7 +261,7 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
             "received_MarketDocument.title",
             acknowledgementRecord.ReceivedMarketDocumentTitle);
 
-        WritePropertyIfNotNull(
+        WriteValueObjectIfNotNull(
             writer,
             "received_MarketDocument.type",
             acknowledgementRecord.ReceivedMarketDocumentType);
@@ -294,6 +294,14 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         if (value is not null)
         {
             writer.WriteProperty(property, value);
+        }
+    }
+
+    private void WriteValueObjectIfNotNull(Utf8JsonWriter writer, string @object, string? value)
+    {
+        if (value is not null)
+        {
+            writer.WriteObject(@object, new KeyValuePair<string, string>("value", value));
         }
     }
 

@@ -56,12 +56,12 @@ public class AcknowledgementJsonDocumentWriterTests
 
         var acknowledgementRecord = new AcknowledgementRecord(
             TransactionId.New(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            SystemClock.Instance.GetCurrentInstant(),
+            TransactionId.New(),
+            "A10",
+            "2",
+            "DocumentTitle",
+            "ERR",
             reasons,
             timePeriods,
             [new Series("bbf014de7733", reasons), new Series("aa0484c10e6d", reasons)],

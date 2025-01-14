@@ -23,7 +23,7 @@ public record AcknowledgementRecord(
     TransactionId TransactionId,
     Instant? ReceivedMarketDocumentCreatedDateTime,
     TransactionId? ReceivedMarketDocumentTransactionId,
-    ProcessType? ReceivedMarketDocumentProcessProcessType,
+    string? ReceivedMarketDocumentProcessProcessType,
     string? ReceivedMarketDocumentRevisionNumber,
     string? ReceivedMarketDocumentTitle,
     string? ReceivedMarketDocumentType,
