@@ -131,12 +131,12 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeasurementPointMessageProcessDto);
 
-        await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
-            initializeMeteredDataForMeasurementPointMessageProcessDto,
-            cancellationToken)
-        .ConfigureAwait(false);
-
         // Temporary until ProcessManager is ready
+        // await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
+        //     initializeMeteredDataForMeasurementPointMessageProcessDto,
+        //     cancellationToken)
+        // .ConfigureAwait(false);
+
         var serviceBusMessage =
             new ServiceBusMessage(
                 _serializer.Serialize(initializeMeteredDataForMeasurementPointMessageProcessDto))
