@@ -81,12 +81,15 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
         if (deserializeResult == null)
         {
-            _logger.LogError(
-                "Failed to deserialize EnqueueActorMessagesV1.Data to type \"{Type}\" (format: {DataFormat}). Actual value:\n{Data}",
-                typeof(TData).Name,
-                dataFormat,
-                data.Truncate(maxLength: 1000));
-            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueActorMessagesV1)}.{nameof(data)} to type {typeof(TData).Name}", nameof(data));
+            throw new ArgumentException($"Failed to deserialize enqueue actor messages data to type {typeof(TData).Name}", nameof(data))
+            {
+                Data =
+                {
+                    { "TargetType", typeof(TData).Name },
+                    { "DataFormat", dataFormat },
+                    { "Data", data.Truncate(maxLength: 1000) },
+                },
+            };
         }
 
         return deserializeResult;
