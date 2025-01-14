@@ -67,8 +67,8 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
             OrchestrationName = "Brs_028",
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
-            DataType = nameof(RequestCalculatedWholesaleServicesAcceptedV1),
             Data = JsonSerializer.Serialize(enqueueMessagesData),
+            DataType = nameof(RequestCalculatedWholesaleServicesAcceptedV1),
             DataFormat = "application/json",
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
@@ -79,6 +79,9 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
             ContentType = "application/json",
             MessageId = "a-message-id",
         };
+
+        serviceBusMessage.ApplicationProperties.Add("MajorVersion", nameof(EnqueueActorMessagesV1));
+        serviceBusMessage.ApplicationProperties.Add("BodyFormat", "application/json");
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
