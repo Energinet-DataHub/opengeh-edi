@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 /// <param name="logger"></param>
 public class EnqueueHandler_Brs_023_027_V1(
     ILogger<EnqueueHandler_Brs_023_027_V1> logger)
-    : EnqueueMessagesHandlerBase(logger)
+    : EnqueueActorMessagesV1HandlerBase(logger)
 {
     private readonly ILogger _logger = logger;
 

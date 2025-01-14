@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 /// the expected <see cref="EnqueueMessagesDto"/> type.
 /// </summary>
 /// <param name="logger"></param>
-public abstract class EnqueueMessagesHandlerBase(
+public abstract class EnqueueActorMessagesV1HandlerBase(
     ILogger logger)
 {
     private readonly ILogger _logger = logger;
