@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using DurableTask.Core.Common;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
 /// <summary>
 /// Base handler for enqueuing messages. Handles converting the <see cref="ServiceBusReceivedMessage"/> into
-/// the expected <see cref="EnqueueMessagesDto"/> type.
+/// the expected type.
 /// </summary>
 /// <param name="logger"></param>
 public abstract class EnqueueActorMessagesHandlerBase(
@@ -32,7 +33,6 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
     /// <summary>
     /// Enqueue the received service bus message sent from the Process Manager subsystem.
-    /// The service bus message body must be of the type <see cref="EnqueueMessagesDto"/>.
     /// </summary>
     /// <param name="message"></param>
     public async Task EnqueueAsync(ServiceBusReceivedMessage message)
@@ -64,17 +64,25 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
     protected abstract Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages);
 
-    protected TData DeserializeJsonInput<TData>(EnqueueActorMessagesV1 enqueueActorMessages)
+    protected TData DeserializeMessageData<TData>(string dataFormat, string data)
     {
-        var deserializeResult = JsonSerializer.Deserialize<TData>(enqueueActorMessages.Data);
+        var deserializeResult = dataFormat switch
+        {
+            "application/json" => JsonSerializer.Deserialize<TData>(data),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(dataFormat),
+                dataFormat,
+                "Unhandled data format from received enqueue actor messages"),
+        };
 
         if (deserializeResult == null)
         {
             _logger.LogError(
-                "Failed to deserialize EnqueueActorMessagesV1.Data to type \"{Type}\". Actual JSON value:\n{Data}",
+                "Failed to deserialize EnqueueActorMessagesV1.Data to type \"{Type}\" (format: {DataFormat}). Actual value:\n{Data}",
                 typeof(TData).Name,
-                enqueueActorMessages.Data);
-            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueActorMessagesV1)}.{nameof(enqueueActorMessages.Data)} to type {typeof(TData).Name}", nameof(enqueueActorMessages.Data));
+                dataFormat,
+                data.Truncate(maxLength: 1000));
+            throw new ArgumentException($"Cannot deserialize {nameof(EnqueueActorMessagesV1)}.{nameof(data)} to type {typeof(TData).Name}", nameof(data));
         }
 
         return deserializeResult;

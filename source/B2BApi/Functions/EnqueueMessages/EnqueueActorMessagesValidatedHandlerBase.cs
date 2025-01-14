@@ -23,12 +23,12 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {
-            var acceptedData = DeserializeJsonInput<TAcceptedData>(enqueueActorMessages);
+            var acceptedData = DeserializeMessageData<TAcceptedData>(enqueueActorMessages.DataType, enqueueActorMessages.Data);
             return EnqueueAcceptedMessagesAsync(acceptedData);
         }
         else if (enqueueActorMessages.DataType == typeof(TRejectedData).Name)
         {
-            var rejectedData = DeserializeJsonInput<TRejectedData>(enqueueActorMessages);
+            var rejectedData = DeserializeMessageData<TRejectedData>(enqueueActorMessages.DataType, enqueueActorMessages.Data);
             return EnqueueRejectedMessagesAsync(rejectedData);
         }
 
