@@ -132,7 +132,7 @@ public sealed class PeriodValidationRule(
             return;
         }
 
-        if (zonedEndDateTime.LocalDateTime.Month - zonedStartDateTime.LocalDateTime.Month != 1)
+        if ((zonedEndDateTime.LocalDateTime - zonedStartDateTime.LocalDateTime).Months != 1)
             errors.Add(_invalidPeriodAcrossMonths);
     }
 
