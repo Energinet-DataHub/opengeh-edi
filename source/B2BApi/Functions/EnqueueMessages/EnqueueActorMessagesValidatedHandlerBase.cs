@@ -19,20 +19,20 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
 public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueActorMessagesHandlerBase(logger)
 {
-    protected override Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages)
+    protected override Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {
-            var acceptedData = DeserializeMessageData<TAcceptedData>(enqueueActorMessages.DataType, enqueueActorMessages.Data);
+            var acceptedData = DeserializeMessageData<TAcceptedData>(enqueueActorMessages.DataFormat, enqueueActorMessages.Data);
             return EnqueueAcceptedMessagesAsync(acceptedData);
         }
         else if (enqueueActorMessages.DataType == typeof(TRejectedData).Name)
         {
-            var rejectedData = DeserializeMessageData<TRejectedData>(enqueueActorMessages.DataType, enqueueActorMessages.Data);
+            var rejectedData = DeserializeMessageData<TRejectedData>(enqueueActorMessages.DataFormat, enqueueActorMessages.Data);
             return EnqueueRejectedMessagesAsync(rejectedData);
         }
 
-        throw new ArgumentOutOfRangeException(nameof(enqueueActorMessages.DataType), enqueueActorMessages.DataType, "EnqueueActorMessages contains an invalid data type.");
+        throw new ArgumentOutOfRangeException(nameof(enqueueActorMessages.DataType), enqueueActorMessages.DataType, $"{nameof(EnqueueActorMessagesV1)} contains an invalid data type (expected {typeof(TAcceptedData).Name} or {typeof(TRejectedData).Name}).");
     }
 
     protected abstract Task EnqueueAcceptedMessagesAsync(TAcceptedData acceptedData);

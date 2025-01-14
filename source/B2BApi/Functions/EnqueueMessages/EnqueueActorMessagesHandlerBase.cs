@@ -66,7 +66,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
         }
     }
 
-    protected abstract Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages);
+    protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages);
 
     protected TData DeserializeMessageData<TData>(string dataFormat, string data)
     {
@@ -137,7 +137,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
             },
         });
 
-        await EnqueueMessagesAsync(enqueueActorMessages)
+        await EnqueueActorMessagesV1Async(enqueueActorMessages)
             .ConfigureAwait(false);
     }
 }

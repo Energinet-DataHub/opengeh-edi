@@ -28,14 +28,16 @@ public class EnqueueHandler_Brs_023_027_V1(
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages)
+    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         _logger.LogInformation(
             "Received enqueue actor messages for BRS 023/027. Data: {Data}",
             enqueueActorMessages.Data);
 
         // TODO: Deserialize to actual input type instead of object (replace "object" type in summary as well)
-        var input = DeserializeMessageData<object>(enqueueActorMessages.DataFormat, enqueueActorMessages.DataType);
+        var input = DeserializeMessageData<object>(
+            dataFormat: enqueueActorMessages.DataFormat,
+            data: enqueueActorMessages.Data);
 
         // TODO: Call actual logic that enqueues messages (starts orchestration)
         await Task.CompletedTask.ConfigureAwait(false);
