@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 /// the expected <see cref="EnqueueMessagesDto"/> type.
 /// </summary>
 /// <param name="logger"></param>
-public abstract class EnqueueActorMessagesV1HandlerBase(
+public abstract class EnqueueActorMessagesHandlerBase(
     ILogger logger)
 {
     private readonly ILogger _logger = logger;
@@ -52,6 +52,13 @@ public abstract class EnqueueActorMessagesV1HandlerBase(
         if (majorVersion == EnqueueActorMessagesV1.MajorVersion)
         {
             await HandleV1Async(message, bodyFormat).ConfigureAwait(false);
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(majorVersion),
+                majorVersion,
+                $"Unsupported major version from service bus message (MessageId={message.MessageId}, Subject={message.Subject})");
         }
     }
 

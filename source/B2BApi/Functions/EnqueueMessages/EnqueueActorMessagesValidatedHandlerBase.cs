@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
-public abstract class EnqueueActorMessagesV1ValidatedHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueActorMessagesV1HandlerBase(logger)
+public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueActorMessagesHandlerBase(logger)
 {
     protected override Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages)
     {
