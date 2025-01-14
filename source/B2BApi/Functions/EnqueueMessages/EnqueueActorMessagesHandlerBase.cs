@@ -44,11 +44,15 @@ public abstract class EnqueueActorMessagesHandlerBase(
                 message.MessageId,
                 message.CorrelationId,
                 message.Subject,
+                message.ApplicationProperties,
             },
         });
 
+        _logger.LogInformation("Handling received enqueue actor messages service bus message.");
+
         var bodyFormat = message.GetBodyFormat();
         var majorVersion = message.GetMajorVersion();
+
         if (majorVersion == EnqueueActorMessagesV1.MajorVersion)
         {
             await HandleV1Async(message, bodyFormat).ConfigureAwait(false);
@@ -102,11 +106,16 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
         if (enqueueActorMessages is null)
         {
-            _logger.LogError(
-                "Failed to parse service bus message body as JSON to type \"{EnqueueMessagesDto}\". Actual body value as string:\n{Body}",
-                nameof(EnqueueActorMessagesV1),
-                serviceBusMessage.Body.ToString());
-            throw new ArgumentException($"Enqueue handler cannot parse received service bus message body to type \"{nameof(EnqueueActorMessagesV1)}\"", nameof(serviceBusMessage.Body));
+            throw new ArgumentException(
+                $"Enqueue handler cannot parse received enqueue actor messages service bus message body to type \"{nameof(EnqueueActorMessagesV1)}\" (MessageId={serviceBusMessage.MessageId}, Subject={serviceBusMessage.Subject})",
+                nameof(serviceBusMessage.Body))
+            {
+                Data =
+                {
+                    { "TargetType", nameof(EnqueueActorMessagesV1) },
+                    { "Body", serviceBusMessage.Body.ToString().Truncate(maxLength: 1000) },
+                },
+            };
         }
 
         using var enqueueActorMessagesLoggerScope = _logger.BeginScope(new
@@ -118,9 +127,13 @@ public abstract class EnqueueActorMessagesHandlerBase(
                 OperatingIdentity = new
                 {
                     ActorId = enqueueActorMessages.OrchestrationStartedByActorId,
-                    UserId = enqueueActorMessages.OrchestrationStartedByUserId,
+                    UserId = enqueueActorMessages.HasOrchestrationStartedByUserId
+                        ? enqueueActorMessages.OrchestrationStartedByUserId
+                        : null,
                 },
                 enqueueActorMessages.DataType,
+                enqueueActorMessages.DataFormat,
+                enqueueActorMessages.OrchestrationInstanceId,
             },
         });
 
