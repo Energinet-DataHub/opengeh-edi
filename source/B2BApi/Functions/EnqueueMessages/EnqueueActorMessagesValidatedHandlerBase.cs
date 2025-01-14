@@ -32,7 +32,10 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
             return EnqueueRejectedMessagesAsync(rejectedData);
         }
 
-        throw new ArgumentOutOfRangeException(nameof(enqueueActorMessages.DataType), enqueueActorMessages.DataType, $"{nameof(EnqueueActorMessagesV1)} contains an invalid data type (expected {typeof(TAcceptedData).Name} or {typeof(TRejectedData).Name}).");
+        throw new ArgumentOutOfRangeException(
+            nameof(enqueueActorMessages.DataType),
+            enqueueActorMessages.DataType,
+            $"{nameof(EnqueueActorMessagesV1)} contains an invalid data type (expected {typeof(TAcceptedData).Name} or {typeof(TRejectedData).Name}).");
     }
 
     protected abstract Task EnqueueAcceptedMessagesAsync(TAcceptedData acceptedData);
