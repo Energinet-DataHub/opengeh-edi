@@ -217,44 +217,27 @@ internal sealed class EdiDatabaseDriver
     }
 
     /// <summary>
-    /// Delete outgoing messages for previuse performance test.
+    /// Mark bundles from load test as dequeued from a month ago to ensure that they are cleaned up by the retention service
     /// </summary>
-    internal async Task DeleteOutgoingMessagesForFromLoadTestAsync(CancellationToken cancellationToken)
+    internal async Task MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync(CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        await using (var deleteOutgoingMessagesCommand = new SqlCommand())
+        await using (var updateBundles = new SqlCommand())
         {
-            deleteOutgoingMessagesCommand.CommandText = @"
-                DELETE FROM [MarketDocuments] WHERE [BundleId] IN (SELECT [Id] FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%');
-                DELETE FROM [OutgoingMessages] WHERE [AssignedBundleId] IN (SELECT [Id] FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%');
-                DELETE FROM [Bundles] WHERE [RelatedToMessageId] like 'perf_test_%';
-                ";
+            updateBundles.CommandText = """
+                    UPDATE Bundles
+                    SET DequeuedAt = DATEADD(DAY, -1, DATEADD(MONTH, -1, GETDATE()))
+                    WHERE [RelatedToMessageId] like 'perf_test_%'
+                    AND DequeuedAt is null
+                """;
 
-            deleteOutgoingMessagesCommand.Connection = connection;
-            deleteOutgoingMessagesCommand.CommandTimeout = (int)TimeSpan.FromMinutes(4).TotalSeconds;
+            updateBundles.Connection = connection;
+            updateBundles.CommandTimeout = (int)TimeSpan.FromMinutes(4).TotalSeconds;
 
-            await deleteOutgoingMessagesCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            await updateBundles.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
-    }
-
-    internal async Task<IList<string>> GetOutgoingMessagesFileStorageReferencesForFromLoadTestAsync(CancellationToken cancellationToken)
-    {
-        await using var connection = new SqlConnection(_connectionString);
-        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-
-        var query = """
-                    SELECT [FileStorageReference] 
-                    FROM [OutgoingMessages] 
-                    WHERE [AssignedBundleId] IN (
-                        SELECT [Id] 
-                        FROM [Bundles] 
-                        WHERE [RelatedToMessageId] LIKE 'perf_test_%')
-                    """;
-
-        var result = await connection.QueryAsync<string>(query).ConfigureAwait(false);
-        return result.ToList();
     }
 
     internal async Task<(bool Success, string? Payload)>
@@ -342,6 +325,7 @@ internal sealed class EdiDatabaseDriver
                  FROM [Bundles]
                  WHERE [DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
                  AND RelatedToMessageId like 'perf_test_%'
+                 AND DequeuedAt is null
                  """);
 
         return enqueuedMessagesCount;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
@@ -22,34 +22,37 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 
-public class EnqueueWholesaleResultsForTotalAmountsActivity(
-    ILogger<EnqueueWholesaleResultsForTotalAmountsActivity> logger,
+/// <summary>
+/// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
+/// </summary>
+public class EnqueueWholesaleResultsForAmountPerChargesActivity(
+    ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     WholesaleResultEnumerator wholesaleResultEnumerator)
     : EnqueueWholesaleResultsBaseActivity(logger, serviceScopeFactory, wholesaleResultEnumerator)
 {
-    private readonly ILogger<EnqueueWholesaleResultsForTotalAmountsActivity> _logger = logger;
+    private readonly ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> _logger = logger;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
     /// <summary>
-    /// Start an EnqueueWholesaleResultsForTotalAmountPerCharges activity.
+    /// Start an EnqueueWholesaleResultsForAmountPerCharges activity.
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>
     public static Task<int> StartActivityAsync(EnqueueMessagesForActorInput input, TaskOrchestrationContext context, TaskOptions? options)
     {
         return context.CallActivityAsync<int>(
-            nameof(EnqueueWholesaleResultsForTotalAmountsActivity),
+            nameof(EnqueueWholesaleResultsForAmountPerChargesActivity),
             input,
             options: options);
     }
 
-    [Function(nameof(EnqueueWholesaleResultsForTotalAmountsActivity))]
+    [Function(nameof(EnqueueWholesaleResultsForAmountPerChargesActivity))]
     public Task<int> Run([ActivityTrigger] EnqueueMessagesForActorInput input)
     {
-        var query = new WholesaleTotalAmountQuery(
+        var query = new WholesaleAmountPerChargeQuery(
             _logger,
             _wholesaleResultEnumerator.EdiDatabricksOptions,
             input.GridAreaOwners,
@@ -62,10 +65,10 @@ public class EnqueueWholesaleResultsForTotalAmountsActivity(
 
     protected override Task EnqueueAndCommitWholesaleResult<TOutgoingMessage>(IOutgoingMessagesClient outgoingMessagesClient, TOutgoingMessage outgoingMessageDto)
     {
-        return outgoingMessageDto is WholesaleTotalAmountMessageDto totalAmountMessageDto
-            ? outgoingMessagesClient.EnqueueAndCommitAsync(totalAmountMessageDto, CancellationToken.None)
+        return outgoingMessageDto is WholesaleAmountPerChargeMessageDto amountPerChargeMessageDto
+            ? outgoingMessagesClient.EnqueueAndCommitAsync(amountPerChargeMessageDto, CancellationToken.None)
             : throw new ArgumentException(
-                $"The outgoing message dto is not of the expected type {typeof(WholesaleTotalAmountMessageDto).FullName}",
+                $"The outgoing message dto is not of the expected type {typeof(WholesaleAmountPerChargeMessageDto).FullName}",
                 nameof(outgoingMessageDto));
     }
 }

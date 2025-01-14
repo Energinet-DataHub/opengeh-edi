@@ -37,7 +37,7 @@ using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages;
+namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_023_027;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
