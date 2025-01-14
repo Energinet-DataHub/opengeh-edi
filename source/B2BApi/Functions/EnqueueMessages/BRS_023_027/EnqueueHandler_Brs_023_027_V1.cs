@@ -22,20 +22,22 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 /// The <see cref="EnqueueMessagesDto"/><see cref="EnqueueMessagesDto.JsonInput"/> must be of type <see cref="object"/>.
 /// </summary>
 /// <param name="logger"></param>
-public class EnqueueBrs_023_027_Handler(
-    ILogger<EnqueueBrs_023_027_Handler> logger)
-    : EnqueueMessagesHandlerBase(logger)
+public class EnqueueHandler_Brs_023_027_V1(
+    ILogger<EnqueueHandler_Brs_023_027_V1> logger)
+    : EnqueueActorMessagesHandlerBase(logger)
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages)
+    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         _logger.LogInformation(
-            "Received enqueue actor messages for BRS 023/027. Data: {JsonData}",
-            enqueueActorMessages.JsonData);
+            "Received enqueue actor messages for BRS 023/027. Data: {Data}",
+            enqueueActorMessages.Data);
 
         // TODO: Deserialize to actual input type instead of object (replace "object" type in summary as well)
-        var input = DeserializeJsonInput<object>(enqueueActorMessages);
+        var input = DeserializeMessageData<object>(
+            dataFormat: enqueueActorMessages.DataFormat,
+            data: enqueueActorMessages.Data);
 
         // TODO: Call actual logic that enqueues messages (starts orchestration)
         await Task.CompletedTask.ConfigureAwait(false);

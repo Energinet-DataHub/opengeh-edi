@@ -21,9 +21,9 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 /// Enqueue accepted/rejected messages for BRS-028 (RequestWholesaleServices).
 /// </summary>
 /// <param name="logger"></param>
-public class EnqueueBrs_028_Handler(
-    ILogger<EnqueueBrs_028_Handler> logger)
-    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1, RequestCalculatedWholesaleServicesRejectedV1>(logger)
+public class EnqueueHandler_Brs_028_V1(
+    ILogger<EnqueueHandler_Brs_028_V1> logger)
+    : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1, RequestCalculatedWholesaleServicesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
 
