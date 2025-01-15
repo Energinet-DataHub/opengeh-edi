@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 using Microsoft.Extensions.Logging;
 
@@ -21,9 +23,11 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 /// Enqueue accepted/rejected messages for BRS-028 (RequestWholesaleServices).
 /// </summary>
 public sealed class EnqueueBrs_021_Handler(
+    IOutgoingMessagesClient outgoingMessagesClient,
     ILogger<EnqueueBrs_021_Handler> logger)
-    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1, RequestCalculatedWholesaleServicesRejectedV1>(logger)
+    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1, ProcManRsm009>(logger)
 {
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly ILogger _logger = logger;
 
     protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedWholesaleServicesAcceptedV1 acceptedData)
@@ -36,11 +40,13 @@ public sealed class EnqueueBrs_021_Handler(
         await Task.CompletedTask.ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(RequestCalculatedWholesaleServicesRejectedV1 rejectedData)
+    protected override async Task EnqueueRejectedMessagesAsync(ProcManRsm009 rejectedData)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
+
+        _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None);
 
         // TODO: Call actual logic that enqueues rejected message
         await Task.CompletedTask.ConfigureAwait(false);

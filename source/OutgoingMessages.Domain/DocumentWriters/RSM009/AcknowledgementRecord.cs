@@ -14,11 +14,9 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 
-// This is a copy of RejectedWholesaleServicesMessageSeries defined in the process module
 public record AcknowledgementRecord(
     TransactionId TransactionId,
     Instant? ReceivedMarketDocumentCreatedDateTime,

@@ -110,4 +110,11 @@ public interface IOutgoingMessagesClient
     Task<Guid> EnqueueAndCommitAsync(
         MeteredDataForMeasurementPointMessageProcessDto meteredDataForMeasurementPointMessageProcessDto,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue metered data for measurement point messages, handles enqueuing messages to all appropriate parties in a single transaction.
+    /// </summary>
+    Task<Guid> EnqueueAndCommitAsync(
+        object meteredDataForMeasurementPointMessageProcessDto,
+        CancellationToken cancellationToken);
 }

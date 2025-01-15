@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
@@ -402,6 +403,39 @@ public static class OutgoingMessageFactory
             externalId: message.ExternalId,
             calculationId: null,
             message.Series.StartedDateTime);
+    }
+
+    public static OutgoingMessage CreateMessage(
+        ProcManRsm009 message,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(message);
+
+        MessageId? relatedToMessageId = message.AcknowledgementRecord.ReceivedMarketDocumentTransactionId is not null
+            ? MessageId.Create(message.AcknowledgementRecord.ReceivedMarketDocumentTransactionId.Value)
+            : null;
+
+        return new OutgoingMessage(
+            eventId: EventId.From(message.EventId),
+            documentType: DocumentType.Acknowledgement,
+            receiver: Receiver.Create(
+                ActorNumber.Create(message.ReceiverId),
+                ActorRole.FromCode(message.ReceiverRole)),
+            documentReceiver: Receiver.Create(
+                ActorNumber.Create(message.ReceiverId),
+                ActorRole.FromCode(message.ReceiverRole)),
+            processId: message.ProcessId,
+            businessReason: message.BusinessReason,
+            serializedContent: serializer.Serialize(message.AcknowledgementRecord),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.IncomingMeteredDataForMeasurementPoint,
+            relatedToMessageId: relatedToMessageId,
+            gridAreaCode: null,
+            externalId: new ExternalId(message.ExternalId),
+            calculationId: null,
+            periodStartedAt: null);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
