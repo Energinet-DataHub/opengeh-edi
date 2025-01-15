@@ -150,6 +150,7 @@ public static class IncomingMessagesExtensions
          * Process Manager
          */
         services.AddTransient<IRequestProcessOrchestrationStarter, RequestProcessOrchestrationStarter>();
+        services.AddTransient<MeteredDataOrchestrationStarter>();
         services.AddProcessManagerMessageClient();
 
         return services;

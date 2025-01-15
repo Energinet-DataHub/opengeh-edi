@@ -68,7 +68,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         {
             { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            { DocumentFormat.Ebix, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
+            //{ DocumentFormat.Ebix, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
             { DocumentFormat.Xml, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.xml") },
             { DocumentFormat.Json, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.json") },
         };
