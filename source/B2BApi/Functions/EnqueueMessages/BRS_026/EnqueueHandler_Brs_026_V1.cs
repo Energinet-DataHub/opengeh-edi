@@ -21,9 +21,9 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 /// Enqueue accepted/rejected messages for BRS-026 (RequestAggregatedMeasureData).
 /// </summary>
 /// <param name="logger"></param>
-public class EnqueueBrs_026_Handler(
-    ILogger<EnqueueBrs_026_Handler> logger)
-    : EnqueueValidatedMessagesHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
+public class EnqueueHandler_Brs_026_V1(
+    ILogger<EnqueueHandler_Brs_026_V1> logger)
+    : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
 

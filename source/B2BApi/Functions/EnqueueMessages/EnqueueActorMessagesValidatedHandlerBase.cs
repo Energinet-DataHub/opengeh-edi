@@ -12,28 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
-public abstract class EnqueueValidatedMessagesHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueMessagesHandlerBase(logger)
+public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueActorMessagesHandlerBase(logger)
 {
-    protected override Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages)
+    protected override Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {
-            var acceptedData = DeserializeJsonInput<TAcceptedData>(enqueueActorMessages);
+            var acceptedData = DeserializeMessageData<TAcceptedData>(enqueueActorMessages.DataFormat, enqueueActorMessages.Data);
             return EnqueueAcceptedMessagesAsync(acceptedData);
         }
         else if (enqueueActorMessages.DataType == typeof(TRejectedData).Name)
         {
-            var rejectedData = DeserializeJsonInput<TRejectedData>(enqueueActorMessages);
+            var rejectedData = DeserializeMessageData<TRejectedData>(enqueueActorMessages.DataFormat, enqueueActorMessages.Data);
             return EnqueueRejectedMessagesAsync(rejectedData);
         }
 
-        throw new ArgumentOutOfRangeException(nameof(enqueueActorMessages.DataType), enqueueActorMessages.DataType, "EnqueueActorMessages contains an invalid data type.");
+        throw new ArgumentOutOfRangeException(
+            nameof(enqueueActorMessages.DataType),
+            enqueueActorMessages.DataType,
+            $"{nameof(EnqueueActorMessagesV1)} contains an invalid data type (expected {typeof(TAcceptedData).Name} or {typeof(TRejectedData).Name}).");
     }
 
     protected abstract Task EnqueueAcceptedMessagesAsync(TAcceptedData acceptedData);

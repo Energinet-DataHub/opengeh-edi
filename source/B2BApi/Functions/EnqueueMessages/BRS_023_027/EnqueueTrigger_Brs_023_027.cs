@@ -18,32 +18,32 @@ using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 
 /// <summary>
-/// Service Bus Trigger to enqueue messages for BRS-028 (RequestWholesaleServices),
+/// Service Bus Trigger to enqueue messages for BRS-023 (NotifyAggregatedMeasureData) and BRS-027 (NotifyWholesaleServices),
 /// received from the Process Manager subsystem.
 /// </summary>
 /// <param name="logger"></param>
-/// <param name="enqueueBrs028Handler"></param>
-public class EnqueueBrs_028_Trigger(
-    ILogger<EnqueueBrs_028_Trigger> logger,
-    EnqueueBrs_028_Handler enqueueBrs028Handler)
+/// <param name="handler"></param>
+public class EnqueueTrigger_Brs_023_027(
+    ILogger<EnqueueTrigger_Brs_023_027> logger,
+    EnqueueHandler_Brs_023_027_V1 handler)
 {
-    private readonly ILogger<EnqueueBrs_028_Trigger> _logger = logger;
-    private readonly EnqueueBrs_028_Handler _enqueueBrs028Handler = enqueueBrs028Handler;
+    private readonly ILogger<EnqueueTrigger_Brs_023_027> _logger = logger;
+    private readonly EnqueueHandler_Brs_023_027_V1 _handler = handler;
 
-    [Function(nameof(EnqueueBrs_028_Trigger))]
+    [Function(nameof(EnqueueTrigger_Brs_023_027))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
-            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}%",
+            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_023_027_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {
-        _logger.LogInformation("Enqueue BRS-028 messages service bus message received");
+        _logger.LogInformation("Enqueue BRS-023/027 messages service bus message received");
 
-        await _enqueueBrs028Handler.EnqueueAsync(message)
+        await _handler.EnqueueAsync(message)
             .ConfigureAwait(false);
     }
 }

@@ -58,9 +58,9 @@ public static class EdiTopicExtensions
                 name: "Enqueue BRS-028 Subscription");
 
         services
-            .AddTransient<EnqueueBrs_023_027_Handler>()
-            .AddTransient<EnqueueBrs_026_Handler>()
-            .AddTransient<EnqueueBrs_028_Handler>();
+            .AddTransient<EnqueueHandler_Brs_023_027_V1>()
+            .AddTransient<EnqueueHandler_Brs_026_V1>()
+            .AddTransient<EnqueueHandler_Brs_028_V1>();
 
         return services;
     }

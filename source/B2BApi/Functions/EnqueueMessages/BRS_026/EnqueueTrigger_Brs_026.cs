@@ -18,30 +18,30 @@ using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 
 /// <summary>
-/// Service Bus Trigger to enqueue messages for BRS-023 (NotifyAggregatedMeasureData) and BRS-027 (NotifyWholesaleServices),
+/// Service Bus Trigger to enqueue messages for BRS-026 (RequestAggregatedMeasureData),
 /// received from the Process Manager subsystem.
 /// </summary>
 /// <param name="logger"></param>
 /// <param name="handler"></param>
-public class EnqueueBrs_023_027_Trigger(
-    ILogger<EnqueueBrs_023_027_Trigger> logger,
-    EnqueueBrs_023_027_Handler handler)
+public class EnqueueTrigger_Brs_026(
+    ILogger<EnqueueTrigger_Brs_026> logger,
+    EnqueueHandler_Brs_026_V1 handler)
 {
-    private readonly ILogger<EnqueueBrs_023_027_Trigger> _logger = logger;
-    private readonly EnqueueBrs_023_027_Handler _handler = handler;
+    private readonly ILogger<EnqueueTrigger_Brs_026> _logger = logger;
+    private readonly EnqueueHandler_Brs_026_V1 _handler = handler;
 
-    [Function(nameof(EnqueueBrs_023_027_Trigger))]
+    [Function(nameof(EnqueueTrigger_Brs_026))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
-            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_023_027_SubscriptionName)}%",
+            $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_026_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {
-        _logger.LogInformation("Enqueue BRS-023/027 messages service bus message received");
+        _logger.LogInformation("Enqueue BRS-026 messages service bus message received");
 
         await _handler.EnqueueAsync(message)
             .ConfigureAwait(false);
