@@ -57,7 +57,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
             var startCommand =
                 new StartForwardMeteredDataCommandV1(
                     operatingIdentity: actorIdentity,
-                    new MeteredDataForMeasurementPointMessageInputV1(
+                    new MeteredDataForMeteringPointMessageInputV1(
                         AuthenticatedActorId: actorId,
                         TransactionId: transaction.TransactionId,
                         MeteringPointId: transaction.MeteringPointLocationId,
