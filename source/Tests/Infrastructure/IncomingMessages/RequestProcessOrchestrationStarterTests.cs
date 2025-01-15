@@ -85,12 +85,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup Process Manager client and callback
         var processManagerClient = new Mock<IProcessManagerMessageClient>();
-        MessageCommand<RequestCalculatedWholesaleServicesInputV1>? actualCommand = null;
+        RequestCalculatedWholesaleServicesCommandV1? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<RequestCalculatedWholesaleServicesCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((MessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((RequestCalculatedWholesaleServicesCommandV1 command, CancellationToken token) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -196,12 +196,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup Process Manager client and callback
         var processManagerClient = new Mock<IProcessManagerMessageClient>();
-        MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1>? actualCommand = null;
+        RequestCalculatedEnergyTimeSeriesCommandV1? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<RequestCalculatedEnergyTimeSeriesCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((RequestCalculatedEnergyTimeSeriesCommandV1 command, CancellationToken token) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -313,12 +313,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup Process Manager client and callback
         var processManagerClient = new Mock<IProcessManagerMessageClient>();
-        MessageCommand<MeteredDataForMeasurementPointMessageInputV1>? actualCommand = null;
+        StartForwardMeteredDataCommandV1? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<StartForwardMeteredDataCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((MessageCommand<MeteredDataForMeasurementPointMessageInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((StartForwardMeteredDataCommandV1 command, CancellationToken token) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -347,7 +347,7 @@ public class RequestProcessOrchestrationStarterTests
 
         var expectedCommand = new StartForwardMeteredDataCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
-            inputParameter: new MeteredDataForMeasurementPointMessageInputV1(
+            inputParameter: new MeteredDataForMeteringPointMessageInputV1(
                 AuthenticatedActorId: expectedActorId,
                 TransactionId: expectedTransactionId,
                 MeteringPointId: expectedMeteringPointId,
@@ -362,7 +362,7 @@ public class RequestProcessOrchestrationStarterTests
                 DelegatedGridAreaCodes: null,
                 EnergyObservations:
                 [
-                    new ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.EnergyObservation(
+                    new EnergyObservation(
                         Position: expectedPosition,
                         EnergyQuantity: expectedEnergyQuantity,
                         QuantityQuality: expectedQuantityQuality)
