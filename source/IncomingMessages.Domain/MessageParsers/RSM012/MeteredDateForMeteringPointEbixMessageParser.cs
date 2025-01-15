@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageParserBase(schemaProvider)
+public class MeteredDateForMeteringPointEbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageParserBase(schemaProvider)
 {
     private const string SeriesElementName = "PayloadEnergyTimeSeries";
     private const string Identification = "Identification";
@@ -46,7 +46,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
     protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
     {
         var transactionElements = document.Descendants(ns + SeriesElementName);
-        var result = new List<MeteredDataForMeasurementPointSeries>();
+        var result = new List<MeteredDataForMeteringPointSeries>();
         foreach (var transactionElement in transactionElements)
         {
             var id = transactionElement.Element(ns + Identification)?.Value ?? string.Empty;
@@ -68,7 +68,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
                     e.Element(ns + QuantityQuality)?.Value))
                 .ToList();
 
-            result.Add(new MeteredDataForMeasurementPointSeries(
+            result.Add(new MeteredDataForMeteringPointSeries(
                 id,
                 resolution,
                 startDateAndOrTimeDateTime,
@@ -87,7 +87,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
-        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessageBase(
+        return new IncomingMarketMessageParserResult(new MeteredDataForMeteringPointMessageBase(
             header.MessageId,
             header.MessageType,
             header.CreatedAt,

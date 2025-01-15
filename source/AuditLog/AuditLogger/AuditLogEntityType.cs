@@ -42,7 +42,7 @@ public record AuditLogEntityType(string Identifier)
     /// <summary>
     /// Used when a new metered data for measurement point message is received.
     /// </summary>
-    public static readonly AuditLogEntityType MeteredDataForMeasurementPointReceived = new("MeteredDataForMeasurementPointReceived");
+    public static readonly AuditLogEntityType MeteredDataForMeteringPointReceived = new("MeteredDataForMeteringPointReceived");
 
     /// <summary>
     /// Used when searching for orchestrations or getting status of a specific orchestration.

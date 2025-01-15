@@ -79,7 +79,7 @@ public class DelegateIncomingMessage
         {
             if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
                 && series.GridArea == null
-                && processType != ProcessType.IncomingMeteredDataForMeasurementPoint)
+                && processType != ProcessType.IncomingMeteredDataForMeteringPoint)
             {
                 continue;
             }
@@ -105,7 +105,7 @@ public class DelegateIncomingMessage
                         .ConfigureAwait(false);
                 }
 
-                if (processType == ProcessType.IncomingMeteredDataForMeasurementPoint)
+                if (processType == ProcessType.IncomingMeteredDataForMeteringPoint)
                 {
                     // For incoming metered data for measurement point, we do not know the owner of the metering point yet (original actor). Therefore, all delegated grid ares are parsed on.
                     // Then in the async validation we will check that the metering point belongs to any of the grid areas.
@@ -156,7 +156,7 @@ public class DelegateIncomingMessage
             { IncomingDocumentType.B2CRequestAggregatedMeasureData, ProcessType.RequestEnergyResults },
             { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
-            { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeasurementPoint },
+            { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeteringPoint },
         };
 
         if (documentTypeToProcessTypeMap.TryGetValue(incomingDocumentType, out var processType))

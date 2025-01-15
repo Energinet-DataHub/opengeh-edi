@@ -19,30 +19,30 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
-internal sealed class MeteredDataForMeasurementPointRequestDsl(EbixDriver ebix, EdiDriver ediDriver, EdiDatabaseDriver ediDatabaseDriver)
+internal sealed class MeteredDataForMeteringPointRequestDsl(EbixDriver ebix, EdiDriver ediDriver, EdiDatabaseDriver ediDatabaseDriver)
 {
     private readonly EbixDriver _ebix = ebix;
     private readonly EdiDriver _ediDriver = ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver = ediDatabaseDriver;
 
-    public async Task<string> SendMeteredDataForMeasurementPointInEbixAsync(CancellationToken cancellationToken)
+    public async Task<string> SendMeteredDataForMeteringPointInEbixAsync(CancellationToken cancellationToken)
     {
-        return await _ebix.SendMeteredDataForMeasurementPointAsync(cancellationToken);
+        return await _ebix.SendMeteredDataForMeteringPointAsync(cancellationToken);
     }
 
     public async Task ConfirmRequestIsReceivedAsync(string messageId, CancellationToken cancellationToken)
     {
         var processId = await _ediDatabaseDriver
-            .GetMeteredDataForMeasurementPointProcessIdAsync(messageId, cancellationToken)
+            .GetMeteredDataForMeteringPointProcessIdAsync(messageId, cancellationToken)
             .ConfigureAwait(false);
 
         processId.Should().NotBeNull("because the metered data for measurement point process should be initialized");
     }
 
-    public async Task<string> SendMeteredDataForMeasurementPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
+    public async Task<string> SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
     {
         return await _ebix
-            .SendMeteredDataForMeasurementPointWithAlreadyUsedMessageIdAsync(cancellationToken)
+            .SendMeteredDataForMeteringPointWithAlreadyUsedMessageIdAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -51,8 +51,8 @@ internal sealed class MeteredDataForMeasurementPointRequestDsl(EbixDriver ebix, 
         response.Should().BeEquivalentTo(errorMessage);
     }
 
-    public async Task<string> SendMeteredDataForMeasurementPointInCimAsync(CancellationToken cancellationToken)
+    public async Task<string> SendMeteredDataForMeteringPointInCimAsync(CancellationToken cancellationToken)
     {
-        return await _ediDriver.SendMeteredDataForMeasurementPointAsync(cancellationToken);
+        return await _ediDriver.SendMeteredDataForMeteringPointAsync(cancellationToken);
     }
 }

@@ -252,7 +252,7 @@ public class RequestProcessOrchestrationStarterTests
     [Theory]
     [InlineData("571313101700011887", "E17", "2023-05-31T22:00:00Z", "8716867000030", "Kwh", "PT1H")]
     [InlineData(null, null, null, null, null, null)]
-    public async Task Given_MeteredDataForMeasurementPoint_When_StartMeteredDataForMeasurementCalled_Then_ProcessManagerMessageClientIsCalled(
+    public async Task Given_MeteredDataForMeteringPoint_When_StartMeteredDataForMeasurementCalled_Then_ProcessManagerMessageClientIsCalled(
         string? expectedMeteringPointId,
         string? expectedMeteringPointType,
         string? expectedEndDate,
@@ -282,7 +282,7 @@ public class RequestProcessOrchestrationStarterTests
             ? Resolution.FromCode(expectedResolution)
             : null;
 
-        var initializeProcessDto = new InitializeMeteredDataForMeasurementPointMessageProcessDto(
+        var initializeProcessDto = new InitializeMeteredDataForMeteringPointMessageProcessDto(
             MessageId: expectedTransactionId,
             MessageType: "E66",
             CreatedAt: expectedRegistrationDateFrom,
@@ -290,7 +290,7 @@ public class RequestProcessOrchestrationStarterTests
             BusinessType: "23",
             Series:
             [
-                new InitializeMeteredDataForMeasurementPointMessageSeries(
+                new InitializeMeteredDataForMeteringPointMessageSeries(
                     TransactionId: expectedTransactionId,
                     Resolution: resolution?.Code,
                     StartDateTime: expectedStart,
@@ -313,12 +313,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup Process Manager client and callback
         var processManagerClient = new Mock<IProcessManagerMessageClient>();
-        MessageCommand<MeteredDataForMeasurementPointMessageInputV1>? actualCommand = null;
+        MessageCommand<MeteredDataForMeteringPointMessageInputV1>? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<StartForwardMeteredDataCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((MessageCommand<MeteredDataForMeasurementPointMessageInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((MessageCommand<MeteredDataForMeteringPointMessageInputV1> command, CancellationToken token) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -334,7 +334,7 @@ public class RequestProcessOrchestrationStarterTests
             authenticatedActor);
 
         // Act
-        await sut.StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
+        await sut.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
             initializeProcessDto,
             CancellationToken.None);
 
@@ -347,7 +347,7 @@ public class RequestProcessOrchestrationStarterTests
 
         var expectedCommand = new StartForwardMeteredDataCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
-            inputParameter: new MeteredDataForMeasurementPointMessageInputV1(
+            inputParameter: new MeteredDataForMeteringPointMessageInputV1(
                 AuthenticatedActorId: expectedActorId,
                 TransactionId: expectedTransactionId,
                 MeteringPointId: expectedMeteringPointId,

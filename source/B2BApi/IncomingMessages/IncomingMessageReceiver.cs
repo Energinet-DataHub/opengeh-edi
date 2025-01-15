@@ -144,7 +144,7 @@ public class IncomingMessageReceiver
         {
             { IncomingDocumentType.RequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
             { IncomingDocumentType.RequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
-            { IncomingDocumentType.NotifyValidatedMeasureData, AuditLogEntityType.MeteredDataForMeasurementPointReceived },
+            { IncomingDocumentType.NotifyValidatedMeasureData, AuditLogEntityType.MeteredDataForMeteringPointReceived },
         };
 
         entityTypeMapping.TryGetValue(incomingDocumentType, out var affectedEntityType);
@@ -169,8 +169,8 @@ public class IncomingMessageReceiver
             affectedEntityType = null;
         }
 
-        // Do not log the message if it is a MeteredDataForMeasurementPointReceived message
-        if (affectedEntityType == AuditLogEntityType.MeteredDataForMeasurementPointReceived) return;
+        // Do not log the message if it is a MeteredDataForMeteringPointReceived message
+        if (affectedEntityType == AuditLogEntityType.MeteredDataForMeteringPointReceived) return;
 
         var incomingMessage = await new StreamReader(incomingMarketMessageStream.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         await _auditLogger.LogWithCommitAsync(

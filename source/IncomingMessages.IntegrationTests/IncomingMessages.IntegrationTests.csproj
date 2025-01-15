@@ -60,14 +60,10 @@ limitations under the License.
         <EmbeddedResource Include="IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
-        <EmbeddedResource Include="IncomingMessages\EbixMeteredDataForMeasurementPoint.xml">
+        <EmbeddedResource Include="IncomingMessages\EbixMeteredDataForMeteringPoint.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
-        <EmbeddedResource Include="IncomingMessages\MeteredDataForMeasurementPoint.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </EmbeddedResource>
-        <None Remove="IncomingMessages\MeteredDataForMeasurementPoint.xml" />
-        <EmbeddedResource Include="IncomingMessages\MeteredDataForMeasurementPoint.xml">
+        <EmbeddedResource Include="IncomingMessages\MeteredDataForMeteringPoint.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>

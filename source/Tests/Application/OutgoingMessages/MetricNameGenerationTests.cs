@@ -27,11 +27,11 @@ public class MetricNameGenerationTests
     //     "resourceMetadata": {
     //         "id": "${appi_sharedres_id}"
     //     },
-    //     "name": "MeteredDataForMeasurementPoint{format}",
+    //     "name": "MeteredDataForMeteringPoint{format}",
     //     "aggregationType": 7,
     //     "namespace": "azure.applicationinsights",
     //     "metricVisualization": {
-    //         "displayName": "MeteredDataForMeasurementPoint{format}"
+    //         "displayName": "MeteredDataForMeteringPoint{format}"
     //     }
     // }
     // replace {format} with the supported formats for the new document type.

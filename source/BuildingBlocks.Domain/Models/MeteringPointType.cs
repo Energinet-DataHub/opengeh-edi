@@ -38,6 +38,7 @@ public class MeteringPointType : DataHubType<MeteringPointType>
     public static readonly MeteringPointType ElectricalHeating = new("ElectricalHeating", "D14");
     public static readonly MeteringPointType NetConsumption = new("NetConsumption", "D15");
     public static readonly MeteringPointType CapacitySettlement = new("CapacitySettlement", "D19");
+    public static readonly MeteringPointType SurplusProductionGroup6 = new(DataHubNames.MeteringPointType.SurplusProductionGroup6, "D04");
 
     [JsonConstructor]
     private MeteringPointType(string name, string code)

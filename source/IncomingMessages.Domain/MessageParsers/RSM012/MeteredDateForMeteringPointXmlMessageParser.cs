@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider schemaProvider)
+public class MeteredDateForMeteringPointXmlMessageParser(CimXmlSchemaProvider schemaProvider)
     : XmlMessageParserBase(schemaProvider)
 {
     private const string SeriesElementName = "Series";
@@ -76,7 +76,7 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
                     e.Element(ns + QualityElementName)?.Value))
             .ToList();
 
-        return new MeteredDataForMeasurementPointSeries(
+        return new MeteredDataForMeteringPointSeries(
             id,
             resolution,
             startDateAndOrTimeDateTime,
@@ -95,7 +95,7 @@ public class MeteredDateForMeasurementPointXmlMessageParser(CimXmlSchemaProvider
         IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
         return new IncomingMarketMessageParserResult(
-            new MeteredDataForMeasurementPointMessageBase(
+            new MeteredDataForMeteringPointMessageBase(
                 header.MessageId,
                 header.MessageType,
                 header.CreatedAt,

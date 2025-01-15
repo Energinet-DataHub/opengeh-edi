@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
-public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
+public class MeteredDateForMeteringPointCimXmlDocumentWriter(
     IMessageRecordParser parser)
     : CimXmlDocumentWriter(
         new DocumentDetails(
@@ -38,7 +38,7 @@ public class MeteredDateForMeasurementPointCimXmlDocumentWriter(
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
         XNamespace @namespace = "urn:ediel.org:measure:notifyvalidatedmeasuredata:0:1";
-        foreach (var activityRecord in ParseFrom<MeteredDateForMeasurementPointMarketActivityRecord>(marketActivityPayloads))
+        foreach (var activityRecord in ParseFrom<MeteredDateForMeteringPointMarketActivityRecord>(marketActivityPayloads))
         {
             var seriesElement = new XElement(@namespace + "Series");
             seriesElement.Add(new XElement(@namespace + "mRID", activityRecord.TransactionId.Value));

@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 
 public class ProcessTypeValidator : IProcessTypeValidator
 {
-    private static readonly IReadOnlyCollection<string> _meteredDataForMeasurementPointEbixWhiteList =
+    private static readonly IReadOnlyCollection<string> _meteredDataForMeteringPointEbixWhiteList =
     [
         BusinessReason.PeriodicMetering.Code,
         // Flex metering is only supported for Ebix and should be rejected when used for CIM
@@ -35,9 +35,9 @@ public class ProcessTypeValidator : IProcessTypeValidator
         ArgumentNullException.ThrowIfNull(message);
 
         if (documentFormat == DocumentFormat.Ebix
-            && message is MeteredDataForMeasurementPointMessageBase meteredDataForMeasurementPointMessage
-            && _meteredDataForMeasurementPointEbixWhiteList.Contains(
-                meteredDataForMeasurementPointMessage.BusinessReason))
+            && message is MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessageBase
+            && _meteredDataForMeteringPointEbixWhiteList.Contains(
+                meteredDataForMeteringPointMessageBase.BusinessReason))
         {
             return await Task.FromResult(Result.Succeeded()).ConfigureAwait(false);
         }

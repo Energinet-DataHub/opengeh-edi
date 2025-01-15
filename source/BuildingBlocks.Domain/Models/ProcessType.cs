@@ -20,8 +20,8 @@ public class ProcessType : EnumerationType
     public static readonly ProcessType ReceiveEnergyResults = new(nameof(ReceiveEnergyResults));
     public static readonly ProcessType RequestWholesaleResults = new(nameof(RequestWholesaleResults));
     public static readonly ProcessType ReceiveWholesaleResults = new(nameof(ReceiveWholesaleResults));
-    public static readonly ProcessType IncomingMeteredDataForMeasurementPoint = new(nameof(IncomingMeteredDataForMeasurementPoint));
-    public static readonly ProcessType OutgoingMeteredDataForMeasurementPoint = new(nameof(OutgoingMeteredDataForMeasurementPoint));
+    public static readonly ProcessType IncomingMeteredDataForMeteringPoint = new(nameof(IncomingMeteredDataForMeteringPoint));
+    public static readonly ProcessType OutgoingMeteredDataForMeteringPoint = new(nameof(OutgoingMeteredDataForMeteringPoint));
 
     private ProcessType(string name)
         : base(name)

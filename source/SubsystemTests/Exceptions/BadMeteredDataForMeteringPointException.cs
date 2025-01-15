@@ -14,18 +14,18 @@
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 
-public class BadMeteredDataForMeasurementPointException : Exception
+public class BadMeteredDataForMeteringPointException : Exception
 {
-    public BadMeteredDataForMeasurementPointException(string message)
+    public BadMeteredDataForMeteringPointException(string message)
         : base(message)
     {
     }
 
-    public BadMeteredDataForMeasurementPointException()
+    public BadMeteredDataForMeteringPointException()
     {
     }
 
-    public BadMeteredDataForMeasurementPointException(string message, Exception innerException)
+    public BadMeteredDataForMeteringPointException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

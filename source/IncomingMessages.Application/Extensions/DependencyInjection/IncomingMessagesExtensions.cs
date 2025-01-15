@@ -134,9 +134,9 @@ public static class IncomingMessagesExtensions
             .AddSingleton<EbixSchemaProvider>()
             .AddSingleton<JsonSchemaProvider>();
 
-        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointJsonMessageParser>();
-        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointEbixMessageParser>();
-        services.AddTransient<IMessageParser, MeteredDateForMeasurementPointXmlMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeteringPointJsonMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeteringPointEbixMessageParser>();
+        services.AddTransient<IMessageParser, MeteredDateForMeteringPointXmlMessageParser>();
 
         services.AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
         services.AddTransient<IMessageParser, WholesaleSettlementJsonMessageParser>();
