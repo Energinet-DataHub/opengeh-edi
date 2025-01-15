@@ -61,9 +61,6 @@ public static class DataHubNames
         public const string Consumption = "Consumption";
         public const string Production = "Production";
         public const string Exchange = "Exchange";
-
-        // Child
-        public const string SurplusProductionGroup6 = "SurplusProductionGroup6";
     }
 
     public static class Resolution
