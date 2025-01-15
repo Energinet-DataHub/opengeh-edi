@@ -66,6 +66,10 @@ limitations under the License.
         <EmbeddedResource Include="IncomingMessages\MeteredDataForMeteringPoint.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
+        <None Remove="IncomingMessages\MeteredDataForMeteringPoint.xml" />
+        <EmbeddedResource Include="IncomingMessages\MeteredDataForMeteringPoint.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
