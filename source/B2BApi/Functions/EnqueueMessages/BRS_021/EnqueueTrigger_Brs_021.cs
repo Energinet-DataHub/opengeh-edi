@@ -25,14 +25,14 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 /// Service Bus Trigger to enqueue messages for BRS-028 (RequestWholesaleServices),
 /// received from the Process Manager subsystem.
 /// </summary>
-public sealed class EnqueueBrs_021_Trigger(
-    ILogger<EnqueueBrs_021_Trigger> logger,
-    EnqueueBrs_021_Handler enqueueBrs021Handler)
+public sealed class EnqueueTrigger_Brs_021(
+    ILogger<EnqueueTrigger_Brs_021> logger,
+    EnqueueHandler_Brs_021_V1 enqueueHandlerBrs021V1)
 {
-    private readonly ILogger<EnqueueBrs_021_Trigger> _logger = logger;
-    private readonly EnqueueBrs_021_Handler _enqueueBrs021Handler = enqueueBrs021Handler;
+    private readonly ILogger<EnqueueTrigger_Brs_021> _logger = logger;
+    private readonly EnqueueHandler_Brs_021_V1 _enqueueHandlerBrs021V1 = enqueueHandlerBrs021V1;
 
-    [Function(nameof(EnqueueBrs_021_Trigger))]
+    [Function(nameof(EnqueueTrigger_Brs_021))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
@@ -42,7 +42,7 @@ public sealed class EnqueueBrs_021_Trigger(
     {
         _logger.LogInformation("Enqueue BRS-021 messages service bus message received");
 
-        await _enqueueBrs021Handler.EnqueueAsync(message)
+        await _enqueueHandlerBrs021V1.EnqueueAsync(message)
             .ConfigureAwait(false);
     }
 }
