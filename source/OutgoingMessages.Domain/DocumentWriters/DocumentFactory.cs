@@ -22,14 +22,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 
 public class DocumentFactory
 {
-    private readonly AcknowledgementJsonDocumentWriter _acknowledgementJsonDocumentWriter;
     private readonly IReadOnlyCollection<IDocumentWriter> _documentWriters;
 
-    public DocumentFactory(
-        IEnumerable<IDocumentWriter> documentWriters,
-        AcknowledgementJsonDocumentWriter acknowledgementJsonDocumentWriter)
+    public DocumentFactory(IEnumerable<IDocumentWriter> documentWriters)
     {
-        _acknowledgementJsonDocumentWriter = acknowledgementJsonDocumentWriter;
         _documentWriters = documentWriters.ToList();
     }
 
@@ -42,14 +38,11 @@ public class DocumentFactory
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(bundle);
 
-        if (bundle.DocumentType == DocumentType.Acknowledgement)
-        {
-            return WriteAcknowledgementAsync(bundle, documentFormat, timestamp, cancellationToken);
-        }
-
         var documentWriter =
             _documentWriters.FirstOrDefault(
-                writer => writer.HandlesType(bundle.DocumentType) && writer.HandlesFormat(documentFormat))
+                writer => writer.HandlesType(bundle.DocumentType)
+                          && writer.HandlesFormat(documentFormat)
+                          && (bundle.OutgoingMessages.Count <= 1 || writer.HandlesMultipleRecords()))
             ?? throw new OutgoingMessageException(
                 $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
 
@@ -64,42 +57,5 @@ public class DocumentFactory
                 timestamp),
             bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList(),
             cancellationToken);
-    }
-
-    private Task<MarketDocumentStream> WriteAcknowledgementAsync(
-        OutgoingMessageBundle bundle,
-        DocumentFormat documentFormat,
-        Instant timestamp,
-        CancellationToken cancellationToken)
-    {
-        if (bundle.OutgoingMessages.Count != 1)
-        {
-            throw new OutgoingMessageException(
-                $"Could not handle document type {bundle.DocumentType} in format {documentFormat} due to invalid number of messages");
-        }
-
-        if (documentFormat == DocumentFormat.Json)
-        {
-            return _acknowledgementJsonDocumentWriter.WriteAsync(
-                new OutgoingMessageHeader(
-                    bundle.BusinessReason,
-                    bundle.SenderId.Value,
-                    bundle.SenderRole.Code,
-                    bundle.Receiver.Number.Value,
-                    bundle.DocumentReceiver.ActorRole.Code,
-                    bundle.MessageId.Value,
-                    timestamp),
-                bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).Single(),
-                cancellationToken);
-        }
-
-        if (documentFormat == DocumentFormat.Xml)
-        {
-            throw new OutgoingMessageException(
-                $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
-        }
-
-        throw new OutgoingMessageException(
-            $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
     }
 }

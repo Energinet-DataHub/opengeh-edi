@@ -78,9 +78,8 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, MeteredDateForMeteringPointCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, MeteredDateForMeteringPointCimXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, AcknowledgementJsonDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
-
-        services.AddScoped<AcknowledgementJsonDocumentWriter>();
 
         // MessageEnqueueingConfiguration
         services.AddTransient<EnqueueMessage>()

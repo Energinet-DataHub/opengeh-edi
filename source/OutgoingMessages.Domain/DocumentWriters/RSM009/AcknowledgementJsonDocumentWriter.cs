@@ -31,6 +31,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
     "SA1118:Parameter should not span multiple lines",
     Justification = "Readability")]
 public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parser, JavaScriptEncoder encoder)
+    : IDocumentWriter
 {
     private const string DocumentTypeName = "Acknowledgement_MarketDocument";
 
@@ -41,14 +42,16 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
 
     public bool HandlesType(DocumentType documentType) => documentType == DocumentType.Acknowledgement;
 
+    public bool HandlesMultipleRecords() => false;
+
     public async Task<MarketDocumentStream> WriteAsync(
         OutgoingMessageHeader messageHeader,
-        string rawAcknowledgementV1,
+        IReadOnlyCollection<string> rawAcknowledgementV1,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var acknowledgementV1 = ParseFrom(rawAcknowledgementV1);
+        var acknowledgementV1 = ParseFrom(rawAcknowledgementV1.Single());
 
         var stream = new MarketDocumentWriterMemoryStream();
 

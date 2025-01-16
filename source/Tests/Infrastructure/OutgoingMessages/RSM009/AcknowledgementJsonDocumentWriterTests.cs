@@ -76,7 +76,7 @@ public class AcknowledgementJsonDocumentWriterTests
                 "DDQ",
                 "MessageId",
                 SystemClock.Instance.GetCurrentInstant()),
-            new Serializer().Serialize(acknowledgementRecord));
+            [new Serializer().Serialize(acknowledgementRecord)]);
 
         marketDocumentStream.Stream.Position = 0;
         var streamReader = new StreamReader(marketDocumentStream.Stream);
