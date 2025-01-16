@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMea
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
@@ -115,6 +116,6 @@ public interface IOutgoingMessagesClient
     /// Enqueue metered data for measurement point messages, handles enqueuing messages to all appropriate parties in a single transaction.
     /// </summary>
     Task<Guid> EnqueueAndCommitAsync(
-        object meteredDataForMeasurementPointMessageProcessDto,
+        MeteredDataForMeteringPointRejectedV1 meteredDataForMeasurementPointMessageProcessDto,
         CancellationToken cancellationToken);
 }

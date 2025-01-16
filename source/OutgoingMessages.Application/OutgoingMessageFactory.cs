@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessa
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
@@ -406,15 +407,15 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        ProcManRsm009 message,
+        MeteredDataForMeteringPointRejectedV1 message,
         ISerializer serializer,
         Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(message);
 
-        MessageId? relatedToMessageId = message.AcknowledgementRecord.ReceivedMarketDocumentTransactionId is not null
-            ? MessageId.Create(message.AcknowledgementRecord.ReceivedMarketDocumentTransactionId.Value)
+        MessageId? relatedToMessageId = message.AcknowledgementV1.ReceivedMarketDocumentTransactionId is not null
+            ? MessageId.Create(message.AcknowledgementV1.ReceivedMarketDocumentTransactionId)
             : null;
 
         return new OutgoingMessage(
@@ -428,7 +429,7 @@ public static class OutgoingMessageFactory
                 ActorRole.FromCode(message.ReceiverRole)),
             processId: message.ProcessId,
             businessReason: message.BusinessReason,
-            serializedContent: serializer.Serialize(message.AcknowledgementRecord),
+            serializedContent: serializer.Serialize(message.AcknowledgementV1),
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.IncomingMeteredDataForMeasurementPoint,
             relatedToMessageId: relatedToMessageId,

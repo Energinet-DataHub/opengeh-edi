@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 using Microsoft.Extensions.Logging;
 
@@ -25,7 +26,8 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 public sealed class EnqueueHandler_Brs_021_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     ILogger<EnqueueHandler_Brs_021_V1> logger)
-    : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1, ProcManRsm009>(logger)
+    : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1,
+        MeteredDataForMeteringPointRejectedV1>(logger)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly ILogger _logger = logger;
@@ -40,15 +42,12 @@ public sealed class EnqueueHandler_Brs_021_V1(
         await Task.CompletedTask.ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(ProcManRsm009 rejectedData)
+    protected override async Task EnqueueRejectedMessagesAsync(MeteredDataForMeteringPointRejectedV1 rejectedData)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None);
-
-        // TODO: Call actual logic that enqueues rejected message
-        await Task.CompletedTask.ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None);
     }
 }

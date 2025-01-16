@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMea
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
@@ -217,6 +218,21 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var message = OutgoingMessageFactory.CreateMessage(
             meteredDataForMeasurementPointMessageProcessDto,
+            _serializer,
+            _clock.GetCurrentInstant());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messageId.Value;
+    }
+
+    public async Task<Guid> EnqueueAndCommitAsync(
+        MeteredDataForMeteringPointRejectedV1 meteredDataForMeteringPointRejected,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessageFactory.CreateMessage(
+            meteredDataForMeteringPointRejected,
             _serializer,
             _clock.GetCurrentInstant());
 
