@@ -37,7 +37,7 @@ public class AcknowledgementJsonDocumentWriterTests
             UnicodeRanges.LatinExtendedA));
 
     [Fact]
-    public async Task METHOD()
+    public async Task Given_MaximalMessage_Then_CanWriteSchemaValidDocument()
     {
         var reasons = new ReasonV1[] { new("A22", "Some error occured"), new("A23", "Some other error occured"), };
         var timePeriods = new TimePeriodV1[]
