@@ -20,7 +20,7 @@ using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public class MeteredDateForMeasurementPointBuilder
+public class MeteredDateForMeteringPointBuilder
 {
     public OutgoingMessageHeader BuildHeader()
     {
@@ -34,9 +34,9 @@ public class MeteredDateForMeasurementPointBuilder
             SampleData.TimeStamp);
     }
 
-    public MeteredDateForMeasurementPointMarketActivityRecord BuildMeteredDataForMeasurementPoint()
+    public MeteredDateForMeteringPointMarketActivityRecord BuildMeteredDataForMeteringPoint()
     {
-        return new MeteredDateForMeasurementPointMarketActivityRecord(
+        return new MeteredDateForMeteringPointMarketActivityRecord(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,
             SampleData.MeteringPointType,
@@ -50,7 +50,7 @@ public class MeteredDateForMeasurementPointBuilder
             SampleData.Points);
     }
 
-    public MeteredDateForMeasurementPointMarketActivityRecord BuildMinimalMeteredDataForMeasurementPoint() =>
+    public MeteredDateForMeteringPointMarketActivityRecord BuildMinimalMeteredDataForMeteringPoint() =>
         new(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,

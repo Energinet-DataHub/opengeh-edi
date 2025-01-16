@@ -19,9 +19,9 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
 
 /// <summary>
-/// Represents the message for metered data for measurement point known as RSM-012.
+/// Represents the message for metered data for metering point known as RSM-012.
 /// </summary>
-public class MeteredDataForMeasurementPointMessageBase(
+public class MeteredDataForMeteringPointMessageBase(
     string messageId,
     string messageType,
     string createdAt,
@@ -66,7 +66,7 @@ public class MeteredDataForMeasurementPointMessageBase(
     ];
 }
 
-public record MeteredDataForMeasurementPointSeries(
+public record MeteredDataForMeteringPointSeries(
     string TransactionId,
     string? Resolution,
     string StartDateTime,

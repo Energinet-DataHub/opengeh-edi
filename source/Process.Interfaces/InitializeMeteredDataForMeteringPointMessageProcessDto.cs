@@ -14,15 +14,15 @@
 
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
-public record InitializeMeteredDataForMeasurementPointMessageProcessDto(
+public record InitializeMeteredDataForMeteringPointMessageProcessDto(
     string MessageId,
     string MessageType,
     string CreatedAt,
     string BusinessReason,
     string? BusinessType,
-    IReadOnlyCollection<InitializeMeteredDataForMeasurementPointMessageSeries> Series);
+    IReadOnlyCollection<InitializeMeteredDataForMeteringPointMessageSeries> Series);
 
-public record InitializeMeteredDataForMeasurementPointMessageSeries(
+public record InitializeMeteredDataForMeteringPointMessageSeries(
     string TransactionId,
     string? Resolution,
     string StartDateTime,

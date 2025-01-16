@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
@@ -382,7 +382,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        MeteredDataForMeasurementPointMessageProcessDto message,
+        MeteredDataForMeteringPointMessageProcessDto message,
         ISerializer serializer,
         Instant timestamp)
     {
@@ -398,7 +398,7 @@ public static class OutgoingMessageFactory
             businessReason: message.BusinessReason,
             serializedContent: serializer.Serialize(message.Series),
             createdAt: timestamp,
-            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeasurementPoint,
+            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
             relatedToMessageId: message.RelatedToMessageId,
             gridAreaCode: null,
             externalId: message.ExternalId,

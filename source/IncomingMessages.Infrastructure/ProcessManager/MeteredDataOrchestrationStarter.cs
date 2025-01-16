@@ -28,8 +28,8 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
-    public async Task StartForwardMeteredDataForMeasurementPointOrchestrationAsync(
-        InitializeMeteredDataForMeasurementPointMessageProcessDto initializeProcessDto,
+    public async Task StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+        InitializeMeteredDataForMeteringPointMessageProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
         var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);

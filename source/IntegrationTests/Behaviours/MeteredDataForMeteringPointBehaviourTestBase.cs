@@ -30,16 +30,16 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test methods")]
-public abstract class MeteredDataForMeasurementPointBehaviourTestBase : BehavioursTestBase
+public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursTestBase
 {
-    protected MeteredDataForMeasurementPointBehaviourTestBase(
+    protected MeteredDataForMeteringPointBehaviourTestBase(
         IntegrationTestFixture integrationTestFixture,
         ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
     }
 
-    protected async Task<ResponseMessage> GivenReceivedMeteredDataForMeasurementPoint(
+    protected async Task<ResponseMessage> GivenReceivedMeteredDataForMeteringPoint(
         DocumentFormat documentFormat,
         ActorNumber senderActorNumber,
         IReadOnlyCollection<(string TransactionId, Instant PeriodStart, Instant PeriodEnd, Resolution Resolution)>
@@ -48,7 +48,7 @@ public abstract class MeteredDataForMeasurementPointBehaviourTestBase : Behaviou
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
-        var incomingMessageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var incomingMessageStream = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             format: documentFormat,
             senderActorNumber: senderActorNumber,
             series: series);
@@ -80,9 +80,9 @@ public abstract class MeteredDataForMeasurementPointBehaviourTestBase : Behaviou
         return response;
     }
 
-    protected async Task WhenMeteredDataForMeasurementPointProcessIsInitialized(ServiceBusMessage serviceBusMessage)
+    protected async Task WhenMeteredDataForMeteringPointProcessIsInitialized(ServiceBusMessage serviceBusMessage)
     {
-        await InitializeProcess(serviceBusMessage, nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto));
+        await InitializeProcess(serviceBusMessage, nameof(InitializeMeteredDataForMeteringPointMessageProcessDto));
     }
 
     protected async Task ThenNotifyValidatedMeasureDataDocumentIsCorrect(

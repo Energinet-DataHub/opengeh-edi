@@ -75,8 +75,8 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, MeteredDateForMeasurementPointCimJsonDocumentWriter>()
-            .AddScoped<IDocumentWriter, MeteredDateForMeasurementPointCimXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, MeteredDateForMeteringPointCimJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, MeteredDateForMeteringPointCimXmlDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         // MessageEnqueueingConfiguration

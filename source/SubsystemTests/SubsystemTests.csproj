@@ -135,10 +135,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Messages\ebix\MeteredDataForMeasurementPoint.xml">
+      <EmbeddedResource Include="Messages\ebix\MeteredDataForMeteringPoint.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Messages\json\MeteredDataForMeasurementPoint.json">
+      <EmbeddedResource Include="Messages\json\MeteredDataForMeteringPoint.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json">

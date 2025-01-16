@@ -26,7 +26,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeasurementPointMessageParserTests;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeteringPointMessageParserTests;
 
 public sealed class MessageParserTests
 {
@@ -34,26 +34,26 @@ public sealed class MessageParserTests
         $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}";
 
     private static readonly string SubPath =
-        $"{Path.DirectorySeparatorChar}MeteredDataForMeasurementPoint{Path.DirectorySeparatorChar}";
+        $"{Path.DirectorySeparatorChar}MeteredDataForMeteringPoint{Path.DirectorySeparatorChar}";
 
     private readonly Dictionary<DocumentFormat, IMessageParser> _marketMessageParser = new()
     {
-        { DocumentFormat.Ebix, new MeteredDateForMeasurementPointEbixMessageParser(new EbixSchemaProvider()) },
-        { DocumentFormat.Xml, new MeteredDateForMeasurementPointXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
-        { DocumentFormat.Json, new MeteredDateForMeasurementPointJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
+        { DocumentFormat.Ebix, new MeteredDateForMeteringPointEbixMessageParser(new EbixSchemaProvider()) },
+        { DocumentFormat.Xml, new MeteredDateForMeteringPointXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
+        { DocumentFormat.Json, new MeteredDateForMeteringPointJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
     };
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
     {
         var data = new TheoryData<DocumentFormat, Stream>
         {
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.xml") },
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.xml") },
-            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeasurementPoint.json") },
-            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.json") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeteringPoint.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeteringPointWithTwoTransactions.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeteringPoint.xml") },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeteringPoint.xml") },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidMeteredDataForMeteringPointWithTwoTransactions.xml") },
+            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeteringPoint.json") },
+            { DocumentFormat.Json, CreateBaseJsonMessage("ValidMeteredDataForMeteringPointWithTwoTransactions.json") },
         };
 
         return data;
@@ -63,11 +63,11 @@ public sealed class MessageParserTests
     {
         var data = new TheoryData<DocumentFormat, Stream, string>
         {
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDataForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
-            { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionMeteredDataForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
-            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
-            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeasurementPoint.json"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDataForMeteringPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionMeteredDataForMeteringPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeteringPoint.json"), nameof(InvalidMessageStructure) },
         };
 
         return data;
@@ -84,7 +84,7 @@ public sealed class MessageParserTests
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
-        var marketMessage = (MeteredDataForMeasurementPointMessageBase)result.IncomingMessage!;
+        var marketMessage = (MeteredDataForMeteringPointMessageBase)result.IncomingMessage!;
         marketMessage.Should().NotBeNull();
         marketMessage.MessageId.Should().Be("111131835");
         marketMessage.MessageType.Should().Be("E66");
@@ -96,7 +96,7 @@ public sealed class MessageParserTests
         marketMessage.ReceiverRoleCode.Should().Be("DGL");
         marketMessage.BusinessType.Should().Be("23");
 
-        foreach (var series in marketMessage.Series.Cast<MeteredDataForMeasurementPointSeries>())
+        foreach (var series in marketMessage.Series.Cast<MeteredDataForMeteringPointSeries>())
         {
             series.Should().NotBeNull();
             series.TransactionId.Should()

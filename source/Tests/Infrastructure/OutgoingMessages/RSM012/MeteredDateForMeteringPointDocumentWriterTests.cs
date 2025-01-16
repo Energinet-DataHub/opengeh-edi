@@ -30,11 +30,11 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
-public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidationFixture documentValidation)
+public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFixture documentValidation)
     : IClassFixture<DocumentValidationFixture>
 {
     private readonly MessageRecordParser _parser = new(new Serializer());
-    private readonly MeteredDateForMeasurementPointBuilder _meteredDateForMeasurementPointBuilder = new();
+    private readonly MeteredDateForMeteringPointBuilder _meteredDateForMeteringPointBuilder = new();
     private readonly DocumentValidationFixture _documentValidation = documentValidation;
 
     [Theory]
@@ -43,12 +43,12 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
     public async Task Can_create_maximal_notifyValidatedMeasureData_document(string documentFormat)
     {
         // Arrange
-        var messageBuilder = _meteredDateForMeasurementPointBuilder;
+        var messageBuilder = _meteredDateForMeteringPointBuilder;
 
         // Act
         var document = await WriteDocument(
             messageBuilder.BuildHeader(),
-            messageBuilder.BuildMeteredDataForMeasurementPoint(),
+            messageBuilder.BuildMeteredDataForMeteringPoint(),
             DocumentFormat.FromName(documentFormat));
 
         // Assert
@@ -91,12 +91,12 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
     public async Task Can_create_minimal_series_notifyValidatedMeasureData_document(string documentFormat)
     {
         // Arrange
-        var messageBuilder = _meteredDateForMeasurementPointBuilder;
+        var messageBuilder = _meteredDateForMeteringPointBuilder;
 
         // Act
         var document = await WriteDocument(
             messageBuilder.BuildHeader(),
-            messageBuilder.BuildMinimalMeteredDataForMeasurementPoint(),
+            messageBuilder.BuildMinimalMeteredDataForMeteringPoint(),
             DocumentFormat.FromName(documentFormat));
 
         // Assert
@@ -144,7 +144,7 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
     public async Task Can_create_no_series_notifyValidatedMeasureData_document(string documentFormat)
     {
         // Arrange
-        var messageBuilder = _meteredDateForMeasurementPointBuilder;
+        var messageBuilder = _meteredDateForMeteringPointBuilder;
 
         // Act
         var document = await WriteDocument(
@@ -167,36 +167,36 @@ public class MeteredDateForMeasurementPointDocumentWriterTests(DocumentValidatio
 
     private Task<MarketDocumentStream> WriteDocument(
         OutgoingMessageHeader header,
-        MeteredDateForMeasurementPointMarketActivityRecord? meteredDateForMeasurementPointMarketActivityRecord,
+        MeteredDateForMeteringPointMarketActivityRecord? meteredDateForMeteringPointMarketActivityRecord,
         DocumentFormat documentFormat)
     {
-        var records = meteredDateForMeasurementPointMarketActivityRecord is null
+        var records = meteredDateForMeteringPointMarketActivityRecord is null
             ? null
-            : _parser.From(meteredDateForMeasurementPointMarketActivityRecord);
+            : _parser.From(meteredDateForMeteringPointMarketActivityRecord);
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new MeteredDateForMeasurementPointCimXmlDocumentWriter(_parser)
+            return new MeteredDateForMeteringPointCimXmlDocumentWriter(_parser)
                 .WriteAsync(header, records is null ? [] : [records]);
         }
 
         var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
-        return new MeteredDateForMeasurementPointCimJsonDocumentWriter(
+        return new MeteredDateForMeteringPointCimJsonDocumentWriter(
                 _parser,
                 serviceProvider.GetRequiredService<JavaScriptEncoder>())
             .WriteAsync(header, records is null ? [] : [records], CancellationToken.None);
     }
 
-    private IAssertMeteredDateForMeasurementPointDocumentDocument AssertDocument(
+    private IAssertMeteredDateForMeteringPointDocumentDocument AssertDocument(
         MarketDocumentStream document,
         DocumentFormat documentFormat)
     {
         if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
-            return new AssertMeteredDateForMeasurementPointXmlDocument(assertXmlDocument);
+            return new AssertMeteredDateForMeteringPointXmlDocument(assertXmlDocument);
         }
 
-        return new AssertMeteredDateForMeasurementPointJsonDocument(document.Stream);
+        return new AssertMeteredDateForMeteringPointJsonDocument(document.Stream);
     }
 }

@@ -18,18 +18,18 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
-public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
+public static class InitializeMeteredDataForMeteringPointProcessDtoFactory
 {
-    public static InitializeMeteredDataForMeasurementPointMessageProcessDto Create(MeteredDataForMeasurementPointMessageBase meteredDataForMeasurementPointMessageBase, AuthenticatedActor authenticatedActor)
+    public static InitializeMeteredDataForMeteringPointMessageProcessDto Create(MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessageBase, AuthenticatedActor authenticatedActor)
     {
-        ArgumentNullException.ThrowIfNull(meteredDataForMeasurementPointMessageBase);
+        ArgumentNullException.ThrowIfNull(meteredDataForMeteringPointMessageBase);
 
-        var series = meteredDataForMeasurementPointMessageBase.Series
-            .Cast<MeteredDataForMeasurementPointSeries>()
+        var series = meteredDataForMeteringPointMessageBase.Series
+            .Cast<MeteredDataForMeteringPointSeries>()
             .Select(
                 series =>
                 {
-                    return new InitializeMeteredDataForMeasurementPointMessageSeries(
+                    return new InitializeMeteredDataForMeteringPointMessageSeries(
                         TransactionId: series.TransactionId,
                         Resolution: series.Resolution,
                         StartDateTime: series.StartDateTime,
@@ -54,12 +54,12 @@ public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
                 })
             .ToList().AsReadOnly();
 
-        return new InitializeMeteredDataForMeasurementPointMessageProcessDto(
-            meteredDataForMeasurementPointMessageBase.MessageId,
-            meteredDataForMeasurementPointMessageBase.MessageType,
-            meteredDataForMeasurementPointMessageBase.CreatedAt,
-            meteredDataForMeasurementPointMessageBase.BusinessReason,
-            meteredDataForMeasurementPointMessageBase.BusinessType,
+        return new InitializeMeteredDataForMeteringPointMessageProcessDto(
+            meteredDataForMeteringPointMessageBase.MessageId,
+            meteredDataForMeteringPointMessageBase.MessageType,
+            meteredDataForMeteringPointMessageBase.CreatedAt,
+            meteredDataForMeteringPointMessageBase.BusinessReason,
+            meteredDataForMeteringPointMessageBase.BusinessType,
             series);
     }
 }

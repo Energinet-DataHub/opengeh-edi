@@ -24,10 +24,10 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
-public sealed class GivenMeteredDataForMeasurementPointTests(
+public sealed class GivenMeteredDataForMeteringPointTests(
     IntegrationTestFixture integrationTestFixture,
     ITestOutputHelper testOutputHelper)
-    : MeteredDataForMeasurementPointBehaviourTestBase(integrationTestFixture, testOutputHelper)
+    : MeteredDataForMeteringPointBehaviourTestBase(integrationTestFixture, testOutputHelper)
 {
     public static TheoryData<DocumentFormat> SupportedDocumentFormats =>
     [
@@ -51,7 +51,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         var transactionId1 = $"{transactionIdPrefix}-1";
         var transactionId2 = $"{transactionIdPrefix}-2";
 
-        await GivenReceivedMeteredDataForMeasurementPoint(
+        await GivenReceivedMeteredDataForMeteringPoint(
             documentFormat: documentFormat,
             senderActorNumber: currentActor.ActorNumber,
             [
@@ -65,7 +65,7 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
                     Resolution.QuarterHourly),
             ]);
 
-        await WhenMeteredDataForMeasurementPointProcessIsInitialized(senderSpy.LatestMessage!);
+        await WhenMeteredDataForMeteringPointProcessIsInitialized(senderSpy.LatestMessage!);
 
         // ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect
 
@@ -153,12 +153,12 @@ public sealed class GivenMeteredDataForMeasurementPointTests(
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
 
-        await GivenReceivedMeteredDataForMeasurementPoint(
+        await GivenReceivedMeteredDataForMeteringPoint(
             documentFormat: documentFormat,
             senderActorNumber: currentActor.ActorNumber,
             []);
 
-        await WhenMeteredDataForMeasurementPointProcessIsInitialized(senderSpy.LatestMessage!);
+        await WhenMeteredDataForMeteringPointProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(

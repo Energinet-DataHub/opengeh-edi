@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
@@ -106,10 +106,10 @@ public interface IOutgoingMessagesClient
     Task<Guid> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue metered data for measurement point messages, handles enqueuing messages to all appropriate parties in a single transaction.
+    /// Enqueue metered data for metering point messages, handles enqueuing messages to all appropriate parties in a single transaction.
     /// </summary>
     Task<Guid> EnqueueAndCommitAsync(
-        MeteredDataForMeasurementPointMessageProcessDto meteredDataForMeasurementPointMessageProcessDto,
+        MeteredDataForMeteringPointMessageProcessDto meteredDataForMeteringPointMessageProcessDto,
         CancellationToken cancellationToken);
 
     /// <summary>

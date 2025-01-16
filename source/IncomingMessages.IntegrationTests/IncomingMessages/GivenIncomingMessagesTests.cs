@@ -68,9 +68,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         {
             { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            //{ DocumentFormat.Ebix, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Xml, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Json, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.json") },
+            //{ DocumentFormat.Ebix, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml") },
+            { DocumentFormat.Xml, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeteringPoint.xml") },
+            { DocumentFormat.Json, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeteringPoint.json") },
         };
 
         return data;
@@ -398,7 +398,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     }
 
     [Fact]
-    public async Task When_MeteredDataForMeasurementPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
+    public async Task When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
     {
         // Assert
         const string messageIdFromFile = "111131835";
@@ -408,7 +408,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible, ActorId));
 
-        var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml");
+        var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml");
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(

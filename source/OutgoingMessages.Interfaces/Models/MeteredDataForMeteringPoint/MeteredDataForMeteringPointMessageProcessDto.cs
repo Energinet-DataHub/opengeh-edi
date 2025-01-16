@@ -14,14 +14,14 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed class MeteredDataForMeasurementPointMessageProcessDto(
+public sealed class MeteredDataForMeteringPointMessageProcessDto(
     EventId eventId,
     Actor receiver,
     BusinessReason businessReason,
     MessageId relatedToMessageId,
-    MeteredDataForMeasurementPointMessageSeriesDto series)
+    MeteredDataForMeteringPointMessageSeriesDto series)
     : OutgoingMessageDto(
         DocumentType.NotifyValidatedMeasureData,
         receiver.ActorNumber,
@@ -32,5 +32,5 @@ public sealed class MeteredDataForMeasurementPointMessageProcessDto(
         new ExternalId(Guid.NewGuid()),
         relatedToMessageId)
 {
-    public MeteredDataForMeasurementPointMessageSeriesDto Series { get; } = series;
+    public MeteredDataForMeteringPointMessageSeriesDto Series { get; } = series;
 }
