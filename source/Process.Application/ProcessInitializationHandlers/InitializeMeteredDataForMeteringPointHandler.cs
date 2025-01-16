@@ -50,7 +50,7 @@ public class InitializeMeteredDataForMeteringPointHandler(
         var marketMessage =
             _serializer.Deserialize<InitializeMeteredDataForMeteringPointMessageProcessDto>(
                 System.Text.Encoding.UTF8.GetString(processInitializationData));
-        _logger.LogInformation("Received InitializeAggregatedMeasureDataProcess for message {MessageId}", marketMessage.MessageId);
+        _logger.LogInformation("Received InitializeMeteredDataForMeteringPointMessageProcess for message {MessageId}", marketMessage.MessageId);
 
         foreach (var series in marketMessage.Series)
         {
