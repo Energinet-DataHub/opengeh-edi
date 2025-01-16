@@ -19,17 +19,17 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
-using Reason = Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009.Reason;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
 public class AcknowledgementJsonDocumentWriterTests
 {
-    private readonly AcknowledgementJsonDocumentWriter _sut = new AcknowledgementJsonDocumentWriter(
+    private readonly AcknowledgementJsonDocumentWriter _sut = new(
         new MessageRecordParser(new Serializer()),
         JavaScriptEncoder.Create(
             UnicodeRanges.BasicLatin,
@@ -39,24 +39,23 @@ public class AcknowledgementJsonDocumentWriterTests
     [Fact]
     public async Task METHOD()
     {
-        var reasons = new Reason[] { new("A22", "Some error occured"), new("A23", "Some other error occured"), };
-        var timePeriods = new TimePeriod[]
+        var reasons = new ReasonV1[] { new("A22", "Some error occured"), new("A23", "Some other error occured"), };
+        var timePeriods = new TimePeriodV1[]
         {
             new(
-                new Interval(
-                    SystemClock.Instance.GetCurrentInstant(),
-                    SystemClock.Instance.GetCurrentInstant()),
+                new TimeInterval(
+                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset(),
+                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset()),
                 reasons),
             new(
-                new Interval(
-                    SystemClock.Instance.GetCurrentInstant(),
-                    SystemClock.Instance.GetCurrentInstant()),
+                new TimeInterval(
+                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset(),
+                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset()),
                 reasons),
         };
 
-        var acknowledgementRecord = new AcknowledgementRecord(
-            TransactionId.New(),
-            SystemClock.Instance.GetCurrentInstant(),
+        var acknowledgementRecord = new AcknowledgementV1(
+            SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset(),
             TransactionId.New(),
             "A10",
             "2",
@@ -64,9 +63,9 @@ public class AcknowledgementJsonDocumentWriterTests
             "ERR",
             reasons,
             timePeriods,
-            [new Series("bbf014de7733", reasons), new Series("aa0484c10e6d", reasons)],
-            [new MktActivityRecord("680048962dd2", reasons), new MktActivityRecord("b455eba88025", reasons)],
-            [new TimeSeries("123", "1", timePeriods, reasons), new TimeSeries("456", "2", timePeriods, reasons)]);
+            [new SeriesV1("bbf014de7733", reasons), new SeriesV1("aa0484c10e6d", reasons)],
+            [new MktActivityRecordV1("680048962dd2", reasons), new MktActivityRecordV1("b455eba88025", reasons)],
+            [new TimeSeriesV1("123", "1", timePeriods, reasons), new TimeSeriesV1("456", "2", timePeriods, reasons)]);
 
         var marketDocumentStream = await _sut.WriteAsync(
             new OutgoingMessageHeader(
