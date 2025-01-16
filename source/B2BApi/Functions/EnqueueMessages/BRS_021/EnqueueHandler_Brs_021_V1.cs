@@ -48,6 +48,6 @@ public sealed class EnqueueHandler_Brs_021_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None).ConfigureAwait(false);
     }
 }
