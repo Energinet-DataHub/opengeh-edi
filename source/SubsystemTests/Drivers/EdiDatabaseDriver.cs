@@ -175,7 +175,7 @@ internal sealed class EdiDatabaseDriver
         return await GetProcessIdAsync(command, cancellationToken);
     }
 
-    internal async Task<string?> GetMeteredDataForMeasurementPointProcessIdAsync(string initiatedByMessageId, CancellationToken cancellationToken)
+    internal async Task<string?> GetMeteredDataForMeteringPointProcessIdAsync(string initiatedByMessageId, CancellationToken cancellationToken)
     {
         await using var command = new SqlCommand();
 

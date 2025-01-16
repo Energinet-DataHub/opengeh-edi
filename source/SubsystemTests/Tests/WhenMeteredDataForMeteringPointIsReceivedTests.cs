@@ -22,14 +22,14 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public class WhenMeteredDataForMeasurementPointIsReceivedTests : BaseTestClass
+public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
 {
-    private readonly MeteredDataForMeasurementPointRequestDsl _meteredDataForMeasurementPointGridAccessProvider;
+    private readonly MeteredDataForMeteringPointRequestDsl _meteredDataForMeteringPointGridAccessProvider;
 
-    public WhenMeteredDataForMeasurementPointIsReceivedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
+    public WhenMeteredDataForMeteringPointIsReceivedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
     {
-        _meteredDataForMeasurementPointGridAccessProvider = new MeteredDataForMeasurementPointRequestDsl(
+        _meteredDataForMeteringPointGridAccessProvider = new MeteredDataForMeteringPointRequestDsl(
             new EbixDriver(
                 fixture.EbixUri,
                 fixture.EbixGridAccessProviderCredentials,
@@ -42,36 +42,36 @@ public class WhenMeteredDataForMeasurementPointIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_can_send_metered_data_for_measurement_point_in_cim_to_datahub()
+    public async Task Actor_can_send_metered_data_for_metering_point_in_cim_to_datahub()
     {
-        var messageId = await _meteredDataForMeasurementPointGridAccessProvider
-            .SendMeteredDataForMeasurementPointInCimAsync(CancellationToken.None);
+        var messageId = await _meteredDataForMeteringPointGridAccessProvider
+            .SendMeteredDataForMeteringPointInCimAsync(CancellationToken.None);
 
-        await _meteredDataForMeasurementPointGridAccessProvider.ConfirmRequestIsReceivedAsync(
+        await _meteredDataForMeteringPointGridAccessProvider.ConfirmRequestIsReceivedAsync(
             messageId,
             CancellationToken.None);
     }
 
     [Fact]
-    public async Task Actor_can_send_metered_data_for_measurement_point_in_ebix_to_datahub()
+    public async Task Actor_can_send_metered_data_for_metering_point_in_ebix_to_datahub()
     {
-        var messageId = await _meteredDataForMeasurementPointGridAccessProvider
-            .SendMeteredDataForMeasurementPointInEbixAsync(CancellationToken.None);
+        var messageId = await _meteredDataForMeteringPointGridAccessProvider
+            .SendMeteredDataForMeteringPointInEbixAsync(CancellationToken.None);
 
-        await _meteredDataForMeasurementPointGridAccessProvider.ConfirmRequestIsReceivedAsync(
+        await _meteredDataForMeteringPointGridAccessProvider.ConfirmRequestIsReceivedAsync(
             messageId,
             CancellationToken.None);
     }
 
     [Fact]
-    public async Task Actor_sends_metered_data_for_measurement_point_in_ebix_with_already_used_message_id_to_datahub()
+    public async Task Actor_sends_metered_data_for_metering_point_in_ebix_with_already_used_message_id_to_datahub()
     {
-        var faultMessage = await _meteredDataForMeasurementPointGridAccessProvider
-            .SendMeteredDataForMeasurementPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);
+        var faultMessage = await _meteredDataForMeteringPointGridAccessProvider
+            .SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);
 
         var expectedErrorMessage = "B2B-003:The provided Ids are not unique and have been used before";
 
-        _meteredDataForMeasurementPointGridAccessProvider.ConfirmResponseContainsValidationError(
+        _meteredDataForMeteringPointGridAccessProvider.ConfirmResponseContainsValidationError(
             faultMessage,
             expectedErrorMessage,
             CancellationToken.None);

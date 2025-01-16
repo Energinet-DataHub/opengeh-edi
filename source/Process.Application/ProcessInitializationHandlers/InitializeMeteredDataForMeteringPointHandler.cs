@@ -17,7 +17,7 @@ using System.Globalization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Extensions.Logging;
 using NodaTime.Text;
@@ -29,40 +29,40 @@ namespace Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandler
     "StyleCop.CSharp.ReadabilityRules",
     "SA1118:Parameter should not span multiple lines",
     Justification = "Readability")]
-public class InitializeMeteredDataForMeasurementPointHandler(
+public class InitializeMeteredDataForMeteringPointHandler(
     IOutgoingMessagesClient outgoingMessagesClient,
     ISerializer serializer,
-    ILogger<InitializeMeteredDataForMeasurementPointHandler> logger)
+    ILogger<InitializeMeteredDataForMeteringPointHandler> logger)
     : IProcessInitializationHandler
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly ISerializer _serializer = serializer;
-    private readonly ILogger<InitializeMeteredDataForMeasurementPointHandler> _logger = logger;
+    private readonly ILogger<InitializeMeteredDataForMeteringPointHandler> _logger = logger;
 
     public bool CanHandle(string processTypeToInitialize)
     {
         ArgumentNullException.ThrowIfNull(processTypeToInitialize);
-        return processTypeToInitialize.Equals(nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto), StringComparison.Ordinal);
+        return processTypeToInitialize.Equals(nameof(InitializeMeteredDataForMeteringPointMessageProcessDto), StringComparison.Ordinal);
     }
 
     public async Task ProcessAsync(byte[] processInitializationData)
     {
         var marketMessage =
-            _serializer.Deserialize<InitializeMeteredDataForMeasurementPointMessageProcessDto>(
+            _serializer.Deserialize<InitializeMeteredDataForMeteringPointMessageProcessDto>(
                 System.Text.Encoding.UTF8.GetString(processInitializationData));
-        _logger.LogInformation("Received InitializeAggregatedMeasureDataProcess for message {MessageId}", marketMessage.MessageId);
+        _logger.LogInformation("Received InitializeMeteredDataForMeteringPointMessageProcess for message {MessageId}", marketMessage.MessageId);
 
         foreach (var series in marketMessage.Series)
         {
             await _outgoingMessagesClient.EnqueueAndCommitAsync(
-                    new MeteredDataForMeasurementPointMessageProcessDto(
+                    new MeteredDataForMeteringPointMessageProcessDto(
                         EventId.From(Guid.NewGuid()),
                         marketMessage.MessageId.Contains("perf_test")
                             ? new Actor(ActorNumber.Create("5790000282425"), ActorRole.EnergySupplier)
                             : new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),
                         BusinessReason.FromCode(marketMessage.BusinessReason),
                         MessageId.Create(marketMessage.MessageId),
-                        new MeteredDataForMeasurementPointMessageSeriesDto(
+                        new MeteredDataForMeteringPointMessageSeriesDto(
                             TransactionId.From(string.Join(string.Empty, series.TransactionId.Reverse())),
                             series.MeteringPointLocationId!,
                             series.MeteringPointType!,

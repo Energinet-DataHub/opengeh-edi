@@ -24,7 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
-public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordParser parser, JavaScriptEncoder encoder)
+public class MeteredDateForMeteringPointCimJsonDocumentWriter(IMessageRecordParser parser, JavaScriptEncoder encoder)
     : IDocumentWriter
 {
     private const string DocumentTypeName = "NotifyValidatedMeasureData_MarketDocument";
@@ -65,7 +65,7 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
         ArgumentNullException.ThrowIfNull(transactions);
 
         var meteredDataForMeasurementSeries = new Collection<MeteredDataForMeasurementSeries>();
-        foreach (var activityRecord in transactions.Select(t => _parser.From<MeteredDateForMeasurementPointMarketActivityRecord>(t)))
+        foreach (var activityRecord in transactions.Select(t => _parser.From<MeteredDateForMeteringPointMarketActivityRecord>(t)))
         {
             meteredDataForMeasurementSeries.Add(
                 new MeteredDataForMeasurementSeries(
@@ -90,7 +90,7 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
         }
 
         return new Document(
-            new MeteredDateForMeasurementPoint(
+            new MeteredDateForMeteringPoint(
                 header.MessageId,
                 GeneralValues.SectorTypeCode,
                 header.TimeStamp.ToString(),
@@ -104,13 +104,13 @@ public class MeteredDateForMeasurementPointCimJsonDocumentWriter(IMessageRecordP
     }
 }
 
-internal class Document(MeteredDateForMeasurementPoint meteredDateForMeasurementPoint)
+internal class Document(MeteredDateForMeteringPoint meteredDateForMeteringPoint)
 {
     [JsonPropertyName("NotifyValidatedMeasureData_MarketDocument")]
-    public MeteredDateForMeasurementPoint MeteredDateForMeasurementPoint { get; init; } = meteredDateForMeasurementPoint;
+    public MeteredDateForMeteringPoint MeteredDateForMeteringPoint { get; init; } = meteredDateForMeteringPoint;
 }
 
-internal class MeteredDateForMeasurementPoint(
+internal class MeteredDateForMeteringPoint(
     string messageId,
     string businessSectorType,
     string createdDateTime,

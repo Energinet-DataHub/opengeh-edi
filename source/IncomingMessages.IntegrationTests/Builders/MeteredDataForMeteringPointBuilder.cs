@@ -21,7 +21,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 
-public static class MeteredDataForMeasurementPointBuilder
+public static class MeteredDataForMeteringPointBuilder
 {
     public static IncomingMarketMessageStream CreateIncomingMessage(
         DocumentFormat format,

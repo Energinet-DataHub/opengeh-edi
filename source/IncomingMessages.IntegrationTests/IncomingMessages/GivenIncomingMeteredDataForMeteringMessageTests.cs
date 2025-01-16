@@ -29,13 +29,13 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 
-public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessagesTestBase
+public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesTestBase
 {
     private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ActorIdentity _actorIdentity;
 
-    public GivenIncomingMeteredDataForMeasurementMessageTests(
+    public GivenIncomingMeteredDataForMeteringMessageTests(
         IncomingMessagesTestFixture incomingMessagesTestFixture,
         ITestOutputHelper testOutputHelper)
         : base(incomingMessagesTestFixture, testOutputHelper)
@@ -60,7 +60,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var validDataHubReceiverId = "5790001330552";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -86,7 +86,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var invalidDataHubReceiverId = "5790001330052";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -112,7 +112,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var invalidSenderId = ActorNumber.Create("5790001330550");
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             invalidSenderId,
             [
@@ -137,7 +137,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var duplicatedTransactionId = "123456";
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -168,7 +168,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         var existingTransactionIdForSender = "123456";
         var newTransactionIdForSender = "654321";
         await StoreTransactionIdForActorAsync(existingTransactionIdForSender, _actorIdentity.ActorNumber.Value);
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -197,7 +197,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var emptyTransactionId = string.Empty;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -222,7 +222,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var emptyMessageId = string.Empty;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -248,7 +248,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var existingMessageId = "123564789";
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -273,7 +273,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var validSenderRoleInMessage = ActorRole.MeteredDataResponsible;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -299,7 +299,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         var invalidSenderRole = ActorRole.EnergySupplier;
         var actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None, invalidSenderRole, ActorId);
         authenticatedActor.SetAuthenticatedActor(actorIdentity);
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -321,7 +321,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var invalidBusinessProcess = "urn:ediel.org:measure:notifywholesaleservices:0:2";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -340,7 +340,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var invalidSchema = "EEM-DK_MeteredDataTimeSeries:v3";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -359,7 +359,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var notAllowedProcessType = "1880";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -379,7 +379,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_ProcessTypeIsAllowedForEbix_Then_ValidationSucceed(string allowedProcessType)
     {
         var documentFormat = DocumentFormat.Ebix;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -402,7 +402,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var allowedProcessType = "E23";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -425,7 +425,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var notAllowedProcessType = "D42";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -448,7 +448,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var notAllowedMessageType = "1880";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -470,7 +470,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var allowedMessageType = "E66";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -489,7 +489,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var validMessageId = "12356478912356478912356478912356478";
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -513,7 +513,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var invalidMessageId = "123564789123564789123564789123564789_123564789123564789123564789123564789";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -535,7 +535,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var validTransactionId = "1235647891235647891235647891";
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -559,7 +559,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var documentFormat = DocumentFormat.Xml;
         var validTransactionId = "12356478912356478912356478912356478";
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -582,7 +582,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     {
         var invalidTransactionId = "123564789123564789123564789123564789_123564789123564789123564789123564789";
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -602,7 +602,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_BusinessTypeIsAllowed_Then_ValidationSucceed()
     {
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -625,7 +625,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     public async Task When_BusinessTypeIsNotAllowed_Then_ExpectedValidationError()
     {
         var documentFormat = DocumentFormat.Xml;
-        var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _actorIdentity.ActorNumber,
             [
@@ -639,7 +639,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         messageParser.ParserResult.Success.Should().BeFalse();
     }
 
-    private async Task<(MeteredDataForMeasurementPointMessageBase? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(
+    private async Task<(MeteredDataForMeteringPointMessageBase? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(
         Stream message,
         DocumentFormat documentFormat)
     {
@@ -647,7 +647,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         if (_messageParsers.TryGetValue((IncomingDocumentType.NotifyValidatedMeasureData, documentFormat), out var messageParser))
         {
             var result = await messageParser.ParseAsync(incomingMarketMessageStream, CancellationToken.None).ConfigureAwait(false);
-            return (IncomingMessage: (MeteredDataForMeasurementPointMessageBase?)result.IncomingMessage, ParserResult: result);
+            return (IncomingMessage: (MeteredDataForMeteringPointMessageBase?)result.IncomingMessage, ParserResult: result);
         }
 
         throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{IncomingDocumentType.NotifyValidatedMeasureData}'");

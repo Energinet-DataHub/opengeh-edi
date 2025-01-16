@@ -350,7 +350,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     }
 
     [Fact(Skip = "Ebix is not supported.")]
-    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
+    public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
         const string expectedMessageId = "123456";
@@ -364,7 +364,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         _authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole, ActorId));
 
-        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var messageStream = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
                 documentFormat,
                 delegatedToAsDelegated.ActorNumber,
                 [
@@ -376,7 +376,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             _originalActor,
             delegatedToAsDelegated,
             expectedGridAreaCode,
-            ProcessType.IncomingMeteredDataForMeasurementPoint,
+            ProcessType.IncomingMeteredDataForMeteringPoint,
             now,
             now.Plus(Duration.FromSeconds(1)));
 
@@ -399,7 +399,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsDelegated.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber);
@@ -408,7 +408,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     }
 
     [Fact]
-    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsDelegatedAndDelegationDoesNotExists_Then_ReturnsErrorMessage()
+    public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationDoesNotExists_Then_ReturnsErrorMessage()
     {
         // Arrange
         var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
@@ -420,7 +420,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         _authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole, ActorId));
 
-        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var messageStream = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             delegatedToAsDelegated.ActorNumber,
             [
@@ -446,7 +446,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     }
 
     [Fact(Skip = "Ebix is not supported.")]
-    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
+    public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsGridAccessProviderAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
         const string expectedMessageId = "123456";
@@ -460,7 +460,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         _authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole, ActorId));
 
-        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var messageStream = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             delegatedToAsGridAccessProvider.ActorNumber,
             [
@@ -472,7 +472,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             _originalActor,
             delegatedToAsGridAccessProvider,
             expectedGridAreaCode,
-            ProcessType.IncomingMeteredDataForMeasurementPoint,
+            ProcessType.IncomingMeteredDataForMeteringPoint,
             now,
             now.Plus(Duration.FromSeconds(1)));
 
@@ -495,7 +495,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsGridAccessProvider.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsGridAccessProvider.ActorNumber);
@@ -504,7 +504,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     }
 
     [Fact(Skip = "Ebix is not supported")]
-    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationDoesNotExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
+    public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsGridAccessProviderAndDelegationDoesNotExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
         const string expectedMessageId = "123456";
@@ -517,7 +517,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole, ActorId));
         var documentFormat = DocumentFormat.Ebix;
 
-        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+        var messageStream = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             [
@@ -544,7 +544,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);

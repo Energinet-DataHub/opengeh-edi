@@ -40,7 +40,7 @@ public interface IFeatureFlagManager
     Task<bool> RequestStaysInEdiAsync();
 
     /// <summary>
-    /// Whether to allow receiving metered data for measurement points.
+    /// Whether to allow receiving metered data for metering points.
     /// </summary>
     Task<bool> ReceiveMeteredDataForMeasurementPointsAsync();
 

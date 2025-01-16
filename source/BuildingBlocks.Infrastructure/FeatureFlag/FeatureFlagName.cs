@@ -36,7 +36,7 @@ public enum FeatureFlagName
     RequestStaysInEdi,
 
     /// <summary>
-    /// Whether to allow receiving metered data for measurement points.
+    /// Whether to allow receiving metered data for metering points.
     /// </summary>
     ReceiveMeteredDataForMeasurementPoints,
 

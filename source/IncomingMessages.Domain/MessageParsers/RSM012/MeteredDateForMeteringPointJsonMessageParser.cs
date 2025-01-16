@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
+public class MeteredDateForMeteringPointJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
 {
     private const string ValueElementName = "value";
     private const string MridElementName = "mRID";
@@ -97,7 +97,7 @@ public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider 
             }
         }
 
-        return new MeteredDataForMeasurementPointSeries(
+        return new MeteredDataForMeteringPointSeries(
             id,
             resolution,
             startDateAndOrTimeDateTime,
@@ -113,7 +113,7 @@ public class MeteredDateForMeasurementPointJsonMessageParser(JsonSchemaProvider 
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
-        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessageBase(
+        return new IncomingMarketMessageParserResult(new MeteredDataForMeteringPointMessageBase(
             header.MessageId,
             header.MessageType,
             header.CreatedAt,
