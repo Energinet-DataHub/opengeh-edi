@@ -27,7 +27,7 @@ public class MetricNameGenerationTests
     //     "resourceMetadata": {
     //         "id": "${appi_sharedres_id}"
     //     },
-    //     "name": "MeteredDataForMeteringPoint{format}",
+    //     "name": "NotifyValidatedMeasureData{format}",
     //     "aggregationType": 7,
     //     "namespace": "azure.applicationinsights",
     //     "metricVisualization": {
