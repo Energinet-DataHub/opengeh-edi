@@ -56,7 +56,7 @@ public class AcknowledgementJsonDocumentWriterTests
 
         var acknowledgementRecord = new AcknowledgementV1(
             SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset(),
-            TransactionId.New(),
+            TransactionId.New().Value,
             "A10",
             "2",
             "DocumentTitle",
