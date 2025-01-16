@@ -31,7 +31,7 @@ public class MetricNameGenerationTests
     //     "aggregationType": 7,
     //     "namespace": "azure.applicationinsights",
     //     "metricVisualization": {
-    //         "displayName": "MeteredDataForMeteringPoint{format}"
+    //         "displayName": "NotifyValidatedMeasureData{format}"
     //     }
     // }
     // replace {format} with the supported formats for the new document type.
