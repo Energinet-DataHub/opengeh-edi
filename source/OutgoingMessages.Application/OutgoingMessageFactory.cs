@@ -431,7 +431,7 @@ public static class OutgoingMessageFactory
             businessReason: message.BusinessReason,
             serializedContent: serializer.Serialize(message.AcknowledgementV1),
             createdAt: timestamp,
-            messageCreatedFromProcess: ProcessType.IncomingMeteredDataForMeasurementPoint,
+            messageCreatedFromProcess: ProcessType.IncomingMeteredDataForMeteringPoint,
             relatedToMessageId: relatedToMessageId,
             gridAreaCode: null,
             externalId: new ExternalId(message.ExternalId),
