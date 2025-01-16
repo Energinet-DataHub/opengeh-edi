@@ -40,7 +40,7 @@ public record AuditLogEntityType(string Identifier)
     public static readonly AuditLogEntityType RequestWholesaleServices = new("RequestWholesaleServices");
 
     /// <summary>
-    /// Used when a new metered data for measurement point message is received.
+    /// Used when a new metered data for metering point message is received.
     /// </summary>
     public static readonly AuditLogEntityType MeteredDataForMeteringPointReceived = new("MeteredDataForMeteringPointReceived");
 

@@ -105,7 +105,7 @@ public interface IOutgoingMessagesClient
     Task<Guid> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue metered data for measurement point messages, handles enqueuing messages to all appropriate parties in a single transaction.
+    /// Enqueue metered data for metering point messages, handles enqueuing messages to all appropriate parties in a single transaction.
     /// </summary>
     Task<Guid> EnqueueAndCommitAsync(
         MeteredDataForMeteringPointMessageProcessDto meteredDataForMeteringPointMessageProcessDto,

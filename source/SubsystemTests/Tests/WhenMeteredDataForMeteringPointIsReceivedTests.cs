@@ -42,7 +42,7 @@ public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_can_send_metered_data_for_measurement_point_in_cim_to_datahub()
+    public async Task Actor_can_send_metered_data_for_metering_point_in_cim_to_datahub()
     {
         var messageId = await _meteredDataForMeteringPointGridAccessProvider
             .SendMeteredDataForMeteringPointInCimAsync(CancellationToken.None);
@@ -53,7 +53,7 @@ public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_can_send_metered_data_for_measurement_point_in_ebix_to_datahub()
+    public async Task Actor_can_send_metered_data_for_metering_point_in_ebix_to_datahub()
     {
         var messageId = await _meteredDataForMeteringPointGridAccessProvider
             .SendMeteredDataForMeteringPointInEbixAsync(CancellationToken.None);
@@ -64,7 +64,7 @@ public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_sends_metered_data_for_measurement_point_in_ebix_with_already_used_message_id_to_datahub()
+    public async Task Actor_sends_metered_data_for_metering_point_in_ebix_with_already_used_message_id_to_datahub()
     {
         var faultMessage = await _meteredDataForMeteringPointGridAccessProvider
             .SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);

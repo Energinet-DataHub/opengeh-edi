@@ -36,7 +36,7 @@ internal sealed class MeteredDataForMeteringPointRequestDsl(EbixDriver ebix, Edi
             .GetMeteredDataForMeteringPointProcessIdAsync(messageId, cancellationToken)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull("because the metered data for measurement point process should be initialized");
+        processId.Should().NotBeNull("because the metered data for metering point process should be initialized");
     }
 
     public async Task<string> SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
