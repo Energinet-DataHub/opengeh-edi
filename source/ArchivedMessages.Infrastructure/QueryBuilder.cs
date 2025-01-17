@@ -16,6 +16,7 @@ using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
@@ -118,6 +119,11 @@ internal sealed class QueryBuilder
         {
             throw new InvalidRestrictionException($"Invalid restriction for fetching archived messages. Must be either {nameof(Restriction.Owned)} or {nameof(Restriction.None)}. ActorNumber: {_actorIdentity.ActorNumber.Value}; Restriction: {_actorIdentity.Restriction.Name}");
         }
+
+        // TODO: Ensure B2C app, BFF and frontend can handle NotifyValidatedMeasureData before we remove this filter
+        AddFilter(
+            "DocumentType != @ExcludedDocumentType",
+            new KeyValuePair<string, object>("ExcludedDocumentType", DocumentType.NotifyValidatedMeasureData.Name));
 
         return new QueryInput(BuildStatement(query), BuildTotalCountStatement(query), _queryParameters);
     }
