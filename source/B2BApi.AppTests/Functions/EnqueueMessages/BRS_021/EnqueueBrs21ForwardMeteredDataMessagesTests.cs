@@ -110,6 +110,6 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
         didFinish.Should().BeTrue($"the {nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)} should have been executed");
         appThrewException.Should().BeFalse();
-        hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 021*");
+        hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 021*");
     }
 }
