@@ -122,8 +122,8 @@ internal sealed class QueryBuilder
 
         // TODO: Ensure B2C app, BFF and frontend can handle NotifyValidatedMeasureData before we remove this filter
         AddFilter(
-            "DocumentType!=@DocumentType",
-            new KeyValuePair<string, object>("DocumentType", DocumentType.NotifyValidatedMeasureData.Name));
+            "DocumentType != @ExcludedDocumentType",
+            new KeyValuePair<string, object>("ExcludedDocumentType", DocumentType.NotifyValidatedMeasureData.Name));
 
         return new QueryInput(BuildStatement(query), BuildTotalCountStatement(query), _queryParameters);
     }
