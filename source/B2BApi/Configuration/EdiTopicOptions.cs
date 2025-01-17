@@ -52,5 +52,5 @@ public class EdiTopicOptions
     /// uses this to signal EDI to enqueue messages for BRS 021.
     /// </summary>
     [Required(AllowEmptyStrings = false)]
-    public string EnqueueBrs_021_SubscriptionName { get; set; } = string.Empty;
+    public string EnqueueBrs_021_Forward_Metered_Data_SubscriptionName { get; set; } = string.Empty;
 }

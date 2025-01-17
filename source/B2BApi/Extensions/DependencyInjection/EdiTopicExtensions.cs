@@ -60,7 +60,7 @@ public static class EdiTopicExtensions
             .AddAzureServiceBusSubscription(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
-                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_021_SubscriptionName,
+                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
                 name: "Enqueue BRS-021 Subscription");
 
