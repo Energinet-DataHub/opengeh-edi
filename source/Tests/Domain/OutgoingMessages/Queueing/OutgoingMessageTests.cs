@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggreg
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Factories;
@@ -56,6 +57,8 @@ public class OutgoingMessageTests
 
         new MeteredDateForMeteringPointCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new MeteredDateForMeteringPointCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+
+        new AcknowledgementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
     ];
 
     /// <summary>
