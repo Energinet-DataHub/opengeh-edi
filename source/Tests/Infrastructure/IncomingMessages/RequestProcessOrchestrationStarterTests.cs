@@ -136,7 +136,7 @@ public class RequestProcessOrchestrationStarterTests
                         ChargeType: expectedChargeType?.Name,
                         ChargeCode: expectedChargeId)
                 ]),
-            messageId: expectedTransactionId);
+            idempotencyKey: expectedTransactionId);
 
         actualCommand.Should()
             .NotBeNull()
@@ -242,7 +242,7 @@ public class RequestProcessOrchestrationStarterTests
                 MeteringPointType: expectedMeteringPointType?.Name,
                 SettlementMethod: expectedSettlementMethod?.Name,
                 SettlementVersion: expectedSettlementVersion?.Name),
-            messageId: expectedTransactionId);
+            idempotencyKey: expectedTransactionId);
 
         actualCommand.Should()
             .NotBeNull()
@@ -367,7 +367,7 @@ public class RequestProcessOrchestrationStarterTests
                         EnergyQuantity: expectedEnergyQuantity,
                         QuantityQuality: expectedQuantityQuality)
                 ]),
-            messageId: expectedTransactionId);
+            idempotencyKey: expectedTransactionId);
 
         actualCommand.Should()
             .NotBeNull()

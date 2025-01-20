@@ -68,39 +68,12 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
     protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages);
 
-    protected TData DeserializeMessageData<TData>(string dataFormat, string data)
-    {
-        var deserializeResult = dataFormat switch
-        {
-            "application/json" => JsonSerializer.Deserialize<TData>(data),
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(dataFormat),
-                dataFormat,
-                "Unhandled data format from received enqueue actor messages"),
-        };
-
-        if (deserializeResult == null)
-        {
-            throw new ArgumentException($"Failed to deserialize enqueue actor messages data to type {typeof(TData).Name}", nameof(data))
-            {
-                Data =
-                {
-                    { "TargetType", typeof(TData).Name },
-                    { "DataFormat", dataFormat },
-                    { "Data", data.Truncate(maxLength: 1000) },
-                },
-            };
-        }
-
-        return deserializeResult;
-    }
-
-    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage, string messageBodyFormat)
+    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage, ServiceBusMessageBodyFormat messageBodyFormat)
     {
         var enqueueActorMessages = messageBodyFormat switch
         {
-            "application/json" => EnqueueActorMessagesV1.Parser.ParseJson(serviceBusMessage.Body.ToString()),
-            "application/octet-stream" => EnqueueActorMessagesV1.Parser.ParseFrom(serviceBusMessage.Body),
+            ServiceBusMessageBodyFormat.Binary => EnqueueActorMessagesV1.Parser.ParseFrom(serviceBusMessage.Body),
+            ServiceBusMessageBodyFormat.Json => EnqueueActorMessagesV1.Parser.ParseJson(serviceBusMessage.Body.ToString()),
             _ => throw new ArgumentOutOfRangeException(
                 nameof(messageBodyFormat),
                 messageBodyFormat,
