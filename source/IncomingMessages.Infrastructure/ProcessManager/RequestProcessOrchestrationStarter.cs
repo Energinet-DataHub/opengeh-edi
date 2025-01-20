@@ -74,7 +74,7 @@ public class RequestProcessOrchestrationStarter(
                     GridAreas: transaction.GridAreas,
                     SettlementVersion: settlementVersion,
                     ChargeTypes: chargeTypes),
-                messageId: transaction.Id);
+                idempotencyKey: transaction.Id);
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
@@ -120,7 +120,7 @@ public class RequestProcessOrchestrationStarter(
                     MeteringPointType: meteringPointType,
                     SettlementMethod: settlementMethod,
                     SettlementVersion: settlementVersion),
-                messageId: transaction.Id.Value);
+                idempotencyKey: transaction.Id.Value);
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
