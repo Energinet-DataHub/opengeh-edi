@@ -50,12 +50,10 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
         _logger.LogInformation("Handling received enqueue actor messages service bus message.");
 
-        var bodyFormat = message.GetBodyFormat();
         var majorVersion = message.GetMajorVersion();
-
         if (majorVersion == EnqueueActorMessagesV1.MajorVersion)
         {
-            await HandleV1Async(message, bodyFormat).ConfigureAwait(false);
+            await HandleV1Async(message).ConfigureAwait(false);
         }
         else
         {
@@ -68,31 +66,9 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
     protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages);
 
-    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage, ServiceBusMessageBodyFormat messageBodyFormat)
+    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage)
     {
-        var enqueueActorMessages = messageBodyFormat switch
-        {
-            ServiceBusMessageBodyFormat.Binary => EnqueueActorMessagesV1.Parser.ParseFrom(serviceBusMessage.Body),
-            ServiceBusMessageBodyFormat.Json => EnqueueActorMessagesV1.Parser.ParseJson(serviceBusMessage.Body.ToString()),
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(messageBodyFormat),
-                messageBodyFormat,
-                $"Unhandled message body format (MessageId={serviceBusMessage.MessageId}, Subject={serviceBusMessage.Subject})"),
-        };
-
-        if (enqueueActorMessages is null)
-        {
-            throw new ArgumentException(
-                $"Enqueue handler cannot parse received enqueue actor messages service bus message body to type \"{nameof(EnqueueActorMessagesV1)}\" (MessageId={serviceBusMessage.MessageId}, Subject={serviceBusMessage.Subject})",
-                nameof(serviceBusMessage.Body))
-            {
-                Data =
-                {
-                    { "TargetType", nameof(EnqueueActorMessagesV1) },
-                    { "Body", serviceBusMessage.Body.ToString().Truncate(maxLength: 1000) },
-                },
-            };
-        }
+        var enqueueActorMessages = serviceBusMessage.ParseBody<EnqueueActorMessagesV1>();
 
         using var enqueueActorMessagesLoggerScope = _logger.BeginScope(new
         {
