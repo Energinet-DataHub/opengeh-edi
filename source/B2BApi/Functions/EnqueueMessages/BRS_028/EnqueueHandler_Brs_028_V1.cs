@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 using Microsoft.Extensions.Logging;
 
@@ -44,7 +45,7 @@ public class EnqueueHandler_Brs_028_V1(
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
                     OrchestrationInstanceId: orchestrationInstanceId,
-                    "EnqueueActorMessagesCompleted"),  // TODO: Use RequestCalculatedEnergyTimeSeriesNotifyEventsV1 model from abstractions package
+                    RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }
@@ -62,7 +63,7 @@ public class EnqueueHandler_Brs_028_V1(
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
                     OrchestrationInstanceId: orchestrationInstanceId,
-                    "EnqueueActorMessagesCompleted"),  // TODO: Use RequestCalculatedEnergyTimeSeriesNotifyEventsV1 model from abstractions package
+                    RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }

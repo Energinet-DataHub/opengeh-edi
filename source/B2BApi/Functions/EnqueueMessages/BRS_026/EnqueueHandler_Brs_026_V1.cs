@@ -45,7 +45,7 @@ public class EnqueueHandler_Brs_026_V1(
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
                     OrchestrationInstanceId: orchestrationInstanceId,
-                    "EnqueueActorMessagesCompleted"),  // TODO: Use RequestCalculatedEnergyTimeSeriesNotifyEventsV1 model from abstractions package
+                    RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }
@@ -64,7 +64,7 @@ public class EnqueueHandler_Brs_026_V1(
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
             new NotifyOrchestrationInstanceEvent(
                 OrchestrationInstanceId: orchestrationInstanceId,
-                "EnqueueActorMessagesCompleted"), // TODO: Use RequestCalculatedEnergyTimeSeriesNotifyEventsV1 model from abstractions package
+                RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
             CancellationToken.None)
             .ConfigureAwait(false);
     }
