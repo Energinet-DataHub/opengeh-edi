@@ -21,12 +21,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     ILogger<EnqueueHandler_Brs_021_Forward_Metered_Data_V1> logger)
-    : EnqueueActorMessagesValidatedHandlerBase<object, MeteredDataForMeteringPointRejectedV1>(logger)
+    : EnqueueActorMessagesValidatedHandlerBase<MeteredDataForMeteringPointAcceptedV1, MeteredDataForMeteringPointRejectedV1>(logger)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueAcceptedMessagesAsync(object acceptedData)
+    protected override async Task EnqueueAcceptedMessagesAsync(MeteredDataForMeteringPointAcceptedV1 acceptedData)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 021. Data: {0}",
