@@ -35,9 +35,7 @@ public class EnqueueHandler_Brs_023_027_V1(
             enqueueActorMessages.Data);
 
         // TODO: Deserialize to actual input type instead of object (replace "object" type in summary as well)
-        var input = DeserializeMessageData<object>(
-            dataFormat: enqueueActorMessages.DataFormat,
-            data: enqueueActorMessages.Data);
+        var input = enqueueActorMessages.ParseData<object>();
 
         // TODO: Call actual logic that enqueues messages (starts orchestration)
         await Task.CompletedTask.ConfigureAwait(false);

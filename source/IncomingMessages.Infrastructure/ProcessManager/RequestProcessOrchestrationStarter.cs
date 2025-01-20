@@ -74,7 +74,7 @@ public class RequestProcessOrchestrationStarter(
                     GridAreas: transaction.GridAreas,
                     SettlementVersion: settlementVersion,
                     ChargeTypes: chargeTypes),
-                idempotencyKey: transaction.Id);
+                idempotencyKey: CreateIdempotencyKey(transaction.Id, transaction.RequestedByActor));
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
@@ -120,7 +120,7 @@ public class RequestProcessOrchestrationStarter(
                     MeteringPointType: meteringPointType,
                     SettlementMethod: settlementMethod,
                     SettlementVersion: settlementVersion),
-                idempotencyKey: transaction.Id.Value);
+                idempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.RequestedByActor));
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
@@ -138,4 +138,6 @@ public class RequestProcessOrchestrationStarter(
         return actorIdentity?.ActorId
                ?? throw new InvalidOperationException($"Current actor id was null when initializing process (MessageId={messageId})");
     }
+
+    private string CreateIdempotencyKey(string transactionId, RequestedByActor actor) => $"{transactionId}_{actor.ActorNumber.Value}_{actor.ActorRole.Code}";
 }
