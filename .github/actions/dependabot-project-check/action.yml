@@ -17,6 +17,10 @@ description: Checks that dependabot.yml gets updated with any added or removed c
 runs:
   using: composite
   steps:
+    - name: Find associated pull request
+      uses: Energinet-DataHub/.github/.github/actions/find-related-pr-number@v14
+      id: find_pull_request
+
     # Code comments for each line:
     # Fetch all changed files in this PR
     # Return a concatenated string containing status and filename for each object
@@ -31,7 +35,7 @@ runs:
     - name: Fetch csproj dirs with changes
       id: fetchCsprojDirs
       run: |
-        dirs=$(curl --location -s --request GET 'https://api.github.com/repos/Energinet-DataHub/opengeh-edi/pulls/${{ github.event.number }}/files' --header 'Authorization: Bearer ${{ github.token }}' | jq -c '.[] | .status + ";" + .filename' | (grep '.csproj' || true) | xargs --no-run-if-empty -n 1 dirname)
+        dirs=$(curl --location -s --request GET 'https://api.github.com/repos/Energinet-DataHub/opengeh-edi/pulls/${{ steps.find_pull_request.outputs.pull_request_number }}/files' --header 'Authorization: Bearer ${{ github.token }}' | jq -c '.[] | .status + ";" + .filename' | (grep '.csproj' || true) | xargs --no-run-if-empty -n 1 dirname)
         [ -z "$dirs" ] && echo "No changes to csproj files found in this PR. Proceeding to next step." && exit 0
         dirs="${dirs//$'\n'/'%0A'}" # This currently seems to be the best fix to passing along multiline results https://github.community/t/set-output-truncates-multiline-strings/16852
         echo "::set-output name=csproj_dirs::$dirs"
