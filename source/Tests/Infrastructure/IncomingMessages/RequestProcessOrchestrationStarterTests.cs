@@ -61,7 +61,7 @@ public class RequestProcessOrchestrationStarterTests
             ? ChargeType.FromCode(chargeTypeCode)
             : null;
 
-        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber}_{requestedByActor.ActorRole.Code}";
+        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Code}";
 
         var initializeProcessDto = new InitializeWholesaleServicesProcessDto(
             BusinessReason: expectedBusinessReason.Code,
@@ -174,7 +174,7 @@ public class RequestProcessOrchestrationStarterTests
             ? SettlementMethod.FromCode(settlementMethodCode)
             : null;
 
-        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber}_{requestedByActor.ActorRole.Code}";
+        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Code}";
 
         var initializeProcessDto = new InitializeAggregatedMeasureDataProcessDto(
             SenderNumber: requestedByActor.ActorNumber.Value,

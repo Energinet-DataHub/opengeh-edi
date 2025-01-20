@@ -65,6 +65,7 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
             ActorRole.EnergySupplier);
 
         var transactionId = Guid.NewGuid().ToString();
+        var idempotencyKey = $"{transactionId}_{energySupplier.ActorNumber.Value}_{energySupplier.ActorRole.Code}";
 
         // Test steps:
         // => HTTP POST: RequestWholesaleServices
@@ -77,7 +78,7 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
             .When(
                 msg =>
                 {
-                    var messageIdMatch = msg.MessageId.Equals(transactionId);
+                    var messageIdMatch = msg.MessageId.Equals(idempotencyKey);
                     var subjectMatch = msg.Subject.Equals("Brs_028");
 
                     return messageIdMatch && subjectMatch;
