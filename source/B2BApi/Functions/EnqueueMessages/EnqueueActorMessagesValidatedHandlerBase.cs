@@ -17,19 +17,22 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
-public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueActorMessagesHandlerBase(logger)
+public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TRejectedData>(ILogger logger)
+    : EnqueueActorMessagesHandlerBase(logger)
+        where TAcceptedData : class
+        where TRejectedData : class
 {
     protected override Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {
-            var acceptedData = DeserializeMessageData<TAcceptedData>(enqueueActorMessages.DataFormat, enqueueActorMessages.Data);
-            return EnqueueAcceptedMessagesAsync(acceptedData);
+            var acceptedData = enqueueActorMessages.ParseData<TAcceptedData>();
+            return EnqueueAcceptedMessagesAsync(enqueueActorMessages.OrchestrationInstanceId, acceptedData);
         }
         else if (enqueueActorMessages.DataType == typeof(TRejectedData).Name)
         {
-            var rejectedData = DeserializeMessageData<TRejectedData>(enqueueActorMessages.DataFormat, enqueueActorMessages.Data);
-            return EnqueueRejectedMessagesAsync(rejectedData);
+            var rejectedData = enqueueActorMessages.ParseData<TRejectedData>();
+            return EnqueueRejectedMessagesAsync(enqueueActorMessages.OrchestrationInstanceId, rejectedData);
         }
 
         throw new ArgumentOutOfRangeException(
@@ -38,7 +41,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
             $"{nameof(EnqueueActorMessagesV1)} contains an invalid data type (expected {typeof(TAcceptedData).Name} or {typeof(TRejectedData).Name}).");
     }
 
-    protected abstract Task EnqueueAcceptedMessagesAsync(TAcceptedData acceptedData);
+    protected abstract Task EnqueueAcceptedMessagesAsync(string orchestrationInstanceId, TAcceptedData acceptedData);
 
-    protected abstract Task EnqueueRejectedMessagesAsync(TRejectedData rejectedData);
+    protected abstract Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, TRejectedData rejectedData);
 }
