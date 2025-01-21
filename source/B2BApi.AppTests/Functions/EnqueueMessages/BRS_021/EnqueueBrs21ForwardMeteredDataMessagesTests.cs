@@ -87,7 +87,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OrchestrationStartedByActorId = actorId,
             Data = JsonSerializer.Serialize(enqueueMessagesData),
             DataType = nameof(MeteredDataForMeteringPointRejectedV1),
-            DataFormat = "application/json",
+            DataFormat = EnqueueActorMessagesDataFormatV1.Json,
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 
