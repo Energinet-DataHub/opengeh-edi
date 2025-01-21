@@ -49,7 +49,7 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
 
         var expectedBusinessReason = BusinessReason.WholesaleFixing;
-        var expectedTransactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
+        var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedResolution = resolutionCode is not null
             ? Resolution.FromCode(resolutionCode)
@@ -61,13 +61,15 @@ public class RequestProcessOrchestrationStarterTests
             ? ChargeType.FromCode(chargeTypeCode)
             : null;
 
+        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Code}";
+
         var initializeProcessDto = new InitializeWholesaleServicesProcessDto(
             BusinessReason: expectedBusinessReason.Code,
             MessageId: MessageId.Create("9b6184af-2f05-40b9-d783-08dc814df95a").Value,
             Series:
             [
                 new InitializeWholesaleServicesSeries(
-                    Id: TransactionId.From(expectedTransactionId).Value,
+                    Id: TransactionId.From(transactionId).Value,
                     StartDateTime: expectedStart,
                     EndDateTime: expectedEnd,
                     RequestedGridAreaCode: expectedGridArea,
@@ -136,7 +138,7 @@ public class RequestProcessOrchestrationStarterTests
                         ChargeType: expectedChargeType?.Name,
                         ChargeCode: expectedChargeId)
                 ]),
-            messageId: expectedTransactionId);
+            idempotencyKey: expectedIdempotencyKey);
 
         actualCommand.Should()
             .NotBeNull()
@@ -160,7 +162,7 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
 
         var expectedBusinessReason = BusinessReason.BalanceFixing;
-        var expectedTransactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
+        var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedSettlementVersion = settlementVersionCode is not null
             ? SettlementVersion.FromCode(settlementVersionCode)
@@ -172,6 +174,8 @@ public class RequestProcessOrchestrationStarterTests
             ? SettlementMethod.FromCode(settlementMethodCode)
             : null;
 
+        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Code}";
+
         var initializeProcessDto = new InitializeAggregatedMeasureDataProcessDto(
             SenderNumber: requestedByActor.ActorNumber.Value,
             SenderRoleCode: requestedByActor.ActorRole.Code,
@@ -180,7 +184,7 @@ public class RequestProcessOrchestrationStarterTests
             Series:
             [
                 new InitializeAggregatedMeasureDataProcessSeries(
-                    Id: TransactionId.From(expectedTransactionId),
+                    Id: TransactionId.From(transactionId),
                     MeteringPointType: expectedMeteringPointType?.Code,
                     SettlementMethod: expectedSettlementMethod?.Code,
                     StartDateTime: expectedStart,
@@ -242,7 +246,7 @@ public class RequestProcessOrchestrationStarterTests
                 MeteringPointType: expectedMeteringPointType?.Name,
                 SettlementMethod: expectedSettlementMethod?.Name,
                 SettlementVersion: expectedSettlementVersion?.Name),
-            messageId: expectedTransactionId);
+            idempotencyKey: expectedIdempotencyKey);
 
         actualCommand.Should()
             .NotBeNull()
@@ -367,7 +371,7 @@ public class RequestProcessOrchestrationStarterTests
                         EnergyQuantity: expectedEnergyQuantity,
                         QuantityQuality: expectedQuantityQuality)
                 ]),
-            messageId: expectedTransactionId);
+            idempotencyKey: expectedTransactionId);
 
         actualCommand.Should()
             .NotBeNull()

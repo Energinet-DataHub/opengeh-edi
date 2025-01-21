@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
+using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Microsoft.Extensions.Logging;
 
@@ -22,28 +24,48 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 /// </summary>
 /// <param name="logger"></param>
 public class EnqueueHandler_Brs_026_V1(
-    ILogger<EnqueueHandler_Brs_026_V1> logger)
+    ILogger<EnqueueHandler_Brs_026_V1> logger,
+    IProcessManagerMessageClient processManagerMessageClient)
     : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
+    private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
 
-    protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData)
+    protected override async Task EnqueueAcceptedMessagesAsync(
+        string orchestrationInstanceId,
+        RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 026. Data: {0}",
             acceptedData);
 
         // TODO: Call actual logic that enqueues accepted messages instead
-        await Task.CompletedTask.ConfigureAwait(false);
+
+        // TODO: NotifyOrchestrationInstanceAsync should maybe happen in another layer, when the method is actually implemented
+        await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
+                new NotifyOrchestrationInstanceEvent(
+                    OrchestrationInstanceId: orchestrationInstanceId,
+                    RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
+                CancellationToken.None)
+            .ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedData)
+    protected override async Task EnqueueRejectedMessagesAsync(
+        string orchestrationInstanceId,
+        RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedData)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 026. Data: {0}",
             rejectedData);
 
         // TODO: Call actual logic that enqueues rejected message
-        await Task.CompletedTask.ConfigureAwait(false);
+
+        // TODO: NotifyOrchestrationInstanceAsync should maybe happen in another layer, when the method is actually implemented
+        await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
+            new NotifyOrchestrationInstanceEvent(
+                OrchestrationInstanceId: orchestrationInstanceId,
+                RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
+            CancellationToken.None)
+            .ConfigureAwait(false);
     }
 }

@@ -245,6 +245,10 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .AddSubjectFilter("Enqueue_brs_028")
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}", s.SubscriptionName))
+            .AddSubscription("enqueue-brs-021-forward-metered-data-subscription")
+                .AddSubjectFilter("Enqueue_brs_021_forward_metered_data")
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
 
         // => Receive messages on Wholesale Inbox Queue
