@@ -32,8 +32,8 @@ jobs:
           dotnet-version: 8.0.300  
 
       - name: Check dependencies        
-        run: |
-          dotnet list --help
+        run: |          
+          dotnet restore source/Edi.Repository.sln
           dotnet list source/Edi.Repository.sln package 
           # cat versions.json
           
