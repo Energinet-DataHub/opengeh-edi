@@ -33,10 +33,11 @@ jobs:
 
       - name: Check dependencies        
         run: |          
-          dotnet restore source/Edi.Repository.sln
+          dotnet restore source/Edi.Repository.sln > /dev/null
+          
           dotnet list source/Edi.Repository.sln package --format json > versions.json
                     
-          jq -r '.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion' versions.json > fluentassertions-versions.json
+          jq -r '[.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion]' versions.json > fluentassertions-versions.json
           jq fluentassertions-versions.json
 
           forbidden_version=$(jq -r '.[] | select(. >= "8.0.0")' fluentassertions-versions.json)
