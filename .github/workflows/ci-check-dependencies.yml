@@ -23,11 +23,11 @@ jobs:
   dependency-review:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Repository'
+      - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: 'Dependency Review'
+      - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
           license-check: false
           vulnerability-check: false
-          deny-packages: 'pkg:nuget/FluentAssertions'
+          deny-packages: pkg:nuget/FluentAssertions
