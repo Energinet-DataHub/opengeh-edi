@@ -29,4 +29,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
-          jq --version
+
+          dotnet list Edi.Repository.sln package --format json | jq -r '.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion' > versions.json
+          forbidden_version=$(jq -r '.[] | select(. >= "8.0.0")' versions.json)
+          if [ -n "$forbidden_version" ]; then
+            echo -e "\e[31mForbidden 'FluentAssertions' version $forbidden_version found\e[0m"
+            exit 1
+          else
+            echo -e "\e[32mAll 'FluentAssertions' versions are less than 8.0.0\e[0m"
+          fi
