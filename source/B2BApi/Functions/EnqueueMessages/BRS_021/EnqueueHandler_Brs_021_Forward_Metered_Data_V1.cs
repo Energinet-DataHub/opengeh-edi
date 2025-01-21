@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Microsoft.Extensions.Logging;
+using NodaTime;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
@@ -42,6 +45,46 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None).ConfigureAwait(false);
+        var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
+            rejectedData.EventId,
+            rejectedData.BusinessReason,
+            rejectedData.ReceiverId,
+            rejectedData.ReceiverRole,
+            rejectedData.ProcessId,
+            rejectedData.ExternalId,
+            new AcknowledgementDto(
+                rejectedData.AcknowledgementV1.ReceivedMarketDocumentCreatedDateTime,
+                rejectedData.AcknowledgementV1.ReceivedMarketDocumentTransactionId,
+                rejectedData.AcknowledgementV1.ReceivedMarketDocumentProcessProcessType,
+                rejectedData.AcknowledgementV1.ReceivedMarketDocumentRevisionNumber,
+                rejectedData.AcknowledgementV1.ReceivedMarketDocumentTitle,
+                rejectedData.AcknowledgementV1.ReceivedMarketDocumentType,
+                rejectedData.AcknowledgementV1.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList(),
+                rejectedData.AcknowledgementV1.InErrorPeriod.Select(
+                        p => new TimePeriodDto(
+                            new Interval(p.TimeInterval.Start.ToInstant(), p.TimeInterval.End.ToInstant()),
+                            p.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
+                    .ToList(),
+                rejectedData.AcknowledgementV1.Series.Select(
+                        s => new SeriesDto(s.MRID, s.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
+                    .ToList(),
+                rejectedData.AcknowledgementV1.OriginalMktActivityRecord.Select(
+                        o => new MktActivityRecordDto(
+                            o.MRID,
+                            o.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
+                    .ToList(),
+                rejectedData.AcknowledgementV1.RejectedTimeSeries.Select(
+                        t => new TimeSeriesDto(
+                            t.MRID,
+                            t.Version,
+                            t.InErrorPeriod.Select(
+                                    p => new TimePeriodDto(
+                                        new Interval(p.TimeInterval.Start.ToInstant(), p.TimeInterval.End.ToInstant()),
+                                        p.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
+                                .ToList(),
+                            t.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
+                    .ToList()));
+
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointRejectedDto, CancellationToken.None).ConfigureAwait(false);
     }
 }

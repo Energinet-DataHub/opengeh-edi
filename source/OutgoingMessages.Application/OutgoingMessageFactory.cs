@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
@@ -23,7 +22,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessa
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
@@ -407,15 +405,15 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        MeteredDataForMeteringPointRejectedV1 message,
+        MeteredDataForMeteringPointRejectedDto message,
         ISerializer serializer,
         Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(message);
 
-        MessageId? relatedToMessageId = message.AcknowledgementV1.ReceivedMarketDocumentTransactionId is not null
-            ? MessageId.Create(message.AcknowledgementV1.ReceivedMarketDocumentTransactionId)
+        MessageId? relatedToMessageId = message.AcknowledgementDto.ReceivedMarketDocumentTransactionId is not null
+            ? MessageId.Create(message.AcknowledgementDto.ReceivedMarketDocumentTransactionId)
             : null;
 
         return new OutgoingMessage(
@@ -429,7 +427,7 @@ public static class OutgoingMessageFactory
                 ActorRole.FromCode(message.ReceiverRole)),
             processId: message.ProcessId,
             businessReason: message.BusinessReason,
-            serializedContent: serializer.Serialize(message.AcknowledgementV1),
+            serializedContent: serializer.Serialize(message.AcknowledgementDto),
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.IncomingMeteredDataForMeteringPoint,
             relatedToMessageId: relatedToMessageId,
