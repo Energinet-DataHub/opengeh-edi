@@ -88,5 +88,46 @@ public class AcknowledgementJsonDocumentWriterTests
         jsonSchema.Validate(json).Should().BeEmpty();
 
         json.Should().NotBeEmpty();
+        json.Should().NotContain("null");
+    }
+
+    [Fact]
+    public async Task Given_MinimalMessage_Then_CanWriteSchemaValidDocument()
+    {
+        var acknowledgementRecord = new AcknowledgementV1(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [],
+            [],
+            [],
+            [],
+            []);
+
+        var marketDocumentStream = await _sut.WriteAsync(
+            new OutgoingMessageHeader(
+                "A22",
+                "2222222222222",
+                "DDM",
+                "1111111111111",
+                "DDQ",
+                "MessageId",
+                SystemClock.Instance.GetCurrentInstant()),
+            [new Serializer().Serialize(acknowledgementRecord)]);
+
+        marketDocumentStream.Stream.Position = 0;
+        var streamReader = new StreamReader(marketDocumentStream.Stream);
+        var json = await streamReader.ReadToEndAsync();
+
+        using var assertionScope = new AssertionScope();
+        var jsonSchema = await NJsonSchema.JsonSchema.FromFileAsync(
+            @"Infrastructure\OutgoingMessages\RSM009\Acknowledgement-assembly-model.schema.json");
+        jsonSchema.Validate(json).Should().BeEmpty();
+
+        json.Should().NotBeEmpty();
+        json.Should().NotContain("null");
     }
 }
