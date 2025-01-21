@@ -15,6 +15,7 @@
 using Azure.Core;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
@@ -55,12 +56,19 @@ public static class EdiTopicExtensions
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
                 subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_028_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
-                name: "Enqueue BRS-028 Subscription");
+                name: "Enqueue BRS-028 Subscription")
+            .AddAzureServiceBusSubscription(
+                fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
+                subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName,
+                tokenCredentialFactory: _ => credential,
+                name: "Enqueue BRS-021 Forward Metered Data Subscription");
 
         services
             .AddTransient<EnqueueHandler_Brs_023_027_V1>()
             .AddTransient<EnqueueHandler_Brs_026_V1>()
-            .AddTransient<EnqueueHandler_Brs_028_V1>();
+            .AddTransient<EnqueueHandler_Brs_028_V1>()
+            .AddTransient<EnqueueHandler_Brs_021_Forward_Metered_Data_V1>();
 
         return services;
     }
