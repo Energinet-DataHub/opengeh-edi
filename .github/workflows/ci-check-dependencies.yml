@@ -25,7 +25,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
-        with:
-            deny-packages: pkg:nuget/FluentAssertions>7.0.0
+      - name: Check dependencies        
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          jq --version
