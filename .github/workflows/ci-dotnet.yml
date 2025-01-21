@@ -20,7 +20,7 @@ on:
 jobs:
   # Build all projects within solution
   dotnet_ci_build:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@d24558de08028dca2e852dc4a8cff0f09641ba60
     with:
       solution_file_path: source/Edi.Repository.sln
 
