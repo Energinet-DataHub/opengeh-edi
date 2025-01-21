@@ -62,7 +62,7 @@ public static class EdiTopicExtensions
                 topicNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.Name,
                 subscriptionNameFactory: sp => sp.GetRequiredService<IOptions<EdiTopicOptions>>().Value.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName,
                 tokenCredentialFactory: _ => credential,
-                name: "Enqueue BRS-021 Subscription");
+                name: "Enqueue BRS-021 Forward Metered Data Subscription");
 
         services
             .AddTransient<EnqueueHandler_Brs_023_027_V1>()
