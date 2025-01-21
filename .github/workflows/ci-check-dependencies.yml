@@ -14,8 +14,7 @@
 
 name: Check dependencies
 
-on:
-  workflow_call: {}
+on: [pull_request]
 
 permissions:
   contents: read
