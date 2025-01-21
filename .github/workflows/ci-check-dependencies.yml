@@ -34,6 +34,8 @@ jobs:
       - name: Check dependencies        
         run: |
           dotnet list source/Edi.Repository.sln package --format json | jq -r '.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion' > versions.json
+          jq versions.json
+          
           forbidden_version=$(jq -r '.[] | select(. >= "8.0.0")' versions.json)
           if [ -n "$forbidden_version" ]; then
             echo -e "\e[31mForbidden 'FluentAssertions' version $forbidden_version found\e[0m"
