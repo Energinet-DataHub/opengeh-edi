@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json;
+using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -58,11 +59,12 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     [Fact]
     public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_Then_RejectedMessagesIsEnqueued()
     {
+        // Arrange
         // => Given enqueue BRS-021 service bus message
         var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new MeteredDataForMeteringPointRejectedV1(
             "EventId",
-            "BusinessReasonCode",
+            "PeriodicMetering",
             "1111111111111",
             "DDM",
             Guid.NewGuid(),
@@ -91,25 +93,30 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 
+        // Act
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
             idempotencyKey: "a-message-id");
 
         // => When message is received
+        var beforeOrchestrationCreated = DateTime.UtcNow;
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
-        // => Then accepted message is enqueued
-        // TODO: Actually check for enqueued messages and PM notification when the BRS is implemented
+        // Assert
+        using var assertionScope = new AssertionScope();
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
             () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)}"),
             timeLimit: TimeSpan.FromSeconds(30));
-        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-        var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
 
-        using var assertionScope = new AssertionScope();
+        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
+        //var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
+
         didFinish.Should().BeTrue($"the {nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)} should have been executed");
-        appThrewException.Should().BeFalse();
+        //appThrewException.Should().BeFalse();
+
         hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 021*");
+        hostLog.Should().ContainMatch("*INSERT INTO [dbo].[OutgoingMessages]*");
+        hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
     }
 }

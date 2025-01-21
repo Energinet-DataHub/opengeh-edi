@@ -42,7 +42,6 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        // TODO: Call actual logic that enqueues accepted messages instead
-        await Task.CompletedTask.ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None).ConfigureAwait(false);
     }
 }
