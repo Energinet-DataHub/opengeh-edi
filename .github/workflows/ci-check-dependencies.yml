@@ -34,16 +34,15 @@ jobs:
       - name: Check dependencies        
         run: |          
           dotnet restore source/Edi.Repository.sln
-          dotnet list source/Edi.Repository.sln package 
-          # cat versions.json
-          
-          # jq -r '.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion' versions.json > fluentassertions-versions.json
-          # jq fluentassertions-versions.json
+          dotnet list source/Edi.Repository.sln package --format json > versions.json
+                    
+          jq -r '.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion' versions.json > fluentassertions-versions.json
+          jq fluentassertions-versions.json
 
-          # forbidden_version=$(jq -r '.[] | select(. >= "8.0.0")' fluentassertions-versions.json)
-          # if [ -n "$forbidden_version" ]; then
-          #   echo -e "\e[31mForbidden 'FluentAssertions' version $forbidden_version found\e[0m"
-          #   exit 1
-          # else
-          #   echo -e "\e[32mAll 'FluentAssertions' versions are less than 8.0.0\e[0m"
-          # fi
+          forbidden_version=$(jq -r '.[] | select(. >= "8.0.0")' fluentassertions-versions.json)
+          if [ -n "$forbidden_version" ]; then
+            echo -e "\e[31mForbidden 'FluentAssertions' version $forbidden_version found\e[0m"
+            exit 1
+          else
+            echo -e "\e[32mAll 'FluentAssertions' versions are less than 8.0.0\e[0m"
+          fi
