@@ -25,11 +25,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.300  
+
       - name: Check dependencies        
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-
           dotnet list Edi.Repository.sln package --format json | jq -r '.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion' > versions.json
           forbidden_version=$(jq -r '.[] | select(. >= "8.0.0")' versions.json)
           if [ -n "$forbidden_version" ]; then
