@@ -12,27 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
-/// <summary>
-/// Enqueue accepted/rejected messages for BRS-028 (RequestWholesaleServices).
-/// </summary>
-public sealed class EnqueueHandler_Brs_021_V1(
+public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
-    ILogger<EnqueueHandler_Brs_021_V1> logger)
-    : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1,
-        MeteredDataForMeteringPointRejectedV1>(logger)
+    ILogger<EnqueueHandler_Brs_021_Forward_Metered_Data_V1> logger)
+    : EnqueueActorMessagesValidatedHandlerBase<MeteredDataForMeteringPointAcceptedV1, MeteredDataForMeteringPointRejectedV1>(logger)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedWholesaleServicesAcceptedV1 acceptedData)
+    protected override async Task EnqueueAcceptedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointAcceptedV1 acceptedData)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 021. Data: {0}",
@@ -42,12 +36,13 @@ public sealed class EnqueueHandler_Brs_021_V1(
         await Task.CompletedTask.ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(MeteredDataForMeteringPointRejectedV1 rejectedData)
+    protected override async Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointRejectedV1 rejectedData)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedData, CancellationToken.None).ConfigureAwait(false);
+        // TODO: Call actual logic that enqueues accepted messages instead
+        await Task.CompletedTask.ConfigureAwait(false);
     }
 }

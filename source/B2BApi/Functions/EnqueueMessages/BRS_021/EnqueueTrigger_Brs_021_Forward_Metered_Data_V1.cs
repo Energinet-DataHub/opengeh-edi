@@ -15,24 +15,19 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
-/// <summary>
-/// Service Bus Trigger to enqueue messages for BRS-028 (RequestWholesaleServices),
-/// received from the Process Manager subsystem.
-/// </summary>
-public sealed class EnqueueTrigger_Brs_021(
-    ILogger<EnqueueTrigger_Brs_021> logger,
-    EnqueueHandler_Brs_021_V1 enqueueHandlerBrs021V1)
+public sealed class EnqueueTrigger_Brs_021_Forward_Metered_Data_V1(
+    ILogger<EnqueueTrigger_Brs_021_Forward_Metered_Data_V1> logger,
+    EnqueueHandler_Brs_021_Forward_Metered_Data_V1 enqueueHandler)
 {
-    private readonly ILogger<EnqueueTrigger_Brs_021> _logger = logger;
-    private readonly EnqueueHandler_Brs_021_V1 _enqueueHandlerBrs021V1 = enqueueHandlerBrs021V1;
+    private readonly ILogger<EnqueueTrigger_Brs_021_Forward_Metered_Data_V1> _logger = logger;
+    private readonly EnqueueHandler_Brs_021_Forward_Metered_Data_V1 _enqueueHandler = enqueueHandler;
 
-    [Function(nameof(EnqueueTrigger_Brs_021))]
+    [Function(nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
@@ -42,7 +37,6 @@ public sealed class EnqueueTrigger_Brs_021(
     {
         _logger.LogInformation("Enqueue BRS-021 messages service bus message received");
 
-        await _enqueueHandlerBrs021V1.EnqueueAsync(message)
-            .ConfigureAwait(false);
+        await _enqueueHandler.EnqueueAsync(message).ConfigureAwait(false);
     }
 }
