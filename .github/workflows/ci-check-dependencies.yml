@@ -33,8 +33,9 @@ jobs:
 
       - name: Check dependencies        
         run: |
-          dotnet list source/Edi.Repository.sln package --format json > versions.json
-          cat versions.json
+          dotnet list --help
+          # dotnet list source/Edi.Repository.sln package --format json > versions.json
+          # cat versions.json
           
           # jq -r '.. | objects | select(.topLevelPackages? != null) | .topLevelPackages[] | select(.id == "FluentAssertions") | .requestedVersion' versions.json > fluentassertions-versions.json
           # jq fluentassertions-versions.json
