@@ -28,4 +28,4 @@ jobs:
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
-            deny-packages: pkg:nuget/FluentAssertions@>=8.0.0
+            deny-packages: pkg:nuget/FluentAssertions@>7.9.9
