@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Diagnostics.Health
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
@@ -29,8 +30,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
@@ -42,7 +44,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 
 public static class OutgoingMessagesExtensions
 {
@@ -96,6 +98,34 @@ public static class OutgoingMessagesExtensions
 
         // DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
+
+        // CalculationResults
+        services.AddOptions<DeltaTableOptions>()
+            .Bind(configuration)
+            .ValidateDataAnnotations();
+
+        services.AddScoped<IWholesaleServicesQueries, WholesaleServicesQueries>();
+        services.AddScoped<IAggregatedTimeSeriesQueries, AggregatedTimeSeriesQueries>();
+        services.AddScoped<WholesaleServicesQuerySnippetProviderFactory>();
+        services.AddScoped<AggregatedTimeSeriesQuerySnippetProviderFactory>();
+        services
+            .AddScoped<IWholesaleServicesDatabricksContract,
+                AmountsPerChargeWholesaleServicesDatabricksContract>();
+        services
+            .AddScoped<IWholesaleServicesDatabricksContract,
+                MonthlyAmountsPerChargeWholesaleServicesDatabricksContract>();
+        services
+            .AddScoped<IWholesaleServicesDatabricksContract,
+                TotalMonthlyAmountWholesaleServicesDatabricksContract>();
+        services
+            .AddScoped<IAggregatedTimeSeriesDatabricksContract,
+                EnergyPerBrpGaAggregatedTimeSeriesDatabricksContract>();
+        services
+            .AddScoped<IAggregatedTimeSeriesDatabricksContract,
+                EnergyPerEsBrpGaAggregatedTimeSeriesDatabricksContract>();
+        services
+            .AddScoped<IAggregatedTimeSeriesDatabricksContract,
+                EnergyPerGaAggregatedTimeSeriesDatabricksContract>();
 
         // Databricks
         services

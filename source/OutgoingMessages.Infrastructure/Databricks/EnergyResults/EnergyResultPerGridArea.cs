@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using NodaTime;
 
@@ -25,7 +24,7 @@ public sealed class EnergyResultPerGridArea(
     string gridAreaCode,
     MeteringPointType meteringPointType,
     IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
-    CalculationType calculationType,
+    Interfaces.Models.CalculationResults.CalculationType calculationType,
     Instant periodStartUtc,
     Instant periodEndUtc,
     Resolution resolution,

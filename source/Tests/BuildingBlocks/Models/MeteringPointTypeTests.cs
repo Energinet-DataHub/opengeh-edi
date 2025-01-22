@@ -51,7 +51,7 @@ public class MeteringPointTypeTests
             (MeteringPointType.TotalConsumption, "TotalConsumption", "D12"),
             (MeteringPointType.ElectricalHeating, "ElectricalHeating", "D14"),
             (MeteringPointType.NetConsumption, "NetConsumption", "D15"),
-            (MeteringPointType.CapacitySettlement, "CapacitySettlement", "D19"),
+            (MeteringPointType.EffectSettlement, "EffectSettlement", "D19"),
         };
 
         using var scope = new AssertionScope();

@@ -37,7 +37,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.RevisionLog.Integration.Options;
-using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;

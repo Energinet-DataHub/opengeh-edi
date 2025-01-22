@@ -36,7 +36,7 @@ public static class MeteringPointTypeMapper
             WholesaleServicesRequestSeries.Types.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
             WholesaleServicesRequestSeries.Types.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
             WholesaleServicesRequestSeries.Types.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.EffectSettlement => MeteringPointType.CapacitySettlement,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.EffectSettlement => MeteringPointType.EffectSettlement,
             WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
         };
@@ -59,7 +59,7 @@ public static class MeteringPointTypeMapper
             Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
             Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
             Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.EffectSettlement => MeteringPointType.CapacitySettlement,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.EffectSettlement => MeteringPointType.EffectSettlement,
             Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.Exchange => MeteringPointType.Exchange,
             _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
         };

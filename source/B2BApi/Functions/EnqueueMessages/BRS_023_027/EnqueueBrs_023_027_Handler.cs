@@ -28,11 +28,11 @@ public class EnqueueBrs_023_027_Handler(
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages)
+    protected override async Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         _logger.LogInformation(
-            "Received enqueue actor messages for BRS 023/027. Data: {JsonData}",
-            enqueueActorMessages.JsonData);
+            "Received enqueue actor messages for BRS 023/027. Data: {Data}",
+            enqueueActorMessages.Data);
 
         // TODO: Deserialize to actual input type instead of object (replace "object" type in summary as well)
         var input = DeserializeJsonInput<object>(enqueueActorMessages);

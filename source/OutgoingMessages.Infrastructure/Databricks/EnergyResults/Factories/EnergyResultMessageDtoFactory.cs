@@ -36,16 +36,16 @@ public class EnergyResultMessageDtoFactory()
             .AsReadOnly();
     }
 
-    public static (BusinessReason BusinessReason, SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(CalculationType calculationType)
+    public static (BusinessReason BusinessReason, SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(Interfaces.Models.CalculationResults.CalculationType calculationType)
     {
         return calculationType switch
         {
-            CalculationType.Aggregation => (BusinessReason.PreliminaryAggregation, null),
-            CalculationType.BalanceFixing => (BusinessReason.BalanceFixing, null),
-            CalculationType.WholesaleFixing => (BusinessReason.WholesaleFixing, null),
-            CalculationType.FirstCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.FirstCorrection),
-            CalculationType.SecondCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.SecondCorrection),
-            CalculationType.ThirdCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.ThirdCorrection),
+            Interfaces.Models.CalculationResults.CalculationType.Aggregation => (BusinessReason.PreliminaryAggregation, null),
+            Interfaces.Models.CalculationResults.CalculationType.BalanceFixing => (BusinessReason.BalanceFixing, null),
+            Interfaces.Models.CalculationResults.CalculationType.WholesaleFixing => (BusinessReason.WholesaleFixing, null),
+            Interfaces.Models.CalculationResults.CalculationType.FirstCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.FirstCorrection),
+            Interfaces.Models.CalculationResults.CalculationType.SecondCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.SecondCorrection),
+            Interfaces.Models.CalculationResults.CalculationType.ThirdCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.ThirdCorrection),
 
             _ => throw new ArgumentOutOfRangeException(
                 nameof(calculationType),

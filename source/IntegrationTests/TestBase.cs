@@ -47,7 +47,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjec
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
@@ -59,7 +59,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Google.Protobuf;
 using MediatR;

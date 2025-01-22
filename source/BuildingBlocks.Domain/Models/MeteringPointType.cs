@@ -37,7 +37,7 @@ public class MeteringPointType : DataHubType<MeteringPointType>
     public static readonly MeteringPointType TotalConsumption = new("TotalConsumption", "D12");
     public static readonly MeteringPointType ElectricalHeating = new("ElectricalHeating", "D14");
     public static readonly MeteringPointType NetConsumption = new("NetConsumption", "D15");
-    public static readonly MeteringPointType CapacitySettlement = new("CapacitySettlement", "D19");
+    public static readonly MeteringPointType EffectSettlement = new("EffectSettlement", "D19");
 
     [JsonConstructor]
     private MeteringPointType(string name, string code)

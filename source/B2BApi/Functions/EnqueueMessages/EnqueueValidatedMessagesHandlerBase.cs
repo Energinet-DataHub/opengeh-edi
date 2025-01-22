@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
 public abstract class EnqueueValidatedMessagesHandlerBase<TAcceptedData, TRejectedData>(ILogger logger) : EnqueueMessagesHandlerBase(logger)
 {
-    protected override Task EnqueueMessagesAsync(EnqueueActorMessages enqueueActorMessages)
+    protected override Task EnqueueMessagesAsync(EnqueueActorMessagesV1 enqueueActorMessages)
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {
