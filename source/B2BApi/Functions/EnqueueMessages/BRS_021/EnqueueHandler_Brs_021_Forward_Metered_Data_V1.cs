@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Microsoft.Extensions.Logging;
+using NodaTime.Extensions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
@@ -32,8 +36,28 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             "Received enqueue accepted message(s) for BRS 021. Data: {0}",
             acceptedData);
 
-        // TODO: Call actual logic that enqueues accepted messages instead
-        await Task.CompletedTask.ConfigureAwait(false);
+        var series = acceptedData.AcceptedEnergyObservations.Select(x => new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality?.Name)).ToList(); // what is correct QQ?
+        foreach (var acceptedDataMarketActorRecipient in acceptedData.MarketActorRecipients)
+        {
+            var meteredDataForMeteringPointMessageProcessDto = new MeteredDataForMeteringPointMessageProcessDto(
+                eventId: EventId.From(Guid.NewGuid()), // Should be exposed from PM as the external provider
+                receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorId), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
+                businessReason: BusinessReason.PeriodicMetering, // Should this be exposed from PM? Or simply never be set from outside of OGM module in this case?
+                relatedToMessageId: MessageId.Create("MessageId"), // Should come from the incoming message
+                series: new MeteredDataForMeteringPointMessageSeriesDto(
+                    TransactionId: TransactionId.New(),
+                    MarketEvaluationPointNumber: acceptedData.MeteringPointId,
+                    MarketEvaluationPointType: acceptedData.MeteringPointType.Code,  // code or name?
+                    OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
+                    Product: acceptedData.ProductNumber,
+                    QuantityMeasureUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
+                    RegistrationDateTime: acceptedData.RegistrationDateTime, //Should be datatype DateTimeOffset
+                    Resolution: Resolution.FromName(acceptedData.Resolution.Name),
+                    StartedDateTime: acceptedData.StartDateTime.ToInstant(),
+                    EndedDateTime: acceptedData.EndDateTime.ToInstant(),
+                    EnergyObservations: series));
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointMessageProcessDto, CancellationToken.None).ConfigureAwait(false); // should we pass a cancelation token?
+        }
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointRejectedV1 rejectedData)
