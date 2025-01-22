@@ -47,9 +47,9 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
             rejectedData.EventId,
-            rejectedData.BusinessReason,
-            rejectedData.ReceiverId,
-            rejectedData.ReceiverRole,
+            rejectedData.BusinessReason.Name,
+            rejectedData.MarketActorRecipient.ActorId,
+            rejectedData.MarketActorRecipient.ActorRole.Name,
             rejectedData.ProcessId,
             rejectedData.ExternalId,
             new AcknowledgementDto(

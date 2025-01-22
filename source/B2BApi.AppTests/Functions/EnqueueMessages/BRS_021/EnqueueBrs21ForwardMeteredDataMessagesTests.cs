@@ -31,6 +31,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
+using PMValueTypes = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
@@ -69,9 +70,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new MeteredDataForMeteringPointRejectedV1(
             "EventId",
-            "PeriodicMetering",
-            "1111111111111",
-            "DDM",
+            PMValueTypes.BusinessReason.PeriodicMetering,
+            new MarketActorRecipient("1111111111111", PMValueTypes.ActorRole.GridAccessProvider),
             Guid.NewGuid(),
             Guid.NewGuid(),
             new AcknowledgementV1(
@@ -140,7 +140,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(request);
         await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
         peekResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        (await peekResponse.Content.ReadAsStringAsync()).Should().NotBeNullOrEmpty();
+        (await peekResponse.Content.ReadAsStringAsync()).Should().NotBeNullOrEmpty().And.Contain("Acknowledgement");
 
         hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
         hostLog.Should().ContainMatch("*Executing 'Functions.PeekRequestListener'*");
