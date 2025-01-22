@@ -32,31 +32,31 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
     protected override async Task EnqueueAcceptedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointAcceptedV1 acceptedData)
     {
-        _logger.LogInformation(
-            "Received enqueue accepted message(s) for BRS 021. Data: {0}",
-            acceptedData);
+        var series = acceptedData.AcceptedEnergyObservations.Select(x =>
+            new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality?.Name))
+            .ToList();
 
-        var series = acceptedData.AcceptedEnergyObservations.Select(x => new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality?.Name)).ToList(); // what is correct QQ?
         foreach (var acceptedDataMarketActorRecipient in acceptedData.MarketActorRecipients)
         {
             var meteredDataForMeteringPointMessageProcessDto = new MeteredDataForMeteringPointMessageProcessDto(
                 eventId: EventId.From(Guid.NewGuid()), // Should be exposed from PM as the external provider
                 receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorId), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
                 businessReason: BusinessReason.PeriodicMetering, // Should this be exposed from PM? Or simply never be set from outside of OGM module in this case?
-                relatedToMessageId: MessageId.Create("MessageId"), // Should come from the incoming message
+                relatedToMessageId: MessageId.Create(Guid.NewGuid().ToString()), // Should come from the incoming message, but we don't have that yet
                 series: new MeteredDataForMeteringPointMessageSeriesDto(
                     TransactionId: TransactionId.New(),
                     MarketEvaluationPointNumber: acceptedData.MeteringPointId,
-                    MarketEvaluationPointType: acceptedData.MeteringPointType.Code,  // code or name?
+                    MarketEvaluationPointType: acceptedData.MeteringPointType.Name,
                     OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
                     Product: acceptedData.ProductNumber,
                     QuantityMeasureUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
-                    RegistrationDateTime: acceptedData.RegistrationDateTime, //Should be datatype DateTimeOffset
+                    RegistrationDateTime: acceptedData.RegistrationDateTime,
                     Resolution: Resolution.FromName(acceptedData.Resolution.Name),
                     StartedDateTime: acceptedData.StartDateTime.ToInstant(),
                     EndedDateTime: acceptedData.EndDateTime.ToInstant(),
                     EnergyObservations: series));
-            await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointMessageProcessDto, CancellationToken.None).ConfigureAwait(false); // should we pass a cancelation token?
+
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointMessageProcessDto, CancellationToken.None).ConfigureAwait(false);
         }
     }
 
