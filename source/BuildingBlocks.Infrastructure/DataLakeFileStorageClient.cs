@@ -28,20 +28,15 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
 public class DataLakeFileStorageClient : IFileStorageClient
 {
-    private readonly IClock _clock;
     private readonly BlobServiceClient _blobServiceClientObsoleted;
     private readonly BlobServiceClient _blobServiceClient;
-    private readonly Instant _cutOffDate;
 
     public DataLakeFileStorageClient(
         IAzureClientFactory<BlobServiceClient> clientFactory,
-        IOptions<BlobServiceClientConnectionOptions> options,
-        IClock clock)
+        IOptions<BlobServiceClientConnectionOptions> options)
     {
-        _clock = clock;
         _blobServiceClientObsoleted = clientFactory.CreateClient(options.Value.ClientNameObsoleted);
         _blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
-        _cutOffDate = InstantPattern.General.Parse(options.Value.CutOffDate).Value;
     }
 
     public async Task UploadAsync(FileStorageReference reference, Stream stream)
@@ -49,9 +44,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(reference);
 
-        var container = _clock.GetCurrentInstant() < _cutOffDate
-            ? _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value)
-            : _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
+        var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
 
         stream.Position = 0; // Make sure we read the entire stream
         await container.UploadBlobAsync(reference.Path, stream).ConfigureAwait(false);

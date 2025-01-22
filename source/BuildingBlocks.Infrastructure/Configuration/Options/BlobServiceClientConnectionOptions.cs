@@ -31,9 +31,6 @@ public class BlobServiceClientConnectionOptions
     public string StorageAccountUrl { get; init; } = string.Empty;
 
     [Required]
-    public string CutOffDate { get; init; } = string.Empty;
-
-    [Required]
     public string ClientNameObsoleted { get; init; } = DefaultClientNameObsoleted;
 
     [Required]

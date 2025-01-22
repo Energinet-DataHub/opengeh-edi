@@ -149,8 +149,6 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
                 AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
             [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
                 AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
-            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.CutOffDate)}"] =
-                "2025-01-01T00:00:00Z",
             // TODO: fix this
             // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",

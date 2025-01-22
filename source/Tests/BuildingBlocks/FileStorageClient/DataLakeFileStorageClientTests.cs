@@ -14,16 +14,12 @@
 
 using Azure;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Specialized;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Moq;
-using NodaTime;
-using NodaTime.Text;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.BuildingBlocks.FileStorageClient;
@@ -33,8 +29,6 @@ public class DataLakeFileStorageClientTests
     private readonly DataLakeFileStorageClient _sut;
     private readonly Mock<BlobContainerClient> _blobContainerClientMock;
     private readonly Mock<BlobContainerClient> _blobContainerClientObsoletedMock;
-    private readonly ClockStub _clockStub;
-    private readonly Instant _cutOffDate = InstantPattern.General.Parse("2025-01-01T00:00:00Z").Value;
     private readonly Mock<BlobClient> _blobClientMock;
 
     public DataLakeFileStorageClientTests()
@@ -49,7 +43,6 @@ public class DataLakeFileStorageClientTests
             {
                 ClientName = "ClientName",
                 ClientNameObsoleted = "ClientNameObsoleted",
-                CutOffDate = _cutOffDate.ToString(),
             });
 
         clientFactoryMock
@@ -80,8 +73,7 @@ public class DataLakeFileStorageClientTests
             .Returns(_blobClientMock.Object);
         // End: Obsoleted client
 
-        _clockStub = new ClockStub();
-        _sut = new DataLakeFileStorageClient(clientFactoryMock.Object, options, _clockStub);
+        _sut = new DataLakeFileStorageClient(clientFactoryMock.Object, options);
     }
 
     [Fact]
@@ -106,74 +98,15 @@ public class DataLakeFileStorageClientTests
     }
 
     [Fact]
-    public async Task Given_Stream_When_UploadAsyncBeforeCutOffDate_Then_ShouldCallUploadBlobAsyncOnBlobContainerClientObsoleted()
+    public async Task Given_BlobFileUploadedInObsoletedContainer_When_DownloadAsync_Then_ShouldCallGetBlobClientOnBlobContainerClientObsoleted()
     {
         // Arrange
-        var now = _cutOffDate.Minus(Duration.FromDays(1));
-        _clockStub.SetCurrentInstant(now);
-
         var reference = new FileStorageReference(FileStorageCategory.ArchivedMessage(), "path");
-        var content = "test content";
-        var stream = new MemoryStream();
-        var writer = new StreamWriter(stream);
-        await writer.WriteAsync(content);
-        await writer.FlushAsync();
-        stream.Position = 0;
 
-        // Act
-        await _sut.UploadAsync(reference, stream);
-
-        // Assert
-        _blobContainerClientObsoletedMock.Verify(
-            x => x.UploadBlobAsync(reference.Path, stream, It.IsAny<CancellationToken>()),
-            Times.Once);
-        _blobContainerClientMock.Verify(
-            x => x.UploadBlobAsync(reference.Path, stream, It.IsAny<CancellationToken>()),
-            Times.Never);
-    }
-
-    [Fact]
-    public async Task Given_Stream_When_UploadAsyncAfterCutOffDate_Then_ShouldCallUploadBlobAsyncOnBlobContainerClient()
-    {
-        // Arrange
-        var now = _cutOffDate.Plus(Duration.FromDays(1));
-        _clockStub.SetCurrentInstant(now);
-
-        var reference = new FileStorageReference(FileStorageCategory.ArchivedMessage(), "path");
-        var content = "test content";
-        var stream = new MemoryStream();
-        var writer = new StreamWriter(stream);
-        await writer.WriteAsync(content);
-        await writer.FlushAsync();
-        stream.Position = 0;
-
-        // Act
-        await _sut.UploadAsync(reference, stream);
-
-        // Assert
-        _blobContainerClientMock.Verify(
-            x => x.UploadBlobAsync(reference.Path, stream, It.IsAny<CancellationToken>()),
-            Times.Once);
-        _blobContainerClientObsoletedMock.Verify(
-            x => x.UploadBlobAsync(reference.Path, stream, It.IsAny<CancellationToken>()),
-            Times.Never);
-    }
-
-    [Fact]
-    public async Task Given_ReferenceToUploadedBlob_When_DownloadAsync_Then_ShouldCallGetBlobClientOnBlobContainerClientObsoleted()
-    {
-        // Arrange
-        var now = _cutOffDate.Minus(Duration.FromDays(1));
-        _clockStub.SetCurrentInstant(now);
-
-        var reference = new FileStorageReference(FileStorageCategory.ArchivedMessage(), "path");
-        var content = "test content";
-        var stream = new MemoryStream();
-        var writer = new StreamWriter(stream);
-        await writer.WriteAsync(content);
-        await writer.FlushAsync();
-        stream.Position = 0;
-        await _sut.UploadAsync(reference, stream);
+        var responseMock = new Mock<Response>();
+        _blobClientMock
+            .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Response.FromValue(false, responseMock.Object));
 
         // Act
         var file = await _sut.DownloadAsync(reference);
@@ -186,24 +119,12 @@ public class DataLakeFileStorageClientTests
     }
 
     [Fact]
-    public async Task Given_ReferenceToUploadedBlob_When_DownloadAsync_Then_ShouldCallGetBlobClientOnBlobContainerClient()
+    public async Task Given_BlobFileExistsInContainer_When_DownloadAsync_Then_ShouldCallGetBlobClientOnBlobContainerClient()
     {
         // Arrange
-        var now = _cutOffDate.Plus(Duration.FromDays(1));
-        _clockStub.SetCurrentInstant(now);
-
         var reference = new FileStorageReference(FileStorageCategory.ArchivedMessage(), "path");
-        var content = "test content";
-        var stream = new MemoryStream();
-        var writer = new StreamWriter(stream);
-        await writer.WriteAsync(content);
-        await writer.FlushAsync();
-        stream.Position = 0;
-        await _sut.UploadAsync(reference, stream);
 
         var responseMock = new Mock<Response>();
-        responseMock.SetupGet(r => r.Status).Returns(200);
-        responseMock.SetupGet(r => r.IsError).Returns(false);
         _blobClientMock
             .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Response.FromValue(true, responseMock.Object));
