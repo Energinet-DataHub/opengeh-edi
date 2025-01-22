@@ -17,6 +17,8 @@ using Azure.Storage.Blobs;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -73,7 +75,11 @@ public class DataLakeFileStorageClientTests
             .Returns(_blobClientMock.Object);
         // End: Obsoleted client
 
-        _sut = new DataLakeFileStorageClient(clientFactoryMock.Object, options);
+        Mock<IFeatureFlagManager> featureFlagManager = new();
+        featureFlagManager
+            .Setup(x => x.UseStandardBlobServiceClientAsync())
+            .ReturnsAsync(true);
+        _sut = new DataLakeFileStorageClient(clientFactoryMock.Object, options, featureFlagManager.Object);
     }
 
     [Fact]

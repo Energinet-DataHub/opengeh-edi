@@ -53,4 +53,9 @@ public interface IFeatureFlagManager
     /// Whether to use the RequestAggregatedMeasureData process orchestration.
     /// </summary>
     Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
+
+    /// <summary>
+    /// Whether to use the StandardBlobServiceClient.
+    /// </summary>
+    Task<bool> UseStandardBlobServiceClientAsync();
 }

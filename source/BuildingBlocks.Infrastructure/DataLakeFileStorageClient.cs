@@ -18,6 +18,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
@@ -28,13 +29,16 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
 public class DataLakeFileStorageClient : IFileStorageClient
 {
+    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly BlobServiceClient _blobServiceClientObsoleted;
     private readonly BlobServiceClient _blobServiceClient;
 
     public DataLakeFileStorageClient(
         IAzureClientFactory<BlobServiceClient> clientFactory,
-        IOptions<BlobServiceClientConnectionOptions> options)
+        IOptions<BlobServiceClientConnectionOptions> options,
+        IFeatureFlagManager featureFlagManager)
     {
+        _featureFlagManager = featureFlagManager;
         _blobServiceClientObsoleted = clientFactory.CreateClient(options.Value.ClientNameObsoleted);
         _blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
     }
@@ -45,6 +49,10 @@ public class DataLakeFileStorageClient : IFileStorageClient
         ArgumentNullException.ThrowIfNull(reference);
 
         var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
+        if (!await _featureFlagManager.UseStandardBlobServiceClientAsync().ConfigureAwait(false))
+        {
+            container = _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value);
+        }
 
         stream.Position = 0; // Make sure we read the entire stream
         await container.UploadBlobAsync(reference.Path, stream).ConfigureAwait(false);
