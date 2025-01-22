@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.23.0" />
+    <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.24.0" />
     <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="0.15.2" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.9.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
