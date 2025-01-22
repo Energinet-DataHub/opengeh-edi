@@ -49,7 +49,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             rejectedData.EventId,
             rejectedData.BusinessReason.Name,
             rejectedData.MarketActorRecipient.ActorId,
-            rejectedData.MarketActorRecipient.ActorRole.Name,
+            rejectedData.MarketActorRecipient.ActorRole.Code,
             rejectedData.ProcessId,
             rejectedData.ExternalId,
             new AcknowledgementDto(
