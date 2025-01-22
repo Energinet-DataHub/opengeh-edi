@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
+using Energinet.DataHub.Wholesale.Edi.Models;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -58,17 +59,24 @@ public class EnqueueBrs_026_Handler(
             EndOfPeriod: Instant.FromUtc(2024, 2, 1, 23, 00),
             SettlementVersion: null);
 
-        // 2. Create query
+        var t2 = new AggregatedTimeSeriesRequest();
+
+        // 1. Map to AggregatedTimeSeriesQueryParameters
+        // 2. Call IActorRequestsClient.EnqueueAggregatedMeasureDataAsync();
+
+        // ----- START IActorRequestsClient.EnqueueAggregatedMeasureDataAsync -----
+        // 3a. Create query
         // Map AcceptedEnergyResultTimeSeries to AggregatedTimeSeriesQueryParameters
 
-        // 3. Get result from query
+        // 3b. Get result from query
         // GetAsync(AggregatedTimeSeriesQueryParameters parameters) in IAggregatedTimeSeriesQueries
         //   -> if empty result, send NoDataRejectedMessage
 
-        // 4. Enqueue message
+        // 3c. Enqueue message
         // EnqueueAsync(AcceptedEnergyResultMessageDto resultMessage) in IOutgoingMessagesClient
+        // ----- END IActorRequestsClient.EnqueueAggregatedMeasureDataAsync -----
 
-        // 5. Notify ProcessManager
+        // 4. Notify ProcessManager
         // NotifyProcessOrchestrationAsync(NotifyOrchestrationInstanceEvent event) in IProcessManagerMessageClient
 
         // TODO: Call actual logic that enqueues accepted messages instead
