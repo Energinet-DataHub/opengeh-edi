@@ -21,18 +21,27 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
+using NodaTime;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
 public class DataLakeFileStorageClient : IFileStorageClient
 {
+    private readonly IClock _clock;
+    private readonly BlobServiceClient _blobServiceClientObsoleted;
     private readonly BlobServiceClient _blobServiceClient;
+    private readonly Instant _cutOffDate;
 
     public DataLakeFileStorageClient(
         IAzureClientFactory<BlobServiceClient> clientFactory,
-        IOptions<BlobServiceClientConnectionOptions> options)
+        IOptions<BlobServiceClientConnectionOptions> options,
+        IClock clock)
     {
+        _clock = clock;
+        _blobServiceClientObsoleted = clientFactory.CreateClient(options.Value.ClientNameObsoleted);
         _blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
+        _cutOffDate = InstantPattern.General.Parse(options.Value.CutOffDate).Value;
     }
 
     public async Task UploadAsync(FileStorageReference reference, Stream stream)
@@ -40,7 +49,9 @@ public class DataLakeFileStorageClient : IFileStorageClient
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(reference);
 
-        var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
+        var container = _clock.GetCurrentInstant() < _cutOffDate
+            ? _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value)
+            : _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
 
         stream.Position = 0; // Make sure we read the entire stream
         await container.UploadBlobAsync(reference.Path, stream).ConfigureAwait(false);
@@ -67,8 +78,14 @@ public class DataLakeFileStorageClient : IFileStorageClient
         ArgumentNullException.ThrowIfNull(reference);
 
         var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
-
         var blob = container.GetBlobClient(reference.Path);
+
+        var blobExists = await blob.ExistsAsync(cancellationToken).ConfigureAwait(false);
+        if (blobExists == null || blobExists is { Value: false })
+        {
+            var containerObsoleted = _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value);
+            blob = containerObsoleted.GetBlobClient(reference.Path);
+        }
 
         // OpenReadAsync() returns a stream for the file, and the file is downloaded the first time the stream is read
         var downloadStream = await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -78,8 +95,15 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
     public async Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory, CancellationToken cancellationToken = default)
     {
-        var container = _blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
-        var blobBatchClient = _blobServiceClient.GetBlobBatchClient();
+        await DeleteFromClientAsync(_blobServiceClientObsoleted, fileStorageReferences, fileStorageCategory, cancellationToken).ConfigureAwait(false);
+        await DeleteFromClientAsync(_blobServiceClient, fileStorageReferences, fileStorageCategory, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task DeleteFromClientAsync(BlobServiceClient client, IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory, CancellationToken cancellationToken)
+    {
+        var container = client.GetBlobContainerClient(fileStorageCategory.Value);
+        var blobBatchClient = client.GetBlobBatchClient();
+
         var blobUris = fileStorageReferences
             .Where(x => x.Category == fileStorageCategory)
             .Select(reference => container.GetBlobClient(reference.Path).Uri)

@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -144,14 +145,19 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         var configuration = AddInMemoryConfigurations(ServiceCollection, new Dictionary<string, string?>()
         {
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
+            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}"] =
+                AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
             [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
                 AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
+            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.CutOffDate)}"] =
+                "2025-01-01T00:00:00Z",
             // TODO: fix this
             // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });
 
         ServiceCollection
+            .AddScoped<IClock>(_ => new ClockStub())
             .AddScoped<AuthenticatedActor>()
             .AddArchivedMessagesModule(configuration);
 
@@ -225,7 +231,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         return archivedMessages.ToList().AsReadOnly();
     }
 
-    public async Task<ArchivedMessageStreamDto> GetMessagesFromBlob(FileStorageReference reference)
+    public async Task<ArchivedMessageStreamDto> GetMessagesFromBlob(
+        FileStorageReference reference)
     {
         var blobClient = Services.GetService<IFileStorageClient>()!;
 
