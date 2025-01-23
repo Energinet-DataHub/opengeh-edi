@@ -27,6 +27,8 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
+using BusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
@@ -62,9 +64,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new MeteredDataForMeteringPointRejectedV1(
             "EventId",
-            "BusinessReasonCode",
-            "1111111111111",
-            "DDM",
+            BusinessReason.WholesaleFixing,
+            new MarketActorRecipient("1111111111111", ActorRole.GridAccessProvider),
             Guid.NewGuid(),
             Guid.NewGuid(),
             new AcknowledgementV1(
