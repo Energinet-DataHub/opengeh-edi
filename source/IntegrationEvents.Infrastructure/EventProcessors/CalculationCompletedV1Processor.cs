@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
@@ -24,19 +25,27 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
 {
     private readonly ILogger<CalculationCompletedV1Processor> _logger;
     private readonly IDurableClientFactory _durableClientFactory;
+    private readonly IFeatureFlagManager _featureFlagManager;
 
     public CalculationCompletedV1Processor(
         ILogger<CalculationCompletedV1Processor> logger,
-        IDurableClientFactory durableClientFactory)
+        IDurableClientFactory durableClientFactory,
+        IFeatureFlagManager featureFlagManager)
     {
         _logger = logger;
         _durableClientFactory = durableClientFactory;
+        _featureFlagManager = featureFlagManager;
     }
 
     public string EventTypeToHandle => CalculationCompletedV1.EventName;
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
+        if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false))
+        {
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
         var message = (CalculationCompletedV1)integrationEvent.Message;
