@@ -43,7 +43,7 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
     {
         if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false))
         {
-            await Task.CompletedTask.ConfigureAwait(false);
+            return;
         }
 
         ArgumentNullException.ThrowIfNull(integrationEvent);

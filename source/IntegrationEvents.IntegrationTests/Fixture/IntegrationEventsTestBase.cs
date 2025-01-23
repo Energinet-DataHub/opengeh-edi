@@ -19,6 +19,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -35,9 +37,12 @@ public class IntegrationEventsTestBase : IAsyncLifetime
     {
         _integrationEventsFixture = integrationEventsFixture;
         _testOutputHelper = testOutputHelper;
+        FeatureFlagManagerStub = new();
     }
 
     protected ServiceProvider Services { get; private set; } = null!;
+
+    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; set; }
 
     public void SetupServiceCollection()
     {
@@ -47,7 +52,6 @@ public class IntegrationEventsTestBase : IAsyncLifetime
             ["DB_CONNECTION_STRING"] = _integrationEventsFixture.DatabaseManager.ConnectionString,
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
             [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}"] = "https://fakeurl.com",
-            [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.ContainerName)}"] = "fake-container-name",
         });
 
         var services = new ServiceCollection();
@@ -57,7 +61,8 @@ public class IntegrationEventsTestBase : IAsyncLifetime
             .AddNodaTimeForApplication()
             .AddMasterDataModule(configuration)
             .AddIntegrationEventModule(configuration)
-            .AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
+            .AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub)
+            .AddScoped<IDurableClientFactory, DurableClientFactoryStub>();
 
         services.AddScoped<IConfiguration>(_ => configuration);
 

@@ -23,6 +23,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Tests")]
 public class FeatureFlagManagerStub : IFeatureFlagManager
 {
+    private readonly bool _enableBrs023027MessagesViaProcessManager;
+
+    public FeatureFlagManagerStub(bool enableBrs023027MessagesViaProcessManager = false)
+    {
+        _enableBrs023027MessagesViaProcessManager = enableBrs023027MessagesViaProcessManager;
+    }
+
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(true);
 
     public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(true);
@@ -35,5 +42,5 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(false);
 
-    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => Task.FromResult(false);
+    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => Task.FromResult(_enableBrs023027MessagesViaProcessManager);
 }
