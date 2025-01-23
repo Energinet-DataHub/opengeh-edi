@@ -48,7 +48,6 @@ public class DelegateMessage
         if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults
             || messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestEnergyResults
             // TODO (MWO): We skip delegation for now
-            || messageToEnqueue.MessageCreatedFromProcess == ProcessType.IncomingMeteredDataForMeteringPoint
             || messageToEnqueue.MessageCreatedFromProcess == ProcessType.OutgoingMeteredDataForMeteringPoint)
         {
             return messageToEnqueue;

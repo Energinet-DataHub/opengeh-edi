@@ -425,7 +425,7 @@ public static class OutgoingMessageFactory
             businessReason: message.BusinessReason.Name,
             serializedContent: serializer.Serialize(message.AcknowledgementDto),
             createdAt: timestamp,
-            messageCreatedFromProcess: ProcessType.IncomingMeteredDataForMeteringPoint,
+            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
             relatedToMessageId: relatedToMessageId,
             gridAreaCode: null,
             externalId: new ExternalId(message.ExternalId),
