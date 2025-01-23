@@ -17,6 +17,7 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
@@ -89,7 +90,9 @@ public static class IntegrationEventExtensions
             options.IsExternalClient = true;
         });
 
-        services.AddIntegrationEventsHealthChecks();
+        services
+            .AddIntegrationEventsHealthChecks()
+            .AddFeatureFlags();
 
         return services;
     }

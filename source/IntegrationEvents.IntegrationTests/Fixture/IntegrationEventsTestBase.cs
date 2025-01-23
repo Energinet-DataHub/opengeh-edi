@@ -14,7 +14,9 @@
 
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -54,7 +56,8 @@ public class IntegrationEventsTestBase : IAsyncLifetime
         services
             .AddNodaTimeForApplication()
             .AddMasterDataModule(configuration)
-            .AddIntegrationEventModule(configuration);
+            .AddIntegrationEventModule(configuration)
+            .AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
 
         services.AddScoped<IConfiguration>(_ => configuration);
 
