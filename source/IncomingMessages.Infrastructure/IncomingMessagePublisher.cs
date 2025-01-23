@@ -131,19 +131,19 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        // Temporary until ProcessManager is ready
-        // await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
-        //     initializeMeteredDataForMeteringPointMessageProcessDto,
-        //     cancellationToken)
-        // .ConfigureAwait(false);
+        // Go through ProcessManager
+        await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+            initializeMeteredDataForMeteringPointMessageProcessDto,
+            cancellationToken)
+        .ConfigureAwait(false);
 
+        // Enqueue message directly
         var serviceBusMessage =
             new ServiceBusMessage(
                 _serializer.Serialize(initializeMeteredDataForMeteringPointMessageProcessDto))
             {
                 Subject = nameof(InitializeMeteredDataForMeteringPointMessageProcessDto),
             };
-
         await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }
