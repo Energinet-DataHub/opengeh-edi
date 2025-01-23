@@ -52,7 +52,7 @@ public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
             CancellationToken.None);
     }
 
-    [Fact]
+    [Fact(Skip = "Ebix is not supported.")]
     public async Task Actor_can_send_metered_data_for_metering_point_in_ebix_to_datahub()
     {
         var messageId = await _meteredDataForMeteringPointGridAccessProvider
@@ -63,7 +63,7 @@ public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
             CancellationToken.None);
     }
 
-    [Fact]
+    [Fact(Skip = "Ebix is not supported.")]
     public async Task Actor_sends_metered_data_for_metering_point_in_ebix_with_already_used_message_id_to_datahub()
     {
         var faultMessage = await _meteredDataForMeteringPointGridAccessProvider
