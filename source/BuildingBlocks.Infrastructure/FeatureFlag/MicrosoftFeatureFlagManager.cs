@@ -40,5 +40,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => IsEnabledAsync(FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration);
 
+    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => IsEnabledAsync(FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

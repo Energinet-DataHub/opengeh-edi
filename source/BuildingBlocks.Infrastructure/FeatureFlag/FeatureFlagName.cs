@@ -49,4 +49,10 @@ public enum FeatureFlagName
     /// Whether to use orchestration for handling RequestAggregatedMeasureData processes.
     /// </summary>
     UseRequestAggregatedMeasureDataProcessOrchestration,
+
+    /// <summary>
+    /// Whether to enqueue BRS-023/027 messages via the Process Manager.
+    /// Or to depend on the shared integration event topic
+    /// </summary>
+    EnqueueBrs023027MessagesViaProcessManager,
 }

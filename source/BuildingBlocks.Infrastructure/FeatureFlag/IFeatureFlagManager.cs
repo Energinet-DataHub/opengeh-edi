@@ -53,4 +53,10 @@ public interface IFeatureFlagManager
     /// Whether to use the RequestAggregatedMeasureData process orchestration.
     /// </summary>
     Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
+
+    /// <summary>
+    /// Whether to enqueue BRS-023/027 messages via the Process Manager.
+    /// Or to depend on the shared integration event topic
+    /// </summary>
+    Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync();
 }
