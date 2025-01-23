@@ -36,8 +36,9 @@ public class AcknowledgementJsonDocumentWriterTests
             UnicodeRanges.Latin1Supplement,
             UnicodeRanges.LatinExtendedA));
 
+    // 'Maximal' is here to be understood as 'containing values for all optional fields'.
     [Fact]
-    public async Task Given_MaximalMessage_Then_CanWriteSchemaValidDocument()
+    public async Task Given_MaximalMessage_When_WriteAsync_Then_CanWriteSchemaValidDocument()
     {
         var reasons = new ReasonV1[] { new("A22", "Some error occured"), new("A23", "Some other error occured"), };
         var timePeriods = new TimePeriodV1[]
@@ -91,8 +92,9 @@ public class AcknowledgementJsonDocumentWriterTests
         json.Should().NotContain("null");
     }
 
+    // 'Minimal' is here to be understood as 'containing no values for optional fields'.
     [Fact]
-    public async Task Given_MinimalMessage_Then_CanWriteSchemaValidDocument()
+    public async Task Given_MinimalMessage_When_WriteAsync_Then_CanWriteSchemaValidDocument()
     {
         var acknowledgementRecord = new AcknowledgementV1(
             null,

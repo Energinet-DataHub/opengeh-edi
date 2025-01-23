@@ -419,14 +419,10 @@ public static class OutgoingMessageFactory
         return new OutgoingMessage(
             eventId: EventId.From(message.EventId),
             documentType: DocumentType.Acknowledgement,
-            receiver: Receiver.Create(
-                ActorNumber.Create(message.ReceiverId),
-                ActorRole.FromCode(message.ReceiverRole)),
-            documentReceiver: Receiver.Create(
-                ActorNumber.Create(message.ReceiverId),
-                ActorRole.FromCode(message.ReceiverRole)),
+            receiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
             processId: message.ProcessId,
-            businessReason: message.BusinessReason,
+            businessReason: message.BusinessReason.Name,
             serializedContent: serializer.Serialize(message.AcknowledgementDto),
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.IncomingMeteredDataForMeteringPoint,

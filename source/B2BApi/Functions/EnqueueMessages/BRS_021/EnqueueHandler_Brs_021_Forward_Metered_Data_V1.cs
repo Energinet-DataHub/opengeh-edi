@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
@@ -47,9 +48,9 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
             rejectedData.EventId,
-            rejectedData.BusinessReason.Name,
-            rejectedData.MarketActorRecipient.ActorId,
-            rejectedData.MarketActorRecipient.ActorRole.Code,
+            BusinessReason.FromCode(rejectedData.BusinessReason.Code),
+            ActorNumber.Create(rejectedData.MarketActorRecipient.ActorId),
+            ActorRole.FromCode(rejectedData.MarketActorRecipient.ActorRole.Code),
             rejectedData.ProcessId,
             rejectedData.ExternalId,
             new AcknowledgementDto(

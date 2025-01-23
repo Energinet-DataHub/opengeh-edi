@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
 public sealed record MeteredDataForMeteringPointRejectedDto(
     string EventId,
-    string BusinessReason,
-    string ReceiverId,
-    string ReceiverRole,
+    BusinessReason BusinessReason,
+    ActorNumber ReceiverId,
+    ActorRole ReceiverRole,
     Guid ProcessId,
     Guid ExternalId,
     AcknowledgementDto AcknowledgementDto);
