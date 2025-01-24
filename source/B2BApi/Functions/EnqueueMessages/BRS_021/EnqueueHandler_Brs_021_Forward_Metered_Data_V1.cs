@@ -15,6 +15,8 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
+using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
@@ -24,10 +26,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
 public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
+    IProcessManagerMessageClient processManagerMessageClient,
     ILogger<EnqueueHandler_Brs_021_Forward_Metered_Data_V1> logger)
     : EnqueueActorMessagesValidatedHandlerBase<MeteredDataForMeteringPointAcceptedV1, MeteredDataForMeteringPointRejectedV1>(logger)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
+    private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly ILogger _logger = logger;
 
     protected override async Task EnqueueAcceptedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointAcceptedV1 acceptedData)
@@ -58,6 +62,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
             await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointMessageProcessDto, CancellationToken.None).ConfigureAwait(false);
         }
+        await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(new NotifyOrchestrationInstanceEvent())
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointRejectedV1 rejectedData)
