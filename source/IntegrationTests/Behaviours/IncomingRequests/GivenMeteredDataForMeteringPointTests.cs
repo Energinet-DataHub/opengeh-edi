@@ -35,7 +35,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
         DocumentFormat.Xml,
     ];
 
-    [Theory]
+    [Theory(Skip = "Service bus is not used for metered data")]
     [MemberData(nameof(SupportedDocumentFormats))]
     public async Task When_ActorPeeksAllMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
     {
@@ -141,7 +141,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
         }
     }
 
-    [Theory]
+    [Theory(Skip = "Service bus is not used for metered data")]
     [MemberData(nameof(SupportedDocumentFormats))]
     public async Task AndGiven_MessageIsEmpty_When_ActorPeeksAllMessages_Then_ReceivesNoMessages(
         DocumentFormat documentFormat)

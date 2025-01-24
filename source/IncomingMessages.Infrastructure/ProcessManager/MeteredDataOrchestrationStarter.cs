@@ -79,7 +79,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                                             EnergyQuantity: energyObservation.EnergyQuantity,
                                             QuantityQuality: energyObservation.QuantityQuality))
                                     .ToList())),
-                    initializeProcessDto.MessageId);
+                    $"{transaction.RequestedByActor.ActorNumber.Value}-{transaction.TransactionId}");
 
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, CancellationToken.None);
             startProcessTasks.Add(startProcessTask);

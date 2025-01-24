@@ -225,4 +225,19 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
 
         return messageId.Value;
     }
+
+    public async Task<Guid> EnqueueAndCommitAsync(
+        MeteredDataForMeteringPointRejectedDto meteredDataForMeteringPointRejected,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessageFactory.CreateMessage(
+            meteredDataForMeteringPointRejected,
+            _serializer,
+            _clock.GetCurrentInstant());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messageId.Value;
+    }
 }

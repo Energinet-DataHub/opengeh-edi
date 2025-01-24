@@ -305,12 +305,14 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public void EnsureAppHostUsesFeatureFlagValue(
         bool useRequestWholesaleServicesOrchestration = false,
-        bool useRequestAggregatedMeasureDataOrchestration = false)
+        bool useRequestAggregatedMeasureDataOrchestration = false,
+        bool usePeekTimeSeriesMessages = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UsePeekTimeSeriesMessages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
         });
     }
 

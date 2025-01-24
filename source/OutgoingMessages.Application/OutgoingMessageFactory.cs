@@ -404,6 +404,35 @@ public static class OutgoingMessageFactory
             message.Series.StartedDateTime);
     }
 
+    public static OutgoingMessage CreateMessage(
+        MeteredDataForMeteringPointRejectedDto message,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(message);
+
+        MessageId? relatedToMessageId = message.AcknowledgementDto.ReceivedMarketDocumentTransactionId is not null
+            ? MessageId.Create(message.AcknowledgementDto.ReceivedMarketDocumentTransactionId)
+            : null;
+
+        return new OutgoingMessage(
+            eventId: EventId.From(message.EventId),
+            documentType: DocumentType.Acknowledgement,
+            receiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
+            processId: message.ProcessId,
+            businessReason: message.BusinessReason.Name,
+            serializedContent: serializer.Serialize(message.AcknowledgementDto),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
+            relatedToMessageId: relatedToMessageId,
+            gridAreaCode: null,
+            externalId: new ExternalId(message.ExternalId),
+            calculationId: null,
+            periodStartedAt: null);
+    }
+
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
     {
         return chargeOwnerId == DataHubDetails.SystemOperatorActorNumber

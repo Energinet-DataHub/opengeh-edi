@@ -36,6 +36,11 @@ public interface IDocumentWriter
     bool HandlesType(DocumentType documentType);
 
     /// <summary>
+    /// Determine if the writer can handle multiple records at once.
+    /// </summary>
+    bool HandlesMultipleRecords() => true;
+
+    /// <summary>
     /// Writes the message
     /// </summary>
     /// <param name="header"></param>

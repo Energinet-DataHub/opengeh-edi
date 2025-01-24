@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
@@ -39,7 +40,9 @@ public class DocumentFactory
 
         var documentWriter =
             _documentWriters.FirstOrDefault(
-                writer => writer.HandlesType(bundle.DocumentType) && writer.HandlesFormat(documentFormat))
+                writer => writer.HandlesType(bundle.DocumentType)
+                          && writer.HandlesFormat(documentFormat)
+                          && (bundle.OutgoingMessages.Count <= 1 || writer.HandlesMultipleRecords()))
             ?? throw new OutgoingMessageException(
                 $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
 
