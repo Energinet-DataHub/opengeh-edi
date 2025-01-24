@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -54,9 +55,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     [Fact]
     public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_EventIsHandled()
     {
-        FeatureFlagManagerStub = new FeatureFlagManagerStub(enableBrs023027MessagesViaProcessManager: true);
-
-        SetupServiceCollection();
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager, true);
 
         var integrationEvent = new CalculationCompletedV1()
         {

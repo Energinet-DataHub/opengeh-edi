@@ -23,24 +23,33 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Tests")]
 public class FeatureFlagManagerStub : IFeatureFlagManager
 {
-    private readonly bool _enableBrs023027MessagesViaProcessManager;
-
-    public FeatureFlagManagerStub(bool enableBrs023027MessagesViaProcessManager = false)
+    private readonly Dictionary<FeatureFlagName, bool> _featureFlagDictionary = new()
     {
-        _enableBrs023027MessagesViaProcessManager = enableBrs023027MessagesViaProcessManager;
+        { FeatureFlagName.UsePeekMessages, true },
+        { FeatureFlagName.UsePeekTimeSeriesMessages, true },
+        { FeatureFlagName.RequestStaysInEdi, false },
+        { FeatureFlagName.ReceiveMeteredDataForMeasurementPoints, true },
+        { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
+        { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
+        { FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager, false },
+    };
+
+    public void SetFeatureFlag(FeatureFlagName featureFlagName, bool value)
+    {
+        _featureFlagDictionary[featureFlagName] = value;
     }
 
-    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(true);
+    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekMessages]);
 
-    public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(true);
+    public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekTimeSeriesMessages]);
 
-    public Task<bool> RequestStaysInEdiAsync() => Task.FromResult(false);
+    public Task<bool> RequestStaysInEdiAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.RequestStaysInEdi]);
 
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(true);
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ReceiveMeteredDataForMeasurementPoints]);
 
-    public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(false);
+    public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration]);
 
-    public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(false);
+    public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration]);
 
-    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => Task.FromResult(_enableBrs023027MessagesViaProcessManager);
+    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager]);
 }
