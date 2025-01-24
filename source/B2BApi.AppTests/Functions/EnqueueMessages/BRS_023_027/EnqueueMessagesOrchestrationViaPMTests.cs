@@ -25,11 +25,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -45,6 +43,9 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_02
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
 {
+    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
+    private const string NotifyOrchestrationInstanceEventName = "ActorMessagesEnqueued"; // Hardcoded in the orchestration activity, fix it
+
     public EnqueueMessagesOrchestrationViaPMTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
@@ -61,6 +62,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
 
         // Clear mappings etc. before each test
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
+        Fixture.EnsureAppHostUsesFeatureFlagValue(enqueueBrs023027MessagesViaProcessManager: true);
 
         await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "543");
         await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "804");
@@ -83,92 +85,93 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
     /// <remarks>
     /// Feature flags are enabled for all calculation types to ensure activities are executed.
     /// </remarks>
-    // [Fact]
-    // public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
-    // {
-    //     // Arrange
-    //     var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
-    //     var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
-    //     var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
-    //     var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
-    //     var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
-    //     var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
-    //     var calculationId = await ClearAndAddDatabricksData(
-    //         perGridAreaDataDescription,
-    //         perBrpGridAreaDataDescription,
-    //         perBrpAndEsGridAreaDataDescription,
-    //         forAmountPerChargeDescription,
-    //         forMonthlyAmountPerChargeDescription,
-    //         forTotalAmountDescription);
-    //
-    //     var calculationOrchestrationId = Guid.NewGuid().ToString();
-    //     var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
-    //         calculationOrchestrationId,
-    //         CalculationCompletedV1.Types.CalculationType.BalanceFixing,
-    //         calculationId.ToString());
-    //
-    //     // Act
-    //     var beforeOrchestrationCreated = DateTime.UtcNow;
-    //     await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
-    //
-    //     // Assert
-    //     // => Verify expected behaviour by searching the orchestration history
-    //     var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
-    //
-    //     // => Wait for completion
-    //     var completeOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationCompletedAsync(
-    //         actualOrchestrationStatus.InstanceId,
-    //         TimeSpan.FromMinutes(5));
-    //
-    //     // => Expect history
-    //     using var assertionScope = new AssertionScope();
-    //
-    //     var activities = completeOrchestrationStatus.History
-    //         .OrderBy(item => item["Timestamp"])
-    //         .Select(item =>
-    //             (item.Value<string>("FunctionName"), ValueIsArray(item) ? string.Join(',', item.Value<JArray>("Result")!.Select(x => x.ToString())) : item.Value<JToken>("Result")?.ToString()));
-    //
-    //     activities.Should().NotBeNull().And.Contain(
-    //     [
-    //         ("EnqueueMessagesOrchestration", null),
-    //         ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
-    //         ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
-    //         ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrpAndEsGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
-    //         ("GetActorsForWholesaleResultsForAmountPerChargesActivity", string.Empty),
-    //         ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", string.Empty),
-    //         ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", string.Empty),
-    //         ("SendActorMessagesEnqueuedActivity", string.Empty),
-    //         (null, "Success"),
-    //     ]);
-    //
-    //     // => Verify that the durable function completed successfully
-    //     var last = completeOrchestrationStatus.History.Last();
-    //     last.Value<string>("EventType").Should().Be("ExecutionCompleted");
-    //     last.Value<string>("Result").Should().Be("Success");
-    //
-    //     // => Verify that the expected message was sent on the ServiceBus
-    //     var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
-    //         .When(msg =>
-    //         {
-    //             if (msg.Subject != ActorMessagesEnqueuedV1.EventName)
-    //             {
-    //                 return false;
-    //             }
-    //
-    //             var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
-    //
-    //             var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
-    //             var matchingCalculationId = parsedEvent.CalculationId == calculationId.ToString();
-    //             var isSuccessful = parsedEvent.Success;
-    //
-    //             return matchingOrchestrationId && matchingCalculationId && isSuccessful;
-    //         })
-    //         .VerifyCountAsync(1);
-    //
-    //     var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-    //     wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
-    // }
-    //
+    [Fact]
+    public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
+    {
+        // Arrange
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
+        var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
+        var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
+        var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
+        var calculationId = await ClearAndAddDatabricksData(
+            perGridAreaDataDescription,
+            perBrpGridAreaDataDescription,
+            perBrpAndEsGridAreaDataDescription,
+            forAmountPerChargeDescription,
+            forMonthlyAmountPerChargeDescription,
+            forTotalAmountDescription);
+
+        var processManagerOrchestrationId = Guid.NewGuid();
+        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
+            CalculationId: calculationId,
+            CalculationType: CalculationType.BalanceFixing);
+
+        var serviceBusMessage = CreateEnqueueFromProcessManager(
+            calculationCompletedEvent,
+            processManagerOrchestrationId);
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
+
+        // Assert
+        // => Verify expected behaviour by searching the orchestration history
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
+
+        // => Wait for completion
+        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationCompletedAsync(
+            actualOrchestrationStatus.InstanceId,
+            TimeSpan.FromMinutes(5));
+
+        // => Expect history
+        using var assertionScope = new AssertionScope();
+
+        var activities = completeOrchestrationStatus.History
+            .OrderBy(item => item["Timestamp"])
+            .Select(item =>
+                (item.Value<string>("FunctionName"), ValueIsArray(item) ? string.Join(',', item.Value<JArray>("Result")!.Select(x => x.ToString())) : item.Value<JToken>("Result")?.ToString()));
+
+        activities.Should().NotBeNull().And.Contain(
+        [
+            ("EnqueueMessagesOrchestration", null),
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrpAndEsGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
+            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", string.Empty),
+            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", string.Empty),
+            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", string.Empty),
+            ("SendActorMessagesEnqueuedActivity", string.Empty),
+            (null, "Success"),
+        ]);
+
+        // => Verify that the durable function completed successfully
+        completeOrchestrationStatus.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
+
+        // => Verify that the expected message was sent on the ServiceBus
+        var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
+                {
+                    return false;
+                }
+
+                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
+                    msg.Body.ToString());
+
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == processManagerOrchestrationId.ToString();
+                var matchingCalculationId = parsedNotification.EventName == NotifyOrchestrationInstanceEventName;
+
+                return matchingOrchestrationId && matchingCalculationId;
+            })
+            .VerifyCountAsync(1);
+
+        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
+    }
+
     // /// <summary>
     // /// Verifies that:
     // ///  - The orchestration can complete a full run.
@@ -416,31 +419,19 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
             perBrpAndEsGridAreaDataDescription);
         var energyCalculationId = perBrpAndEsGridAreaDataDescription.CalculationId;
 
-        var energyCalculationOrchestrationId = Guid.NewGuid();
         var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
-            CalculationId: energyCalculationOrchestrationId,
+            CalculationId: energyCalculationId,
             CalculationType: CalculationType.BalanceFixing);
 
-        // move the stuff below to a helper method
-        var actorId = Guid.NewGuid().ToString();
-        var enqueueActorMessages = new EnqueueActorMessagesV1
-        {
-            OrchestrationName = "Brs_023_027",
-            OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
-            OrchestrationInstanceId = Guid.NewGuid().ToString(),
-        };
-        enqueueActorMessages.SetData(calculationCompletedEvent);
-        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: "a-message-id");
+        var serviceBusMessage = CreateEnqueueFromProcessManager(calculationCompletedEvent);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
-        var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(
+            createdTimeFrom: beforeOrchestrationCreated);
 
-        // Assert // TODO: Align this with the altered stuff
+        // Assert
         using var assertionScope = new AssertionScope();
         var energyEventId = actualEnergyOrchestrationStatus.Input["EventId"];
 
@@ -456,7 +447,9 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         var isExpected = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
-                var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualEnergyOrchestrationStatus.InstanceId, showHistory: true);
+                var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(
+                    actualEnergyOrchestrationStatus.InstanceId,
+                    showHistory: true);
                 actualHistory = orchestrationStatus.History;
 
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
@@ -485,16 +478,22 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         return item.Value<JToken>("Result")?.Type == JTokenType.Array;
     }
 
-    private static ServiceBusMessage CreateCalculationCompletedEventMessage(
-        string calculationOrchestrationId,
-        CalculationType? calculationType = null,
-        Guid? calculationId = default)
+    private static ServiceBusMessage CreateEnqueueFromProcessManager(
+        CalculatedDataForCalculationTypeV1 calculationCompletedEvent,
+        Guid? orchestrationInstanceId = null)
     {
-        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
-            CalculationId: calculationId ?? Guid.NewGuid(),
-            CalculationType: calculationType ?? CalculationType.BalanceFixing);
-
-        return CreateServiceBusMessage(eventId: Guid.NewGuid(), calculationCompletedEvent);
+        var actorId = Guid.NewGuid().ToString();
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = "Brs_023_027",
+            OrchestrationVersion = 1,
+            OrchestrationStartedByActorId = actorId,
+            OrchestrationInstanceId = orchestrationInstanceId?.ToString() ?? Guid.NewGuid().ToString(),
+        };
+        enqueueActorMessages.SetData(calculationCompletedEvent);
+        return enqueueActorMessages.ToServiceBusMessage(
+            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
+            idempotencyKey: "a-message-id");
     }
 
     private static ServiceBusMessage CreateServiceBusMessage(Guid eventId, IEventMessage eventMessage)

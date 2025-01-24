@@ -305,12 +305,14 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public void EnsureAppHostUsesFeatureFlagValue(
         bool useRequestWholesaleServicesOrchestration = false,
-        bool useRequestAggregatedMeasureDataOrchestration = false)
+        bool useRequestAggregatedMeasureDataOrchestration = false,
+        bool enqueueBrs023027MessagesViaProcessManager = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager.ToString()}", enqueueBrs023027MessagesViaProcessManager.ToString().ToLower() },
         });
     }
 
@@ -504,6 +506,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.ReceiveMeteredDataForMeasurementPoints.ToString()}",
             true.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"FeatureManagement__{FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager.ToString()}",
+            false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",

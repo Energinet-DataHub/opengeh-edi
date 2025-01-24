@@ -14,8 +14,11 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
+using Energinet.DataHub.ProcessManager.Client;
 using Google.Protobuf;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
@@ -25,33 +28,42 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Act
 
 public class SendActorMessagesEnqueuedActivity
 {
-    private readonly ServiceBusSender _sender;
+    private readonly ServiceBusSender _wholesaleSender;
+    private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly IProcessManagerMessageClient _processManagerMessageClient;
 
     public SendActorMessagesEnqueuedActivity(
         IOptions<WholesaleInboxQueueOptions> options,
-        IAzureClientFactory<ServiceBusSender> senderFactory)
+        IAzureClientFactory<ServiceBusSender> senderFactory,
+        IFeatureFlagManager featureFlagManager,
+        IProcessManagerMessageClient processManagerMessageClient)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
 
-        _sender = senderFactory.CreateClient(options.Value.QueueName);
+        _wholesaleSender = senderFactory.CreateClient(options.Value.QueueName);
+        _featureFlagManager = featureFlagManager;
+        _processManagerMessageClient = processManagerMessageClient;
     }
 
     [Function(nameof(SendActorMessagesEnqueuedActivity))]
     public async Task Run(
         [ActivityTrigger] SendMessagesEnqueuedInput input)
     {
-        var messagesEnqueuedEvent = new ActorMessagesEnqueuedV1
+        if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false))
         {
-            OrchestrationInstanceId = input.CalculationOrchestrationInstanceId,
-            CalculationId = input.CalculationId.ToString(),
-            Success = input.Success,
-        };
+            await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
+                    new NotifyOrchestrationInstanceEvent(
+                        OrchestrationInstanceId: input.CalculationOrchestrationInstanceId,
+                        // Correct this magic string, such that it comes from the process manager
+                        EventName: "ActorMessagesEnqueued"),
+                    CancellationToken.None)
+                .ConfigureAwait(false);
 
-        var eventId = Guid.Parse(input.OrchestrationInstanceId);
-        var serviceBusMessage = CreateServiceBusMessage(messagesEnqueuedEvent, eventId);
+            return;
+        }
 
-        await _sender.SendMessageAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
+        await SendToWholesale(input).ConfigureAwait(false);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage(ActorMessagesEnqueuedV1 messagesEnqueuedEvent, Guid eventId)
@@ -66,5 +78,20 @@ public class SendActorMessagesEnqueuedActivity
         serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", ActorMessagesEnqueuedV1.CurrentMinorVersion);
         serviceBusMessage.ApplicationProperties.Add("ReferenceId", eventId.ToString());
         return serviceBusMessage;
+    }
+
+    private async Task SendToWholesale(SendMessagesEnqueuedInput input)
+    {
+        var messagesEnqueuedEvent = new ActorMessagesEnqueuedV1
+        {
+            OrchestrationInstanceId = input.CalculationOrchestrationInstanceId,
+            CalculationId = input.CalculationId.ToString(),
+            Success = input.Success,
+        };
+
+        var eventId = Guid.Parse(input.OrchestrationInstanceId);
+        var serviceBusMessage = CreateServiceBusMessage(messagesEnqueuedEvent, eventId);
+
+        await _wholesaleSender.SendMessageAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
     }
 }
