@@ -20,6 +20,7 @@ using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
+using Polly;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
@@ -43,10 +44,10 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         foreach (var acceptedDataMarketActorRecipient in acceptedData.MarketActorRecipients)
         {
             var meteredDataForMeteringPointMessageProcessDto = new MeteredDataForMeteringPointMessageProcessDto(
-                eventId: EventId.From(Guid.NewGuid()), // Should be exposed from PM as the external provider
+                eventId: EventId.From(orchestrationInstanceId),
                 receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorId), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
                 businessReason: BusinessReason.PeriodicMetering, // Should this be exposed from PM? Or should it always be PeriodicMetering and be set on the MeteredDataForMeteringPointMessageProcessDto ctor?
-                relatedToMessageId: MessageId.Create(Guid.NewGuid().ToString()), // Should come from the incoming message, but we don't have that yet
+                relatedToMessageId: MessageId.Create(acceptedData.MessageId), // Should come from the incoming message, but we don't have that yet
                 series: new MeteredDataForMeteringPointMessageSeriesDto(
                     TransactionId: TransactionId.New(),
                     MarketEvaluationPointNumber: acceptedData.MeteringPointId,
@@ -54,7 +55,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
                     OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
                     Product: acceptedData.ProductNumber,
                     QuantityMeasureUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
-                    RegistrationDateTime: acceptedData.RegistrationDateTime,
+                    RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
                     Resolution: Resolution.FromName(acceptedData.Resolution.Name),
                     StartedDateTime: acceptedData.StartDateTime.ToInstant(),
                     EndedDateTime: acceptedData.EndDateTime.ToInstant(),
@@ -62,7 +63,16 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
             await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointMessageProcessDto, CancellationToken.None).ConfigureAwait(false);
         }
-        await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(new NotifyOrchestrationInstanceEvent())
+
+        var executionPolicy = Policy
+            .Handle<Exception>(ex => ex is not OperationCanceledException)
+            .WaitAndRetryAsync(
+                [TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)]);
+
+        var task = executionPolicy.ExecuteAsync(
+            () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(new NotifyOrchestrationInstanceEvent(orchestrationInstanceId, "MeteredDataForMeteringPointAcceptedV1"), CancellationToken.None));
+
+        await Task.WhenAll(task).ConfigureAwait(false);
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointRejectedV1 rejectedData)
