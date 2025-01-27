@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
@@ -62,14 +61,15 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
             BusinessReason: BusinessReason.BalanceFixing.Code);
 
-        var enqueueActorMessages = new EnqueueActorMessages
+        var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = "Brs_026",
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             DataType = nameof(RequestCalculatedEnergyTimeSeriesAcceptedV1),
-            JsonData = JsonSerializer.Serialize(enqueueMessagesData),
         };
+
+        enqueueActorMessages.SetData(enqueueActorMessages);
 
         var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))
         {

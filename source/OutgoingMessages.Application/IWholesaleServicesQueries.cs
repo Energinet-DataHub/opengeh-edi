@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 /// <summary>
 /// Used to query wholesale services which is wholesale data across multiple calculations

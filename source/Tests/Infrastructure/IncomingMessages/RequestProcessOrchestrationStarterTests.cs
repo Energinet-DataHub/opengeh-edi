@@ -84,12 +84,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup Process Manager client and callback
         var processManagerClient = new Mock<IProcessManagerMessageClient>();
-        MessageCommand<RequestCalculatedWholesaleServicesInputV1>? actualCommand = null;
+        StartOrchestrationInstanceMessageCommand<RequestCalculatedWholesaleServicesInputV1>? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<RequestCalculatedWholesaleServicesCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((MessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken token) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -135,7 +135,7 @@ public class RequestProcessOrchestrationStarterTests
                         ChargeType: expectedChargeType?.Name,
                         ChargeCode: expectedChargeId)
                 ]),
-            messageId: expectedTransactionId);
+            idempotencyKey: $"{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Name}_{expectedTransactionId}");
 
         actualCommand.Should()
             .NotBeNull()
@@ -195,12 +195,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup Process Manager client and callback
         var processManagerClient = new Mock<IProcessManagerMessageClient>();
-        MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1>? actualCommand = null;
+        StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1>? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<RequestCalculatedEnergyTimeSeriesCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((MessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken token) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -241,7 +241,7 @@ public class RequestProcessOrchestrationStarterTests
                 MeteringPointType: expectedMeteringPointType?.Name,
                 SettlementMethod: expectedSettlementMethod?.Name,
                 SettlementVersion: expectedSettlementVersion?.Name),
-            messageId: expectedTransactionId);
+            idempotencyKey: $"{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Name}_{expectedTransactionId}");
 
         actualCommand.Should()
             .NotBeNull()

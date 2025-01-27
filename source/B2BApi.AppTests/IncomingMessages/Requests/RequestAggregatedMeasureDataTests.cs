@@ -88,6 +88,21 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
         messageReceived.Should().BeTrue("because a Brs_026 message should be sent to the Process Manager topic");
     }
 
+    //[Fact]
+    //public async Task Given_RequestAggregatedMeasureData_When_AcceptedRequestIsEnqueued_Then_ServiceBusMessageIsSentToProcessManagerTopic()
+    //{
+    //    // Arrange
+    //    EnableRequestAggregatedMeasureDataOrchestrationFeature();
+    //    // The following must match with the JSON/XML document content
+    //    var energySupplier = new Actor(
+    //        ActorNumber.Create("5790000701278"),
+    //        ActorRole.EnergySupplier);
+
+    //    var transactionId = Guid.NewGuid().ToString();
+    //    // Assert
+    //    // Verify that the notify message is put on PM queue.
+    //}
+
     private void EnableRequestAggregatedMeasureDataOrchestrationFeature()
     {
         Fixture.EnsureAppHostUsesFeatureFlagValue(useRequestAggregatedMeasureDataOrchestration: true);

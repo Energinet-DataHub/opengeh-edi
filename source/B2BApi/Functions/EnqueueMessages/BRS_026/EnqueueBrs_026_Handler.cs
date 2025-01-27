@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
-using Energinet.DataHub.Wholesale.Edi.Models;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -29,14 +29,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 /// <param name="logger"></param>
 public class EnqueueBrs_026_Handler(
     ILogger<EnqueueBrs_026_Handler> logger,
-    IAggregatedTimeSeriesQueries aggregatedTimeSeriesQueries,
-    IOutgoingMessagesClient outgoingMessagesClient,
+    IActorRequestsClient actorRequestsClient,
     IProcessManagerMessageClient processManagerMessageClient)
     : EnqueueValidatedMessagesHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
-    private readonly IAggregatedTimeSeriesQueries _aggregatedTimeSeriesQueries = aggregatedTimeSeriesQueries;
-    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
+    private readonly IActorRequestsClient _actorRequestsClient = actorRequestsClient;
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
 
     protected override async Task EnqueueAcceptedMessagesAsync(RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData)
@@ -45,39 +43,32 @@ public class EnqueueBrs_026_Handler(
             "Received enqueue accepted message(s) for BRS 026. Data: {0}",
             acceptedData);
 
-        // 1. Create actual properties in RequestCalculatedEnergyTimeSeriesAcceptedV1
-        // Dummy response from PM after async validation
-        var t = new AcceptedEnergyResultTimeSeries(
-            Points: [new Point(0, 5, CalculatedQuantityQuality.Estimated, string.Empty)],
-            MeteringPointType: MeteringPointType.Consumption,
-            SettlementMethod: SettlementMethod.Flex,
-            UnitType: MeasurementUnit.Kwh,
-            Resolution: Resolution.Hourly,
-            GridAreaCode: "804",
-            CalculationResultVersion: 124123,
-            StartOfPeriod: Instant.FromUtc(2024, 1, 31, 23, 00),
-            EndOfPeriod: Instant.FromUtc(2024, 2, 1, 23, 00),
-            SettlementVersion: null);
+        // DUMMY for build purpose.
+        var request = new AggregatedTimeSeriesRequest(
+            Period: new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.Period(Instant.FromUtc(2024, 1, 31, 23, 00), Instant.FromUtc(2024, 2, 1, 23, 00)),
+            TimeSeriesTypes: [EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.TimeSeriesType.FlexConsumption],
+            AggregationPerRoleAndGridArea: new AggregationPerRoleAndGridArea(["804"]),
+            CalculationType: EDI.OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.Aggregation);
 
-        var t2 = new AggregatedTimeSeriesRequest();
+        // 1. Map RequestCalculatedEnergyTimeSeriesAcceptedV1 to AggregatedTimeSeriesQueryParameters when it is ready - model is currently empty.
+        // DUMMY
+        var query = new AggregatedTimeSeriesQueryParameters(
+            [EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType.FlexConsumption],
+            ["804"],
+            null,
+            null,
+            request.CalculationType,
+            new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(request.Period.Start, request.Period.End));
 
-        // 1. Map to AggregatedTimeSeriesQueryParameters
-        // 2. Call IActorRequestsClient.EnqueueAggregatedMeasureDataAsync();
+        // 2. Call IActorRequestsClient.EnqueueAggregatedMeasureDataAsync(query + needed properties from RequestCalculatedEnergyTimeSeriesAcceptedV1);
+        await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(acceptedData.BusinessReason, query).ConfigureAwait(false);
 
-        // ----- START IActorRequestsClient.EnqueueAggregatedMeasureDataAsync -----
-        // 3a. Create query
-        // Map AcceptedEnergyResultTimeSeries to AggregatedTimeSeriesQueryParameters
-
-        // 3b. Get result from query
-        // GetAsync(AggregatedTimeSeriesQueryParameters parameters) in IAggregatedTimeSeriesQueries
-        //   -> if empty result, send NoDataRejectedMessage
-
-        // 3c. Enqueue message
-        // EnqueueAsync(AcceptedEnergyResultMessageDto resultMessage) in IOutgoingMessagesClient
-        // ----- END IActorRequestsClient.EnqueueAggregatedMeasureDataAsync -----
+        // 3. See inside _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(query).
 
         // 4. Notify ProcessManager
-        // NotifyProcessOrchestrationAsync(NotifyOrchestrationInstanceEvent event) in IProcessManagerMessageClient
+        var notifyEvent = new NotifyOrchestrationInstanceEvent("orchestrationInstanceId", RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted);
+
+        await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(notifyEvent, CancellationToken.None).ConfigureAwait(false);
 
         // TODO: Call actual logic that enqueues accepted messages instead
         await Task.CompletedTask.ConfigureAwait(false);

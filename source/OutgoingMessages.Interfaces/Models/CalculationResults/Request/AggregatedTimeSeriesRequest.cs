@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-
-public interface IAggregatedTimeSeriesQueries
-{
-    /// <summary>
-    /// Gets the latest aggregated time series per grid area
-    /// </summary>
-    /// <returns>Returns an empty list if the aggregated time series does not contain any points.</returns>
-    IAsyncEnumerable<AggregatedTimeSeries> GetAsync(AggregatedTimeSeriesQueryParameters parameters);
-}
+public record AggregatedTimeSeriesRequest(
+    Period Period,
+    IReadOnlyCollection<TimeSeriesType> TimeSeriesTypes,
+    AggregationPerRoleAndGridArea AggregationPerRoleAndGridArea,
+    CalculationType CalculationType);

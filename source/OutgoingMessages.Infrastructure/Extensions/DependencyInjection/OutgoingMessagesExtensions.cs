@@ -106,6 +106,7 @@ public static class OutgoingMessagesExtensions
 
         services.AddScoped<IWholesaleServicesQueries, WholesaleServicesQueries>();
         services.AddScoped<IAggregatedTimeSeriesQueries, AggregatedTimeSeriesQueries>();
+        services.AddScoped<IActorRequestsClient, ActorRequestsClient>();
         services.AddScoped<WholesaleServicesQuerySnippetProviderFactory>();
         services.AddScoped<AggregatedTimeSeriesQuerySnippetProviderFactory>();
         services
