@@ -49,4 +49,9 @@ public enum FeatureFlagName
     /// Whether to use orchestration for handling RequestAggregatedMeasureData processes.
     /// </summary>
     UseRequestAggregatedMeasureDataProcessOrchestration,
+
+    /// <summary>
+    /// Whether to start using standard blob service client.
+    /// </summary>
+    UseStandardBlobServiceClient,
 }
