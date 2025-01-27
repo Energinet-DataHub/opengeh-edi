@@ -55,4 +55,9 @@ public enum FeatureFlagName
     /// Or to depend on the shared integration event topic
     /// </summary>
     EnqueueBrs023027MessagesViaProcessManager,
+
+    /// <summary>
+    /// Whether to start using standard blob service client.
+    /// </summary>
+    UseStandardBlobServiceClient,
 }

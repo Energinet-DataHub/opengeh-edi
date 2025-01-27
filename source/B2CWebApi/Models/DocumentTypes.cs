@@ -25,4 +25,5 @@ public enum DocumentType
     B2CRequestAggregatedMeasureData = 5,
     RequestWholesaleSettlement = 6,
     B2CRequestWholesaleSettlement = 7,
+    Acknowledgement = 8,
 }

@@ -195,6 +195,9 @@ public class OutgoingMessagesTestBase : IDisposable
         Environment.SetEnvironmentVariable(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
+        Environment.SetEnvironmentVariable(
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
+            Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

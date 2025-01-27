@@ -59,4 +59,9 @@ public interface IFeatureFlagManager
     /// Or to depend on the shared integration event topic
     /// </summary>
     Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync();
+
+    /// <summary>
+    /// Whether to use the StandardBlobServiceClient.
+    /// </summary>
+    Task<bool> UseStandardBlobServiceClientAsync();
 }

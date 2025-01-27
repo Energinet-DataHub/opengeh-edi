@@ -267,9 +267,10 @@ public class RequestProcessOrchestrationStarterTests
         // Arrange
         // => Setup input
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+        var transactionId = TransactionId.From("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
 
         var expectedBusinessReason = BusinessReason.PeriodicMetering;
-        var expectedTransactionId = MessageId.Create("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
+        var expectedIdempotencyKey = $"{requestedByActor.ActorNumber.Value}-{transactionId}";
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
         var expectedPosition = "1";
@@ -287,7 +288,7 @@ public class RequestProcessOrchestrationStarterTests
             : null;
 
         var initializeProcessDto = new InitializeMeteredDataForMeteringPointMessageProcessDto(
-            MessageId: expectedTransactionId,
+            MessageId: transactionId,
             MessageType: "E66",
             CreatedAt: expectedRegistrationDateFrom,
             BusinessReason: expectedBusinessReason.Code,
@@ -295,7 +296,7 @@ public class RequestProcessOrchestrationStarterTests
             Series:
             [
                 new InitializeMeteredDataForMeteringPointMessageSeries(
-                    TransactionId: expectedTransactionId,
+                    TransactionId: transactionId,
                     Resolution: resolution?.Code,
                     StartDateTime: expectedStart,
                     EndDateTime: expectedEndDate,
@@ -353,7 +354,7 @@ public class RequestProcessOrchestrationStarterTests
             operatingIdentity: new ActorIdentityDto(expectedActorId),
             inputParameter: new MeteredDataForMeteringPointMessageInputV1(
                 AuthenticatedActorId: expectedActorId,
-                TransactionId: expectedTransactionId,
+                TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,
                 ProductNumber: expectedProductNumber,
@@ -371,7 +372,7 @@ public class RequestProcessOrchestrationStarterTests
                         EnergyQuantity: expectedEnergyQuantity,
                         QuantityQuality: expectedQuantityQuality)
                 ]),
-            idempotencyKey: expectedTransactionId);
+            idempotencyKey: expectedIdempotencyKey);
 
         actualCommand.Should()
             .NotBeNull()

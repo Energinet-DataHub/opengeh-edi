@@ -23,6 +23,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.Depende
 
 public static class FileStorageExtensions
 {
+    private const string HealthCheckNameObsoleted = "EDI blob file storage obsoleted";
     private const string HealthCheckName = "EDI blob file storage";
 
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
@@ -46,6 +47,10 @@ public static class FileStorageExtensions
                 builder.UseCredential(new DefaultAzureCredential());
 
                 builder
+                    .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.StorageAccountUrlObsoleted))
+                    .WithName(blobServiceClientConnectionOptions.ClientNameObsoleted);
+
+                builder
                     .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.StorageAccountUrl))
                     .WithName(blobServiceClientConnectionOptions.ClientName);
             });
@@ -53,6 +58,10 @@ public static class FileStorageExtensions
         services.TryAddBlobStorageHealthCheck(
             HealthCheckName,
             blobServiceClientConnectionOptions.ClientName);
+
+        services.TryAddBlobStorageHealthCheck(
+            HealthCheckNameObsoleted,
+            blobServiceClientConnectionOptions.ClientNameObsoleted);
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
 
