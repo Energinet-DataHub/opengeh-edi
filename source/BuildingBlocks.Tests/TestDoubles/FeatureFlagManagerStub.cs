@@ -32,7 +32,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
         { FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager, false },
-        { FeatureFlagName.UseStandardBlob, false },
+        { FeatureFlagName.UseStandardBlobServiceClient, false },
     };
 
     public void SetFeatureFlag(FeatureFlagName featureFlagName, bool value)
@@ -54,5 +54,5 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager]);
 
-    public Task<bool> UseStandardBlobServiceClientAsync() => Task.FromResult(false);
+    public Task<bool> UseStandardBlobServiceClientAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseStandardBlobServiceClient]);
 }
