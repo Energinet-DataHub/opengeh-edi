@@ -76,6 +76,9 @@ public class DataLakeFileStorageClientTests
         _blobContainerClientMock.Verify(
             x => x.UploadBlobAsync(reference.Path, stream, It.IsAny<CancellationToken>()),
             Times.Never);
+
+        // Teardown
+        await stream.DisposeAsync();
     }
 
     [Fact]
@@ -101,6 +104,9 @@ public class DataLakeFileStorageClientTests
         _blobContainerClientMock.Verify(
             x => x.UploadBlobAsync(reference.Path, stream, It.IsAny<CancellationToken>()),
             Times.Once);
+
+        // Teardown
+        await stream.DisposeAsync();
     }
 
     [Fact]
