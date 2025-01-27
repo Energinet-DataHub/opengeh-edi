@@ -46,8 +46,8 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             var meteredDataForMeteringPointMessageProcessDto = new MeteredDataForMeteringPointMessageProcessDto(
                 eventId: EventId.From(orchestrationInstanceId),
                 receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorId), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
-                businessReason: BusinessReason.PeriodicMetering, // Should this be exposed from PM? Or should it always be PeriodicMetering and be set on the MeteredDataForMeteringPointMessageProcessDto ctor?
-                relatedToMessageId: MessageId.Create(acceptedData.MessageId), // Should come from the incoming message, but we don't have that yet
+                businessReason: BusinessReason.PeriodicMetering,
+                relatedToMessageId: MessageId.Create(acceptedData.MessageId),
                 series: new MeteredDataForMeteringPointMessageSeriesDto(
                     TransactionId: TransactionId.New(),
                     MarketEvaluationPointNumber: acceptedData.MeteringPointId,
