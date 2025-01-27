@@ -27,11 +27,11 @@ public class MetricNameGenerationTests
     //     "resourceMetadata": {
     //         "id": "${appi_sharedres_id}"
     //     },
-    //     "name": "MeteredDataForMeasurementPoint{format}",
+    //     "name": "NotifyValidatedMeasureData{format}",
     //     "aggregationType": 7,
     //     "namespace": "azure.applicationinsights",
     //     "metricVisualization": {
-    //         "displayName": "MeteredDataForMeasurementPoint{format}"
+    //         "displayName": "NotifyValidatedMeasureData{format}"
     //     }
     // }
     // replace {format} with the supported formats for the new document type.
@@ -48,12 +48,14 @@ public class MetricNameGenerationTests
         "RejectRequestWholesaleSettlement",
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",
+        "Acknowledgement",
     ];
 
     private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
     [
         DocumentType.RejectRequestWholesaleSettlement,
-        DocumentType.RejectRequestAggregatedMeasureData
+        DocumentType.RejectRequestAggregatedMeasureData,
+        DocumentType.Acknowledgement,
     ];
 
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(

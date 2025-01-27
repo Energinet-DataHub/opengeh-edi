@@ -87,7 +87,7 @@ public class SenderAuthorizerTests
 
     [Fact]
     public async Task
-        Given_ActorIsNotMeteredDataResponsible_When_MeteredDataForMeasurementPoint_Then_SenderRoleTypeIsNotAuthorizedError()
+        Given_ActorIsNotMeteredDataResponsible_When_MeteredDataForMeteringPoint_Then_SenderRoleTypeIsNotAuthorizedError()
     {
         var senderRole = ActorRole.BalanceResponsibleParty;
         var authenticatedActor = CreateAuthenticatedActor(
@@ -95,7 +95,7 @@ public class SenderAuthorizerTests
             senderRole);
         var sut = CreateSut(authenticatedActor);
 
-        var incomingMessage = new MeteredDataForMeasurementPointMessageBase(
+        var incomingMessage = new MeteredDataForMeteringPointMessageBase(
             "MessageId",
             "MessageType",
             "CreatedAt",
@@ -114,7 +114,7 @@ public class SenderAuthorizerTests
 
     [Fact]
     public async Task
-        Given_ActorIsMeteredDataResponsible_When_MeteredDataForMeasurementPoint_Then_SenderIsAuthorized()
+        Given_ActorIsMeteredDataResponsible_When_MeteredDataForMeteringPoint_Then_SenderIsAuthorized()
     {
         var senderRole = ActorRole.MeteredDataResponsible;
         var authenticatedActor = CreateAuthenticatedActor(
@@ -122,7 +122,7 @@ public class SenderAuthorizerTests
             senderRole);
         var sut = CreateSut(authenticatedActor);
 
-        var incomingMessage = new MeteredDataForMeasurementPointMessageBase(
+        var incomingMessage = new MeteredDataForMeteringPointMessageBase(
             "MessageId",
             "MessageType",
             "CreatedAt",

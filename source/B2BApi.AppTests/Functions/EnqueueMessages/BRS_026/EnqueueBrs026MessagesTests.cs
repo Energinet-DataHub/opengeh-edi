@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
@@ -66,32 +67,28 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             OrchestrationName = "Brs_026",
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
-            DataType = nameof(RequestCalculatedEnergyTimeSeriesAcceptedV1),
+            OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
+        enqueueActorMessages.SetData(enqueueMessagesData);
 
-        enqueueActorMessages.SetData(enqueueActorMessages);
-
-        var serviceBusMessage = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))
-        {
-            Subject = $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            ContentType = "application/json",
-            MessageId = "a-message-id",
-        };
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
+            idempotencyKey: "a-message-id");
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
         // => Then accepted message is enqueued
-        // TODO: Actually check for enqueued messages when the BRS is implemented
+        // TODO: Actually check for enqueued messages and PM notification when the BRS is implemented
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
-            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueBrs_026_Trigger)}"),
+            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_026)}"),
             timeLimit: TimeSpan.FromSeconds(30));
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
         var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
 
         using var assertionScope = new AssertionScope();
-        didFinish.Should().BeTrue($"because the {nameof(EnqueueBrs_026_Trigger)} should have been executed");
+        didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_026)} should have been executed");
         appThrewException.Should().BeFalse();
         hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 026*");
     }

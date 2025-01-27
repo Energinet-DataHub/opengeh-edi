@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeasurementPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using NodaTime;
@@ -380,7 +380,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        MeteredDataForMeasurementPointMessageProcessDto message,
+        MeteredDataForMeteringPointMessageProcessDto message,
         ISerializer serializer,
         Instant timestamp)
     {
@@ -396,12 +396,41 @@ public static class OutgoingMessageFactory
             businessReason: message.BusinessReason,
             serializedContent: serializer.Serialize(message.Series),
             createdAt: timestamp,
-            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeasurementPoint,
+            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
             relatedToMessageId: message.RelatedToMessageId,
             gridAreaCode: null,
             externalId: message.ExternalId,
             calculationId: null,
             message.Series.StartedDateTime);
+    }
+
+    public static OutgoingMessage CreateMessage(
+        MeteredDataForMeteringPointRejectedDto message,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(message);
+
+        MessageId? relatedToMessageId = message.AcknowledgementDto.ReceivedMarketDocumentTransactionId is not null
+            ? MessageId.Create(message.AcknowledgementDto.ReceivedMarketDocumentTransactionId)
+            : null;
+
+        return new OutgoingMessage(
+            eventId: EventId.From(message.EventId),
+            documentType: DocumentType.Acknowledgement,
+            receiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
+            processId: message.ProcessId,
+            businessReason: message.BusinessReason.Name,
+            serializedContent: serializer.Serialize(message.AcknowledgementDto),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
+            relatedToMessageId: relatedToMessageId,
+            gridAreaCode: null,
+            externalId: new ExternalId(message.ExternalId),
+            calculationId: null,
+            periodStartedAt: null);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

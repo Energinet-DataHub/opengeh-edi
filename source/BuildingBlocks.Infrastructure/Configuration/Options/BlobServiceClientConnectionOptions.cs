@@ -20,10 +20,18 @@ public class BlobServiceClientConnectionOptions
 {
     public const string SectionName = "FileStorage";
 
-    private const string DefaultClientName = "FileStorageClient";
+    private const string DefaultClientNameObsoleted = "FileStorageClient";
+
+    private const string DefaultClientName = "ClassicFileStorageClient";
+
+    [Required]
+    public string StorageAccountUrlObsoleted { get; init; } = string.Empty;
 
     [Required]
     public string StorageAccountUrl { get; init; } = string.Empty;
+
+    [Required]
+    public string ClientNameObsoleted { get; init; } = DefaultClientNameObsoleted;
 
     [Required]
     public string ClientName { get; init; } = DefaultClientName;

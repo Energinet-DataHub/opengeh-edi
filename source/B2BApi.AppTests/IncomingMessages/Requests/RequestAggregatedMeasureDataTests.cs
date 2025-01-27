@@ -65,6 +65,7 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
             ActorRole.EnergySupplier);
 
         var transactionId = Guid.NewGuid().ToString();
+        var idempotencyKey = $"{transactionId}_{energySupplier.ActorNumber.Value}_{energySupplier.ActorRole.Code}";
 
         // Test steps:
         // => HTTP POST: RequestAggregatedMeasureData
@@ -77,7 +78,7 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
             .When(
                 msg =>
                 {
-                    var messageIdMatch = msg.MessageId.Equals(transactionId);
+                    var messageIdMatch = msg.MessageId.Equals(idempotencyKey);
                     var subjectMatch = msg.Subject.Equals("Brs_026");
 
                     return messageIdMatch && subjectMatch;

@@ -33,6 +33,7 @@ public class IncomingMessagePublisher
     private readonly ISerializer _serializer;
     private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
+    private readonly MeteredDataOrchestrationStarter _meteredDataOrchestrationStarter;
     private readonly ServiceBusSender _sender;
 
     public IncomingMessagePublisher(
@@ -41,7 +42,8 @@ public class IncomingMessagePublisher
         IAzureClientFactory<ServiceBusSender> senderFactory,
         ISerializer serializer,
         IFeatureFlagManager featureFlagManager,
-        IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter)
+        IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter,
+        MeteredDataOrchestrationStarter meteredDataOrchestrationStarter)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
@@ -49,6 +51,7 @@ public class IncomingMessagePublisher
         _serializer = serializer;
         _featureFlagManager = featureFlagManager;
         _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
+        _meteredDataOrchestrationStarter = meteredDataOrchestrationStarter;
 
         _sender = senderFactory.CreateClient(options.Value.QueueName);
     }
@@ -66,8 +69,8 @@ public class IncomingMessagePublisher
             case RequestWholesaleServicesMessage wholesaleSettlementMessage:
                 await SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
                 break;
-            case MeteredDataForMeasurementPointMessageBase meteredDataForMeasurementPointMessage:
-                await SendInitializeMeteredDataForMeasurementPointMessageProcessAsync(InitializeMeteredDataForMeasurementPointProcessDtoFactory.Create(meteredDataForMeasurementPointMessage, _authenticatedActor), cancellationToken).ConfigureAwait(false);
+            case MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessage:
+                await SendInitializeMeteredDataForMeteringPointMessageProcessAsync(InitializeMeteredDataForMeteringPointProcessDtoFactory.Create(meteredDataForMeteringPointMessage, _authenticatedActor), cancellationToken).ConfigureAwait(false);
                 break;
             default:
                 throw new InvalidOperationException($"Unknown message type {incomingMessage.GetType().Name}");
@@ -124,17 +127,23 @@ public class IncomingMessagePublisher
         }
     }
 
-    private async Task SendInitializeMeteredDataForMeasurementPointMessageProcessAsync(InitializeMeteredDataForMeasurementPointMessageProcessDto initializeMeteredDataForMeasurementPointMessageProcessDto, CancellationToken cancellationToken)
+    private async Task SendInitializeMeteredDataForMeteringPointMessageProcessAsync(InitializeMeteredDataForMeteringPointMessageProcessDto initializeMeteredDataForMeteringPointMessageProcessDto, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeasurementPointMessageProcessDto);
+        ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        var serviceBusMessage =
-            new ServiceBusMessage(
-                _serializer.Serialize(initializeMeteredDataForMeasurementPointMessageProcessDto))
-            {
-                Subject = nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto),
-            };
+        // Go through ProcessManager
+        await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+            initializeMeteredDataForMeteringPointMessageProcessDto,
+            cancellationToken)
+        .ConfigureAwait(false);
 
-        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        // Enqueue message directly
+        // var serviceBusMessage =
+        //     new ServiceBusMessage(
+        //         _serializer.Serialize(initializeMeteredDataForMeteringPointMessageProcessDto))
+        //     {
+        //         Subject = nameof(InitializeMeteredDataForMeteringPointMessageProcessDto),
+        //     };
+        // await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }

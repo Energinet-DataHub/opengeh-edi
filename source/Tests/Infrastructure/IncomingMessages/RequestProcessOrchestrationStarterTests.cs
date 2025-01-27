@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
 using FluentAssertions;
@@ -48,7 +49,7 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
 
         var expectedBusinessReason = BusinessReason.WholesaleFixing;
-        var expectedTransactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
+        var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedResolution = resolutionCode is not null
             ? Resolution.FromCode(resolutionCode)
@@ -60,13 +61,15 @@ public class RequestProcessOrchestrationStarterTests
             ? ChargeType.FromCode(chargeTypeCode)
             : null;
 
+        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Code}";
+
         var initializeProcessDto = new InitializeWholesaleServicesProcessDto(
             BusinessReason: expectedBusinessReason.Code,
             MessageId: MessageId.Create("9b6184af-2f05-40b9-d783-08dc814df95a").Value,
             Series:
             [
                 new InitializeWholesaleServicesSeries(
-                    Id: TransactionId.From(expectedTransactionId).Value,
+                    Id: TransactionId.From(transactionId).Value,
                     StartDateTime: expectedStart,
                     EndDateTime: expectedEnd,
                     RequestedGridAreaCode: expectedGridArea,
@@ -135,7 +138,7 @@ public class RequestProcessOrchestrationStarterTests
                         ChargeType: expectedChargeType?.Name,
                         ChargeCode: expectedChargeId)
                 ]),
-            idempotencyKey: $"{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Name}_{expectedTransactionId}");
+            idempotencyKey: expectedIdempotencyKey);
 
         actualCommand.Should()
             .NotBeNull()
@@ -159,7 +162,7 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
 
         var expectedBusinessReason = BusinessReason.BalanceFixing;
-        var expectedTransactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
+        var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedSettlementVersion = settlementVersionCode is not null
             ? SettlementVersion.FromCode(settlementVersionCode)
@@ -171,6 +174,8 @@ public class RequestProcessOrchestrationStarterTests
             ? SettlementMethod.FromCode(settlementMethodCode)
             : null;
 
+        var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Code}";
+
         var initializeProcessDto = new InitializeAggregatedMeasureDataProcessDto(
             SenderNumber: requestedByActor.ActorNumber.Value,
             SenderRoleCode: requestedByActor.ActorRole.Code,
@@ -179,7 +184,7 @@ public class RequestProcessOrchestrationStarterTests
             Series:
             [
                 new InitializeAggregatedMeasureDataProcessSeries(
-                    Id: TransactionId.From(expectedTransactionId),
+                    Id: TransactionId.From(transactionId),
                     MeteringPointType: expectedMeteringPointType?.Code,
                     SettlementMethod: expectedSettlementMethod?.Code,
                     StartDateTime: expectedStart,
@@ -241,7 +246,133 @@ public class RequestProcessOrchestrationStarterTests
                 MeteringPointType: expectedMeteringPointType?.Name,
                 SettlementMethod: expectedSettlementMethod?.Name,
                 SettlementVersion: expectedSettlementVersion?.Name),
-            idempotencyKey: $"{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Name}_{expectedTransactionId}");
+            idempotencyKey: expectedIdempotencyKey);
+
+        actualCommand.Should()
+            .NotBeNull()
+            .And.BeEquivalentTo(expectedCommand);
+    }
+
+    [Theory]
+    [InlineData("571313101700011887", "E17", "2023-05-31T22:00:00Z", "8716867000030", "Kwh", "PT1H")]
+    [InlineData(null, null, null, null, null, null)]
+    public async Task Given_MeteredDataForMeteringPoint_When_StartForwardMeteredDataForMeteringPointCalled_Then_ProcessManagerMessageClientIsCalled(
+        string? expectedMeteringPointId,
+        string? expectedMeteringPointType,
+        string? expectedEndDate,
+        string? expectedProductNumber,
+        string? expectedMeasureUnit,
+        string? expectedResolution)
+    {
+        // Arrange
+        // => Setup input
+        var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+        var transactionId = TransactionId.From("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
+
+        var expectedBusinessReason = BusinessReason.PeriodicMetering;
+        var expectedIdempotencyKey = $"{requestedByActor.ActorNumber.Value}-{transactionId}";
+        var expectedStart = "2023-04-30T22:00:00Z";
+        var expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
+        var expectedPosition = "1";
+        var expectedEnergyQuantity = "1001";
+        var expectedQuantityQuality = "A03";
+
+        var meteringPointType = expectedMeteringPointType is not null
+            ? MeteringPointType.FromCode(expectedMeteringPointType)
+            : null;
+        var productUnitType = expectedMeasureUnit is not null
+            ? MeasurementUnit.FromCode(expectedMeasureUnit)
+            : null;
+        var resolution = expectedResolution is not null
+            ? Resolution.FromCode(expectedResolution)
+            : null;
+
+        var initializeProcessDto = new InitializeMeteredDataForMeteringPointMessageProcessDto(
+            MessageId: transactionId,
+            MessageType: "E66",
+            CreatedAt: expectedRegistrationDateFrom,
+            BusinessReason: expectedBusinessReason.Code,
+            BusinessType: "23",
+            Series:
+            [
+                new InitializeMeteredDataForMeteringPointMessageSeries(
+                    TransactionId: transactionId,
+                    Resolution: resolution?.Code,
+                    StartDateTime: expectedStart,
+                    EndDateTime: expectedEndDate,
+                    ProductNumber: expectedProductNumber,
+                    ProductUnitType: productUnitType?.Code,
+                    MeteringPointType: meteringPointType?.Code,
+                    MeteringPointLocationId: expectedMeteringPointId,
+                    RegisteredAt: expectedRegistrationDateFrom,
+                    DelegatedGridAreaCodes: null,
+                    RequestedByActor: requestedByActor,
+                    EnergyObservations:
+                    [
+                        new InitializeEnergyObservation(
+                            Position: expectedPosition,
+                            EnergyQuantity: expectedEnergyQuantity,
+                            QuantityQuality: expectedQuantityQuality)
+                    ])
+            ]);
+
+        // => Setup Process Manager client and callback
+        var processManagerClient = new Mock<IProcessManagerMessageClient>();
+        StartOrchestrationInstanceMessageCommand<MeteredDataForMeteringPointMessageInputV1>? actualCommand = null;
+        processManagerClient.Setup(
+                client => client.StartNewOrchestrationInstanceAsync(
+                    It.IsAny<StartForwardMeteredDataCommandV1>(),
+                    It.IsAny<CancellationToken>()))
+            .Callback((StartOrchestrationInstanceMessageCommand<MeteredDataForMeteringPointMessageInputV1> command, CancellationToken token) => actualCommand = command);
+
+        // => Setup authenticated actor
+        var expectedActorId = Guid.NewGuid();
+        var authenticatedActor = new AuthenticatedActor();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+            ActorNumber.Create("1111111111111"),
+            Restriction.None,
+            ActorRole.GridAccessProvider,
+            expectedActorId));
+
+        var sut = new MeteredDataOrchestrationStarter(
+            processManagerClient.Object,
+            authenticatedActor);
+
+        // Act
+        await sut.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+            initializeProcessDto,
+            CancellationToken.None);
+
+        // Assert
+        processManagerClient.Verify(
+            client => client.StartNewOrchestrationInstanceAsync(
+                It.IsAny<StartForwardMeteredDataCommandV1>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        var expectedCommand = new StartForwardMeteredDataCommandV1(
+            operatingIdentity: new ActorIdentityDto(expectedActorId),
+            inputParameter: new MeteredDataForMeteringPointMessageInputV1(
+                AuthenticatedActorId: expectedActorId,
+                TransactionId: transactionId,
+                MeteringPointId: expectedMeteringPointId,
+                MeteringPointType: meteringPointType?.Name,
+                ProductNumber: expectedProductNumber,
+                MeasureUnit: expectedMeasureUnit,
+                RegistrationDateTime: expectedRegistrationDateFrom,
+                Resolution: resolution?.Name,
+                StartDateTime: expectedStart,
+                EndDateTime: expectedEndDate,
+                GridAccessProviderNumber: requestedByActor.ActorNumber.Value,
+                DelegatedGridAreaCodes: null,
+                EnergyObservations:
+                [
+                    new EnergyObservation(
+                        Position: expectedPosition,
+                        EnergyQuantity: expectedEnergyQuantity,
+                        QuantityQuality: expectedQuantityQuality)
+                ]),
+            idempotencyKey: expectedIdempotencyKey);
 
         actualCommand.Should()
             .NotBeNull()

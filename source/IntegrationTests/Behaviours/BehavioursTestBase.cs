@@ -337,14 +337,6 @@ public class BehavioursTestBase : IDisposable
         return messages;
     }
 
-    protected async Task GivenIntegrationEventReceived(IEventMessage @event)
-    {
-        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), @event.EventName, @event.EventMinorVersion, @event);
-
-        using var serviceScope = _serviceProvider.CreateScope();
-        await serviceScope.ServiceProvider.GetRequiredService<IIntegrationEventHandler>().HandleAsync(integrationEvent);
-    }
-
     protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat, MessageCategory messageCategory)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
@@ -440,6 +432,9 @@ public class BehavioursTestBase : IDisposable
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", _integrationTestFixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+            _integrationTestFixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
+        Environment.SetEnvironmentVariable(
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
             _integrationTestFixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()

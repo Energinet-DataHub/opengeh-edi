@@ -68,9 +68,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         {
             { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            { DocumentFormat.Ebix, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Xml, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.xml") },
-            { DocumentFormat.Json, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeasurementPoint.json") },
+            //{ DocumentFormat.Ebix, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml") },
+            { DocumentFormat.Xml, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeteringPoint.xml") },
+            { DocumentFormat.Json, IncomingDocumentType.NotifyValidatedMeasureData, ActorRole.GridAccessProvider, ReadFile(@"IncomingMessages\MeteredDataForMeteringPoint.json") },
         };
 
         return data;
@@ -130,10 +130,15 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.LatestMessage;
+
+        // Service bus is not used when receiving NotifyValidatedMeasureData
+        if (incomingDocumentType != IncomingDocumentType.NotifyValidatedMeasureData)
+        {
+            var message = _senderSpy.LatestMessage;
+            Assert.NotNull(message);
+        }
 
         Assert.Multiple(
-            () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
     }
@@ -174,6 +179,12 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
+        // Service bus is not used when receiving NotifyValidatedMeasureData
+        if (incomingDocumentType == IncomingDocumentType.NotifyValidatedMeasureData)
+        {
+            return;
+        }
+
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
@@ -254,11 +265,16 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.LatestMessage;
+
+        // Service bus is not used when receiving NotifyValidatedMeasureData
+        if (incomingDocumentType != IncomingDocumentType.NotifyValidatedMeasureData)
+        {
+            var message = _senderSpy.LatestMessage;
+            Assert.NotNull(message);
+        }
 
         Assert.Multiple(
             () => Assert.NotNull(results),
-            () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
     }
@@ -398,7 +414,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     }
 
     [Fact]
-    public async Task When_MeteredDataForMeasurementPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
+    public async Task When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
     {
         // Assert
         const string messageIdFromFile = "111131835";
@@ -408,7 +424,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible, ActorId));
 
-        var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml");
+        var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml");
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(

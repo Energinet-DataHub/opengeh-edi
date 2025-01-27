@@ -74,12 +74,12 @@ public class DelegateIncomingMessage
         }
 
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
-        // Except for incoming metered data for measurement point, which this doesn't have a grid area
+        // Except for incoming metered data for metering point, which this doesn't have a grid area
         foreach (var series in message.Series)
         {
             if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
                 && series.GridArea == null
-                && processType != ProcessType.IncomingMeteredDataForMeasurementPoint)
+                && processType != ProcessType.IncomingMeteredDataForMeteringPoint)
             {
                 continue;
             }
@@ -105,9 +105,9 @@ public class DelegateIncomingMessage
                         .ConfigureAwait(false);
                 }
 
-                if (processType == ProcessType.IncomingMeteredDataForMeasurementPoint)
+                if (processType == ProcessType.IncomingMeteredDataForMeteringPoint)
                 {
-                    // For incoming metered data for measurement point, we do not know the owner of the metering point yet (original actor). Therefore, all delegated grid ares are parsed on.
+                    // For incoming metered data for metering point, we do not know the owner of the metering point yet (original actor). Therefore, all delegated grid ares are parsed on.
                     // Then in the async validation we will check that the metering point belongs to any of the grid areas.
                     series.DelegateSeries(null, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
                 }
@@ -156,7 +156,7 @@ public class DelegateIncomingMessage
             { IncomingDocumentType.B2CRequestAggregatedMeasureData, ProcessType.RequestEnergyResults },
             { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
-            { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeasurementPoint },
+            { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeteringPoint },
         };
 
         if (documentTypeToProcessTypeMap.TryGetValue(incomingDocumentType, out var processType))

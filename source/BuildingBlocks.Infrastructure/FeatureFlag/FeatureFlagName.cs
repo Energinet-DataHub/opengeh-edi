@@ -36,7 +36,7 @@ public enum FeatureFlagName
     RequestStaysInEdi,
 
     /// <summary>
-    /// Whether to allow receiving metered data for measurement points.
+    /// Whether to allow receiving metered data for metering points.
     /// </summary>
     ReceiveMeteredDataForMeasurementPoints,
 
@@ -49,4 +49,9 @@ public enum FeatureFlagName
     /// Whether to use orchestration for handling RequestAggregatedMeasureData processes.
     /// </summary>
     UseRequestAggregatedMeasureDataProcessOrchestration,
+
+    /// <summary>
+    /// Whether to start using standard blob service client.
+    /// </summary>
+    UseStandardBlobServiceClient,
 }

@@ -161,7 +161,7 @@ internal sealed class EbixDriver : IDisposable
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
 
-    public async Task<string> SendMeteredDataForMeasurementPointAsync(CancellationToken cancellationToken)
+    public async Task<string> SendMeteredDataForMeteringPointAsync(CancellationToken cancellationToken)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -169,7 +169,7 @@ internal sealed class EbixDriver : IDisposable
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
         var messageId = Guid.NewGuid().ToString("N");
-        var requestContent = await GetMeteredDataForMeasurementPointRequestContentAsync(messageId, cancellationToken).ConfigureAwait(false);
+        var requestContent = await GetMeteredDataForMeteringPointRequestContentAsync(messageId, cancellationToken).ConfigureAwait(false);
         var requestXml = new XmlDocument();
         requestXml.LoadXml(requestContent);
         var message = new MessageContainer_Type
@@ -184,7 +184,7 @@ internal sealed class EbixDriver : IDisposable
         return response.MessageId;
     }
 
-    public async Task<string> SendMeteredDataForMeasurementPointWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
+    public async Task<string> SendMeteredDataForMeteringPointWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -192,7 +192,7 @@ internal sealed class EbixDriver : IDisposable
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
         var existingMessageId = "fe8eaac060c8418fae510402c6c60376";
-        var requestContent = await GetMeteredDataForMeasurementPointRequestContentAsync(existingMessageId, cancellationToken).ConfigureAwait(false);
+        var requestContent = await GetMeteredDataForMeteringPointRequestContentAsync(existingMessageId, cancellationToken).ConfigureAwait(false);
         var requestXml = new XmlDocument();
         requestXml.LoadXml(requestContent);
         var message = new MessageContainer_Type
@@ -271,9 +271,9 @@ internal sealed class EbixDriver : IDisposable
         return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
     }
 
-    private async Task<string> GetMeteredDataForMeasurementPointRequestContentAsync(string messageId, CancellationToken cancellationToken)
+    private async Task<string> GetMeteredDataForMeteringPointRequestContentAsync(string messageId, CancellationToken cancellationToken)
     {
-        var content = await File.ReadAllTextAsync("Messages/ebix/MeteredDataForMeasurementPoint.xml", cancellationToken)
+        var content = await File.ReadAllTextAsync("Messages/ebix/MeteredDataForMeteringPoint.xml", cancellationToken)
             .ConfigureAwait(false);
 
         content = content.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);

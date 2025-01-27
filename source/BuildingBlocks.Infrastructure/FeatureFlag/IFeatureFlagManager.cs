@@ -40,7 +40,7 @@ public interface IFeatureFlagManager
     Task<bool> RequestStaysInEdiAsync();
 
     /// <summary>
-    /// Whether to allow receiving metered data for measurement points.
+    /// Whether to allow receiving metered data for metering points.
     /// </summary>
     Task<bool> ReceiveMeteredDataForMeasurementPointsAsync();
 
@@ -53,4 +53,9 @@ public interface IFeatureFlagManager
     /// Whether to use the RequestAggregatedMeasureData process orchestration.
     /// </summary>
     Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
+
+    /// <summary>
+    /// Whether to use the StandardBlobServiceClient.
+    /// </summary>
+    Task<bool> UseStandardBlobServiceClientAsync();
 }

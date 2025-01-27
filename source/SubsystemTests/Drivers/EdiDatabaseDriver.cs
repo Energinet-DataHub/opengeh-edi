@@ -175,7 +175,7 @@ internal sealed class EdiDatabaseDriver
         return await GetProcessIdAsync(command, cancellationToken);
     }
 
-    internal async Task<string?> GetMeteredDataForMeasurementPointProcessIdAsync(string initiatedByMessageId, CancellationToken cancellationToken)
+    internal async Task<string?> GetMeteredDataForMeteringPointProcessIdAsync(string initiatedByMessageId, CancellationToken cancellationToken)
     {
         await using var command = new SqlCommand();
 
@@ -323,7 +323,7 @@ internal sealed class EdiDatabaseDriver
             sql: """
                  SELECT COUNT([Id])
                  FROM [Bundles]
-                 WHERE [DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
+                 WHERE ([DocumentTypeInBundle] = 'NotifyValidatedMeasureData' or [DocumentTypeInBundle] = 'Acknowledgement')
                  AND RelatedToMessageId like 'perf_test_%'
                  AND DequeuedAt is null
                  """);
