@@ -68,6 +68,10 @@ public class DataLakeFileStorageClientTests
         // Act
         await sut.UploadAsync(reference, stream);
 
+        // Teardown
+        await stream.DisposeAsync();
+        await writer.DisposeAsync();
+
         // Assert
         _blobContainerClientObsoletedMock.Verify(
             x => x.UploadBlobAsync(reference.Path, stream, It.IsAny<CancellationToken>()),
@@ -79,6 +83,7 @@ public class DataLakeFileStorageClientTests
 
         // Teardown
         await stream.DisposeAsync();
+        await writer.DisposeAsync();
     }
 
     [Fact]
@@ -107,6 +112,7 @@ public class DataLakeFileStorageClientTests
 
         // Teardown
         await stream.DisposeAsync();
+        await writer.DisposeAsync();
     }
 
     [Fact]
