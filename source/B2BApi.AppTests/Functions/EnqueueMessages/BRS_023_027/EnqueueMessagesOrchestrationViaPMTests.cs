@@ -282,136 +282,140 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
     }
 
-    // /// <summary>
-    // /// Verifies that:
-    // /// - If databricks has no data for the CalculationId, then orchestration runs "forever" (because of retry policies).
-    // /// </summary>
-    // [Fact]
-    // public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever()
-    // {
-    //     // Arrange
-    //     var calculationId = Guid.NewGuid().ToString();
-    //     var calculationOrchestrationId = Guid.NewGuid().ToString();
-    //     var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
-    //         calculationOrchestrationId,
-    //         CalculationCompletedV1.Types.CalculationType.WholesaleFixing, // WholesaleFixing covers retries for both energy and wholesale results
-    //         calculationId);
-    //
-    //     var expectedHistory = new List<(string? Name, string? EventType)>
-    //     {
-    //         ("EnqueueEnergyResultsForGridAreaOwnersActivity", "TaskFailed"),
-    //         ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "TaskFailed"),
-    //         ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "TaskFailed"),
-    //         ("GetActorsForWholesaleResultsForAmountPerChargesActivity", "TaskFailed"),
-    //         ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", "TaskFailed"),
-    //         ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", "TaskFailed"),
-    //     };
-    //
-    //     // Act
-    //     var beforeOrchestrationCreated = DateTime.UtcNow;
-    //     await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
-    //
-    //     // Assert
-    //     // => Verify expected behaviour by searching the orchestration history
-    //     var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
-    //
-    //     // => Wait for running and expected history
-    //     JArray? actualHistory = null;
-    //     var isExpected = await Awaiter.TryWaitUntilConditionAsync(
-    //         async () =>
-    //         {
-    //             var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualOrchestrationStatus.InstanceId, showHistory: true);
-    //             actualHistory = orchestrationStatus.History;
-    //
-    //             if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
-    //                 return false;
-    //
-    //             var history = orchestrationStatus.History
-    //                 .OrderBy(item => item["Timestamp"])
-    //                 .Select(item => new
-    //                 {
-    //                     Name = item.Value<string>("FunctionName"),
-    //                     EventType = item.Value<string>("EventType"),
-    //                 })
-    //                 .ToList();
-    //
-    //             var containsExpectedHistoryAtleastTwice = expectedHistory
-    //                 .All(expected => history
-    //                     .Count(actual => actual.Name == expected.Name && actual.EventType == expected.EventType) > 1);
-    //
-    //             return containsExpectedHistoryAtleastTwice;
-    //         },
-    //         TimeSpan.FromSeconds(60),
-    //         delay: TimeSpan.FromSeconds(5));
-    //
-    //     await Fixture.DurableClient.TerminateAsync(actualOrchestrationStatus.InstanceId,  reason: "Test is completed");
-    //
-    //     isExpected.Should().BeTrue($"because the history should contain the expected 6 failed activities atleast twice. Actual history: {actualHistory?.ToString() ?? "<null>"}");
-    // }
-    //
-    // [Fact]
-    // public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
-    // {
-    //     // Arrange
-    //     var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
-    //     var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
-    //     var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
-    //     await ClearAndAddInvalidDatabricksData(
-    //         forAmountPerChargeDescription,
-    //         forMonthlyAmountPerChargeDescription,
-    //         forTotalAmountDescription);
-    //     var wholesaleCalculationId = forAmountPerChargeDescription.CalculationId;
-    //
-    //     var wholesaleCalculationOrchestrationId = Guid.NewGuid().ToString();
-    //     var wholesaleCalculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
-    //         wholesaleCalculationOrchestrationId,
-    //         CalculationCompletedV1.Types.CalculationType.WholesaleFixing,
-    //         wholesaleCalculationId.ToString());
-    //
-    //     // Act
-    //     var beforeOrchestrationCreated = DateTime.UtcNow;
-    //     await Fixture.IntegrationEventsTopicResource.SenderClient.SendMessageAsync(wholesaleCalculationCompletedEventMessage);
-    //     var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
-    //
-    //     // Assert
-    //     using var assertionScope = new AssertionScope();
-    //     var wholesaleEventId = actualWholesaleOrchestrationStatus.Input["EventId"];
-    //
-    //     var expectedHistory = new List<(string?, string?)>
-    //     {
-    //         ("EnqueueWholesaleResultsForAmountPerChargesActivity", $"Enqueue messages activity failed. Actor='{forAmountPerChargeDescription.ExampleWholesaleResultMessageData.EnergySupplier.Value}' CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forAmountPerChargeDescription.ExpectedCalculationResultsCount - 1}'"),
-    //         ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", $"Enqueue messages activity failed. Actor='{forMonthlyAmountPerChargeDescription.ExampleWholesaleResultMessageDataForEnergySupplier.EnergySupplier.Value}' CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forMonthlyAmountPerChargeDescription.ExpectedCalculationResultsCount - 1}'"),
-    //         ("EnqueueWholesaleResultsForTotalAmountsActivity", $"Enqueue messages activity failed. Actor='{forTotalAmountDescription.ExampleWholesaleResultMessageDataForEnergySupplier.EnergySupplier.Value}' CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forTotalAmountDescription.ExpectedCalculationResultsCount - 1}'"),
-    //     };
-    //
-    //     // => Wait for running and expected history
-    //     JArray? actualHistory = null;
-    //     var isExpected = await Awaiter.TryWaitUntilConditionAsync(
-    //         async () =>
-    //         {
-    //             var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualWholesaleOrchestrationStatus.InstanceId, showHistory: true);
-    //             actualHistory = orchestrationStatus.History;
-    //
-    //             if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
-    //                 return false;
-    //
-    //             var activities = orchestrationStatus.History
-    //                 .OrderBy(item => item["Timestamp"])
-    //                 .Where(item => item.HasValues)
-    //                 .Select(item =>
-    //                     (item.Value<string>("FunctionName"), (string?)item.Value<dynamic>("FailureDetails")?.ErrorMessage))
-    //                 .ToList();
-    //
-    //             var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
-    //             return containsExpectedHistory;
-    //         },
-    //         TimeSpan.FromSeconds(60),
-    //         delay: TimeSpan.FromSeconds(5));
-    //
-    //     await Fixture.DurableClient.TerminateAsync(actualWholesaleOrchestrationStatus.InstanceId, reason: "Test is completed");
-    //
-    //     isExpected.Should().BeTrue($"because the history should contain the expected 3 failed wholesale result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
-    // }
+    /// <summary>
+    /// Verifies that:
+    /// - If databricks has no data for the CalculationId, then orchestration runs "forever" (because of retry policies).
+    /// </summary>
+    [Fact]
+    public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever()
+    {
+        // Arrange
+        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
+            CalculationId: Guid.NewGuid(),
+            CalculationType: CalculationType.WholesaleFixing); // WholesaleFixing covers retries for both energy and wholesale results
+
+        var serviceBusMessage = CreateEnqueueFromProcessManager(
+            calculationCompletedEvent,
+            Guid.NewGuid());
+
+        var expectedHistory = new List<(string? Name, string? EventType)>
+        {
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", "TaskFailed"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "TaskFailed"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", "TaskFailed"),
+        };
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
+
+        // Assert
+        // => Verify expected behaviour by searching the orchestration history
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
+
+        // => Wait for running and expected history
+        JArray? actualHistory = null;
+        var isExpected = await Awaiter.TryWaitUntilConditionAsync(
+            async () =>
+            {
+                var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
+
+                if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
+                    return false;
+
+                var history = orchestrationStatus.History
+                    .OrderBy(item => item["Timestamp"])
+                    .Select(item => new
+                    {
+                        Name = item.Value<string>("FunctionName"),
+                        EventType = item.Value<string>("EventType"),
+                    })
+                    .ToList();
+
+                var containsExpectedHistoryAtleastTwice = expectedHistory
+                    .All(expected => history
+                        .Count(actual => actual.Name == expected.Name && actual.EventType == expected.EventType) > 1);
+
+                return containsExpectedHistoryAtleastTwice;
+            },
+            TimeSpan.FromSeconds(60),
+            delay: TimeSpan.FromSeconds(5));
+
+        await Fixture.DurableClient.TerminateAsync(actualOrchestrationStatus.InstanceId,  reason: "Test is completed");
+
+        isExpected.Should().BeTrue($"because the history should contain the expected 6 failed activities atleast twice. Actual history: {actualHistory?.ToString() ?? "<null>"}");
+    }
+
+    [Fact]
+    public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
+    {
+        // Arrange
+        var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
+        var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
+        var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
+        await ClearAndAddInvalidDatabricksData(
+            forAmountPerChargeDescription,
+            forMonthlyAmountPerChargeDescription,
+            forTotalAmountDescription);
+        var wholesaleCalculationId = forAmountPerChargeDescription.CalculationId;
+
+        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
+            CalculationId: wholesaleCalculationId,
+            CalculationType: CalculationType.BalanceFixing);
+
+        var serviceBusMessage = CreateEnqueueFromProcessManager(
+            calculationCompletedEvent,
+            Guid.NewGuid());
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
+        var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        var wholesaleEventId = actualWholesaleOrchestrationStatus.Input["EventId"];
+
+        var expectedHistory = new List<(string?, string?)>
+        {
+            ("EnqueueWholesaleResultsForAmountPerChargesActivity", $"Enqueue messages activity failed. Actor='{forAmountPerChargeDescription.ExampleWholesaleResultMessageData.EnergySupplier.Value}' CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forAmountPerChargeDescription.ExpectedCalculationResultsCount - 1}'"),
+            ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", $"Enqueue messages activity failed. Actor='{forMonthlyAmountPerChargeDescription.ExampleWholesaleResultMessageDataForEnergySupplier.EnergySupplier.Value}' CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forMonthlyAmountPerChargeDescription.ExpectedCalculationResultsCount - 1}'"),
+            ("EnqueueWholesaleResultsForTotalAmountsActivity", $"Enqueue messages activity failed. Actor='{forTotalAmountDescription.ExampleWholesaleResultMessageDataForEnergySupplier.EnergySupplier.Value}' CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forTotalAmountDescription.ExpectedCalculationResultsCount - 1}'"),
+        };
+
+        // => Wait for running and expected history
+        JArray? actualHistory = null;
+        var isExpected = await Awaiter.TryWaitUntilConditionAsync(
+            async () =>
+            {
+                var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualWholesaleOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
+
+                if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
+                    return false;
+
+                var activities = orchestrationStatus.History
+                    .OrderBy(item => item["Timestamp"])
+                    .Where(item => item.HasValues)
+                    .Select(item =>
+                        (item.Value<string>("FunctionName"), (string?)item.Value<dynamic>("FailureDetails")?.ErrorMessage))
+                    .ToList();
+
+                var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
+                return containsExpectedHistory;
+            },
+            TimeSpan.FromSeconds(60),
+            delay: TimeSpan.FromSeconds(5));
+
+        await Fixture.DurableClient.TerminateAsync(actualWholesaleOrchestrationStatus.InstanceId, reason: "Test is completed");
+
+        isExpected.Should().BeTrue($"because the history should contain the expected 3 failed wholesale result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
+    }
+
     [Fact]
     public async Task Given_EnergyResultsContainsAnInvalidRow_When_CalculationCompletedEventForBalanceFixing_Then_EnqueueAllValidMessages()
     {
