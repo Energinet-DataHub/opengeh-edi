@@ -34,6 +34,7 @@ using FluentAssertions.Execution;
 using Google.Protobuf;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -162,9 +163,10 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
                     msg.Body.ToString());
 
                 var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == processManagerOrchestrationId.ToString();
-                var matchingCalculationId = parsedNotification.EventName == NotifyOrchestrationInstanceEventName;
+                var matchingCalculationId = parsedNotification.EventName == NotifyEnqueueFinishedV1.EventName;
+                var enqueueFinishedV1 = JsonConvert.DeserializeObject<NotifyEnqueueFinishedV1>(parsedNotification.Data.Data)!;
 
-                return matchingOrchestrationId && matchingCalculationId;
+                return matchingOrchestrationId && matchingCalculationId && enqueueFinishedV1.Success;
             })
             .VerifyCountAsync(1);
 

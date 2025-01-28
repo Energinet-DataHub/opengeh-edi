@@ -55,7 +55,7 @@ public class EnqueueHandler_Brs_023_027_V1(
             CalculationOrchestrationId: enqueueActorMessages.OrchestrationInstanceId,
             // This is not event driven anymore. But it is still passed to the outgoing messages
             // Do we want to preserve this and use the orchestration instance id instead?
-            // This should be a guid, even tho the datatype states otherwise
+            // enqueueActorMessages.OrchestrationInstanceId should be a guid, even tho the datatype states otherwise
             EventId: Guid.Parse(enqueueActorMessages.OrchestrationInstanceId));
 
         var durableClient = _durableClientFactory.CreateClient();

@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
 using Google.Protobuf;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Azure;
@@ -53,10 +54,10 @@ public class SendActorMessagesEnqueuedActivity
         if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false))
         {
             await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                    new NotifyOrchestrationInstanceEvent(
+                    new NotifyOrchestrationInstanceEvent<NotifyEnqueueFinishedV1>(
                         OrchestrationInstanceId: input.CalculationOrchestrationInstanceId,
-                        // Correct this magic string, such that it comes from the process manager
-                        EventName: "ActorMessagesEnqueued"),
+                        EventName: NotifyEnqueueFinishedV1.EventName,
+                        Data: new NotifyEnqueueFinishedV1 { Success = input.Success }),
                     CancellationToken.None)
                 .ConfigureAwait(false);
 

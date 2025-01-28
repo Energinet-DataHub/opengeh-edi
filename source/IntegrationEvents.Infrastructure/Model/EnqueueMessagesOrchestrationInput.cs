@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 
 /// <summary>
-/// An immutable input to start the equeue messages orchestration.
+/// An immutable input to start the enqueue messages orchestration.
 /// </summary>
 public sealed record EnqueueMessagesOrchestrationInput(
     string CalculationOrchestrationId,
     Guid CalculationId,
+    // This is not always an eventId, but may also be a orchestrationId.
+    // Should it be renamed ti orchestrationId when the integration event enqueuer is deleted?
+    // Maybe ExternalId?
     Guid EventId);
