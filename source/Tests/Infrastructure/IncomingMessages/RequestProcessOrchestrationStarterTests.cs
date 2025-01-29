@@ -162,6 +162,7 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
 
         var expectedBusinessReason = BusinessReason.BalanceFixing;
+        var messageId = "9b6184af-2f05-40b9-d783-08dc814df95a";
         var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
         var messageId = "996D9155-DB5E-4B4C-817D-8B880B59E611";
         var expectedStart = "2023-04-30T22:00:00Z";
@@ -181,7 +182,7 @@ public class RequestProcessOrchestrationStarterTests
             SenderNumber: requestedByActor.ActorNumber.Value,
             SenderRoleCode: requestedByActor.ActorRole.Code,
             BusinessReason: expectedBusinessReason.Code,
-            MessageId: MessageId.Create("9b6184af-2f05-40b9-d783-08dc814df95a").Value,
+            MessageId: messageId,
             Series:
             [
                 new InitializeAggregatedMeasureDataProcessSeries(

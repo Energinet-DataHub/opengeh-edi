@@ -65,6 +65,7 @@ public class EnqueueHandler_Brs_026_V1(
             new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(request.Period.Start, request.Period.End));
 
         // 2. Call IActorRequestsClient.EnqueueAggregatedMeasureDataAsync(query + needed properties from RequestCalculatedEnergyTimeSeriesAcceptedV1);
+        // TODO: Add correct properties
         await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(acceptedData.BusinessReason.ToString(), query).ConfigureAwait(false);
 
         // 3. See inside _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(query).
