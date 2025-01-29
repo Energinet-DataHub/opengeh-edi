@@ -40,14 +40,18 @@ public class EnqueueHandler_Brs_023_027_V1(
 
     protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
     {
-        if (!await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false))
+        var featureIsDisabled =
+            !await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false);
+
+        _logger.LogInformation(
+            "Received enqueue actor messages for BRS 023/027. Feature is {Status}. Data: {Data}",
+            featureIsDisabled ? "disabled" : "enabled",
+            enqueueActorMessages.Data);
+
+        if (featureIsDisabled)
         {
             await Task.CompletedTask.ConfigureAwait(false);
         }
-
-        _logger.LogInformation(
-            "Received enqueue actor messages for BRS 023/027. Data: {Data}",
-            enqueueActorMessages.Data);
 
         var calculationCompleted = enqueueActorMessages.ParseData<CalculatedDataForCalculationTypeV1>();
         var orchestrationInput = new EnqueueMessagesOrchestrationInput(

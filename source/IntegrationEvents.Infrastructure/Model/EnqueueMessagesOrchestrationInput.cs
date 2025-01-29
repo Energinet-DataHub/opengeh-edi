@@ -21,6 +21,6 @@ public sealed record EnqueueMessagesOrchestrationInput(
     string CalculationOrchestrationId,
     Guid CalculationId,
     // This is not always an eventId, but may also be a orchestrationId.
-    // Should it be renamed ti orchestrationId when the integration event enqueuer is deleted?
+    // Should it be renamed to orchestrationId when the integration event enqueuer is deleted?
     // Maybe ExternalId?
     Guid EventId);

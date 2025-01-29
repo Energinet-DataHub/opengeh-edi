@@ -22,11 +22,11 @@ public class DurableClientFactoryStub : IDurableClientFactory
 {
     public IDurableClient CreateClient(DurableClientOptions durableClientOptions)
     {
-        throw new Exception("This method is just here to test featureflags");
+        throw new Exception("This method is just here to test feature flags");
     }
 
     public IDurableClient CreateClient()
     {
-        throw new Exception("This method is just here to test featureflags");
+        throw new Exception("This method is just here to test feature flags");
     }
 }

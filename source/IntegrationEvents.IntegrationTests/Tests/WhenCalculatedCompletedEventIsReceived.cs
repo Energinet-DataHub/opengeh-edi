@@ -51,7 +51,9 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
 
         var act = () => HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        await act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowAsync<Exception>("the handler should try to create a durable client,"
+                                                 + "which is mocked to throw an exception")
+            .WithMessage("This method is just here to test feature flags");
     }
 
     [Fact]
@@ -69,7 +71,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
 
         var act = () => HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        await act.Should().NotThrowAsync("the processer should not do anything");
+        await act.Should().NotThrowAsync("the handler should not do anything");
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(CalculationCompletedV1 calculationCompleted)

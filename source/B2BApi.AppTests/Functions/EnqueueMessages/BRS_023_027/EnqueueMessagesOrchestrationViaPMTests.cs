@@ -44,8 +44,8 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_02
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
 {
+    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
     private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
-    private const string NotifyOrchestrationInstanceEventName = "ActorMessagesEnqueued"; // Hardcoded in the orchestration activity, fix it
 
     public EnqueueMessagesOrchestrationViaPMTests(
         B2BApiAppFixture fixture,
@@ -85,9 +85,6 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
     ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
-    /// <remarks>
-    /// Feature flags are enabled for all calculation types to ensure activities are executed.
-    /// </remarks>
     [Fact]
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
@@ -98,7 +95,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
         var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
-        var calculationId = await ClearAndAddDatabricksData(
+        var calculationId = await ClearAndAddDatabricksDataAsync(
             perGridAreaDataDescription,
             perBrpGridAreaDataDescription,
             perBrpAndEsGridAreaDataDescription,
@@ -121,8 +118,9 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         await Fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
         // Assert
-        // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(createdTimeFrom: beforeOrchestrationCreated);
+        // Getting orchestrationId
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStartedAsync(
+            createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationCompletedAsync(
@@ -183,9 +181,6 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
     ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
-    /// <remarks>
-    /// Feature flags are enabled for all calculation types to ensure activities are executed.
-    /// </remarks>
     [Fact]
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
@@ -196,7 +191,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
         var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
-        await ClearAndAddDatabricksData(
+        await ClearAndAddDatabricksDataAsync(
             perGridAreaDataDescription,
             perBrpGridAreaDataDescription,
             perBrpAndEsGridAreaDataDescription,
@@ -209,7 +204,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         var processManagerOrchestrationId = calculationId;
         var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
             CalculationId: calculationId,
-            CalculationType: CalculationType.BalanceFixing);
+            CalculationType: CalculationType.WholesaleFixing);
 
         var serviceBusMessage = CreateEnqueueFromProcessManager(
             calculationCompletedEvent,
@@ -363,7 +358,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
         var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
-        await ClearAndAddInvalidDatabricksData(
+        await ClearAndAddInvalidDatabricksDataAsync(
             forAmountPerChargeDescription,
             forMonthlyAmountPerChargeDescription,
             forTotalAmountDescription);
@@ -371,7 +366,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
 
         var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
             CalculationId: wholesaleCalculationId,
-            CalculationType: CalculationType.BalanceFixing);
+            CalculationType: CalculationType.WholesaleFixing);
 
         // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
         var processManagerOrchestrationId = calculationCompletedEvent.CalculationId;
@@ -431,7 +426,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
-        await ClearAndAddInvalidDatabricksData(
+        await ClearAndAddInvalidDatabricksDataAsync(
             perGridAreaDataDescription,
             perBrpGridAreaDataDescription,
             perBrpAndEsGridAreaDataDescription);
@@ -518,21 +513,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
             idempotencyKey: "a-message-id");
     }
 
-    private static ServiceBusMessage CreateServiceBusMessage(Guid eventId, IEventMessage eventMessage)
-    {
-        var serviceBusMessage = new ServiceBusMessage
-        {
-            Body = new BinaryData(eventMessage.ToByteArray()),
-            Subject = eventMessage.EventName,
-            MessageId = eventId.ToString(),
-        };
-
-        serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", eventMessage.EventMinorVersion);
-
-        return serviceBusMessage;
-    }
-
-    private async Task ClearAndAddInvalidDatabricksData(
+    private async Task ClearAndAddInvalidDatabricksDataAsync(
         params TestDataDescription[] testDataDescriptions)
     {
         await ResetDatabricks();
@@ -582,7 +563,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
     /// Notice we reuse test data from the `OutgoingMessagesClientTests`
     /// </summary>
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
-    private async Task<Guid> ClearAndAddDatabricksData(
+    private async Task<Guid> ClearAndAddDatabricksDataAsync(
         EnergyResultPerGridAreaDescription perGridAreaDataDescription,
         EnergyResultPerBrpGridAreaDescription perBrpGridAreaDataDescription,
         EnergyResultPerEnergySupplierBrpGridAreaDescription perBrpAndEsGridAreaDataDescription,

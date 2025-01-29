@@ -65,7 +65,7 @@ public interface IFeatureFlagManager
     Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync();
 
     /// <summary>
-    /// Whether to enqueue BRS-023/027 messages via Wholesale.
+    /// Whether to disable enqueue BRS-023/027 messages via Wholesale.
     /// </summary>
     Task<bool> DisableEnqueueBrs023027MessagesFromWholesaleAsync();
 }
