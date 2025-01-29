@@ -20,8 +20,8 @@ using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using Moq;
 using Xunit;
@@ -134,7 +134,7 @@ public class RequestProcessOrchestrationStarterTests
                 SettlementVersion: expectedSettlementVersion?.Name,
                 ChargeTypes:
                 [
-                    new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInputV1(
+                    new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInput(
                         ChargeType: expectedChargeType?.Name,
                         ChargeCode: expectedChargeId)
                 ]),
@@ -163,6 +163,7 @@ public class RequestProcessOrchestrationStarterTests
 
         var expectedBusinessReason = BusinessReason.BalanceFixing;
         var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
+        var messageId = "996D9155-DB5E-4B4C-817D-8B880B59E611";
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedSettlementVersion = settlementVersionCode is not null
             ? SettlementVersion.FromCode(settlementVersionCode)
@@ -235,6 +236,8 @@ public class RequestProcessOrchestrationStarterTests
         var expectedCommand = new RequestCalculatedEnergyTimeSeriesCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
             inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
+                ActorMessageId: messageId,
+                TransactionId: transactionId,
                 RequestedForActorNumber: requestedByActor.ActorNumber.Value,
                 RequestedForActorRole: requestedByActor.ActorRole.Name,
                 BusinessReason: expectedBusinessReason.Name,
@@ -268,6 +271,7 @@ public class RequestProcessOrchestrationStarterTests
         // => Setup input
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
         var transactionId = TransactionId.From("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
+        var messageId = Guid.NewGuid().ToString();
 
         var expectedBusinessReason = BusinessReason.PeriodicMetering;
         var expectedIdempotencyKey = $"{requestedByActor.ActorNumber.Value}-{transactionId}";
@@ -353,6 +357,7 @@ public class RequestProcessOrchestrationStarterTests
         var expectedCommand = new StartForwardMeteredDataCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
             inputParameter: new MeteredDataForMeteringPointMessageInputV1(
+                MessageId: messageId,
                 AuthenticatedActorId: expectedActorId,
                 TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,

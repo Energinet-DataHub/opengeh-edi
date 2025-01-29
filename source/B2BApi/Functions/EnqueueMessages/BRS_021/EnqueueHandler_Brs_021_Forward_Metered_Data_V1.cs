@@ -71,7 +71,11 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
                 [TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)]);
 
         var task = executionPolicy.ExecuteAsync(
-            () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(new NotifyOrchestrationInstanceEvent(orchestrationInstanceId, "MeteredDataForMeteringPointAcceptedV1"), CancellationToken.None));
+            () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
+                new NotifyOrchestrationInstanceEvent(
+                    orchestrationInstanceId,
+                    MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
+                CancellationToken.None));
 
         await Task.WhenAll(task).ConfigureAwait(false);
     }

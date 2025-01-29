@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResult
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.TimeSeriesType;
@@ -65,7 +65,7 @@ public class EnqueueHandler_Brs_026_V1(
             new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(request.Period.Start, request.Period.End));
 
         // 2. Call IActorRequestsClient.EnqueueAggregatedMeasureDataAsync(query + needed properties from RequestCalculatedEnergyTimeSeriesAcceptedV1);
-        await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(acceptedData.BusinessReason, query).ConfigureAwait(false);
+        await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(acceptedData.BusinessReason.ToString(), query).ConfigureAwait(false);
 
         // 3. See inside _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(query).
 
