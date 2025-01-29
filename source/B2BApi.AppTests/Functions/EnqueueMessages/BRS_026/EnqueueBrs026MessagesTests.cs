@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Google.Protobuf;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -61,7 +59,19 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         // => Given enqueue BRS-026 service bus message
         var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
-            BusinessReason: BusinessReason.BalanceFixing.Code);
+            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            BusinessReason: BusinessReason.BalanceFixing,
+            RequestedForActorNumber: ActorNumber.Create("1111111111111"),
+            RequestedForActorRole: ActorRole.EnergySupplier,
+            PeriodStart: Instant.FromUtc(2024, 01, 03, 23, 00),
+            PeriodEnd: Instant.FromUtc(2024, 01, 04, 23, 00),
+            GridAreas: ["804"],
+            EnergySupplierNumber: ActorNumber.Create("1111111111111"),
+            BalanceResponsibleNumber: null,
+            MeteringPointType: null,
+            SettlementMethod: null,
+            SettlementVersion: null);
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
