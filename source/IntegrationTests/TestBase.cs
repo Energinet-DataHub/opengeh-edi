@@ -123,26 +123,6 @@ public class TestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected static async Task<string> GetFileContentFromFileStorageAsync(
-        string container,
-        string fileStorageReference)
-    {
-        var azuriteBlobUrl = Environment.GetEnvironmentVariable(
-            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}");
-        var blobServiceClient = new BlobServiceClient(new Uri(azuriteBlobUrl!)); // Uses new client to avoid some form of caching or similar
-
-        var containerClient = blobServiceClient.GetBlobContainerClient(container);
-        var blobClient = containerClient.GetBlobClient(fileStorageReference);
-
-        var blobContent = await blobClient.DownloadAsync();
-
-        if (!blobContent.HasValue)
-            throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
-
-        var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
-        return fileStringContent;
-    }
-
     protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -306,6 +286,9 @@ public class TestBase : IDisposable
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
+            Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
+        Environment.SetEnvironmentVariable(
+            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
