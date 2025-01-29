@@ -271,7 +271,7 @@ public class RequestProcessOrchestrationStarterTests
         // => Setup input
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
         var transactionId = TransactionId.From("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
-        var messageId = Guid.NewGuid().ToString();
+        var messageId = "62EA5019-57FB-41B8-BD34-4F0885E77DAE";
 
         var expectedBusinessReason = BusinessReason.PeriodicMetering;
         var expectedIdempotencyKey = $"{requestedByActor.ActorNumber.Value}-{transactionId}";
