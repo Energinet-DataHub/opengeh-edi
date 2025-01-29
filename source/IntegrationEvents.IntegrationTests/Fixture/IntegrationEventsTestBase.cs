@@ -62,7 +62,7 @@ public class IntegrationEventsTestBase : IAsyncLifetime
             .AddMasterDataModule(configuration)
             .AddIntegrationEventModule(configuration)
             .AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub)
-            .AddScoped<IDurableClient, DurableClientStub>()
+            .AddScoped<IDurableClient, DurableClientSpy>()
             .AddScoped<IDurableClientFactory, DurableClientFactoryStub>();
 
         services.AddScoped<IConfiguration>(_ => configuration);

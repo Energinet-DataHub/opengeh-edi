@@ -19,7 +19,7 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
-public sealed class DurableClientStub : IDurableClient
+public sealed class DurableClientSpy : IDurableClient
 {
     private readonly string _taskHubName = "taskHubName1";
     private readonly string _taskHubName1 = "taskHubName2";
@@ -31,7 +31,7 @@ public sealed class DurableClientStub : IDurableClient
 
     string IDurableOrchestrationClient.TaskHubName => _taskHubName;
 
-    public int NumberOfJobsStarted { get;  } = 0;
+    public int NumberOfJobsStarted { get; set; } = 0;
 
     public HttpResponseMessage CreateCheckStatusResponse(
         HttpRequestMessage request,

@@ -52,7 +52,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientStub;
+        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientSpy;
         durableClientStub!.NumberOfJobsStarted.Should().Be(1);
     }
 
@@ -71,7 +71,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientStub;
+        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientSpy;
         durableClientStub!.NumberOfJobsStarted.Should().Be(0);
     }
 
