@@ -27,7 +27,7 @@ limitations under the License.
         <PackageReference Include="Energinet.DataHub.Core.Outbox" Version="1.0.1" />
         <PackageReference Include="Energinet.DataHub.ProcessManager.Abstractions" Version="0.25.1" />
         <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.25.1" />
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="0.17.1-alpha-89" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="0.17.1" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.2.1" />
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
