@@ -103,9 +103,8 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
 
         // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
         var processManagerOrchestrationId = calculationId;
-        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
-            CalculationId: calculationId,
-            CalculationType: CalculationType.BalanceFixing);
+        var calculationCompletedEvent = new CalculationEnqueueActorMessagesV1(
+            CalculationId: calculationId);
 
         var serviceBusMessage = CreateEnqueueFromProcessManager(
             calculationCompletedEvent,
@@ -200,9 +199,8 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
 
         // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
         var processManagerOrchestrationId = calculationId;
-        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
-            CalculationId: calculationId,
-            CalculationType: CalculationType.WholesaleFixing);
+        var calculationCompletedEvent = new CalculationEnqueueActorMessagesV1(
+            CalculationId: calculationId);
 
         var serviceBusMessage = CreateEnqueueFromProcessManager(
             calculationCompletedEvent,
@@ -287,9 +285,8 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever()
     {
         // Arrange
-        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
-            CalculationId: Guid.NewGuid(),
-            CalculationType: CalculationType.WholesaleFixing); // WholesaleFixing covers retries for both energy and wholesale results
+        var calculationCompletedEvent = new CalculationEnqueueActorMessagesV1(
+            CalculationId: Guid.NewGuid());
 
         // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
         var processManagerOrchestrationId = calculationCompletedEvent.CalculationId;
@@ -362,9 +359,8 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
             forTotalAmountDescription);
         var wholesaleCalculationId = forAmountPerChargeDescription.CalculationId;
 
-        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
-            CalculationId: wholesaleCalculationId,
-            CalculationType: CalculationType.WholesaleFixing);
+        var calculationCompletedEvent = new CalculationEnqueueActorMessagesV1(
+            CalculationId: wholesaleCalculationId);
 
         // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
         var processManagerOrchestrationId = calculationCompletedEvent.CalculationId;
@@ -430,9 +426,8 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
             perBrpAndEsGridAreaDataDescription);
         var energyCalculationId = perBrpAndEsGridAreaDataDescription.CalculationId;
 
-        var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
-            CalculationId: energyCalculationId,
-            CalculationType: CalculationType.BalanceFixing);
+        var calculationCompletedEvent = new CalculationEnqueueActorMessagesV1(
+            CalculationId: energyCalculationId);
 
         // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
         var processManagerOrchestrationId = calculationCompletedEvent.CalculationId;
@@ -494,7 +489,7 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
     }
 
     private static ServiceBusMessage CreateEnqueueFromProcessManager(
-        CalculatedDataForCalculationTypeV1 calculationCompletedEvent,
+        CalculationEnqueueActorMessagesV1 calculationCompletedEvent,
         Guid? orchestrationInstanceId = null)
     {
         var actorId = Guid.NewGuid().ToString();

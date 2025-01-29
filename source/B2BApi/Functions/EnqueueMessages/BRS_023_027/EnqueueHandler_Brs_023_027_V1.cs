@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 
 /// <summary>
 /// Enqueue messages for BRS-023 (NotifyAggregatedMeasureData) and BRS-027 (NotifyWholesaleServices).
-/// The <see cref="EnqueueMessagesDto"/><see cref="EnqueueMessagesDto.JsonInput"/> must be of type <see cref="CalculatedDataForCalculationTypeV1"/>.
+/// The <see cref="EnqueueMessagesDto"/><see cref="EnqueueMessagesDto.JsonInput"/> must be of type <see cref="CalculationEnqueueActorMessagesV1"/>.
 /// </summary>
 /// <param name="logger"></param>
 public class EnqueueHandler_Brs_023_027_V1(
@@ -55,17 +55,17 @@ public class EnqueueHandler_Brs_023_027_V1(
 
         switch (enqueueActorMessages.DataType)
         {
-            case nameof(CalculatedDataForCalculationTypeV1):
-                await HandleCalculatedDataForCalculationTypeV1Async(enqueueActorMessages, Guid.Parse(eventId)).ConfigureAwait(false);
+            case nameof(CalculationEnqueueActorMessagesV1):
+                await HandleCalculationEnqueueActorMessagesV1Async(enqueueActorMessages, Guid.Parse(eventId)).ConfigureAwait(false);
                 break;
             default:
                 throw new NotSupportedException($"Data type '{enqueueActorMessages.DataType}' is not supported.");
         }
     }
 
-    private async Task HandleCalculatedDataForCalculationTypeV1Async(EnqueueActorMessagesV1 enqueueActorMessages, Guid eventId)
+    private async Task HandleCalculationEnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, Guid eventId)
     {
-        var calculatedData = enqueueActorMessages.ParseData<CalculatedDataForCalculationTypeV1>();
+        var calculatedData = enqueueActorMessages.ParseData<CalculationEnqueueActorMessagesV1>();
         var orchestrationInput = new EnqueueMessagesOrchestrationInput(
             CalculationId: calculatedData.CalculationId,
             CalculationOrchestrationId: enqueueActorMessages.OrchestrationInstanceId,
@@ -78,10 +78,9 @@ public class EnqueueHandler_Brs_023_027_V1(
             orchestrationInput).ConfigureAwait(false);
 
         _logger.LogInformation(
-            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation type: {CalculationType}, calculation orchestration id: {CalculationOrchestrationId}, service bus message id: {EventId}.)",
+            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation orchestration id: {CalculationOrchestrationId}, service bus message id: {EventId}.)",
             instanceId,
             calculatedData.CalculationId,
-            calculatedData.CalculationType,
             enqueueActorMessages.OrchestrationInstanceId,
             eventId);
     }
