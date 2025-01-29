@@ -292,7 +292,7 @@ public class RequestProcessOrchestrationStarterTests
             : null;
 
         var initializeProcessDto = new InitializeMeteredDataForMeteringPointMessageProcessDto(
-            MessageId: transactionId,
+            MessageId: messageId,
             MessageType: "E66",
             CreatedAt: expectedRegistrationDateFrom,
             BusinessReason: expectedBusinessReason.Code,
