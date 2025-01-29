@@ -70,14 +70,12 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             .WaitAndRetryAsync(
                 [TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)]);
 
-        var task = executionPolicy.ExecuteAsync(
+        await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
                     orchestrationInstanceId,
                     MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
-                CancellationToken.None));
-
-        await Task.WhenAll(task).ConfigureAwait(false);
+                CancellationToken.None)).ConfigureAwait(false);
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointRejectedV1 rejectedData)
@@ -127,5 +125,17 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
                     .ToList()));
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointRejectedDto, CancellationToken.None).ConfigureAwait(false);
+
+        var executionPolicy = Policy
+            .Handle<Exception>(ex => ex is not OperationCanceledException)
+            .WaitAndRetryAsync(
+                [TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)]);
+
+        await executionPolicy.ExecuteAsync(
+            () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
+                new NotifyOrchestrationInstanceEvent(
+                    orchestrationInstanceId,
+                    MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
+                CancellationToken.None)).ConfigureAwait(false);
     }
 }
