@@ -25,6 +25,20 @@ public class DatabricksSqlRow(IDictionary<string, object?> columns)
 {
     private readonly IDictionary<string, object?> _columns = columns;
 
+    public string? this[string key]
+    {
+        get
+        {
+            var value = _columns[key];
+            return value == null ? null : Convert.ToString(value);
+        }
+    }
+
+    public bool HasColumn(string columnName)
+    {
+        return _columns.ContainsKey(columnName);
+    }
+
     public override string ToString()
     {
         return _columns.Aggregate(string.Empty, (current, kvp) => current + $"Key = {kvp.Key}, Value = {kvp.Value}");

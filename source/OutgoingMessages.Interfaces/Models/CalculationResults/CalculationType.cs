@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
 /// <summary>
-/// Defines the Wholesale databricks calculation type
+/// Defines the wholesale calculation type
 /// </summary>
 public enum CalculationType
 {
