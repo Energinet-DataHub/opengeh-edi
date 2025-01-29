@@ -41,7 +41,7 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false))
+        if (await _featureFlagManager.DisableEnqueueBrs023027MessagesFromWholesaleAsync().ConfigureAwait(false))
         {
             return;
         }

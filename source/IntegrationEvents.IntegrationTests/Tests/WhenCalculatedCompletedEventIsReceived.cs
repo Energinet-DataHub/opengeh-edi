@@ -37,7 +37,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsEnabled_Then_EventHandlerHasLogic()
+    public async Task Given_CalculationCompletedV1_When_FeatureIsEnabled_Then_EventHandlerTriesToCreateDurableClient()
     {
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, false);
 
@@ -55,7 +55,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_EventHandlesReturnWithoutLogic()
+    public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_EventHandlerDoesNothing()
     {
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, true);
 

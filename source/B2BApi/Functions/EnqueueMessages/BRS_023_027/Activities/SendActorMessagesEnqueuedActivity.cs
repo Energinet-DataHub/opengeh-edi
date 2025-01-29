@@ -36,15 +36,15 @@ public class SendActorMessagesEnqueuedActivity
     public SendActorMessagesEnqueuedActivity(
         IOptions<WholesaleInboxQueueOptions> options,
         IAzureClientFactory<ServiceBusSender> senderFactory,
-        IFeatureFlagManager featureFlagManager,
-        IProcessManagerMessageClient processManagerMessageClient)
+        IProcessManagerMessageClient processManagerMessageClient,
+        IFeatureFlagManager featureFlagManager)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
 
         _wholesaleSender = senderFactory.CreateClient(options.Value.QueueName);
-        _featureFlagManager = featureFlagManager;
         _processManagerMessageClient = processManagerMessageClient;
+        _featureFlagManager = featureFlagManager;
     }
 
     [Function(nameof(SendActorMessagesEnqueuedActivity))]
@@ -57,13 +57,7 @@ public class SendActorMessagesEnqueuedActivity
         if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false)
             && instructionFromProcessManager)
         {
-            await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                    new NotifyOrchestrationInstanceEvent<NotifyEnqueueFinishedV1>(
-                        OrchestrationInstanceId: input.CalculationOrchestrationInstanceId,
-                        EventName: NotifyEnqueueFinishedV1.EventName,
-                        Data: new NotifyEnqueueFinishedV1 { Success = input.Success }),
-                    CancellationToken.None)
-                .ConfigureAwait(false);
+            await SendToProcessManager(input).ConfigureAwait(false);
         }
 
         if (!await _featureFlagManager.DisableEnqueueBrs023027MessagesFromWholesaleAsync().ConfigureAwait(false)
@@ -100,5 +94,16 @@ public class SendActorMessagesEnqueuedActivity
         var serviceBusMessage = CreateServiceBusMessage(messagesEnqueuedEvent, eventId);
 
         await _wholesaleSender.SendMessageAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
+    }
+
+    private async Task SendToProcessManager(SendMessagesEnqueuedInput input)
+    {
+        await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
+                new NotifyOrchestrationInstanceEvent<NotifyEnqueueFinishedV1>(
+                    OrchestrationInstanceId: input.CalculationOrchestrationInstanceId,
+                    EventName: NotifyEnqueueFinishedV1.EventName,
+                    Data: new NotifyEnqueueFinishedV1 { Success = input.Success }),
+                CancellationToken.None)
+            .ConfigureAwait(false);
     }
 }
