@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
@@ -37,7 +38,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsEnabled_Then_EventHandlerTriesToCreateDurableClient()
+    public async Task Given_CalculationCompletedV1_When_FeatureIsEnabled_Then_OrchestrationIsStarted()
     {
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, false);
 
@@ -49,15 +50,14 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
             CalculationType = CalculationCompletedV1.Types.CalculationType.Aggregation,
         };
 
-        var act = () => HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
+        await HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        await act.Should().ThrowAsync<Exception>("the handler should try to create a durable client,"
-                                                 + "which is mocked to throw an exception")
-            .WithMessage("This method is just here to test feature flags");
+        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientStub;
+        durableClientStub!.NumberOfJobsStarted.Should().Be(1);
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_EventHandlerDoesNothing()
+    public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_OrchestrationIsNotStarter()
     {
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, true);
 
@@ -69,9 +69,10 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
             CalculationType = CalculationCompletedV1.Types.CalculationType.Aggregation,
         };
 
-        var act = () => HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
+        await HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        await act.Should().NotThrowAsync("the handler should not do anything");
+        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientStub;
+        durableClientStub!.NumberOfJobsStarted.Should().Be(0);
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(CalculationCompletedV1 calculationCompleted)

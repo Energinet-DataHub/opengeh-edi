@@ -22,7 +22,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
         where TAcceptedData : class
         where TRejectedData : class
 {
-    protected override Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
+    protected override Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, string eventId)
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {

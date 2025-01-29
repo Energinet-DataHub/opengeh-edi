@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,6 +62,7 @@ public class IntegrationEventsTestBase : IAsyncLifetime
             .AddMasterDataModule(configuration)
             .AddIntegrationEventModule(configuration)
             .AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub)
+            .AddScoped<IDurableClient, DurableClientStub>()
             .AddScoped<IDurableClientFactory, DurableClientFactoryStub>();
 
         services.AddScoped<IConfiguration>(_ => configuration);

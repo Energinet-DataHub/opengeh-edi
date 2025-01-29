@@ -18,15 +18,18 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask.Options;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
-public class DurableClientFactoryStub : IDurableClientFactory
+public class DurableClientFactoryStub(IDurableClient durableClient)
+    : IDurableClientFactory
 {
+    private readonly IDurableClient _durableClient = durableClient;
+
     public IDurableClient CreateClient(DurableClientOptions durableClientOptions)
     {
-        throw new Exception("This method is just here to test feature flags");
+        return _durableClient;
     }
 
     public IDurableClient CreateClient()
     {
-        throw new Exception("This method is just here to test feature flags");
+        return _durableClient;
     }
 }
