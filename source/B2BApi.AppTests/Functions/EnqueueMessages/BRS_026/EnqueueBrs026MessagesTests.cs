@@ -96,11 +96,10 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_026)}"),
             timeLimit: TimeSpan.FromSeconds(30));
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-        var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
 
         using var assertionScope = new AssertionScope();
         didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_026)} should have been executed");
-        appThrewException.Should().BeFalse();
+        hostLog.Should().ContainMatch($"Executed '{nameof(EnqueueTrigger_Brs_026)}' (Succeeded, Id=");
         hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 026*");
     }
 }
