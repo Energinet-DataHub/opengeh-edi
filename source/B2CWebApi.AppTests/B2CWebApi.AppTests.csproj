@@ -9,7 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.1" />
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.24.0" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Abstractions" Version="0.25.1" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.25.1" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

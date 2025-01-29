@@ -15,24 +15,25 @@
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_028;
+namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_026;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueBrs028MessagesTests : IAsyncLifetime
+public class EnqueueBrs026MessagesTests : IAsyncLifetime
 {
     private readonly B2BApiAppFixture _fixture;
 
-    public EnqueueBrs028MessagesTests(
+    public EnqueueBrs026MessagesTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
@@ -52,17 +53,29 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         await Task.CompletedTask;
     }
 
-    [Fact]
-    public async Task Given_EnqueueAcceptedBrs028Message_When_MessageIsReceived_Then_AcceptedMessagesIsEnqueued()
+    [Fact(Skip = "Need databricks data to query")] // TODO: Implement databricks data so test can work
+    public async Task Given_EnqueueAcceptedBrs026Message_When_MessageIsReceived_Then_AcceptedMessagesIsEnqueued()
     {
-        // => Given enqueue BRS-028 service bus message
+        // => Given enqueue BRS-026 service bus message
         var actorId = Guid.NewGuid().ToString();
-        var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
-            BusinessReason: BusinessReason.WholesaleFixing.Code);
+        var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
+            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            BusinessReason: BusinessReason.BalanceFixing,
+            RequestedForActorNumber: ActorNumber.Create("1111111111111"),
+            RequestedForActorRole: ActorRole.EnergySupplier,
+            PeriodStart: Instant.FromUtc(2024, 01, 03, 23, 00).ToDateTimeOffset(),
+            PeriodEnd: Instant.FromUtc(2024, 01, 04, 23, 00).ToDateTimeOffset(),
+            GridAreas: ["804"],
+            EnergySupplierNumber: ActorNumber.Create("1111111111111"),
+            BalanceResponsibleNumber: null,
+            MeteringPointType: null,
+            SettlementMethod: null,
+            SettlementVersion: null);
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_028",
+            OrchestrationName = "Brs_026",
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
@@ -80,14 +93,13 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // TODO: Actually check for enqueued messages and PM notification when the BRS is implemented
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
-            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_028)}"),
+            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_026)}"),
             timeLimit: TimeSpan.FromSeconds(30));
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-        var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
 
         using var assertionScope = new AssertionScope();
-        didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_028)} should have been executed");
-        appThrewException.Should().BeFalse();
-        hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 028*");
+        didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_026)} should have been executed");
+        hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_026)}' (Succeeded,*");
+        hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 026*");
     }
 }
