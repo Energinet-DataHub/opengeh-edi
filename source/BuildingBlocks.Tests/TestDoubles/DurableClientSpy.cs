@@ -31,7 +31,7 @@ public sealed class DurableClientSpy : IDurableClient
 
     string IDurableOrchestrationClient.TaskHubName => _taskHubName;
 
-    public int NumberOfJobsStarted { get; set; } = 0;
+    public int NumberOfJobsStarted { get; private set; } = 0;
 
     public HttpResponseMessage CreateCheckStatusResponse(
         HttpRequestMessage request,
