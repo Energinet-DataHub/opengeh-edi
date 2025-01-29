@@ -54,7 +54,7 @@ public class RequestProcessOrchestrationStarter(
                         ? ChargeType.TryGetNameFromCode(ct.Type, fallbackValue: ct.Type)
                         : null;
 
-                    return new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInputV1(
+                    return new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInput(
                         ChargeType: chargeType,
                         ChargeCode: ct.Id);
                 })
