@@ -38,7 +38,7 @@ public class EnqueueHandler_Brs_023_027_V1(
 
     private readonly IDurableClientFactory _durableClientFactory = durableClientFactory;
 
-    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
+    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, string eventId)
     {
         var featureIsDisabled =
             !await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false);
@@ -50,17 +50,26 @@ public class EnqueueHandler_Brs_023_027_V1(
 
         if (featureIsDisabled)
         {
-            await Task.CompletedTask.ConfigureAwait(false);
+            return;
         }
 
-        var calculationCompleted = enqueueActorMessages.ParseData<CalculatedDataForCalculationTypeV1>();
+        switch (enqueueActorMessages.DataType)
+        {
+            case nameof(CalculatedDataForCalculationTypeV1):
+                await HandleCalculatedDataForCalculationTypeV1Async(enqueueActorMessages, Guid.Parse(eventId)).ConfigureAwait(false);
+                break;
+            default:
+                throw new NotSupportedException($"Data type '{enqueueActorMessages.DataType}' is not supported.");
+        }
+    }
+
+    private async Task HandleCalculatedDataForCalculationTypeV1Async(EnqueueActorMessagesV1 enqueueActorMessages, Guid eventId)
+    {
+        var calculatedData = enqueueActorMessages.ParseData<CalculatedDataForCalculationTypeV1>();
         var orchestrationInput = new EnqueueMessagesOrchestrationInput(
-            CalculationId: calculationCompleted.CalculationId,
+            CalculationId: calculatedData.CalculationId,
             CalculationOrchestrationId: enqueueActorMessages.OrchestrationInstanceId,
-            // This is not event driven anymore. But it is still passed to the outgoing messages
-            // Do we want to preserve this and use the orchestration instance id instead?
-            // enqueueActorMessages.OrchestrationInstanceId should be a guid, even tho the datatype states otherwise
-            EventId: Guid.Parse(enqueueActorMessages.OrchestrationInstanceId));
+            EventId: eventId);
 
         var durableClient = _durableClientFactory.CreateClient();
 
@@ -69,13 +78,11 @@ public class EnqueueHandler_Brs_023_027_V1(
             orchestrationInput).ConfigureAwait(false);
 
         _logger.LogInformation(
-            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation type: {CalculationType}, calculation orchestration id: {CalculationOrchestrationId}.",
+            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation type: {CalculationType}, calculation orchestration id: {CalculationOrchestrationId}, service bus message id: {EventId}.)",
             instanceId,
-            calculationCompleted.CalculationId,
-            calculationCompleted.CalculationType,
-            enqueueActorMessages.OrchestrationInstanceId);
-
-        // TODO: Call actual logic that enqueues messages (starts orchestration)
-        await Task.CompletedTask.ConfigureAwait(false);
+            calculatedData.CalculationId,
+            calculatedData.CalculationType,
+            enqueueActorMessages.OrchestrationInstanceId,
+            eventId);
     }
 }

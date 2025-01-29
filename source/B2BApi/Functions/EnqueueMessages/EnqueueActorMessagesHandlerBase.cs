@@ -89,7 +89,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
             },
         });
 
-        await EnqueueActorMessagesV1Async(enqueueActorMessages)
+        await EnqueueActorMessagesV1Async(enqueueActorMessages, serviceBusMessage.MessageId)
             .ConfigureAwait(false);
     }
 }

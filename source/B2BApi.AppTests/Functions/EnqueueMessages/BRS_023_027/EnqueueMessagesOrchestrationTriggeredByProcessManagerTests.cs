@@ -28,10 +28,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
-using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Google.Protobuf;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -42,12 +40,12 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_023_027;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
+public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsyncLifetime
 {
     // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
     private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
 
-    public EnqueueMessagesOrchestrationViaPMTests(
+    public EnqueueMessagesOrchestrationTriggeredByProcessManagerTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
@@ -510,7 +508,7 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
         enqueueActorMessages.SetData(calculationCompletedEvent);
         return enqueueActorMessages.ToServiceBusMessage(
             subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: "a-message-id");
+            idempotencyKey: Guid.NewGuid().ToString());
     }
 
     private async Task ClearAndAddInvalidDatabricksDataAsync(

@@ -76,7 +76,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(CalculationCompletedV1 calculationCompleted)
     {
-        var integrationEventHandler = Services.GetService<IIntegrationEventHandler>();
+        var integrationEventHandler = Services.GetRequiredService<IIntegrationEventHandler>();
 
         var integrationEvent = new IntegrationEvent(
             Guid.NewGuid(),
@@ -84,6 +84,6 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
             1,
             calculationCompleted);
 
-        await integrationEventHandler!.HandleAsync(integrationEvent).ConfigureAwait(false);
+        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 }
