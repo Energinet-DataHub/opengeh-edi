@@ -13,13 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 
 public abstract class WholesaleTimeSeries(
-    CalculationType calculationType,
+    Interfaces.Models.CalculationResults.CalculationType calculationType,
     string gridAreaCode,
     long calculationVersion,
     Instant periodStartUtc,
@@ -29,7 +28,7 @@ public abstract class WholesaleTimeSeries(
     Currency currency,
     string energySupplierId)
 {
-    public CalculationType CalculationType { get; } = calculationType;
+    public Interfaces.Models.CalculationResults.CalculationType CalculationType { get; } = calculationType;
 
     public string GridAreaCode { get; } = gridAreaCode;
 

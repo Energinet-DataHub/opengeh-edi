@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 
@@ -33,6 +34,24 @@ public static class CalculationTypeMapper
                 nameof(calculationType),
                 actualValue: calculationType,
                 "Value does not contain a valid string representation of a calculation type."),
+        };
+    }
+
+    public static string ToDeltaTableValue(CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            CalculationType.BalanceFixing => DeltaTableCalculationType.BalanceFixing,
+            CalculationType.Aggregation => DeltaTableCalculationType.Aggregation,
+            CalculationType.WholesaleFixing => DeltaTableCalculationType.WholesaleFixing,
+            CalculationType.FirstCorrectionSettlement => DeltaTableCalculationType.FirstCorrectionSettlement,
+            CalculationType.SecondCorrectionSettlement => DeltaTableCalculationType.SecondCorrectionSettlement,
+            CalculationType.ThirdCorrectionSettlement => DeltaTableCalculationType.ThirdCorrectionSettlement,
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(calculationType),
+                actualValue: calculationType,
+                "Value cannot be mapped to a string representation of a calculation type."),
         };
     }
 }

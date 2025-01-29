@@ -78,7 +78,7 @@ public class EnergyResultPerGridAreaFactoryTests
         actual.CalculationId.Should().Be("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
         actual.GridAreaCode.Should().Be("543");
         actual.MeteringPointType.Should().Be(MeteringPointType.Consumption);
-        actual.CalculationType.Should().Be(CalculationType.BalanceFixing);
+        actual.CalculationType.Should().Be(EDI.OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.BalanceFixing);
         actual.PeriodStartUtc.Should().Be(Instant.FromUtc(2022, 01, 11, 23, 0, 0));
         actual.PeriodEndUtc.Should().Be(Instant.FromUtc(2022, 01, 12, 23, 0, 0));
         actual.Resolution.Should().Be(Resolution.Hourly);

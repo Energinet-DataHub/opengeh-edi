@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Microsoft.Extensions.Logging;
+using NodaTime;
+using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.TimeSeriesType;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 
@@ -25,10 +30,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 /// <param name="logger"></param>
 public class EnqueueHandler_Brs_026_V1(
     ILogger<EnqueueHandler_Brs_026_V1> logger,
+    IActorRequestsClient actorRequestsClient,
     IProcessManagerMessageClient processManagerMessageClient)
     : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
+    private readonly IActorRequestsClient _actorRequestsClient = actorRequestsClient;
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
@@ -40,6 +47,27 @@ public class EnqueueHandler_Brs_026_V1(
             acceptedData);
 
         // TODO: Call actual logic that enqueues accepted messages instead
+        // DUMMY for build purpose.
+        var request = new AggregatedTimeSeriesRequest(
+            Period: new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.Period(Instant.FromUtc(2024, 1, 31, 23, 00), Instant.FromUtc(2024, 2, 1, 23, 00)),
+            TimeSeriesTypes: [TimeSeriesType.FlexConsumption],
+            AggregationPerRoleAndGridArea: new AggregationPerRoleAndGridArea(["804"]),
+            CalculationType: EDI.OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.Aggregation);
+
+        // 1. Map RequestCalculatedEnergyTimeSeriesAcceptedV1 to AggregatedTimeSeriesQueryParameters when it is ready - model is currently empty.
+        // DUMMY
+        var query = new AggregatedTimeSeriesQueryParameters(
+            [EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType.FlexConsumption],
+            ["804"],
+            null,
+            null,
+            request.CalculationType,
+            new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(request.Period.Start, request.Period.End));
+
+        // 2. Call IActorRequestsClient.EnqueueAggregatedMeasureDataAsync(query + needed properties from RequestCalculatedEnergyTimeSeriesAcceptedV1);
+        await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(acceptedData.BusinessReason, query).ConfigureAwait(false);
+
+        // 3. See inside _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(query).
 
         // TODO: NotifyOrchestrationInstanceAsync should maybe happen in another layer, when the method is actually implemented
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
