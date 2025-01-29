@@ -31,8 +31,9 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.ReceiveMeteredDataForMeasurementPoints, true },
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
-        { FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager, false },
         { FeatureFlagName.UseStandardBlobServiceClient, false },
+        { FeatureFlagName.EnqueueBrs023027MessagesFromProcessManager, false },
+        { FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, false },
     };
 
     public void SetFeatureFlag(FeatureFlagName featureFlagName, bool value)
@@ -52,7 +53,9 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration]);
 
-    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager]);
+    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.EnqueueBrs023027MessagesFromProcessManager]);
+
+    public Task<bool> DisableEnqueueBrs023027MessagesFromWholesaleAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale]);
 
     public Task<bool> UseStandardBlobServiceClientAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseStandardBlobServiceClient]);
 }

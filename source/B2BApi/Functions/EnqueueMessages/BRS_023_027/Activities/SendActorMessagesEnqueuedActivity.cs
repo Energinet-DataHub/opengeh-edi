@@ -51,7 +51,11 @@ public class SendActorMessagesEnqueuedActivity
     public async Task Run(
         [ActivityTrigger] SendMessagesEnqueuedInput input)
     {
-        if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false))
+        // By construction, we have that the process manager orchestration has the same id as the calculation
+        var instructionFromProcessManager = input.CalculationId.ToString() == input.CalculationOrchestrationInstanceId;
+
+        if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false)
+            && instructionFromProcessManager)
         {
             await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                     new NotifyOrchestrationInstanceEvent<NotifyEnqueueFinishedV1>(
@@ -60,11 +64,13 @@ public class SendActorMessagesEnqueuedActivity
                         Data: new NotifyEnqueueFinishedV1 { Success = input.Success }),
                     CancellationToken.None)
                 .ConfigureAwait(false);
-
-            return;
         }
 
-        await SendToWholesale(input).ConfigureAwait(false);
+        if (!await _featureFlagManager.DisableEnqueueBrs023027MessagesFromWholesaleAsync().ConfigureAwait(false)
+            && !instructionFromProcessManager)
+        {
+            await SendToWholesale(input).ConfigureAwait(false);
+        }
     }
 
     private static ServiceBusMessage CreateServiceBusMessage(ActorMessagesEnqueuedV1 messagesEnqueuedEvent, Guid eventId)

@@ -37,8 +37,10 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsEnabled_Then_EventIsHandled()
+    public async Task Given_CalculationCompletedV1_When_FeatureIsEnabled_Then_EventHandlerHasLogic()
     {
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, false);
+
         var integrationEvent = new CalculationCompletedV1()
         {
             CalculationId = Guid.NewGuid().ToString(),
@@ -53,9 +55,9 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_EventIsHandled()
+    public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_EventHandlesReturnWithoutLogic()
     {
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager, true);
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, true);
 
         var integrationEvent = new CalculationCompletedV1()
         {

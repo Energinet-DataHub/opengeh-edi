@@ -307,14 +307,16 @@ public class B2BApiAppFixture : IAsyncLifetime
         bool useRequestWholesaleServicesOrchestration = false,
         bool useRequestAggregatedMeasureDataOrchestration = false,
         bool usePeekTimeSeriesMessages = false,
-        bool enqueueBrs023027MessagesViaProcessManager = false)
+        bool enqueueBrs023027MessagesViaProcessManager = false,
+        bool disableEnqueueBrs023027MessagesFromWholesale = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UsePeekTimeSeriesMessages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager.ToString()}", enqueueBrs023027MessagesViaProcessManager.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.EnqueueBrs023027MessagesFromProcessManager.ToString()}", enqueueBrs023027MessagesViaProcessManager.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale.ToString()}", disableEnqueueBrs023027MessagesFromWholesale.ToString().ToLower() },
         });
     }
 
@@ -513,7 +515,11 @@ public class B2BApiAppFixture : IAsyncLifetime
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.EnqueueBrs023027MessagesFromProcessManager.ToString()}",
+            false.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"FeatureManagement__{FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale.ToString()}",
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(

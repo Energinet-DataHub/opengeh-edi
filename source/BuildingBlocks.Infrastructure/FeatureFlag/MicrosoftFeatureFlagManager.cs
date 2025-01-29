@@ -40,9 +40,11 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => IsEnabledAsync(FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration);
 
-    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => IsEnabledAsync(FeatureFlagName.EnqueueBrs023027MessagesViaProcessManager);
-
     public Task<bool> UseStandardBlobServiceClientAsync() => IsEnabledAsync(FeatureFlagName.UseStandardBlobServiceClient);
+
+    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => IsEnabledAsync(FeatureFlagName.EnqueueBrs023027MessagesFromProcessManager);
+
+    public Task<bool> DisableEnqueueBrs023027MessagesFromWholesaleAsync() => IsEnabledAsync(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale);
 
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

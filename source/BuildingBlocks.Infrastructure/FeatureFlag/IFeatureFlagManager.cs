@@ -55,13 +55,17 @@ public interface IFeatureFlagManager
     Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
 
     /// <summary>
+    /// Whether to use the StandardBlobServiceClient.
+    /// </summary>
+    Task<bool> UseStandardBlobServiceClientAsync();
+
+    /// <summary>
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
-    /// Or to depend on the shared integration event topic
     /// </summary>
     Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync();
 
     /// <summary>
-    /// Whether to use the StandardBlobServiceClient.
+    /// Whether to enqueue BRS-023/027 messages via Wholesale.
     /// </summary>
-    Task<bool> UseStandardBlobServiceClientAsync();
+    Task<bool> DisableEnqueueBrs023027MessagesFromWholesaleAsync();
 }

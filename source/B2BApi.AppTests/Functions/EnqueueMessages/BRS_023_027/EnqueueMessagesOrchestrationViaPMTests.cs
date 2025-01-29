@@ -63,7 +63,9 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
 
         // Clear mappings etc. before each test
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enqueueBrs023027MessagesViaProcessManager: true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enqueueBrs023027MessagesViaProcessManager: true,
+            disableEnqueueBrs023027MessagesFromWholesale: true);
 
         await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "543");
         await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "804");
@@ -104,7 +106,8 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
             forMonthlyAmountPerChargeDescription,
             forTotalAmountDescription);
 
-        var processManagerOrchestrationId = Guid.NewGuid();
+        // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
+        var processManagerOrchestrationId = calculationId;
         var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
             CalculationId: calculationId,
             CalculationType: CalculationType.BalanceFixing);
@@ -202,7 +205,8 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
             forTotalAmountDescription);
         var calculationId = forAmountPerChargeDescription.CalculationId;
 
-        var processManagerOrchestrationId = Guid.NewGuid();
+        // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
+        var processManagerOrchestrationId = calculationId;
         var calculationCompletedEvent = new CalculatedDataForCalculationTypeV1(
             CalculationId: calculationId,
             CalculationType: CalculationType.BalanceFixing);
@@ -294,9 +298,11 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
             CalculationId: Guid.NewGuid(),
             CalculationType: CalculationType.WholesaleFixing); // WholesaleFixing covers retries for both energy and wholesale results
 
+        // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
+        var processManagerOrchestrationId = calculationCompletedEvent.CalculationId;
         var serviceBusMessage = CreateEnqueueFromProcessManager(
             calculationCompletedEvent,
-            Guid.NewGuid());
+            processManagerOrchestrationId);
 
         var expectedHistory = new List<(string? Name, string? EventType)>
         {
@@ -367,9 +373,11 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
             CalculationId: wholesaleCalculationId,
             CalculationType: CalculationType.BalanceFixing);
 
+        // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
+        var processManagerOrchestrationId = calculationCompletedEvent.CalculationId;
         var serviceBusMessage = CreateEnqueueFromProcessManager(
             calculationCompletedEvent,
-            Guid.NewGuid());
+            processManagerOrchestrationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -433,7 +441,11 @@ public class EnqueueMessagesOrchestrationViaPMTests : IAsyncLifetime
             CalculationId: energyCalculationId,
             CalculationType: CalculationType.BalanceFixing);
 
-        var serviceBusMessage = CreateEnqueueFromProcessManager(calculationCompletedEvent);
+        // When we receive the event from the process manager, then the calculationId and orchestrationId are the same
+        var processManagerOrchestrationId = calculationCompletedEvent.CalculationId;
+        var serviceBusMessage = CreateEnqueueFromProcessManager(
+            calculationCompletedEvent,
+            processManagerOrchestrationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
