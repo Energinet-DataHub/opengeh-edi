@@ -99,7 +99,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         using var assertionScope = new AssertionScope();
         didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_026)} should have been executed");
-        hostLog.Should().ContainMatch($"Executed '{nameof(EnqueueTrigger_Brs_026)}' (Succeeded, Id=");
+        hostLog.Should().ContainMatch($"Executed 'Functions.{nameof(EnqueueTrigger_Brs_026)}' (Succeeded, Id=");
         hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 026*");
     }
 }
