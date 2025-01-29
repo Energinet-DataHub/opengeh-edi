@@ -17,19 +17,17 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.CalculationResults;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.CalculationResults.Statements;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.DeltaTableConstants;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults;
-using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
-using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using Period = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.Period;
 using Resolution =
     Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution;
 
@@ -71,7 +69,7 @@ public class WholesaleServicesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierWithAmountPerChargeAndWholesaleFixing_When_Queried_Then_CorrespondingDataReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -152,7 +150,7 @@ public class WholesaleServicesQueriesCsvTests
             Given_EnergySupplierAndChargeOwnerWithTotalMonthlyAmountAndSecondCorrection_When_Queried_Then_CorrespondingDataReturned(
                 bool isEnergySupplier)
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -183,7 +181,7 @@ public class WholesaleServicesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierWithTotalMonthlyAmountAndSecondCorrection_When_Queried_Then_CorrespondingDataReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -220,7 +218,7 @@ public class WholesaleServicesQueriesCsvTests
         public async Task Given_AllQueryParametersAssignedValuesWithLatestCorrection_When_Queried_Then_LatestCorrectionReturned(
             bool isEnergySupplier)
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -251,7 +249,7 @@ public class WholesaleServicesQueriesCsvTests
         [Fact]
         public async Task Given_SomeArbitraryQueryParameters_When_Queried_Then_AmountAndMonthlyAndTotalHaveCorrectPeriods()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -329,7 +327,7 @@ public class WholesaleServicesQueriesCsvTests
         public async Task Given_ChargeOwnerForSpecificGridAreaAndLatestCorrection_When_Queried_Then_LatestCorrectionReturned(
             bool isEnergySupplier)
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -394,7 +392,7 @@ public class WholesaleServicesQueriesCsvTests
         [Fact]
         public async Task Given_ChargeTypeForSpecificCalculationTypeAndGridAreas_When_Queried_Then_CalculationTypeForChargeAndGridAreasReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -431,7 +429,7 @@ public class WholesaleServicesQueriesCsvTests
         public async Task
             Given_ChargeOwnerRequestsWithoutChargeOwnerOrEnergySupplier_When_Queried_Then_DataReturnedContainsChargeOwnerChargesAndIsTaxCharges()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -511,7 +509,7 @@ public class WholesaleServicesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 15, 0, 0),
                 null);
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -552,7 +550,7 @@ public class WholesaleServicesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 20, 0, 0),
                 Instant.FromUtc(2022, 1, 10, 0, 0));
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -629,7 +627,7 @@ public class WholesaleServicesQueriesCsvTests
             await ClearAndAddDatabricksDataAsync(_fixture, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, []);
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
@@ -661,7 +659,7 @@ public class WholesaleServicesQueriesCsvTests
             await ClearAndAddDatabricksDataAsync(_fixture, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, ["804", "543"]);
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
 
