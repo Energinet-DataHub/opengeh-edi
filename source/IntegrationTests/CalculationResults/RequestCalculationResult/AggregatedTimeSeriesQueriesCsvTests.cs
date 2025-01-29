@@ -94,7 +94,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: null,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.BalanceFixing,
+                CalculationType: CalculationType.BalanceFixing,
                 Period: totalPeriod);
 
             // Act
@@ -152,7 +152,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: EnergySupplierOne,
                 BalanceResponsibleId: null,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.BalanceFixing,
+                CalculationType: CalculationType.BalanceFixing,
                 Period: totalPeriod);
 
             // Act
@@ -203,7 +203,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: EnergySupplierOne,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.BalanceFixing,
+                CalculationType: CalculationType.BalanceFixing,
                 Period: totalPeriod);
 
             // Act
@@ -248,7 +248,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: null,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.BalanceFixing,
+                CalculationType: CalculationType.BalanceFixing,
                 Period: totalPeriod);
 
             // Act
@@ -295,7 +295,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: null,
                 BalanceResponsibleId: null,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.BalanceFixing,
+                CalculationType: CalculationType.BalanceFixing,
                 Period: totalPeriod);
 
             // Act
@@ -341,7 +341,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["543"],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.BalanceFixing,
+                CalculationType: CalculationType.Aggregation,
                 Period: totalPeriod);
 
             // Act
@@ -425,7 +425,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: null,
                 BalanceResponsibleId: null,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.Aggregation,
+                CalculationType: CalculationType.Aggregation,
                 Period: totalPeriod);
 
             // Act
@@ -491,7 +491,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: "5790002617263",
                 BalanceResponsibleId: null,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.SecondCorrectionSettlement,
+                CalculationType: CalculationType.SecondCorrectionSettlement,
                 Period: totalPeriod);
 
             // Act
@@ -539,7 +539,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: "5790002617263",
                 BalanceResponsibleId: null,
-                CalculationType: OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.ThirdCorrectionSettlement,
+                CalculationType: CalculationType.ThirdCorrectionSettlement,
                 Period: totalPeriod);
 
             // Act
