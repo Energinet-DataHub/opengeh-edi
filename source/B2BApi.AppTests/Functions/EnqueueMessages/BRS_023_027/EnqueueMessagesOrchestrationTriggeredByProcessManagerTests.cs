@@ -161,8 +161,8 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
                     msg.Body.ToString());
 
                 var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == processManagerOrchestrationId.ToString();
-                var matchingCalculationId = parsedNotification.EventName == NotifyEnqueueFinishedV1.EventName;
-                var enqueueFinishedV1 = JsonConvert.DeserializeObject<NotifyEnqueueFinishedV1>(parsedNotification.Data.Data)!;
+                var matchingCalculationId = parsedNotification.EventName == CalculationEnqueueActorMessagesCompletedNotifyEventV1.EventName;
+                var enqueueFinishedV1 = JsonConvert.DeserializeObject<CalculationEnqueueActorMessagesCompletedNotifyEventV1>(parsedNotification.Data.Data)!;
 
                 return matchingOrchestrationId && matchingCalculationId && enqueueFinishedV1.Success;
             })
@@ -266,8 +266,8 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
                     msg.Body.ToString());
 
                 var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == processManagerOrchestrationId.ToString();
-                var matchingCalculationId = parsedNotification.EventName == NotifyEnqueueFinishedV1.EventName;
-                var enqueueFinishedV1 = JsonConvert.DeserializeObject<NotifyEnqueueFinishedV1>(parsedNotification.Data.Data)!;
+                var matchingCalculationId = parsedNotification.EventName == CalculationEnqueueActorMessagesCompletedNotifyEventV1.EventName;
+                var enqueueFinishedV1 = JsonConvert.DeserializeObject<CalculationEnqueueActorMessagesCompletedNotifyEventV1>(parsedNotification.Data.Data)!;
 
                 return matchingOrchestrationId && matchingCalculationId && enqueueFinishedV1.Success;
             })

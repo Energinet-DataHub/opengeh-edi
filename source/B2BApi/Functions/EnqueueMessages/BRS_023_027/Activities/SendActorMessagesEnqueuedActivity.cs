@@ -99,10 +99,10 @@ public class SendActorMessagesEnqueuedActivity
     private async Task SendToProcessManager(SendMessagesEnqueuedInput input)
     {
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                new NotifyOrchestrationInstanceEvent<NotifyEnqueueFinishedV1>(
+                new NotifyOrchestrationInstanceEvent<CalculationEnqueueActorMessagesCompletedNotifyEventV1>(
                     OrchestrationInstanceId: input.CalculationOrchestrationInstanceId,
-                    EventName: NotifyEnqueueFinishedV1.EventName,
-                    Data: new NotifyEnqueueFinishedV1 { Success = input.Success }),
+                    EventName: CalculationEnqueueActorMessagesCompletedNotifyEventV1.EventName,
+                    Data: new CalculationEnqueueActorMessagesCompletedNotifyEventV1 { Success = input.Success }),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }
