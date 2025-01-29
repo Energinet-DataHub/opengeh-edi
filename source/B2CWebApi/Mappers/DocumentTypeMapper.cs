@@ -28,6 +28,7 @@ public static class DocumentTypeMapper
         { Models.DocumentType.B2CRequestAggregatedMeasureData, IncomingDocumentType.B2CRequestAggregatedMeasureData.Name },
         { Models.DocumentType.RequestWholesaleSettlement, IncomingDocumentType.RequestWholesaleSettlement.Name },
         { Models.DocumentType.B2CRequestWholesaleSettlement, IncomingDocumentType.B2CRequestWholesaleSettlement.Name },
+        { Models.DocumentType.Acknowledgement, DocumentType.Acknowledgement.Name },
     };
 
     public static List<string>? FromDocumentTypes(IReadOnlyCollection<Models.DocumentType>? documentTypes)

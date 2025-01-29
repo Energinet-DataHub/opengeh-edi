@@ -48,12 +48,14 @@ public class MetricNameGenerationTests
         "RejectRequestWholesaleSettlement",
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",
+        "Acknowledgement",
     ];
 
     private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
     [
         DocumentType.RejectRequestWholesaleSettlement,
-        DocumentType.RejectRequestAggregatedMeasureData
+        DocumentType.RejectRequestAggregatedMeasureData,
+        DocumentType.Acknowledgement,
     ];
 
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(

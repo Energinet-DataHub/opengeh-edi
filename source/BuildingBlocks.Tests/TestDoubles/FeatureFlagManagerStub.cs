@@ -34,4 +34,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(false);
 
     public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(false);
+
+    public Task<bool> UseStandardBlobServiceClientAsync() => Task.FromResult(false);
 }

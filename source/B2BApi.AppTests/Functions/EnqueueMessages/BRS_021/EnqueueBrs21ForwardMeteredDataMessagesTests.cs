@@ -12,23 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
-using ActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
-using BusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
+using PMValueTypes = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
@@ -60,12 +63,15 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     [Fact]
     public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_Then_RejectedMessagesIsEnqueued()
     {
+        _fixture.EnsureAppHostUsesFeatureFlagValue(usePeekTimeSeriesMessages: true);
+
+        // Arrange
         // => Given enqueue BRS-021 service bus message
         var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new MeteredDataForMeteringPointRejectedV1(
             "EventId",
-            BusinessReason.WholesaleFixing,
-            new MarketActorRecipient("1111111111111", ActorRole.GridAccessProvider),
+            PMValueTypes.BusinessReason.PeriodicMetering,
+            new MarketActorRecipient("1111111111111", PMValueTypes.ActorRole.GridAccessProvider),
             Guid.NewGuid(),
             Guid.NewGuid(),
             new AcknowledgementV1(
@@ -92,25 +98,52 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 
+        // Act
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
             idempotencyKey: "a-message-id");
 
         // => When message is received
+        var beforeOrchestrationCreated = DateTime.UtcNow;
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
-        // => Then accepted message is enqueued
-        // TODO: Actually check for enqueued messages and PM notification when the BRS is implemented
+        // Assert
+        using var assertionScope = new AssertionScope();
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
             () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)}"),
             timeLimit: TimeSpan.FromSeconds(30));
-        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-        var appThrewException = _fixture.AppHostManager.CheckIfFunctionThrewException();
 
-        using var assertionScope = new AssertionScope();
-        didFinish.Should().BeTrue($"the {nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)} should have been executed");
-        appThrewException.Should().BeFalse();
+        didFinish.Should()
+            .BeTrue($"the {nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)} should have been executed");
+
+        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
+
+        hostLog.Should().ContainMatch("*Executing 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1'*");
         hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 021*");
+        hostLog.Should().ContainMatch("*INSERT INTO [dbo].[OutgoingMessages]*");
+        hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
+
+        var externalId = Guid.NewGuid().ToString();
+        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create("1111111111111"), externalId);
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/TimeSeries");
+
+        var b2bToken = new JwtBuilder()
+            .WithRole(ClaimsMap.RoleFrom(ActorRole.GridAccessProvider).Value)
+            .WithClaim(ClaimsMap.ActorId, externalId)
+            .CreateToken();
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+
+        request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(request);
+        await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+        peekResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await peekResponse.Content.ReadAsStringAsync()).Should().NotBeNullOrEmpty().And.Contain("Acknowledgement");
+
+        hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
+        hostLog.Should().ContainMatch("*Executing 'Functions.PeekRequestListener'*");
+        hostLog.Should().ContainMatch("*Executed 'Functions.PeekRequestListener' (Succeeded,*");
     }
 }

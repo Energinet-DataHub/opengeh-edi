@@ -130,10 +130,15 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.LatestMessage;
+
+        // Service bus is not used when receiving NotifyValidatedMeasureData
+        if (incomingDocumentType != IncomingDocumentType.NotifyValidatedMeasureData)
+        {
+            var message = _senderSpy.LatestMessage;
+            Assert.NotNull(message);
+        }
 
         Assert.Multiple(
-            () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
     }
@@ -174,6 +179,12 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
+        // Service bus is not used when receiving NotifyValidatedMeasureData
+        if (incomingDocumentType == IncomingDocumentType.NotifyValidatedMeasureData)
+        {
+            return;
+        }
+
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
@@ -254,11 +265,16 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.LatestMessage;
+
+        // Service bus is not used when receiving NotifyValidatedMeasureData
+        if (incomingDocumentType != IncomingDocumentType.NotifyValidatedMeasureData)
+        {
+            var message = _senderSpy.LatestMessage;
+            Assert.NotNull(message);
+        }
 
         Assert.Multiple(
             () => Assert.NotNull(results),
-            () => Assert.NotNull(message),
             () => Assert.Single(transactionIds),
             () => Assert.Single(messageIds));
     }

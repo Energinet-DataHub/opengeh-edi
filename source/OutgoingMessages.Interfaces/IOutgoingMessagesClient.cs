@@ -110,4 +110,11 @@ public interface IOutgoingMessagesClient
     Task<Guid> EnqueueAndCommitAsync(
         MeteredDataForMeteringPointMessageProcessDto meteredDataForMeteringPointMessageProcessDto,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue RSM-009 messages.
+    /// </summary>
+    Task<Guid> EnqueueAndCommitAsync(
+        MeteredDataForMeteringPointRejectedDto meteredDataForMeasurementPointMessageProcessDto,
+        CancellationToken cancellationToken);
 }

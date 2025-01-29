@@ -323,7 +323,7 @@ internal sealed class EdiDatabaseDriver
             sql: """
                  SELECT COUNT([Id])
                  FROM [Bundles]
-                 WHERE [DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
+                 WHERE ([DocumentTypeInBundle] = 'NotifyValidatedMeasureData' or [DocumentTypeInBundle] = 'Acknowledgement')
                  AND RelatedToMessageId like 'perf_test_%'
                  AND DequeuedAt is null
                  """);

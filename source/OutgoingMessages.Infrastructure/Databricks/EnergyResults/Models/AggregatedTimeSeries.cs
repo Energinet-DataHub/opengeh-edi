@@ -24,7 +24,7 @@ public abstract class AggregatedTimeSeries
         string gridAreaCode,
         IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
         MeteringPointType meteringPointType,
-        CalculationType calculationType,
+        Interfaces.Models.CalculationResults.CalculationType calculationType,
         Instant periodStartUtc,
         Instant periodEndUtc,
         Resolution resolution,
@@ -53,7 +53,7 @@ public abstract class AggregatedTimeSeries
 
     public MeteringPointType MeteringPointType { get; init; }
 
-    public CalculationType CalculationType { get; init; }
+    public Interfaces.Models.CalculationResults.CalculationType CalculationType { get; init; }
 
     public Instant PeriodStartUtc { get; init; }
 
