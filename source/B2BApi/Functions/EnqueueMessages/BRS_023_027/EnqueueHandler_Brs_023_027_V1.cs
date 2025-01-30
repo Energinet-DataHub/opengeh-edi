@@ -41,7 +41,7 @@ public class EnqueueHandler_Brs_023_027_V1(
     protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, string eventId)
     {
         var featureIsDisabled =
-            !await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false);
+            !await _featureFlagManager.UseProcessManagerToEnqueueBrs023027MessagesAsync().ConfigureAwait(false);
 
         _logger.LogInformation(
             "Received enqueue actor messages for BRS 023/027. Feature is {Status}. Data: {Data}",

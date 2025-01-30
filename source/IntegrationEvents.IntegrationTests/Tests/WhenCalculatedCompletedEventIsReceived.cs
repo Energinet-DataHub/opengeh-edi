@@ -38,9 +38,9 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsEnabled_Then_OrchestrationIsStarted()
+    public async Task Given_CalculationCompletedV1_When_EnqueueingViaIntegrationTopic_Then_OrchestrationIsStarted()
     {
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, false);
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false);
 
         var integrationEvent = new CalculationCompletedV1()
         {
@@ -57,9 +57,9 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedV1_When_FeatureIsDisabled_Then_OrchestrationIsNotStarter()
+    public async Task Given_CalculationCompletedV1_When_EnqueueingViaProcessManager_Then_OrchestrationIsNotStarter()
     {
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale, true);
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, true);
 
         var integrationEvent = new CalculationCompletedV1()
         {

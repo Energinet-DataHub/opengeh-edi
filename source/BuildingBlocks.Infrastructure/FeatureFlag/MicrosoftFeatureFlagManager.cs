@@ -42,9 +42,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseStandardBlobServiceClientAsync() => IsEnabledAsync(FeatureFlagName.UseStandardBlobServiceClient);
 
-    public Task<bool> EnqueueBrs023027MessagesViaProcessManagerAsync() => IsEnabledAsync(FeatureFlagName.EnqueueBrs023027MessagesFromProcessManager);
-
-    public Task<bool> DisableEnqueueBrs023027MessagesFromWholesaleAsync() => IsEnabledAsync(FeatureFlagName.DisableEnqueueBrs023027MessagesFromWholesale);
+    public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => IsEnabledAsync(FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages);
 
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

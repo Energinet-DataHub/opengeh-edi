@@ -58,9 +58,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Clear mappings etc. before each test
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
-        Fixture.EnsureAppHostUsesFeatureFlagValue(
-            enqueueBrs023027MessagesViaProcessManager: false,
-            disableEnqueueBrs023027MessagesFromWholesale: false);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(useProcessManagerToEnqueueBrs023027Messages: false);
 
         await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "543");
         await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "804");

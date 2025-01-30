@@ -58,10 +58,5 @@ public enum FeatureFlagName
     /// <summary>
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
     /// </summary>
-    EnqueueBrs023027MessagesFromProcessManager,
-
-    /// <summary>
-    /// Whether to disable enqueue BRS-023/027 messages via Wholesale.
-    /// </summary>
-    DisableEnqueueBrs023027MessagesFromWholesale,
+    UseProcessManagerToEnqueueBrs023027Messages,
 }

@@ -51,17 +51,15 @@ public class SendActorMessagesEnqueuedActivity
     public async Task Run(
         [ActivityTrigger] SendMessagesEnqueuedInput input)
     {
-        // By construction, we have that the process manager orchestration has the same id as the calculation
-        var instructionFromProcessManager = input.CalculationId.ToString() == input.CalculationOrchestrationInstanceId;
+        var informProcessManger = await _featureFlagManager
+            .UseProcessManagerToEnqueueBrs023027MessagesAsync().ConfigureAwait(false);
 
-        if (await _featureFlagManager.EnqueueBrs023027MessagesViaProcessManagerAsync().ConfigureAwait(false)
-            && instructionFromProcessManager)
+        if (informProcessManger)
         {
             await SendToProcessManager(input).ConfigureAwait(false);
         }
 
-        if (!await _featureFlagManager.DisableEnqueueBrs023027MessagesFromWholesaleAsync().ConfigureAwait(false)
-            && !instructionFromProcessManager)
+        if (!informProcessManger)
         {
             await SendToWholesale(input).ConfigureAwait(false);
         }
