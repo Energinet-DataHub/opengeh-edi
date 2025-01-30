@@ -52,7 +52,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration]);
 
-    public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages]);
-
     public Task<bool> UseStandardBlobServiceClientAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseStandardBlobServiceClient]);
+
+    public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages]);
 }
