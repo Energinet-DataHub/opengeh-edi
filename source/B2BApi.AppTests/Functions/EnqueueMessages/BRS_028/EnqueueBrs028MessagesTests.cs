@@ -16,12 +16,13 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -57,8 +58,23 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     {
         // => Given enqueue BRS-028 service bus message
         var actorId = Guid.NewGuid().ToString();
+        var requestedForActorNumber = ActorNumber.Create("1111111111111");
+        var requestedForActorRole = ActorRole.EnergySupplier;
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
-            BusinessReason: BusinessReason.WholesaleFixing.Code);
+            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            BusinessReason: BusinessReason.BalanceFixing,
+            RequestedForActorNumber: requestedForActorNumber,
+            RequestedForActorRole: requestedForActorRole,
+            RequestedByActorNumber: requestedForActorNumber,
+            RequestedByActorRole: requestedForActorRole,
+            PeriodStart: Instant.FromUtc(2024, 01, 03, 23, 00).ToDateTimeOffset(),
+            PeriodEnd: Instant.FromUtc(2024, 01, 04, 23, 00).ToDateTimeOffset(),
+            GridAreas: ["804"],
+            EnergySupplierNumber: requestedForActorNumber,
+            ChargeOwnerNumber: null,
+            SettlementVersion: null,
+            ChargeTypes: []);
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
