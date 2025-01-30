@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
@@ -764,7 +763,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                     WHERE ({EnergyResultColumnNames.CalculationType} = '{DeltaTableCalculationType.FirstCorrectionSettlement}'
                     OR {EnergyResultColumnNames.CalculationType} = '{DeltaTableCalculationType.SecondCorrectionSettlement}'
                     OR {EnergyResultColumnNames.CalculationType} = '{DeltaTableCalculationType.ThirdCorrectionSettlement}')
-                    {(_gridAreasToRemoveFrom.Any() ? $"AND {EnergyResultColumnNames.GridAreaCode} IN ({string.Join(", ", _gridAreasToRemoveFrom.Select(ga => $"'{ga}'"))})" : string.Empty)}
+                    {(_gridAreasToRemoveFrom.Any() ? $"AND {EnergyResultColumnNames.GridArea} IN ({string.Join(", ", _gridAreasToRemoveFrom.Select(ga => $"'{ga}'"))})" : string.Empty)}
                     """;
         }
     }

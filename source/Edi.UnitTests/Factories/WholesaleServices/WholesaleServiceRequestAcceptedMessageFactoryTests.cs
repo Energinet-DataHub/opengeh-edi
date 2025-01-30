@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults;
-using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Edi.Factories.WholesaleServices;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using FluentAssertions;
@@ -24,11 +23,10 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
-using Period = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.Period;
 using QuantityQuality = Energinet.DataHub.Edi.Responses.QuantityQuality;
-using QuantityUnit = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.QuantityUnit;
-using Resolution = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution;
-using WholesaleQuantity = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality;
+using QuantityUnit = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityUnit;
+using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
+using WholesaleQuantity = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Factories.WholesaleServices;
 
@@ -133,8 +131,8 @@ public class WholesaleServiceRequestAcceptedMessageFactoryTests
             null,
             9857.916610M);
 
-        var wholesaleServices = new CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices(
-            new Period(Instant.FromUtc(2021, 12, 31, 23, 00), Instant.FromUtc(2022, 1, 31, 23, 0)),
+        var wholesaleServices = new DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices(
+            new DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(Instant.FromUtc(2021, 12, 31, 23, 00), Instant.FromUtc(2022, 1, 31, 23, 0)),
             "543",
             "5790000701278",
             null,
@@ -187,7 +185,7 @@ public class WholesaleServiceRequestAcceptedMessageFactoryTests
             });
     }
 
-    private IReadOnlyCollection<CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices> CreateWholesaleServices(
+    private IReadOnlyCollection<Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices> CreateWholesaleServices(
         IReadOnlyCollection<WholesaleQuantity>? quantityQualities = null,
         MeteringPointType? meteringPointType = null,
         SettlementMethod? settlementMethod = null,
@@ -205,7 +203,7 @@ public class WholesaleServiceRequestAcceptedMessageFactoryTests
 
         return [
             new(
-                new Period(
+                new DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                     _periodStart,
                     _periodEnd),
                 _gridArea,

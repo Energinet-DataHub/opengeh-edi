@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.Wholesale.Edi.Exceptions;
 using Energinet.DataHub.Wholesale.Edi.Models;
-using CalculationTimeSeriesType = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.TimeSeriesType;
+using CalculationTimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType;
 using TimeSeriesTypeContract = Energinet.DataHub.Edi.Responses.TimeSeriesType;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;

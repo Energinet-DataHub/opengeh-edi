@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 
-public enum Resolution
+public class BasisDataCalculationsColumnNames
 {
-    Quarter,
-    Hour,
+    public const string CalculationId = "calculation_id";
+    public const string CalculationType = "calculation_type";
+    public const string PeriodStart = "period_start";
+    public const string PeriodEnd = "period_end";
+    public const string ExecutionTimeStart = "execution_time_start";
+    public const string CreatedByUserId = "created_by_user_id";
+    public const string Version = "version";
 }

@@ -14,13 +14,13 @@
 
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults;
-using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using Currency = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Currency;
-using QuantityUnit = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.QuantityUnit;
+using QuantityUnit = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityUnit;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
 
@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 
 public static class WholesaleServicesResultMapper
 {
-    public static AcceptedWholesaleServicesSerieDto MapToAcceptedWholesaleServicesSerieDto(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices wholesaleSeries)
+    public static AcceptedWholesaleServicesSerieDto MapToAcceptedWholesaleServicesSerieDto(OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices wholesaleSeries)
     {
         return new AcceptedWholesaleServicesSerieDto(
             MapPoints(wholesaleSeries.TimeSeriesPoints, wholesaleSeries.Resolution, wholesaleSeries.ChargeType),
@@ -48,7 +48,7 @@ public static class WholesaleServicesResultMapper
             wholesaleSeries.Version);
     }
 
-    private static bool ShouldHaveChargeOwner(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices wholesaleSeries)
+    private static bool ShouldHaveChargeOwner(OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices wholesaleSeries)
     {
         /*
          * The charge owner should be present on the outgoing message
@@ -62,7 +62,7 @@ public static class WholesaleServicesResultMapper
         return wholesaleSeries is { ChargeOwnerId: not null, QuantityUnit: not null };
     }
 
-    private static MeteringPointType? MapMeteringPointType(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices wholesaleSeries)
+    private static BuildingBlocks.Domain.Models.MeteringPointType? MapMeteringPointType(OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices wholesaleSeries)
     {
         // Monthly sum does not have a metering point type
         if (wholesaleSeries.MeteringPointType != null)
@@ -86,31 +86,31 @@ public static class WholesaleServicesResultMapper
         };
     }
 
-    private static Currency MapCurrency(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Currency currency)
+    private static Currency MapCurrency(OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Currency currency)
     {
         return currency switch
         {
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Currency.DKK => Currency.DanishCrowns,
+            OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Currency.DKK => Currency.DanishCrowns,
             _ => throw new InvalidOperationException("Unknown currency type"),
         };
     }
 
-    private static SettlementMethod? MapSettlementMethod(
-        Wholesale.CalculationResults.Interfaces.CalculationResults.Model.SettlementMethod? settlementMethod)
+    private static BuildingBlocks.Domain.Models.SettlementMethod? MapSettlementMethod(
+        OutgoingMessages.Interfaces.Models.CalculationResults.SettlementMethod? settlementMethod)
     {
         return settlementMethod switch
         {
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.SettlementMethod.Flex => SettlementMethod.Flex,
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.SettlementMethod.NonProfiled => SettlementMethod.NonProfiled,
+            OutgoingMessages.Interfaces.Models.CalculationResults.SettlementMethod.Flex => BuildingBlocks.Domain.Models.SettlementMethod.Flex,
+            OutgoingMessages.Interfaces.Models.CalculationResults.SettlementMethod.NonProfiled => BuildingBlocks.Domain.Models.SettlementMethod.NonProfiled,
             null => null,
             _ => throw new InvalidOperationException("Unknown settlement method"),
         };
     }
 
-    private static MeasurementUnit MapMeasurementUnit(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices wholesaleServicesRequest)
+    private static MeasurementUnit MapMeasurementUnit(OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices wholesaleServicesRequest)
     {
         if (wholesaleServicesRequest is
-            { QuantityUnit: not null, Resolution: Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution.Month })
+            { QuantityUnit: not null, Resolution: OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month })
         {
             return MeasurementUnit.Kwh;
         }
@@ -123,32 +123,32 @@ public static class WholesaleServicesResultMapper
         };
     }
 
-    private static ChargeType MapChargeType(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType chargeType)
+    private static ChargeType MapChargeType(OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType chargeType)
     {
         return chargeType switch
         {
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType.Fee => ChargeType.Fee,
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType.Tariff => ChargeType.Tariff,
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType.Subscription => ChargeType.Subscription,
+            OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Fee => ChargeType.Fee,
+            OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff => ChargeType.Tariff,
+            OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription => ChargeType.Subscription,
             _ => throw new InvalidOperationException("Unknown charge type"),
         };
     }
 
-    private static Resolution MapResolution(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution resolution)
+    private static Resolution MapResolution(OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)
     {
         return resolution switch
         {
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution.Day => Resolution.Daily,
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution.Hour => Resolution.Hourly,
-            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution.Month => Resolution.Monthly,
+            OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Day => Resolution.Daily,
+            OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Hour => Resolution.Hourly,
+            OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month => Resolution.Monthly,
             _ => throw new InvalidOperationException("Unknown resolution"),
         };
     }
 
     private static ReadOnlyCollection<Point> MapPoints(
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
-        Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution resolution,
-        Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType? chargeType)
+        OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution,
+        OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? chargeType)
     {
         var points = new List<Point>();
 

@@ -49,7 +49,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
     public static AcceptedWholesaleServicesMessageDto Create(
         EventId eventId,
         RequestWholesaleServicesTransaction transaction,
-        Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices wholesaleServices)
+        OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices wholesaleServices)
     {
         ArgumentNullException.ThrowIfNull(transaction);
         ArgumentNullException.ThrowIfNull(wholesaleServices);

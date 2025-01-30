@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Reflection;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.CalculationResults.Statements;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using FluentAssertions;
 using Xunit;
 

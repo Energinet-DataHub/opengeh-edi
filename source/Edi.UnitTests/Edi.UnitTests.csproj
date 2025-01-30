@@ -37,5 +37,6 @@
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
     <ProjectReference Include="..\Edi\Edi.csproj" />
     <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
+    <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
   </ItemGroup>
 </Project>
