@@ -359,6 +359,8 @@ public class RequestProcessOrchestrationStarterTests
             inputParameter: new MeteredDataForMeteringPointMessageInputV1(
                 MessageId: messageId,
                 AuthenticatedActorId: expectedActorId,
+                ActorNumber: requestedByActor.ActorNumber.Value,
+                ActorRole: requestedByActor.ActorRole.Code,
                 TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,
