@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
-using ChargeTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers.WholesaleResults.ChargeTypeMapper;
+using ChargeTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ChargeTypeMapper;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
 

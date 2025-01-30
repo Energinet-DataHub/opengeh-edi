@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.Wholesale.Edi.Client;
 using Energinet.DataHub.Wholesale.Edi.Factories;
 using Energinet.DataHub.Wholesale.Edi.Factories.WholesaleServices;
@@ -24,7 +23,7 @@ using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Microsoft.Extensions.Logging;
-using Period = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.Period;
+using Period = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period;
 
 namespace Energinet.DataHub.Wholesale.Edi;
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using EdiModel = Energinet.DataHub.Edi.Responses;
-using WholesaleModel = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
+using WholesaleModel = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
 

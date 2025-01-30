@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+
 namespace Energinet.DataHub.Wholesale.Edi.Models;
 
 public record WholesaleServicesRequest(
-    CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.AmountType AmountType,
+    AmountType AmountType,
     IReadOnlyCollection<string> GridAreaCodes,
     string? EnergySupplierId,
     string? ChargeOwnerId,

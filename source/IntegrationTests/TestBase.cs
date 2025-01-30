@@ -14,7 +14,6 @@
 
 using System.Text;
 using Azure.Messaging.ServiceBus;
-using Azure.Storage.Blobs;
 using Dapper;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -58,7 +57,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Google.Protobuf;
 using MediatR;
@@ -348,7 +346,6 @@ public class TestBase : IDisposable
             .AddOutboxContext(config)
             .AddOutboxClient<OutboxContext>()
             .AddOutboxProcessor<OutboxContext>()
-            .AddCalculationResultsModule(config)
             .AddEdiModule(config);
 
         // Replace the services with stub implementations.
