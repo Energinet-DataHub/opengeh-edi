@@ -17,8 +17,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
@@ -54,7 +54,7 @@ public class RequestProcessOrchestrationStarter(
                         ? ChargeType.TryGetNameFromCode(ct.Type, fallbackValue: ct.Type)
                         : null;
 
-                    return new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInputV1(
+                    return new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInput(
                         ChargeType: chargeType,
                         ChargeCode: ct.Id);
                 })
@@ -109,6 +109,8 @@ public class RequestProcessOrchestrationStarter(
             var startCommand = new RequestCalculatedEnergyTimeSeriesCommandV1(
                 operatingIdentity: actorIdentity,
                 inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
+                    ActorMessageId: initializeProcessDto.MessageId,
+                    TransactionId: transaction.Id.Value,
                     RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
                     RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
                     BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),

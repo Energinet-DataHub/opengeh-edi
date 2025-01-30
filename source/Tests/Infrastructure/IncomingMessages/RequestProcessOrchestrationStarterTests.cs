@@ -20,8 +20,8 @@ using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using Moq;
 using Xunit;
@@ -134,7 +134,7 @@ public class RequestProcessOrchestrationStarterTests
                 SettlementVersion: expectedSettlementVersion?.Name,
                 ChargeTypes:
                 [
-                    new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInputV1(
+                    new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInput(
                         ChargeType: expectedChargeType?.Name,
                         ChargeCode: expectedChargeId)
                 ]),
@@ -162,6 +162,7 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
 
         var expectedBusinessReason = BusinessReason.BalanceFixing;
+        var messageId = "9b6184af-2f05-40b9-d783-08dc814df95a";
         var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
         var expectedStart = "2023-04-30T22:00:00Z";
         var expectedSettlementVersion = settlementVersionCode is not null
@@ -180,7 +181,7 @@ public class RequestProcessOrchestrationStarterTests
             SenderNumber: requestedByActor.ActorNumber.Value,
             SenderRoleCode: requestedByActor.ActorRole.Code,
             BusinessReason: expectedBusinessReason.Code,
-            MessageId: MessageId.Create("9b6184af-2f05-40b9-d783-08dc814df95a").Value,
+            MessageId: messageId,
             Series:
             [
                 new InitializeAggregatedMeasureDataProcessSeries(
@@ -235,6 +236,8 @@ public class RequestProcessOrchestrationStarterTests
         var expectedCommand = new RequestCalculatedEnergyTimeSeriesCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
             inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
+                ActorMessageId: messageId,
+                TransactionId: transactionId,
                 RequestedForActorNumber: requestedByActor.ActorNumber.Value,
                 RequestedForActorRole: requestedByActor.ActorRole.Name,
                 BusinessReason: expectedBusinessReason.Name,
@@ -268,6 +271,7 @@ public class RequestProcessOrchestrationStarterTests
         // => Setup input
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
         var transactionId = TransactionId.From("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
+        var messageId = "62EA5019-57FB-41B8-BD34-4F0885E77DAE";
 
         var expectedBusinessReason = BusinessReason.PeriodicMetering;
         var expectedIdempotencyKey = $"{requestedByActor.ActorNumber.Value}-{transactionId}";
@@ -288,7 +292,7 @@ public class RequestProcessOrchestrationStarterTests
             : null;
 
         var initializeProcessDto = new InitializeMeteredDataForMeteringPointMessageProcessDto(
-            MessageId: transactionId,
+            MessageId: messageId,
             MessageType: "E66",
             CreatedAt: expectedRegistrationDateFrom,
             BusinessReason: expectedBusinessReason.Code,
@@ -353,7 +357,10 @@ public class RequestProcessOrchestrationStarterTests
         var expectedCommand = new StartForwardMeteredDataCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
             inputParameter: new MeteredDataForMeteringPointMessageInputV1(
+                MessageId: messageId,
                 AuthenticatedActorId: expectedActorId,
+                ActorNumber: requestedByActor.ActorNumber.Value,
+                ActorRole: requestedByActor.ActorRole.Code,
                 TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,

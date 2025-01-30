@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -23,6 +24,10 @@ using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
+[SuppressMessage(
+    "StyleCop.CSharp.ReadabilityRules",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "Needed for inline ebix exception")]
 public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient processManagerMessageClient, AuthenticatedActor authenticatedActor)
 {
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
@@ -32,8 +37,11 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         InitializeMeteredDataForMeteringPointMessageProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
-        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
-        var actorIdentity = new ActorIdentityDto(actorId);
+        var actorIdentity = GetAuthenticatedActorId(initializeProcessDto.MessageId);
+        var actorIdentityDto = new ActorIdentityDto(
+            actorIdentity.ActorId
+            ?? throw new InvalidOperationException(
+                $"Current actor id was null when initializing process (MessageId={initializeProcessDto.MessageId})"));
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -56,15 +64,21 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
 
             var startCommand =
                 new StartForwardMeteredDataCommandV1(
-                    operatingIdentity: actorIdentity,
+                    operatingIdentity: actorIdentityDto,
                     new MeteredDataForMeteringPointMessageInputV1(
-                        AuthenticatedActorId: actorId,
+                        MessageId: initializeProcessDto.MessageId,
+                        AuthenticatedActorId: actorIdentity.ActorId.Value,
+                        ActorNumber: actorIdentity.ActorNumber.Value,
+                        ActorRole: actorIdentity.ActorRole.Code,
                         TransactionId: transaction.TransactionId,
                         MeteringPointId: transaction.MeteringPointLocationId,
                         MeteringPointType: meteringPointType,
                         ProductNumber: transaction.ProductNumber,
                         MeasureUnit: productUnitType,
-                        RegistrationDateTime: registeredAt ?? throw new ArgumentNullException("RegistrationDateTime is only allowed to be null in Ebix."),
+                        RegistrationDateTime: registeredAt
+                                              ?? throw new ArgumentNullException(
+                                                  nameof(transaction.RegisteredAt),
+                                                  "RegistrationDateTime is only allowed to be null in Ebix."),
                         Resolution: resolution,
                         StartDateTime: transaction.StartDateTime,
                         EndDateTime: transaction.EndDateTime,
@@ -88,12 +102,11 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    private Guid GetAuthenticatedActorId(string messageId)
-    {
-        if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
-            throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");
-
-        return actorIdentity?.ActorId
-               ?? throw new InvalidOperationException($"Current actor id was null when initializing process (MessageId={messageId})");
-    }
+    private ActorIdentity GetAuthenticatedActorId(string messageId) =>
+        !_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
+            ? throw new InvalidOperationException(
+                $"Cannot get current actor when initializing process (MessageId={messageId})")
+            : actorIdentity
+              ?? throw new InvalidOperationException(
+                  $"Current actor id was null when initializing process (MessageId={messageId})");
 }
