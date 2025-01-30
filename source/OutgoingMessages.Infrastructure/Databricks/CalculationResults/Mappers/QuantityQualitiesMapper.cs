@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers.WholesaleResults;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
 
-public static class QuantityUnitMapper
+public static class QuantityQualitiesMapper
 {
-    public static QuantityUnit FromDeltaTableValue(string quantityUnit)
+    public static IReadOnlyCollection<QuantityQuality>? FromDeltaTableValue(string? value)
     {
-        return quantityUnit switch
-        {
-            "kWh" => QuantityUnit.Kwh,
-            "pcs" => QuantityUnit.Pieces,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(quantityUnit),
-                actualValue: quantityUnit,
-                "Value does not contain a valid string representation of a quantity unit."),
-        };
+        if (value == null)
+            return null;
+
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(QuantityQualityMapper.FromDeltaTableValue).ToArray();
     }
 }

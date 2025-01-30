@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
 
 public static class QuantityQualityMapper
 {

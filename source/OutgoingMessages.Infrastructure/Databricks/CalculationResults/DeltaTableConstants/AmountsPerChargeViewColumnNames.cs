@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
-public class TotalMonthlyAmountsViewColumnNames
+public class AmountsPerChargeViewColumnNames
 {
     public const string CalculationId = "calculation_id";
     public const string CalculationType = "calculation_type";
@@ -22,8 +22,18 @@ public class TotalMonthlyAmountsViewColumnNames
     public const string CalculationResultId = "result_id";
     public const string GridAreaCode = "grid_area_code";
     public const string EnergySupplierId = "energy_supplier_id";
+    public const string ChargeCode = "charge_code";
+    public const string ChargeType = "charge_type";
     public const string ChargeOwnerId = "charge_owner_id";
+    public const string Resolution = "resolution";
+    public const string QuantityUnit = "quantity_unit";
+    public const string MeteringPointType = "metering_point_type";
+    public const string SettlementMethod = "settlement_method";
+    public const string IsTax = "is_tax";
     public const string Currency = "currency";
     public const string Time = "time";
+    public const string Quantity = "quantity";
+    public const string QuantityQualities = "quantity_qualities";
+    public const string Price = "price";
     public const string Amount = "amount";
 }

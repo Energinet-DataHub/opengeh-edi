@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers;
-
-public static class QuantityQualitiesMapper
+public static class DeltaTableCalculationType
 {
-    public static IReadOnlyCollection<QuantityQuality>? FromDeltaTableValue(string? value)
-    {
-        if (value == null) return null;
-
-        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
-
-        return qualities.Select(QuantityQualityMapper.FromDeltaTableValue).ToArray();
-    }
+    public const string Aggregation = "aggregation";
+    public const string BalanceFixing = "balance_fixing";
+    public const string WholesaleFixing = "wholesale_fixing";
+    public const string FirstCorrectionSettlement = "first_correction_settlement";
+    public const string SecondCorrectionSettlement = "second_correction_settlement";
+    public const string ThirdCorrectionSettlement = "third_correction_settlement";
 }

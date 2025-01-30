@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
-public static class DeltaTableCalculationType
+public static class DeltaTableAggregationLevel
 {
-    public const string Aggregation = "aggregation";
-    public const string BalanceFixing = "balance_fixing";
-    public const string WholesaleFixing = "wholesale_fixing";
-    public const string FirstCorrectionSettlement = "first_correction_settlement";
-    public const string SecondCorrectionSettlement = "second_correction_settlement";
-    public const string ThirdCorrectionSettlement = "third_correction_settlement";
+    public const string GridArea = "total_ga";
+    public const string EnergySupplierAndGridArea = "es_brp_ga";
+    public const string BalanceResponsibleAndGridArea = "brp_ga";
+    public const string EnergySupplierAndBalanceResponsibleAndGridArea = "es_brp_ga";
 }

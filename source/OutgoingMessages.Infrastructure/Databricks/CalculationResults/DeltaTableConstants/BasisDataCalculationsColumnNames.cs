@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
-public static class DeltaTableAggregationLevel
+public class BasisDataCalculationsColumnNames
 {
-    public const string GridArea = "total_ga";
-    public const string EnergySupplierAndGridArea = "es_brp_ga";
-    public const string BalanceResponsibleAndGridArea = "brp_ga";
-    public const string EnergySupplierAndBalanceResponsibleAndGridArea = "es_brp_ga";
+    public const string CalculationId = "calculation_id";
+    public const string CalculationType = "calculation_type";
+    public const string PeriodStart = "period_start";
+    public const string PeriodEnd = "period_end";
+    public const string ExecutionTimeStart = "execution_time_start";
+    public const string CreatedByUserId = "created_by_user_id";
+    public const string Version = "version";
 }

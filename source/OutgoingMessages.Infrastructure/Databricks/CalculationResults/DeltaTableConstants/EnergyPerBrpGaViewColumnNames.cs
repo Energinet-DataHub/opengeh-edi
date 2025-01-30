@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
 /// <summary>
 /// The columns are defined in https://energinet.atlassian.net/wiki/spaces/D3/pages/1014202369/Wholesale+Results
 /// </summary>
-public class EnergyPerGaViewColumnNames
+public class EnergyPerBrpGaViewColumnNames
 {
     public const string CalculationId = "calculation_id";
     public const string CalculationType = "calculation_type";
@@ -26,6 +26,7 @@ public class EnergyPerGaViewColumnNames
     public const string CalculationVersion = "calculation_version";
     public const string ResultId = "result_id";
     public const string GridAreaCode = "grid_area_code";
+    public const string BalanceResponsiblePartyId = "balance_responsible_party_id";
     public const string MeteringPointType = "metering_point_type";
     public const string SettlementMethod = "settlement_method";
     public const string Resolution = "resolution";

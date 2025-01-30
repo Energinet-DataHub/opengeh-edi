@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
@@ -93,11 +93,11 @@ public sealed class AggregatedTimeSeriesQuerySnippetProvider(
         TimeSeriesType timeSeriesType,
         string table)
     {
-        var meteringPointType = SqlStatements.Mappers.MeteringPointTypeMapper.ToDeltaTableValue(
-            SqlStatements.Mappers.MeteringPointTypeMapper.FromTimeSeriesTypeDeltaTableValue(
+        var meteringPointType = Mappers.MeteringPointTypeMapper.ToDeltaTableValue(
+            Mappers.MeteringPointTypeMapper.FromTimeSeriesTypeDeltaTableValue(
                 TimeSeriesTypeMapper.ToDeltaTableValue(timeSeriesType)));
-        var settlementMethod = SqlStatements.Mappers.SettlementMethodMapper.ToDeltaTableValue(
-            SqlStatements.Mappers.SettlementMethodMapper.FromTimeSeriesTypeDeltaTableValue(
+        var settlementMethod = Mappers.SettlementMethodMapper.ToDeltaTableValue(
+            Mappers.SettlementMethodMapper.FromTimeSeriesTypeDeltaTableValue(
                 TimeSeriesTypeMapper.ToDeltaTableValue(timeSeriesType)));
 
         var sqlConstraint =
