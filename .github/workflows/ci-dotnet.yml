@@ -42,7 +42,7 @@ jobs:
 
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
-      download_attempt_limit: 30
+      download_attempt_limit: 40 # waits for 40 * 15 seconds = 10 minutes.
       azure_functions_core_tools_version: 4.0.5455
       # Matrix parameters
       job_name: ${{ matrix.tests_filter_expression.name }}
@@ -165,7 +165,7 @@ jobs:
 
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
-      download_attempt_limit: 20
+      download_attempt_limit: 40 # waits for 40 * 15 seconds = 10 minutes.
       azure_functions_core_tools_version: 4.0.5455
       azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
       azure_integrationtest_subscription_id: ${{ vars.integration_test_azure_subscription_id }}

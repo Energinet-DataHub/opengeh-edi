@@ -12,32 +12,76 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 
 /// <summary>
 /// Enqueue messages for BRS-023 (NotifyAggregatedMeasureData) and BRS-027 (NotifyWholesaleServices).
-/// The <see cref="EnqueueMessagesDto"/><see cref="EnqueueMessagesDto.JsonInput"/> must be of type <see cref="object"/>.
+/// The <see cref="EnqueueMessagesDto"/><see cref="EnqueueMessagesDto.JsonInput"/> must be of type <see cref="CalculationEnqueueActorMessagesV1"/>.
 /// </summary>
 /// <param name="logger"></param>
 public class EnqueueHandler_Brs_023_027_V1(
-    ILogger<EnqueueHandler_Brs_023_027_V1> logger)
+    ILogger<EnqueueHandler_Brs_023_027_V1> logger,
+    IFeatureFlagManager featureFlagManager,
+    IDurableClientFactory durableClientFactory)
     : EnqueueActorMessagesHandlerBase(logger)
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages)
+    private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
+
+    private readonly IDurableClientFactory _durableClientFactory = durableClientFactory;
+
+    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, string serviceBusMessageId)
     {
+        var featureIsDisabled =
+            !await _featureFlagManager.UseProcessManagerToEnqueueBrs023027MessagesAsync().ConfigureAwait(false);
+
         _logger.LogInformation(
-            "Received enqueue actor messages for BRS 023/027. Data: {Data}",
+            "Received enqueue actor messages for BRS 023/027. Feature is {Status}. Data: {Data}",
+            featureIsDisabled ? "disabled" : "enabled",
             enqueueActorMessages.Data);
 
-        // TODO: Deserialize to actual input type instead of object (replace "object" type in summary as well)
-        var input = enqueueActorMessages.ParseData<object>();
+        if (featureIsDisabled)
+        {
+            return;
+        }
 
-        // TODO: Call actual logic that enqueues messages (starts orchestration)
-        await Task.CompletedTask.ConfigureAwait(false);
+        switch (enqueueActorMessages.DataType)
+        {
+            case nameof(CalculationEnqueueActorMessagesV1):
+                await HandleCalculationEnqueueActorMessagesV1Async(enqueueActorMessages, Guid.Parse(serviceBusMessageId)).ConfigureAwait(false);
+                break;
+            default:
+                throw new NotSupportedException($"Data type '{enqueueActorMessages.DataType}' is not supported.");
+        }
+    }
+
+    private async Task HandleCalculationEnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, Guid eventId)
+    {
+        var calculatedData = enqueueActorMessages.ParseData<CalculationEnqueueActorMessagesV1>();
+        var orchestrationInput = new EnqueueMessagesOrchestrationInput(
+            CalculationId: calculatedData.CalculationId,
+            CalculationOrchestrationId: enqueueActorMessages.OrchestrationInstanceId,
+            EventId: eventId);
+
+        var durableClient = _durableClientFactory.CreateClient();
+
+        var instanceId = await durableClient.StartNewAsync(
+            nameof(EnqueueMessagesOrchestration),
+            orchestrationInput).ConfigureAwait(false);
+
+        _logger.LogInformation(
+            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation orchestration id: {CalculationOrchestrationId}, service bus message id: {EventId}.)",
+            instanceId,
+            calculatedData.CalculationId,
+            enqueueActorMessages.OrchestrationInstanceId,
+            eventId);
     }
 }
