@@ -24,6 +24,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
 {
     protected override Task EnqueueActorMessagesV1Async(
         Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
         EnqueueActorMessagesV1 enqueueActorMessages,
         CancellationToken cancellationToken)
     {
@@ -32,7 +33,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
             var acceptedData = enqueueActorMessages.ParseData<TAcceptedData>();
             return EnqueueAcceptedMessagesAsync(
                 serviceBusMessageId,
-                enqueueActorMessages.OrchestrationInstanceId,
+                orchestrationInstanceId,
                 acceptedData,
                 cancellationToken);
         }
@@ -41,7 +42,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
             var rejectedData = enqueueActorMessages.ParseData<TRejectedData>();
             return EnqueueRejectedMessagesAsync(
                 serviceBusMessageId,
-                enqueueActorMessages.OrchestrationInstanceId,
+                orchestrationInstanceId,
                 rejectedData,
                 cancellationToken);
         }
@@ -54,13 +55,13 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
 
     protected abstract Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         TAcceptedData acceptedData,
         CancellationToken cancellationToken);
 
     protected abstract Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         TRejectedData rejectedData,
         CancellationToken cancellationToken);
 }

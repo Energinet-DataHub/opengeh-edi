@@ -43,7 +43,7 @@ public class EnqueueHandler_Brs_026_V1(
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
     {
@@ -78,7 +78,7 @@ public class EnqueueHandler_Brs_026_V1(
         // TODO: NotifyOrchestrationInstanceAsync should maybe happen in another layer, when the method is actually implemented
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId,
+                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
                     RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
@@ -86,7 +86,7 @@ public class EnqueueHandler_Brs_026_V1(
 
     protected override async Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedData,
         CancellationToken cancellationToken)
     {
@@ -111,7 +111,7 @@ public class EnqueueHandler_Brs_026_V1(
             receiverRole: ActorRole.FromName(rejectedData.RequestedByActorRole.Name),
             documentReceiverNumber: ActorNumber.Create(rejectedData.RequestedForActorNumber.Value),
             documentReceiverRole: ActorRole.FromName(rejectedData.RequestedForActorRole.Name),
-            processId: Guid.Parse(orchestrationInstanceId),
+            processId: orchestrationInstanceId,
             eventId: EventId.From(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,
             series: rejectedTimeSeries);
@@ -121,7 +121,7 @@ public class EnqueueHandler_Brs_026_V1(
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId,
+                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
                     RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);

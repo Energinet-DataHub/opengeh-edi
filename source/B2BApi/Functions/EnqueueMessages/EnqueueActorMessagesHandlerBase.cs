@@ -65,6 +65,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
 
     protected abstract Task EnqueueActorMessagesV1Async(
         Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
         EnqueueActorMessagesV1 enqueueActorMessages,
         CancellationToken cancellationToken);
 
@@ -93,19 +94,34 @@ public abstract class EnqueueActorMessagesHandlerBase(
             },
         });
 
-        if (!Guid.TryParse(serviceBusMessage.MessageId, out var serviceBusMessageId))
-        {
-            throw new InvalidOperationException(
-                $"Unable to parse service bus message id to guid (MessageId={serviceBusMessage.MessageId}, Subject={serviceBusMessage.Subject})");
-        }
-
         _logger.LogInformation(
             "Enqueue actor messages (v1) triggered for {OrchestrationName} (Version={OrchestrationVersion}, OrchestrationInstanceId={OrchestrationInstanceId}).",
             enqueueActorMessages.OrchestrationName,
             enqueueActorMessages.OrchestrationVersion,
             enqueueActorMessages.OrchestrationInstanceId);
 
-        await EnqueueActorMessagesV1Async(serviceBusMessageId, enqueueActorMessages, cancellationToken)
+        if (!Guid.TryParse(serviceBusMessage.MessageId, out var serviceBusMessageId))
+        {
+            throw new InvalidOperationException(
+                $"Unable to parse service bus message id to guid ("
+                + $"MessageId={serviceBusMessage.MessageId}, "
+                + $"Subject={serviceBusMessage.Subject})");
+        }
+
+        if (!Guid.TryParse(enqueueActorMessages.OrchestrationInstanceId, out var orchestrationInstanceId))
+        {
+            throw new InvalidOperationException(
+                $"Unable to parse orchestration instance id to guid ("
+                + $"OrchestrationInstanceId={enqueueActorMessages.OrchestrationInstanceId}, "
+                + $"MessageId={serviceBusMessage.MessageId}, "
+                + $"Subject={serviceBusMessage.Subject})");
+        }
+
+        await EnqueueActorMessagesV1Async(
+                serviceBusMessageId,
+                orchestrationInstanceId,
+                enqueueActorMessages,
+                cancellationToken)
             .ConfigureAwait(false);
     }
 }

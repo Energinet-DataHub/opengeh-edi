@@ -38,7 +38,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         MeteredDataForMeteringPointAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
     {
@@ -77,14 +77,14 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    orchestrationInstanceId,
+                    orchestrationInstanceId.ToString(),
                     MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
                 CancellationToken.None)).ConfigureAwait(false);
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         MeteredDataForMeteringPointRejectedV1 rejectedData,
         CancellationToken cancellationToken)
     {
@@ -142,7 +142,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    orchestrationInstanceId,
+                    orchestrationInstanceId.ToString(),
                     MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
                 CancellationToken.None)).ConfigureAwait(false);
     }

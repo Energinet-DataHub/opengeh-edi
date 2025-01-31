@@ -30,6 +30,7 @@ public class EnqueueHandler_Brs_023_027_V1(
 
     protected override async Task EnqueueActorMessagesV1Async(
         Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
         EnqueueActorMessagesV1 enqueueActorMessages,
         CancellationToken cancellationToken)
     {

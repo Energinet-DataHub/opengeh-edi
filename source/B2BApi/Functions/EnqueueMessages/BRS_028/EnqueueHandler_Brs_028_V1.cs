@@ -33,7 +33,7 @@ public class EnqueueHandler_Brs_028_V1(
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         RequestCalculatedWholesaleServicesAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
     {
@@ -45,7 +45,7 @@ public class EnqueueHandler_Brs_028_V1(
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId,
+                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
                     RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
@@ -53,7 +53,7 @@ public class EnqueueHandler_Brs_028_V1(
 
     protected override async Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
-        string orchestrationInstanceId,
+        Guid orchestrationInstanceId,
         RequestCalculatedWholesaleServicesRejectedV1 rejectedData,
         CancellationToken cancellationToken)
     {
@@ -65,7 +65,7 @@ public class EnqueueHandler_Brs_028_V1(
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId,
+                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
                     RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
