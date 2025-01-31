@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -43,7 +44,7 @@ public class DataLakeFileStorageClientTests
         featureFlagManager
             .Setup(x => x.UseStandardBlobServiceClientAsync())
             .ReturnsAsync(true);
-        _sut = new DataLakeFileStorageClient(clientFactoryMock.Object, options, featureFlagManager.Object);
+        _sut = new DataLakeFileStorageClient(clientFactoryMock.Object, options, featureFlagManager.Object, new Mock<ILogger<DataLakeFileStorageClient>>().Object);
     }
 
     [Fact]
@@ -63,7 +64,7 @@ public class DataLakeFileStorageClientTests
             .Setup(x => x.UseStandardBlobServiceClientAsync())
             .ReturnsAsync(false);
 
-        var sut = new DataLakeFileStorageClient(GetClientFactoryMock(GetOptions()).Object, GetOptions(), featureFlagManager.Object);
+        var sut = new DataLakeFileStorageClient(GetClientFactoryMock(GetOptions()).Object, GetOptions(), featureFlagManager.Object, new Mock<ILogger<DataLakeFileStorageClient>>().Object);
 
         // Act
         await sut.UploadAsync(reference, stream);
