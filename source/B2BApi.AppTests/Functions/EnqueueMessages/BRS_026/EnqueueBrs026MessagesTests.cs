@@ -95,7 +95,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: "a-message-id");
+            idempotencyKey: Guid.NewGuid().ToString());
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
@@ -151,7 +151,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: eventId.ToString());
+            idempotencyKey: eventId.Value);
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);

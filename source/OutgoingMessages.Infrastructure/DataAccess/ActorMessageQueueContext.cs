@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
@@ -46,6 +47,18 @@ public class ActorMessageQueueContext : DbContext, IEdiDbContext, IActorMessageQ
         _executionContext = executionContext;
         _authenticatedActor = authenticatedActor;
         _clock = clock;
+    }
+
+    /// <summary>
+    /// Used to supports tests
+    /// </summary>
+    public ActorMessageQueueContext(DbContextOptions<ActorMessageQueueContext> options)
+        : base(options)
+    {
+        _executionContext = new BuildingBlocks.Domain.ExecutionContext();
+        _executionContext.SetExecutionType(ExecutionType.Test);
+        _authenticatedActor = new AuthenticatedActor();
+        _clock = SystemClock.Instance;
     }
 
     public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
