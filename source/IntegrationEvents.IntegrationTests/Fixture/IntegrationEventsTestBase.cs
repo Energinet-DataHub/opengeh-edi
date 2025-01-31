@@ -38,11 +38,14 @@ public class IntegrationEventsTestBase : IAsyncLifetime
         _integrationEventsFixture = integrationEventsFixture;
         _testOutputHelper = testOutputHelper;
         FeatureFlagManagerStub = new();
+        DurableClientSpy = new();
     }
 
     protected ServiceProvider Services { get; private set; } = null!;
 
     protected FeatureFlagManagerStub FeatureFlagManagerStub { get; }
+
+    protected DurableClientSpy DurableClientSpy { get; }
 
     public void SetupServiceCollection()
     {
@@ -62,7 +65,7 @@ public class IntegrationEventsTestBase : IAsyncLifetime
             .AddMasterDataModule(configuration)
             .AddIntegrationEventModule(configuration)
             .AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub)
-            .AddScoped<IDurableClient, DurableClientSpy>()
+            .AddScoped<IDurableClient>(_ => DurableClientSpy)
             .AddScoped<IDurableClientFactory, DurableClientFactoryStub>();
 
         services.AddScoped<IConfiguration>(_ => configuration);

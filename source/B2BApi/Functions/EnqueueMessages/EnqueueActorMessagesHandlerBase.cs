@@ -62,7 +62,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
         }
     }
 
-    protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, string eventId);
+    protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, string serviceBusMessageId);
 
     private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage)
     {

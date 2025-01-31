@@ -33,6 +33,30 @@ public sealed class DurableClientSpy : IDurableClient
 
     public int NumberOfJobsStarted { get; private set; } = 0;
 
+    public Task<string> StartNewAsync(string orchestratorFunctionName, string? instanceId = null)
+    {
+        NumberOfJobsStarted++;
+        return Task.FromResult(Guid.NewGuid().ToString());
+    }
+
+    public Task<string> StartNewAsync<T>(string orchestratorFunctionName, T input)
+        where T : class
+    {
+        NumberOfJobsStarted++;
+        return Task.FromResult(Guid.NewGuid().ToString());
+    }
+
+    public Task<string> StartNewAsync<T>(string orchestratorFunctionName, string instanceId, T input)
+    {
+        NumberOfJobsStarted++;
+        return Task.FromResult(Guid.NewGuid().ToString());
+    }
+
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // --------------- Everything below this line is not implemented ---------------
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
     public HttpResponseMessage CreateCheckStatusResponse(
         HttpRequestMessage request,
         string instanceId,
@@ -72,25 +96,6 @@ public sealed class DurableClientSpy : IDurableClient
         bool returnInternalServerErrorOnFailure = false)
     {
         throw new NotImplementedException();
-    }
-
-    public Task<string> StartNewAsync(string orchestratorFunctionName, string? instanceId = null)
-    {
-        NumberOfJobsStarted++;
-        return Task.FromResult(Guid.NewGuid().ToString());
-    }
-
-    public Task<string> StartNewAsync<T>(string orchestratorFunctionName, T input)
-        where T : class
-    {
-        NumberOfJobsStarted++;
-        return Task.FromResult(Guid.NewGuid().ToString());
-    }
-
-    public Task<string> StartNewAsync<T>(string orchestratorFunctionName, string instanceId, T input)
-    {
-        NumberOfJobsStarted++;
-        return Task.FromResult(Guid.NewGuid().ToString());
     }
 
     public Task RaiseEventAsync(string instanceId, string eventName, object? eventData = null)

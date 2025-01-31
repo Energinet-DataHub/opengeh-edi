@@ -52,8 +52,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientSpy;
-        durableClientStub!.NumberOfJobsStarted.Should().Be(1);
+        DurableClientSpy.NumberOfJobsStarted.Should().Be(1);
     }
 
     [Fact]
@@ -71,8 +70,7 @@ public class WhenCalculatedCompletedEventIsReceived : IntegrationEventsTestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(integrationEvent);
 
-        var durableClientStub = Services.GetRequiredService<IDurableClient>() as DurableClientSpy;
-        durableClientStub!.NumberOfJobsStarted.Should().Be(0);
+        DurableClientSpy.NumberOfJobsStarted.Should().Be(0);
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(CalculationCompletedV1 calculationCompleted)
