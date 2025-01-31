@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
@@ -22,11 +23,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 public class ActorRequestsClient(
     IOutgoingMessagesClient outgoingMessagesClient,
     IAggregatedTimeSeriesQueries aggregatedTimeSeriesQueries,
-    IWholesaleServicesQueries wholeSaleServicesQueries) : IActorRequestsClient
+    IWholesaleServicesQueries wholeSaleServicesQueries,
+    IUnitOfWork unitOfWork)
+        : IActorRequestsClient
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IAggregatedTimeSeriesQueries _aggregatedTimeSeriesQueries = aggregatedTimeSeriesQueries;
     private readonly IWholesaleServicesQueries _wholesaleServicesQueries = wholeSaleServicesQueries;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters)
     {
@@ -79,5 +83,14 @@ public class ActorRequestsClient(
             // 3d. Enqueue the message
             await _outgoingMessagesClient.EnqueueAsync(acceptedEnergyResult, CancellationToken.None).ConfigureAwait(false);
         }
+    }
+
+    public async Task EnqueueRejectAggregatedMeasureDataRequestAsync(
+        RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
+        CancellationToken cancellationToken)
+    {
+        await _outgoingMessagesClient.EnqueueAsync(rejectedEnergyResultMessageDto, cancellationToken).ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 }

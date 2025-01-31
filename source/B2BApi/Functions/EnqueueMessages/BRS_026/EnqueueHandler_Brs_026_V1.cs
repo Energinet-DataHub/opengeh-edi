@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
@@ -21,6 +22,7 @@ using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.TimeSeriesType;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
@@ -92,14 +94,36 @@ public class EnqueueHandler_Brs_026_V1(
             "Received enqueue rejected message(s) for BRS 026. Data: {0}",
             rejectedData);
 
-        // TODO: Call actual logic that enqueues rejected message
+        var rejectReasons = rejectedData.ValidationErrors.Select(
+                e => new RejectedEnergyResultMessageRejectReason(
+                    ErrorCode: e.ErrorCode,
+                    ErrorMessage: e.Message))
+            .ToList();
 
-        // TODO: NotifyOrchestrationInstanceAsync should maybe happen in another layer, when the method is actually implemented
+        var rejectedTimeSeries = new RejectedEnergyResultMessageSerie(
+            TransactionId: TransactionId.New(),
+            RejectReasons: rejectReasons,
+            OriginalTransactionIdReference: rejectedData.TransactionId);
+
+        var enqueueRejectedMessageDto = new RejectedEnergyResultMessageDto(
+            relatedToMessageId: rejectedData.OriginalMessageId,
+            receiverNumber: rejectedData.RequestedByActorNumber,
+            receiverRole: rejectedData.RequestedByActorRole,
+            documentReceiverNumber: rejectedData.RequestedForActorNumber,
+            documentReceiverRole: rejectedData.RequestedForActorRole,
+            processId: Guid.Parse(orchestrationInstanceId), // TODO: Is this viable? Is the orchestration instance id always a guid?
+            eventId: EventId.From(serviceBusMessageId),
+            businessReason: rejectedData.BusinessReason,
+            series: rejectedTimeSeries);
+
+        await _actorRequestsClient.EnqueueRejectAggregatedMeasureDataRequestAsync(enqueueRejectedMessageDto, cancellationToken)
+            .ConfigureAwait(false);
+
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-            new NotifyOrchestrationInstanceEvent(
-                OrchestrationInstanceId: orchestrationInstanceId,
-                RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
-            CancellationToken.None)
+                new NotifyOrchestrationInstanceEvent(
+                    OrchestrationInstanceId: orchestrationInstanceId,
+                    RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
+                CancellationToken.None)
             .ConfigureAwait(false);
     }
 }

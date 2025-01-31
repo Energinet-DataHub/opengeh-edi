@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
@@ -24,4 +25,8 @@ public interface IActorRequestsClient
     /// <param name="businessReason"></param>
     /// <param name="aggregatedTimeSeriesQueryParameters"></param>
     public Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters);
+
+    public Task EnqueueRejectAggregatedMeasureDataRequestAsync(
+        RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
+        CancellationToken cancellationToken);
 }
