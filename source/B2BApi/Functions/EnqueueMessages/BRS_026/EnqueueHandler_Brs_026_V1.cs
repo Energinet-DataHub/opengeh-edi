@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
@@ -40,7 +41,8 @@ public class EnqueueHandler_Brs_026_V1(
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         string orchestrationInstanceId,
-        RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData)
+        RequestCalculatedEnergyTimeSeriesAcceptedV1 acceptedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 026. Data: {0}",
@@ -81,7 +83,8 @@ public class EnqueueHandler_Brs_026_V1(
 
     protected override async Task EnqueueRejectedMessagesAsync(
         string orchestrationInstanceId,
-        RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedData)
+        RequestCalculatedEnergyTimeSeriesRejectedV1 rejectedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 026. Data: {0}",

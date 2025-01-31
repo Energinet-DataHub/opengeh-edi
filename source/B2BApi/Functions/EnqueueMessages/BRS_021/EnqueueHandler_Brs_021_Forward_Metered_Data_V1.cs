@@ -36,7 +36,10 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueAcceptedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointAcceptedV1 acceptedData)
+    protected override async Task EnqueueAcceptedMessagesAsync(
+        string orchestrationInstanceId,
+        MeteredDataForMeteringPointAcceptedV1 acceptedData,
+        CancellationToken cancellationToken)
     {
         var series = acceptedData.AcceptedEnergyObservations.Select(x =>
             new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality?.Name))
@@ -78,7 +81,10 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
                 CancellationToken.None)).ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointRejectedV1 rejectedData)
+    protected override async Task EnqueueRejectedMessagesAsync(
+        string orchestrationInstanceId,
+        MeteredDataForMeteringPointRejectedV1 rejectedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",

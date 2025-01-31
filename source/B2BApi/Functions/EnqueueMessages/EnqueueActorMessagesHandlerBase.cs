@@ -34,8 +34,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
     /// <summary>
     /// Enqueue the received service bus message sent from the Process Manager subsystem.
     /// </summary>
-    /// <param name="message"></param>
-    public async Task EnqueueAsync(ServiceBusReceivedMessage message)
+    public async Task EnqueueAsync(ServiceBusReceivedMessage message, CancellationToken cancellationToken)
     {
         using var serviceBusMessageLoggerScope = _logger.BeginScope(new
         {
@@ -53,7 +52,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
         var majorVersion = message.GetMajorVersion();
         if (majorVersion == EnqueueActorMessagesV1.MajorVersion)
         {
-            await HandleV1Async(message).ConfigureAwait(false);
+            await HandleV1Async(message, cancellationToken).ConfigureAwait(false);
         }
         else
         {
@@ -64,9 +63,9 @@ public abstract class EnqueueActorMessagesHandlerBase(
         }
     }
 
-    protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages);
+    protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, CancellationToken cancellationToken);
 
-    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage)
+    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage, CancellationToken cancellationToken)
     {
         var enqueueActorMessages = serviceBusMessage.ParseBody<EnqueueActorMessagesV1>();
 
@@ -89,7 +88,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
             },
         });
 
-        await EnqueueActorMessagesV1Async(enqueueActorMessages)
+        await EnqueueActorMessagesV1Async(enqueueActorMessages, cancellationToken)
             .ConfigureAwait(false);
     }
 }

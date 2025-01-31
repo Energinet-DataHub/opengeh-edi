@@ -33,7 +33,8 @@ public class EnqueueHandler_Brs_028_V1(
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         string orchestrationInstanceId,
-        RequestCalculatedWholesaleServicesAcceptedV1 acceptedData)
+        RequestCalculatedWholesaleServicesAcceptedV1 acceptedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 028. Data: {0}",
@@ -51,7 +52,8 @@ public class EnqueueHandler_Brs_028_V1(
 
     protected override async Task EnqueueRejectedMessagesAsync(
         string orchestrationInstanceId,
-        RequestCalculatedWholesaleServicesRejectedV1 rejectedData)
+        RequestCalculatedWholesaleServicesRejectedV1 rejectedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 028. Data: {0}",
