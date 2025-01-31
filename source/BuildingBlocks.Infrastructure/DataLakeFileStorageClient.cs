@@ -89,7 +89,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
         if (blobExists == null || blobExists is { Value: false })
         {
             // This logging is only temporary while we verify data migration is successful.
-            _logger.LogInformation($"Blob does not exist in the new storage account, trying the obsoleted storage account. Category {reference.Category.Value}, Path {reference.Path}");
+            _logger.LogInformation("Blob does not exist in the new storage account, trying the obsoleted storage account. Category {Category}, Path {Path}", reference.Category.Value, reference.Path);
             var containerObsoleted = _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value);
             blob = containerObsoleted.GetBlobClient(reference.Path);
         }
