@@ -173,7 +173,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var actualOutgoingMessage = await dbContext.OutgoingMessages
-            .SingleOrDefaultAsync(om => om.EventId.Value == eventId.Value);
+            .SingleOrDefaultAsync(om => om.EventId == eventId);
 
         actualOutgoingMessage.Should().NotBeNull();
 
