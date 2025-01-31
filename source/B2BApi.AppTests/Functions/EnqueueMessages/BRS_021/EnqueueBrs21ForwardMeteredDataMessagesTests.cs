@@ -102,7 +102,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // Act
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
-            idempotencyKey: "a-message-id");
+            idempotencyKey: Guid.NewGuid().ToString());
 
         // => When message is received
         var beforeOrchestrationCreated = DateTime.UtcNow;
