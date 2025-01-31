@@ -25,9 +25,9 @@ limitations under the License.
     <ItemGroup>
         <PackageReference Include="Energinet.DataHub.Core.Databricks.SqlStatementExecution" Version="12.0.0" />
         <PackageReference Include="Energinet.DataHub.Core.Outbox" Version="1.0.1" />
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Abstractions" Version="0.25.1" />
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.25.1" />
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="0.18.0"/>
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Abstractions" Version="0.26.0" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="0.26.0" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="0.18.1" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.2.1" />
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
@@ -56,7 +56,6 @@ limitations under the License.
       <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-      <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
