@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Azure.Messaging.ServiceBus;
-using DurableTask.Core.Common;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using Microsoft.Extensions.Logging;

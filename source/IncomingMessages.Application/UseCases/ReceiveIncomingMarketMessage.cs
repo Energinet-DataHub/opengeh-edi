@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
@@ -33,11 +32,10 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 public class ReceiveIncomingMarketMessage
 {
     private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
-    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly ILogger<IncomingMessageClient> _logger;
+    private readonly ILogger<ReceiveIncomingMarketMessage> _logger;
     private readonly IIncomingMessageReceiver _incomingMessageReceiver;
     private readonly DelegateIncomingMessage _delegateIncomingMessage;
     private readonly IClock _clock;
@@ -45,11 +43,10 @@ public class ReceiveIncomingMarketMessage
 
     public ReceiveIncomingMarketMessage(
         IEnumerable<IMessageParser> messageParsers,
-        IFeatureFlagManager featureFlagManager,
         ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
-        ILogger<IncomingMessageClient> logger,
+        ILogger<ReceiveIncomingMarketMessage> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
         DelegateIncomingMessage delegateIncomingMessage,
         IClock clock,
@@ -59,7 +56,6 @@ public class ReceiveIncomingMarketMessage
             .ToDictionary(
                 parser => (parser.DocumentType, parser.DocumentFormat),
                 parser => parser);
-        _featureFlagManager = featureFlagManager;
         _validateIncomingMessage = validateIncomingMessage;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;

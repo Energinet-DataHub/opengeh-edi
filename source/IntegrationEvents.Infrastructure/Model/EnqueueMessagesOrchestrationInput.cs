@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 
 /// <summary>
-/// An immutable input to start the equeue messages orchestration.
+/// An immutable input to start the enqueue messages orchestration.
 /// </summary>
 public sealed record EnqueueMessagesOrchestrationInput(
     string CalculationOrchestrationId,
