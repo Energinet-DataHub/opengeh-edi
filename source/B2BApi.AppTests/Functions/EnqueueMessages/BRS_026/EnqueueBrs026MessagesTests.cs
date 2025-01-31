@@ -16,11 +16,11 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Components.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
@@ -86,7 +86,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_026",
+            OrchestrationName = Brs_026.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
@@ -94,7 +94,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         enqueueActorMessages.SetData(enqueueMessagesData);
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
             idempotencyKey: Guid.NewGuid().ToString());
 
         // => When message is received
@@ -142,7 +142,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_026",
+            OrchestrationName = Brs_026.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
@@ -150,7 +150,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         enqueueActorMessages.SetData(enqueueMessagesData);
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
             idempotencyKey: eventId.Value);
 
         // => When message is received
@@ -179,7 +179,9 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         using var assertionScope = new AssertionScope();
         actualOutgoingMessage!.BusinessReason.Should().Be(businessReason.Name);
-        actualOutgoingMessage.RelatedToMessageId.Should().Be(enqueueMessagesData.OriginalMessageId);
+        actualOutgoingMessage.RelatedToMessageId.Should()
+            .NotBeNull()
+            .And.Be(enqueueMessagesData.OriginalMessageId);
         actualOutgoingMessage.Receiver.Number.Should().Be(requestedForActorNumber);
         actualOutgoingMessage.Receiver.ActorRole.Should().Be(requestedForActorRole);
     }
