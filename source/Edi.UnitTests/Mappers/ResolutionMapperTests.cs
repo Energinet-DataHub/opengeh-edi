@@ -22,10 +22,10 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Mappers;
 public class ResolutionMapperTests
 {
     [Theory]
-    [InlineData(DataHubNames.Resolution.Monthly, CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution.Month)]
-    [InlineData(DataHubNames.Resolution.Hourly, CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution.Hour)]
-    [InlineData(DataHubNames.Resolution.Daily, CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution.Day)]
-    public void Map_WhenValid_ReturnsExpectedChargeType(string resolution, Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution expectedResult)
+    [InlineData(DataHubNames.Resolution.Monthly, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month)]
+    [InlineData(DataHubNames.Resolution.Hourly, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Hour)]
+    [InlineData(DataHubNames.Resolution.Daily, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Day)]
+    public void Map_WhenValid_ReturnsExpectedChargeType(string resolution, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution expectedResult)
     {
         // Act
         var actual = ResolutionMapper.Map(resolution);

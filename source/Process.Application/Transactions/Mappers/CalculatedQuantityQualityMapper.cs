@@ -15,8 +15,8 @@
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Responses;
-using ChargeType = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType;
-using Resolution = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution;
+using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
+using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
@@ -185,7 +185,7 @@ public static class CalculatedQuantityQualityMapper
             };
     }
 
-    public static CalculatedQuantityQuality? MapForWholesaleServices(ReadOnlyCollection<Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality>? quantityQualities, Resolution resolution, bool hasPrice, ChargeType? chargeType)
+    public static CalculatedQuantityQuality? MapForWholesaleServices(ReadOnlyCollection<Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality>? quantityQualities, Resolution resolution, bool hasPrice, ChargeType? chargeType)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);
 
@@ -204,10 +204,10 @@ public static class CalculatedQuantityQualityMapper
             return CalculatedQuantityQuality.Calculated;
         }
 
-        return (missing: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Missing),
-                estimated: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Estimated),
-                measured: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Measured),
-                calculated: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Calculated)) switch
+        return (missing: quantityQualities.Contains(OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality.Missing),
+                estimated: quantityQualities.Contains(OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality.Estimated),
+                measured: quantityQualities.Contains(OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality.Measured),
+                calculated: quantityQualities.Contains(OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality.Calculated)) switch
             {
                 (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality
                     .Missing,

@@ -16,10 +16,10 @@ using AutoFixture.Xunit2;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults;
-using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Edi.Client;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Extensions;
@@ -31,9 +31,9 @@ using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using AggregatedTimeSeriesRequest = Energinet.DataHub.Edi.Requests.AggregatedTimeSeriesRequest;
-using QuantityQuality = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality;
-using Resolution = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.Resolution;
-using TimeSeriesType = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.TimeSeriesType;
+using QuantityQuality = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality;
+using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
+using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests;
 

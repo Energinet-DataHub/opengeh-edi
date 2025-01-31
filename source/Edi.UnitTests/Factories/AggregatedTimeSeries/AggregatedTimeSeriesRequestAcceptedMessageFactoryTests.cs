@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults;
-using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -22,9 +22,9 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
-using QuantityQuality = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality;
-using Resolution = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.Resolution;
-using TimeSeriesType = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.TimeSeriesType;
+using QuantityQuality = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality;
+using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
+using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Factories.AggregatedTimeSeries;
 
@@ -136,13 +136,13 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
             });
     }
 
-    private IReadOnlyCollection<CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.AggregatedTimeSeries> CreateAggregatedTimeSeries(
+    private IReadOnlyCollection<Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.AggregatedTimeSeries> CreateAggregatedTimeSeries(
         IReadOnlyCollection<QuantityQuality>? quantityQualities = null,
         CalculationType calculationType = CalculationType.Aggregation)
     {
         quantityQualities ??= new List<QuantityQuality> { QuantityQuality.Estimated };
 
-        var aggregatedTimeSeries = new CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.AggregatedTimeSeries(
+        var aggregatedTimeSeries = new DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.AggregatedTimeSeries(
             _gridArea,
             new EnergyTimeSeriesPoint[]
             {
@@ -157,7 +157,7 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
             Resolution.Quarter,
             1);
 
-        return new List<CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.AggregatedTimeSeries>()
+        return new List<DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.AggregatedTimeSeries>()
         {
             aggregatedTimeSeries,
         };

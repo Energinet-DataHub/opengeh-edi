@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;

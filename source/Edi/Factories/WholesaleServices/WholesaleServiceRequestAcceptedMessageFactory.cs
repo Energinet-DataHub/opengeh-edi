@@ -13,24 +13,23 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults;
-using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.Edi.Responses.Period;
-using QuantityUnit = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.QuantityUnit;
-using Resolution = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution;
+using QuantityUnit = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityUnit;
+using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
 
 namespace Energinet.DataHub.Wholesale.Edi.Factories.WholesaleServices;
 
 public static class WholesaleServiceRequestAcceptedMessageFactory
 {
-    public static ServiceBusMessage Create(IReadOnlyCollection<CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices> wholesaleServices, string referenceId)
+    public static ServiceBusMessage Create(IReadOnlyCollection<EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices> wholesaleServices, string referenceId)
     {
         var body = CreateAcceptedResponse(wholesaleServices);
 
@@ -44,7 +43,7 @@ public static class WholesaleServiceRequestAcceptedMessageFactory
         return message;
     }
 
-    private static WholesaleServicesRequestAccepted CreateAcceptedResponse(IReadOnlyCollection<CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices> wholesaleServices)
+    private static WholesaleServicesRequestAccepted CreateAcceptedResponse(IReadOnlyCollection<EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices> wholesaleServices)
     {
         var response = new WholesaleServicesRequestAccepted();
         foreach (var series in wholesaleServices)
@@ -196,7 +195,7 @@ public static class WholesaleServiceRequestAcceptedMessageFactory
         return timeSeriesPoint;
     }
 
-    private static RepeatedField<Energinet.DataHub.Edi.Responses.QuantityQuality> MapQuantityQualities(IReadOnlyCollection<CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality> pointQualities)
+    private static RepeatedField<Energinet.DataHub.Edi.Responses.QuantityQuality> MapQuantityQualities(IReadOnlyCollection<EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality> pointQualities)
     {
         return new RepeatedField<Energinet.DataHub.Edi.Responses.QuantityQuality>()
         {

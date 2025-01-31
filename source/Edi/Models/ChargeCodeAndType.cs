@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.Wholesale.Edi.Models;
 
-public record ChargeCodeAndType(string? ChargeCode, CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType? ChargeType);
+public record ChargeCodeAndType(string? ChargeCode, EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? ChargeType);

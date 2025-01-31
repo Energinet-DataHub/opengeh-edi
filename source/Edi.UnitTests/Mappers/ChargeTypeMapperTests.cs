@@ -22,10 +22,10 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Mappers;
 public class ChargeTypeMapperTests
 {
     [Theory]
-    [InlineData(DataHubNames.ChargeType.Tariff, CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType.Tariff)]
-    [InlineData(DataHubNames.ChargeType.Fee, CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType.Fee)]
-    [InlineData(DataHubNames.ChargeType.Subscription, CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType.Subscription)]
-    public void Map_WhenValid_ReturnsExpectedChargeType(string chargeType, Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType expectedResult)
+    [InlineData(DataHubNames.ChargeType.Tariff, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff)]
+    [InlineData(DataHubNames.ChargeType.Fee, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Fee)]
+    [InlineData(DataHubNames.ChargeType.Subscription, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription)]
+    public void Map_WhenValid_ReturnsExpectedChargeType(string chargeType, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType expectedResult)
     {
         // Act
         var actual = ChargeTypeMapper.Map(chargeType);

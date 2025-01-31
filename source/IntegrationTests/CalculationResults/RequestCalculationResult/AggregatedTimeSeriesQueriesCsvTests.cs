@@ -17,19 +17,18 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.CalculationResults;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.CalculationResults.Statements;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.DeltaTableConstants;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults;
-using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
-using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
-using Period = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.CalculationResults.RequestCalculationResult;
 
@@ -85,7 +84,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAcrossGridAreas_When_Queried_Then_RelevantDataFromRelevantGridAreasReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -143,7 +142,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAndGridArea_When_Queried_Then_RelevantDataFromSpecifiedGridAreaReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -194,7 +193,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAndBalanceResponsibleAndGridArea_When_Queried_Then_DataFilteredCorrectlyReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -239,7 +238,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_BalanceResponsibleAndGridArea_When_Queried_Then_RelevantDataFromGridAreaReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -286,7 +285,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_GridArea_When_Queried_Then_GridOperatorDataForGridAreaReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -332,7 +331,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_FullQueryParametersForAggregation_When_Queried_Then_DataFromNewestVersionsReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -375,7 +374,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAndBalanceResponsibleWithLatestCorrection_When_Queried_Then_DataFromNewestCorrectionsReturned()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -416,7 +415,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_NoEnergySupplierAndBalanceResponsibleAndGridArea_When_Queried_Then_IdenticalToRequestsForEachGridAreaIndividually()
         {
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -482,7 +481,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 4, 0, 0),
                 null);
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -530,7 +529,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 5, 0, 0),
                 Instant.FromUtc(2022, 1, 3, 0, 0));
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -571,7 +570,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
             await ClearAndAddDatabricksDataAsync(_fixture.DatabricksSchemaManager, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, []);
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -596,7 +595,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
             await ClearAndAddDatabricksDataAsync(_fixture.DatabricksSchemaManager, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, ["804", "543"]);
 
-            var totalPeriod = new Period(
+            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 

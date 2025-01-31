@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Reflection;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using FluentAssertions;
 using FluentAssertions.Execution;

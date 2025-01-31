@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.DeltaTableConstants;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.Mappers;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using FluentAssertions;
 using Xunit;
 

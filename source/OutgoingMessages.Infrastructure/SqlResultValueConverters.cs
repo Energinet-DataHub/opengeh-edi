@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements.Mappers.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using NodaTime;

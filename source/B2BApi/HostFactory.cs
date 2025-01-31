@@ -30,7 +30,6 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjec
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -95,7 +94,6 @@ public static class HostFactory
                         .AddDataAccessUnitOfWorkModule()
                         .AddAuditLog()
                         .AddEdiModule(context.Configuration)
-                        .AddCalculationResultsModule(context.Configuration)
 
                         // Audit log (outbox publisher)
                         .AddAuditLogOutboxPublisher(context.Configuration)
