@@ -61,7 +61,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
-            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: BusinessReason.BalanceFixing,
             RequestedForActorNumber: requestedForActorNumber,
@@ -87,7 +87,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: "a-message-id");
+            idempotencyKey: Guid.NewGuid().ToString());
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
