@@ -111,7 +111,7 @@ public class EnqueueHandler_Brs_026_V1(
             receiverRole: ActorRole.FromName(rejectedData.RequestedByActorRole.Name),
             documentReceiverNumber: ActorNumber.Create(rejectedData.RequestedForActorNumber.Value),
             documentReceiverRole: ActorRole.FromName(rejectedData.RequestedForActorRole.Name),
-            processId: Guid.Parse(orchestrationInstanceId), // TODO: Is this viable? Is the orchestration instance id always a guid?
+            processId: Guid.Parse(orchestrationInstanceId),
             eventId: EventId.From(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,
             series: rejectedTimeSeries);
