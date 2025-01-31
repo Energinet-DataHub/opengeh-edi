@@ -32,6 +32,7 @@ public class EnqueueHandler_Brs_028_V1(
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
+        Guid serviceBusMessageId,
         string orchestrationInstanceId,
         RequestCalculatedWholesaleServicesAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
@@ -51,6 +52,7 @@ public class EnqueueHandler_Brs_028_V1(
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(
+        Guid serviceBusMessageId,
         string orchestrationInstanceId,
         RequestCalculatedWholesaleServicesRejectedV1 rejectedData,
         CancellationToken cancellationToken)

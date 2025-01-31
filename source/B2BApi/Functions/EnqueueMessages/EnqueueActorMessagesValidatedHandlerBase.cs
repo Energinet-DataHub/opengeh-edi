@@ -22,17 +22,28 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
         where TAcceptedData : class
         where TRejectedData : class
 {
-    protected override Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, CancellationToken cancellationToken)
+    protected override Task EnqueueActorMessagesV1Async(
+        Guid serviceBusMessageId,
+        EnqueueActorMessagesV1 enqueueActorMessages,
+        CancellationToken cancellationToken)
     {
         if (enqueueActorMessages.DataType == typeof(TAcceptedData).Name)
         {
             var acceptedData = enqueueActorMessages.ParseData<TAcceptedData>();
-            return EnqueueAcceptedMessagesAsync(enqueueActorMessages.OrchestrationInstanceId, acceptedData, cancellationToken);
+            return EnqueueAcceptedMessagesAsync(
+                serviceBusMessageId,
+                enqueueActorMessages.OrchestrationInstanceId,
+                acceptedData,
+                cancellationToken);
         }
         else if (enqueueActorMessages.DataType == typeof(TRejectedData).Name)
         {
             var rejectedData = enqueueActorMessages.ParseData<TRejectedData>();
-            return EnqueueRejectedMessagesAsync(enqueueActorMessages.OrchestrationInstanceId, rejectedData, cancellationToken);
+            return EnqueueRejectedMessagesAsync(
+                serviceBusMessageId,
+                enqueueActorMessages.OrchestrationInstanceId,
+                rejectedData,
+                cancellationToken);
         }
 
         throw new ArgumentOutOfRangeException(
@@ -41,7 +52,15 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
             $"{nameof(EnqueueActorMessagesV1)} contains an invalid data type (expected {typeof(TAcceptedData).Name} or {typeof(TRejectedData).Name}).");
     }
 
-    protected abstract Task EnqueueAcceptedMessagesAsync(string orchestrationInstanceId, TAcceptedData acceptedData, CancellationToken cancellationToken);
+    protected abstract Task EnqueueAcceptedMessagesAsync(
+        Guid serviceBusMessageId,
+        string orchestrationInstanceId,
+        TAcceptedData acceptedData,
+        CancellationToken cancellationToken);
 
-    protected abstract Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, TRejectedData rejectedData, CancellationToken cancellationToken);
+    protected abstract Task EnqueueRejectedMessagesAsync(
+        Guid serviceBusMessageId,
+        string orchestrationInstanceId,
+        TRejectedData rejectedData,
+        CancellationToken cancellationToken);
 }

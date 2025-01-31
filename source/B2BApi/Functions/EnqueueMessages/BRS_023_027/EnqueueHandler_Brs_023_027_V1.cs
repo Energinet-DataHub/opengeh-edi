@@ -28,7 +28,10 @@ public class EnqueueHandler_Brs_023_027_V1(
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, CancellationToken cancellationToken)
+    protected override async Task EnqueueActorMessagesV1Async(
+        Guid serviceBusMessageId,
+        EnqueueActorMessagesV1 enqueueActorMessages,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue actor messages for BRS 023/027. Data: {Data}",

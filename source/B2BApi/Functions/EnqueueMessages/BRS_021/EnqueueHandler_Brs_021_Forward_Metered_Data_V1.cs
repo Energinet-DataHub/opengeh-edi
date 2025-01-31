@@ -37,6 +37,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     private readonly ILogger _logger = logger;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
+        Guid serviceBusMessageId,
         string orchestrationInstanceId,
         MeteredDataForMeteringPointAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
@@ -82,6 +83,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(
+        Guid serviceBusMessageId,
         string orchestrationInstanceId,
         MeteredDataForMeteringPointRejectedV1 rejectedData,
         CancellationToken cancellationToken)

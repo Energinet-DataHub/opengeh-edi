@@ -63,9 +63,14 @@ public abstract class EnqueueActorMessagesHandlerBase(
         }
     }
 
-    protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, CancellationToken cancellationToken);
+    protected abstract Task EnqueueActorMessagesV1Async(
+        Guid serviceBusMessageId,
+        EnqueueActorMessagesV1 enqueueActorMessages,
+        CancellationToken cancellationToken);
 
-    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage, CancellationToken cancellationToken)
+    private async Task HandleV1Async(
+        ServiceBusReceivedMessage serviceBusMessage,
+        CancellationToken cancellationToken)
     {
         var enqueueActorMessages = serviceBusMessage.ParseBody<EnqueueActorMessagesV1>();
 
@@ -88,7 +93,15 @@ public abstract class EnqueueActorMessagesHandlerBase(
             },
         });
 
-        await EnqueueActorMessagesV1Async(enqueueActorMessages, cancellationToken)
+        var serviceBusMessageId = Guid.Parse(serviceBusMessage.MessageId);
+
+        _logger.LogInformation(
+            "Enqueue actor messages (v1) triggered for {OrchestrationName} (Version={OrchestrationVersion}, OrchestrationInstanceId={OrchestrationInstanceId}).",
+            enqueueActorMessages.OrchestrationName,
+            enqueueActorMessages.OrchestrationVersion,
+            enqueueActorMessages.OrchestrationInstanceId);
+
+        await EnqueueActorMessagesV1Async(serviceBusMessageId, enqueueActorMessages, cancellationToken)
             .ConfigureAwait(false);
     }
 }
