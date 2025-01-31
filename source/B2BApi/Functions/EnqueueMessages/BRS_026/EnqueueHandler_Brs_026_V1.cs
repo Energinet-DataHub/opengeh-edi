@@ -103,17 +103,17 @@ public class EnqueueHandler_Brs_026_V1(
         var rejectedTimeSeries = new RejectedEnergyResultMessageSerie(
             TransactionId: TransactionId.New(),
             RejectReasons: rejectReasons,
-            OriginalTransactionIdReference: rejectedData.TransactionId);
+            OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId));
 
         var enqueueRejectedMessageDto = new RejectedEnergyResultMessageDto(
-            relatedToMessageId: rejectedData.OriginalMessageId,
-            receiverNumber: rejectedData.RequestedByActorNumber,
-            receiverRole: rejectedData.RequestedByActorRole,
-            documentReceiverNumber: rejectedData.RequestedForActorNumber,
-            documentReceiverRole: rejectedData.RequestedForActorRole,
+            relatedToMessageId: MessageId.Create(rejectedData.OriginalMessageId),
+            receiverNumber: ActorNumber.Create(rejectedData.RequestedByActorNumber.Value),
+            receiverRole: ActorRole.FromName(rejectedData.RequestedByActorRole.Name),
+            documentReceiverNumber: ActorNumber.Create(rejectedData.RequestedForActorNumber.Value),
+            documentReceiverRole: ActorRole.FromName(rejectedData.RequestedForActorRole.Name),
             processId: Guid.Parse(orchestrationInstanceId), // TODO: Is this viable? Is the orchestration instance id always a guid?
             eventId: EventId.From(serviceBusMessageId),
-            businessReason: rejectedData.BusinessReason,
+            businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,
             series: rejectedTimeSeries);
 
         await _actorRequestsClient.EnqueueRejectAggregatedMeasureDataRequestAsync(enqueueRejectedMessageDto, cancellationToken)
