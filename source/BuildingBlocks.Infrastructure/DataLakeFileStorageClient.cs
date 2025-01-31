@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Text;
@@ -30,15 +31,18 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 public class DataLakeFileStorageClient : IFileStorageClient
 {
     private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly ILogger<DataLakeFileStorageClient> _logger;
     private readonly BlobServiceClient _blobServiceClientObsoleted;
     private readonly BlobServiceClient _blobServiceClient;
 
     public DataLakeFileStorageClient(
         IAzureClientFactory<BlobServiceClient> clientFactory,
         IOptions<BlobServiceClientConnectionOptions> options,
-        IFeatureFlagManager featureFlagManager)
+        IFeatureFlagManager featureFlagManager,
+        ILogger<DataLakeFileStorageClient> logger)
     {
         _featureFlagManager = featureFlagManager;
+        _logger = logger;
         _blobServiceClientObsoleted = clientFactory.CreateClient(options.Value.ClientNameObsoleted);
         _blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
     }
@@ -84,6 +88,8 @@ public class DataLakeFileStorageClient : IFileStorageClient
         var blobExists = await blob.ExistsAsync(cancellationToken).ConfigureAwait(false);
         if (blobExists == null || blobExists is { Value: false })
         {
+            // This logging is only temporary while we verify data migration is successful.
+            _logger.LogInformation("Blob does not exist in the new storage account, trying the obsoleted storage account. Category {Category}, Path {Path}", reference.Category.Value, reference.Path);
             var containerObsoleted = _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value);
             blob = containerObsoleted.GetBlobClient(reference.Path);
         }
