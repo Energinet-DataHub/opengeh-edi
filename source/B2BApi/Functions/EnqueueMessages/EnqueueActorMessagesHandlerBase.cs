@@ -93,7 +93,11 @@ public abstract class EnqueueActorMessagesHandlerBase(
             },
         });
 
-        var serviceBusMessageId = Guid.Parse(serviceBusMessage.MessageId);
+        if (!Guid.TryParse(serviceBusMessage.MessageId, out var serviceBusMessageId))
+        {
+            throw new InvalidOperationException(
+                $"Unable to parse service bus message id to guid (MessageId={serviceBusMessage.MessageId}, Subject={serviceBusMessage.Subject})");
+        }
 
         _logger.LogInformation(
             "Enqueue actor messages (v1) triggered for {OrchestrationName} (Version={OrchestrationVersion}, OrchestrationInstanceId={OrchestrationInstanceId}).",
