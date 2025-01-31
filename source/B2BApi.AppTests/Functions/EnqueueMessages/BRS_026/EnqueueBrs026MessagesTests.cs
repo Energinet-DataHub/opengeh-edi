@@ -178,7 +178,8 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         actualOutgoingMessage.Should().NotBeNull();
 
         using var assertionScope = new AssertionScope();
-        actualOutgoingMessage!.BusinessReason.Should().Be(businessReason.Name);
+        actualOutgoingMessage!.DocumentType.Should().Be(DocumentType.RejectRequestAggregatedMeasureData);
+        actualOutgoingMessage.BusinessReason.Should().Be(businessReason.Name);
         actualOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
         actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalMessageId);
         actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
