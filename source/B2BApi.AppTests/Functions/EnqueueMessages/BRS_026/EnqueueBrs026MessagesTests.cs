@@ -58,16 +58,20 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
     {
         // => Given enqueue BRS-026 service bus message
         var actorId = Guid.NewGuid().ToString();
+        var requestedForActorNumber = ActorNumber.Create("1111111111111");
+        var requestedForActorRole = ActorRole.EnergySupplier;
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
             OriginalMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: BusinessReason.BalanceFixing,
-            RequestedForActorNumber: ActorNumber.Create("1111111111111"),
-            RequestedForActorRole: ActorRole.EnergySupplier,
+            RequestedForActorNumber: requestedForActorNumber,
+            RequestedForActorRole: requestedForActorRole,
+            RequestedByActorNumber: requestedForActorNumber,
+            RequestedByActorRole: requestedForActorRole,
             PeriodStart: Instant.FromUtc(2024, 01, 03, 23, 00).ToDateTimeOffset(),
             PeriodEnd: Instant.FromUtc(2024, 01, 04, 23, 00).ToDateTimeOffset(),
             GridAreas: ["804"],
-            EnergySupplierNumber: ActorNumber.Create("1111111111111"),
+            EnergySupplierNumber: requestedForActorNumber,
             BalanceResponsibleNumber: null,
             MeteringPointType: null,
             SettlementMethod: null,

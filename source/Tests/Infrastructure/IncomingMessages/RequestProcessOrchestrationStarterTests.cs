@@ -49,8 +49,8 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
 
         var expectedBusinessReason = BusinessReason.WholesaleFixing;
-        var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
-        var expectedStart = "2023-04-30T22:00:00Z";
+        const string transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
+        const string expectedStart = "2023-04-30T22:00:00Z";
         var expectedResolution = resolutionCode is not null
             ? Resolution.FromCode(resolutionCode)
             : null;
@@ -63,9 +63,10 @@ public class RequestProcessOrchestrationStarterTests
 
         var expectedIdempotencyKey = $"{transactionId}_{requestedByActor.ActorNumber.Value}_{requestedByActor.ActorRole.Code}";
 
+        const string messageId = "9b6184af-2f05-40b9-d783-08dc814df95a";
         var initializeProcessDto = new InitializeWholesaleServicesProcessDto(
             BusinessReason: expectedBusinessReason.Code,
-            MessageId: MessageId.Create("9b6184af-2f05-40b9-d783-08dc814df95a").Value,
+            MessageId: MessageId.Create(messageId).Value,
             Series:
             [
                 new InitializeWholesaleServicesSeries(
@@ -92,7 +93,7 @@ public class RequestProcessOrchestrationStarterTests
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<RequestCalculatedWholesaleServicesCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken _) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -122,8 +123,12 @@ public class RequestProcessOrchestrationStarterTests
         var expectedCommand = new RequestCalculatedWholesaleServicesCommandV1(
             operatingIdentity: new ActorIdentityDto(expectedActorId),
             inputParameter: new RequestCalculatedWholesaleServicesInputV1(
+                ActorMessageId: messageId,
+                TransactionId: transactionId,
                 RequestedForActorNumber: requestedByActor.ActorNumber.Value,
                 RequestedForActorRole: requestedByActor.ActorRole.Name,
+                RequestedByActorNumber: requestedByActor.ActorNumber.Value,
+                RequestedByActorRole: requestedByActor.ActorRole.Name,
                 BusinessReason: expectedBusinessReason.Name,
                 Resolution: expectedResolution?.Name,
                 PeriodStart: expectedStart,
@@ -162,9 +167,9 @@ public class RequestProcessOrchestrationStarterTests
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
 
         var expectedBusinessReason = BusinessReason.BalanceFixing;
-        var messageId = "9b6184af-2f05-40b9-d783-08dc814df95a";
-        var transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
-        var expectedStart = "2023-04-30T22:00:00Z";
+        const string messageId = "9b6184af-2f05-40b9-d783-08dc814df95a";
+        const string transactionId = "85f00b2e-cbfa-4b17-86e0-b9004d683f9f";
+        const string expectedStart = "2023-04-30T22:00:00Z";
         var expectedSettlementVersion = settlementVersionCode is not null
             ? SettlementVersion.FromCode(settlementVersionCode)
             : null;
@@ -206,7 +211,7 @@ public class RequestProcessOrchestrationStarterTests
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<RequestCalculatedEnergyTimeSeriesCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken _) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
@@ -240,6 +245,8 @@ public class RequestProcessOrchestrationStarterTests
                 TransactionId: transactionId,
                 RequestedForActorNumber: requestedByActor.ActorNumber.Value,
                 RequestedForActorRole: requestedByActor.ActorRole.Name,
+                RequestedByActorNumber: requestedByActor.ActorNumber.Value,
+                RequestedByActorRole: requestedByActor.ActorRole.Name,
                 BusinessReason: expectedBusinessReason.Name,
                 PeriodStart: expectedStart,
                 PeriodEnd: expectedEnd,
@@ -271,15 +278,15 @@ public class RequestProcessOrchestrationStarterTests
         // => Setup input
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
         var transactionId = TransactionId.From("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
-        var messageId = "62EA5019-57FB-41B8-BD34-4F0885E77DAE";
+        const string messageId = "62EA5019-57FB-41B8-BD34-4F0885E77DAE";
 
         var expectedBusinessReason = BusinessReason.PeriodicMetering;
         var expectedIdempotencyKey = $"{requestedByActor.ActorNumber.Value}-{transactionId}";
-        var expectedStart = "2023-04-30T22:00:00Z";
-        var expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
-        var expectedPosition = "1";
-        var expectedEnergyQuantity = "1001";
-        var expectedQuantityQuality = "A03";
+        const string expectedStart = "2023-04-30T22:00:00Z";
+        const string expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
+        const string expectedPosition = "1";
+        const string expectedEnergyQuantity = "1001";
+        const string expectedQuantityQuality = "A03";
 
         var meteringPointType = expectedMeteringPointType is not null
             ? MeteringPointType.FromCode(expectedMeteringPointType)
@@ -327,7 +334,7 @@ public class RequestProcessOrchestrationStarterTests
                 client => client.StartNewOrchestrationInstanceAsync(
                     It.IsAny<StartForwardMeteredDataCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((StartOrchestrationInstanceMessageCommand<MeteredDataForMeteringPointMessageInputV1> command, CancellationToken token) => actualCommand = command);
+            .Callback((StartOrchestrationInstanceMessageCommand<MeteredDataForMeteringPointMessageInputV1> command, CancellationToken _) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActorId = Guid.NewGuid();
