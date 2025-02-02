@@ -32,8 +32,10 @@ public class EnqueueHandler_Brs_028_V1(
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
-        string orchestrationInstanceId,
-        RequestCalculatedWholesaleServicesAcceptedV1 acceptedData)
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        RequestCalculatedWholesaleServicesAcceptedV1 acceptedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 028. Data: {0}",
@@ -43,15 +45,17 @@ public class EnqueueHandler_Brs_028_V1(
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId,
+                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
                     RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(
-        string orchestrationInstanceId,
-        RequestCalculatedWholesaleServicesRejectedV1 rejectedData)
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        RequestCalculatedWholesaleServicesRejectedV1 rejectedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 028. Data: {0}",
@@ -61,7 +65,7 @@ public class EnqueueHandler_Brs_028_V1(
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId,
+                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
                     RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);

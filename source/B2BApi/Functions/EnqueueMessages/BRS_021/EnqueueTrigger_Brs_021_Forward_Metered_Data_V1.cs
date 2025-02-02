@@ -33,10 +33,11 @@ public sealed class EnqueueTrigger_Brs_021_Forward_Metered_Data_V1(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
-        ServiceBusReceivedMessage message)
+        ServiceBusReceivedMessage message,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation("Enqueue BRS-021 messages service bus message received");
 
-        await _enqueueHandler.EnqueueAsync(message).ConfigureAwait(false);
+        await _enqueueHandler.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
     }
 }

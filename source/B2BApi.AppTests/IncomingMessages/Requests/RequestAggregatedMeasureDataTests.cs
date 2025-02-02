@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -79,7 +80,7 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
                 msg =>
                 {
                     var messageIdMatch = msg.MessageId.Equals(idempotencyKey);
-                    var subjectMatch = msg.Subject.Equals("Brs_026");
+                    var subjectMatch = msg.Subject.Equals(Brs_026.Name);
 
                     return messageIdMatch && subjectMatch;
                 })

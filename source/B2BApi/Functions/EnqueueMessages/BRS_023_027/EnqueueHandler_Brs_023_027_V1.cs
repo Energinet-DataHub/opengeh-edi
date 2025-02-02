@@ -38,7 +38,11 @@ public class EnqueueHandler_Brs_023_027_V1(
 
     private readonly IDurableClientFactory _durableClientFactory = durableClientFactory;
 
-    protected override async Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages, string serviceBusMessageId)
+    protected override async Task EnqueueActorMessagesV1Async(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        EnqueueActorMessagesV1 enqueueActorMessages,
+        CancellationToken cancellationToken)
     {
         var featureIsDisabled =
             !await _featureFlagManager.UseProcessManagerToEnqueueBrs023027MessagesAsync().ConfigureAwait(false);
@@ -56,7 +60,10 @@ public class EnqueueHandler_Brs_023_027_V1(
         switch (enqueueActorMessages.DataType)
         {
             case nameof(CalculationEnqueueActorMessagesV1):
-                await HandleCalculationEnqueueActorMessagesV1Async(enqueueActorMessages, Guid.Parse(serviceBusMessageId)).ConfigureAwait(false);
+                await HandleCalculationEnqueueActorMessagesV1Async(
+                        enqueueActorMessages,
+                        serviceBusMessageId)
+                    .ConfigureAwait(false);
                 break;
             default:
                 throw new NotSupportedException($"Data type '{enqueueActorMessages.DataType}' is not supported.");

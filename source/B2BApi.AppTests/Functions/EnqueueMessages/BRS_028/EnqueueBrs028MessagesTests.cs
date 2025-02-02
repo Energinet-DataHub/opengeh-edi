@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
@@ -61,7 +62,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
-            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: BusinessReason.BalanceFixing,
             RequestedForActorNumber: requestedForActorNumber,
@@ -78,7 +79,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_028",
+            OrchestrationName = Brs_028.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
@@ -86,8 +87,8 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         enqueueActorMessages.SetData(enqueueMessagesData);
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: "a-message-id");
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
+            idempotencyKey: Guid.NewGuid().ToString());
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
