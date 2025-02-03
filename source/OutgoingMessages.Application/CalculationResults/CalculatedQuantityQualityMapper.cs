@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
-using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
-using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 
 /// <summary>
 ///     Provides mapping functionality for converting a collection of quantity qualities to EDI quality.
@@ -148,14 +145,14 @@ public static class CalculatedQuantityQualityMapper
     /// </summary>
     /// <returns>The calculated quantity quality based on the input collection.</returns>
     public static CalculatedQuantityQuality? MapForWholesaleServices(
-        ICollection<QuantityQuality> quantityQualities,
-        WholesaleServicesRequestSeries.Types.Resolution resolution,
-        bool hasPrice,
-        WholesaleServicesRequestSeries.Types.ChargeType? chargeType)
+        IReadOnlyCollection<QuantityQuality> quantityQualities,
+        Resolution resolution,
+        ChargeType? chargeType,
+        bool hasPrice)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);
 
-        if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
+        if (resolution == Resolution.Monthly)
         {
             return null;
         }
@@ -165,7 +162,8 @@ public static class CalculatedQuantityQualityMapper
             return CalculatedQuantityQuality.Missing;
         }
 
-        if (chargeType is WholesaleServicesRequestSeries.Types.ChargeType.Subscription or WholesaleServicesRequestSeries.Types.ChargeType.Fee)
+        if (chargeType == ChargeType.Subscription
+            || chargeType == ChargeType.Fee)
         {
             return CalculatedQuantityQuality.Calculated;
         }

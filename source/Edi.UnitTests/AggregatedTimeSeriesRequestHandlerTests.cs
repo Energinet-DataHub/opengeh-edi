@@ -17,6 +17,7 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.Edi.Responses;

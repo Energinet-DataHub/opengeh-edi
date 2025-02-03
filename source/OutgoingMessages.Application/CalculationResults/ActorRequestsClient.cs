@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
@@ -28,19 +27,17 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 
 public class ActorRequestsClient(
     IOutgoingMessagesClient outgoingMessagesClient,
     IAggregatedTimeSeriesQueries aggregatedTimeSeriesQueries,
-    IWholesaleServicesQueries wholeSaleServicesQueries,
-    IUnitOfWork unitOfWork)
+    IWholesaleServicesQueries wholeSaleServicesQueries)
         : IActorRequestsClient
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IAggregatedTimeSeriesQueries _aggregatedTimeSeriesQueries = aggregatedTimeSeriesQueries;
     private readonly IWholesaleServicesQueries _wholesaleServicesQueries = wholeSaleServicesQueries;
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters)
     {
@@ -109,30 +106,42 @@ public class ActorRequestsClient(
     {
         var wholesaleServicesQuery = _wholesaleServicesQueries.GetAsync(wholesaleServicesQueryParameters);
 
-        int enqueuedCount = 0;
+        var enqueuedCount = 0;
         await foreach (var data in wholesaleServicesQuery)
         {
+            var chargeType = GetChargeType(data.ChargeType);
+            var resolution = GetResolution(data.Resolution);
+
+            var points = data.TimeSeriesPoints.OrderBy(p => p.Time)
+                .Select(
+                    (p, index) => new WholesaleServicesPoint(
+                        Position: index, // Position starts at 1, so position = index + 1
+                        Quantity: p.Quantity,
+                        Price: p.Price,
+                        Amount: p.Amount,
+                        QuantityQuality: GetCalculatedQuantityQualityForWholesaleServices(
+                            quantityQualities: p.Qualities,
+                            resolution: resolution,
+                            chargeType: chargeType,
+                            hasPrice: p.Price != null)))
+                .ToList();
+
             var series = new AcceptedWholesaleServicesSeries(
                 TransactionId: TransactionId.New(),
                 CalculationVersion: data.Version,
                 GridAreaCode: data.GridArea,
                 ChargeCode: data.ChargeCode,
                 IsTax: false,
-                Points: data.TimeSeriesPoints.OrderBy(p => p.Time).Select((p, index) => new WholesaleServicesPoint(
-                    Position: index, // Position starts at 1, so position = index + 1
-                    Quantity: p.Quantity,
-                    Price: p.Price,
-                    Amount: p.Amount,
-                    QuantityQuality: GetCalculatedQuantityQuality(p.Qualities))).ToList(),
+                Points: points,
                 EnergySupplier: ActorNumber.Create(data.EnergySupplierId),
                 ChargeOwner: GetChargeOwner(data.ChargeOwnerId, data.QuantityUnit),
                 Period: new Period(data.Period.Start, data.Period.End),
                 SettlementVersion: GetSettlementVersion(data.CalculationType),
-                QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit)!, // TODO: FIX
-                PriceMeasureUnit: MeasurementUnit.Kwh, // TODO: Correct?
+                QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit, data.Resolution),
+                PriceMeasureUnit: GetPriceMeasureUnit(points, resolution, chargeType),
                 Currency: GetCurrency(data.Currency),
-                ChargeType: GetChargeType(data.ChargeType),
-                Resolution: GetResolution(data.Resolution),
+                ChargeType: chargeType,
+                Resolution: resolution,
                 MeteringPointType: GetMeteringPointType(data.MeteringPointType),
                 SettlementMethod: GetSettlementMethod(data.SettlementMethod),
                 OriginalTransactionIdReference: originalTransactionId);
@@ -257,9 +266,17 @@ public class ActorRequestsClient(
             : null;
     }
 
-    private CalculatedQuantityQuality? GetCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality>? quantityQualities)
+    private CalculatedQuantityQuality? GetCalculatedQuantityQualityForWholesaleServices(
+        IReadOnlyCollection<QuantityQuality>? quantityQualities,
+        Resolution resolution,
+        ChargeType? chargeType,
+        bool hasPrice)
     {
-        throw new NotImplementedException();
+        return CalculatedQuantityQualityMapper.MapForWholesaleServices(
+            quantityQualities ?? [],
+            resolution,
+            chargeType,
+            hasPrice);
     }
 
     private SettlementVersion? GetSettlementVersion(CalculationType calculationType)
@@ -296,14 +313,31 @@ public class ActorRequestsClient(
         };
     }
 
-    private MeasurementUnit? GetQuantityMeasureUnit(QuantityUnit? quantityUnit)
+    private MeasurementUnit GetQuantityMeasureUnit(QuantityUnit? quantityUnit, Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)
     {
+        if (quantityUnit is null && resolution == Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month)
+            return MeasurementUnit.Kwh;
+
         return quantityUnit switch
         {
-            null => null,
             QuantityUnit.Kwh => MeasurementUnit.Kwh,
             QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            _ => throw new ArgumentOutOfRangeException(nameof(quantityUnit), quantityUnit, null),
+            _ => throw new ArgumentException($"Invalid quantity unit {quantityUnit} and resolution {resolution} combination"),
         };
+    }
+
+    private MeasurementUnit? GetPriceMeasureUnit(
+        List<WholesaleServicesPoint> points,
+        Resolution resolution,
+        ChargeType? chargeType)
+    {
+        var isTotalSum = points.Count == 1
+                         && points.First().Price is null
+                         && resolution == Resolution.Monthly;
+
+        if (isTotalSum)
+            return null;
+
+        return MeasurementUnit.TryFromChargeType(chargeType);
     }
 }
