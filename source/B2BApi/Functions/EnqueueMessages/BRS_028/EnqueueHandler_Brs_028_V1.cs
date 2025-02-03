@@ -25,7 +25,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
 using ActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
 using BusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
-using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using ChargeType = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ChargeType;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using Resolution = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.Resolution;
 using SettlementVersion = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.SettlementVersion;
@@ -145,12 +145,11 @@ public class EnqueueHandler_Brs_028_V1(
         throw new InvalidOperationException($"Invalid business reason '{businessReason}' and settlement version '{settlementVersion}' combination.");
     }
 
-    private Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? GetChargeType(string? chargeTypeName)
+    private Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? GetChargeType(
+        ChargeType? chargeType)
     {
-        if (chargeTypeName is null)
+        if (chargeType is null)
             return null;
-
-        var chargeType = ChargeType.FromName(chargeTypeName);
 
         if (chargeType == ChargeType.Subscription)
             return EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription;
@@ -160,12 +159,14 @@ public class EnqueueHandler_Brs_028_V1(
             return EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff;
 
         throw new ArgumentOutOfRangeException(
-            nameof(chargeTypeName),
-            chargeTypeName,
+            nameof(chargeType),
+            chargeType,
             "Unknown charge type name");
     }
 
-    private IReadOnlyCollection<AmountType> GetAmountTypes(Resolution? resolution, IReadOnlyCollection<RequestCalculatedWholesaleServicesInputV1.ChargeTypeInput> chargeTypes)
+    private IReadOnlyCollection<AmountType> GetAmountTypes(
+        Resolution? resolution,
+        IReadOnlyCollection<RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType> chargeTypes)
     {
         if (resolution is null)
             return [AmountType.AmountPerCharge];
