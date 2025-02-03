@@ -23,7 +23,6 @@ using Energinet.DataHub.ProcessManager.Abstractions.Components.BusinessValidatio
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
