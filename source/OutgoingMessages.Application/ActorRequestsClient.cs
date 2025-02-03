@@ -128,7 +128,7 @@ public class ActorRequestsClient(
                 ChargeOwner: GetChargeOwner(data.ChargeOwnerId, data.QuantityUnit),
                 Period: new Period(data.Period.Start, data.Period.End),
                 SettlementVersion: GetSettlementVersion(data.CalculationType),
-                QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit),
+                QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit)!, // TODO: FIX
                 PriceMeasureUnit: MeasurementUnit.Kwh, // TODO: Correct?
                 Currency: GetCurrency(data.Currency),
                 ChargeType: GetChargeType(data.ChargeType),
