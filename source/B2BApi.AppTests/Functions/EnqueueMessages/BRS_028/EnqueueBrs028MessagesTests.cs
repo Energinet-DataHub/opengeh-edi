@@ -65,6 +65,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: BusinessReason.BalanceFixing,
+            Resolution: Resolution.Hourly,
             RequestedForActorNumber: requestedForActorNumber,
             RequestedForActorRole: requestedForActorRole,
             RequestedByActorNumber: requestedForActorNumber,

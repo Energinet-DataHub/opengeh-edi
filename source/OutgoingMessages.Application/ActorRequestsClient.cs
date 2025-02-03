@@ -95,7 +95,7 @@ public class ActorRequestsClient(
         }
     }
 
-    public async Task EnqueueWholesaleServicesAsync(
+    public async Task<int> EnqueueWholesaleServicesAsync(
         WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
         ActorNumber requestedByActorNumber,
         ActorRole requestedByActorRole,
@@ -109,6 +109,7 @@ public class ActorRequestsClient(
     {
         var wholesaleServicesQuery = _wholesaleServicesQueries.GetAsync(wholesaleServicesQueryParameters);
 
+        int enqueuedCount = 0;
         await foreach (var data in wholesaleServicesQuery)
         {
             var series = new AcceptedWholesaleServicesSeries(
@@ -127,7 +128,7 @@ public class ActorRequestsClient(
                 ChargeOwner: GetChargeOwner(data.ChargeOwnerId, data.QuantityUnit),
                 Period: new Period(data.Period.Start, data.Period.End),
                 SettlementVersion: GetSettlementVersion(data.CalculationType),
-                QuantityMeasureUnit: MeasurementUnit.Kwh, // TODO: Correct?
+                QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit),
                 PriceMeasureUnit: MeasurementUnit.Kwh, // TODO: Correct?
                 Currency: GetCurrency(data.Currency),
                 ChargeType: GetChargeType(data.ChargeType),
@@ -149,7 +150,10 @@ public class ActorRequestsClient(
                 wholesaleSeries: series);
 
             await _outgoingMessagesClient.EnqueueAsync(enqueueWholesaleServicesMessage, cancellationToken).ConfigureAwait(false);
+            enqueuedCount++;
         }
+
+        return enqueuedCount;
     }
 
     public async Task EnqueueRejectAggregatedMeasureDataRequestAsync(
@@ -157,8 +161,6 @@ public class ActorRequestsClient(
         CancellationToken cancellationToken)
     {
         await _outgoingMessagesClient.EnqueueAsync(rejectedEnergyResultMessageDto, cancellationToken).ConfigureAwait(false);
-
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private SettlementMethod? GetSettlementMethod(Interfaces.Models.CalculationResults.SettlementMethod? settlementMethod)
@@ -291,6 +293,17 @@ public class ActorRequestsClient(
                 nameof(calculationType),
                 calculationType,
                 "Unknown calculation type when mapping to business reason"),
+        };
+    }
+
+    private MeasurementUnit? GetQuantityMeasureUnit(QuantityUnit? quantityUnit)
+    {
+        return quantityUnit switch
+        {
+            null => null,
+            QuantityUnit.Kwh => MeasurementUnit.Kwh,
+            QuantityUnit.Pieces => MeasurementUnit.Pieces,
+            _ => throw new ArgumentOutOfRangeException(nameof(quantityUnit), quantityUnit, null),
         };
     }
 }

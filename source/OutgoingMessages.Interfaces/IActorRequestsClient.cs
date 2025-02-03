@@ -28,7 +28,7 @@ public interface IActorRequestsClient
     /// <param name="aggregatedTimeSeriesQueryParameters"></param>
     public Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters);
 
-    public Task EnqueueWholesaleServicesAsync(
+    public Task<int> EnqueueWholesaleServicesAsync(
         WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
         ActorNumber requestedByActorNumber,
         ActorRole requestedByActorRole,
