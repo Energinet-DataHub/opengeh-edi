@@ -15,8 +15,18 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using Currency = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Currency;
+using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
@@ -85,6 +95,63 @@ public class ActorRequestsClient(
         }
     }
 
+    public async Task EnqueueWholesaleServicesAsync(
+        WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        CancellationToken cancellationToken)
+    {
+        var wholesaleServicesQuery = _wholesaleServicesQueries.GetAsync(wholesaleServicesQueryParameters);
+
+        await foreach (var data in wholesaleServicesQuery)
+        {
+            var series = new AcceptedWholesaleServicesSeries(
+                TransactionId: TransactionId.New(),
+                CalculationVersion: data.Version,
+                GridAreaCode: data.GridArea,
+                ChargeCode: data.ChargeCode,
+                IsTax: false,
+                Points: data.TimeSeriesPoints.OrderBy(p => p.Time).Select((p, index) => new WholesaleServicesPoint(
+                    Position: index, // Position starts at 1, so position = index + 1
+                    Quantity: p.Quantity,
+                    Price: p.Price,
+                    Amount: p.Amount,
+                    QuantityQuality: GetCalculatedQuantityQuality(p.Qualities))).ToList(),
+                EnergySupplier: ActorNumber.Create(data.EnergySupplierId),
+                ChargeOwner: GetChargeOwner(data.ChargeOwnerId, data.QuantityUnit),
+                Period: new Period(data.Period.Start, data.Period.End),
+                SettlementVersion: GetSettlementVersion(data.CalculationType),
+                QuantityMeasureUnit: MeasurementUnit.Kwh, // TODO: Correct?
+                PriceMeasureUnit: MeasurementUnit.Kwh, // TODO: Correct?
+                Currency: GetCurrency(data.Currency),
+                ChargeType: GetChargeType(data.ChargeType),
+                Resolution: GetResolution(data.Resolution),
+                MeteringPointType: GetMeteringPointType(data.MeteringPointType),
+                SettlementMethod: GetSettlementMethod(data.SettlementMethod),
+                OriginalTransactionIdReference: originalTransactionId);
+
+            var enqueueWholesaleServicesMessage = AcceptedWholesaleServicesMessageDto.Create(
+                receiverNumber: requestedByActorNumber,
+                receiverRole: requestedByActorRole,
+                documentReceiverNumber: requestedForActorNumber,
+                documentReceiverRole: requestedForActorRole,
+                processId: orchestrationInstanceId,
+                eventId: eventId,
+                businessReason: GetBusinessReason(data.CalculationType).Name,
+                chargeOwnerId: ActorNumber.TryCreate(data.ChargeOwnerId),
+                relatedToMessageId: originalMessageId,
+                wholesaleSeries: series);
+
+            await _outgoingMessagesClient.EnqueueAsync(enqueueWholesaleServicesMessage, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
     public async Task EnqueueRejectAggregatedMeasureDataRequestAsync(
         RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
         CancellationToken cancellationToken)
@@ -92,5 +159,138 @@ public class ActorRequestsClient(
         await _outgoingMessagesClient.EnqueueAsync(rejectedEnergyResultMessageDto, cancellationToken).ConfigureAwait(false);
 
         await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private SettlementMethod? GetSettlementMethod(Interfaces.Models.CalculationResults.SettlementMethod? settlementMethod)
+    {
+        return settlementMethod switch
+        {
+            Interfaces.Models.CalculationResults.SettlementMethod.Flex => SettlementMethod.Flex,
+            Interfaces.Models.CalculationResults.SettlementMethod.NonProfiled => SettlementMethod.NonProfiled,
+            null => null,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(settlementMethod),
+                settlementMethod,
+                "Unknown settlement method"),
+        };
+    }
+
+    private MeteringPointType? GetMeteringPointType(Interfaces.Models.CalculationResults.MeteringPointType? meteringPointType)
+    {
+        return meteringPointType switch
+        {
+            Interfaces.Models.CalculationResults.MeteringPointType.Consumption => MeteringPointType.Consumption,
+            Interfaces.Models.CalculationResults.MeteringPointType.Production => MeteringPointType.Production,
+            Interfaces.Models.CalculationResults.MeteringPointType.Exchange => MeteringPointType.Exchange,
+            Interfaces.Models.CalculationResults.MeteringPointType.VeProduction => MeteringPointType.VeProduction,
+            Interfaces.Models.CalculationResults.MeteringPointType.NetProduction => MeteringPointType.NetProduction,
+            Interfaces.Models.CalculationResults.MeteringPointType.SupplyToGrid => MeteringPointType.SupplyToGrid,
+            Interfaces.Models.CalculationResults.MeteringPointType.ConsumptionFromGrid => MeteringPointType.ConsumptionFromGrid,
+            Interfaces.Models.CalculationResults.MeteringPointType.WholesaleServicesInformation => MeteringPointType.WholesaleServicesInformation,
+            Interfaces.Models.CalculationResults.MeteringPointType.OwnProduction => MeteringPointType.OwnProduction,
+            Interfaces.Models.CalculationResults.MeteringPointType.NetFromGrid => MeteringPointType.NetFromGrid,
+            Interfaces.Models.CalculationResults.MeteringPointType.NetToGrid => MeteringPointType.NetToGrid,
+            Interfaces.Models.CalculationResults.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
+            Interfaces.Models.CalculationResults.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
+            Interfaces.Models.CalculationResults.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
+            Interfaces.Models.CalculationResults.MeteringPointType.EffectSettlement => MeteringPointType.CapacitySettlement,
+            null => null,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(meteringPointType),
+                meteringPointType,
+                "Unknown metering point type"),
+        };
+    }
+
+    private Resolution GetResolution(Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)
+    {
+        return resolution switch {
+            Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month => Resolution.Monthly,
+            Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Hour => Resolution.Hourly,
+            Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Day => Resolution.Daily,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(resolution),
+                resolution,
+                "Unknown resolution"),
+        };
+    }
+
+    private ChargeType? GetChargeType(Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? chargeType)
+    {
+        return chargeType switch
+        {
+            Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff => ChargeType.Tariff,
+            Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Fee => ChargeType.Fee,
+            Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription => ChargeType.Subscription,
+            null => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(chargeType), chargeType, "Unknown charge type"),
+        };
+    }
+
+    private Currency GetCurrency(Interfaces.Models.CalculationResults.WholesaleResults.Currency currency)
+    {
+        return currency switch
+        {
+            Interfaces.Models.CalculationResults.WholesaleResults.Currency.DKK => Currency.DanishCrowns,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(currency),
+                currency,
+                "Unknown currency"),
+        };
+    }
+
+    private ActorNumber? GetChargeOwner(string? chargeOwnerId, QuantityUnit? quantityUnit)
+    {
+        /*
+         * The charge owner should be present on the outgoing message
+         * if there is a charge owner and the message is not a total sum.
+         * Note that some total sums do have a charge owner (the sums for a specific charge owner) while others do not
+         * (those for an energy supplier).
+         * However, no total sum has a quantity unit as this is absent from the underlying data source
+         * and can thus be used to determine if the message is a total sum.
+         * In other words: if the message has a quantity unit, it is not a total sum.
+         */
+        return chargeOwnerId is not null && quantityUnit is not null
+            ? ActorNumber.Create(chargeOwnerId)
+            : null;
+    }
+
+    private CalculatedQuantityQuality? GetCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality>? quantityQualities)
+    {
+        throw new NotImplementedException();
+    }
+
+    private SettlementVersion? GetSettlementVersion(CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            CalculationType.BalanceFixing or
+                CalculationType.Aggregation or
+                CalculationType.WholesaleFixing => null,
+            CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
+            CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
+            CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(calculationType),
+                calculationType,
+                "Unknown calculation type when mapping to settlement version"),
+        };
+    }
+
+    private BusinessReason GetBusinessReason(CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            CalculationType.BalanceFixing => BusinessReason.BalanceFixing,
+            CalculationType.Aggregation => BusinessReason.PreliminaryAggregation,
+            CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing,
+            CalculationType.FirstCorrectionSettlement or
+                CalculationType.SecondCorrectionSettlement or
+                CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(calculationType),
+                calculationType,
+                "Unknown calculation type when mapping to business reason"),
+        };
     }
 }

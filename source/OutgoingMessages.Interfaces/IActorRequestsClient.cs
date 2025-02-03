@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -25,6 +27,18 @@ public interface IActorRequestsClient
     /// <param name="businessReason"></param>
     /// <param name="aggregatedTimeSeriesQueryParameters"></param>
     public Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters);
+
+    public Task EnqueueWholesaleServicesAsync(
+        WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        CancellationToken cancellationToken);
 
     public Task EnqueueRejectAggregatedMeasureDataRequestAsync(
         RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,

@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Microsoft.Extensions.Logging;
+using NodaTime.Extensions;
+using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 
@@ -25,10 +31,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 /// <param name="logger"></param>
 public class EnqueueHandler_Brs_028_V1(
     ILogger<EnqueueHandler_Brs_028_V1> logger,
+    IActorRequestsClient actorRequestsClient,
     IProcessManagerMessageClient processManagerMessageClient)
     : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedWholesaleServicesAcceptedV1, RequestCalculatedWholesaleServicesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
+    private readonly IActorRequestsClient _actorRequestsClient = actorRequestsClient;
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
@@ -42,6 +50,28 @@ public class EnqueueHandler_Brs_028_V1(
             acceptedData);
 
         // TODO: Call actual logic that enqueues accepted messages instead
+        var queryParams = new WholesaleServicesQueryParameters(
+            acceptedData.Resolution == null
+                ? AmountType.TotalMonthlyAmount
+                : acceptedData.Resolution == Resolution.Monthly
+                    ? AmountType.TotalMonthlyAmount
+                    : AmountType.AmountPerCharge,
+            acceptedData.GridAreas,
+            acceptedData.EnergySupplierNumber?.Value,
+            acceptedData.ChargeOwnerNumber?.Value,
+            acceptedData.ChargeTypes.Select(
+                    ct => (ct.ChargeCode, ct.ChargeType))
+                .ToList(),
+            GetCalculationType(acceptedData.BusinessReason, acceptedData.SettlementVersion),
+            new Period(acceptedData.PeriodStart.ToInstant(), acceptedData.PeriodEnd.ToInstant()),
+            acceptedData.RequestedForActorRole == ActorRole.EnergySupplier,
+            acceptedData.RequestedForActorNumber.Value);
+
+        await _actorRequestsClient.EnqueueWholesaleServicesAsync(
+                ,
+
+            )
+            .ConfigureAwait(false);
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
@@ -49,6 +79,21 @@ public class EnqueueHandler_Brs_028_V1(
                     RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
+    }
+
+    private CalculationType? GetCalculationType(BusinessReason businessReason, SettlementVersion? settlementVersion)
+    {
+        if (businessReason == BusinessReason.BalanceFixing)
+            return CalculationType.BalanceFixing;
+        else if (businessReason == BusinessReason.PreliminaryAggregation)
+            return CalculationType.Aggregation;
+        else if (businessReason == BusinessReason.WholesaleFixing)
+            return CalculationType.WholesaleFixing;
+        else if (businessReason == BusinessReason.Correction)
+        {
+            if (settlementVersion is null)
+                return
+        }
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(
