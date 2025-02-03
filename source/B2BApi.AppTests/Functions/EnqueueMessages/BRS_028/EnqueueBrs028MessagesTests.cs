@@ -64,14 +64,14 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: BusinessReason.BalanceFixing,
-            Resolution: Resolution.Hourly,
+            BusinessReason: BusinessReason.WholesaleFixing,
+            Resolution: null, // Request is amount per charge
             RequestedForActorNumber: requestedForActorNumber,
             RequestedForActorRole: requestedForActorRole,
             RequestedByActorNumber: requestedForActorNumber,
             RequestedByActorRole: requestedForActorRole,
-            PeriodStart: Instant.FromUtc(2024, 01, 03, 23, 00).ToDateTimeOffset(),
-            PeriodEnd: Instant.FromUtc(2024, 01, 04, 23, 00).ToDateTimeOffset(),
+            PeriodStart: Instant.FromUtc(2024, 01, 31, 23, 00).ToDateTimeOffset(),
+            PeriodEnd: Instant.FromUtc(2024, 02, 29, 23, 00).ToDateTimeOffset(),
             GridAreas: ["804"],
             EnergySupplierNumber: requestedForActorNumber,
             ChargeOwnerNumber: null,
