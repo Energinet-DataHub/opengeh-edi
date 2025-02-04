@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
@@ -26,7 +25,6 @@ using NodaTime.Extensions;
 using ActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
 using BusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
 using ChargeType = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ChargeType;
-using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using Resolution = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.Resolution;
 using SettlementVersion = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.SettlementVersion;
 
@@ -83,9 +81,9 @@ public class EnqueueHandler_Brs_028_V1(
                     requestedForActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedForActorNumber.Value),
                     requestedForActorRole: BuildingBlocks.Domain.Models.ActorRole.FromName(acceptedData.RequestedForActorRole.Name),
                     orchestrationInstanceId: orchestrationInstanceId,
-                    eventId: EventId.From(serviceBusMessageId),
-                    originalMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-                    originalTransactionId: TransactionId.From(acceptedData.OriginalTransactionId),
+                    eventId: BuildingBlocks.Domain.Models.EventId.From(serviceBusMessageId),
+                    originalMessageId: BuildingBlocks.Domain.Models.MessageId.Create(acceptedData.OriginalActorMessageId),
+                    originalTransactionId: BuildingBlocks.Domain.Models.TransactionId.From(acceptedData.OriginalTransactionId),
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -134,6 +132,8 @@ public class EnqueueHandler_Brs_028_V1(
 
         await _actorRequestsClient.EnqueueRejectWholesaleServicesRequestAsync(rejectedMessageDto, cancellationToken)
             .ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(

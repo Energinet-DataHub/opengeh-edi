@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResult
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using Currency = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Currency;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
@@ -77,7 +76,7 @@ public class ActorRequestsClient(
                 meteringPointType: MeteringPointType.Consumption.Name,
                 settlementMethod: SettlementMethod.Flex.Name,
                 measureUnitType: MeasurementUnit.Kwh.Name,
-                resolution: BuildingBlocks.Domain.Models.Resolution.Hourly.Name,
+                resolution: Resolution.Hourly.Name,
                 energySupplierNumber: aggregatedTimeSeriesQueryParameters.EnergySupplierId,
                 balanceResponsibleNumber: aggregatedTimeSeriesQueryParameters.BalanceResponsibleId,
                 period: new Period(result.PeriodStart, result.PeriodEnd),
@@ -178,8 +177,6 @@ public class ActorRequestsClient(
         CancellationToken cancellationToken)
     {
         await _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessageDto, cancellationToken).ConfigureAwait(false);
-
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private SettlementMethod? GetSettlementMethod(Interfaces.Models.CalculationResults.SettlementMethod? settlementMethod)
