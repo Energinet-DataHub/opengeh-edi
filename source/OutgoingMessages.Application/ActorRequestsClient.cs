@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResult
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using Currency = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Currency;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
@@ -170,6 +171,15 @@ public class ActorRequestsClient(
         CancellationToken cancellationToken)
     {
         await _outgoingMessagesClient.EnqueueAsync(rejectedEnergyResultMessageDto, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task EnqueueRejectWholesaleServicesRequestAsync(
+        RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessageDto,
+        CancellationToken cancellationToken)
+    {
+        await _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessageDto, cancellationToken).ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private SettlementMethod? GetSettlementMethod(Interfaces.Models.CalculationResults.SettlementMethod? settlementMethod)

@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
@@ -109,7 +110,30 @@ public class EnqueueHandler_Brs_028_V1(
             "Received enqueue rejected message(s) for BRS 028. Data: {0}",
             rejectedData);
 
-        // TODO: Call actual logic that enqueues rejected message
+        var rejectReasons = rejectedData.ValidationErrors.Select(
+                e => new RejectedWholesaleServicesMessageRejectReason(
+                    ErrorCode: e.ErrorCode,
+                    ErrorMessage: e.Message))
+            .ToList();
+
+        var rejectedTimeSeries = new RejectedWholesaleServicesMessageSeries(
+            TransactionId: BuildingBlocks.Domain.Models.TransactionId.New(),
+            RejectReasons: rejectReasons,
+            OriginalTransactionIdReference: BuildingBlocks.Domain.Models.TransactionId.From(rejectedData.OriginalTransactionId));
+
+        var rejectedMessageDto = new RejectedWholesaleServicesMessageDto(
+            relatedToMessageId: BuildingBlocks.Domain.Models.MessageId.Create(rejectedData.OriginalMessageId),
+            receiverNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(rejectedData.RequestedByActorNumber.Value),
+            receiverRole: BuildingBlocks.Domain.Models.ActorRole.FromName(rejectedData.RequestedByActorRole.Name),
+            documentReceiverNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(rejectedData.RequestedForActorNumber.Value),
+            documentReceiverRole: BuildingBlocks.Domain.Models.ActorRole.FromName(rejectedData.RequestedForActorRole.Name),
+            processId: orchestrationInstanceId,
+            eventId: BuildingBlocks.Domain.Models.EventId.From(serviceBusMessageId),
+            businessReason: BuildingBlocks.Domain.Models.BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,
+            series: rejectedTimeSeries);
+
+        await _actorRequestsClient.EnqueueRejectWholesaleServicesRequestAsync(rejectedMessageDto, cancellationToken)
+            .ConfigureAwait(false);
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
