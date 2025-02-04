@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
@@ -70,43 +71,15 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     public async Task Given_EnqueueAcceptedBrs028Message_AndGiven_GridAreaHasNoData_When_MessageIsReceived_Then_RejectedMessageIsEnqueued()
     {
         // => Given enqueue BRS-028 service bus message
-        var eventId = EventId.From(Guid.NewGuid());
-        var actorId = Guid.NewGuid().ToString();
-        var orchestrationInstanceId = Guid.NewGuid().ToString();
-
         var testDataResultSet = AmountsPerChargeTestDataDescription.ResultSet1;
+        var orchestrationInstanceId = Guid.NewGuid();
+        var eventId = EventId.From(Guid.NewGuid());
 
-        var energySupplierNumber = testDataResultSet.EnergySupplierNumber;
-        var energySupplierRole = ActorRole.EnergySupplier;
-        var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
-            OriginalActorMessageId: Guid.NewGuid().ToString(),
-            OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: AmountsPerChargeTestDataDescription.ResultSet1.BusinessReason,
-            Resolution: null, // Request is amount per charge
-            RequestedForActorNumber: energySupplierNumber,
-            RequestedForActorRole: energySupplierRole,
-            RequestedByActorNumber: energySupplierNumber,
-            RequestedByActorRole: energySupplierRole,
-            PeriodStart: testDataResultSet.PeriodStart.ToDateTimeOffset(),
-            PeriodEnd: testDataResultSet.PeriodEnd.ToDateTimeOffset(),
-            GridAreas: ["000"], // Result set has no data for this grid area, so an "invalid grid area" rejected message should be enqueued
-            EnergySupplierNumber: energySupplierNumber,
-            ChargeOwnerNumber: null,
-            SettlementVersion: null,
-            ChargeTypes: []);
-
-        var enqueueActorMessages = new EnqueueActorMessagesV1
-        {
-            OrchestrationName = Brs_028.Name,
-            OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
-            OrchestrationInstanceId = orchestrationInstanceId,
-        };
-        enqueueActorMessages.SetData(enqueueMessagesData);
-
-        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
-            idempotencyKey: eventId.Value);
+        var (enqueueData, serviceBusMessage) = GivenEnqueueAcceptedBrs028Message(
+            testDataResultSet,
+            orchestrationInstanceId,
+            eventId,
+            overrideGridArea: "000"); // Result set has no data for grid area 000, so an "invalid grid area" rejected message should be enqueued
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
@@ -139,11 +112,11 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
                 (om) =>
                 {
                     om.DocumentType.Should().Be(DocumentType.RejectRequestWholesaleSettlement);
-                    om.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
+                    om.BusinessReason.Should().Be(enqueueData.BusinessReason.Name);
                     om.RelatedToMessageId.Should().NotBeNull();
-                    om.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
-                    om.Receiver.Number.Value.Should().Be(energySupplierNumber.Value);
-                    om.Receiver.ActorRole.Name.Should().Be(energySupplierRole.Name);
+                    om.RelatedToMessageId!.Value.Value.Should().Be(enqueueData.OriginalActorMessageId);
+                    om.Receiver.Number.Value.Should().Be(enqueueData.RequestedByActorNumber.Value);
+                    om.Receiver.ActorRole.Name.Should().Be(enqueueData.RequestedByActorRole.Name);
                 });
 
         // => Verify that the expected notify message was sent on the ServiceBus
@@ -156,7 +129,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
                 var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
                     msg.Body.ToString());
 
-                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId.ToString();
                 var matchingEvent = parsedNotification.EventName == RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted;
 
                 return matchingOrchestrationId && matchingEvent;
@@ -171,43 +144,14 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     public async Task Given_EnqueueAcceptedBrs028Message_When_MessageIsReceived_Then_AcceptedMessagesAreEnqueued()
     {
         // => Given enqueue BRS-028 service bus message
-        var eventId = EventId.From(Guid.NewGuid());
-        var actorId = Guid.NewGuid().ToString();
-        var orchestrationInstanceId = Guid.NewGuid().ToString();
-
         var testDataResultSet = AmountsPerChargeTestDataDescription.ResultSet1;
+        var orchestrationInstanceId = Guid.NewGuid();
+        var eventId = EventId.From(Guid.NewGuid());
 
-        var energySupplierNumber = testDataResultSet.EnergySupplierNumber;
-        var energySupplierRole = ActorRole.EnergySupplier;
-        var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
-            OriginalActorMessageId: Guid.NewGuid().ToString(),
-            OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: AmountsPerChargeTestDataDescription.ResultSet1.BusinessReason,
-            Resolution: null, // Request is amount per charge
-            RequestedForActorNumber: energySupplierNumber,
-            RequestedForActorRole: energySupplierRole,
-            RequestedByActorNumber: energySupplierNumber,
-            RequestedByActorRole: energySupplierRole,
-            PeriodStart: testDataResultSet.PeriodStart.ToDateTimeOffset(),
-            PeriodEnd: testDataResultSet.PeriodEnd.ToDateTimeOffset(),
-            GridAreas: [testDataResultSet.GridArea],
-            EnergySupplierNumber: energySupplierNumber,
-            ChargeOwnerNumber: null,
-            SettlementVersion: null,
-            ChargeTypes: []);
-
-        var enqueueActorMessages = new EnqueueActorMessagesV1
-        {
-            OrchestrationName = Brs_028.Name,
-            OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
-            OrchestrationInstanceId = orchestrationInstanceId,
-        };
-        enqueueActorMessages.SetData(enqueueMessagesData);
-
-        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
-            idempotencyKey: eventId.Value);
+        var (enqueueData, serviceBusMessage) = GivenEnqueueAcceptedBrs028Message(
+            testDataResultSet,
+            orchestrationInstanceId,
+            eventId);
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
@@ -240,11 +184,11 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
                 (om) =>
                 {
                     om.DocumentType.Should().Be(DocumentType.NotifyWholesaleServices);
-                    om.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
+                    om.BusinessReason.Should().Be(enqueueData.BusinessReason.Name);
                     om.RelatedToMessageId.Should().NotBeNull();
-                    om.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
-                    om.Receiver.Number.Value.Should().Be(energySupplierNumber.Value);
-                    om.Receiver.ActorRole.Name.Should().Be(energySupplierRole.Name);
+                    om.RelatedToMessageId!.Value.Value.Should().Be(enqueueData.OriginalActorMessageId);
+                    om.Receiver.Number.Value.Should().Be(enqueueData.RequestedByActorNumber.Value);
+                    om.Receiver.ActorRole.Name.Should().Be(enqueueData.RequestedByActorRole.Name);
                 });
 
         // => Verify that the expected notify message was sent on the ServiceBus
@@ -257,7 +201,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
                 var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
                     msg.Body.ToString());
 
-                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId.ToString();
                 var matchingEvent = parsedNotification.EventName == RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted;
 
                 return matchingOrchestrationId && matchingEvent;
@@ -358,5 +302,46 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
 
         var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
         wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
+    }
+
+    private (RequestCalculatedWholesaleServicesAcceptedV1 EnqueueData, ServiceBusMessage ServiceBusMessage)
+        GivenEnqueueAcceptedBrs028Message(
+            AmountsPerChargeTestDataDescription.ResultSet testDataResultSet,
+            Guid orchestrationInstanceId,
+            EventId eventId,
+            string? overrideGridArea = null)
+    {
+        var requestedForActorNumber = testDataResultSet.EnergySupplierNumber;
+        var requestedForActorRole = ActorRole.EnergySupplier;
+        var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            BusinessReason: AmountsPerChargeTestDataDescription.ResultSet1.BusinessReason,
+            Resolution: null, // Request is amount per charge
+            RequestedForActorNumber: requestedForActorNumber,
+            RequestedForActorRole: requestedForActorRole,
+            RequestedByActorNumber: requestedForActorNumber,
+            RequestedByActorRole: requestedForActorRole,
+            PeriodStart: testDataResultSet.PeriodStart.ToDateTimeOffset(),
+            PeriodEnd: testDataResultSet.PeriodEnd.ToDateTimeOffset(),
+            GridAreas: [overrideGridArea ?? testDataResultSet.GridArea],
+            EnergySupplierNumber: requestedForActorNumber,
+            ChargeOwnerNumber: null,
+            SettlementVersion: null,
+            ChargeTypes: []);
+
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_028.Name,
+            OrchestrationVersion = 1,
+            OrchestrationStartedByActorId = Guid.NewGuid().ToString(),
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
+        };
+        enqueueActorMessages.SetData(enqueueMessagesData);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
+            idempotencyKey: eventId.Value);
+        return (enqueueMessagesData, serviceBusMessage);
     }
 }
