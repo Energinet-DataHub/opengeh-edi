@@ -67,7 +67,108 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueAcceptedBrs028Message_When_MessageIsReceived_Then_AcceptedMessagesIsEnqueued()
+    public async Task Given_EnqueueAcceptedBrs028Message_AndGiven_GridAreaHasNoData_When_MessageIsReceived_Then_RejectedMessageIsEnqueued()
+    {
+        // => Given enqueue BRS-028 service bus message
+        var eventId = EventId.From(Guid.NewGuid());
+        var actorId = Guid.NewGuid().ToString();
+        var orchestrationInstanceId = Guid.NewGuid().ToString();
+
+        var testDataResultSet = AmountsPerChargeTestDataDescription.ResultSet1;
+
+        var energySupplierNumber = testDataResultSet.EnergySupplierNumber;
+        var energySupplierRole = ActorRole.EnergySupplier;
+        var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            BusinessReason: AmountsPerChargeTestDataDescription.ResultSet1.BusinessReason,
+            Resolution: null, // Request is amount per charge
+            RequestedForActorNumber: energySupplierNumber,
+            RequestedForActorRole: energySupplierRole,
+            RequestedByActorNumber: energySupplierNumber,
+            RequestedByActorRole: energySupplierRole,
+            PeriodStart: testDataResultSet.PeriodStart.ToDateTimeOffset(),
+            PeriodEnd: testDataResultSet.PeriodEnd.ToDateTimeOffset(),
+            GridAreas: ["000"], // Result set has no data for this grid area, so an "invalid grid area" rejected message should be enqueued
+            EnergySupplierNumber: energySupplierNumber,
+            ChargeOwnerNumber: null,
+            SettlementVersion: null,
+            ChargeTypes: []);
+
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_028.Name,
+            OrchestrationVersion = 1,
+            OrchestrationStartedByActorId = actorId,
+            OrchestrationInstanceId = orchestrationInstanceId,
+        };
+        enqueueActorMessages.SetData(enqueueMessagesData);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
+            idempotencyKey: eventId.Value);
+
+        // => When message is received
+        await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
+
+        // => Then accepted message is enqueued
+
+        // => Verify the function was executed
+        var didFinish = await Awaiter.TryWaitUntilConditionAsync(
+            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_028)}"),
+            timeLimit: TimeSpan.FromSeconds(300));
+        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
+
+        using (new AssertionScope())
+        {
+            didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_028)} should have been executed");
+            hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_028)}' (Succeeded,*");
+            hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 028*");
+        }
+
+        // => Verify that an outgoing message was enqueued
+        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+            .Where(om => om.EventId == eventId)
+            .ToListAsync();
+
+        using var assertionScope = new AssertionScope();
+        enqueuedOutgoingMessages.Should()
+            .ContainSingle() // Only 1 rejected outgoing message should be enqueued.
+            .And.AllSatisfy(
+                (om) =>
+                {
+                    om.DocumentType.Should().Be(DocumentType.RejectRequestWholesaleSettlement);
+                    om.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
+                    om.RelatedToMessageId.Should().NotBeNull();
+                    om.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
+                    om.Receiver.Number.Value.Should().Be(energySupplierNumber.Value);
+                    om.Receiver.ActorRole.Name.Should().Be(energySupplierRole.Name);
+                });
+
+        // => Verify that the expected notify message was sent on the ServiceBus
+        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
+                    return false;
+
+                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
+                    msg.Body.ToString());
+
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
+                var matchingEvent = parsedNotification.EventName == RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted;
+
+                return matchingOrchestrationId && matchingEvent;
+            })
+            .VerifyCountAsync(1);
+
+        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
+    }
+
+    [Fact]
+    public async Task Given_EnqueueAcceptedBrs028Message_When_MessageIsReceived_Then_AcceptedMessagesAreEnqueued()
     {
         // => Given enqueue BRS-028 service bus message
         var eventId = EventId.From(Guid.NewGuid());
@@ -168,7 +269,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueRejectBrs028Message_When_MessageIsReceived_Then_RejectedMessagesIsEnqueued()
+    public async Task Given_EnqueueRejectBrs028Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued()
     {
         // => Given enqueue rejected BRS-028 service bus message
         var eventId = EventId.From(Guid.NewGuid());
