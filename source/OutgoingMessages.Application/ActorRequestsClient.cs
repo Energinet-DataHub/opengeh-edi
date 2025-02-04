@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
@@ -90,6 +91,15 @@ public class ActorRequestsClient(
         CancellationToken cancellationToken)
     {
         await _outgoingMessagesClient.EnqueueAsync(rejectedEnergyResultMessageDto, cancellationToken).ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task EnqueueRejectWholesaleServicesRequestAsync(
+        RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessageDto,
+        CancellationToken cancellationToken)
+    {
+        await _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessageDto, cancellationToken).ConfigureAwait(false);
 
         await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
