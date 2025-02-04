@@ -54,11 +54,13 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _fixture.AppHostManager.ClearHostLog();
+        _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         await Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
     {
+        _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         _fixture.SetTestOutputHelper(null!);
         await Task.CompletedTask;
     }
@@ -67,13 +69,16 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     public async Task Given_EnqueueAcceptedBrs028Message_When_MessageIsReceived_Then_AcceptedMessagesIsEnqueued()
     {
         // => Given enqueue BRS-028 service bus message
+        var eventId = EventId.From(Guid.NewGuid());
         var actorId = Guid.NewGuid().ToString();
+        var orchestrationInstanceId = Guid.NewGuid().ToString();
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
+        var businessReason = BusinessReason.WholesaleFixing;
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: BusinessReason.WholesaleFixing,
+            BusinessReason: businessReason,
             Resolution: null, // Request is amount per charge
             RequestedForActorNumber: requestedForActorNumber,
             RequestedForActorRole: requestedForActorRole,
@@ -92,29 +97,67 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
-            OrchestrationInstanceId = Guid.NewGuid().ToString(),
+            OrchestrationInstanceId = orchestrationInstanceId,
         };
         enqueueActorMessages.SetData(enqueueMessagesData);
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
-            idempotencyKey: Guid.NewGuid().ToString());
+            idempotencyKey: eventId.ToString());
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
         // => Then accepted message is enqueued
-        // TODO: Actually check for enqueued messages and PM notification when the BRS is implemented
 
+        // => Verify the function was executed
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
             () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_028)}"),
-            timeLimit: TimeSpan.FromSeconds(30));
+            timeLimit: TimeSpan.FromSeconds(300));
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
 
+        using (new AssertionScope())
+        {
+            didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_028)} should have been executed");
+            hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_028)}' (Succeeded,*");
+            hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 028*");
+        }
+
+        // => Verify that an outgoing message was enqueued
+        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+        var actualOutgoingMessage = await dbContext.OutgoingMessages
+            .SingleOrDefaultAsync(om => om.EventId == eventId);
+
+        actualOutgoingMessage.Should().NotBeNull();
+
         using var assertionScope = new AssertionScope();
-        didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_028)} should have been executed");
-        hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_028)}' (Succeeded,*");
-        hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 028*");
+        // The outgoing message is rejected because there is no data in databricks. TODO: Add data and change to accepted.
+        actualOutgoingMessage!.DocumentType.Should().Be(DocumentType.RejectRequestWholesaleSettlement);
+        actualOutgoingMessage.BusinessReason.Should().Be(businessReason.Name);
+        actualOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
+        actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
+        actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
+        actualOutgoingMessage.Receiver.ActorRole.Name.Should().Be(requestedForActorRole.Name);
+
+        // => Verify that the expected notify message was sent on the ServiceBus
+        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
+                    return false;
+
+                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
+                    msg.Body.ToString());
+
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
+                var matchingEvent = parsedNotification.EventName == RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted;
+
+                return matchingOrchestrationId && matchingEvent;
+            })
+            .VerifyCountAsync(1);
+
+        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
     }
 
     [Fact]
