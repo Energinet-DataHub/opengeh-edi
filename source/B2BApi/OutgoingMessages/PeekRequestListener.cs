@@ -72,6 +72,17 @@ public class PeekRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
+        // Check if request has been disposed before accessing headers
+        // This can happen if the request is disposed before the function is executed
+        // E.g. if the request is cancelled by the client
+        if (request.FunctionContext.GetHttpContext()?.Features is null)
+        {
+            _logger.LogWarning("Request has been disposed before accessing headers.");
+            var badRequestResponse = HttpResponseData.CreateResponse(request);
+            badRequestResponse.StatusCode = HttpStatusCode.BadRequest;
+            return badRequestResponse;
+        }
+
         var contentType = request.Headers.TryGetContentType();
         if (contentType is null)
         {
