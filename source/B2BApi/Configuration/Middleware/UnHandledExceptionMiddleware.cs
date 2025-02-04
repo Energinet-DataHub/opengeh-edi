@@ -43,13 +43,29 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
         {
             await next(context);
         }
+        catch (OperationCanceledException operationCanceledException)
+        {
+            // This catch block handles cancellations triggered by a CancellationToken.
+            // E.g. if a task is cancelled it throws a TaskCanceledException which is a OperationCanceledException.
+            // E.g. if cancellationToken.ThrowIfCancellationRequested() it throws an OperationCanceledException.
+            // It logs a warning message indicating that the request was cancelled.
+            _logger.LogWarning(operationCanceledException, "Request was cancelled: {Ex}", operationCanceledException.Message);
+        }
         catch (Exception ex)
         {
             // This catch block handles all other exceptions.
             // It logs an error message indicating that an error occurred during the invocation.
             _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
-            var httpReqData = await context.GetHttpRequestDataAsync();
 
+            // Check if request has been disposed before accessing headers
+            // This can happen if the request is disposed before the function is executed
+            // E.g. if the request is cancelled by the client
+            if (context.GetHttpContext()?.Features is null)
+            {
+                return;
+            }
+
+            var httpReqData = await context.GetHttpRequestDataAsync();
             if (httpReqData == null)
             {
                 return;
