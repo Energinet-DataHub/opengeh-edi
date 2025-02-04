@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
@@ -28,5 +29,9 @@ public interface IActorRequestsClient
 
     public Task EnqueueRejectAggregatedMeasureDataRequestAsync(
         RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
+        CancellationToken cancellationToken);
+
+    public Task EnqueueRejectWholesaleServicesRequestAsync(
+        RejectedWholesaleServicesMessageDto enqueueRejectedMessageDto,
         CancellationToken cancellationToken);
 }

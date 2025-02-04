@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
@@ -38,6 +39,8 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_02
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueBrs026MessagesTests : IAsyncLifetime
 {
+    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
+    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
     private readonly B2BApiAppFixture _fixture;
 
     public EnqueueBrs026MessagesTests(
@@ -123,6 +126,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
         var businessReason = BusinessReason.BalanceFixing;
+        var orchestrationInstanceId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesRejectedV1(
             OriginalMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
@@ -139,13 +143,12 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
                     ErrorCode: "T02",
                     Message: "Test error message 2"),
             ]);
-
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_026.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
-            OrchestrationInstanceId = Guid.NewGuid().ToString(),
+            OrchestrationInstanceId = orchestrationInstanceId,
         };
         enqueueActorMessages.SetData(enqueueMessagesData);
 
@@ -157,8 +160,6 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
         // => Then accepted message is enqueued
-        // TODO: Actually check for enqueued messages and PM notification when the BRS is implemented
-
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
             () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_026)}"),
             timeLimit: TimeSpan.FromSeconds(30));
@@ -184,5 +185,27 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalMessageId);
         actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
         actualOutgoingMessage.Receiver.ActorRole.Name.Should().Be(requestedForActorRole.Name);
+
+        // => Verify that the expected message was sent on the ServiceBus
+        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
+                {
+                    return false;
+                }
+
+                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
+                    msg.Body.ToString());
+
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
+                var matchingEvent = parsedNotification.EventName == RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted;
+
+                return matchingOrchestrationId && matchingEvent;
+            })
+            .VerifyCountAsync(1);
+
+        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
     }
 }
