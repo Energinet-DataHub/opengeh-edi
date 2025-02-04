@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
@@ -27,7 +28,7 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 public class ActorRequestsClient(
     IOutgoingMessagesClient outgoingMessagesClient,
@@ -35,6 +36,14 @@ public class ActorRequestsClient(
     IWholesaleServicesQueries wholeSaleServicesQueries)
         : IActorRequestsClient
 {
+    private static readonly RejectedWholesaleServicesMessageRejectReason _noDataAvailable = new(
+        ErrorMessage: "E0H",
+        ErrorCode: "Ingen data tilgængelig / No data available");
+
+    private static readonly RejectedWholesaleServicesMessageRejectReason _noDataForRequestedGridArea = new(
+        ErrorMessage: "D46",
+        ErrorCode: "Forkert netområde / invalid grid area");
+
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IAggregatedTimeSeriesQueries _aggregatedTimeSeriesQueries = aggregatedTimeSeriesQueries;
     private readonly IWholesaleServicesQueries _wholesaleServicesQueries = wholeSaleServicesQueries;
@@ -165,18 +174,83 @@ public class ActorRequestsClient(
         return enqueuedCount;
     }
 
-    public async Task EnqueueRejectAggregatedMeasureDataRequestAsync(
+    public Task EnqueueRejectAggregatedMeasureDataRequestAsync(
         RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
         CancellationToken cancellationToken)
     {
-        await _outgoingMessagesClient.EnqueueAsync(rejectedEnergyResultMessageDto, cancellationToken).ConfigureAwait(false);
+        return _outgoingMessagesClient.EnqueueAsync(rejectedEnergyResultMessageDto, cancellationToken);
     }
 
-    public async Task EnqueueRejectWholesaleServicesRequestAsync(
+    public Task EnqueueRejectWholesaleServicesRequestAsync(
         RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessageDto,
         CancellationToken cancellationToken)
     {
-        await _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessageDto, cancellationToken).ConfigureAwait(false);
+        return _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessageDto, cancellationToken);
+    }
+
+    public async Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
+        WholesaleServicesQueryParameters queryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        BusinessReason businessReason,
+        CancellationToken cancellationToken)
+    {
+        var hasDataInAnotherGridArea = await HasDataInAnotherGridAreaAsync(
+            queryParameters,
+            requestedByActorRole).ConfigureAwait(false);
+
+        var rejectError = hasDataInAnotherGridArea
+            ? _noDataForRequestedGridArea
+            : _noDataAvailable;
+
+        var rejectedWholesaleServicesMessageDto = new RejectedWholesaleServicesMessageDto(
+            requestedByActorNumber,
+            orchestrationInstanceId,
+            eventId,
+            businessReason.Name,
+            requestedByActorRole,
+            originalMessageId,
+            new RejectedWholesaleServicesMessageSeries(
+                TransactionId.New(),
+                [rejectError],
+                originalTransactionId),
+            requestedForActorNumber,
+            requestedForActorRole);
+
+        await EnqueueRejectWholesaleServicesRequestAsync(
+                rejectedWholesaleServicesMessageDto,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private async Task<bool> HasDataInAnotherGridAreaAsync(
+        WholesaleServicesQueryParameters queryParameters,
+        ActorRole requestedByActorRole)
+    {
+        if (queryParameters.GridAreaCodes.Count == 0)
+            return false;  // If grid area codes is empty, we already retrieved any data across all grid areas
+
+        var actorCanHaveDataInOtherGridAreas = requestedByActorRole == ActorRole.EnergySupplier
+                                               || requestedByActorRole == ActorRole.SystemOperator;
+        if (actorCanHaveDataInOtherGridAreas)
+        {
+            var queryParametersWithoutGridArea = queryParameters with
+            {
+                GridAreaCodes = [],
+            };
+
+            var anyResultsExists = await _wholesaleServicesQueries.AnyAsync(queryParametersWithoutGridArea).ConfigureAwait(false);
+
+            return anyResultsExists;
+        }
+
+        return false;
     }
 
     private SettlementMethod? GetSettlementMethod(Interfaces.Models.CalculationResults.SettlementMethod? settlementMethod)

@@ -55,27 +55,33 @@ public class EnqueueHandler_Brs_028_V1(
             "Received enqueue accepted message(s) for BRS 028. Data: {0}",
             acceptedData);
 
+        var queryParams = new WholesaleServicesQueryParameters(
+            AmountType: AmountType.AmountPerCharge, // Default to AmountPerCharge, will be replaced in foreach loop
+            GridAreaCodes: acceptedData.GridAreas,
+            EnergySupplierId: acceptedData.EnergySupplierNumber?.Value,
+            ChargeOwnerId: acceptedData.ChargeOwnerNumber?.Value,
+            ChargeTypes: acceptedData.ChargeTypes.Select(
+                    ct => (ct.ChargeCode, GetChargeType(ct.ChargeType)))
+                .ToList(),
+            CalculationType: GetCalculationType(acceptedData.BusinessReason, acceptedData.SettlementVersion),
+            Period: new Period(
+                acceptedData.PeriodStart.ToInstant(),
+                acceptedData.PeriodEnd.ToInstant()),
+            RequestedForEnergySupplier: acceptedData.RequestedForActorRole == ActorRole.EnergySupplier,
+            RequestedForActorNumber: acceptedData.RequestedForActorNumber.Value);
+
         var amountTypes = GetAmountTypes(acceptedData.Resolution, acceptedData.ChargeTypes);
 
+        var totalEnqueuedCount = 0;
         foreach (var amountType in amountTypes)
         {
-            var queryParams = new WholesaleServicesQueryParameters(
-                AmountType: amountType,
-                GridAreaCodes: acceptedData.GridAreas,
-                EnergySupplierId: acceptedData.EnergySupplierNumber?.Value,
-                ChargeOwnerId: acceptedData.ChargeOwnerNumber?.Value,
-                ChargeTypes: acceptedData.ChargeTypes.Select(
-                        ct => (ct.ChargeCode, GetChargeType(ct.ChargeType)))
-                    .ToList(),
-                CalculationType: GetCalculationType(acceptedData.BusinessReason, acceptedData.SettlementVersion),
-                Period: new Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(
-                    acceptedData.PeriodStart.ToInstant(),
-                    acceptedData.PeriodEnd.ToInstant()),
-                RequestedForEnergySupplier: acceptedData.RequestedForActorRole == ActorRole.EnergySupplier,
-                RequestedForActorNumber: acceptedData.RequestedForActorNumber.Value);
+            var queryParamsForAmountType = queryParams with
+            {
+                AmountType = amountType,
+            };
 
-            await _actorRequestsClient.EnqueueWholesaleServicesAsync(
-                    wholesaleServicesQueryParameters: queryParams,
+            var enqueuedCount = await _actorRequestsClient.EnqueueWholesaleServicesAsync(
+                    wholesaleServicesQueryParameters: queryParamsForAmountType,
                     requestedByActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedByActorNumber.Value),
                     requestedByActorRole: BuildingBlocks.Domain.Models.ActorRole.FromName(acceptedData.RequestedByActorRole.Name),
                     requestedForActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedForActorNumber.Value),
@@ -84,6 +90,26 @@ public class EnqueueHandler_Brs_028_V1(
                     eventId: BuildingBlocks.Domain.Models.EventId.From(serviceBusMessageId),
                     originalMessageId: BuildingBlocks.Domain.Models.MessageId.Create(acceptedData.OriginalActorMessageId),
                     originalTransactionId: BuildingBlocks.Domain.Models.TransactionId.From(acceptedData.OriginalTransactionId),
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            totalEnqueuedCount += enqueuedCount;
+        }
+
+        if (totalEnqueuedCount == 0)
+        {
+            _logger.LogInformation("No wholesale services messages enqueued for accepted BRS-028, enqueuing rejected message. Data: {0}", acceptedData);
+            await _actorRequestsClient.EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
+                    queryParams,
+                    requestedByActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedByActorNumber.Value),
+                    requestedByActorRole: BuildingBlocks.Domain.Models.ActorRole.FromName(acceptedData.RequestedByActorRole.Name),
+                    requestedForActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedForActorNumber.Value),
+                    requestedForActorRole: BuildingBlocks.Domain.Models.ActorRole.FromName(acceptedData.RequestedForActorRole.Name),
+                    orchestrationInstanceId: orchestrationInstanceId,
+                    eventId: BuildingBlocks.Domain.Models.EventId.From(serviceBusMessageId),
+                    originalMessageId: BuildingBlocks.Domain.Models.MessageId.Create(acceptedData.OriginalActorMessageId),
+                    originalTransactionId: BuildingBlocks.Domain.Models.TransactionId.From(acceptedData.OriginalTransactionId),
+                    businessReason: BuildingBlocks.Domain.Models.BusinessReason.FromName(acceptedData.BusinessReason.Name),
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         }

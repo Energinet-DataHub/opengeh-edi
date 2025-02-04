@@ -48,4 +48,17 @@ public interface IActorRequestsClient
     public Task EnqueueRejectWholesaleServicesRequestAsync(
         RejectedWholesaleServicesMessageDto enqueueRejectedMessageDto,
         CancellationToken cancellationToken);
+
+    public Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
+        WholesaleServicesQueryParameters queryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        BusinessReason businessReason,
+        CancellationToken cancellationToken);
 }
