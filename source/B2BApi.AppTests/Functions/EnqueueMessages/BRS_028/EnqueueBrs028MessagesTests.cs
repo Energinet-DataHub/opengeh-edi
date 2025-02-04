@@ -74,11 +74,10 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         var orchestrationInstanceId = Guid.NewGuid().ToString();
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
-        var businessReason = BusinessReason.WholesaleFixing;
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: businessReason,
+            BusinessReason: BusinessReason.WholesaleFixing,
             Resolution: null, // Request is amount per charge
             RequestedForActorNumber: requestedForActorNumber,
             RequestedForActorRole: requestedForActorRole,
@@ -103,7 +102,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
-            idempotencyKey: eventId.ToString());
+            idempotencyKey: eventId.Value);
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
@@ -133,7 +132,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
         // The outgoing message is rejected because there is no data in databricks. TODO: Add data and change to accepted.
         actualOutgoingMessage!.DocumentType.Should().Be(DocumentType.RejectRequestWholesaleSettlement);
-        actualOutgoingMessage.BusinessReason.Should().Be(businessReason.Name);
+        actualOutgoingMessage.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
         actualOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
         actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
         actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
