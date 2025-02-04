@@ -16,6 +16,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.B2BApi.AppTests.TestData.CalculationResults;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
@@ -72,21 +73,24 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         var eventId = EventId.From(Guid.NewGuid());
         var actorId = Guid.NewGuid().ToString();
         var orchestrationInstanceId = Guid.NewGuid().ToString();
-        var requestedForActorNumber = ActorNumber.Create("1111111111111");
-        var requestedForActorRole = ActorRole.EnergySupplier;
+
+        var testDataResultSet = AmountsPerChargeTestDataDescription.ResultSet1;
+
+        var energySupplierNumber = testDataResultSet.EnergySupplierNumber;
+        var energySupplierRole = ActorRole.EnergySupplier;
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: BusinessReason.WholesaleFixing,
+            BusinessReason: AmountsPerChargeTestDataDescription.ResultSet1.BusinessReason,
             Resolution: null, // Request is amount per charge
-            RequestedForActorNumber: requestedForActorNumber,
-            RequestedForActorRole: requestedForActorRole,
-            RequestedByActorNumber: requestedForActorNumber,
-            RequestedByActorRole: requestedForActorRole,
-            PeriodStart: Instant.FromUtc(2024, 01, 31, 23, 00).ToDateTimeOffset(),
-            PeriodEnd: Instant.FromUtc(2024, 02, 29, 23, 00).ToDateTimeOffset(),
-            GridAreas: ["804"],
-            EnergySupplierNumber: requestedForActorNumber,
+            RequestedForActorNumber: energySupplierNumber,
+            RequestedForActorRole: energySupplierRole,
+            RequestedByActorNumber: energySupplierNumber,
+            RequestedByActorRole: energySupplierRole,
+            PeriodStart: testDataResultSet.PeriodStart.ToDateTimeOffset(),
+            PeriodEnd: testDataResultSet.PeriodEnd.ToDateTimeOffset(),
+            GridAreas: [testDataResultSet.GridArea],
+            EnergySupplierNumber: energySupplierNumber,
             ChargeOwnerNumber: null,
             SettlementVersion: null,
             ChargeTypes: []);
@@ -124,19 +128,21 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
 
         // => Verify that an outgoing message was enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
-        var actualOutgoingMessage = await dbContext.OutgoingMessages
-            .SingleOrDefaultAsync(om => om.EventId == eventId);
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+            .Where(om => om.EventId == eventId)
+            .ToListAsync();
 
-        actualOutgoingMessage.Should().NotBeNull();
+        enqueuedOutgoingMessages.Should().HaveCount(testDataResultSet.ExpectedMessagesCount);
+
+        var enqueuedOutgoingMessage = enqueuedOutgoingMessages.First();
 
         using var assertionScope = new AssertionScope();
-        // The outgoing message is rejected because there is no data in databricks. TODO: Add data and change to accepted.
-        actualOutgoingMessage!.DocumentType.Should().Be(DocumentType.RejectRequestWholesaleSettlement);
-        actualOutgoingMessage.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
-        actualOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
-        actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
-        actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
-        actualOutgoingMessage.Receiver.ActorRole.Name.Should().Be(requestedForActorRole.Name);
+        enqueuedOutgoingMessage.DocumentType.Should().Be(DocumentType.NotifyWholesaleServices);
+        enqueuedOutgoingMessage.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
+        enqueuedOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
+        enqueuedOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
+        enqueuedOutgoingMessage.Receiver.Number.Value.Should().Be(energySupplierNumber.Value);
+        enqueuedOutgoingMessage.Receiver.ActorRole.Name.Should().Be(energySupplierRole.Name);
 
         // => Verify that the expected notify message was sent on the ServiceBus
         var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
