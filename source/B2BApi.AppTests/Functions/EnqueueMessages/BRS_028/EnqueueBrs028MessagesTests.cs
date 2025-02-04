@@ -144,7 +144,6 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
                     om.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
                     om.Receiver.Number.Value.Should().Be(energySupplierNumber.Value);
                     om.Receiver.ActorRole.Name.Should().Be(energySupplierRole.Name);
-                    i++;
                 });
 
         // => Verify that the expected notify message was sent on the ServiceBus
