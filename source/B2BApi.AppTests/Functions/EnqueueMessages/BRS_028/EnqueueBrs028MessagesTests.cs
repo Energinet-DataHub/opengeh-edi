@@ -132,17 +132,20 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
             .Where(om => om.EventId == eventId)
             .ToListAsync();
 
-        enqueuedOutgoingMessages.Should().HaveCount(testDataResultSet.ExpectedMessagesCount);
-
-        var enqueuedOutgoingMessage = enqueuedOutgoingMessages.First();
-
         using var assertionScope = new AssertionScope();
-        enqueuedOutgoingMessage.DocumentType.Should().Be(DocumentType.NotifyWholesaleServices);
-        enqueuedOutgoingMessage.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
-        enqueuedOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
-        enqueuedOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
-        enqueuedOutgoingMessage.Receiver.Number.Value.Should().Be(energySupplierNumber.Value);
-        enqueuedOutgoingMessage.Receiver.ActorRole.Name.Should().Be(energySupplierRole.Name);
+        enqueuedOutgoingMessages.Should()
+            .HaveCount(testDataResultSet.ExpectedMessagesCount)
+            .And.AllSatisfy(
+                (om) =>
+                {
+                    om.DocumentType.Should().Be(DocumentType.NotifyWholesaleServices);
+                    om.BusinessReason.Should().Be(enqueueMessagesData.BusinessReason.Name);
+                    om.RelatedToMessageId.Should().NotBeNull();
+                    om.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
+                    om.Receiver.Number.Value.Should().Be(energySupplierNumber.Value);
+                    om.Receiver.ActorRole.Name.Should().Be(energySupplierRole.Name);
+                    i++;
+                });
 
         // => Verify that the expected notify message was sent on the ServiceBus
         var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock

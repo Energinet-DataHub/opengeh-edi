@@ -27,9 +27,9 @@ public static class AmountsPerChargeTestDataDescription
         PeriodEnd: PeriodEnd,
         GridArea: "804",
         BusinessReason: BusinessReason.WholesaleFixing,
-        EnergySupplierNumber: ActorNumber.Create("5790000701278"),
-        RowCount: 31,
-        ExpectedMessagesCount: 1);
+        EnergySupplierNumber: ActorNumber.Create("5790001687137"),
+        RowCount: 837,
+        ExpectedMessagesCount: 27); // Resolution is daily, so 283 rows / 31 days = 27 expected messages.
 
     public record ResultSet(
         Instant PeriodStart,
