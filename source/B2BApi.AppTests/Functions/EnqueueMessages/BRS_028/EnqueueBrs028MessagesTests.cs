@@ -161,7 +161,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // => Verify the function was executed
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
             () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_028)}"),
-            timeLimit: TimeSpan.FromSeconds(300));
+            timeLimit: TimeSpan.FromSeconds(30));
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
 
         using (new AssertionScope())
