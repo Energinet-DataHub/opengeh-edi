@@ -56,35 +56,35 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
             // This catch block handles all other exceptions.
             // It logs an error message indicating that an error occurred during the invocation.
             _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
-        }
 
-        // Check if request has been disposed before accessing headers
-        // This can happen if the request is disposed before the function is executed
-        // E.g. if the request is cancelled by the client
-        if (context.GetHttpContext()?.Features is null)
-        {
-            return;
-        }
+            // Check if request has been disposed before accessing headers
+            // This can happen if the request is disposed before the function is executed
+            // E.g. if the request is cancelled by the client
+            if (context.GetHttpContext()?.Features is null)
+            {
+                return;
+            }
 
-        var httpReqData = await context.GetHttpRequestDataAsync();
-        if (httpReqData == null)
-        {
-            return;
-        }
+            var httpReqData = await context.GetHttpRequestDataAsync();
+            if (httpReqData == null)
+            {
+                return;
+            }
 
-        // Create an instance of HttpResponseData with 500 status code.
-        var newHttpResponse = await CreateHttpResponseAsync(httpReqData);
+            // Create an instance of HttpResponseData with 500 status code.
+            var newHttpResponse = await CreateHttpResponseAsync(httpReqData);
 
-        var invocationResult = context.GetInvocationResult();
+            var invocationResult = context.GetInvocationResult();
 
-        var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
-        if (httpOutputBindingFromMultipleOutputBindings is not null)
-        {
-            httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
-        }
-        else
-        {
-            invocationResult.Value = newHttpResponse;
+            var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
+            if (httpOutputBindingFromMultipleOutputBindings is not null)
+            {
+                httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
+            }
+            else
+            {
+                invocationResult.Value = newHttpResponse;
+            }
         }
     }
 
