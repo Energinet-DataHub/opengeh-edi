@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Immutable;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
@@ -72,7 +73,10 @@ public class WholesaleResultForAmountPerChargeDescription
         Resolution.Daily,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Daily, 0.348m, 2, 0.697M, QuantityQuality.Calculated));
+            .CreatePointsForPeriod(Period, Resolution.Daily, 0.348m, 2, 0.697M, QuantityQuality.Calculated),
+        ChargeCode: "Sub-804",
+        ChargeType: ChargeType.Subscription,
+        MeasurementUnit: MeasurementUnit.Pieces);
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForSystemOperator => new(
         GridArea: GridAreaCode,
@@ -112,7 +116,10 @@ public class WholesaleResultForAmountPerChargeDescription
             new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
             new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
             new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-        });
+        },
+        ChargeCode: "41000",
+        ChargeType: ChargeType.Tariff,
+        MeasurementUnit: MeasurementUnit.Kwh);
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty

@@ -487,6 +487,7 @@ public class BehavioursTestBase : IDisposable
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = _integrationTestFixture.DatabricksSchemaManager.SchemaName,
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                     // => Calculation Result views
+                    [$"{nameof(DeltaTableOptions.WholesaleCalculationResultsSchemaName)}"] = _integrationTestFixture.DatabricksSchemaManager.SchemaName,
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
                 })
             .Build();
