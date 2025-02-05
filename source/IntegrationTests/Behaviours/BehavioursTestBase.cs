@@ -340,8 +340,7 @@ public class BehavioursTestBase : IDisposable
         Func<string, TServiceBusMessage> parser)
         where TServiceBusMessage : IMessage
     {
-        var sentMessages = senderSpy.MessagesSent
-            .ToList();
+        var sentMessages = senderSpy.MessagesSent.ToList();
 
         sentMessages.Should().HaveCount(expectedCount);
 
@@ -352,6 +351,10 @@ public class BehavioursTestBase : IDisposable
             message.Body.Should().NotBeNull();
             var parsedMessage = parser(message.Body.ToString());
             parsedMessage.Should().NotBeNull();
+            message.ApplicationProperties.TryGetValue("MajorVersion", out var majorVersion);
+            majorVersion.Should().NotBeNull();
+            message.ApplicationProperties.TryGetValue("BodyFormat", out var bodyFormat);
+            bodyFormat.Should().NotBeNull();
 
             messages.Add(parsedMessage);
         }
