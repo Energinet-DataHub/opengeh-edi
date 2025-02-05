@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -51,6 +52,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -141,6 +143,7 @@ public class BehavioursTestBase : IDisposable
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
+        FeatureFlagManagerStub = new();
         _clockStub = new ClockStub();
         _serviceProvider = BuildServices(testOutputHelper);
 
@@ -151,6 +154,8 @@ public class BehavioursTestBase : IDisposable
         _authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator, _actorId));
     }
+
+    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; }
 
     private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
@@ -290,22 +295,18 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
-    protected ServiceBusSenderSpy CreateServiceBusSenderSpy()
+    protected ServiceBusSenderSpy CreateServiceBusSenderSpy(string? queueOrTopicName = null)
     {
-        var serviceBusSenderSpy = new ServiceBusSenderSpy(MockServiceBusName);
+        var serviceBusSenderSpy = new ServiceBusSenderSpy(queueOrTopicName ?? MockServiceBusName);
         _serviceBusSenderFactoryStub.AddSenderSpy(serviceBusSenderSpy);
 
         return serviceBusSenderSpy;
     }
 
-    protected (TServiceBusMessage Message, Guid ProcessId) AssertServiceBusMessage<TServiceBusMessage>(ServiceBusSenderSpy senderSpy, Func<BinaryData, TServiceBusMessage> parser)
-        where TServiceBusMessage : IMessage
-    {
-        var assertResult = AssertServiceBusMessages(senderSpy, 1, parser);
-        return assertResult.Single();
-    }
-
-    protected IList<(TServiceBusMessage Message, Guid ProcessId)> AssertServiceBusMessages<TServiceBusMessage>(ServiceBusSenderSpy senderSpy, int expectedCount, Func<BinaryData, TServiceBusMessage> parser)
+    protected IList<(TServiceBusMessage Message, Guid ProcessId)> AssertServiceBusMessages<TServiceBusMessage>(
+        ServiceBusSenderSpy senderSpy,
+        int expectedCount,
+        Func<BinaryData, TServiceBusMessage> parser)
         where TServiceBusMessage : IMessage
     {
         var sentMessages = senderSpy.MessagesSent
@@ -328,6 +329,34 @@ public class BehavioursTestBase : IDisposable
             parsedMessage.Should().NotBeNull();
 
             messages.Add((parsedMessage, processId));
+        }
+
+        return messages;
+    }
+
+    protected IList<TServiceBusMessage> AssertProcessManagerServiceBusMessages<TServiceBusMessage>(
+        ServiceBusSenderSpy senderSpy,
+        int expectedCount,
+        Func<string, TServiceBusMessage> parser)
+        where TServiceBusMessage : IMessage
+    {
+        var sentMessages = senderSpy.MessagesSent.ToList();
+
+        sentMessages.Should().HaveCount(expectedCount);
+
+        List<TServiceBusMessage> messages = [];
+        using var scope = new AssertionScope();
+        foreach (var message in sentMessages)
+        {
+            message.Body.Should().NotBeNull();
+            var parsedMessage = parser(message.Body.ToString());
+            parsedMessage.Should().NotBeNull();
+            message.ApplicationProperties.TryGetValue("MajorVersion", out var majorVersion);
+            majorVersion.Should().NotBeNull();
+            message.ApplicationProperties.TryGetValue("BodyFormat", out var bodyFormat);
+            bodyFormat.Should().NotBeNull();
+
+            messages.Add(parsedMessage);
         }
 
         return messages;
@@ -473,6 +502,7 @@ public class BehavioursTestBase : IDisposable
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule()
+            .AddEnqueueActorMessagesFromProcessManager(new DefaultAzureCredential())
             .AddEdiModule(config);
 
         _services.AddTransient<InboxEventsProcessor>()
@@ -501,7 +531,7 @@ public class BehavioursTestBase : IDisposable
         // Replace the services with stub implementations.
         // - Building blocks
         _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
-        _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
+        _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
 
         _services.AddSingleton<TelemetryClient>(x =>
         {
