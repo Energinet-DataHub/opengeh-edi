@@ -285,7 +285,7 @@ public class ActorRequestsClient(
             Interfaces.Models.CalculationResults.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
             Interfaces.Models.CalculationResults.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
             Interfaces.Models.CalculationResults.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
-            Interfaces.Models.CalculationResults.MeteringPointType.EffectSettlement => MeteringPointType.CapacitySettlement,
+            Interfaces.Models.CalculationResults.MeteringPointType.CapacitySettlement => MeteringPointType.CapacitySettlement,
             null => null,
             _ => throw new ArgumentOutOfRangeException(
                 nameof(meteringPointType),

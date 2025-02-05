@@ -36,7 +36,7 @@ public static class MeteringPointTypeMapper
             WholesaleServicesRequestSeries.Types.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
             WholesaleServicesRequestSeries.Types.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
             WholesaleServicesRequestSeries.Types.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.EffectSettlement => MeteringPointType.CapacitySettlement,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.CapacitySettlement => MeteringPointType.CapacitySettlement,
             WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
         };
@@ -59,7 +59,7 @@ public static class MeteringPointTypeMapper
             OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
             OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
             OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
-            OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType.EffectSettlement => MeteringPointType.CapacitySettlement,
+            OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType.CapacitySettlement => MeteringPointType.CapacitySettlement,
             OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType.Exchange => MeteringPointType.Exchange,
             _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
         };
