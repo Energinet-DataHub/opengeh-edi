@@ -13,8 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using PMTypes=Energinet.DataHub.ProcessManager.Components.ValueObjects;
+using PMTypes=Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -22,31 +21,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class SettlementMethod : DataHubType<SettlementMethod>
 {
     // Customer with more than ~100.000 kwH per year
-    public static readonly SettlementMethod NonProfiled = new(DataHubNames.SettlementMethod.NonProfiled, "E02");
+    public static readonly SettlementMethod NonProfiled = new(PMTypes.SettlementMethod.NonProfiled.Name, "E02");
 
     // Customer with less than ~100.000 kwH per year
-    public static readonly SettlementMethod Flex = new(DataHubNames.SettlementMethod.Flex, "D01");
+    public static readonly SettlementMethod Flex = new(PMTypes.SettlementMethod.Flex.Name, "D01");
 
     [JsonConstructor]
     private SettlementMethod(string name, string code)
-        : base(name, code)
-    {
-    }
-}
-
-// TODO: PoC
-// This is a very simple refactoring in which we don't change the "contract" of the types.
-// It also means we don't change any serialization/deserialization so everything should work as before.
-public class SettlementMethodWithCode : DataHubType<SettlementMethodWithCode>
-{
-    // Customer with more than ~100.000 kwH per year
-    public static readonly SettlementMethodWithCode NonProfiled = new(PMTypes.SettlementMethod.NonProfiled.Name, "E02");
-
-    // Customer with less than ~100.000 kwH per year
-    public static readonly SettlementMethodWithCode Flex = new(PMTypes.SettlementMethod.Flex.Name, "D01");
-
-    [JsonConstructor]
-    private SettlementMethodWithCode(string name, string code)
         : base(name, code)
     {
     }

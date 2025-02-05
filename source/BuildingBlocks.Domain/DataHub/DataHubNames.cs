@@ -71,12 +71,6 @@ public static class DataHubNames
         public const string Monthly = "Monthly";
     }
 
-    public static class SettlementMethod
-    {
-        public const string NonProfiled = "NonProfiled";
-        public const string Flex = "Flex";
-    }
-
     public static class SettlementVersion
     {
         public const string FirstCorrection = "FirstCorrection";
