@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
-using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
-using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 
 /// <summary>
+/// COPIED FROM PROCESS MODULE: Energinet.DataHub.EDI.Process.Application.Transactions.Mappers.CalculatedQuantityQualityMapper
+///
 ///     Provides mapping functionality for converting a collection of quantity qualities to EDI quality.
 ///     The conversion is based on the documentation at
 ///     https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
@@ -29,66 +28,6 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 /// </summary>
 public static class CalculatedQuantityQualityMapper
 {
-    /// <summary>
-    /// The following list describes the conversion of quantity qualities to EDI quality for energy results.
-    /// Note that the list is written in priotized order.
-    ///     <list type="number">
-    ///         <item>
-    ///             <description>
-    ///                 If the collection contains Missing and doesn't contain Estimated, Measured, or Calculated, it
-    ///                 returns CalculatedQuantityQuality.Missing.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 If the collection contains Missing, regardless of the other values, it returns
-    ///                 CalculatedQuantityQuality.Incomplete.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 If the collection contains Estimated, regardless of the other values, it returns
-    ///                 CalculatedQuantityQuality.Estimated.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 If the collection contains Measured, regardless of the other values, it returns
-    ///                 CalculatedQuantityQuality.Measured.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 If the collection contains Calculated, regardless of the other values, it returns
-    ///                 CalculatedQuantityQuality.Calculated.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>If none of the above conditions are met, it returns CalculatedQuantityQuality.NotAvailable.</description>
-    ///         </item>
-    ///     </list>
-    /// </summary>
-    /// <param name="quantityQualities">The collection of quantity qualities to convert.</param>
-    /// <returns>The calculated quantity quality based on the input collection.</returns>
-    public static CalculatedQuantityQuality MapForEnergyResults(
-        ICollection<QuantityQuality> quantityQualities)
-    {
-        ArgumentNullException.ThrowIfNull(quantityQualities);
-
-        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
-                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
-                measured: quantityQualities.Contains(QuantityQuality.Measured),
-                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
-            {
-                (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
-                (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
-                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-                _ => CalculatedQuantityQuality.NotAvailable,
-            };
-    }
-
     /// <summary>
     /// The following list describes the conversion of quantity qualities to EDI quality for wholesale services.
     /// Note that the list is written in priotized order.
@@ -148,14 +87,14 @@ public static class CalculatedQuantityQualityMapper
     /// </summary>
     /// <returns>The calculated quantity quality based on the input collection.</returns>
     public static CalculatedQuantityQuality? MapForWholesaleServices(
-        ICollection<QuantityQuality> quantityQualities,
-        WholesaleServicesRequestSeries.Types.Resolution resolution,
-        bool hasPrice,
-        WholesaleServicesRequestSeries.Types.ChargeType? chargeType)
+        IReadOnlyCollection<QuantityQuality> quantityQualities,
+        Resolution resolution,
+        ChargeType? chargeType,
+        bool hasPrice)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);
 
-        if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
+        if (resolution == Resolution.Monthly)
         {
             return null;
         }
@@ -165,7 +104,8 @@ public static class CalculatedQuantityQualityMapper
             return CalculatedQuantityQuality.Missing;
         }
 
-        if (chargeType is WholesaleServicesRequestSeries.Types.ChargeType.Subscription or WholesaleServicesRequestSeries.Types.ChargeType.Fee)
+        if (chargeType == ChargeType.Subscription
+            || chargeType == ChargeType.Fee)
         {
             return CalculatedQuantityQuality.Calculated;
         }
