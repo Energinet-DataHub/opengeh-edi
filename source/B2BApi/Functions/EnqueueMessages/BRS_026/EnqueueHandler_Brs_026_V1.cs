@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
@@ -34,12 +35,14 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 public class EnqueueHandler_Brs_026_V1(
     ILogger<EnqueueHandler_Brs_026_V1> logger,
     IActorRequestsClient actorRequestsClient,
-    IProcessManagerMessageClient processManagerMessageClient)
+    IProcessManagerMessageClient processManagerMessageClient,
+    IUnitOfWork unitOfWork)
     : EnqueueActorMessagesValidatedHandlerBase<RequestCalculatedEnergyTimeSeriesAcceptedV1, RequestCalculatedEnergyTimeSeriesRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
     private readonly IActorRequestsClient _actorRequestsClient = actorRequestsClient;
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
@@ -118,6 +121,8 @@ public class EnqueueHandler_Brs_026_V1(
 
         await _actorRequestsClient.EnqueueRejectAggregatedMeasureDataRequestAsync(enqueueRejectedMessageDto, cancellationToken)
             .ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(

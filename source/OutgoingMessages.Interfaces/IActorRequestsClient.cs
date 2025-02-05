@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 
@@ -27,11 +29,36 @@ public interface IActorRequestsClient
     /// <param name="aggregatedTimeSeriesQueryParameters"></param>
     public Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters);
 
+    public Task<int> EnqueueWholesaleServicesAsync(
+        WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        CancellationToken cancellationToken);
+
     public Task EnqueueRejectAggregatedMeasureDataRequestAsync(
         RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
         CancellationToken cancellationToken);
 
     public Task EnqueueRejectWholesaleServicesRequestAsync(
         RejectedWholesaleServicesMessageDto enqueueRejectedMessageDto,
+        CancellationToken cancellationToken);
+
+    public Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
+        WholesaleServicesQueryParameters queryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        BusinessReason businessReason,
         CancellationToken cancellationToken);
 }

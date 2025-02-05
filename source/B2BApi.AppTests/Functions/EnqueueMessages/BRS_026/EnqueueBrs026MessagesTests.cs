@@ -54,11 +54,13 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _fixture.AppHostManager.ClearHostLog();
+        _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         await Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
     {
+        _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         _fixture.SetTestOutputHelper(null!);
         await Task.CompletedTask;
     }
