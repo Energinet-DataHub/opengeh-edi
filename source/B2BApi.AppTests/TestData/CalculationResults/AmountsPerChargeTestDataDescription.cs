@@ -29,7 +29,7 @@ public static class AmountsPerChargeTestDataDescription
         BusinessReason: BusinessReason.WholesaleFixing,
         EnergySupplierNumber: ActorNumber.Create("5790001687137"),
         RowCount: 837,
-        ExpectedMessagesCount: 27); // Resolution is daily, so 283 rows / 31 days = 27 expected messages.
+        ExpectedMessagesCount: 27); // Resolution is daily, so 837 rows / 31 days = 27 expected messages.
 
     public record ResultSet(
         Instant PeriodStart,
