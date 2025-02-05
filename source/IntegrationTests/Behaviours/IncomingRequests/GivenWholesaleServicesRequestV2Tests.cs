@@ -168,8 +168,6 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 null,
                 new List<ChargeTypeInput> { new(chargeType.Name, chargeCode) }));
 
-        // TODO: Assert correct process is created?
-
         /*
          *  --- PART 2: Receive data from Wholesale and create RSM document ---
          */
