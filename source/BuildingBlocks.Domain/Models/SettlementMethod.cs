@@ -37,7 +37,7 @@ public class SettlementMethod : DataHubType<SettlementMethod>
 // TODO: PoC
 // This is a very simple refactoring in which we don't change the "contract" of the types.
 // It also means we don't change any serialization/deserialization so everything should work as before.
-public class SettlementMethodWithCode : DataHubType<SettlementMethod>
+public class SettlementMethodWithCode : DataHubType<SettlementMethodWithCode>
 {
     // Customer with more than ~100.000 kwH per year
     public static readonly SettlementMethodWithCode NonProfiled = new(PMTypes.SettlementMethod.NonProfiled.Name, "E02");
