@@ -46,35 +46,6 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             relatedToMessageId: process.InitiatedByMessageId);
     }
 
-    public static AcceptedWholesaleServicesMessageDto Create(
-        EventId eventId,
-        RequestWholesaleServicesTransaction transaction,
-        OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.WholesaleServices wholesaleServices)
-    {
-        ArgumentNullException.ThrowIfNull(transaction);
-        ArgumentNullException.ThrowIfNull(wholesaleServices);
-
-        var acceptedWholesaleServicesSeriesDto = WholesaleServicesResultMapper.MapToAcceptedWholesaleServicesSerieDto(wholesaleServices);
-
-        var message = CreateWholesaleResultSeries(transaction, acceptedWholesaleServicesSeriesDto);
-
-        var chargeOwnerId = wholesaleServices.ChargeOwnerId != null
-                ? ActorNumber.Create(wholesaleServices.ChargeOwnerId)
-                : null;
-
-        return AcceptedWholesaleServicesMessageDto.Create(
-            receiverNumber: transaction.RequestedByActor.ActorNumber,
-            receiverRole: transaction.RequestedByActor.ActorRole,
-            documentReceiverNumber: transaction.OriginalActor.ActorNumber,
-            documentReceiverRole: transaction.OriginalActor.ActorRole,
-            chargeOwnerId: chargeOwnerId,
-            processId: transaction.ProcessId.Id,
-            eventId: eventId,
-            businessReason: transaction.BusinessReason.Name,
-            wholesaleSeries: message,
-            relatedToMessageId: transaction.InitiatedByMessageId);
-    }
-
     private static AcceptedWholesaleServicesSeries CreateWholesaleResultSeries(
         WholesaleServicesProcess process,
         AcceptedWholesaleServicesSerieDto wholesaleServices)
@@ -98,33 +69,6 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             wholesaleServices.MeteringPointType,
             wholesaleServices.SettlementMethod,
             OriginalTransactionIdReference: process.BusinessTransactionId);
-
-        return acceptedWholesaleCalculationSeries;
-    }
-
-    private static AcceptedWholesaleServicesSeries CreateWholesaleResultSeries(
-        RequestWholesaleServicesTransaction transaction,
-        AcceptedWholesaleServicesSerieDto wholesaleServices)
-    {
-        var acceptedWholesaleCalculationSeries = new AcceptedWholesaleServicesSeries(
-            TransactionId: TransactionId.New(),
-            CalculationVersion: wholesaleServices.CalculationResultVersion,
-            GridAreaCode: wholesaleServices.GridArea,
-            ChargeCode: wholesaleServices.ChargeCode,
-            IsTax: false,
-            Points: PointsMapper.Map(wholesaleServices.Points),
-            EnergySupplier: wholesaleServices.EnergySupplierId,
-            ChargeOwner: wholesaleServices.ChargeOwnerId,
-            Period: new Period(wholesaleServices.StartOfPeriod, wholesaleServices.EndOfPeriod),
-            wholesaleServices.SettlementVersion,
-            wholesaleServices.MeasurementUnit,
-            PriceMeasureUnit: IsTotalSum(wholesaleServices) ? null : MeasurementUnit.TryFromChargeType(wholesaleServices.ChargeType),
-            wholesaleServices.Currency,
-            wholesaleServices.ChargeType,
-            wholesaleServices.Resolution,
-            wholesaleServices.MeteringPointType,
-            wholesaleServices.SettlementMethod,
-            OriginalTransactionIdReference: transaction.BusinessTransactionId);
 
         return acceptedWholesaleCalculationSeries;
     }
