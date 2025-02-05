@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
@@ -28,7 +29,18 @@ public class ActorRequestsClient(
     private readonly IAggregatedTimeSeriesQueries _aggregatedTimeSeriesQueries = aggregatedTimeSeriesQueries;
     private readonly IWholesaleServicesQueries _wholesaleServicesQueries = wholeSaleServicesQueries;
 
-    public async Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters)
+    public async Task EnqueueAggregatedMeasureDataAsync(
+        string orchestrationInstanceId,
+        string originalTransactionId,
+        string originalMessageId,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        BusinessReason businessReason,
+        MeteringPointType? meteringPointType,
+        SettlementMethod? settlementMethod,
+        SettlementVersion? settlementVersion,
+        Resolution resolution,
+        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters)
     {
         // 3a. Query data from wholesale
         var calculationResults = await _aggregatedTimeSeriesQueries
@@ -51,30 +63,33 @@ public class ActorRequestsClient(
 
             // 3c. Create AcceptedEnergyResultMessageDto - (waiting for RequestCalculatedEnergyTimeSeriesAcceptedV1 model to be finished).
 
-            // ------------------------------------------------------------------------- //
-            // ALL PROPERTIES CONTAIN DUMMY DATA UNTIL RequestCalculatedEnergyTimeSeriesAcceptedV1 IS DONE.
-            // ------------------------------------------------------------------------- //
+            var pointList = new List<AcceptedEnergyResultMessagePoint>();
+
             var acceptedEnergyResult = AcceptedEnergyResultMessageDto.Create(
-                receiverNumber: ActorNumber.Create("12345"),
-                receiverRole: receiverRole,
-                documentReceiverNumber: ActorNumber.Create("12345"),
-                documentReceiverRole: documentReceiverRole,
-                processId: Guid.NewGuid(),
-                eventId: EventId.From(Guid.NewGuid()),
+                receiverNumber: requestedForActorNumber,
+                receiverRole: requestedForActorRole,
+                documentReceiverNumber: requestedForActorNumber,
+                documentReceiverRole: requestedForActorRole,
+                processId: Guid.Parse(orchestrationInstanceId),
+                eventId: EventId.From(originalMessageId),
                 gridAreaCode: result.GridArea,
-                meteringPointType: MeteringPointType.Consumption.Name,
-                settlementMethod: SettlementMethod.Flex.Name,
+                meteringPointType: meteringPointType?.Name,
+                settlementMethod: settlementMethod?.Name,
                 measureUnitType: MeasurementUnit.Kwh.Name,
-                resolution: BuildingBlocks.Domain.Models.Resolution.Hourly.Name,
+                resolution: R.FromName(result.Resolution.ToString()).Name,
                 energySupplierNumber: aggregatedTimeSeriesQueryParameters.EnergySupplierId,
                 balanceResponsibleNumber: aggregatedTimeSeriesQueryParameters.BalanceResponsibleId,
                 period: new Period(result.PeriodStart, result.PeriodEnd),
-                points: new List<AcceptedEnergyResultMessagePoint>(),
-                businessReasonName: businessReason,
+                points: result.TimeSeriesPoints.Select(x => new AcceptedEnergyResultMessagePoint(
+                    Position: 1, // Where does this come from? It used to come from AcceptedEnergyResultTimeSeriesCommand.
+                    Quantity: x.Quantity,
+                    QuantityQuality: x.Qualities,
+                    SampleTime: string.Empty)), // Where does this come from? It used to come from AcceptedEnergyResultTimeSeriesCommand.
+                businessReasonName: businessReason.Name,
                 calculationResultVersion: 1,
-                originalTransactionIdReference: TransactionId.New(),
-                settlementVersion: "settlementVersion",
-                relatedToMessageId: MessageId.New());
+                originalTransactionIdReference: TransactionId.From(originalTransactionId),
+                settlementVersion: settlementVersion?.Name,
+                relatedToMessageId: null);
 
             // 3d. Enqueue the message
             await _outgoingMessagesClient.EnqueueAsync(acceptedEnergyResult, CancellationToken.None).ConfigureAwait(false);

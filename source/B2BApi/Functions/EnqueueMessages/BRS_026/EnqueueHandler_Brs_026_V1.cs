@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Microsoft.Extensions.Logging;
-using NodaTime;
-using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.TimeSeriesType;
+using Period = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 
@@ -46,31 +47,28 @@ public class EnqueueHandler_Brs_026_V1(
             "Received enqueue accepted message(s) for BRS 026. Data: {0}",
             acceptedData);
 
-        // TODO: Call actual logic that enqueues accepted messages instead
-        // DUMMY for build purpose.
-        var request = new AggregatedTimeSeriesRequest(
-            Period: new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.Period(Instant.FromUtc(2024, 1, 31, 23, 00), Instant.FromUtc(2024, 2, 1, 23, 00)),
-            TimeSeriesTypes: [TimeSeriesType.FlexConsumption],
-            AggregationPerRoleAndGridArea: new AggregationPerRoleAndGridArea(["804"]),
-            CalculationType: EDI.OutgoingMessages.Interfaces.Models.CalculationResults.CalculationType.Aggregation);
+        var request = AggregatedTimeSeriesRequestFactory.Parse(acceptedData);
 
-        // 1. Map RequestCalculatedEnergyTimeSeriesAcceptedV1 to AggregatedTimeSeriesQueryParameters when it is ready - model is currently empty.
-        // DUMMY
         var query = new AggregatedTimeSeriesQueryParameters(
-            [EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType.FlexConsumption],
-            ["804"],
-            null,
-            null,
+            request.TimeSeriesTypes.Select(CalculationTimeSeriesTypeMapper.MapTimeSeriesTypeFromEdi).ToList(),
+            request.AggregationPerRoleAndGridArea.GridAreaCodes,
+            request.AggregationPerRoleAndGridArea.EnergySupplierId,
+            request.AggregationPerRoleAndGridArea.BalanceResponsibleId,
             request.CalculationType,
-            new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(request.Period.Start, request.Period.End));
+            new Period(request.Period.Start, request.Period.End));
 
-        // 2. Call IActorRequestsClient.EnqueueAggregatedMeasureDataAsync(query + needed properties from RequestCalculatedEnergyTimeSeriesAcceptedV1);
-        // TODO: Add correct properties
-        await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(acceptedData.BusinessReason.ToString(), query).ConfigureAwait(false);
+        await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(
+            orchestrationInstanceId: orchestrationInstanceId,
+            originalTransactionId: acceptedData.OriginalTransactionId,
+            originalMessageId: acceptedData.OriginalMessageId,
+            requestedForActorNumber: ActorNumber.Create(acceptedData.RequestedForActorNumber.Value),
+            requestedForActorRole: ActorRole.FromCode(acceptedData.RequestedForActorRole.Code),
+            businessReason: BusinessReason.FromCode(acceptedData.BusinessReason.Code),
+            meteringPointType: acceptedData.MeteringPointType != null ? MeteringPointType.FromCode(acceptedData.MeteringPointType.Code) : null,
+            settlementMethod: acceptedData.SettlementMethod != null ? SettlementMethod.FromCode(acceptedData.SettlementMethod.Code) : null,
+            settlementVersion: acceptedData.SettlementVersion != null ? SettlementVersion.FromCode(acceptedData.SettlementVersion.Code) : null,
+            query).ConfigureAwait(false);
 
-        // 3. See inside _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(query).
-
-        // TODO: NotifyOrchestrationInstanceAsync should maybe happen in another layer, when the method is actually implemented
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
                     OrchestrationInstanceId: orchestrationInstanceId,
