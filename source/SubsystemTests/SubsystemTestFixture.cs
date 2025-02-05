@@ -93,6 +93,9 @@ public class SubsystemTestFixture : IAsyncLifetime
         var serviceBusFullyQualifiedNamespace = $"{GetConfigurationValue<string>(root, "sb-domain-relay-namespace-name")}.servicebus.windows.net";
         var topicName = GetConfigurationValue<string>(root, "sbt-shres-integrationevent-received-name");
         var ediInboxQueueName = GetConfigurationValue<string>(root, "sbq-edi-inbox-messagequeue-name");
+
+        // TODO: Update these
+        var ediTopicName = "EdiTopicName";
         _processMangerTopicName = "ProcessManagerTopicName";
 
         _azureB2CTenantId = GetConfigurationValue<string>(root, "b2c-tenant-id", defaultValue: "e9aa9b15-7200-441e-b255-927506b3494");
@@ -180,6 +183,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         ServiceBusClient = new ServiceBusClient(serviceBusFullyQualifiedNamespace, credential);
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
+        EdiTopicClient = new EdiTopicClient(ServiceBusClient, ediTopicName);
 
         DurableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
@@ -217,6 +221,8 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     internal EdiInboxClient EdiInboxClient { get; }
 
+    internal EdiTopicClient EdiTopicClient { get; }
+
     internal string ConnectionString { get; }
 
     internal Uri ApiManagementUri { get; }
@@ -238,6 +244,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         // Close subclients before client (ServiceBusClient)
         await EventPublisher.DisposeAsync();
         await EdiInboxClient.DisposeAsync();
+        await EdiTopicClient.DisposeAsync();
         await ServiceBusClient.DisposeAsync();
 
         await B2BClients.DisposeAsync();
