@@ -27,13 +27,9 @@ public static class TimeSeriesTypeMapper
             var mpt when mpt == MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
             var mpt when mpt == MeteringPointType.Consumption => settlementMethodName switch
             {
-                var name when string.IsNullOrWhiteSpace(name)
-                    => TimeSeriesType.TotalConsumption,
-
-                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.NonProfiled
-                    => TimeSeriesType.NonProfiledConsumption,
-                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.Flex
-                    => TimeSeriesType.FlexConsumption,
+                var name when string.IsNullOrWhiteSpace(name) => TimeSeriesType.TotalConsumption,
+                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
+                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
 
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementMethodName),
