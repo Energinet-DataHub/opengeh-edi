@@ -47,7 +47,7 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
 
     public override Guid CalculationId => Guid.Parse("44a9e9fd-01a9-4c37-bb09-fca2d456a414");
 
-    public override string GridAreaCode => "804";
+    public override IList<string> GridAreaCodes => new List<string>() { "804" };
 
     public override int ExpectedCalculationResultsCount => 7;
 
@@ -62,7 +62,7 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         Instant.FromUtc(2023, 2, 28, 23, 0, 0));
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForSystemOperator => new(
-        GridArea: GridAreaCode,
+        GridArea: GridAreaCodes.First(),
         Currency.DanishCrowns,
         ActorNumber.Create("5790001662233"),
         null,
@@ -73,7 +73,7 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
             .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 61754.247M, null));
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForChargeOwner => new(
-        GridArea: GridAreaCode,
+        GridArea: GridAreaCodes.First(),
         Currency.DanishCrowns,
         ActorNumber.Create("5790001662233"),
         null,
@@ -84,7 +84,7 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
             .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null));
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForEnergySupplier => new(
-        GridArea: GridAreaCode,
+        GridArea: GridAreaCodes.First(),
         Currency.DanishCrowns,
         ActorNumber.Create("5790001662233"),
         null,
@@ -96,5 +96,5 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty
-            .Add(GridAreaCode, ActorNumber.Create("8500000000502"));
+            .Add(GridAreaCodes.First(), ActorNumber.Create("8500000000502"));
 }

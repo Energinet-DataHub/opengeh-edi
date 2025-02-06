@@ -42,7 +42,12 @@ public static class WholesaleServicesResponseEventBuilder
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data
     /// </summary>
-    public static WholesaleServicesRequestAccepted GenerateAcceptedFrom(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, string? defaultEnergySupplierId = null, ICollection<string>? defaultGridAreas = null)
+    public static WholesaleServicesRequestAccepted GenerateAcceptedFrom(
+        WholesaleServicesRequest request,
+        Instant now,
+        string? defaultChargeOwnerId = null,
+        string? defaultEnergySupplierId = null,
+        ICollection<string>? defaultGridAreas = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(now);
@@ -152,7 +157,14 @@ public static class WholesaleServicesResponseEventBuilder
         return requestAcceptedMessage;
     }
 
-    public static ServiceBusMessage GenerateAcceptedFrom(RequestCalculatedWholesaleServicesInputV1 requestCalculatedWholesaleServicesInputV1, Instant getNow)
+    /// <summary>
+    /// Accepted Response from PM
+    /// </summary>
+    /// <param name="requestCalculatedWholesaleServicesInputV1"></param>
+    /// <param name="gridAreas">All grid areas which PM finds for requester, when request is not limited by gridAreas</param>
+    public static ServiceBusMessage GenerateAcceptedFrom(
+        RequestCalculatedWholesaleServicesInputV1 requestCalculatedWholesaleServicesInputV1,
+        IReadOnlyCollection<string>? gridAreas = null)
     {
         var chargeTypes = requestCalculatedWholesaleServicesInputV1.ChargeTypes?
             .Select(x => new RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType(PMChargeType.FromName(x.ChargeType!), x.ChargeCode))
@@ -173,6 +185,9 @@ public static class WholesaleServicesResponseEventBuilder
         var resolution = requestCalculatedWholesaleServicesInputV1.Resolution != null
             ? PMResolution.FromName(requestCalculatedWholesaleServicesInputV1.Resolution)
             : null;
+        var acceptedGridAreas = requestCalculatedWholesaleServicesInputV1.GridAreas.Count != 0
+            ? requestCalculatedWholesaleServicesInputV1.GridAreas
+            : gridAreas;
         var acceptRequest = new RequestCalculatedWholesaleServicesAcceptedV1(
             OriginalActorMessageId: requestCalculatedWholesaleServicesInputV1.ActorMessageId,
             OriginalTransactionId: requestCalculatedWholesaleServicesInputV1.TransactionId,
@@ -184,7 +199,7 @@ public static class WholesaleServicesResponseEventBuilder
             Resolution: resolution,
             PeriodStart: InstantPattern.General.Parse(requestCalculatedWholesaleServicesInputV1.PeriodStart).Value.ToDateTimeOffset(),
             PeriodEnd: periodEnd,
-            GridAreas: requestCalculatedWholesaleServicesInputV1.GridAreas,
+            GridAreas: acceptedGridAreas ?? throw new ArgumentNullException(nameof(acceptedGridAreas), "acceptedGridAreas must be set when request has no GridAreaCodes"),
             EnergySupplierNumber: energySupplierNumber,
             ChargeOwnerNumber: chargeOwnerNumber,
             SettlementVersion: settlementVersion,
@@ -195,7 +210,7 @@ public static class WholesaleServicesResponseEventBuilder
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = Brs_028.V1.Version,
             OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
-            OrchestrationInstanceId = Guid.NewGuid().ToString(), // TODO, could be used to assert on when notifying the orchestration instance in pm
+            OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(acceptRequest);
 

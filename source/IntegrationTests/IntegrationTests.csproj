@@ -173,6 +173,9 @@ limitations under the License.
       <None Update="CalculationResults\TestData\wholesale_calculation_results.total_monthly_amounts_v1.csv">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Behaviours\IntegrationEvents\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_803_and_804_amount_per_charge_v1.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>

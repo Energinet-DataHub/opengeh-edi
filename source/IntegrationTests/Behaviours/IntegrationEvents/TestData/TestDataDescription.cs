@@ -48,7 +48,7 @@ public abstract class TestDataDescription
     /// <summary>
     /// Grid area code matching test file content.
     /// </summary>
-    public abstract string GridAreaCode { get; }
+    public abstract IList<string> GridAreaCodes { get; }
 
     /// <summary>
     /// Expected calculation results based on test file content.

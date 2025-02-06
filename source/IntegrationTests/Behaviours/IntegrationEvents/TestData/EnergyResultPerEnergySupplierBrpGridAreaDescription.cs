@@ -36,7 +36,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override Guid CalculationId => Guid.Parse("a8cfe7c7-f197-405c-b922-52153fa0332d");
 
-    public override string GridAreaCode => "543";
+    public override IList<string> GridAreaCodes => new List<string>() { "543" };
 
     public override int ExpectedCalculationResultsCount => 36;
 
