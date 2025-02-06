@@ -56,6 +56,7 @@ public static class DataHubNames
         public const string Pieces = "Pieces";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class MeteringPointType
     {
         public const string Consumption = "Consumption";

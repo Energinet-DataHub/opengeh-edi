@@ -12,28 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Models;
-using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
 
 public static class TimeSeriesTypeMapper
 {
-    public static TimeSeriesType MapTimeSeriesType(string meteringPointType, string? settlementMethodName)
+    public static TimeSeriesType MapTimeSeriesType(string meteringPointTypeName, string? settlementMethodName)
     {
-        return meteringPointType switch
+        return MeteringPointType.FromName(meteringPointTypeName) switch
         {
-            DataHubNames.MeteringPointType.Production => TimeSeriesType.Production,
-            DataHubNames.MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
-            DataHubNames.MeteringPointType.Consumption => settlementMethodName switch
+            var meteringPointType when meteringPointType == MeteringPointType.Production => TimeSeriesType.Production,
+            var meteringPointType when meteringPointType == MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
+            var meteringPointType when meteringPointType == MeteringPointType.Consumption => settlementMethodName switch
             {
                 var name when string.IsNullOrWhiteSpace(name)
                     => TimeSeriesType.TotalConsumption,
 
-                var name when PMTypes.SettlementMethod.FromNameOrDefault(name) == PMTypes.SettlementMethod.NonProfiled
+                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.NonProfiled
                     => TimeSeriesType.NonProfiledConsumption,
-                var name when PMTypes.SettlementMethod.FromNameOrDefault(name) == PMTypes.SettlementMethod.Flex
+                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.Flex
                     => TimeSeriesType.FlexConsumption,
 
                 _ => throw new ArgumentOutOfRangeException(
@@ -43,8 +42,8 @@ public static class TimeSeriesTypeMapper
             },
 
             _ => throw new ArgumentOutOfRangeException(
-                nameof(meteringPointType),
-                actualValue: meteringPointType,
+                nameof(meteringPointTypeName),
+                actualValue: meteringPointTypeName,
                 "Value does not contain a valid string representation of a metering point type."),
         };
     }

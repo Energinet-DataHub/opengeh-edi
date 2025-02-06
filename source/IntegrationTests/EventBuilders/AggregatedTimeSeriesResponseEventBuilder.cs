@@ -111,15 +111,18 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         return rejectedResponse;
     }
 
-    private static TimeSeriesType GetTimeSeriesType(string? settlementMethodName, string? meteringPointType)
+    private static TimeSeriesType GetTimeSeriesType(string? settlementMethodName, string? meteringPointTypeName)
     {
-        return (PMTypes.SettlementMethod.FromNameOrDefault(settlementMethodName), meteringPointType) switch
+        return (PMTypes.SettlementMethod.FromNameOrDefault(settlementMethodName), PMTypes.MeteringPointType.FromNameOrDefault(meteringPointTypeName)) switch
         {
-            (var settlementMethod, DataHubNames.MeteringPointType.Consumption) when settlementMethod == PMTypes.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
-            (var settlementMethod, DataHubNames.MeteringPointType.Consumption) when settlementMethod == PMTypes.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-            (null, DataHubNames.MeteringPointType.Production) => TimeSeriesType.Production,
+            (var settlementMethod, var meteringPointType) when
+                settlementMethod == PMTypes.SettlementMethod.Flex && meteringPointType == PMTypes.MeteringPointType.Consumption => TimeSeriesType.FlexConsumption,
+            (var settlementMethod, var meteringPointType) when
+                settlementMethod == PMTypes.SettlementMethod.NonProfiled && meteringPointType == PMTypes.MeteringPointType.Consumption => TimeSeriesType.NonProfiledConsumption,
+            (null, var meteringPointType) when
+                meteringPointType == PMTypes.MeteringPointType.Production => TimeSeriesType.Production,
             (null, null) => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
-            _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethodName} and {meteringPointType})"),
+            _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethodName} and {meteringPointTypeName})"),
         };
     }
 
