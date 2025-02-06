@@ -13,20 +13,24 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
-using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
-public record ExampleWholesaleResultMessageForActor(
-    string GridArea,
-    Currency Currency,
-    ActorNumber EnergySupplier,
-    MeteringPointType? MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    int Version,
-    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points,
-    string? ChargeCode = null,
-    ChargeType? ChargeType = null,
-    MeasurementUnit? MeasurementUnit = null);
+public record RequestCalculatedWholesaleServicesInputV1AssertionInput(
+    TransactionId TransactionId,
+    string RequestedForActorNumber,
+    string RequestedForActorRole,
+    BusinessReason BusinessReason,
+    Resolution? Resolution,
+    Instant PeriodStart,
+    Instant? PeriodEnd,
+    string? EnergySupplierNumber,
+    string? ChargeOwnerNumber,
+    IReadOnlyCollection<string> GridAreas,
+    string? SettlementVersion,
+    IReadOnlyCollection<ChargeTypeInput>? ChargeTypes);
+
+public record ChargeTypeInput(
+    string? ChargeType,
+    string? ChargeCode);

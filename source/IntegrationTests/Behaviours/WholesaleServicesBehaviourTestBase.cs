@@ -15,21 +15,33 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -37,9 +49,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
 public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
 {
+    private readonly IntegrationTestFixture _fixture;
+    private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions;
+
     protected WholesaleServicesBehaviourTestBase(IntegrationTestFixture fixture, ITestOutputHelper outputHelper)
         : base(fixture, outputHelper)
     {
+        _fixture = fixture;
+        _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 
     protected async Task<string> GetGridAreaFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
@@ -94,6 +111,16 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return GivenWholesaleServicesRequestResponseIsReceived(processId, rejectedMessage);
     }
 
+    protected async Task GivenWholesaleServicesRequestRejectedIsReceived(ServiceBusMessage rejectedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(rejectedMessage);
+    }
+
+    protected async Task GivenWholesaleServicesRequestAcceptedIsReceived(ServiceBusMessage message)
+    {
+        await GivenProcessManagerResponseIsReceived(message);
+    }
+
     protected async Task<(WholesaleServicesRequest WholesaleServicesRequest, Guid ProcessId)> ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
         WholesaleServicesMessageAssertionInput assertionInput)
@@ -101,6 +128,17 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         var assertionResult = await ThenWholesaleServicesRequestServiceBusMessagesAreCorrect(
             senderSpy,
             new List<WholesaleServicesMessageAssertionInput> { assertionInput });
+
+        return assertionResult.Single();
+    }
+
+    protected async Task<StartOrchestrationInstanceV1> ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+        ServiceBusSenderSpy senderSpy,
+        RequestCalculatedWholesaleServicesInputV1AssertionInput assertionInput)
+    {
+        var assertionResult = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessagesAreCorrect(
+            senderSpy,
+            new List<RequestCalculatedWholesaleServicesInputV1AssertionInput> { assertionInput });
 
         return assertionResult.Single();
     }
@@ -122,6 +160,28 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
 
         messages.Select(m => m.Message)
             .OrderBy(m => string.Join(",", m.GridAreaCodes))
+            .Should()
+            .SatisfyRespectively(assertionMethods);
+
+        return Task.FromResult(messages);
+    }
+
+    protected Task<IList<StartOrchestrationInstanceV1>> ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessagesAreCorrect(
+        ServiceBusSenderSpy senderSpy,
+        IList<RequestCalculatedWholesaleServicesInputV1AssertionInput> assertionInputs)
+    {
+        var messages = AssertProcessManagerServiceBusMessages(
+            senderSpy: senderSpy,
+            expectedCount: assertionInputs.Count,
+            parser: data => StartOrchestrationInstanceV1.Parser.ParseJson(data));
+
+        using var assertionScope = new AssertionScope();
+
+        var assertionMethods = assertionInputs
+            .Select(GetAssertServiceBusMessage);
+
+        messages
+            .Select(x => x.ParseInput<RequestCalculatedWholesaleServicesInputV1>())
             .Should()
             .SatisfyRespectively(assertionMethods);
 
@@ -220,6 +280,22 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return response;
     }
 
+    protected async Task<WholesaleResultForAmountPerChargeDescription> GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
+    {
+        var wholesaleResultForAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
+        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
+            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
+            _ediDatabricksOptions.Value,
+            wholesaleResultForAmountPerChargeDescription.GridAreaOwners,
+            EventId.From(Guid.NewGuid()),
+            wholesaleResultForAmountPerChargeDescription.CalculationId,
+            null);
+
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeDescription.TestFilePath);
+        return wholesaleResultForAmountPerChargeDescription;
+    }
+
     private static Action<WholesaleServicesRequest> GetAssertServiceBusMessage(
         WholesaleServicesMessageAssertionInput input)
     {
@@ -271,6 +347,39 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         };
     }
 
+    private static Action<RequestCalculatedWholesaleServicesInputV1> GetAssertServiceBusMessage(
+        RequestCalculatedWholesaleServicesInputV1AssertionInput input)
+    {
+        return (message) =>
+        {
+            message.TransactionId.Should().BeEquivalentTo(input.TransactionId.Value);
+            message.GridAreas.Should().BeEquivalentTo(input.GridAreas);
+            message.RequestedForActorNumber.Should().Be(input.RequestedForActorNumber);
+            message.RequestedForActorRole.Should().Be(input.RequestedForActorRole);
+            message.EnergySupplierNumber.Should().Be(input.EnergySupplierNumber);
+            message.ChargeOwnerNumber.Should().Be(input.ChargeOwnerNumber);
+            message.Resolution.Should().Be(input.Resolution?.Name);
+            message.BusinessReason.Should().Be(input.BusinessReason.Name);
+            message.PeriodStart.Should().Be(input.PeriodStart.ToString());
+            message.PeriodEnd.Should().Be(input.PeriodEnd.ToString());
+            message.SettlementVersion.Should().Be(input.SettlementVersion);
+
+            if (input.ChargeTypes == null)
+            {
+                message.ChargeTypes.Should().BeEmpty();
+            }
+            else
+            {
+                message.ChargeTypes.Should()
+                    .BeEquivalentTo(
+                        input.ChargeTypes.Select(
+                            ct => new RequestCalculatedWholesaleServicesInputV1.ChargeTypeInput(
+                                ct.ChargeType,
+                                ct.ChargeCode)));
+            }
+        };
+    }
+
     private Task GivenWholesaleServicesRequestResponseIsReceived<TType>(Guid processId, TType wholesaleServicesRequestResponseMessage)
         where TType : IMessage
     {
@@ -278,5 +387,16 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
             eventType: typeof(TType).Name,
             eventPayload: wholesaleServicesRequestResponseMessage,
             processId: processId);
+    }
+
+    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage rejectedMessage)
+    {
+        var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
+            messageId: Guid.NewGuid().ToString(),
+            subject: rejectedMessage.Subject,
+            body: rejectedMessage.Body,
+            properties: rejectedMessage.ApplicationProperties);
+        var enqueueHandler = GetService<EnqueueHandler_Brs_028_V1>();
+        await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
     }
 }

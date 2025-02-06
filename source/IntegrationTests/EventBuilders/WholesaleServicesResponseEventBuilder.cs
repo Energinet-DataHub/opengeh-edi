@@ -13,13 +13,26 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.ProcessManager.Abstractions.Components.BusinessValidation;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
+using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using PMActorNumber = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorNumber;
+using PMActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
+using PMBusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
+using PMChargeType = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ChargeType;
+using PMResolution = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.Resolution;
+using PMSettlementVersion = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -139,6 +152,60 @@ public static class WholesaleServicesResponseEventBuilder
         return requestAcceptedMessage;
     }
 
+    public static ServiceBusMessage GenerateAcceptedFrom(RequestCalculatedWholesaleServicesInputV1 requestCalculatedWholesaleServicesInputV1, Instant getNow)
+    {
+        var chargeTypes = requestCalculatedWholesaleServicesInputV1.ChargeTypes?
+            .Select(x => new RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType(PMChargeType.FromName(x.ChargeType!), x.ChargeCode))
+            ?? new List<RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType>() { new(PMChargeType.Tariff, "25361478") };
+
+        var periodEnd = requestCalculatedWholesaleServicesInputV1.PeriodEnd != null ?
+            InstantPattern.General.Parse(requestCalculatedWholesaleServicesInputV1.PeriodEnd).Value.ToDateTimeOffset()
+            : throw new ArgumentNullException(nameof(requestCalculatedWholesaleServicesInputV1.PeriodEnd), "PeriodEnd must be set");
+        var energySupplierNumber = requestCalculatedWholesaleServicesInputV1.EnergySupplierNumber != null
+            ? PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.EnergySupplierNumber)
+            : null;
+        var chargeOwnerNumber = requestCalculatedWholesaleServicesInputV1.ChargeOwnerNumber != null
+            ? PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.ChargeOwnerNumber)
+            : null;
+        var settlementVersion = requestCalculatedWholesaleServicesInputV1.SettlementVersion != null
+            ? PMSettlementVersion.FromName(requestCalculatedWholesaleServicesInputV1.SettlementVersion)
+            : null;
+        var resolution = requestCalculatedWholesaleServicesInputV1.Resolution != null
+            ? PMResolution.FromName(requestCalculatedWholesaleServicesInputV1.Resolution)
+            : null;
+        var acceptRequest = new RequestCalculatedWholesaleServicesAcceptedV1(
+            OriginalActorMessageId: requestCalculatedWholesaleServicesInputV1.ActorMessageId,
+            OriginalTransactionId: requestCalculatedWholesaleServicesInputV1.TransactionId,
+            RequestedForActorNumber: PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.RequestedForActorNumber),
+            RequestedForActorRole: PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedForActorRole),
+            RequestedByActorNumber: PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber),
+            RequestedByActorRole: PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedByActorRole),
+            BusinessReason: PMBusinessReason.FromName(requestCalculatedWholesaleServicesInputV1.BusinessReason),
+            Resolution: resolution,
+            PeriodStart: InstantPattern.General.Parse(requestCalculatedWholesaleServicesInputV1.PeriodStart).Value.ToDateTimeOffset(),
+            PeriodEnd: periodEnd,
+            GridAreas: requestCalculatedWholesaleServicesInputV1.GridAreas,
+            EnergySupplierNumber: energySupplierNumber,
+            ChargeOwnerNumber: chargeOwnerNumber,
+            SettlementVersion: settlementVersion,
+            ChargeTypes: chargeTypes.ToList());
+
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_028.Name,
+            OrchestrationVersion = Brs_028.V1.Version,
+            OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+            OrchestrationInstanceId = Guid.NewGuid().ToString(), // TODO, could be used to assert on when notifying the orchestration instance in pm
+        };
+        enqueueActorMessages.SetData(acceptRequest);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_028.Name),
+            idempotencyKey: Guid.NewGuid().ToString());
+
+        return serviceBusMessage;
+    }
+
     public static WholesaleServicesRequestRejected GenerateRejectedFrom(WholesaleServicesRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -169,6 +236,43 @@ public static class WholesaleServicesResponseEventBuilder
         }
 
         return rejectedMessage;
+    }
+
+    public static ServiceBusMessage GenerateRejectedFrom(
+        RequestCalculatedWholesaleServicesInputV1 requestCalculatedWholesaleServicesInputV1,
+        string errorMessage,
+        string errorCode)
+    {
+        var validationErrors = new List<ValidationErrorDto>()
+        {
+            new(
+                errorMessage,
+                errorCode),
+        };
+        var rejectRequest = new RequestCalculatedWholesaleServicesRejectedV1(
+            OriginalMessageId: requestCalculatedWholesaleServicesInputV1.ActorMessageId,
+            OriginalTransactionId: requestCalculatedWholesaleServicesInputV1.TransactionId,
+            RequestedForActorNumber: PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.RequestedForActorNumber),
+            RequestedForActorRole: PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedForActorRole),
+            RequestedByActorNumber: PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber),
+            RequestedByActorRole: PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedByActorRole),
+            BusinessReason: PMBusinessReason.FromName(requestCalculatedWholesaleServicesInputV1.BusinessReason),
+            validationErrors);
+
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_028.Name,
+            OrchestrationVersion = Brs_028.V1.Version,
+            OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+            OrchestrationInstanceId = Guid.NewGuid().ToString(), // TODO, could be used to assert on when notifying the orchestration instance in pm
+        };
+        enqueueActorMessages.SetData(rejectRequest);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_028.Name),
+            idempotencyKey: Guid.NewGuid().ToString());
+
+        return serviceBusMessage;
     }
 
     private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodStart, Instant periodEnd)
