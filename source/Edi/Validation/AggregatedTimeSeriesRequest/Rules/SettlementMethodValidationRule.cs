@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
 
@@ -20,8 +21,8 @@ public class SettlementMethodValidationRule : IValidationRule<DataHub.Edi.Reques
 {
     private static readonly IReadOnlyList<string> _validSettlementMethods = new List<string>
     {
-        DataHubNames.SettlementMethod.Flex,
-        DataHubNames.SettlementMethod.NonProfiled,
+        PMTypes.SettlementMethod.Flex.Name,
+        PMTypes.SettlementMethod.NonProfiled.Name,
     };
 
     private static readonly string _validMeteringPointType = DataHubNames.MeteringPointType.Consumption;

@@ -21,6 +21,7 @@ using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Duration = NodaTime.Duration;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -112,10 +113,10 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
 
     private static TimeSeriesType GetTimeSeriesType(string? settlementMethod, string? meteringPointType)
     {
-        return (settlementMethod, meteringPointType) switch
+        return (PMTypes.SettlementMethod.FromNameOrDefault(settlementMethod), meteringPointType) switch
         {
-            (DataHubNames.SettlementMethod.Flex, DataHubNames.MeteringPointType.Consumption) => TimeSeriesType.FlexConsumption,
-            (DataHubNames.SettlementMethod.NonProfiled, DataHubNames.MeteringPointType.Consumption) => TimeSeriesType.NonProfiledConsumption,
+            (var sm, DataHubNames.MeteringPointType.Consumption) when sm == PMTypes.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
+            (var sm, DataHubNames.MeteringPointType.Consumption) when sm == PMTypes.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
             (null, DataHubNames.MeteringPointType.Production) => TimeSeriesType.Production,
             (null, null) => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
             _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethod} and {meteringPointType})"),
