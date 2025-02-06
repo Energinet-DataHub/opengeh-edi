@@ -23,9 +23,9 @@ public static class TimeSeriesTypeMapper
     {
         return MeteringPointType.FromName(meteringPointTypeName) switch
         {
-            var meteringPointType when meteringPointType == MeteringPointType.Production => TimeSeriesType.Production,
-            var meteringPointType when meteringPointType == MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
-            var meteringPointType when meteringPointType == MeteringPointType.Consumption => settlementMethodName switch
+            var mpt when mpt == MeteringPointType.Production => TimeSeriesType.Production,
+            var mpt when mpt == MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
+            var mpt when mpt == MeteringPointType.Consumption => settlementMethodName switch
             {
                 var name when string.IsNullOrWhiteSpace(name)
                     => TimeSeriesType.TotalConsumption,
