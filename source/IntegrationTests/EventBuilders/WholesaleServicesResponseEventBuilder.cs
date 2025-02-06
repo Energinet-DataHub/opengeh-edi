@@ -13,13 +13,24 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.ProcessManager.Abstractions.Components.BusinessValidation;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
+using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using PMActorNumber = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorNumber;
+using PMActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
+using PMBusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -169,6 +180,43 @@ public static class WholesaleServicesResponseEventBuilder
         }
 
         return rejectedMessage;
+    }
+
+    public static ServiceBusMessage GenerateRejectedFrom(
+        RequestCalculatedWholesaleServicesInputV1 requestCalculatedWholesaleServicesInputV1,
+        string errorMessage,
+        string errorCode)
+    {
+        var validationErrors = new List<ValidationErrorDto>()
+        {
+            new(
+                errorMessage,
+                errorCode),
+        };
+        var rejectRequest = new RequestCalculatedWholesaleServicesRejectedV1(
+            OriginalMessageId: requestCalculatedWholesaleServicesInputV1.ActorMessageId,
+            OriginalTransactionId: requestCalculatedWholesaleServicesInputV1.TransactionId,
+            RequestedForActorNumber: PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.RequestedForActorNumber),
+            RequestedForActorRole: PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedForActorRole),
+            RequestedByActorNumber: PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber),
+            RequestedByActorRole: PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedByActorRole),
+            BusinessReason: PMBusinessReason.FromName(requestCalculatedWholesaleServicesInputV1.BusinessReason),
+            validationErrors);
+
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_028.Name,
+            OrchestrationVersion = Brs_028.V1.Version,
+            OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+            OrchestrationInstanceId = Guid.NewGuid().ToString(), // TODO, could be used to assert on when notifying the orchestration instance in pm
+        };
+        enqueueActorMessages.SetData(rejectRequest);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_028.Name),
+            idempotencyKey: Guid.NewGuid().ToString());
+
+        return serviceBusMessage;
     }
 
     private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodStart, Instant periodEnd)
