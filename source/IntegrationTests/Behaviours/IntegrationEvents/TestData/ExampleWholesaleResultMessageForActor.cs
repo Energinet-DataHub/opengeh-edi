@@ -26,4 +26,7 @@ public record ExampleWholesaleResultMessageForActor(
     SettlementMethod? SettlementMethod,
     Resolution Resolution,
     int Version,
-    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);
+    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points,
+    string? ChargeCode = null,
+    ChargeType? ChargeType = null,
+    MeasurementUnit? MeasurementUnit = null);

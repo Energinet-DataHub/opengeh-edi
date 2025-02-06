@@ -38,11 +38,14 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
-public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTestBase
+public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTestBase, IAsyncLifetime
 {
+    private readonly IntegrationTestFixture _fixture;
+
     public GivenWholesaleServicesRequestV2Tests(IntegrationTestFixture fixture, ITestOutputHelper testOutput)
         : base(fixture, testOutput)
     {
+        _fixture = fixture;
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, true);
     }
 
@@ -83,7 +86,17 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             .ToArray();
     }
 
-    [Theory(Skip = "not updated")]
+    public async Task InitializeAsync()
+    {
+        await _fixture.DatabricksSchemaManager.CreateSchemaAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await _fixture.DatabricksSchemaManager.DropSchemaAsync();
+    }
+
+    [Theory]
     [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
     public async Task
         AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(
@@ -92,61 +105,68 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             DocumentFormat peekDocumentFormat)
     {
         /*
-         *  --- PART 1: Receive request, create process and send message to Wholesale ---
+         *  --- PART 1: Receive request and send message to Process Manager ---
          */
 
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
-        var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
-            ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
-            ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
-            ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
+        var exampleWholesaleResultMessageForActor = actorRole == ActorRole.SystemOperator
+            ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
+            : testDataDescription.ExampleWholesaleResultMessageData;
+
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var energySupplierNumber = ActorNumber.Create("5790001662233");
+        var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create("5790000432752") : ActorNumber.Create("8500000000502");
+        var gridOperatorNumber = ActorNumber.Create("4444444444444");
+        var actor = (ActorNumber: actorRole == ActorRole.EnergySupplier
+            ? energySupplierNumber
+            : actorRole == ActorRole.SystemOperator
+                ? chargeOwnerNumber
+                : gridOperatorNumber, ActorRole: actorRole);
+        var transactionId = TransactionId.From("12356478912356478912356478912356478");
+
+        var gridArea = exampleWholesaleResultMessageForActor.GridArea;
+        var chargeCode = exampleWholesaleResultMessageForActor.ChargeCode;
+        var chargeType = exampleWholesaleResultMessageForActor.ChargeType!;
+        var quantityMeasurementUnit = exampleWholesaleResultMessageForActor.MeasurementUnit!;
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
-        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync(gridArea, gridOperatorNumber);
 
+        // Act
         await GivenReceivedWholesaleServicesRequest(
             documentFormat: incomingDocumentFormat,
             senderActorNumber: actor.ActorNumber,
             senderActorRole: actor.ActorRole,
-            periodStart: (2024, 1, 1),
-            periodEnd: (2024, 1, 31),
+            periodStart: (2023, 2, 1),
+            periodEnd: (2023, 3, 1),
             energySupplier: energySupplierNumber,
             chargeOwner: chargeOwnerNumber,
-            chargeCode: "25361478",
-            chargeType: ChargeType.Tariff,
+            chargeCode: chargeCode,
+            chargeType: chargeType,
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", TransactionId.From("12356478912356478912356478912356478")),
+                (gridArea, transactionId),
             });
 
-        // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
-
         // Assert
-        var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
+        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
-            new WholesaleServicesMessageAssertionInput(
-                new List<string> { "512" },
+            new RequestCalculatedWholesaleServicesInputV1AssertionInput(
+                transactionId,
                 actor.ActorNumber.Value,
                 actor.ActorRole.Name,
+                BusinessReason.WholesaleFixing,
+                Resolution: null,
+                PeriodStart: CreateDateInstant(2023, 2, 1),
+                PeriodEnd: CreateDateInstant(2023, 3, 1),
                 energySupplierNumber.Value,
                 chargeOwnerNumber.Value,
+                new List<string> { gridArea },
                 null,
-                DataHubNames.BusinessReason.WholesaleFixing,
-                new List<(string ChargeType, string? ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
-                new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-                null));
-
-        // TODO: Assert correct process is created?
+                new List<ChargeTypeInput> { new(chargeType.Name, chargeCode) }));
 
         /*
          *  --- PART 2: Receive data from Wholesale and create RSM document ---
@@ -154,13 +174,15 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
         // Arrange
 
-        // Generate a mock WholesaleServicesRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
+        // Generate a mock ServiceBus Message with RequestCalculatedWholesaleServicesAcceptedV1 response from Process Manager,
+        // based on the RequestCalculatedWholesaleServicesInputV1
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
-        var acceptedResponse = WholesaleServicesResponseEventBuilder
-            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
+        var requestCalculatedWholesaleServicesInputV1 = message!.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
+        var requestCalculatedWholesaleServicesAccepted = WholesaleServicesResponseEventBuilder
+            .GenerateAcceptedFrom(requestCalculatedWholesaleServicesInputV1, GetNow());
 
-        await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, acceptedResponse);
+        await GivenWholesaleServicesRequestAcceptedIsReceived(requestCalculatedWholesaleServicesAccepted);
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(
@@ -193,23 +215,21 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 SenderId: "5790001330552", // Sender is always DataHub
                 SenderRole: ActorRole.MeteredDataAdministrator,
                 ChargeTypeOwner: chargeOwnerNumber.Value,
-                ChargeCode: "25361478",
-                ChargeType: ChargeType.Tariff,
-                Currency: Currency.DanishCrowns,
+                ChargeCode: chargeCode,
+                ChargeType: chargeType,
+                Currency: exampleWholesaleResultMessageForActor.Currency,
                 EnergySupplierNumber: energySupplierNumber.Value,
-                SettlementMethod: SettlementMethod.Flex,
-                MeteringPointType: MeteringPointType.Consumption,
-                GridArea: "512",
-                TransactionId.From("12356478912356478912356478912356478"),
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
-                CalculationVersion: GetNow().ToUnixTimeTicks(),
-                Resolution: Resolution.Hourly,
-                Period: new Period(
-                    CreateDateInstant(2024, 1, 1),
-                    CreateDateInstant(2024, 1, 31)),
-                Points: acceptedResponse.Series.Single().TimeSeriesPoints));
+                SettlementMethod: exampleWholesaleResultMessageForActor.SettlementMethod,
+                MeteringPointType: exampleWholesaleResultMessageForActor.MeteringPointType,
+                GridArea: gridArea,
+                transactionId,
+                PriceMeasurementUnit: quantityMeasurementUnit,
+                ProductCode: "5790001330590",
+                QuantityMeasurementUnit: quantityMeasurementUnit,
+                CalculationVersion: exampleWholesaleResultMessageForActor.Version,
+                Resolution: exampleWholesaleResultMessageForActor.Resolution,
+                Period: testDataDescription.Period,
+                Points: exampleWholesaleResultMessageForActor.Points));
     }
 
     [Fact(Skip = "not updated")]
@@ -733,6 +753,10 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
     [InlineData("Json")]
     public async Task AndGiven_RequestContainsWrongEnergySupplierInSeries_When_OriginalEnergySupplier_Then_ReceivesOneRejectWholesaleSettlementDocumentsWithCorrectContent(string incomingDocumentFormatName)
     {
+        /*
+         *  --- PART 1: Receive request and send message to Process Manager ---
+         */
+
         // Arrange
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
@@ -788,14 +812,14 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                                     + "Energysupplier in header and payload must be the same";
         var expectedErrorCode = "E16";
 
-        // Generate a mock RequestCalculatedWholesaleServicesRejectedV1 response from Process Mananger
+        // Generate a mock ServiceBus Message with RequestCalculatedWholesaleServicesRejectedV1 response from Process Manager
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var requestCalculatedWholesaleServicesInputV1 = message!.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
-        var requestCalculatedWholesaleServicesRejectedV1 = WholesaleServicesResponseEventBuilder
+        var requestCalculatedWholesaleServicesRejected = WholesaleServicesResponseEventBuilder
             .GenerateRejectedFrom(requestCalculatedWholesaleServicesInputV1, expectedErrorMessage, expectedErrorCode);
 
-        await GivenWholesaleServicesRequestRejectedIsReceived(requestCalculatedWholesaleServicesRejectedV1);
+        await GivenWholesaleServicesRequestRejectedIsReceived(requestCalculatedWholesaleServicesRejected);
 
         // Act
         var actorPeekResults = await WhenActorPeeksAllMessages(
@@ -824,7 +848,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 "5790001330552",
                 ActorRole.MeteredDataAdministrator,
                 ReasonCode.FullyRejected.Code,
-                TransactionId.From("123564789123564789123564789123564787"),
+                transactionId,
                 expectedErrorCode,
                 expectedErrorMessage));
     }
