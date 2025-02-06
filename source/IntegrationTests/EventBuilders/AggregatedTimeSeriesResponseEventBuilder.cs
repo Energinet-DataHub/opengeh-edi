@@ -111,15 +111,15 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         return rejectedResponse;
     }
 
-    private static TimeSeriesType GetTimeSeriesType(string? settlementMethod, string? meteringPointType)
+    private static TimeSeriesType GetTimeSeriesType(string? settlementMethodName, string? meteringPointType)
     {
-        return (PMTypes.SettlementMethod.FromNameOrDefault(settlementMethod), meteringPointType) switch
+        return (PMTypes.SettlementMethod.FromNameOrDefault(settlementMethodName), meteringPointType) switch
         {
-            (var sm, DataHubNames.MeteringPointType.Consumption) when sm == PMTypes.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
-            (var sm, DataHubNames.MeteringPointType.Consumption) when sm == PMTypes.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
+            (var settlementMethod, DataHubNames.MeteringPointType.Consumption) when settlementMethod == PMTypes.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
+            (var settlementMethod, DataHubNames.MeteringPointType.Consumption) when settlementMethod == PMTypes.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
             (null, DataHubNames.MeteringPointType.Production) => TimeSeriesType.Production,
             (null, null) => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
-            _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethod} and {meteringPointType})"),
+            _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethodName} and {meteringPointType})"),
         };
     }
 
