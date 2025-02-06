@@ -71,7 +71,6 @@ public static class DataHubNames
         public const string Monthly = "Monthly";
     }
 
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class SettlementMethod
     {
         public const string NonProfiled = "NonProfiled";
