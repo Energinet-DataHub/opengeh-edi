@@ -14,27 +14,31 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Wholesale.Edi.Models;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
 
 public static class TimeSeriesTypeMapper
 {
-    public static TimeSeriesType MapTimeSeriesType(string meteringPointType, string? settlementMethod)
+    public static TimeSeriesType MapTimeSeriesType(string meteringPointType, string? settlementMethodName)
     {
         return meteringPointType switch
         {
             DataHubNames.MeteringPointType.Production => TimeSeriesType.Production,
             DataHubNames.MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
-            DataHubNames.MeteringPointType.Consumption => settlementMethod switch
+            DataHubNames.MeteringPointType.Consumption => settlementMethodName switch
             {
-                DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
-                var method when
-                    string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
+                var name when string.IsNullOrWhiteSpace(name)
+                    => TimeSeriesType.TotalConsumption,
+
+                var name when PMTypes.SettlementMethod.FromNameOrDefault(name) == PMTypes.SettlementMethod.NonProfiled
+                    => TimeSeriesType.NonProfiledConsumption,
+                var name when PMTypes.SettlementMethod.FromNameOrDefault(name) == PMTypes.SettlementMethod.Flex
+                    => TimeSeriesType.FlexConsumption,
 
                 _ => throw new ArgumentOutOfRangeException(
-                    nameof(settlementMethod),
-                    actualValue: settlementMethod,
+                    nameof(settlementMethodName),
+                    actualValue: settlementMethodName,
                     "Value does not contain a valid string representation of a settlement method."),
             },
 
