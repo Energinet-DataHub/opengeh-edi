@@ -74,7 +74,7 @@ public class PeekRequestListener
 
         if (HttpContextHasBeenDisposed(request))
         {
-            _logger.LogWarning("Request has been disposed before accessing headers.");
+            _logger.LogWarning("Request has been disposed before accessing headers. Cancellation has been requested: {IsCancellationRequested}.", cancellationToken.IsCancellationRequested);
             var badRequestResponse = HttpResponseData.CreateResponse(request);
             badRequestResponse.StatusCode = HttpStatusCode.BadRequest;
             return badRequestResponse;
@@ -125,6 +125,14 @@ public class PeekRequestListener
                     desiredDocumentFormat),
                 cancellationToken)
             .ConfigureAwait(false);
+
+        if (HttpContextHasBeenDisposed(request))
+        {
+            _logger.LogWarning("Request has been disposed before accessing headers. Cancellation has been requested: {IsCancellationRequested}.", cancellationToken.IsCancellationRequested);
+            var badRequestResponse = HttpResponseData.CreateResponse(request);
+            badRequestResponse.StatusCode = HttpStatusCode.BadRequest;
+            return badRequestResponse;
+        }
 
         var response = HttpResponseData.CreateResponse(request);
         response.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
