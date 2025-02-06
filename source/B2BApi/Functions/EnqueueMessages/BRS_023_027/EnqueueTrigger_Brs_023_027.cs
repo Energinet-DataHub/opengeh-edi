@@ -39,11 +39,12 @@ public class EnqueueTrigger_Brs_023_027(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.EnqueueBrs_023_027_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
-        ServiceBusReceivedMessage message)
+        ServiceBusReceivedMessage message,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation("Enqueue BRS-023/027 messages service bus message received");
 
-        await _handler.EnqueueAsync(message)
+        await _handler.EnqueueAsync(message, cancellationToken)
             .ConfigureAwait(false);
     }
 }

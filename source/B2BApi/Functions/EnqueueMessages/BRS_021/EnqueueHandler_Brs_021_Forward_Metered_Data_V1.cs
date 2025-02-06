@@ -36,7 +36,11 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly ILogger _logger = logger;
 
-    protected override async Task EnqueueAcceptedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointAcceptedV1 acceptedData)
+    protected override async Task EnqueueAcceptedMessagesAsync(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        MeteredDataForMeteringPointAcceptedV1 acceptedData,
+        CancellationToken cancellationToken)
     {
         var series = acceptedData.AcceptedEnergyObservations.Select(x =>
             new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality?.Name))
@@ -73,12 +77,16 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    orchestrationInstanceId,
+                    orchestrationInstanceId.ToString(),
                     MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
                 CancellationToken.None)).ConfigureAwait(false);
     }
 
-    protected override async Task EnqueueRejectedMessagesAsync(string orchestrationInstanceId, MeteredDataForMeteringPointRejectedV1 rejectedData)
+    protected override async Task EnqueueRejectedMessagesAsync(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        MeteredDataForMeteringPointRejectedV1 rejectedData,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
@@ -86,9 +94,9 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
             rejectedData.EventId,
-            BusinessReason.FromCode(rejectedData.BusinessReason.Code),
+            BusinessReason.FromName(rejectedData.BusinessReason.Name),
             ActorNumber.Create(rejectedData.MarketActorRecipient.ActorId),
-            ActorRole.FromCode(rejectedData.MarketActorRecipient.ActorRole.Code),
+            ActorRole.FromName(rejectedData.MarketActorRecipient.ActorRole.Name),
             rejectedData.ProcessId,
             rejectedData.ExternalId,
             new AcknowledgementDto(
@@ -134,7 +142,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
-                    orchestrationInstanceId,
+                    orchestrationInstanceId.ToString(),
                     MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
                 CancellationToken.None)).ConfigureAwait(false);
     }

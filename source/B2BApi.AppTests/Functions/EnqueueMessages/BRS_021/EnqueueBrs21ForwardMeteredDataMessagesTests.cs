@@ -25,13 +25,14 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
-using PMValueTypes = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
+using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
@@ -89,7 +90,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_021_Forward_Metered_Data",
+            OrchestrationName = Brs_021_ForwardedMeteredData.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             Data = JsonSerializer.Serialize(enqueueMessagesData),
@@ -100,8 +101,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         // Act
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: "a-message-id");
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
+            idempotencyKey: Guid.NewGuid().ToString());
 
         // => When message is received
         var beforeOrchestrationCreated = DateTime.UtcNow;

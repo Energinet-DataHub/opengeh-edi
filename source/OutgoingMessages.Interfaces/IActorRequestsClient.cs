@@ -14,33 +14,73 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 public interface IActorRequestsClient
 {
-    /// <summary>
-    /// Enqueues aggregated measure data, if data is found.
-    /// </summary>
-    /// <param name="orchestrationInstanceId"></param>
-    /// <param name="originalTransactionId"></param>
-    /// <param name="originalMessageId"></param>
-    /// <param name="requestedForActorNumber"></param>
-    /// <param name="requestedForActorRole"></param>
-    /// <param name="businessReason"></param>
-    /// <param name="meteringPointType"></param>
-    /// <param name="settlementMethod"></param>
-    /// <param name="settlementVersion"></param>
-    /// <param name="aggregatedTimeSeriesQueryParameters"></param>
-    public Task EnqueueAggregatedMeasureDataAsync(
-        string orchestrationInstanceId,
-        string originalTransactionId,
-        string originalMessageId,
+    public Task<int> EnqueueAggregatedMeasureDataAsync(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
         ActorNumber requestedForActorNumber,
         ActorRole requestedForActorRole,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
         BusinessReason businessReason,
         MeteringPointType? meteringPointType,
         SettlementMethod? settlementMethod,
         SettlementVersion? settlementVersion,
-        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters);
+        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
+        CancellationToken cancellationToken);
+
+    public Task<int> EnqueueWholesaleServicesAsync(
+        WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        CancellationToken cancellationToken);
+
+    public Task EnqueueRejectAggregatedMeasureDataRequestAsync(
+        RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
+        CancellationToken cancellationToken);
+
+    public Task EnqueueRejectWholesaleServicesRequestAsync(
+        RejectedWholesaleServicesMessageDto enqueueRejectedMessageDto,
+        CancellationToken cancellationToken);
+
+    public Task EnqueueRejectAggregatedMeasureDataRequestWithNoDataAsync(
+        Guid orchestrationInstanceId,
+        MessageId originalMessageId,
+        EventId eventId,
+        TransactionId originalTransactionId,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        BusinessReason businessReason,
+        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
+        CancellationToken cancellationToken);
+
+    public Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
+        WholesaleServicesQueryParameters queryParameters,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        Guid orchestrationInstanceId,
+        EventId eventId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        BusinessReason businessReason,
+        CancellationToken cancellationToken);
 }

@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Calcu
 
 public static class CalculationTimeSeriesTypeMapper
 {
-    public static CalculationTimeSeriesType MapTimeSeriesTypeFromEdi(TimeSeriesType timeSeriesType)
+    public static CalculationTimeSeriesType MapTimeSeriesType(TimeSeriesType timeSeriesType)
     {
         return timeSeriesType switch
         {

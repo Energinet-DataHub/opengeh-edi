@@ -35,7 +35,12 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Option
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028;
 using Energinet.DataHub.RevisionLog.Integration.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
@@ -233,19 +238,19 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .Do(topic => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.Name)}", topic.Name))
             .AddSubscription("enqueue-brs-023-027-subscription")
-                .AddSubjectFilter("Enqueue_brs_023_027")
+                .AddSubjectFilter(EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_023_027.V1))
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_023_027_SubscriptionName)}", s.SubscriptionName))
             .AddSubscription("enqueue-brs-026-subscription")
-                .AddSubjectFilter("Enqueue_brs_026")
+                .AddSubjectFilter(EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_026.V1))
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_026_SubscriptionName)}", s.SubscriptionName))
             .AddSubscription("enqueue-brs-028-subscription")
-                .AddSubjectFilter("Enqueue_brs_028")
+                .AddSubjectFilter(EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_028.V1))
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_028_SubscriptionName)}", s.SubscriptionName))
             .AddSubscription("enqueue-brs-021-forward-metered-data-subscription")
-                .AddSubjectFilter("Enqueue_brs_021_forward_metered_data")
+                .AddSubjectFilter(EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_021_ForwardedMeteredData.V1))
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
@@ -305,13 +310,15 @@ public class B2BApiAppFixture : IAsyncLifetime
     public void EnsureAppHostUsesFeatureFlagValue(
         bool useRequestWholesaleServicesOrchestration = false,
         bool useRequestAggregatedMeasureDataOrchestration = false,
-        bool usePeekTimeSeriesMessages = false)
+        bool usePeekTimeSeriesMessages = false,
+        bool useProcessManagerToEnqueueBrs023027Messages = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UsePeekTimeSeriesMessages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }
 
@@ -508,6 +515,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.ReceiveMeteredDataForMeasurementPoints.ToString()}",
             true.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}",
+            false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",

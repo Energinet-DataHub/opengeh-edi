@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Azure.Messaging.ServiceBus;
-using DurableTask.Core.Common;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using Microsoft.Extensions.Logging;
@@ -34,8 +32,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
     /// <summary>
     /// Enqueue the received service bus message sent from the Process Manager subsystem.
     /// </summary>
-    /// <param name="message"></param>
-    public async Task EnqueueAsync(ServiceBusReceivedMessage message)
+    public async Task EnqueueAsync(ServiceBusReceivedMessage message, CancellationToken cancellationToken)
     {
         using var serviceBusMessageLoggerScope = _logger.BeginScope(new
         {
@@ -53,7 +50,7 @@ public abstract class EnqueueActorMessagesHandlerBase(
         var majorVersion = message.GetMajorVersion();
         if (majorVersion == EnqueueActorMessagesV1.MajorVersion)
         {
-            await HandleV1Async(message).ConfigureAwait(false);
+            await HandleV1Async(message, cancellationToken).ConfigureAwait(false);
         }
         else
         {
@@ -64,9 +61,15 @@ public abstract class EnqueueActorMessagesHandlerBase(
         }
     }
 
-    protected abstract Task EnqueueActorMessagesV1Async(EnqueueActorMessagesV1 enqueueActorMessages);
+    protected abstract Task EnqueueActorMessagesV1Async(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        EnqueueActorMessagesV1 enqueueActorMessages,
+        CancellationToken cancellationToken);
 
-    private async Task HandleV1Async(ServiceBusReceivedMessage serviceBusMessage)
+    private async Task HandleV1Async(
+        ServiceBusReceivedMessage serviceBusMessage,
+        CancellationToken cancellationToken)
     {
         var enqueueActorMessages = serviceBusMessage.ParseBody<EnqueueActorMessagesV1>();
 
@@ -89,7 +92,34 @@ public abstract class EnqueueActorMessagesHandlerBase(
             },
         });
 
-        await EnqueueActorMessagesV1Async(enqueueActorMessages)
+        _logger.LogInformation(
+            "Enqueue actor messages (v1) triggered for {OrchestrationName} (Version={OrchestrationVersion}, OrchestrationInstanceId={OrchestrationInstanceId}).",
+            enqueueActorMessages.OrchestrationName,
+            enqueueActorMessages.OrchestrationVersion,
+            enqueueActorMessages.OrchestrationInstanceId);
+
+        if (!Guid.TryParse(serviceBusMessage.MessageId, out var serviceBusMessageId))
+        {
+            throw new InvalidOperationException(
+                $"Unable to parse service bus message id to guid ("
+                + $"MessageId={serviceBusMessage.MessageId}, "
+                + $"Subject={serviceBusMessage.Subject})");
+        }
+
+        if (!Guid.TryParse(enqueueActorMessages.OrchestrationInstanceId, out var orchestrationInstanceId))
+        {
+            throw new InvalidOperationException(
+                $"Unable to parse orchestration instance id to guid ("
+                + $"OrchestrationInstanceId={enqueueActorMessages.OrchestrationInstanceId}, "
+                + $"MessageId={serviceBusMessage.MessageId}, "
+                + $"Subject={serviceBusMessage.Subject})");
+        }
+
+        await EnqueueActorMessagesV1Async(
+                serviceBusMessageId,
+                orchestrationInstanceId,
+                enqueueActorMessages,
+                cancellationToken)
             .ConfigureAwait(false);
     }
 }

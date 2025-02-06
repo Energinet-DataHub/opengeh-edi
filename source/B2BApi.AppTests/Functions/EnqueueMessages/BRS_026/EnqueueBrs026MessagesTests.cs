@@ -13,24 +13,34 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using ActorNumber = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorNumber;
+using ActorRole = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorRole;
+using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_026;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueBrs026MessagesTests : IAsyncLifetime
 {
+    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
+    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
     private readonly B2BApiAppFixture _fixture;
 
     public EnqueueBrs026MessagesTests(
@@ -44,11 +54,13 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _fixture.AppHostManager.ClearHostLog();
+        _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         await Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
     {
+        _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         _fixture.SetTestOutputHelper(null!);
         await Task.CompletedTask;
     }
@@ -58,16 +70,20 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
     {
         // => Given enqueue BRS-026 service bus message
         var actorId = Guid.NewGuid().ToString();
+        var requestedForActorNumber = ActorNumber.Create("1111111111111");
+        var requestedForActorRole = ActorRole.EnergySupplier;
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
-            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: BusinessReason.BalanceFixing,
-            RequestedForActorNumber: ActorNumber.Create("1111111111111"),
-            RequestedForActorRole: ActorRole.EnergySupplier,
+            RequestedForActorNumber: requestedForActorNumber,
+            RequestedForActorRole: requestedForActorRole,
+            RequestedByActorNumber: requestedForActorNumber,
+            RequestedByActorRole: requestedForActorRole,
             PeriodStart: Instant.FromUtc(2024, 01, 03, 23, 00).ToDateTimeOffset(),
             PeriodEnd: Instant.FromUtc(2024, 01, 04, 23, 00).ToDateTimeOffset(),
             GridAreas: ["804"],
-            EnergySupplierNumber: ActorNumber.Create("1111111111111"),
+            EnergySupplierNumber: requestedForActorNumber,
             BalanceResponsibleNumber: null,
             MeteringPointType: null,
             SettlementMethod: null,
@@ -75,7 +91,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_026",
+            OrchestrationName = Brs_026.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActorId = actorId,
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
@@ -83,8 +99,8 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         enqueueActorMessages.SetData(enqueueMessagesData);
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{enqueueActorMessages.OrchestrationName.ToLower()}",
-            idempotencyKey: "a-message-id");
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
+            idempotencyKey: Guid.NewGuid().ToString());
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
@@ -101,5 +117,97 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_026)} should have been executed");
         hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_026)}' (Succeeded,*");
         hostLog.Should().ContainMatch("*Received enqueue accepted message(s) for BRS 026*");
+    }
+
+    [Fact]
+    public async Task Given_EnqueueRejectedBrs026Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued()
+    {
+        // => Given enqueue rejected BRS-026 service bus message
+        var eventId = EventId.From(Guid.NewGuid());
+        var actorId = Guid.NewGuid().ToString();
+        var requestedForActorNumber = ActorNumber.Create("1111111111111");
+        var requestedForActorRole = ActorRole.EnergySupplier;
+        var businessReason = BusinessReason.BalanceFixing;
+        var orchestrationInstanceId = Guid.NewGuid().ToString();
+        var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesRejectedV1(
+            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            BusinessReason: businessReason,
+            RequestedForActorNumber: requestedForActorNumber,
+            RequestedForActorRole: requestedForActorRole,
+            RequestedByActorNumber: requestedForActorNumber,
+            RequestedByActorRole: requestedForActorRole,
+            ValidationErrors: [
+                new ValidationErrorDto(
+                    ErrorCode: "T01",
+                    Message: "Test error message 1"),
+                new ValidationErrorDto(
+                    ErrorCode: "T02",
+                    Message: "Test error message 2"),
+            ]);
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_026.Name,
+            OrchestrationVersion = 1,
+            OrchestrationStartedByActorId = actorId,
+            OrchestrationInstanceId = orchestrationInstanceId,
+        };
+        enqueueActorMessages.SetData(enqueueMessagesData);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
+            idempotencyKey: eventId.Value);
+
+        // => When message is received
+        await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
+
+        // => Then accepted message is enqueued
+        var didFinish = await Awaiter.TryWaitUntilConditionAsync(
+            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_026)}"),
+            timeLimit: TimeSpan.FromSeconds(30));
+        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
+
+        using (new AssertionScope())
+        {
+            didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_026)} should have been executed");
+            hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_026)}' (Succeeded,*");
+            hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 026*");
+        }
+
+        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+        var actualOutgoingMessage = await dbContext.OutgoingMessages
+            .SingleOrDefaultAsync(om => om.EventId == eventId);
+
+        actualOutgoingMessage.Should().NotBeNull();
+
+        using var assertionScope = new AssertionScope();
+        actualOutgoingMessage!.DocumentType.Should().Be(DocumentType.RejectRequestAggregatedMeasureData);
+        actualOutgoingMessage.BusinessReason.Should().Be(businessReason.Name);
+        actualOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
+        actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalMessageId);
+        actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
+        actualOutgoingMessage.Receiver.ActorRole.Name.Should().Be(requestedForActorRole.Name);
+
+        // => Verify that the expected message was sent on the ServiceBus
+        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
+                {
+                    return false;
+                }
+
+                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
+                    msg.Body.ToString());
+
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
+                var matchingEvent = parsedNotification.EventName == RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted;
+
+                return matchingOrchestrationId && matchingEvent;
+            })
+            .VerifyCountAsync(1);
+
+        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
     }
 }

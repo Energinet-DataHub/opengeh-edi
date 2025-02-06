@@ -222,7 +222,7 @@ public class MigrationsFreeDatabricksSchemaManager
             */
             retryCount++;
             if (state != "SUCCEEDED")
-                Thread.Sleep(200);
+                await Task.Delay(200);
         }
         while (retryCount < 3 && state != "SUCCEEDED");
 

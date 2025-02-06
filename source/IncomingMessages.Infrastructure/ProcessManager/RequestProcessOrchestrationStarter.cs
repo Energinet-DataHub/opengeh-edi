@@ -63,8 +63,12 @@ public class RequestProcessOrchestrationStarter(
             var startCommand = new RequestCalculatedWholesaleServicesCommandV1(
                 operatingIdentity: actorIdentity,
                 inputParameter: new RequestCalculatedWholesaleServicesInputV1(
+                    ActorMessageId: initializeProcessDto.MessageId,
+                    TransactionId: transaction.Id,
                     RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
                     RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
+                    RequestedByActorNumber: transaction.RequestedByActor.ActorNumber.Value,
+                    RequestedByActorRole: transaction.RequestedByActor.ActorRole.Name,
                     BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),
                     Resolution: resolution,
                     PeriodStart: transaction.StartDateTime,
@@ -113,6 +117,8 @@ public class RequestProcessOrchestrationStarter(
                     TransactionId: transaction.Id.Value,
                     RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
                     RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
+                    RequestedByActorNumber: transaction.RequestedByActor.ActorNumber.Value,
+                    RequestedByActorRole: transaction.RequestedByActor.ActorRole.Name,
                     BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),
                     PeriodStart: transaction.StartDateTime,
                     PeriodEnd: transaction.EndDateTime,

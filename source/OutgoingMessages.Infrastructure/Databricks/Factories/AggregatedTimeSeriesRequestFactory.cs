@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
+using NodaTime.Extensions;
 using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
@@ -26,8 +27,8 @@ public static class AggregatedTimeSeriesRequestFactory
     {
         return new AggregatedTimeSeriesRequest(
             Period: new Period(
-                InstantPattern.General.Parse(request.PeriodStart.ToString()).Value,
-                InstantPattern.General.Parse(request.PeriodEnd.ToString()).Value),
+                request.PeriodStart.ToInstant(),
+                request.PeriodEnd.ToInstant()),
             GetTimeSeriesTypes(request),
             MapAggregationPerRoleAndGridArea(request),
             RequestedCalculationTypeMapper.ToRequestedCalculationType(request.BusinessReason.Name, request.SettlementVersion?.Name));
