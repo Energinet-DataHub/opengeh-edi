@@ -19,6 +19,7 @@ using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidatio
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Google.Protobuf;
 using NodaTime.Text;
+using ProcessManagerTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
@@ -33,11 +34,11 @@ public static class EnqueueBrs026MessageFactory
         var accepted = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            RequestedForActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedForActorRole: ProcessManager.Components.Abstractions.ValueObjects.ActorRole.FromName(actor.ActorRole.Name),
-            RequestedByActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedByActorRole: ProcessManager.Components.Abstractions.ValueObjects.ActorRole.FromName(actor.ActorRole.Name),
-            BusinessReason: ProcessManager.Components.Abstractions.ValueObjects.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
+            RequestedForActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
+            RequestedForActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
+            RequestedByActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
+            RequestedByActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
+            BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
             PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00Z").GetValueOrThrow().ToDateTimeOffset(),
             PeriodEnd: InstantPattern.General.Parse("2023-02-31T23:00Z").GetValueOrThrow().ToDateTimeOffset(),
             GridAreas: [gridArea],
@@ -56,11 +57,11 @@ public static class EnqueueBrs026MessageFactory
         var rejected = new RequestCalculatedEnergyTimeSeriesRejectedV1(
             OriginalMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            RequestedForActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedForActorRole: ProcessManager.Components.Abstractions.ValueObjects.ActorRole.FromName(actor.ActorRole.Name),
-            RequestedByActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedByActorRole: ProcessManager.Components.Abstractions.ValueObjects.ActorRole.FromName(actor.ActorRole.Name),
-            BusinessReason: ProcessManager.Components.Abstractions.ValueObjects.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
+            RequestedForActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
+            RequestedForActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
+            RequestedByActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
+            RequestedByActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
+            BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
             ValidationErrors: new List<ValidationErrorDto>()
             {
                 new ValidationErrorDto(Message: "Test Rejection", ErrorCode: "888"),
