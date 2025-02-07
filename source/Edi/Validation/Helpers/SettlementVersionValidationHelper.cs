@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 
@@ -27,7 +28,7 @@ public static class SettlementVersionValidationHelper
 
     public static bool IsSettlementVersionValid(string businessReason, string? settlementVersion)
     {
-        var isCorrection = businessReason == DataHubNames.BusinessReason.Correction;
+        var isCorrection = businessReason == BusinessReason.Correction.Name;
 
         if (!isCorrection && settlementVersion != null)
             return false;
