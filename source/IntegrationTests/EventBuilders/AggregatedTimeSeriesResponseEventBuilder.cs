@@ -113,12 +113,25 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
 
     private static TimeSeriesType GetTimeSeriesType(string? settlementMethodName, string? meteringPointTypeName)
     {
-        return (PMTypes.SettlementMethod.FromNameOrDefault(settlementMethodName), PMTypes.MeteringPointType.FromNameOrDefault(meteringPointTypeName)) switch
+        var settlementMethodNameOrDefault = PMTypes.SettlementMethod.FromNameOrDefault(settlementMethodName);
+        var meteringPointTypeNameOrDefault = PMTypes.MeteringPointType.FromNameOrDefault(meteringPointTypeName);
+
+        return (settlementMethodNameOrDefault, meteringPointTypeNameOrDefault) switch
         {
-            (var sm, var mpt) when sm == PMTypes.SettlementMethod.Flex && mpt == PMTypes.MeteringPointType.Consumption => TimeSeriesType.FlexConsumption,
-            (var sm, var mpt) when sm == PMTypes.SettlementMethod.NonProfiled && mpt == PMTypes.MeteringPointType.Consumption => TimeSeriesType.NonProfiledConsumption,
-            (null, var mpt) when mpt == PMTypes.MeteringPointType.Production => TimeSeriesType.Production,
-            (null, null) => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
+            (var sm, var mpt) when
+                sm == PMTypes.SettlementMethod.Flex
+                && mpt == PMTypes.MeteringPointType.Consumption => TimeSeriesType.FlexConsumption,
+
+            (var sm, var mpt) when
+                sm == PMTypes.SettlementMethod.NonProfiled
+                && mpt == PMTypes.MeteringPointType.Consumption => TimeSeriesType.NonProfiledConsumption,
+
+            (null, var mpt) when
+                mpt == PMTypes.MeteringPointType.Production => TimeSeriesType.Production,
+
+            (null, null)
+                => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
+
             _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethodName} and {meteringPointTypeName})"),
         };
     }
