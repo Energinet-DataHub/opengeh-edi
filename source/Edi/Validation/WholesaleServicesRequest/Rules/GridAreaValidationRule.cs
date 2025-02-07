@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest.Rules;
@@ -37,7 +37,8 @@ public class GridAreaValidationRule : IValidationRule<DataHub.Edi.Requests.Whole
 
     public async Task<IList<ValidationError>> ValidateAsync(DataHub.Edi.Requests.WholesaleServicesRequest subject)
     {
-        if (subject.RequestedForActorRole != DataHubNames.ActorRole.GridAccessProvider) return NoError;
+        if (subject.RequestedForActorRole != ActorRole.GridAccessProvider.Name)
+            return NoError;
 
         if (subject.GridAreaCodes.Count == 0)
             return MissingGridAreaCodeError;
