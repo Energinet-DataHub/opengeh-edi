@@ -19,8 +19,8 @@ using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
-using Energinet.DataHub.ProcessManager.Abstractions.Components.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
@@ -30,9 +30,9 @@ using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using ActorNumber = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorNumber;
-using ActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
-using BusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
+using ActorNumber = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorNumber;
+using ActorRole = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorRole;
+using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_026;
 

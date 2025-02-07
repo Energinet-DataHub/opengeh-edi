@@ -32,7 +32,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
-using PMValueTypes = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects;
+using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 

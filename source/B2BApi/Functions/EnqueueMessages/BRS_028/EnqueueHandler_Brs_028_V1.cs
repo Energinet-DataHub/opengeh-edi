@@ -22,11 +22,11 @@ using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
-using ActorRole = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ActorRole;
-using BusinessReason = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.BusinessReason;
-using ChargeType = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.ChargeType;
-using Resolution = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.Resolution;
-using SettlementVersion = Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Components.Datahub.ValueObjects.SettlementVersion;
+using ActorRole = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorRole;
+using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
+using ChargeType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ChargeType;
+using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
+using SettlementVersion = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 
