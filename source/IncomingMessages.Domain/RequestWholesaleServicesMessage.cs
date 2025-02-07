@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
 
@@ -62,12 +62,12 @@ public record RequestWholesaleServicesSeries(
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        return actorRole.Name switch
+        return PMTypes.ActorRole.FromNameOrDefault(actorRole.Name) switch
         {
-            DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
+            var ar when ar == PMTypes.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
 
-            DataHubNames.ActorRole.GridAccessProvider => gridAreaOwner,
-            DataHubNames.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
+            var ar when ar == PMTypes.ActorRole.GridAccessProvider => gridAreaOwner,
+            var ar when ar == PMTypes.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
         };
     }

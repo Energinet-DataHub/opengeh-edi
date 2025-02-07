@@ -86,6 +86,7 @@ public static class DataHubNames
         public const string ThirdCorrection = "ThirdCorrection";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class ActorRole
     {
         public const string MeteringPointAdministrator = "MeteringPointAdministrator";
