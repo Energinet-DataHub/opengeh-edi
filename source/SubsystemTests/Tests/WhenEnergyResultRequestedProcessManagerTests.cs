@@ -50,7 +50,8 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
                 ediDriver,
                 new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
                 new EdiDatabaseDriver(fixture.ConnectionString),
-                wholesaleDriver);
+                wholesaleDriver,
+                new ProcessManagerDriver());
     }
 
     // Can we create our own subscription and listen for the event sent to process manager
