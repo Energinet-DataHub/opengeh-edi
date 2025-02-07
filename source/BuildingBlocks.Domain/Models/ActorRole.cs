@@ -14,32 +14,33 @@
 
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
 public class ActorRole : DataHubType<ActorRole>
 {
-    public static readonly ActorRole MeteringPointAdministrator = new(DataHubNames.ActorRole.MeteringPointAdministrator, "DDZ");
-    public static readonly ActorRole EnergySupplier = new(DataHubNames.ActorRole.EnergySupplier, "DDQ");
+    public static readonly ActorRole MeteringPointAdministrator = new(PMTypes.ActorRole.MeteringPointAdministrator.Name, "DDZ");
+    public static readonly ActorRole EnergySupplier = new(PMTypes.ActorRole.EnergySupplier.Name, "DDQ");
 
     // A grid operator has two roles.
     // GridOperator (DDM) when creating a new metering point
-    public static readonly ActorRole GridAccessProvider = new(DataHubNames.ActorRole.GridAccessProvider, "DDM");
-    public static readonly ActorRole MeteredDataAdministrator = new(DataHubNames.ActorRole.MeteredDataAdministrator, "DGL");
+    public static readonly ActorRole GridAccessProvider = new(PMTypes.ActorRole.GridAccessProvider.Name, "DDM");
+    public static readonly ActorRole MeteredDataAdministrator = new(PMTypes.ActorRole.MeteredDataAdministrator.Name, "DGL");
 
     // A grid operator has two roles.
     // MeteredDataResponsible (MDR) when requesting data from DataHub
-    public static readonly ActorRole MeteredDataResponsible = new(DataHubNames.ActorRole.MeteredDataResponsible, "MDR");
-    public static readonly ActorRole BalanceResponsibleParty = new(DataHubNames.ActorRole.BalanceResponsibleParty, "DDK");
+    public static readonly ActorRole MeteredDataResponsible = new(PMTypes.ActorRole.MeteredDataResponsible.Name, "MDR");
+    public static readonly ActorRole BalanceResponsibleParty = new(PMTypes.ActorRole.BalanceResponsibleParty.Name, "DDK");
 
-    public static readonly ActorRole ImbalanceSettlementResponsible = new(DataHubNames.ActorRole.ImbalanceSettlementResponsible, "DDX");
-    public static readonly ActorRole SystemOperator = new(DataHubNames.ActorRole.SystemOperator, "EZ");
-    public static readonly ActorRole DanishEnergyAgency = new(DataHubNames.ActorRole.DanishEnergyAgency, "STS");
-    public static readonly ActorRole Delegated = new(DataHubNames.ActorRole.Delegated, "DEL");
+    public static readonly ActorRole ImbalanceSettlementResponsible = new(PMTypes.ActorRole.ImbalanceSettlementResponsible.Name, "DDX");
+    public static readonly ActorRole SystemOperator = new(PMTypes.ActorRole.SystemOperator.Name, "EZ");
+    public static readonly ActorRole DanishEnergyAgency = new(PMTypes.ActorRole.DanishEnergyAgency.Name, "STS");
+    public static readonly ActorRole Delegated = new(PMTypes.ActorRole.Delegated.Name, "DEL");
 
     // DataHubAdministrator is a special role that is used to indicate that the user has special permissions.
-    public static readonly ActorRole DataHubAdministrator = new(DataHubNames.ActorRole.DataHubAdministrator, string.Empty);
+    public static readonly ActorRole DataHubAdministrator = new(PMTypes.ActorRole.DataHubAdministrator.Name, string.Empty);
 
     [JsonConstructor]
     private ActorRole(string name, string code)

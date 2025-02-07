@@ -94,9 +94,9 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
             rejectedData.EventId,
-            BusinessReason.FromCode(rejectedData.BusinessReason.Code),
+            BusinessReason.FromName(rejectedData.BusinessReason.Name),
             ActorNumber.Create(rejectedData.MarketActorRecipient.ActorId),
-            ActorRole.FromCode(rejectedData.MarketActorRecipient.ActorRole.Code),
+            ActorRole.FromName(rejectedData.MarketActorRecipient.ActorRole.Name),
             rejectedData.ProcessId,
             rejectedData.ExternalId,
             new AcknowledgementDto(

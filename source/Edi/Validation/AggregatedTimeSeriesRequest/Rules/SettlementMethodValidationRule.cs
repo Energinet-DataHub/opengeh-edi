@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
 
 public class SettlementMethodValidationRule : IValidationRule<DataHub.Edi.Requests.AggregatedTimeSeriesRequest>
 {
-    private static readonly IReadOnlyList<string> _validSettlementMethods = new List<string> { DataHubNames.SettlementMethod.Flex, DataHubNames.SettlementMethod.NonProfiled };
-    private static readonly string _validMeteringPointType = DataHubNames.MeteringPointType.Consumption;
+    private static readonly IReadOnlyList<string> _validSettlementMethods = new List<string>
+    {
+        SettlementMethod.Flex.Name,
+        SettlementMethod.NonProfiled.Name,
+    };
+
+    private static readonly string _validMeteringPointType = MeteringPointType.Consumption.Name;
     private static readonly ValidationError _invalidSettlementMethod = new("SettlementMethod kan kun benyttes i kombination med E17 og skal være enten D01 og E02 / SettlementMethod can only be used in combination with E17 and must be either D01 or E02", "D15");
 
     private static IList<ValidationError> NoError => new List<ValidationError>();
