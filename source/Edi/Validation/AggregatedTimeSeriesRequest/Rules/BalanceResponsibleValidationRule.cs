@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
 
@@ -27,10 +27,10 @@ public class BalanceResponsibleValidationRule : IValidationRule<DataHub.Edi.Requ
     {
         IList<ValidationError> errors = new List<ValidationError>();
 
-        if (subject.RequestedForActorRole != DataHubNames.ActorRole.BalanceResponsibleParty)
+        if (subject.RequestedForActorRole != ActorRole.BalanceResponsibleParty.Name)
             return Task.FromResult(errors);
 
-        if (subject.BusinessReason is not DataHubNames.BusinessReason.BalanceFixing and not DataHubNames.BusinessReason.PreliminaryAggregation)
+        if (subject.BusinessReason != BusinessReason.BalanceFixing.Name && subject.BusinessReason != BusinessReason.PreliminaryAggregation.Name)
             errors.Add(_invalidBusinessReason);
 
         if (string.IsNullOrWhiteSpace(subject.BalanceResponsibleId))
