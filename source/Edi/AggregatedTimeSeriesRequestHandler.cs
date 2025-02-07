@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Client;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
@@ -22,7 +23,6 @@ using Energinet.DataHub.Wholesale.Edi.Models;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Microsoft.Extensions.Logging;
 using Period = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period;
-using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi;
 
@@ -104,9 +104,8 @@ public class AggregatedTimeSeriesRequestHandler(
         if (!aggregatedTimeSeriesRequestMessage.AggregationPerRoleAndGridArea.GridAreaCodes.Any())
             return false; // If grid area codes is empty, we already retrieved any data across all grid areas
 
-        var actorRole = PMTypes.ActorRole.FromNameOrDefault(aggregatedTimeSeriesRequest.RequestedForActorRole);
-        if (actorRole == PMTypes.ActorRole.EnergySupplier
-            || actorRole == PMTypes.ActorRole.BalanceResponsibleParty)
+        var actorRole = aggregatedTimeSeriesRequest.RequestedForActorRole;
+        if (actorRole == ActorRole.EnergySupplier.Name || actorRole == ActorRole.BalanceResponsibleParty.Name)
         {
             var newAggregationLevel = aggregatedTimeSeriesRequestMessage.AggregationPerRoleAndGridArea with { GridAreaCodes = [] };
             var newRequest = aggregatedTimeSeriesRequestMessage with { AggregationPerRoleAndGridArea = newAggregationLevel };
