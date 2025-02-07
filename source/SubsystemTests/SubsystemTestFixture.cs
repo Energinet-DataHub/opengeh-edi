@@ -66,8 +66,6 @@ public class SubsystemTestFixture : IAsyncLifetime
     private readonly string _azureB2CTenantId;
     private readonly string _azureEntraBackendAppId;
 
-    private readonly string _processMangerTopicName;
-
     public SubsystemTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
@@ -93,10 +91,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         var serviceBusFullyQualifiedNamespace = $"{GetConfigurationValue<string>(root, "sb-domain-relay-namespace-name")}.servicebus.windows.net";
         var topicName = GetConfigurationValue<string>(root, "sbt-shres-integrationevent-received-name");
         var ediInboxQueueName = GetConfigurationValue<string>(root, "sbq-edi-inbox-messagequeue-name");
-
-        // TODO: Update these
-        var ediTopicName = "EdiTopicName";
-        _processMangerTopicName = "ProcessManagerTopicName";
+        var ediTopicName = GetConfigurationValue<string>(root, "sbt-edi-name");
 
         _azureB2CTenantId = GetConfigurationValue<string>(root, "b2c-tenant-id", defaultValue: "e9aa9b15-7200-441e-b255-927506b3494");
         _azureEntraBackendAppId = GetConfigurationValue<string>(root, "backend-b2b-app-id");
@@ -231,12 +226,10 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     private ServiceBusClient ServiceBusClient { get; }
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
         DurableClient = DurableTaskManager.CreateClient("Edi01"); // Must be the same task hub name as used in B2BApi
-
-        // Hoping to create a subscription on the process manager topic which we can use to listen for events
-        await AddSubscriptionToProcessManagerTopicAsync();
+        return Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
@@ -327,22 +320,6 @@ public class SubsystemTestFixture : IAsyncLifetime
         return Logger
                ?? throw new NullReferenceException(
                    "SubsystemTestFixture.Logger must be set from tests. Inject ITestOutputHelper in tests constructor and set it on the fixture");
-    }
-
-    private async Task AddSubscriptionToProcessManagerTopicAsync()
-    {
-        // Hoping to create a subscription on the process manager topic which we can use to listen for events
-        var serviceBusAdmin = new ServiceBusAdministrationClient(ServiceBusClient.FullyQualifiedNamespace, new DefaultAzureCredential());
-        var testSubscriptionName = "SubSystemTestSubscription" + $"{DateTimeOffset.UtcNow:yyyy.MM.ddTHH.mm.ss}-{Guid.NewGuid()}";
-
-        var subscriptionOptions = new CreateSubscriptionOptions(_processMangerTopicName, testSubscriptionName)
-        {
-            AutoDeleteOnIdle = TimeSpan.FromMinutes(15),
-            MaxDeliveryCount = 1,
-            LockDuration = TimeSpan.FromMinutes(1),
-            RequiresSession = false,
-        };
-        await serviceBusAdmin.CreateSubscriptionAsync(subscriptionOptions, CancellationToken.None);
     }
 }
 
