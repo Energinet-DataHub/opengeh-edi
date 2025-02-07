@@ -286,19 +286,19 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             ChargeTypeOwner: gridOperator.ActorNumber.Value,
             ChargeCode: "Sub-804",
             ChargeType: ChargeType.Subscription,
-            Currency: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Currency,
-            EnergySupplierNumber: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.EnergySupplier.Value,
-            SettlementMethod: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.SettlementMethod,
-            MeteringPointType: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.MeteringPointType,
-            GridArea: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.GridArea,
+            Currency: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Currency,
+            EnergySupplierNumber: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.EnergySupplier.Value,
+            SettlementMethod: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.SettlementMethod,
+            MeteringPointType: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.MeteringPointType,
+            GridArea: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.GridArea,
             OriginalTransactionIdReference: null,
             PriceMeasurementUnit: MeasurementUnit.Pieces,
             ProductCode: "5790001330590",
             QuantityMeasurementUnit: MeasurementUnit.Pieces,
-            CalculationVersion: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Version,
-            Resolution: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Resolution,
+            CalculationVersion: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Version,
+            Resolution: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Resolution,
             Period: testDataDescription.Period,
-            Points: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Points);
+            Points: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Points);
 
         await ThenOneOfWholesaleServicesDocumentsAreCorrect(
             peekResultsForSystemOperator,
@@ -772,38 +772,6 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<WholesaleResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary(), energySupplier.ActorNumber.Value));
-    }
-
-    private async Task<WholesaleResultForMonthlyAmountPerChargeDescription> GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge()
-    {
-        var wholesaleResultForMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
-        var wholesaleMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
-            _ediDatabricksOptions.Value,
-            wholesaleResultForMonthlyAmountPerChargeDescription.GridAreaOwners,
-            EventId.From(Guid.NewGuid()),
-            wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId,
-            null);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
-        return wholesaleResultForMonthlyAmountPerChargeDescription;
-    }
-
-    private async Task<WholesaleResultForTotalAmountDescription> GivenDatabricksResultDataForWholesaleResultTotalAmount()
-    {
-        var resultDataForWholesaleResultTotalAmount = new WholesaleResultForTotalAmountDescription();
-        var wholesaleTotalAmountQuery = new WholesaleTotalAmountQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
-            _ediDatabricksOptions.Value,
-            resultDataForWholesaleResultTotalAmount.GridAreaOwners,
-            EventId.From(Guid.NewGuid()),
-            resultDataForWholesaleResultTotalAmount.CalculationId,
-            null);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition, resultDataForWholesaleResultTotalAmount.TestFilePath);
-        return resultDataForWholesaleResultTotalAmount;
     }
 
     /// <summary>

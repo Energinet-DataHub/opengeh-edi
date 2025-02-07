@@ -42,7 +42,7 @@ public record NotifyWholesaleServicesDocumentAssertionInput(
     long CalculationVersion,
     Resolution Resolution,
     Period Period,
-    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);
+    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point>? Points);
 
 public record BusinessReasonWithSettlementVersion(
     BusinessReason BusinessReason,
