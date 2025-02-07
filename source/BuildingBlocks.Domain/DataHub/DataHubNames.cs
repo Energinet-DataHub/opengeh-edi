@@ -39,6 +39,7 @@ public static class DataHubNames
         public const string PeriodicFlexMetering = "PeriodicFlexMetering";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class ChargeType
     {
         public const string Subscription = "Subscription";
