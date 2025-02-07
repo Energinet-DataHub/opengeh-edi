@@ -27,6 +27,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Keep names in a single file to easily share with Wholesale")]
 public static class DataHubNames
 {
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class BusinessReason
     {
         public const string MoveIn = "MoveIn";
