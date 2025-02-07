@@ -68,7 +68,7 @@ public class IncomingMessageReceiver : IIncomingMessageReceiver
                             cancellationToken)
                         .ConfigureAwait(false);
                 })
-                .SaveChangesAsync([_incomingMessagesContext])
+                .SaveChangesAsync([_incomingMessagesContext], cancellationToken)
                 .ConfigureAwait(false);
             var transactionIds = string.Join(',', incomingMessage.Series.Select(x => x.TransactionId));
             _logger.LogInformation("Message with id {MessageId} received with transaction ids {TransactionIds}", incomingMessage.MessageId, transactionIds);

@@ -72,12 +72,9 @@ public class PeekRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
-        // Check if request has been disposed before accessing headers
-        // This can happen if the request is disposed before the function is executed
-        // E.g. if the request is cancelled by the client
-        if (request.FunctionContext.GetHttpContext()?.Features is null)
+        if (HttpContextHasBeenDisposed(request))
         {
-            _logger.LogWarning("Request has been disposed before accessing headers.");
+            _logger.LogWarning("Request has been disposed before accessing headers. Cancellation has been requested: {IsCancellationRequested}.", cancellationToken.IsCancellationRequested);
             var badRequestResponse = HttpResponseData.CreateResponse(request);
             badRequestResponse.StatusCode = HttpStatusCode.BadRequest;
             return badRequestResponse;
@@ -129,6 +126,14 @@ public class PeekRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
+        if (HttpContextHasBeenDisposed(request))
+        {
+            _logger.LogWarning("Request has been disposed before accessing headers. Cancellation has been requested: {IsCancellationRequested}.", cancellationToken.IsCancellationRequested);
+            var badRequestResponse = HttpResponseData.CreateResponse(request);
+            badRequestResponse.StatusCode = HttpStatusCode.BadRequest;
+            return badRequestResponse;
+        }
+
         var response = HttpResponseData.CreateResponse(request);
         response.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
 
@@ -145,5 +150,17 @@ public class PeekRequestListener
         await peekResult.Bundle.CopyToAsync(response.Body, cancellationToken).ConfigureAwait(false);
 
         return response;
+    }
+
+    private static bool HttpContextHasBeenDisposed(HttpRequestData request)
+    {
+        try
+        {
+            return request.FunctionContext.GetHttpContext()?.Features is null;
+        }
+        catch (ObjectDisposedException)
+        {
+            return true;
+        }
     }
 }

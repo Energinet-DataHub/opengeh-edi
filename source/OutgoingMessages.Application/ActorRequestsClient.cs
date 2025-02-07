@@ -124,7 +124,7 @@ public class ActorRequestsClient(
             var points = data.TimeSeriesPoints.OrderBy(p => p.Time)
                 .Select(
                     (p, index) => new WholesaleServicesPoint(
-                        Position: index, // Position starts at 1, so position = index + 1
+                        Position: index + 1, // Position starts at 1, so position = index + 1
                         Quantity: p.Quantity,
                         Price: p.Price,
                         Amount: p.Amount,

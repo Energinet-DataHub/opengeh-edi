@@ -60,7 +60,7 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
             // Check if request has been disposed before accessing headers
             // This can happen if the request is disposed before the function is executed
             // E.g. if the request is cancelled by the client
-            if (context.GetHttpContext()?.Features is null)
+            if (HttpContextHasBeenDisposed(context))
             {
                 return;
             }
@@ -85,6 +85,18 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
             {
                 invocationResult.Value = newHttpResponse;
             }
+        }
+    }
+
+    private static bool HttpContextHasBeenDisposed(FunctionContext context)
+    {
+        try
+        {
+            return context.GetHttpContext()?.Features is null;
+        }
+        catch (ObjectDisposedException)
+        {
+            return true;
         }
     }
 
