@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,10 +21,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class MeasurementUnit : DataHubType<MeasurementUnit>
 {
     // Tariffs are measured in Kwh
-    public static readonly MeasurementUnit Kwh = new(PMTypes.MeasurementUnit.KilowattHour.Name, "KWH");
+    public static readonly MeasurementUnit Kwh = new(DataHubNames.MeasurementUnit.Kwh, "KWH");
 
     // Subscription and Fees are measured in pieces
-    public static readonly MeasurementUnit Pieces = new(PMTypes.MeasurementUnit.Pieces.Name, "H87");
+    public static readonly MeasurementUnit Pieces = new(DataHubNames.MeasurementUnit.Pieces, "H87");
 
     [JsonConstructor]
     private MeasurementUnit(string name, string code)
