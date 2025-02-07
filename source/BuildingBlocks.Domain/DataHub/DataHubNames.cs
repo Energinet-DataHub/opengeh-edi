@@ -82,6 +82,7 @@ public static class DataHubNames
         public const string Flex = "Flex";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class SettlementVersion
     {
         public const string FirstCorrection = "FirstCorrection";
