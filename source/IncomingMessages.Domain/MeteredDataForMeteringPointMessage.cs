@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
 
@@ -87,8 +87,8 @@ public record MeteredDataForMeteringPointSeries(
     {
         return actorRole.Name switch
         {
-            DataHubNames.ActorRole.GridAccessProvider => ActorNumber.TryCreate(SenderNumber),
-            DataHubNames.ActorRole.Delegated => ActorNumber.TryCreate(SenderNumber),
+            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => ActorNumber.TryCreate(SenderNumber),
+            var name when name == PMTypes.ActorRole.Delegated.Name => ActorNumber.TryCreate(SenderNumber),
             _ => null,
         };
     }
