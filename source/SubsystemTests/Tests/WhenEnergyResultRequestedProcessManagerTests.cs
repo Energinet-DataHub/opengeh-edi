@@ -60,14 +60,11 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
                 new ProcessManagerDriver(fixture.EdiTopicClient));
     }
 
-    // Can we create our own subscription and listen for the event sent to process manager
     [Fact]
     public async Task Given_GoodRequest_When_B2BActorRequests_Then_GetSuccessfulResponse()
     {
-        var messageId = await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
         var act = async () => await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
 
-        // Replace this such that we expect and message sent to Process manager
         await act.Should().NotThrowAsync("because the request should be valid");
     }
 
@@ -76,7 +73,6 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
     {
         var act = async () => await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
 
-        // Replace this such that we expect and message sent to Process manager
         await act.Should().NotThrowAsync("because the request should be valid");
     }
 

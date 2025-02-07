@@ -16,46 +16,46 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Google.Protobuf;
 using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
-public static class EnqueueBrs026MessageFactory
+public class EnqueueBrs028MessageFactory
 {
-    private static readonly string _orchestrationName = "BRS_026";
+    private static readonly string _orchestrationName = "BRS_028";
 
     public static ServiceBusMessage CreateAccept(
         Actor actor,
         string gridArea)
     {
-        var accepted = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
+        // TODO: Correct values, such that there exists data
+        var accepted = new RequestCalculatedWholesaleServicesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             RequestedForActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
             RequestedForActorRole: ProcessManager.Components.Abstractions.ValueObjects.ActorRole.FromName(actor.ActorRole.Name),
             RequestedByActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
             RequestedByActorRole: ProcessManager.Components.Abstractions.ValueObjects.ActorRole.FromName(actor.ActorRole.Name),
-            BusinessReason: ProcessManager.Components.Abstractions.ValueObjects.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
-            PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00Z").GetValueOrThrow().ToDateTimeOffset(),
-            PeriodEnd: InstantPattern.General.Parse("2023-02-31T23:00Z").GetValueOrThrow().ToDateTimeOffset(),
+            BusinessReason: ProcessManager.Components.Abstractions.ValueObjects.BusinessReason.FromName(BusinessReason.WholesaleFixing.Name),
+            Resolution: null,
+            PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
+            PeriodEnd: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             GridAreas: [gridArea],
             EnergySupplierNumber: null,
-            BalanceResponsibleNumber: null,
-            MeteringPointType: null,
-            SettlementMethod: null,
-            SettlementVersion: null);
+            ChargeOwnerNumber: null,
+            SettlementVersion: null,
+            ChargeTypes: []);
 
         return CreateServiceBusMessage(accepted, actor);
     }
 
-    public static ServiceBusMessage CreateReject(
-        Actor actor)
+    public static ServiceBusMessage CreateReject(Actor actor)
     {
-        var rejected = new RequestCalculatedEnergyTimeSeriesRejectedV1(
-            OriginalMessageId: Guid.NewGuid().ToString(),
+        var reject = new RequestCalculatedWholesaleServicesRejectedV1(
             OriginalTransactionId: Guid.NewGuid().ToString(),
+            OriginalMessageId: Guid.NewGuid().ToString(),
             RequestedForActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
             RequestedForActorRole: ProcessManager.Components.Abstractions.ValueObjects.ActorRole.FromName(actor.ActorRole.Name),
             RequestedByActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(actor.ActorNumber.Value),
@@ -66,13 +66,13 @@ public static class EnqueueBrs026MessageFactory
                 new ValidationErrorDto(Message: "Test Rejection", ErrorCode: "888"),
             });
 
-        return CreateServiceBusMessage(rejected, actor);
+        return CreateServiceBusMessage(reject, actor);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage<TData>(
         TData data,
         Actor actor)
-            where TData : class
+        where TData : class
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {

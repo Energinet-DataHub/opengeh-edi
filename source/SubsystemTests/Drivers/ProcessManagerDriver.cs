@@ -33,4 +33,16 @@ public class ProcessManagerDriver(
         var message = EnqueueBrs026MessageFactory.CreateReject(actor);
         await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
+
+    internal async Task PublishAcceptedRequestBrs028Async(string gridArea, Actor actor)
+    {
+        var message = EnqueueBrs028MessageFactory.CreateAccept(actor, gridArea);
+        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+    }
+
+    internal async Task PublishRejectedRequestBrs028Async(Actor actor)
+    {
+        var message = EnqueueBrs028MessageFactory.CreateReject(actor);
+        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+    }
 }

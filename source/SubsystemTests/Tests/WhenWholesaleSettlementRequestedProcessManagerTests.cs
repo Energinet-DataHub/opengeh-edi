@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
-using NodaTime;
+using FluentAssertions;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
@@ -28,13 +29,13 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
+// TODO: Rename this to brs028 when we have deleted the old request tests
+public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTestClass
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
     private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
-    private readonly string _energySupplierActorNumber;
 
-    public WhenWholesaleSettlementRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public WhenWholesaleSettlementRequestedProcessManagerTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -53,55 +54,49 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
                 new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
                 wholesaleDriver,
                 new ProcessManagerDriver(fixture.EdiTopicClient));
-
-        _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
     [Fact]
-    public async Task Actor_can_request_wholesale_settlement()
+    public async Task Given_GoodRequest_When_B2BActorRequests_Then_GetSuccessfulResponse()
     {
-        var messageId = await _wholesaleSettlementRequest.Request(CancellationToken.None);
+        var act = async () => await _wholesaleSettlementRequest.Request(CancellationToken.None);
 
-        await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(messageId);
+        await act.Should().NotThrowAsync("because the request should be valid");
     }
 
     [Fact]
-    public async Task B2C_actor_can_request_wholesale_settlement()
+    public async Task Given_GoodRequest_When_B2CActorRequests_Then_GetSuccessfulResponse()
     {
-        var createdAfter = SystemClock.Instance.GetCurrentInstant();
-        var energySupplierActorNumber = _energySupplierActorNumber;
-        await _wholesaleSettlementRequest.B2CRequest(CancellationToken.None);
+        var act = async () => await _wholesaleSettlementRequest.B2CRequest(CancellationToken.None);
 
-        await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(
-            createdAfter,
-            requestedByActorNumber: energySupplierActorNumber);
+        await act.Should().NotThrowAsync("because the request should be valid");
     }
 
     [Fact]
-    public async Task Actor_get_sync_rejected_response_when_wholesale_settlement_request_is_invalid()
+    public async Task Given_BadRequest_When_ActorRequests_Then_GetBadRequest()
     {
         await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_response_from_wholesale_settlement_request()
+    public async Task Given_EnqueueBrs028FromProcessManager_When_ActorPeeks_Then_GetsNotifyMessage()
     {
-        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestAcceptedResponse(
+        await _wholesaleSettlementRequest.PublishAcceptedRequestBrs028Async(
             "888",
-            SubsystemTestFixture.ActorNumber,
-            SubsystemTestFixture.EZTestCimActorNumber,
-            CancellationToken.None);
+            new Actor(
+                ActorNumber.Create(SubsystemTestFixture.EZTestCimActorNumber),
+                ActorRole.SystemOperator));
 
         await _notifyWholesaleServices.ConfirmResultIsAvailable();
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_settlement_request()
+    public async Task Given_EnqueueRejectBrs028FromProcessManager_When_ActorPeeks_Then_ActorGetRejectedMessage()
     {
-        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestRejectedResponse(
-            "888",
-            SubsystemTestFixture.EZTestCimActorNumber,
-            CancellationToken.None);
+        await _wholesaleSettlementRequest.PublishRejectedRequestBrs026Async(
+            new Actor(
+                ActorNumber.Create(SubsystemTestFixture.EZTestCimActorNumber),
+                ActorRole.SystemOperator));
 
         await _notifyWholesaleServices.ConfirmRejectResultIsAvailable();
     }
