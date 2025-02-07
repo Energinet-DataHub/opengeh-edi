@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,9 +21,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class MeteringPointType : DataHubType<MeteringPointType>
 {
     // Metering point types
-    public static readonly MeteringPointType Consumption = new(DataHubNames.MeteringPointType.Consumption, "E17");
-    public static readonly MeteringPointType Production = new(DataHubNames.MeteringPointType.Production, "E18");
-    public static readonly MeteringPointType Exchange = new(DataHubNames.MeteringPointType.Exchange, "E20");
+    public static readonly MeteringPointType Consumption = new(PMTypes.MeteringPointType.Consumption.Name, "E17");
+    public static readonly MeteringPointType Production = new(PMTypes.MeteringPointType.Production.Name, "E18");
+    public static readonly MeteringPointType Exchange = new(PMTypes.MeteringPointType.Exchange.Name, "E20");
 
     // Child metering point types
     public static readonly MeteringPointType VeProduction = new("VeProduction", "D01");

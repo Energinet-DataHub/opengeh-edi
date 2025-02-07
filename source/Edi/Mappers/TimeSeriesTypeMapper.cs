@@ -12,35 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Models;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
 
 public static class TimeSeriesTypeMapper
 {
-    public static TimeSeriesType MapTimeSeriesType(string meteringPointType, string? settlementMethod)
+    public static TimeSeriesType MapTimeSeriesType(string meteringPointTypeName, string? settlementMethodName)
     {
-        return meteringPointType switch
+        return meteringPointTypeName switch
         {
-            DataHubNames.MeteringPointType.Production => TimeSeriesType.Production,
-            DataHubNames.MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
-            DataHubNames.MeteringPointType.Consumption => settlementMethod switch
+            var mpt when mpt == MeteringPointType.Production.Name => TimeSeriesType.Production,
+            var mpt when mpt == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
+            var mpt when mpt == MeteringPointType.Consumption.Name => settlementMethodName switch
             {
-                DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
-                var method when
-                    string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
+                var sm when string.IsNullOrWhiteSpace(sm) => TimeSeriesType.TotalConsumption,
+                var sm when sm == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
+                var sm when sm == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
 
                 _ => throw new ArgumentOutOfRangeException(
-                    nameof(settlementMethod),
-                    actualValue: settlementMethod,
+                    nameof(settlementMethodName),
+                    actualValue: settlementMethodName,
                     "Value does not contain a valid string representation of a settlement method."),
             },
 
             _ => throw new ArgumentOutOfRangeException(
-                nameof(meteringPointType),
-                actualValue: meteringPointType,
+                nameof(meteringPointTypeName),
+                actualValue: meteringPointTypeName,
                 "Value does not contain a valid string representation of a metering point type."),
         };
     }

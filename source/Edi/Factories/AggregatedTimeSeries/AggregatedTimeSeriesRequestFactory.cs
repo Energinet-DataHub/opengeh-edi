@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using NodaTime.Text;
@@ -38,19 +38,19 @@ public static class AggregatedTimeSeriesRequestFactory
             ? [TimeSeriesTypeMapper.MapTimeSeriesType(request.MeteringPointType, request.SettlementMethod)]
             : request.RequestedForActorRole switch
             {
-                DataHubNames.ActorRole.EnergySupplier =>
+                var name when name == ActorRole.EnergySupplier.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,
                     TimeSeriesType.NonProfiledConsumption,
                 ],
-                DataHubNames.ActorRole.BalanceResponsibleParty =>
+                var name when name == ActorRole.BalanceResponsibleParty.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,
                     TimeSeriesType.NonProfiledConsumption,
                 ],
-                DataHubNames.ActorRole.MeteredDataResponsible =>
+                var name when name == ActorRole.MeteredDataResponsible.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,
