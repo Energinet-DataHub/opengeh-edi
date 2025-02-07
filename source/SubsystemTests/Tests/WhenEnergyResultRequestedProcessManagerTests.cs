@@ -27,9 +27,14 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     "Usage",
     "CA2007",
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
+[SuppressMessage(
+    "Usage",
+    "xUnit1000",
+    Justification = "By making it abstract, we avoid running the tests in this class")] // TODO: Remove this when we are ready to enqueue brs026 messages
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
+// public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
+internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
