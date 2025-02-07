@@ -21,15 +21,15 @@ public static class TimeSeriesTypeMapper
 {
     public static TimeSeriesType MapTimeSeriesType(string meteringPointTypeName, string? settlementMethodName)
     {
-        return MeteringPointType.FromName(meteringPointTypeName) switch
+        return meteringPointTypeName switch
         {
-            var mpt when mpt == MeteringPointType.Production => TimeSeriesType.Production,
-            var mpt when mpt == MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
-            var mpt when mpt == MeteringPointType.Consumption => settlementMethodName switch
+            var mpt when mpt == MeteringPointType.Production.Name => TimeSeriesType.Production,
+            var mpt when mpt == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
+            var mpt when mpt == MeteringPointType.Consumption.Name => settlementMethodName switch
             {
                 var name when string.IsNullOrWhiteSpace(name) => TimeSeriesType.TotalConsumption,
-                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                var name when SettlementMethod.FromNameOrDefault(name) == SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
+                var name when name == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
+                var name when name == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
 
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementMethodName),
