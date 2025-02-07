@@ -69,12 +69,12 @@ public record RequestAggregatedMeasureDataMessageSeries(
         // ActorRole.MeteredDataResponsible,
         // ActorRole.BalanceResponsibleParty,
         // ActorRole.GridOperator, // Grid Operator can make requests because of DDM -> MDR hack
-        return PMTypes.ActorRole.FromNameOrDefault(actorRole.Name) switch
+        return actorRole.Name switch
         {
-            var ar when ar == PMTypes.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
-            var ar when ar == PMTypes.ActorRole.BalanceResponsibleParty => ActorNumber.TryCreate(BalanceResponsiblePartyId),
-            var ar when ar == PMTypes.ActorRole.MeteredDataResponsible => gridAreaOwner,
-            var ar when ar == PMTypes.ActorRole.GridAccessProvider => gridAreaOwner,
+            var name when name == PMTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
+            var name when name == PMTypes.ActorRole.BalanceResponsibleParty.Name => ActorNumber.TryCreate(BalanceResponsiblePartyId),
+            var name when name == PMTypes.ActorRole.MeteredDataResponsible.Name => gridAreaOwner,
+            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
             _ => null,
         };
     }

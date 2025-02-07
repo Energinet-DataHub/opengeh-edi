@@ -85,10 +85,10 @@ public record MeteredDataForMeteringPointSeries(
 
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
-        return PMTypes.ActorRole.FromNameOrDefault(actorRole.Name) switch
+        return actorRole.Name switch
         {
-            var ar when ar == PMTypes.ActorRole.GridAccessProvider => ActorNumber.TryCreate(SenderNumber),
-            var ar when ar == PMTypes.ActorRole.Delegated => ActorNumber.TryCreate(SenderNumber),
+            var ar when ar == PMTypes.ActorRole.GridAccessProvider.Name => ActorNumber.TryCreate(SenderNumber),
+            var ar when ar == PMTypes.ActorRole.Delegated.Name => ActorNumber.TryCreate(SenderNumber),
             _ => null,
         };
     }

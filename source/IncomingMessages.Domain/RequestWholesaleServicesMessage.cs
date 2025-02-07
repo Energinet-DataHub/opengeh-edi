@@ -62,12 +62,12 @@ public record RequestWholesaleServicesSeries(
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        return PMTypes.ActorRole.FromNameOrDefault(actorRole.Name) switch
+        return actorRole.Name switch
         {
-            var ar when ar == PMTypes.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
+            var name when name == PMTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
 
-            var ar when ar == PMTypes.ActorRole.GridAccessProvider => gridAreaOwner,
-            var ar when ar == PMTypes.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
+            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
+            var name when name == PMTypes.ActorRole.SystemOperator.Name => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
         };
     }
