@@ -60,6 +60,7 @@ public static class DataHubNames
         public const string Exchange = "Exchange";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class Resolution
     {
         public const string QuarterHourly = "QuarterHourly";
