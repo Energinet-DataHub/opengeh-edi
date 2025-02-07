@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Xml;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
@@ -131,15 +132,18 @@ public sealed class AggregatedMeasureDataRequestDsl
             .ConfigureAwait(false);
     }
 
-    internal async Task PublishAcceptedRequestBrs026Async()
+    internal async Task PublishAcceptedRequestBrs026Async(
+        string gridAreaCode,
+        Actor actor)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-        await _processManagerDriver.PublishAcceptedRequestBrs026Async();
+        await _processManagerDriver.PublishAcceptedRequestBrs026Async(gridAreaCode, actor);
     }
 
-    internal async Task PublishRejectedRequestBrs026Async()
+    internal async Task PublishRejectedRequestBrs026Async(
+        Actor actor)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-        await _processManagerDriver.PublishRejectedRequestBrs026Async();
+        await _processManagerDriver.PublishRejectedRequestBrs026Async(actor);
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
@@ -51,7 +52,7 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
                 new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
                 new EdiDatabaseDriver(fixture.ConnectionString),
                 wholesaleDriver,
-                new ProcessManagerDriver());
+                new ProcessManagerDriver(fixture.EdiTopicClient));
     }
 
     // Can we create our own subscription and listen for the event sent to process manager
@@ -83,7 +84,9 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     [Fact]
     public async Task Given_EnqueueBrs026FromProcessManager_When_ActorPeeks_Then_GetsNotifyMessage()
     {
-        await _aggregatedMeasureDataRequest.PublishAcceptedRequestBrs026Async();
+        await _aggregatedMeasureDataRequest.PublishAcceptedRequestBrs026Async(
+            "804",
+            new Actor(ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber), ActorRole.EnergySupplier));
 
         await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailable();
     }
@@ -91,7 +94,8 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     [Fact]
     public async Task Given_EnqueueRejectBrs026FromProcessManager_When_ActorPeeks_Then_ActorGetRejectedMessage()
     {
-        await _aggregatedMeasureDataRequest.PublishRejectedRequestBrs026Async();
+        await _aggregatedMeasureDataRequest.PublishRejectedRequestBrs026Async(
+            new Actor(ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber), ActorRole.EnergySupplier));
 
         await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailable();
     }

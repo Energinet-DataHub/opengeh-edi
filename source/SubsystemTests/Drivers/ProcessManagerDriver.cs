@@ -12,17 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
+
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
-public class ProcessManagerDriver
+public class ProcessManagerDriver(
+    EdiTopicClient ediTopicClient)
 {
-    internal async Task PublishAcceptedRequestBrs026Async()
+    private readonly EdiTopicClient _ediTopicClient = ediTopicClient;
+
+    internal async Task PublishAcceptedRequestBrs026Async(string gridArea, Actor actor)
     {
-        await Task.CompletedTask;
+        var message = EnqueueBrs026MessageFactory.CreateAccept(actor, gridArea);
+        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
-    internal async Task PublishRejectedRequestBrs026Async()
+    internal async Task PublishRejectedRequestBrs026Async(Actor actor)
     {
-        await Task.CompletedTask;
+        var message = EnqueueBrs026MessageFactory.CreateReject(actor);
+        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 }

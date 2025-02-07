@@ -52,7 +52,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
                 new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
                 new EdiDatabaseDriver(fixture.ConnectionString),
                 wholesaleDriver,
-                new ProcessManagerDriver());
+                new ProcessManagerDriver(fixture.EdiTopicClient));
 
         _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }

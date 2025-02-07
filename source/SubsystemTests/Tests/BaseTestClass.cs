@@ -52,6 +52,6 @@ public class BaseTestClass
                 Output),
             new EdiDatabaseDriver(_fixture.ConnectionString),
             new WholesaleDriver(_fixture.EventPublisher, _fixture.EdiInboxClient),
-            new ProcessManagerDriver());
+            new ProcessManagerDriver(_fixture.EdiTopicClient));
     }
 }
