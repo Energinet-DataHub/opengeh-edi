@@ -87,8 +87,8 @@ public record MeteredDataForMeteringPointSeries(
     {
         return actorRole.Name switch
         {
-            var ar when ar == PMTypes.ActorRole.GridAccessProvider.Name => ActorNumber.TryCreate(SenderNumber),
-            var ar when ar == PMTypes.ActorRole.Delegated.Name => ActorNumber.TryCreate(SenderNumber),
+            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => ActorNumber.TryCreate(SenderNumber),
+            var name when name == PMTypes.ActorRole.Delegated.Name => ActorNumber.TryCreate(SenderNumber),
             _ => null,
         };
     }
