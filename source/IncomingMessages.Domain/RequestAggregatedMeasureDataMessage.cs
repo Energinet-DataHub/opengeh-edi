@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
 
@@ -71,10 +71,10 @@ public record RequestAggregatedMeasureDataMessageSeries(
         // ActorRole.GridOperator, // Grid Operator can make requests because of DDM -> MDR hack
         return actorRole.Name switch
         {
-            DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
-            DataHubNames.ActorRole.BalanceResponsibleParty => ActorNumber.TryCreate(BalanceResponsiblePartyId),
-            DataHubNames.ActorRole.MeteredDataResponsible => gridAreaOwner,
-            DataHubNames.ActorRole.GridAccessProvider => gridAreaOwner,
+            var name when name == PMTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
+            var name when name == PMTypes.ActorRole.BalanceResponsibleParty.Name => ActorNumber.TryCreate(BalanceResponsiblePartyId),
+            var name when name == PMTypes.ActorRole.MeteredDataResponsible.Name => gridAreaOwner,
+            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
             _ => null,
         };
     }

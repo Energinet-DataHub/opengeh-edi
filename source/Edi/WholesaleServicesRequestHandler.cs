@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Client;
 using Energinet.DataHub.Wholesale.Edi.Factories;
 using Energinet.DataHub.Wholesale.Edi.Factories.WholesaleServices;
@@ -124,7 +124,7 @@ public class WholesaleServicesRequestHandler(
                 ? null
                 : CalculationTypeMapper.FromRequestedCalculationType(request.RequestedCalculationType),
             new Period(request.Period.Start, request.Period.End),
-            request.RequestedForActorRole == DataHubNames.ActorRole.EnergySupplier,
+            request.RequestedForActorRole == ActorRole.EnergySupplier.Name,
             request.RequestedForActorNumber);
     }
 
@@ -135,7 +135,7 @@ public class WholesaleServicesRequestHandler(
         if (queryParameters.GridAreaCodes.Count == 0) // If grid area codes is empty, we already retrieved any data across all grid areas
             return false;
 
-        if (requestedByActorRole is DataHubNames.ActorRole.EnergySupplier or DataHubNames.ActorRole.SystemOperator)
+        if (requestedByActorRole == ActorRole.EnergySupplier.Name || requestedByActorRole == ActorRole.SystemOperator.Name)
         {
             var queryParametersWithoutGridArea = queryParameters with
             {
