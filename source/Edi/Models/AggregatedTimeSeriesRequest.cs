@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
-
 namespace Energinet.DataHub.Wholesale.Edi.Models;
 
 public record AggregatedTimeSeriesRequest(

@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Microsoft.Extensions.Logging;
+using NodaTime.Extensions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 
@@ -53,19 +56,16 @@ public class EnqueueHandler_Brs_026_V1(
             "Received enqueue accepted message(s) for BRS 026. Data: {0}",
             acceptedData);
 
-        var totalEnqueuedCount = 0;
-        var request = AggregatedTimeSeriesRequestFactory.Parse(acceptedData);
-
         var query = new AggregatedTimeSeriesQueryParameters(
-            request.TimeSeriesTypes.Select(CalculationTimeSeriesTypeMapper.MapTimeSeriesType).ToList(),
-            request.AggregationPerRoleAndGridArea.GridAreaCodes,
-            request.AggregationPerRoleAndGridArea.EnergySupplierId,
-            request.AggregationPerRoleAndGridArea.BalanceResponsibleId,
-            request.CalculationType,
-            new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(request.Period.Start, request.Period.End));
+            GetTimeSeriesTypes(acceptedData.MeteringPointType, acceptedData.SettlementMethod, acceptedData.RequestedForActorRole),
+            acceptedData.GridAreas,
+            acceptedData.EnergySupplierNumber?.Value,
+            acceptedData.BalanceResponsibleNumber?.Value,
+            MapCalculationType(acceptedData.BusinessReason.Name, acceptedData.SettlementVersion?.Name),
+            new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(acceptedData.PeriodStart.ToInstant(), acceptedData.PeriodEnd.ToInstant()));
 
         var enqueuedCount = await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(
-            serviceBusMessageId: serviceBusMessageId,
+            eventId: EventId.From(serviceBusMessageId),
             orchestrationInstanceId: orchestrationInstanceId,
             originalMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
             originalTransactionId: TransactionId.From(acceptedData.OriginalTransactionId),
@@ -80,9 +80,7 @@ public class EnqueueHandler_Brs_026_V1(
             query,
             cancellationToken).ConfigureAwait(false);
 
-        totalEnqueuedCount += enqueuedCount;
-
-        if (totalEnqueuedCount == 0)
+        if (enqueuedCount == 0)
         {
             _logger.LogInformation("No aggregated measure data messages enqueued for accepted BRS-026, enqueuing rejected message. Data: {0}", acceptedData);
             await _actorRequestsClient.EnqueueRejectAggregatedMeasureDataRequestWithNoDataAsync(
@@ -99,6 +97,8 @@ public class EnqueueHandler_Brs_026_V1(
                 cancellationToken)
                 .ConfigureAwait(false);
         }
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
@@ -151,5 +151,99 @@ public class EnqueueHandler_Brs_026_V1(
                     RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
+    }
+
+    private static TimeSeriesType[] GetTimeSeriesTypes(
+        ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType? meteringPointType,
+        ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod? settlementMethod,
+        ProcessManager.Components.Abstractions.ValueObjects.ActorRole requestedForActorRole)
+    {
+        return meteringPointType != null
+            ? [MapTimeSeriesType(meteringPointType.Name, settlementMethod?.Name)]
+            : requestedForActorRole.Name switch
+            {
+                DataHubNames.ActorRole.EnergySupplier =>
+                [
+                    TimeSeriesType.Production,
+                    TimeSeriesType.FlexConsumption,
+                    TimeSeriesType.NonProfiledConsumption,
+                ],
+                DataHubNames.ActorRole.BalanceResponsibleParty =>
+                [
+                    TimeSeriesType.Production,
+                    TimeSeriesType.FlexConsumption,
+                    TimeSeriesType.NonProfiledConsumption,
+                ],
+                DataHubNames.ActorRole.MeteredDataResponsible =>
+                [
+                    TimeSeriesType.Production,
+                    TimeSeriesType.FlexConsumption,
+                    TimeSeriesType.NonProfiledConsumption,
+                    TimeSeriesType.TotalConsumption,
+                    TimeSeriesType.NetExchangePerGa,
+                ],
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(requestedForActorRole),
+                    requestedForActorRole,
+                    "Value does not contain a valid string representation of a requested by actor role."),
+            };
+    }
+
+    private static CalculationType MapCalculationType(string businessReason, string? settlementVersion)
+    {
+        if (businessReason != DataHubNames.BusinessReason.Correction && settlementVersion != null)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(settlementVersion),
+                settlementVersion,
+                $"Value must be null when {nameof(businessReason)} is not {nameof(DataHubNames.BusinessReason.Correction)}.");
+        }
+
+        return businessReason switch
+        {
+            DataHubNames.BusinessReason.BalanceFixing => CalculationType.BalanceFixing,
+            DataHubNames.BusinessReason.PreliminaryAggregation => CalculationType.Aggregation,
+            DataHubNames.BusinessReason.WholesaleFixing => CalculationType.WholesaleFixing,
+            DataHubNames.BusinessReason.Correction => settlementVersion switch
+            {
+                DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
+                DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
+                DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(settlementVersion),
+                    settlementVersion,
+                    $"Value cannot be mapped to a {nameof(CalculationType)}."),
+            },
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(businessReason),
+                businessReason,
+                $"Value cannot be mapped to a {nameof(CalculationType)}."),
+        };
+    }
+
+    private static TimeSeriesType MapTimeSeriesType(string meteringPointType, string? settlementMethod)
+    {
+        return meteringPointType switch
+        {
+            DataHubNames.MeteringPointType.Production => TimeSeriesType.Production,
+            DataHubNames.MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
+            DataHubNames.MeteringPointType.Consumption => settlementMethod switch
+            {
+                DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
+                DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
+                var method when
+                    string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
+
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(settlementMethod),
+                    actualValue: settlementMethod,
+                    "Value does not contain a valid string representation of a settlement method."),
+            },
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(meteringPointType),
+                actualValue: meteringPointType,
+                "Value does not contain a valid string representation of a metering point type."),
+        };
     }
 }

@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Calculati
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using NodaTime.Extensions;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 

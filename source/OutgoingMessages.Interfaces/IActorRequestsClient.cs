@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 public interface IActorRequestsClient
 {
     public Task<int> EnqueueAggregatedMeasureDataAsync(
-        Guid serviceBusMessageId,
+        EventId eventId,
         Guid orchestrationInstanceId,
         MessageId originalMessageId,
         TransactionId originalTransactionId,

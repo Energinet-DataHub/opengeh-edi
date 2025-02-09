@@ -57,7 +57,7 @@ public class ActorRequestsClient(
     private readonly IWholesaleServicesQueries _wholesaleServicesQueries = wholeSaleServicesQueries;
 
     public async Task<int> EnqueueAggregatedMeasureDataAsync(
-        Guid serviceBusMessageId,
+        EventId eventId,
         Guid orchestrationInstanceId,
         MessageId originalMessageId,
         TransactionId originalTransactionId,
@@ -78,12 +78,10 @@ public class ActorRequestsClient(
         var enqueuedCount = 0;
         await foreach (var result in calculationResults)
         {
-            var pointList = new List<AcceptedEnergyResultMessagePoint>();
-
             var points = result.TimeSeriesPoints.OrderBy(p => p.Time)
                 .Select(
                     (p, index) => new AcceptedEnergyResultMessagePoint(
-                        Position: index,
+                        Position: index + 1,
                         Quantity: p.Quantity,
                         QuantityQuality: GetCalculatedQuantityQualityForEnergy(p.Qualities),
                         SampleTime: string.Empty))
@@ -95,11 +93,11 @@ public class ActorRequestsClient(
                 documentReceiverNumber: requestedForActorNumber,
                 documentReceiverRole: requestedForActorRole,
                 processId: orchestrationInstanceId,
-                eventId: EventId.From(serviceBusMessageId),
+                eventId: eventId,
                 gridAreaCode: result.GridArea,
-                meteringPointType: meteringPointType?.Name ?? throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
-                settlementMethod: settlementMethod?.Name,
-                measureUnitType: MeasurementUnit.Kwh.Name, // Old implementation included this in AcceptedEnergyResultTimeSeriesCommand => AcceptedEnergyResultTimeSeries. Hardcoded for now.
+                meteringPointType: GetMeteringPointType(result.TimeSeriesType).Name,
+                settlementMethod: GetSettlementMethod(result.TimeSeriesType),
+                measureUnitType: MeasurementUnit.Kwh.Name, // "Unit is always Kwh for energy results" - it is hardcoded in the AggregatedTimeSeriesRequestAcceptedMessageFactory
                 resolution: GetResolution(result.Resolution).Name,
                 energySupplierNumber: aggregatedTimeSeriesQueryParameters.EnergySupplierId,
                 balanceResponsibleNumber: aggregatedTimeSeriesQueryParameters.BalanceResponsibleId,
@@ -220,7 +218,7 @@ public class ActorRequestsClient(
     {
         var hasDataInAnotherGridArea = await HasDataInAnotherGridAreaAsync(
             aggregatedTimeSeriesQueryParameters,
-            requestedByActorRole).ConfigureAwait(false);
+            requestedForActorRole).ConfigureAwait(false);
 
         var rejectError = hasDataInAnotherGridArea
             ? _noEnergyDataForRequestedGridArea
@@ -261,7 +259,7 @@ public class ActorRequestsClient(
     {
         var hasDataInAnotherGridArea = await HasDataInAnotherGridAreaAsync(
             queryParameters,
-            requestedByActorRole).ConfigureAwait(false);
+            requestedForActorRole).ConfigureAwait(false);
 
         var rejectError = hasDataInAnotherGridArea
             ? _noWholesaleDataForRequestedGridArea
@@ -463,18 +461,7 @@ public class ActorRequestsClient(
 
     private CalculatedQuantityQuality GetCalculatedQuantityQualityForEnergy(IReadOnlyCollection<QuantityQuality> quantityQualities)
     {
-        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
-                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
-                measured: quantityQualities.Contains(QuantityQuality.Measured),
-                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
-        {
-            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
-            (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-            (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-            (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
-            (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-            _ => CalculatedQuantityQuality.NotAvailable,
-        };
+        return CalculatedQuantityQualityMapper.MapForEnergy(quantityQualities);
     }
 
     private SettlementVersion? GetSettlementVersion(CalculationType calculationType)
@@ -538,4 +525,46 @@ public class ActorRequestsClient(
 
         return MeasurementUnit.TryFromChargeType(chargeType);
     }
+
+    private MeteringPointType GetMeteringPointType(TimeSeriesType timeSeriesType) =>
+        timeSeriesType switch
+    {
+        TimeSeriesType.Production => MeteringPointType.Production,
+        TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
+        TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
+        TimeSeriesType.GridLoss => MeteringPointType.Consumption,
+        TimeSeriesType.NegativeGridLoss => MeteringPointType.Production,
+        TimeSeriesType.PositiveGridLoss => MeteringPointType.Consumption,
+        TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.TempFlexConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.TempProduction => MeteringPointType.Production,
+
+        _ => throw new ArgumentOutOfRangeException(
+            nameof(timeSeriesType),
+            actualValue: timeSeriesType,
+            "Value cannot be mapped to a metering point type."),
+    };
+
+    private string? GetSettlementMethod(TimeSeriesType timeSeriesType) =>
+        timeSeriesType switch
+    {
+        TimeSeriesType.Production => null,
+        TimeSeriesType.FlexConsumption => SettlementMethod.Flex.Name,
+        TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled.Name,
+        TimeSeriesType.NetExchangePerGa => null,
+        TimeSeriesType.NetExchangePerNeighboringGa => null,
+        TimeSeriesType.GridLoss => null,
+        TimeSeriesType.NegativeGridLoss => null,
+        TimeSeriesType.PositiveGridLoss => SettlementMethod.Flex.Name,
+        TimeSeriesType.TotalConsumption => null,
+        TimeSeriesType.TempFlexConsumption => null,
+        TimeSeriesType.TempProduction => null,
+
+        _ => throw new ArgumentOutOfRangeException(
+            nameof(timeSeriesType),
+            actualValue: timeSeriesType,
+            "Value cannot be mapped to a settlement method."),
+    };
 }
