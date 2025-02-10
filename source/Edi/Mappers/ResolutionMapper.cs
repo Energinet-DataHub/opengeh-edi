@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using EnergyResultResolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
 using WholesaleResolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
 
@@ -24,9 +24,9 @@ public static class ResolutionMapper
     {
         return resolution switch
         {
-            DataHubNames.Resolution.Hourly => WholesaleResolution.Hour,
-            DataHubNames.Resolution.Daily => WholesaleResolution.Day,
-            DataHubNames.Resolution.Monthly => WholesaleResolution.Month,
+            var name when name == Resolution.Hourly.Name => WholesaleResolution.Hour,
+            var name when name == Resolution.Daily.Name => WholesaleResolution.Day,
+            var name when name == Resolution.Monthly.Name => WholesaleResolution.Month,
             _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown Resolution"),
         };
     }

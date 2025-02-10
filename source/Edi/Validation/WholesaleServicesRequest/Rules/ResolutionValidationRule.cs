@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest.Rules;
 
@@ -34,7 +34,7 @@ public class ResolutionValidationRule
     public Task<IList<ValidationError>> ValidateAsync(DataHub.Edi.Requests.WholesaleServicesRequest subject)
     {
         var errors = new List<ValidationError>();
-        if (subject.HasResolution && subject.Resolution != DataHubNames.Resolution.Monthly)
+        if (subject.HasResolution && subject.Resolution != Resolution.Monthly.Name)
         {
             errors.Add(_notMonthlyResolution);
         }

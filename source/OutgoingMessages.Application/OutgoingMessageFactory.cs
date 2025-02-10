@@ -171,8 +171,8 @@ public static class OutgoingMessageFactory
         ];
 
         // Only create a message for the balance responsible if the business reason is BalanceFixing or PreliminaryAggregation
-        if (messageDto.BusinessReason is not DataHubNames.BusinessReason.WholesaleFixing &&
-            messageDto.BusinessReason is not DataHubNames.BusinessReason.Correction)
+        if (messageDto.BusinessReason != BusinessReason.WholesaleFixing.Name &&
+            messageDto.BusinessReason != BusinessReason.Correction.Name)
         {
             var outgoingMessageToBalanceResponsible = new OutgoingMessage(
                 eventId: messageDto.EventId,
