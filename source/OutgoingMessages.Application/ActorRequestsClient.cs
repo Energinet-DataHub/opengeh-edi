@@ -84,7 +84,7 @@ public class ActorRequestsClient(
                         Position: index + 1,
                         Quantity: p.Quantity,
                         QuantityQuality: GetCalculatedQuantityQualityForEnergy(p.Qualities),
-                        SampleTime: string.Empty))
+                        SampleTime: p.Time.ToString()))
                 .ToList();
 
             var acceptedEnergyResult = AcceptedEnergyResultMessageDto.Create(
