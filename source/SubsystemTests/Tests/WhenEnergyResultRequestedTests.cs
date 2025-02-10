@@ -40,7 +40,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.EnergySupplier, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiServiceBusClient);
 
         _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResultDsl(
             ediDriver,

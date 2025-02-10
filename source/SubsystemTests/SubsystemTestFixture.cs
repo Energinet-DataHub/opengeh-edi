@@ -177,8 +177,8 @@ public class SubsystemTestFixture : IAsyncLifetime
         var credential = new DefaultAzureCredential();
         ServiceBusClient = new ServiceBusClient(serviceBusFullyQualifiedNamespace, credential);
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
-        EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
-        EdiTopicClient = new EdiTopicClient(ServiceBusClient, ediTopicName);
+        EdiServiceBusClient = new EdiServiceBusClient(ServiceBusClient, ediInboxQueueName);
+        EdiTopicClient = new EdiServiceBusClient(ServiceBusClient, ediTopicName);
 
         DurableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
@@ -214,9 +214,9 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
-    internal EdiInboxClient EdiInboxClient { get; }
+    internal EdiServiceBusClient EdiServiceBusClient { get; }
 
-    internal EdiTopicClient EdiTopicClient { get; }
+    internal EdiServiceBusClient EdiTopicClient { get; }
 
     internal string ConnectionString { get; }
 
@@ -236,7 +236,7 @@ public class SubsystemTestFixture : IAsyncLifetime
     {
         // Close subclients before client (ServiceBusClient)
         await EventPublisher.DisposeAsync();
-        await EdiInboxClient.DisposeAsync();
+        await EdiServiceBusClient.DisposeAsync();
         await EdiTopicClient.DisposeAsync();
         await ServiceBusClient.DisposeAsync();
 

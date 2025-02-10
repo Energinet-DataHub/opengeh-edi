@@ -33,8 +33,8 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     Justification = "By making it abstract, we avoid running the tests in this class")] // TODO: Remove this when we are ready to enqueue brs026 messages
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-// public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
-internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
+public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
+// internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
@@ -45,7 +45,7 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
         ArgumentNullException.ThrowIfNull(fixture);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.EnergySupplier, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiServiceBusClient);
 
         _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResultDsl(
             ediDriver,

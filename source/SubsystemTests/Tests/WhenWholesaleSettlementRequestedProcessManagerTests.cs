@@ -41,7 +41,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
         ArgumentNullException.ThrowIfNull(fixture);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.SystemOperator, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiServiceBusClient);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
             ediDriver,

@@ -22,11 +22,11 @@ internal sealed class WholesaleDriver
 {
     private const string BalanceResponsiblePartyMarketRoleCode = "DDK";
     private readonly IntegrationEventPublisher _integrationEventPublisher;
-    private readonly EdiInboxClient _inboxEdiClient;
+    private readonly EdiServiceBusClient _inboxEdiClient;
 
     internal WholesaleDriver(
         IntegrationEventPublisher integrationEventPublisher,
-        EdiInboxClient inboxEdiClient)
+        EdiServiceBusClient inboxEdiClient)
     {
         _integrationEventPublisher = integrationEventPublisher;
         _inboxEdiClient = inboxEdiClient;

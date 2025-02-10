@@ -16,15 +16,15 @@ using Azure.Messaging.ServiceBus;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
-internal sealed class EdiInboxClient : IAsyncDisposable
+internal sealed class EdiServiceBusClient : IAsyncDisposable
 {
     private readonly ServiceBusSender _sender;
 
-    public EdiInboxClient(
+    public EdiServiceBusClient(
         ServiceBusClient client,
-        string queueName)
+        string queueOrTopicName)
     {
-        _sender = client.CreateSender(queueName);
+        _sender = client.CreateSender(queueOrTopicName);
     }
 
     public async ValueTask DisposeAsync()

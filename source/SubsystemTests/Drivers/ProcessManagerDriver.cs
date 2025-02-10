@@ -17,10 +17,10 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
-public class ProcessManagerDriver(
-    EdiTopicClient ediTopicClient)
+internal class ProcessManagerDriver(
+    EdiServiceBusClient ediTopicClient)
 {
-    private readonly EdiTopicClient _ediTopicClient = ediTopicClient;
+    private readonly EdiServiceBusClient _ediTopicClient = ediTopicClient;
 
     internal async Task PublishAcceptedRequestBrs026Async(string gridArea, Actor actor)
     {
