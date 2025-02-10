@@ -57,7 +57,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
-    [Fact]
+    [Fact(Skip = "Confirm depends on feature flag. Which might be turned of")]
     public async Task Actor_can_request_wholesale_settlement()
     {
         var messageId = await _wholesaleSettlementRequest.Request(CancellationToken.None);
@@ -65,7 +65,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(messageId);
     }
 
-    [Fact]
+    [Fact(Skip = "Confirm depends on feature flag. Which might be turned of")]
     public async Task B2C_actor_can_request_wholesale_settlement()
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();

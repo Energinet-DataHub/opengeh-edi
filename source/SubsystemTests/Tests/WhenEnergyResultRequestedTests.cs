@@ -57,7 +57,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
         _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
-    [Fact]
+    [Fact(Skip = "Confirm depends on feature flag. Which might be turned of")]
     public async Task Actor_can_request_aggregated_measure_data()
     {
         var messageId = await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
@@ -67,7 +67,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
             CancellationToken.None);
     }
 
-    [Fact]
+    [Fact(Skip = "Confirm depends on feature flag. Which might be turned of")]
     public async Task B2C_actor_can_request_aggregated_measure_data()
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();
