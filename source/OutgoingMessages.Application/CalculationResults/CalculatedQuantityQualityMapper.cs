@@ -124,4 +124,20 @@ public static class CalculatedQuantityQualityMapper
                 _ => CalculatedQuantityQuality.NotAvailable,
             };
     }
+
+    public static CalculatedQuantityQuality MapForEnergy(IReadOnlyCollection<QuantityQuality> quantityQualities)
+    {
+        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
+                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
+                measured: quantityQualities.Contains(QuantityQuality.Measured),
+                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
+        {
+            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
+            (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
+            (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
+            (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
+            (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
+            _ => CalculatedQuantityQuality.NotAvailable,
+        };
+    }
 }
