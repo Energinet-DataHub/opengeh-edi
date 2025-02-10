@@ -215,12 +215,12 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             EventId eventId,
             string? overrideGridArea = null)
     {
-        var requestedForActorNumber = ActorNumber.Create("5790000701414");
+        var requestedForActorNumber = testDataResultSet.ActorNumber;
         var requestedForActorRole = ActorRole.MeteredDataResponsible;
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: EnergyPerGaTestDataDescription.ResultSet1.BusinessReason,
+            BusinessReason: testDataResultSet.BusinessReason,
             RequestedForActorNumber: requestedForActorNumber,
             RequestedForActorRole: requestedForActorRole,
             RequestedByActorNumber: requestedForActorNumber,
@@ -230,7 +230,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             GridAreas: [overrideGridArea ?? testDataResultSet.GridArea],
             EnergySupplierNumber: null,
             BalanceResponsibleNumber: null,
-            MeteringPointType: EnergyPerGaTestDataDescription.ResultSet1.MeteringPointType,
+            MeteringPointType: testDataResultSet.MeteringPointType,
             SettlementMethod: null,
             SettlementVersion: null);
 

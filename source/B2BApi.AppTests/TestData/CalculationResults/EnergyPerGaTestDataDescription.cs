@@ -25,6 +25,7 @@ public class EnergyPerGaTestDataDescription
     public static readonly ResultSet ResultSet1 = new(
         PeriodStart: PeriodStart,
         PeriodEnd: PeriodEnd,
+        ActorNumber: ActorNumber.Create("5790000701414"),
         GridArea: "804",
         BusinessReason: BusinessReason.BalanceFixing,
         MeteringPointType: MeteringPointType.Consumption,
@@ -33,6 +34,7 @@ public class EnergyPerGaTestDataDescription
     public record ResultSet(
         Instant PeriodStart,
         Instant PeriodEnd,
+        ActorNumber ActorNumber,
         string GridArea,
         BusinessReason BusinessReason,
         MeteringPointType MeteringPointType,
