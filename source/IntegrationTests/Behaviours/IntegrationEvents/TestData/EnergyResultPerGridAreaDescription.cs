@@ -38,7 +38,7 @@ public class EnergyResultPerGridAreaDescription
 
     public override Guid CalculationId => Guid.Parse("a8cfe7c7-f197-405c-b922-52153fa0332d");
 
-    public override string GridAreaCode => "543";
+    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "543" };
 
     public override int ExpectedCalculationResultsCount => 5;
 
@@ -49,7 +49,7 @@ public class EnergyResultPerGridAreaDescription
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
     public ExampleEnergyResultMessageForActor ExampleEnergyResultMessageData => new(
-        GridArea: GridAreaCode,
+        GridArea: GridAreaCodes.First(),
         MeteringPointType.Consumption,
         SettlementMethod.Flex,
         Resolution.Hourly,
@@ -62,5 +62,5 @@ public class EnergyResultPerGridAreaDescription
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty
-            .Add(GridAreaCode, ActorNumber.Create("1111111111111"));
+            .Add(GridAreaCodes.First(), ActorNumber.Create("1111111111111"));
 }
