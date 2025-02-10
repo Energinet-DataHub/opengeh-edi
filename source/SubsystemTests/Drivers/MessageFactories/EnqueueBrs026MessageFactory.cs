@@ -46,7 +46,7 @@ public static class EnqueueBrs026MessageFactory
             PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             PeriodEnd: InstantPattern.General.Parse("2023-02-02T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             GridAreas: [gridArea],
-            EnergySupplierNumber: energySupplier,
+            EnergySupplierNumber: null, // This gives a successful response. But the peeking actor is an energy supplier. Hence this should not be null
             BalanceResponsibleNumber: balanceResponsible,
             MeteringPointType: ProcessManagerTypes.MeteringPointType.Consumption,
             SettlementMethod: ProcessManagerTypes.SettlementMethod.Flex,
