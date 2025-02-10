@@ -26,8 +26,6 @@ using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -178,9 +176,9 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         // based on the RequestCalculatedWholesaleServicesInputV1
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
-        var requestCalculatedWholesaleServicesInputV1 = message!.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
+        var requestCalculatedWholesaleServicesInputV1 = message.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
         var requestCalculatedWholesaleServicesAccepted = WholesaleServicesResponseEventBuilder
-            .GenerateAcceptedFrom(requestCalculatedWholesaleServicesInputV1, GetNow());
+            .GenerateAcceptedFrom(requestCalculatedWholesaleServicesInputV1);
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(requestCalculatedWholesaleServicesAccepted);
 
@@ -232,119 +230,79 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 Points: exampleWholesaleResultMessageForActor.Points));
     }
 
-    [Fact(Skip = "not updated")]
-    public async Task AndGiven_TooLongChargeCode_When_WholesaleServicesProcessIsInitialized_Then_DbExceptionIsThrown()
-    {
-        // Arrange
-        var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
-        var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
-            ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
-            ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
-            ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
-
-        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
-        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
-
-        await GivenReceivedWholesaleServicesRequest(
-            DocumentFormat.Json,
-            actor.ActorNumber,
-            actor.ActorRole,
-            (2024, 1, 1),
-            (2024, 1, 31),
-            energySupplierNumber,
-            chargeOwnerNumber,
-            "64852f7a-b928-477e-9213-e219bf250ec3-that-is-too-long",
-            ChargeType.Tariff,
-            false,
-            [
-                ("512", TransactionId.From("12356478912356478912356478912356478")),
-            ]);
-
-        // Act
-        var initializeProcess = async () => await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
-
-        // Assert
-        await initializeProcess
-            .Should()
-            .ThrowExactlyAsync<DbUpdateException>()
-            .WithInnerException<DbUpdateException, SqlException>()
-            .WithMessage(
-                "String or binary data would be truncated *WholesaleServicesProcessChargeTypes', column 'Id'. Truncated value: '64852f7a-b928-477e-9213-e219bf250ec3-'*");
-    }
-
-    [Theory(Skip = "not updated")]
+    [Theory]
     [MemberData(nameof(DocumentFormatsWithActorRoleCombinationsForNullGridArea))]
-    public async Task AndGiven_DataInTwoGridAreas_When_ActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
+    public async Task AndGiven_DataInTwoGridAreas_When_ActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(
+        ActorRole actorRole,
+        DocumentFormat incomingDocumentFormat,
+        DocumentFormat peekDocumentFormat)
     {
         /*
-         *  --- PART 1: Receive request, create process and send message to Wholesale ---
+         *  --- PART 1: Receive request and send message to Process Manager ---
          */
 
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
-        var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
-            ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
-            ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
-            ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas();
+        var exampleWholesaleResultMessageForActor = actorRole == ActorRole.EnergySupplier
+            ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
+            : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
+
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var energySupplierNumber = ActorNumber.Create("5790001662233");
+        var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create("5790000432752") : ActorNumber.Create("8500000000502");
+        var actor = (ActorNumber: actorRole == ActorRole.EnergySupplier
+            ? energySupplierNumber
+            : chargeOwnerNumber, ActorRole: actorRole);
+        var transactionId = TransactionId.From("12356478912356478912356478912356478");
+
+        var chargeCode = exampleWholesaleResultMessageForActor.First().Value.ChargeCode;
+        var chargeType = exampleWholesaleResultMessageForActor.First().Value.ChargeType!;
+        var quantityMeasurementUnit = exampleWholesaleResultMessageForActor.First().Value.MeasurementUnit!;
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
-        await GivenGridAreaOwnershipAsync("106", gridOperatorNumber);
-        await GivenGridAreaOwnershipAsync("509", gridOperatorNumber);
 
+        foreach (var gridAreaOwner in testDataDescription.GridAreaOwners)
+        {
+            await GivenGridAreaOwnershipAsync(gridAreaOwner.Key, gridAreaOwner.Value);
+        }
+
+        // Act
         await GivenReceivedWholesaleServicesRequest(
             documentFormat: incomingDocumentFormat,
             senderActorNumber: actor.ActorNumber,
             senderActorRole: actor.ActorRole,
-            periodStart: (2024, 1, 1),
-            periodEnd: (2024, 1, 31),
+            periodStart: (2023, 2, 1),
+            periodEnd: (2023, 3, 1),
             energySupplier: energySupplierNumber,
             chargeOwner: chargeOwnerNumber,
-            chargeCode: "25361478",
-            chargeType: ChargeType.Tariff,
+            chargeCode: chargeCode,
+            chargeType: chargeType,
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("12356478912356478912356478912356478")),
+                (null, transactionId),
             });
 
-        // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
-
         // Assert
-        var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
+        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
-            new WholesaleServicesMessageAssertionInput(
-                GridAreas: Array.Empty<string>(),
-                RequestedForActorNumber: actor.ActorNumber.Value,
-                RequestedForActorRole: actor.ActorRole.Name,
-                EnergySupplierId: energySupplierNumber.Value,
-                ChargeOwnerId: chargeOwnerNumber.Value,
+            new RequestCalculatedWholesaleServicesInputV1AssertionInput(
+                transactionId,
+                actor.ActorNumber.Value,
+                actor.ActorRole.Name,
+                BusinessReason.WholesaleFixing,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
+                PeriodStart: CreateDateInstant(2023, 2, 1),
+                PeriodEnd: CreateDateInstant(2023, 3, 1),
+                energySupplierNumber.Value,
+                chargeOwnerNumber.Value,
+                GridAreas: new List<string>
                 {
-                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                    Capacity = 0,
                 },
-                Period: new Period(
-                    CreateDateInstant(2024, 1, 1),
-                    CreateDateInstant(2024, 1, 31)),
-                SettlementVersion: null));
-
-        // TODO: Assert correct process is created?
+                null,
+                new List<ChargeTypeInput> { new(chargeType.Name, chargeCode) }));
 
         /*
          *  --- PART 2: Receive data from Wholesale and create RSM document ---
@@ -352,14 +310,16 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
         // Arrange
 
-        // Generate a mock WholesaleServicesRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
+        // Generate a mock ServiceBus Message with RequestCalculatedWholesaleServicesAcceptedV1 response from Process Manager,
+        // based on the RequestCalculatedWholesaleServicesInputV1 for each grid area
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
-        var generateDataInGridAreas = new List<string> { "106", "509" };
-        var wholesaleAcceptedResponse = WholesaleServicesResponseEventBuilder
-            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow(), null, null, generateDataInGridAreas);
+        var acceptedGridAreas = testDataDescription.GridAreaCodes.ToList().AsReadOnly();
+        var requestCalculatedWholesaleServicesInputV1 = message.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
+        var requestCalculatedWholesaleServicesAccepted = WholesaleServicesResponseEventBuilder
+            .GenerateAcceptedFrom(requestCalculatedWholesaleServicesInputV1, acceptedGridAreas);
 
-        await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleAcceptedResponse);
+        await GivenWholesaleServicesRequestAcceptedIsReceived(requestCalculatedWholesaleServicesAccepted);
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(
@@ -370,7 +330,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         // Assert
         using (new AssertionScope())
         {
-            peekResults.Should().HaveSameCount(generateDataInGridAreas, "because there should be one message for each grid area");
+            peekResults.Should().HaveSameCount(acceptedGridAreas, "because there should be one message for each grid area");
         }
 
         var resultGridAreas = new List<string>();
@@ -381,8 +341,8 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
             resultGridAreas.Add(peekResultGridArea);
 
-            var seriesRequest = wholesaleAcceptedResponse.Series
-                .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
+            var seriesRequestGridArea = acceptedGridAreas
+                .Should().ContainSingle(gridArea => gridArea == peekResultGridArea)
                 .Subject;
 
             await ThenNotifyWholesaleServicesDocumentIsCorrect(
@@ -398,26 +358,24 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                     SenderId: "5790001330552", // Sender is always DataHub
                     SenderRole: ActorRole.MeteredDataAdministrator,
                     ChargeTypeOwner: chargeOwnerNumber.Value,
-                    ChargeCode: "25361478",
-                    ChargeType: ChargeType.Tariff,
+                    ChargeCode: chargeCode,
+                    ChargeType: chargeType,
                     Currency: Currency.DanishCrowns,
                     EnergySupplierNumber: energySupplierNumber.Value,
-                    SettlementMethod: SettlementMethod.Flex,
-                    MeteringPointType: MeteringPointType.Consumption,
-                    GridArea: seriesRequest.GridArea,
-                    TransactionId.From("12356478912356478912356478912356478"),
-                    PriceMeasurementUnit: MeasurementUnit.Kwh,
-                    ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
-                    CalculationVersion: GetNow().ToUnixTimeTicks(),
-                    Resolution: Resolution.Hourly,
-                    Period: new Period(
-                        CreateDateInstant(2024, 1, 1),
-                        CreateDateInstant(2024, 1, 31)),
-                    Points: seriesRequest.TimeSeriesPoints));
+                    SettlementMethod: exampleWholesaleResultMessageForActor[seriesRequestGridArea].SettlementMethod,
+                    MeteringPointType: exampleWholesaleResultMessageForActor[seriesRequestGridArea].MeteringPointType,
+                    GridArea: seriesRequestGridArea,
+                    transactionId,
+                    PriceMeasurementUnit: quantityMeasurementUnit,
+                    ProductCode: "5790001330590",
+                    QuantityMeasurementUnit: quantityMeasurementUnit,
+                    CalculationVersion: exampleWholesaleResultMessageForActor[seriesRequestGridArea].Version,
+                    Resolution: exampleWholesaleResultMessageForActor[seriesRequestGridArea].Resolution,
+                    Period: testDataDescription.Period,
+                    Points: exampleWholesaleResultMessageForActor[seriesRequestGridArea].Points));
         }
 
-        resultGridAreas.Should().BeEquivalentTo("106", "509");
+        resultGridAreas.Should().BeEquivalentTo(acceptedGridAreas);
     }
 
     [Theory(Skip = "not updated")]
@@ -668,7 +626,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         var acceptedResponses = messages
             .Select(message =>
                 (
-                    ProcessId: message.ProcessId,
+                    message.ProcessId,
                     AcceptedResponse: WholesaleServicesResponseEventBuilder
                         .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow())))
             .ToList();
@@ -815,7 +773,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         // Generate a mock ServiceBus Message with RequestCalculatedWholesaleServicesRejectedV1 response from Process Manager
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
-        var requestCalculatedWholesaleServicesInputV1 = message!.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
+        var requestCalculatedWholesaleServicesInputV1 = message.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
         var requestCalculatedWholesaleServicesRejected = WholesaleServicesResponseEventBuilder
             .GenerateRejectedFrom(requestCalculatedWholesaleServicesInputV1, expectedErrorMessage, expectedErrorCode);
 

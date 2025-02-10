@@ -73,7 +73,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
         var meteredDataResponsible = new Actor(ActorNumber.Create("1111111111111"), ActorRole.MeteredDataResponsible);
 
-        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, meteredDataResponsible.ActorNumber);
+        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCodes.Single(), meteredDataResponsible.ActorNumber);
         await GivenEnqueueEnergyResultsPerGridAreaAsync(testDataDescription.CalculationId, testDataDescription.GridAreaOwners);
 
         // When (act)
