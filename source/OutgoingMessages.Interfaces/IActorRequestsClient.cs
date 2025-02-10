@@ -22,12 +22,21 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 public interface IActorRequestsClient
 {
-    /// <summary>
-    /// Enqueues aggregated measure data, if data is found.
-    /// </summary>
-    /// <param name="businessReason"></param>
-    /// <param name="aggregatedTimeSeriesQueryParameters"></param>
-    public Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters);
+    public Task<int> EnqueueAggregatedMeasureDataAsync(
+        EventId eventId,
+        Guid orchestrationInstanceId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        BusinessReason businessReason,
+        MeteringPointType? meteringPointType,
+        SettlementMethod? settlementMethod,
+        SettlementVersion? settlementVersion,
+        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
+        CancellationToken cancellationToken);
 
     public Task<int> EnqueueWholesaleServicesAsync(
         WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
@@ -47,6 +56,19 @@ public interface IActorRequestsClient
 
     public Task EnqueueRejectWholesaleServicesRequestAsync(
         RejectedWholesaleServicesMessageDto enqueueRejectedMessageDto,
+        CancellationToken cancellationToken);
+
+    public Task EnqueueRejectAggregatedMeasureDataRequestWithNoDataAsync(
+        Guid orchestrationInstanceId,
+        MessageId originalMessageId,
+        EventId eventId,
+        TransactionId originalTransactionId,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        BusinessReason businessReason,
+        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
         CancellationToken cancellationToken);
 
     public Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
