@@ -66,7 +66,8 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await DatabricksSchemaManager.DropSchemaAsync();
+        if (_databricksDataInserted)
+            await DatabricksSchemaManager.DropSchemaAsync();
         Dispose();
         await Task.CompletedTask;
     }

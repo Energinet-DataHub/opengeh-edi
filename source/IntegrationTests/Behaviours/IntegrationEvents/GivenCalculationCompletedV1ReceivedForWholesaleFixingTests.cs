@@ -232,9 +232,9 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount * 2, "because there should be 3 message per grid area.");
+        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount, "because there should be 3 message per grid area.");
         peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount, "because there should be 3 message per owned grid area.");
-        peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount * 2, "because there should be 3 message per grid area.");
+        peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount, "because there should be 3 message per grid area.");
 
         var expectedDocumentToSystemOperator = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2023-09-07T13:37:05Z",
@@ -523,7 +523,12 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-05T23:00:00.000+00:00'", "1.000", "NULL", "12.756998", "12.756998"],
         ]);
 
-        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(calculationId, energySupplier, new Dictionary<string, ActorNumber>() { { "805", ActorNumber.Create("8500000000502") } });
+        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(calculationId, energySupplier, new Dictionary<string, ActorNumber>()
+        {
+            { "803", ActorNumber.Create("0000000000000") },
+            { "804", ActorNumber.Create("0000000000000") },
+            { "805", ActorNumber.Create("8500000000502") },
+        });
 
         // When (act)
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
@@ -588,7 +593,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(
             testDataDescriptionForMergedGridArea.CalculationId,
             energySupplier,
-            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber } });
+            new Dictionary<string, ActorNumber>
+            {
+                { "804", newGridOperatorForMergedGridArea.ActorNumber },
+                { "803", ActorNumber.Create("0000000000000") },
+            });
 
         // When (act)
         var peekResultsForGridOperator = await WhenActorPeeksAllMessages(
@@ -597,7 +606,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForGridOperator.Should().HaveCount(testDataDescriptionForMergedGridArea.ExpectedOutgoingMessagesForGridOwnerCount * 2, "because there should be 3 message per grid area.");
+        peekResultsForGridOperator.Should().HaveCount(testDataDescriptionForMergedGridArea.ExpectedOutgoingMessagesForGridOwnerCount, "because there should be 3 message per grid area.");
 
         var expectedDocumentToGridOwner = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2023-09-07T13:37:05Z",
