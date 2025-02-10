@@ -54,7 +54,7 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
             new AsyncLazy<HttpClient>(() => throw new NotImplementedException("Not used in load test")),
             logger);
         _ediDatabaseDriver = new EdiDatabaseDriver(_fixture.DatabaseConnectionString);
-        _wholesaleDriver = new WholesaleDriver(_fixture.IntegrationEventPublisher, _fixture.EdiServiceBusClient);
+        _wholesaleDriver = new WholesaleDriver(_fixture.IntegrationEventPublisher, _fixture.EdiInboxClient);
     }
 
     [Fact]
