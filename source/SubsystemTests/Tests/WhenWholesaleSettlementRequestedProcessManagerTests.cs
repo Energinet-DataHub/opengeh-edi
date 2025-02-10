@@ -82,7 +82,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     public async Task Given_EnqueueBrs028FromProcessManager_When_ActorPeeks_Then_GetsNotifyMessage()
     {
         await _wholesaleSettlementRequest.PublishAcceptedRequestBrs028Async(
-            "888",
+            "804",
             new Actor(
                 ActorNumber.Create(SubsystemTestFixture.EZTestCimActorNumber),
                 ActorRole.SystemOperator));

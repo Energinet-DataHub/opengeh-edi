@@ -31,7 +31,9 @@ public class EnqueueBrs028MessageFactory
         Actor actor,
         string gridArea)
     {
-        // TODO: Correct values, such that there exists data
+        var chargeOwner = actor.ActorRole == ActorRole.SystemOperator ? ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value) : null;
+        var energySupplier = actor.ActorRole == ActorRole.EnergySupplier ? ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value) : null;
+
         var accepted = new RequestCalculatedWholesaleServicesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
@@ -42,12 +44,12 @@ public class EnqueueBrs028MessageFactory
             BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.WholesaleFixing.Name),
             Resolution: null,
             PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
-            PeriodEnd: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
+            PeriodEnd: InstantPattern.General.Parse("2023-02-28T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             GridAreas: [gridArea],
-            EnergySupplierNumber: null,
-            ChargeOwnerNumber: null,
+            EnergySupplierNumber: energySupplier,
+            ChargeOwnerNumber: chargeOwner,
             SettlementVersion: null,
-            ChargeTypes: []);
+            ChargeTypes: new List<RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType>() { new(ProcessManagerTypes.ChargeType.Tariff, "40000") });
 
         return CreateServiceBusMessage(accepted, actor);
     }

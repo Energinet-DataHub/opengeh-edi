@@ -31,6 +31,9 @@ public static class EnqueueBrs026MessageFactory
         Actor actor,
         string gridArea)
     {
+        var balanceResponsible = actor.ActorRole == ActorRole.BalanceResponsibleParty ? ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value) : null;
+        var energySupplier = actor.ActorRole == ActorRole.EnergySupplier ? ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value) : null;
+
         var accepted = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
@@ -39,13 +42,13 @@ public static class EnqueueBrs026MessageFactory
             RequestedByActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
             RequestedByActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
             BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
-            PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00Z").GetValueOrThrow().ToDateTimeOffset(),
-            PeriodEnd: InstantPattern.General.Parse("2023-02-31T23:00Z").GetValueOrThrow().ToDateTimeOffset(),
+            PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
+            PeriodEnd: InstantPattern.General.Parse("2023-02-02T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             GridAreas: [gridArea],
-            EnergySupplierNumber: null,
-            BalanceResponsibleNumber: null,
-            MeteringPointType: null,
-            SettlementMethod: null,
+            EnergySupplierNumber: energySupplier,
+            BalanceResponsibleNumber: balanceResponsible,
+            MeteringPointType: ProcessManagerTypes.MeteringPointType.Consumption,
+            SettlementMethod: ProcessManagerTypes.SettlementMethod.Flex,
             SettlementVersion: null);
 
         return CreateServiceBusMessage(accepted, actor);
