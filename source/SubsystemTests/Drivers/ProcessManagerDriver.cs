@@ -18,31 +18,31 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
 internal class ProcessManagerDriver(
-    EdiServiceBusClient ediTopicClient)
+    ServiceBusSenderClient client)
 {
-    private readonly EdiServiceBusClient _ediTopicClient = ediTopicClient;
+    private readonly ServiceBusSenderClient _client = client;
 
     internal async Task PublishAcceptedRequestBrs026Async(string gridArea, Actor actor)
     {
         var message = EnqueueBrs026MessageFactory.CreateAccept(actor, gridArea);
-        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
     internal async Task PublishRejectedRequestBrs026Async(Actor actor)
     {
         var message = EnqueueBrs026MessageFactory.CreateReject(actor);
-        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
     internal async Task PublishAcceptedRequestBrs028Async(string gridArea, Actor actor)
     {
         var message = EnqueueBrs028MessageFactory.CreateAccept(actor, gridArea);
-        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
     internal async Task PublishRejectedRequestBrs028Async(Actor actor)
     {
         var message = EnqueueBrs028MessageFactory.CreateReject(actor);
-        await _ediTopicClient.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 }

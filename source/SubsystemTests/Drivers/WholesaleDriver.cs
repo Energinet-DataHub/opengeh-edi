@@ -22,14 +22,14 @@ internal sealed class WholesaleDriver
 {
     private const string BalanceResponsiblePartyMarketRoleCode = "DDK";
     private readonly IntegrationEventPublisher _integrationEventPublisher;
-    private readonly EdiServiceBusClient _inboxEdiClient;
+    private readonly ServiceBusSenderClient _client;
 
     internal WholesaleDriver(
         IntegrationEventPublisher integrationEventPublisher,
-        EdiServiceBusClient inboxEdiClient)
+        ServiceBusSenderClient client)
     {
         _integrationEventPublisher = integrationEventPublisher;
-        _inboxEdiClient = inboxEdiClient;
+        _client = client;
     }
 
     internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
@@ -45,14 +45,14 @@ internal sealed class WholesaleDriver
             energySupplierNumber,
             chargeOwnerNumber);
 
-        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+        await _client.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
     internal async Task PublishWholesaleServicesRequestRejectedResponseAsync(Guid processId, CancellationToken cancellationToken)
     {
         var message = WholesaleServiceRequestRejectedMessageFactory.Create(processId);
 
-        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+        await _client.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
     internal async Task PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
@@ -64,14 +64,14 @@ internal sealed class WholesaleDriver
             processId,
             gridAreaCode);
 
-        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+        await _client.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
     internal async Task PublishAggregatedMeasureDataRequestRejectedResponseAsync(Guid processId, CancellationToken cancellationToken)
     {
         var message = AggregatedMeasureDataRequestRejectedMessageFactory.Create(processId);
 
-        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+        await _client.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
     internal Task PublishCalculationCompletedAsync(

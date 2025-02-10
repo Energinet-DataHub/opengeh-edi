@@ -16,11 +16,11 @@ using Azure.Messaging.ServiceBus;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
-internal sealed class EdiServiceBusClient : IAsyncDisposable
+internal sealed class ServiceBusSenderClient : IAsyncDisposable
 {
     private readonly ServiceBusSender _sender;
 
-    public EdiServiceBusClient(
+    public ServiceBusSenderClient(
         ServiceBusClient client,
         string queueOrTopicName)
     {
