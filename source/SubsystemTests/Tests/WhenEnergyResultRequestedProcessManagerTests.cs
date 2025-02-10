@@ -61,7 +61,7 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
     }
 
     [Fact]
-    public async Task Given_GoodRequest_When_B2BActorRequests_Then_GetSuccessfulResponse()
+    public async Task B2B_actor_can_request_aggregated_measure_data()
     {
         var act = async () => await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
 
@@ -69,7 +69,7 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
     }
 
     [Fact]
-    public async Task Given_GoodRequest_When_B2CActorRequests_Then_GetSuccessfulResponse()
+    public async Task B2C_actor_can_request_aggregated_measure_data()
     {
         var act = async () => await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
 
@@ -77,13 +77,13 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
     }
 
     [Fact]
-    public async Task Given_BadRequest_When_ActorRequests_Then_GetBadRequest()
+    public async Task Actor_get_bad_request_when_aggregated_measure_data_request_is_invalid()
     {
         await _aggregatedMeasureDataRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
-    public async Task Given_EnqueueBrs026FromProcessManager_When_ActorPeeks_Then_GetsNotifyMessage()
+    public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
     {
         await _aggregatedMeasureDataRequest.PublishAcceptedBrs026RequestAsync(
             "804",
@@ -93,7 +93,7 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
     }
 
     [Fact]
-    public async Task Given_EnqueueRejectBrs026FromProcessManager_When_ActorPeeks_Then_ActorGetRejectedMessage()
+    public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
     {
         await _aggregatedMeasureDataRequest.PublishRejectedBrs026RequestAsync(
             new Actor(ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber), ActorRole.EnergySupplier));

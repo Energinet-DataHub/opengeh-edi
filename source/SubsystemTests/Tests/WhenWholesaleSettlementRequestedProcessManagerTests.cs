@@ -57,7 +57,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    public async Task Given_GoodRequest_When_B2BActorRequests_Then_GetSuccessfulResponse()
+    public async Task B2B_actor_can_request_wholesale_settlement()
     {
         var act = async () => await _wholesaleSettlementRequest.Request(CancellationToken.None);
 
@@ -65,7 +65,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    public async Task Given_GoodRequest_When_B2CActorRequests_Then_GetSuccessfulResponse()
+    public async Task B2C_actor_can_request_wholesale_settlement()
     {
         var act = async () => await _wholesaleSettlementRequest.B2CRequest(CancellationToken.None);
 
@@ -73,13 +73,13 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    public async Task Given_BadRequest_When_ActorRequests_Then_GetBadRequest()
+    public async Task Actor_get_sync_rejected_response_when_wholesale_settlement_request_is_invalid()
     {
         await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
-    public async Task Given_EnqueueBrs028FromProcessManager_When_ActorPeeks_Then_GetsNotifyMessage()
+    public async Task Actor_can_peek_and_dequeue_response_from_wholesale_settlement_request()
     {
         await _wholesaleSettlementRequest.PublishAcceptedBrs028RequestAsync(
             "804",
@@ -91,7 +91,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    public async Task Given_EnqueueRejectBrs028FromProcessManager_When_ActorPeeks_Then_ActorGetRejectedMessage()
+    public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_settlement_request()
     {
         await _wholesaleSettlementRequest.PublishRejectedBrs028RequestAsync(
             new Actor(
