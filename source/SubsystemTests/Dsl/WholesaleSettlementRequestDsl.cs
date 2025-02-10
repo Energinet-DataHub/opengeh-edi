@@ -127,20 +127,20 @@ public sealed class WholesaleSettlementRequestDsl
             cancellationToken).ConfigureAwait(false);
     }
 
-    internal async Task PublishAcceptedRequestBrs028Async(
+    internal async Task PublishAcceptedBrs028RequestAsync(
         string gridArea,
         Actor actor)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        await _processManagerDriver.PublishAcceptedRequestBrs028Async(gridArea, actor);
+        await _processManagerDriver.PublishAcceptedBrs028RequestAsync(gridArea, actor);
     }
 
-    internal async Task PublishRejectedRequestBrs026Async(
+    internal async Task PublishRejectedBrs028RequestAsync(
         Actor actor)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        await _processManagerDriver.PublishRejectedRequestBrs028Async(actor);
+        await _processManagerDriver.PublishRejectedBrs028RequestAsync(actor);
     }
 }

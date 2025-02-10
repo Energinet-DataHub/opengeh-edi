@@ -81,7 +81,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     [Fact]
     public async Task Given_EnqueueBrs028FromProcessManager_When_ActorPeeks_Then_GetsNotifyMessage()
     {
-        await _wholesaleSettlementRequest.PublishAcceptedRequestBrs028Async(
+        await _wholesaleSettlementRequest.PublishAcceptedBrs028RequestAsync(
             "804",
             new Actor(
                 ActorNumber.Create(SubsystemTestFixture.EZTestCimActorNumber),
@@ -93,7 +93,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     [Fact]
     public async Task Given_EnqueueRejectBrs028FromProcessManager_When_ActorPeeks_Then_ActorGetRejectedMessage()
     {
-        await _wholesaleSettlementRequest.PublishRejectedRequestBrs026Async(
+        await _wholesaleSettlementRequest.PublishRejectedBrs028RequestAsync(
             new Actor(
                 ActorNumber.Create(SubsystemTestFixture.EZTestCimActorNumber),
                 ActorRole.SystemOperator));

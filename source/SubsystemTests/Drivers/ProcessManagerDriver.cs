@@ -22,25 +22,25 @@ internal class ProcessManagerDriver(
 {
     private readonly ServiceBusSenderClient _client = client;
 
-    internal async Task PublishAcceptedRequestBrs026Async(string gridArea, Actor actor)
+    internal async Task PublishAcceptedBrs026RequestAsync(string gridArea, Actor actor)
     {
         var message = EnqueueBrs026MessageFactory.CreateAccept(actor, gridArea);
         await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
-    internal async Task PublishRejectedRequestBrs026Async(Actor actor)
+    internal async Task PublishRejectedBrs026RequestAsync(Actor actor)
     {
         var message = EnqueueBrs026MessageFactory.CreateReject(actor);
         await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
-    internal async Task PublishAcceptedRequestBrs028Async(string gridArea, Actor actor)
+    internal async Task PublishAcceptedBrs028RequestAsync(string gridArea, Actor actor)
     {
         var message = EnqueueBrs028MessageFactory.CreateAccept(actor, gridArea);
         await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
-    internal async Task PublishRejectedRequestBrs028Async(Actor actor)
+    internal async Task PublishRejectedBrs028RequestAsync(Actor actor)
     {
         var message = EnqueueBrs028MessageFactory.CreateReject(actor);
         await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);

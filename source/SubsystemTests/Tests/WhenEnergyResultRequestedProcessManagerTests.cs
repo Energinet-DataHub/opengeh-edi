@@ -85,7 +85,7 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
     [Fact]
     public async Task Given_EnqueueBrs026FromProcessManager_When_ActorPeeks_Then_GetsNotifyMessage()
     {
-        await _aggregatedMeasureDataRequest.PublishAcceptedRequestBrs026Async(
+        await _aggregatedMeasureDataRequest.PublishAcceptedBrs026RequestAsync(
             "804",
             new Actor(ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber), ActorRole.EnergySupplier));
 
@@ -95,7 +95,7 @@ internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestC
     [Fact]
     public async Task Given_EnqueueRejectBrs026FromProcessManager_When_ActorPeeks_Then_ActorGetRejectedMessage()
     {
-        await _aggregatedMeasureDataRequest.PublishRejectedRequestBrs026Async(
+        await _aggregatedMeasureDataRequest.PublishRejectedBrs026RequestAsync(
             new Actor(ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber), ActorRole.EnergySupplier));
 
         await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailable();

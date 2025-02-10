@@ -132,18 +132,18 @@ public sealed class AggregatedMeasureDataRequestDsl
             .ConfigureAwait(false);
     }
 
-    internal async Task PublishAcceptedRequestBrs026Async(
+    internal async Task PublishAcceptedBrs026RequestAsync(
         string gridAreaCode,
         Actor actor)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-        await _processManagerDriver.PublishAcceptedRequestBrs026Async(gridAreaCode, actor);
+        await _processManagerDriver.PublishAcceptedBrs026RequestAsync(gridAreaCode, actor);
     }
 
-    internal async Task PublishRejectedRequestBrs026Async(
+    internal async Task PublishRejectedBrs026RequestAsync(
         Actor actor)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-        await _processManagerDriver.PublishRejectedRequestBrs026Async(actor);
+        await _processManagerDriver.PublishRejectedBrs026RequestAsync(actor);
     }
 }

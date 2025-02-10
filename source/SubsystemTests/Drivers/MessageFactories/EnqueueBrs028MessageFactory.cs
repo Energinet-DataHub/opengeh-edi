@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using Google.Protobuf;
 using NodaTime.Text;
 using ProcessManagerTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
@@ -87,15 +88,8 @@ public class EnqueueBrs028MessageFactory
 
         enqueueActorMessages.SetData(data);
 
-        var message = new ServiceBusMessage(JsonFormatter.Default.Format(enqueueActorMessages))
-        {
-            Subject = EnqueueActorMessagesV1.BuildServiceBusMessageSubject(_orchestrationName),
-            MessageId = Guid.NewGuid().ToString(),
-            ContentType = "application/json",
-        };
-        message.ApplicationProperties.Add("MajorVersion", enqueueActorMessages.GetType().Name);
-        message.ApplicationProperties.Add("BodyFormat", "Json");
-
-        return message;
+        return enqueueActorMessages.ToServiceBusMessage(
+            subject: $"Enqueue_{_orchestrationName.ToLower()}",
+            idempotencyKey: Guid.NewGuid().ToString());
     }
 }
