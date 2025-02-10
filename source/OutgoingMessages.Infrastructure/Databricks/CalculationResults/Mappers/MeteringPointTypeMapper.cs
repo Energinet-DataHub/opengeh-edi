@@ -56,7 +56,7 @@ public static class MeteringPointTypeMapper
     }
 
     public static MeteringPointType FromTimeSeriesTypeDeltaTableValue(string timeSeriesType) =>
-        TimeSeriesTypeMapper.FromDeltaTableValue(timeSeriesType) switch
+        EnergyResults.TimeSeriesTypeMapper.FromDeltaTableValue(timeSeriesType) switch
         {
             TimeSeriesType.Production => MeteringPointType.Production,
             TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,

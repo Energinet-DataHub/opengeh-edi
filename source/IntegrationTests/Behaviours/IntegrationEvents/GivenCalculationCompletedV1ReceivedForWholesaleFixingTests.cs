@@ -78,7 +78,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
-        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
+        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCodes.Single(), gridOperator.ActorNumber);
 
         // TODO: Should we enqueue wholesale results for all actors in the dataset?
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier, new Dictionary<string, ActorNumber>() { { "804", ActorNumber.Create("8500000000502") } });
@@ -204,7 +204,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
-        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
+        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCodes.Single(), gridOperator.ActorNumber);
         await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier, new Dictionary<string, ActorNumber>() { { "804", ActorNumber.Create("8500000000502") } });
 
         // When (act)
@@ -328,7 +328,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
-        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
+        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCodes.Single(), gridOperator.ActorNumber);
         await GivenEnqueueWholesaleResultsForTotalAmountAsync(testDataDescription.CalculationId, energySupplier, new Dictionary<string, ActorNumber>() { { "804", ActorNumber.Create("8500000000502") } });
 
         // When (act)
@@ -572,13 +572,13 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var newGridOperatorForMergedGridArea = new Actor(ActorNumber.Create("5790001665533"), ActorRole.GridAccessProvider);
         var oldGridOperatorForMergedGridArea = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
 
-        await GivenGridAreaOwnershipAsync(testDataDescriptionForMergedGridArea.GridAreaCode, newGridOperatorForMergedGridArea.ActorNumber);
+        await GivenGridAreaOwnershipAsync(testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber);
 
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(
             testDataDescriptionForMergedGridArea.CalculationId,
             energySupplier,
-            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCode, newGridOperatorForMergedGridArea.ActorNumber } });
+            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber } });
 
         // When (act)
         var peekResultsForGridOperator = await WhenActorPeeksAllMessages(
@@ -631,11 +631,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
-        await GivenGridAreaOwnershipAsync(testDataDescriptionForMergedGridArea.GridAreaCode, newGridOperatorForMergedGridArea.ActorNumber);
+        await GivenGridAreaOwnershipAsync(testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber);
         await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(
             testDataDescriptionForMergedGridArea.CalculationId,
             energySupplier,
-            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCode, newGridOperatorForMergedGridArea.ActorNumber } });
+            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber } });
 
         // When (act)
         var peekResultsForGridOperator = await WhenActorPeeksAllMessages(
@@ -687,11 +687,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
-        await GivenGridAreaOwnershipAsync(testDataDescriptionForMergedGridArea.GridAreaCode, newGridOperatorForMergedGridArea.ActorNumber);
+        await GivenGridAreaOwnershipAsync(testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber);
         await GivenEnqueueWholesaleResultsForTotalAmountAsync(
             testDataDescriptionForMergedGridArea.CalculationId,
             energySupplier,
-            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCode, newGridOperatorForMergedGridArea.ActorNumber } });
+            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber } });
 
         // When (act)
         var peekResultsForGridOperator = await WhenActorPeeksAllMessages(

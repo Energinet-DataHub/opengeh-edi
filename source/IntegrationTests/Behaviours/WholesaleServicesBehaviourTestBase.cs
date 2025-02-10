@@ -296,6 +296,22 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return wholesaleResultForAmountPerChargeDescription;
     }
 
+    protected async Task<WholesaleResultForAmountPerChargeInTwoGridAreasDescription> GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas()
+    {
+        var wholesaleResultForAmountPerChargeInTwoGridAreasDescription = new WholesaleResultForAmountPerChargeInTwoGridAreasDescription();
+        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
+            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
+            _ediDatabricksOptions.Value,
+            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.GridAreaOwners,
+            EventId.From(Guid.NewGuid()),
+            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.CalculationId,
+            null);
+
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeInTwoGridAreasDescription.TestFilePath);
+        return wholesaleResultForAmountPerChargeInTwoGridAreasDescription;
+    }
+
     private static Action<WholesaleServicesRequest> GetAssertServiceBusMessage(
         WholesaleServicesMessageAssertionInput input)
     {
@@ -389,13 +405,13 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
             processId: processId);
     }
 
-    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage rejectedMessage)
+    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage message)
     {
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
             messageId: Guid.NewGuid().ToString(),
-            subject: rejectedMessage.Subject,
-            body: rejectedMessage.Body,
-            properties: rejectedMessage.ApplicationProperties);
+            subject: message.Subject,
+            body: message.Body,
+            properties: message.ApplicationProperties);
         var enqueueHandler = GetService<EnqueueHandler_Brs_028_V1>();
         await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
     }
