@@ -121,14 +121,14 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 : gridOperatorNumber, ActorRole: actorRole);
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
-        var gridArea = exampleWholesaleResultMessageForActor.GridArea;
-        var chargeCode = exampleWholesaleResultMessageForActor.ChargeCode;
-        var chargeType = exampleWholesaleResultMessageForActor.ChargeType!;
-        var quantityMeasurementUnit = exampleWholesaleResultMessageForActor.MeasurementUnit!;
+        var expectedGridArea = exampleWholesaleResultMessageForActor.GridArea;
+        var expectedChargeCode = exampleWholesaleResultMessageForActor.ChargeCode;
+        var expectedChargeType = exampleWholesaleResultMessageForActor.ChargeType!;
+        var expectedQuantityMeasurementUnit = exampleWholesaleResultMessageForActor.MeasurementUnit!;
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
-        await GivenGridAreaOwnershipAsync(gridArea, gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync(expectedGridArea, gridOperatorNumber);
 
         // Act
         await GivenReceivedWholesaleServicesRequest(
@@ -139,12 +139,12 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             periodEnd: (2023, 3, 1),
             energySupplier: energySupplierNumber,
             chargeOwner: chargeOwnerNumber,
-            chargeCode: chargeCode,
-            chargeType: chargeType,
+            chargeCode: expectedChargeCode,
+            chargeType: expectedChargeType,
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (gridArea, transactionId),
+                (expectedGridArea, transactionId),
             });
 
         // Assert
@@ -160,9 +160,9 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 PeriodEnd: CreateDateInstant(2023, 3, 1),
                 energySupplierNumber.Value,
                 chargeOwnerNumber.Value,
-                new List<string> { gridArea },
+                new List<string> { expectedGridArea },
                 null,
-                new List<ChargeTypeInput> { new(chargeType.Name, chargeCode) }));
+                new List<ChargeTypeInput> { new(expectedChargeType.Name, expectedChargeCode) }));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
@@ -208,20 +208,20 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                     null),
                 ReceiverId: actor.ActorNumber.Value,
                 ReceiverRole: actor.ActorRole,
-                SenderId: "5790001330552", // Sender is always DataHub
+                SenderId: DataHubDetails.DataHubActorNumber.Value, // Sender is always DataHub
                 SenderRole: ActorRole.MeteredDataAdministrator,
                 ChargeTypeOwner: chargeOwnerNumber.Value,
-                ChargeCode: chargeCode,
-                ChargeType: chargeType,
+                ChargeCode: expectedChargeCode,
+                ChargeType: expectedChargeType,
                 Currency: exampleWholesaleResultMessageForActor.Currency,
                 EnergySupplierNumber: energySupplierNumber.Value,
                 SettlementMethod: exampleWholesaleResultMessageForActor.SettlementMethod,
                 MeteringPointType: exampleWholesaleResultMessageForActor.MeteringPointType,
-                GridArea: gridArea,
+                GridArea: expectedGridArea,
                 transactionId,
-                PriceMeasurementUnit: quantityMeasurementUnit,
+                PriceMeasurementUnit: expectedQuantityMeasurementUnit,
                 ProductCode: "5790001330590",
-                QuantityMeasurementUnit: quantityMeasurementUnit,
+                QuantityMeasurementUnit: expectedQuantityMeasurementUnit,
                 CalculationVersion: exampleWholesaleResultMessageForActor.Version,
                 Resolution: exampleWholesaleResultMessageForActor.Resolution,
                 Period: testDataDescription.Period,
@@ -253,9 +253,9 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             : chargeOwnerNumber, ActorRole: actorRole);
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
-        var chargeCode = exampleWholesaleResultMessageForActor.First().Value.ChargeCode;
-        var chargeType = exampleWholesaleResultMessageForActor.First().Value.ChargeType!;
-        var quantityMeasurementUnit = exampleWholesaleResultMessageForActor.First().Value.MeasurementUnit!;
+        var expectedChargeCode = exampleWholesaleResultMessageForActor.First().Value.ChargeCode;
+        var exceptedChargeType = exampleWholesaleResultMessageForActor.First().Value.ChargeType!;
+        var expectedQuantityMeasurementUnit = exampleWholesaleResultMessageForActor.First().Value.MeasurementUnit!;
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
@@ -274,8 +274,8 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             periodEnd: (2023, 3, 1),
             energySupplier: energySupplierNumber,
             chargeOwner: chargeOwnerNumber,
-            chargeCode: chargeCode,
-            chargeType: chargeType,
+            chargeCode: expectedChargeCode,
+            chargeType: exceptedChargeType,
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
@@ -300,7 +300,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                     Capacity = 0,
                 },
                 null,
-                new List<ChargeTypeInput> { new(chargeType.Name, chargeCode) }));
+                new List<ChargeTypeInput> { new(exceptedChargeType.Name, expectedChargeCode) }));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
@@ -353,20 +353,20 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                         null),
                     ReceiverId: actor.ActorNumber.Value,
                     ReceiverRole: actor.ActorRole,
-                    SenderId: "5790001330552", // Sender is always DataHub
+                    SenderId: DataHubDetails.DataHubActorNumber.Value, // Sender is always DataHub
                     SenderRole: ActorRole.MeteredDataAdministrator,
                     ChargeTypeOwner: chargeOwnerNumber.Value,
-                    ChargeCode: chargeCode,
-                    ChargeType: chargeType,
+                    ChargeCode: expectedChargeCode,
+                    ChargeType: exceptedChargeType,
                     Currency: Currency.DanishCrowns,
                     EnergySupplierNumber: energySupplierNumber.Value,
                     SettlementMethod: exampleWholesaleResultMessageForActor[seriesRequestGridArea].SettlementMethod,
                     MeteringPointType: exampleWholesaleResultMessageForActor[seriesRequestGridArea].MeteringPointType,
                     GridArea: seriesRequestGridArea,
                     transactionId,
-                    PriceMeasurementUnit: quantityMeasurementUnit,
+                    PriceMeasurementUnit: expectedQuantityMeasurementUnit,
                     ProductCode: "5790001330590",
-                    QuantityMeasurementUnit: quantityMeasurementUnit,
+                    QuantityMeasurementUnit: expectedQuantityMeasurementUnit,
                     CalculationVersion: exampleWholesaleResultMessageForActor[seriesRequestGridArea].Version,
                     Resolution: exampleWholesaleResultMessageForActor[seriesRequestGridArea].Resolution,
                     Period: testDataDescription.Period,
@@ -508,7 +508,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                         null),
                     ReceiverId: actor.ActorNumber.Value,
                     ReceiverRole: actor.ActorRole,
-                    SenderId: "5790001330552", // Sender is always DataHub
+                    SenderId: DataHubDetails.DataHubActorNumber.Value, // Sender is always DataHub
                     SenderRole: ActorRole.MeteredDataAdministrator,
                     ChargeTypeOwner: chargeOwnerOrNull?.Value ?? "5790000432752",
                     ChargeCode: peekResultChargeCode,
@@ -626,7 +626,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 BusinessReason.WholesaleFixing,
                 actor.ActorNumber.Value,
                 actor.ActorRole,
-                "5790001330552",
+                DataHubDetails.DataHubActorNumber.Value,
                 ActorRole.MeteredDataAdministrator,
                 ReasonCode.FullyRejected.Code,
                 transactionId,
@@ -773,7 +773,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 null),
             ReceiverId: actor.ActorNumber.Value,
             ReceiverRole: actor.ActorRole,
-            SenderId: "5790001330552", // Sender is always DataHub
+            SenderId: DataHubDetails.DataHubActorNumber.Value, // Sender is always DataHub
             SenderRole: ActorRole.MeteredDataAdministrator,
             ChargeTypeOwner: actorRole == ActorRole.EnergySupplier ? "8500000000502" : chargeOwnerNumber!.Value,
             ChargeCode: expectedChargeCode,
@@ -800,7 +800,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 null),
             ReceiverId: actor.ActorNumber.Value,
             ReceiverRole: actor.ActorRole,
-            SenderId: "5790001330552", // Sender is always DataHub
+            SenderId: DataHubDetails.DataHubActorNumber.Value, // Sender is always DataHub
             SenderRole: ActorRole.MeteredDataAdministrator,
             ChargeTypeOwner: null,
             ChargeCode: exampleTotalAmountWholesaleResultMessageForActor.ChargeCode,
