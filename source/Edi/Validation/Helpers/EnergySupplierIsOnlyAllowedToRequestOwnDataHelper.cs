@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 
@@ -29,7 +29,7 @@ public static class EnergySupplierIsOnlyAllowedToRequestOwnDataHelper
 
     public static Task<IList<ValidationError>> ValidateAsync(string requestedForActorRole, string requestedForActorNumber, string energySupplierId)
     {
-        if (requestedForActorRole != DataHubNames.ActorRole.EnergySupplier)
+        if (requestedForActorRole != ActorRole.EnergySupplier.Name)
              return Task.FromResult(NoError);
 
         if (string.IsNullOrEmpty(energySupplierId))

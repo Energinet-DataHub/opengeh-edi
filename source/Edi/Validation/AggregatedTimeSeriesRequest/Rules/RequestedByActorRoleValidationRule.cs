@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
 
@@ -22,10 +22,10 @@ public sealed class RequestedByActorRoleValidationRule : IValidationRule<DataHub
     {
         return Task.FromResult(subject.RequestedForActorRole switch
         {
-            DataHubNames.ActorRole.MeteredDataResponsible => new List<ValidationError>(),
-            DataHubNames.ActorRole.BalanceResponsibleParty => new List<ValidationError>(),
-            DataHubNames.ActorRole.EnergySupplier => new List<ValidationError>(),
-            DataHubNames.ActorRole.GridAccessProvider => new List<ValidationError>
+            var name when name == ActorRole.MeteredDataResponsible.Name => new List<ValidationError>(),
+            var name when name == ActorRole.BalanceResponsibleParty.Name => new List<ValidationError>(),
+            var name when name == ActorRole.EnergySupplier.Name => new List<ValidationError>(),
+            var name when name == ActorRole.GridAccessProvider.Name => new List<ValidationError>
             {
                 new(
                     "Rollen skal være MDR når der anmodes om beregnede energitidsserier / Role must be MDR when requesting aggregated measure data",

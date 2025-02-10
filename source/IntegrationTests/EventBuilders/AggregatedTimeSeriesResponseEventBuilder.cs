@@ -21,6 +21,7 @@ using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Duration = NodaTime.Duration;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -110,15 +111,28 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         return rejectedResponse;
     }
 
-    private static TimeSeriesType GetTimeSeriesType(string? settlementMethod, string? meteringPointType)
+    private static TimeSeriesType GetTimeSeriesType(string? settlementMethodName, string? meteringPointTypeName)
     {
-        return (settlementMethod, meteringPointType) switch
+        var settlementMethodNameOrDefault = PMTypes.SettlementMethod.FromNameOrDefault(settlementMethodName);
+        var meteringPointTypeNameOrDefault = PMTypes.MeteringPointType.FromNameOrDefault(meteringPointTypeName);
+
+        return (settlementMethodNameOrDefault, meteringPointTypeNameOrDefault) switch
         {
-            (DataHubNames.SettlementMethod.Flex, DataHubNames.MeteringPointType.Consumption) => TimeSeriesType.FlexConsumption,
-            (DataHubNames.SettlementMethod.NonProfiled, DataHubNames.MeteringPointType.Consumption) => TimeSeriesType.NonProfiledConsumption,
-            (null, DataHubNames.MeteringPointType.Production) => TimeSeriesType.Production,
-            (null, null) => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
-            _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethod} and {meteringPointType})"),
+            (var sm, var mpt) when
+                sm == PMTypes.SettlementMethod.Flex
+                && mpt == PMTypes.MeteringPointType.Consumption => TimeSeriesType.FlexConsumption,
+
+            (var sm, var mpt) when
+                sm == PMTypes.SettlementMethod.NonProfiled
+                && mpt == PMTypes.MeteringPointType.Consumption => TimeSeriesType.NonProfiledConsumption,
+
+            (null, var mpt) when
+                mpt == PMTypes.MeteringPointType.Production => TimeSeriesType.Production,
+
+            (null, null)
+                => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
+
+            _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethodName} and {meteringPointTypeName})"),
         };
     }
 
