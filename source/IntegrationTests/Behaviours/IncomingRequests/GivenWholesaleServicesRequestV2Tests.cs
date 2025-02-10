@@ -459,7 +459,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         // based on the RequestCalculatedWholesaleServicesInputV1
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
-        var defaultGridAreas = gridAreaOrNull == null ? testDataDescription.GridAreaCodes.AsReadOnly() : null;
+        var defaultGridAreas = gridAreaOrNull == null ? testDataDescription.GridAreaCodes : null;
         var defaultChargeOwner = chargeOwnerOrNull == null ? "5790000432752" : null;
         var defaultEnergySupplier = energySupplierOrNull == null ? "5790001662233" : null;
         var requestCalculatedWholesaleServicesInputV1 = message.ParseInput<RequestCalculatedWholesaleServicesInputV1>();

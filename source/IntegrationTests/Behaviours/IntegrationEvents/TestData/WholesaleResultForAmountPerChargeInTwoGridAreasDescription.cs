@@ -49,7 +49,7 @@ public class WholesaleResultForAmountPerChargeInTwoGridAreasDescription
 
     public override Guid CalculationId => Guid.Parse("44a9e9fd-01a9-4c37-bb09-fca2d456a414");
 
-    public override IList<string> GridAreaCodes => new List<string>() { "803", "804" };
+    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "803", "804" };
 
     public override int ExpectedCalculationResultsCount => 8;
 
