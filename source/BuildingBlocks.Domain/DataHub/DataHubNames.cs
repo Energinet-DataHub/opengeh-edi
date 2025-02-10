@@ -27,6 +27,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Keep names in a single file to easily share with Wholesale")]
 public static class DataHubNames
 {
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class BusinessReason
     {
         public const string MoveIn = "MoveIn";
@@ -38,6 +39,7 @@ public static class DataHubNames
         public const string PeriodicFlexMetering = "PeriodicFlexMetering";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class ChargeType
     {
         public const string Subscription = "Subscription";
@@ -64,6 +66,7 @@ public static class DataHubNames
         public const string Exchange = "Exchange";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class Resolution
     {
         public const string QuarterHourly = "QuarterHourly";
@@ -79,6 +82,7 @@ public static class DataHubNames
         public const string Flex = "Flex";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class SettlementVersion
     {
         public const string FirstCorrection = "FirstCorrection";
