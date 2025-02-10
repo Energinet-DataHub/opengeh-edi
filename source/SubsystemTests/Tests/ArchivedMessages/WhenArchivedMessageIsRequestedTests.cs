@@ -42,7 +42,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
             ediDatabaseDriver);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.MeteredDataResponsible, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiServiceBusClient);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
         _calculationCompleted = new CalculationCompletedDsl(
             ediDriver,
             ediDatabaseDriver,

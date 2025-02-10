@@ -36,7 +36,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
                 fixture.B2BClients.MeteredDataResponsible,
                 output),
             new EdiDatabaseDriver(fixture.ConnectionString),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiServiceBusClient),
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
             output,
             fixture.BalanceFixingCalculationId,
             fixture.WholesaleFixingCalculationId);

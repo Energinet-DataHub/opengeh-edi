@@ -40,7 +40,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.SystemOperator, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiServiceBusClient);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
             ediDriver,
