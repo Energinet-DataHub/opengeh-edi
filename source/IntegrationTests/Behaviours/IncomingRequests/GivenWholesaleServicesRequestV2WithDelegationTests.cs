@@ -96,7 +96,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
 
     public async Task InitializeAsync()
     {
-        await _fixture.InsertDatabricksDataAsync(_ediDatabricksOptions);
+        await _fixture.InsertWholesaleDataDatabricksDataAsync(_ediDatabricksOptions);
     }
 
     public Task DisposeAsync()
