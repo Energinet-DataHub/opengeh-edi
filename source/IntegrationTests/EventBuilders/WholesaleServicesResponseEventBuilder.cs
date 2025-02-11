@@ -162,9 +162,13 @@ public static class WholesaleServicesResponseEventBuilder
     /// </summary>
     /// <param name="requestCalculatedWholesaleServicesInputV1"></param>
     /// <param name="gridAreas">All grid areas which PM finds for requester, when request is not limited by gridAreas</param>
+    /// <param name="defaultChargeOwnerId"></param>
+    /// <param name="defaultEnergySupplierId"></param>
     public static ServiceBusMessage GenerateAcceptedFrom(
         RequestCalculatedWholesaleServicesInputV1 requestCalculatedWholesaleServicesInputV1,
-        IReadOnlyCollection<string>? gridAreas = null)
+        IReadOnlyCollection<string>? gridAreas = null,
+        string? defaultChargeOwnerId = null,
+        string? defaultEnergySupplierId = null)
     {
         var chargeTypes = requestCalculatedWholesaleServicesInputV1.ChargeTypes?
             .Select(x => new RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType(PMChargeType.FromName(x.ChargeType!), x.ChargeCode))
@@ -175,10 +179,10 @@ public static class WholesaleServicesResponseEventBuilder
             : throw new ArgumentNullException(nameof(requestCalculatedWholesaleServicesInputV1.PeriodEnd), "PeriodEnd must be set");
         var energySupplierNumber = requestCalculatedWholesaleServicesInputV1.EnergySupplierNumber != null
             ? PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.EnergySupplierNumber)
-            : null;
+            : defaultEnergySupplierId != null ? PMActorNumber.Create(defaultEnergySupplierId) : null;
         var chargeOwnerNumber = requestCalculatedWholesaleServicesInputV1.ChargeOwnerNumber != null
             ? PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.ChargeOwnerNumber)
-            : null;
+            : defaultChargeOwnerId != null ? PMActorNumber.Create(defaultChargeOwnerId) : null;
         var settlementVersion = requestCalculatedWholesaleServicesInputV1.SettlementVersion != null
             ? PMSettlementVersion.FromName(requestCalculatedWholesaleServicesInputV1.SettlementVersion)
             : null;
@@ -324,7 +328,7 @@ public static class WholesaleServicesResponseEventBuilder
         // Create random price between 0.99 and 5.99
         var price = new DecimalValue { Units = Random.Shared.Next(0, 4), Nanos = Random.Shared.Next(1, 99) };
 
-        // Create random quantity between 1.00 and 999.99 (multiplied a factor used by by monthly resolution)
+        // Create random quantity between 1.00 and 999.99 (multiplied a factor used by monthly resolution)
         var quantity = new DecimalValue { Units = Random.Shared.Next(1, 999) * quantityFactor, Nanos = Random.Shared.Next(0, 99) };
 
         // Calculate the total amount (price * quantity)

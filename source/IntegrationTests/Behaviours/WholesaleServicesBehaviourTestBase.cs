@@ -101,6 +101,93 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
     }
 
+    protected async Task<string> GetChargeCodeFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
+    {
+        documentStream.Position = 0;
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var ebixAsserter = NotifyWholesaleServicesDocumentAsserter.CreateEbixAsserter(documentStream);
+            var chargeCodeElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/PartyChargeTypeID");
+
+            chargeCodeElement.Should().NotBeNull("because charge code should be present in the ebIX document");
+            chargeCodeElement!.Value.Should().NotBeNull("because charge code value should not be null in the ebIX document");
+            return chargeCodeElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var cimXmlAsserter = NotifyWholesaleServicesDocumentAsserter.CreateCimXmlAsserter(documentStream);
+
+            var chargeCodeElement = cimXmlAsserter.GetElement("Series[1]/chargeType.mRID");
+
+            chargeCodeElement.Should().NotBeNull("because charge code should be present in the CIM XML document");
+            chargeCodeElement!.Value.Should().NotBeNull("because charge code value should not be null in the CIM XML document");
+            return chargeCodeElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
+
+            var chargeCodeElement = cimJsonDocument.RootElement
+                .GetProperty("NotifyWholesaleServices_MarketDocument")
+                .GetProperty("Series")
+                .EnumerateArray()
+                .ToList()
+                .Single()
+                .GetProperty("chargeType.mRID");
+
+            chargeCodeElement.Should().NotBeNull("because charge code should be present in the CIM JSON document");
+            return chargeCodeElement.GetString()!;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
+    }
+
+    protected async Task<string> GetResolutionFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
+    {
+        documentStream.Position = 0;
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var ebixAsserter = NotifyWholesaleServicesDocumentAsserter.CreateEbixAsserter(documentStream);
+            var resolutionElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/ResolutionDuration");
+
+            resolutionElement.Should().NotBeNull("because resolution should be present in the ebIX document");
+            resolutionElement!.Value.Should().NotBeNull("because resolution value should not be null in the ebIX document");
+            return resolutionElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var cimXmlAsserter = NotifyWholesaleServicesDocumentAsserter.CreateCimXmlAsserter(documentStream);
+
+            var resolutionElement = cimXmlAsserter.GetElement("Series[1]/Period/resolution");
+
+            resolutionElement.Should().NotBeNull("because resolution should be present in the CIM XML document");
+            resolutionElement!.Value.Should().NotBeNull("because resolution value should not be null in the CIM XML document");
+            return resolutionElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
+
+            var resolutionElement = cimJsonDocument.RootElement
+                .GetProperty("NotifyWholesaleServices_MarketDocument")
+                .GetProperty("Series")
+                .EnumerateArray()
+                .ToList()
+                .Single()
+                .GetProperty("Period")
+                .GetProperty("resolution");
+
+            resolutionElement.Should().NotBeNull("because resolution should be present in the CIM JSON document");
+            return resolutionElement.GetString()!;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
+    }
+
     protected Task GivenWholesaleServicesRequestAcceptedIsReceived(Guid processId, WholesaleServicesRequestAccepted acceptedMessage)
     {
         return GivenWholesaleServicesRequestResponseIsReceived(processId, acceptedMessage);
@@ -288,6 +375,16 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
     protected WholesaleResultForAmountPerChargeInTwoGridAreasDescription GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas()
     {
         return new WholesaleResultForAmountPerChargeInTwoGridAreasDescription();
+    }
+
+    protected WholesaleResultForMonthlyAmountPerChargeDescription GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge()
+    {
+        return new WholesaleResultForMonthlyAmountPerChargeDescription();
+    }
+
+    protected WholesaleResultForTotalAmountDescription GivenDatabricksResultDataForWholesaleResultTotalAmount()
+    {
+        return new WholesaleResultForTotalAmountDescription();
     }
 
     private static Action<WholesaleServicesRequest> GetAssertServiceBusMessage(
