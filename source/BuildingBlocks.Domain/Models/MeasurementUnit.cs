@@ -15,7 +15,6 @@
 using System.Text.Json.Serialization;
 using PMTypes =Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
-
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
