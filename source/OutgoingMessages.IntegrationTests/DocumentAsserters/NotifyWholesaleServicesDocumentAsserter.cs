@@ -81,15 +81,18 @@ public static class NotifyWholesaleServicesDocumentAsserter
             .HasResolution(assertionInput.Resolution)
             .HasPeriod(assertionInput.Period);
 
-        var isTotalMonthlyAmount = assertionInput.Points.First().Price is null;
-        if (!isTotalMonthlyAmount)
+        if (assertionInput.Points is not null)
         {
-            asserter.HasPoints(assertionInput.Points, assertionInput.Resolution);
-        }
-        else
-        {
-            // QuantityQuality should not be present in any format if resolution is monthly
-            asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount, null);
+            var isTotalMonthlyAmount = assertionInput.Points.First().Price is null;
+            if (!isTotalMonthlyAmount)
+            {
+                asserter.HasPoints(assertionInput.Points, assertionInput.Resolution);
+            }
+            else
+            {
+                // QuantityQuality should not be present in any format if resolution is monthly
+                asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount, null);
+            }
         }
 
         if (assertionInput.PriceMeasurementUnit is not null)

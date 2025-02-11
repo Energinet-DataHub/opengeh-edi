@@ -246,7 +246,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
                 GridArea: gridAreaCode,
                 transactionId,
                 PriceMeasurementUnit: exampleWholesaleResultMessageForActor.MeasurementUnit,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+                ProductCode: "5790001330590",
                 QuantityMeasurementUnit: exampleWholesaleResultMessageForActor.MeasurementUnit!,
                 CalculationVersion: exampleWholesaleResultMessageForActor.Version,
                 Resolution: exampleWholesaleResultMessageForActor.Resolution,
@@ -1000,7 +1000,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
                 GridArea: gridAreaCode,
                 transactionId,
                 PriceMeasurementUnit: exampleWholesaleResultMessageForActor.MeasurementUnit,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+                ProductCode: "5790001330590",
                 QuantityMeasurementUnit: exampleWholesaleResultMessageForActor.MeasurementUnit!,
                 CalculationVersion: exampleWholesaleResultMessageForActor.Version,
                 Resolution: exampleWholesaleResultMessageForActor.Resolution,
