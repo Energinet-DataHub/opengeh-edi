@@ -54,12 +54,12 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
 
     public async Task InitializeAsync()
     {
-        await _fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        await _fixture.InsertAggregatedMeasureDataDatabricksDataAsync(_ediDatabricksOptions);
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        await _fixture.DatabricksSchemaManager.DropSchemaAsync();
+        return Task.CompletedTask;
     }
 
     [Theory]
@@ -67,7 +67,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     public async Task AndGiven_EnqueueEnergyResultsPerGridArea_When_MeteredDataResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridArea();
+        var testDataDescription = GivenDatabricksResultDataForEnergyResultPerGridArea();
         var testMessageData = testDataDescription.ExampleEnergyResultMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
@@ -119,7 +119,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         AndGiven_EnqueueEnergyResultsPerBalanceResponsible_When_BalanceResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
+        var testDataDescription = GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
         var testMessageData = testDataDescription.ExampleBalanceResponsible.ExampleMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
@@ -172,7 +172,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         AndGiven_EnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible_When_EnergySupplierAndBalanceReponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
+        var testDataDescription = GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
         var energySupplierTestMessageData = testDataDescription.ExampleEnergySupplier.ExampleMessageData;
         var balanceResponsibleTestMessageData = testDataDescription.ExampleBalanceResponsible.ExampleMessageData;
 
@@ -265,20 +265,20 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     {
         // Given (arrange)
         var expectedNumberOfPeekResults = 2;
-        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
+        var energySupplier = new Actor(ActorNumber.Create("5790001662234"), ActorRole.EnergySupplier);
         var calculationId = Guid.Parse("61d60f89-bbc5-4f7a-be98-6139aab1c1b2");
         var energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition = GetEnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition();
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.DataObjectName, energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertAsync(
             energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.DataObjectName,
             [
-                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-01 23:00:00.000000'", "'39471.336'", "'kWh'", "Array('measured')"],
-                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 00:00:00.000000'", "'39472.336'", "'kWh'", "Array('measured')"],
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a8'", "'543'", "'5790001662234'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-01 23:00:00.000000'", "'39471.336'", "'kWh'", "Array('measured')"],
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a8'", "'543'", "'5790001662234'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 00:00:00.000000'", "'39472.336'", "'kWh'", "Array('measured')"],
                 // "2022-02-02 01:00:00.000000" is missing
                 // "2022-02-02 02:00:00.000000" is missing
                 // "2022-02-02 03:00:00.000000" is missing
                 // "2022-02-02 04:00:00.000000" is missing
-                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 05:00:00.000000'", "'39473.336'", "'kWh'", "Array('measured')"],
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a8'", "'543'", "'5790001662234'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 05:00:00.000000'", "'39473.336'", "'kWh'", "Array('measured')"],
             ]);
 
         await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(calculationId, new Dictionary<string, ActorNumber>() { { "543", ActorNumber.Create("8500000000502") } });
@@ -422,47 +422,19 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary()));
     }
 
-    private async Task<EnergyResultPerGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerGridArea()
+    private EnergyResultPerGridAreaDescription GivenDatabricksResultDataForEnergyResultPerGridArea()
     {
-        var energyResultPerGridAreaTestDataDescription = new EnergyResultPerGridAreaDescription();
-        var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(
-            GetService<ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity>>(),
-            _ediDatabricksOptions.Value,
-            energyResultPerGridAreaTestDataDescription.GridAreaOwners,
-            EventId.From(Guid.NewGuid()),
-            energyResultPerGridAreaTestDataDescription.CalculationId);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition, energyResultPerGridAreaTestDataDescription.TestFilePath);
-        return energyResultPerGridAreaTestDataDescription;
+        return new EnergyResultPerGridAreaDescription();
     }
 
-    private async Task<EnergyResultPerBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerBalanceResponsible()
+    private EnergyResultPerBrpGridAreaDescription GivenDatabricksResultDataForEnergyResultPerBalanceResponsible()
     {
-        var energyResultPerBrpDescription = new EnergyResultPerBrpGridAreaDescription();
-        var energyResultPerBrpQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
-            _ediDatabricksOptions.Value,
-            EventId.From(Guid.NewGuid()),
-            energyResultPerBrpDescription.CalculationId);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition, energyResultPerBrpDescription.TestFilePath);
-        return energyResultPerBrpDescription;
+        return new EnergyResultPerBrpGridAreaDescription();
     }
 
-    private async Task<EnergyResultPerEnergySupplierBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
+    private EnergyResultPerEnergySupplierBrpGridAreaDescription GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
     {
-        var energyResultPerEnergySupplierDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
-        var energyResultPerEnergySupplierQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity>>(),
-            _ediDatabricksOptions.Value,
-            EventId.From(Guid.NewGuid()),
-            energyResultPerEnergySupplierDescription.CalculationId);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition, energyResultPerEnergySupplierDescription.TestFilePath);
-        return energyResultPerEnergySupplierDescription;
+        return new EnergyResultPerEnergySupplierBrpGridAreaDescription();
     }
 
     /// <summary>
