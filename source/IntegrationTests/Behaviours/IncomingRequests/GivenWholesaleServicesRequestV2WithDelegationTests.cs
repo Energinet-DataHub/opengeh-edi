@@ -511,7 +511,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
         var expectedErrorCode = "E17";
 
         // Generate a mock ServiceBus Message with RequestCalculatedWholesaleServicesAcceptedV1 response from Process Manager,
-        // based on the RequestCalculatedWholesaleServicesInputV1
+        // based on the RequestCalculatedWholesaleServicesRejectedV1
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var requestCalculatedWholesaleServicesInputV1 = message!.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
@@ -638,7 +638,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
                 new List<ChargeTypeInput> { new(DataHubNames.ChargeType.Tariff, "25361478") }));
 
         /*
-         *  --- PART 2: Receive data from Wholesale and create RSM document ---
+         *  --- PART 2: Receive data from Process Manager and create RSM document ---
          */
 
         // Arrange
@@ -648,7 +648,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
         var expectedErrorCode = "E17";
 
         // Generate a mock ServiceBus Message with RequestCalculatedWholesaleServicesAcceptedV1 response from Process Manager,
-        // based on the RequestCalculatedWholesaleServicesInputV1
+        // based on the RequestCalculatedWholesaleServicesRejectedV1
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var requestCalculatedWholesaleServicesInputV1 = message!.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
