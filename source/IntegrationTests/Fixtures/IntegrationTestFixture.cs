@@ -16,9 +16,17 @@ using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Xunit;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -26,6 +34,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
+    private bool _databricksDataInserted;
 
     public IntegrationTestFixture()
     {
@@ -49,6 +58,7 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        await DatabricksSchemaManager.CreateSchemaAsync();
         await DatabaseManager.CreateDatabaseAsync();
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
@@ -56,6 +66,8 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        if (_databricksDataInserted)
+            await DatabricksSchemaManager.DropSchemaAsync();
         Dispose();
         await Task.CompletedTask;
     }
@@ -113,6 +125,17 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         GC.SuppressFinalize(this);
     }
 
+    protected internal async Task InsertDatabricksDataAsync(IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        if (_databricksDataInserted)
+            return;
+        await GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreasAsync(ediDatabricksOptions);
+        await GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerChargeAsync(ediDatabricksOptions);
+        await GivenDatabricksResultDataForWholesaleResultTotalAmountAsync(ediDatabricksOptions);
+
+        _databricksDataInserted = true;
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
@@ -146,5 +169,53 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             if (!containerExists)
                 container.Create();
         }
+    }
+
+    private async Task GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreasAsync(
+        IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        var wholesaleResultForAmountPerChargeInTwoGridAreasDescription = new WholesaleResultForAmountPerChargeInTwoGridAreasDescription();
+        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
+            new LoggerSpy(),
+            ediDatabricksOptions.Value,
+            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.GridAreaOwners,
+            EventId.From(Guid.NewGuid()),
+            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.CalculationId,
+            null);
+
+        await DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
+        await DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeInTwoGridAreasDescription.TestFilePath);
+    }
+
+    private async Task GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerChargeAsync(
+        IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        var wholesaleResultForMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
+        var wholesaleMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(
+            new LoggerSpy(),
+            ediDatabricksOptions.Value,
+            wholesaleResultForMonthlyAmountPerChargeDescription.GridAreaOwners,
+            EventId.From(Guid.NewGuid()),
+            wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId,
+            null);
+
+        await DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition);
+        await DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
+    }
+
+    private async Task GivenDatabricksResultDataForWholesaleResultTotalAmountAsync(
+        IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        var resultDataForWholesaleResultTotalAmount = new WholesaleResultForTotalAmountDescription();
+        var wholesaleTotalAmountQuery = new WholesaleTotalAmountQuery(
+            new LoggerSpy(),
+            ediDatabricksOptions.Value,
+            resultDataForWholesaleResultTotalAmount.GridAreaOwners,
+            EventId.From(Guid.NewGuid()),
+            resultDataForWholesaleResultTotalAmount.CalculationId,
+            null);
+
+        await DatabricksSchemaManager.CreateTableAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition);
+        await DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition, resultDataForWholesaleResultTotalAmount.TestFilePath);
     }
 }
