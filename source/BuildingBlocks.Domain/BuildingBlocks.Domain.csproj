@@ -4,7 +4,7 @@
     <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Domain</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.ProcessManager.Components.Abstractions" Version="1.1.1" />
+    <PackageReference Include="Energinet.DataHub.ProcessManager.Components.Abstractions" Version="1.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
