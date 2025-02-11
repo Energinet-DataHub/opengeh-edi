@@ -57,12 +57,12 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
     public async Task InitializeAsync()
     {
-        await _fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        await _fixture.InsertDatabricksDataAsync(_ediDatabricksOptions);
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        await _fixture.DatabricksSchemaManager.DropSchemaAsync();
+        return Task.CompletedTask;
     }
 
     [Theory]
@@ -70,7 +70,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     public async Task AndGiven_EnqueueWholesaleResultsForAmountPerCharges_When_SystemOperatorAndGridOperatorAndEnergySupplierPeeksMessages_Then_ReceivesCorrectWholesaleServicesDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
+        var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
         var testMessageData = testDataDescription.ExampleWholesaleResultMessageData;
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
@@ -81,7 +81,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCodes.Single(), gridOperator.ActorNumber);
 
         // TODO: Should we enqueue wholesale results for all actors in the dataset?
-        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier, new Dictionary<string, ActorNumber>() { { "804", ActorNumber.Create("8500000000502") } });
+        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier, new Dictionary<string, ActorNumber>()
+        {
+            { "804", gridOperator.ActorNumber },
+            { "803", ActorNumber.Create("0000000000000") },
+        });
 
         // When (act)
         var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
@@ -100,9 +104,9 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
-        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
-        peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount);
+        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount * 2, "because there should be 3 message per grid area.");
+        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount, "because there should be 3 message per owned grid area.");
+        peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount * 2, "because there should be 3 message per grid area.");
 
         var expectedDocumentToSystemOperator = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2023-09-07T13:37:05Z",
@@ -197,7 +201,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     public async Task AndGiven_EnqueueWholesaleResultsForMonthlyAmountPerCharges_When_SystemOperatorAndGridOperatorAndEnergySupplierPeeksMessages_Then_ReceivesCorrectWholesaleServicesDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge();
+        var testDataDescription = GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge();
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var systemOperator = new Actor(DataHubDetails.SystemOperatorActorNumber, ActorRole.SystemOperator);
@@ -205,7 +209,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCodes.Single(), gridOperator.ActorNumber);
-        await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier, new Dictionary<string, ActorNumber>() { { "804", ActorNumber.Create("8500000000502") } });
+        await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier, new Dictionary<string, ActorNumber>()
+        {
+            { "804", ActorNumber.Create("8500000000502") },
+            { "803", ActorNumber.Create("0000000000000") },
+        });
 
         // When (act)
         var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
@@ -224,9 +232,9 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
-        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
-        peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount);
+        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount, "because there should be 3 message per grid area.");
+        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount, "because there should be 3 message per owned grid area.");
+        peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount, "because there should be 3 message per grid area.");
 
         var expectedDocumentToSystemOperator = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2023-09-07T13:37:05Z",
@@ -321,7 +329,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     public async Task AndGiven_EnqueueWholesaleResultsForTotalAmount_When_SystemOperatorAndGridOperatorAndEnergySupplierPeeksMessages_Then_ReceivesCorrectWholesaleServicesDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultTotalAmount();
+        var testDataDescription = GivenDatabricksResultDataForWholesaleResultTotalAmount();
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var systemOperator = new Actor(DataHubDetails.SystemOperatorActorNumber, ActorRole.SystemOperator);
@@ -500,22 +508,27 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     {
         // Given (arrange)
         var expectedNumberOfPeekResults = 3;
-        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
-        await GivenGridAreaOwnershipAsync("804", ActorNumber.Create("8500000000502"));
+        var energySupplier = new Actor(ActorNumber.Create("5790001662234"), ActorRole.EnergySupplier);
+        await GivenGridAreaOwnershipAsync("805", ActorNumber.Create("8500000000502"));
         var calculationId = Guid.Parse("61d60f89-bbc5-4f7a-be98-6139aab1c1b2");
         var wholesaleAmountPerChargeSchemaDefinition = GetWholesaleAmountPerChargeSchemaDefinition();
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeSchemaDefinition.DataObjectName, wholesaleAmountPerChargeSchemaDefinition.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertAsync(
             wholesaleAmountPerChargeSchemaDefinition.DataObjectName,
             [
-            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-01T23:00:00.000+00:00'", "2.000", "NULL", "12.756998", "25.513996"],
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662234'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-01T23:00:00.000+00:00'", "2.000", "NULL", "12.756998", "25.513996"],
             // "2023-02-02 23:00:00.000000" is missing
-            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-03T23:00:00.000+00:00'", "3.000",  "NULL", "12.756998", "38.270994"],
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662234'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-03T23:00:00.000+00:00'", "3.000",  "NULL", "12.756998", "38.270994"],
             // "2023-02-04 23:00:00.000000" is missing
-            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-05T23:00:00.000+00:00'", "1.000", "NULL", "12.756998", "12.756998"],
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662234'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-05T23:00:00.000+00:00'", "1.000", "NULL", "12.756998", "12.756998"],
         ]);
 
-        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(calculationId, energySupplier, new Dictionary<string, ActorNumber>() { { "804", ActorNumber.Create("8500000000502") } });
+        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(calculationId, energySupplier, new Dictionary<string, ActorNumber>()
+        {
+            { "803", ActorNumber.Create("0000000000000") },
+            { "804", ActorNumber.Create("0000000000000") },
+            { "805", ActorNumber.Create("8500000000502") },
+        });
 
         // When (act)
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
@@ -562,10 +575,12 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_EnqueueWholesaleResultsForAmountPerCharges_When_TwoGridAreasHasBeenMergedAndGridOwnerPeeksMessages_Then_ReceivesCorrectWholesaleServicesDocuments(DocumentFormat documentFormat)
+    public async Task
+        AndGiven_EnqueueWholesaleResultsForAmountPerCharges_When_TwoGridAreasHasBeenMergedAndGridOwnerPeeksMessages_Then_ReceivesCorrectWholesaleServicesDocuments(
+            DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescriptionForMergedGridArea = await GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
+        var testDataDescriptionForMergedGridArea = GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
         var testMessageDataForMergedGridArea = testDataDescriptionForMergedGridArea.ExampleWholesaleResultMessageData;
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
@@ -578,7 +593,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(
             testDataDescriptionForMergedGridArea.CalculationId,
             energySupplier,
-            new Dictionary<string, ActorNumber> { { testDataDescriptionForMergedGridArea.GridAreaCodes.Single(), newGridOperatorForMergedGridArea.ActorNumber } });
+            new Dictionary<string, ActorNumber>
+            {
+                { "804", newGridOperatorForMergedGridArea.ActorNumber },
+                { "803", ActorNumber.Create("0000000000000") },
+            });
 
         // When (act)
         var peekResultsForGridOperator = await WhenActorPeeksAllMessages(
@@ -587,7 +606,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForGridOperator.Should().HaveCount(testDataDescriptionForMergedGridArea.ExpectedOutgoingMessagesForGridOwnerCount);
+        peekResultsForGridOperator.Should().HaveCount(testDataDescriptionForMergedGridArea.ExpectedOutgoingMessagesForGridOwnerCount, "because there should be 3 message per grid area.");
 
         var expectedDocumentToGridOwner = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2023-09-07T13:37:05Z",
@@ -626,7 +645,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         // Given (arrange)
         var newGridOperatorForMergedGridArea = new Actor(ActorNumber.Create("5790001665533"), ActorRole.GridAccessProvider);
         var oldGridOperatorForMergedGridArea = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
-        var testDataDescriptionForMergedGridArea = await GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge();
+        var testDataDescriptionForMergedGridArea = GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge();
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
@@ -682,7 +701,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     {
         // Given (arrange)
         var newGridOperatorForMergedGridArea = new Actor(ActorNumber.Create("5790001665533"), ActorRole.GridAccessProvider);
-        var testDataDescriptionForMergedGridArea = await GivenDatabricksResultDataForWholesaleResultTotalAmount();
+        var testDataDescriptionForMergedGridArea = GivenDatabricksResultDataForWholesaleResultTotalAmount();
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);

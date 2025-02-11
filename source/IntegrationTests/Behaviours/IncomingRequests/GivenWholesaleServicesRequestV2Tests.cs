@@ -19,12 +19,14 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -37,12 +39,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTestBase, IAsyncLifetime
 {
     private readonly IntegrationTestFixture _fixture;
+    private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions;
 
     public GivenWholesaleServicesRequestV2Tests(IntegrationTestFixture fixture, ITestOutputHelper testOutput)
         : base(fixture, testOutput)
     {
         _fixture = fixture;
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, true);
+        _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 
     public static object[][] DocumentFormatsWithActorRoleCombinationsForNullGridArea() =>
@@ -84,12 +88,12 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
     public async Task InitializeAsync()
     {
-        await _fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        await _fixture.InsertDatabricksDataAsync(_ediDatabricksOptions);
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        await _fixture.DatabricksSchemaManager.DropSchemaAsync();
+        return Task.CompletedTask;
     }
 
     [Theory]
@@ -105,7 +109,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
          */
 
         // Arrange
-        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
+        var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
         var exampleWholesaleResultMessageForActor = actorRole == ActorRole.SystemOperator
             ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescription.ExampleWholesaleResultMessageData;
@@ -240,7 +244,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
          */
 
         // Arrange
-        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas();
+        var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas();
         var exampleWholesaleResultMessageForActor = actorRole == ActorRole.EnergySupplier
             ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
             : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
@@ -389,7 +393,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
          */
 
         // Arrange
-        var testDataDescription = await GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
+        var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
         var exampleWholesaleResultMessageForActor = actorRole == ActorRole.SystemOperator
             ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescription.ExampleWholesaleResultMessageData;
@@ -653,12 +657,12 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
          */
 
         // Arrange
-        var testDataDescriptionForMonthlyAmount = await GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge();
+        var testDataDescriptionForMonthlyAmount = GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge();
         var exampleMonthlyAmountWholesaleResultMessageForActor = actorRole == ActorRole.SystemOperator
             ? testDataDescriptionForMonthlyAmount.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescriptionForMonthlyAmount.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator;
 
-        var testDataDescriptionForTotalAmount = await GivenDatabricksResultDataForWholesaleResultTotalAmount();
+        var testDataDescriptionForTotalAmount = GivenDatabricksResultDataForWholesaleResultTotalAmount();
         var exampleTotalAmountWholesaleResultMessageForActor = actorRole == ActorRole.SystemOperator
             ? testDataDescriptionForTotalAmount.ExampleWholesaleResultMessageDataForSystemOperator
             : actorRole == ActorRole.EnergySupplier
