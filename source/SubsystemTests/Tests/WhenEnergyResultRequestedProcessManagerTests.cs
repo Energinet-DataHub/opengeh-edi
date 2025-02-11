@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
+using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
 using FluentAssertions;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -27,14 +28,13 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     "Usage",
     "CA2007",
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-[SuppressMessage(
-    "Usage",
-    "xUnit1000",
-    Justification = "By making it abstract, we avoid running the tests in this class")] // TODO: Remove this when we are ready to enqueue brs026 messages
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
+[TestCaseOrderer(
+    ordererTypeName: "Energinet.DataHub.EDI.SubsystemTests.TestOrdering.TestOrderer",
+    ordererAssemblyName: "Energinet.DataHub.EDI.SubsystemTests")]
+// TODO: Rename this to brs026 when we have deleted the old request tests
 public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
-// internal abstract class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
@@ -61,6 +61,7 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
+    [Order(100)]
     public async Task B2B_actor_can_request_aggregated_measure_data()
     {
         var act = async () => await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
@@ -69,6 +70,7 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
+    [Order(100)]
     public async Task B2C_actor_can_request_aggregated_measure_data()
     {
         var act = async () => await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
@@ -77,12 +79,14 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
+    [Order(10)]
     public async Task Actor_get_bad_request_when_aggregated_measure_data_request_is_invalid()
     {
         await _aggregatedMeasureDataRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
+    [Order(11)]
     public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
     {
         await _aggregatedMeasureDataRequest.PublishAcceptedBrs026RequestAsync(
@@ -93,6 +97,7 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
+    [Order(12)]
     public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
     {
         await _aggregatedMeasureDataRequest.PublishRejectedBrs026RequestAsync(
