@@ -13,16 +13,16 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
 public class SettlementVersion : DataHubTypeWithUnused<SettlementVersion>
 {
-    public static readonly SettlementVersion FirstCorrection = new(DataHubNames.SettlementVersion.FirstCorrection, "D01");
-    public static readonly SettlementVersion SecondCorrection = new(DataHubNames.SettlementVersion.SecondCorrection, "D02");
-    public static readonly SettlementVersion ThirdCorrection = new(DataHubNames.SettlementVersion.ThirdCorrection, "D03");
+    public static readonly SettlementVersion FirstCorrection = new(PMTypes.SettlementVersion.FirstCorrection.Name, "D01");
+    public static readonly SettlementVersion SecondCorrection = new(PMTypes.SettlementVersion.SecondCorrection.Name, "D02");
+    public static readonly SettlementVersion ThirdCorrection = new(PMTypes.SettlementVersion.ThirdCorrection.Name, "D03");
 
     [JsonConstructor]
     private SettlementVersion(string name, string code, bool isUnused = false)

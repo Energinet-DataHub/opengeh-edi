@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using FluentAssertions;
@@ -22,13 +23,18 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Mappers;
 
 public class TimeSeriesTypeMapperTests
 {
+    public static IEnumerable<object[]> GetCombinationsOf_MeteringPointTypeAndSettlementMethod_WithExpectedTimeSeriesType()
+    {
+        yield return new object[] { "Consumption", string.Empty,                      TimeSeriesType.TotalConsumption };
+        yield return new object[] { "Consumption", null!,                             TimeSeriesType.TotalConsumption };
+        yield return new object[] { "Consumption", SettlementMethod.NonProfiled.Name, TimeSeriesType.NonProfiledConsumption };
+        yield return new object[] { "Consumption", SettlementMethod.Flex.Name,        TimeSeriesType.FlexConsumption };
+        yield return new object[] { "Production",  null!,                             TimeSeriesType.Production };
+        yield return new object[] { "Exchange",    null!,                             TimeSeriesType.NetExchangePerGa };
+    }
+
     [Theory]
-    [InlineData("Consumption", "", TimeSeriesType.TotalConsumption)]
-    [InlineData("Consumption", null, TimeSeriesType.TotalConsumption)]
-    [InlineData("Consumption", DataHubNames.SettlementMethod.NonProfiled, TimeSeriesType.NonProfiledConsumption)]
-    [InlineData("Consumption", DataHubNames.SettlementMethod.Flex, TimeSeriesType.FlexConsumption)]
-    [InlineData("Production", null, TimeSeriesType.Production)]
-    [InlineData("Exchange", null, TimeSeriesType.NetExchangePerGa)]
+    [MemberData(nameof(GetCombinationsOf_MeteringPointTypeAndSettlementMethod_WithExpectedTimeSeriesType))]
     public void MapTimeSeriesType_WhenValidMeteringPointTypeAndSettlementMethod_ReturnsExpectedType(
         string meteringPointType,
         string? settlementMethod,

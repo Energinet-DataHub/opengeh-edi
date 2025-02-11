@@ -36,11 +36,19 @@ public class ActorRequestsClient(
     IWholesaleServicesQueries wholeSaleServicesQueries)
         : IActorRequestsClient
 {
-    private static readonly RejectedWholesaleServicesMessageRejectReason _noDataAvailable = new(
+    private static readonly RejectedEnergyResultMessageRejectReason _noEnergyDataAvailable = new(
         ErrorMessage: "E0H",
         ErrorCode: "Ingen data tilgængelig / No data available");
 
-    private static readonly RejectedWholesaleServicesMessageRejectReason _noDataForRequestedGridArea = new(
+    private static readonly RejectedEnergyResultMessageRejectReason _noEnergyDataForRequestedGridArea = new(
+        ErrorMessage: "D46",
+        ErrorCode: "Forkert netområde / invalid grid area");
+
+    private static readonly RejectedWholesaleServicesMessageRejectReason _noWholesaleDataAvailable = new(
+        ErrorMessage: "E0H",
+        ErrorCode: "Ingen data tilgængelig / No data available");
+
+    private static readonly RejectedWholesaleServicesMessageRejectReason _noWholesaleDataForRequestedGridArea = new(
         ErrorMessage: "D46",
         ErrorCode: "Forkert netområde / invalid grid area");
 
@@ -48,57 +56,64 @@ public class ActorRequestsClient(
     private readonly IAggregatedTimeSeriesQueries _aggregatedTimeSeriesQueries = aggregatedTimeSeriesQueries;
     private readonly IWholesaleServicesQueries _wholesaleServicesQueries = wholeSaleServicesQueries;
 
-    public async Task EnqueueAggregatedMeasureDataAsync(string businessReason, AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters)
+    public async Task<int> EnqueueAggregatedMeasureDataAsync(
+        EventId eventId,
+        Guid orchestrationInstanceId,
+        MessageId originalMessageId,
+        TransactionId originalTransactionId,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        BusinessReason businessReason,
+        MeteringPointType? meteringPointType,
+        SettlementMethod? settlementMethod,
+        SettlementVersion? settlementVersion,
+        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
+        CancellationToken cancellationToken)
     {
-        // 3a. Query data from wholesale
-        var calculationResults = await _aggregatedTimeSeriesQueries
-            .GetAsync(aggregatedTimeSeriesQueryParameters).ToListAsync().ConfigureAwait(false);
+        var calculationResults = _aggregatedTimeSeriesQueries
+            .GetAsync(aggregatedTimeSeriesQueryParameters).ConfigureAwait(false);
 
-        // 3b. Handle no data
-        if (!calculationResults.Any())
+        var enqueuedCount = 0;
+        await foreach (var result in calculationResults)
         {
-            // Send NoDataRejectMessage
-        }
+            var points = result.TimeSeriesPoints.OrderBy(p => p.Time)
+                .Select(
+                    (p, index) => new AcceptedEnergyResultMessagePoint(
+                        Position: index + 1,
+                        Quantity: p.Quantity,
+                        QuantityQuality: GetCalculatedQuantityQualityForEnergy(p.Qualities),
+                        SampleTime: p.Time.ToString()))
+                .ToList();
 
-        foreach (var result in calculationResults)
-        {
-            var receiverRole = ActorRole.TryFromCode("12345");
-            var documentReceiverRole = ActorRole.TryFromCode("12345");
-
-            // Temp check for compilation.
-            if (receiverRole is null || documentReceiverRole is null)
-                throw new ArgumentNullException($"Temp exception | receiverRole: {receiverRole}, documentReceiverRole: {documentReceiverRole}");
-
-            // 3c. Create AcceptedEnergyResultMessageDto - (waiting for RequestCalculatedEnergyTimeSeriesAcceptedV1 model to be finished).
-
-            // ------------------------------------------------------------------------- //
-            // ALL PROPERTIES CONTAIN DUMMY DATA UNTIL RequestCalculatedEnergyTimeSeriesAcceptedV1 IS DONE.
-            // ------------------------------------------------------------------------- //
             var acceptedEnergyResult = AcceptedEnergyResultMessageDto.Create(
-                receiverNumber: ActorNumber.Create("12345"),
-                receiverRole: receiverRole,
-                documentReceiverNumber: ActorNumber.Create("12345"),
-                documentReceiverRole: documentReceiverRole,
-                processId: Guid.NewGuid(),
-                eventId: EventId.From(Guid.NewGuid()),
+                receiverNumber: requestedByActorNumber,
+                receiverRole: requestedByActorRole,
+                documentReceiverNumber: requestedForActorNumber,
+                documentReceiverRole: requestedForActorRole,
+                processId: orchestrationInstanceId,
+                eventId: eventId,
                 gridAreaCode: result.GridArea,
-                meteringPointType: MeteringPointType.Consumption.Name,
-                settlementMethod: SettlementMethod.Flex.Name,
-                measureUnitType: MeasurementUnit.Kwh.Name,
-                resolution: Resolution.Hourly.Name,
+                meteringPointType: GetMeteringPointType(result.TimeSeriesType).Name,
+                settlementMethod: GetSettlementMethod(result.TimeSeriesType),
+                measureUnitType: MeasurementUnit.Kwh.Name, // "Unit is always Kwh for energy results" - it is hardcoded in the AggregatedTimeSeriesRequestAcceptedMessageFactory
+                resolution: GetResolution(result.Resolution).Name,
                 energySupplierNumber: aggregatedTimeSeriesQueryParameters.EnergySupplierId,
                 balanceResponsibleNumber: aggregatedTimeSeriesQueryParameters.BalanceResponsibleId,
                 period: new Period(result.PeriodStart, result.PeriodEnd),
-                points: new List<AcceptedEnergyResultMessagePoint>(),
-                businessReasonName: businessReason,
-                calculationResultVersion: 1,
-                originalTransactionIdReference: TransactionId.New(),
-                settlementVersion: "settlementVersion",
-                relatedToMessageId: MessageId.New());
+                points: points,
+                businessReasonName: businessReason.Name,
+                calculationResultVersion: result.Version,
+                originalTransactionIdReference: originalTransactionId,
+                settlementVersion: GetSettlementVersion(result.CalculationType)?.Name,
+                relatedToMessageId: originalMessageId);
 
-            // 3d. Enqueue the message
-            await _outgoingMessagesClient.EnqueueAsync(acceptedEnergyResult, CancellationToken.None).ConfigureAwait(false);
+            await _outgoingMessagesClient.EnqueueAsync(acceptedEnergyResult, cancellationToken).ConfigureAwait(false);
+            enqueuedCount++;
         }
+
+        return enqueuedCount;
     }
 
     public async Task<int> EnqueueWholesaleServicesAsync(
@@ -188,6 +203,47 @@ public class ActorRequestsClient(
         return _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessageDto, cancellationToken);
     }
 
+    public async Task EnqueueRejectAggregatedMeasureDataRequestWithNoDataAsync(
+        Guid orchestrationInstanceId,
+        MessageId originalMessageId,
+        EventId eventId,
+        TransactionId originalTransactionId,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        BusinessReason businessReason,
+        AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
+        CancellationToken cancellationToken)
+    {
+        var hasDataInAnotherGridArea = await HasDataInAnotherGridAreaAsync(
+            aggregatedTimeSeriesQueryParameters,
+            requestedForActorRole).ConfigureAwait(false);
+
+        var rejectError = hasDataInAnotherGridArea
+            ? _noEnergyDataForRequestedGridArea
+            : _noEnergyDataAvailable;
+
+        var rejectedEnergyResultMessageDto = new RejectedEnergyResultMessageDto(
+            requestedByActorNumber,
+            orchestrationInstanceId,
+            eventId,
+            businessReason.Name,
+            requestedByActorRole,
+            originalMessageId,
+            new RejectedEnergyResultMessageSerie(
+                TransactionId.New(),
+                [rejectError],
+                originalTransactionId),
+            requestedForActorNumber,
+            requestedForActorRole);
+
+        await EnqueueRejectAggregatedMeasureDataRequestAsync(
+                rejectedEnergyResultMessageDto,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     public async Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
         WholesaleServicesQueryParameters queryParameters,
         ActorNumber requestedByActorNumber,
@@ -203,11 +259,11 @@ public class ActorRequestsClient(
     {
         var hasDataInAnotherGridArea = await HasDataInAnotherGridAreaAsync(
             queryParameters,
-            requestedByActorRole).ConfigureAwait(false);
+            requestedForActorRole).ConfigureAwait(false);
 
         var rejectError = hasDataInAnotherGridArea
-            ? _noDataForRequestedGridArea
-            : _noDataAvailable;
+            ? _noWholesaleDataForRequestedGridArea
+            : _noWholesaleDataAvailable;
 
         var rejectedWholesaleServicesMessageDto = new RejectedWholesaleServicesMessageDto(
             requestedByActorNumber,
@@ -227,6 +283,36 @@ public class ActorRequestsClient(
                 rejectedWholesaleServicesMessageDto,
                 cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    private async Task<bool> HasDataInAnotherGridAreaAsync(
+        AggregatedTimeSeriesQueryParameters queryParameters,
+        ActorRole requestedByActorRole)
+    {
+        if (queryParameters.GridAreaCodes.Count == 0)
+            return false; // If grid area codes is empty, we already retrieved any data across all grid areas
+
+        var actorCanHaveDataInOtherGridAreas = requestedByActorRole == ActorRole.EnergySupplier
+                                               || requestedByActorRole == ActorRole.BalanceResponsibleParty;
+
+        if (actorCanHaveDataInOtherGridAreas)
+        {
+            var queryParametersWithoutGridArea = queryParameters with
+            {
+                GridAreaCodes = [],
+            };
+
+            var results = _aggregatedTimeSeriesQueries.GetAsync(
+                    queryParametersWithoutGridArea)
+                .ConfigureAwait(false);
+
+            await foreach (var result in results)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private async Task<bool> HasDataInAnotherGridAreaAsync(
@@ -307,6 +393,19 @@ public class ActorRequestsClient(
         };
     }
 
+    private Resolution GetResolution(Interfaces.Models.CalculationResults.EnergyResults.Resolution resolution)
+    {
+        return resolution switch
+        {
+            Interfaces.Models.CalculationResults.EnergyResults.Resolution.Quarter => Resolution.QuarterHourly,
+            Interfaces.Models.CalculationResults.EnergyResults.Resolution.Hour => Resolution.Hourly,
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(resolution),
+                resolution,
+                "Unknown resolution"),
+        };
+    }
+
     private ChargeType? GetChargeType(Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? chargeType)
     {
         return chargeType switch
@@ -358,6 +457,11 @@ public class ActorRequestsClient(
             resolution,
             chargeType,
             hasPrice);
+    }
+
+    private CalculatedQuantityQuality GetCalculatedQuantityQualityForEnergy(IReadOnlyCollection<QuantityQuality> quantityQualities)
+    {
+        return CalculatedQuantityQualityMapper.MapForEnergy(quantityQualities);
     }
 
     private SettlementVersion? GetSettlementVersion(CalculationType calculationType)
@@ -421,4 +525,46 @@ public class ActorRequestsClient(
 
         return MeasurementUnit.TryFromChargeType(chargeType);
     }
+
+    private MeteringPointType GetMeteringPointType(TimeSeriesType timeSeriesType) =>
+        timeSeriesType switch
+    {
+        TimeSeriesType.Production => MeteringPointType.Production,
+        TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
+        TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
+        TimeSeriesType.GridLoss => MeteringPointType.Consumption,
+        TimeSeriesType.NegativeGridLoss => MeteringPointType.Production,
+        TimeSeriesType.PositiveGridLoss => MeteringPointType.Consumption,
+        TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.TempFlexConsumption => MeteringPointType.Consumption,
+        TimeSeriesType.TempProduction => MeteringPointType.Production,
+
+        _ => throw new ArgumentOutOfRangeException(
+            nameof(timeSeriesType),
+            actualValue: timeSeriesType,
+            "Value cannot be mapped to a metering point type."),
+    };
+
+    private string? GetSettlementMethod(TimeSeriesType timeSeriesType) =>
+        timeSeriesType switch
+    {
+        TimeSeriesType.Production => null,
+        TimeSeriesType.FlexConsumption => SettlementMethod.Flex.Name,
+        TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled.Name,
+        TimeSeriesType.NetExchangePerGa => null,
+        TimeSeriesType.NetExchangePerNeighboringGa => null,
+        TimeSeriesType.GridLoss => null,
+        TimeSeriesType.NegativeGridLoss => null,
+        TimeSeriesType.PositiveGridLoss => SettlementMethod.Flex.Name,
+        TimeSeriesType.TotalConsumption => null,
+        TimeSeriesType.TempFlexConsumption => null,
+        TimeSeriesType.TempProduction => null,
+
+        _ => throw new ArgumentOutOfRangeException(
+            nameof(timeSeriesType),
+            actualValue: timeSeriesType,
+            "Value cannot be mapped to a settlement method."),
+    };
 }

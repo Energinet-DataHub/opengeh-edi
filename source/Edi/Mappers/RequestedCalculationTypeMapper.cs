@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Wholesale.Edi.Models;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
 
@@ -21,24 +21,24 @@ public static class RequestedCalculationTypeMapper
 {
     public static RequestedCalculationType ToRequestedCalculationType(string businessReason, string? settlementVersion)
     {
-        if (businessReason != DataHubNames.BusinessReason.Correction && settlementVersion != null)
+        if (businessReason != PMTypes.BusinessReason.Correction.Name && settlementVersion != null)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(settlementVersion),
                 settlementVersion,
-                $"Value must be null when {nameof(businessReason)} is not {nameof(DataHubNames.BusinessReason.Correction)}.");
+                $"Value must be null when {nameof(businessReason)} is not {nameof(PMTypes.BusinessReason.Correction)}.");
         }
 
         return businessReason switch
         {
-            DataHubNames.BusinessReason.BalanceFixing => RequestedCalculationType.BalanceFixing,
-            DataHubNames.BusinessReason.PreliminaryAggregation => RequestedCalculationType.PreliminaryAggregation,
-            DataHubNames.BusinessReason.WholesaleFixing => RequestedCalculationType.WholesaleFixing,
-            DataHubNames.BusinessReason.Correction => settlementVersion switch
+            var br when br == PMTypes.BusinessReason.BalanceFixing.Name => RequestedCalculationType.BalanceFixing,
+            var br when br == PMTypes.BusinessReason.PreliminaryAggregation.Name => RequestedCalculationType.PreliminaryAggregation,
+            var br when br == PMTypes.BusinessReason.WholesaleFixing.Name => RequestedCalculationType.WholesaleFixing,
+            var br when br == PMTypes.BusinessReason.Correction.Name => settlementVersion switch
             {
-                DataHubNames.SettlementVersion.FirstCorrection => RequestedCalculationType.FirstCorrection,
-                DataHubNames.SettlementVersion.SecondCorrection => RequestedCalculationType.SecondCorrection,
-                DataHubNames.SettlementVersion.ThirdCorrection => RequestedCalculationType.ThirdCorrection,
+                var sv when sv == PMTypes.SettlementVersion.FirstCorrection.Name => RequestedCalculationType.FirstCorrection,
+                var sv when sv == PMTypes.SettlementVersion.SecondCorrection.Name => RequestedCalculationType.SecondCorrection,
+                var sv when sv == PMTypes.SettlementVersion.ThirdCorrection.Name => RequestedCalculationType.ThirdCorrection,
                 null => RequestedCalculationType.LatestCorrection,
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),

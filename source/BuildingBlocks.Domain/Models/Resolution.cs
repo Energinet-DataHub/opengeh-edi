@@ -13,17 +13,17 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
 public class Resolution : DataHubType<Resolution>
 {
-    public static readonly Resolution QuarterHourly = new(DataHubNames.Resolution.QuarterHourly, "PT15M");
-    public static readonly Resolution Hourly = new(DataHubNames.Resolution.Hourly, "PT1H");
-    public static readonly Resolution Daily = new(DataHubNames.Resolution.Daily, "P1D");
-    public static readonly Resolution Monthly = new(DataHubNames.Resolution.Monthly, "P1M");
+    public static readonly Resolution QuarterHourly = new(PMTypes.Resolution.QuarterHourly.Name, "PT15M");
+    public static readonly Resolution Hourly = new(PMTypes.Resolution.Hourly.Name, "PT1H");
+    public static readonly Resolution Daily = new(PMTypes.Resolution.Daily.Name, "P1D");
+    public static readonly Resolution Monthly = new(PMTypes.Resolution.Monthly.Name, "P1M");
 
     [JsonConstructor]
     private Resolution(string name, string code)
