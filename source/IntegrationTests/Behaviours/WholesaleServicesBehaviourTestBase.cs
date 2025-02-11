@@ -101,6 +101,93 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
     }
 
+    protected async Task<string> GetChargeCodeFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
+    {
+        documentStream.Position = 0;
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var ebixAsserter = NotifyWholesaleServicesDocumentAsserter.CreateEbixAsserter(documentStream);
+            var chargeCodeElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/PartyChargeTypeID");
+
+            chargeCodeElement.Should().NotBeNull("because charge code should be present in the ebIX document");
+            chargeCodeElement!.Value.Should().NotBeNull("because charge code value should not be null in the ebIX document");
+            return chargeCodeElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var cimXmlAsserter = NotifyWholesaleServicesDocumentAsserter.CreateCimXmlAsserter(documentStream);
+
+            var chargeCodeElement = cimXmlAsserter.GetElement("Series[1]/chargeType.mRID");
+
+            chargeCodeElement.Should().NotBeNull("because charge code should be present in the CIM XML document");
+            chargeCodeElement!.Value.Should().NotBeNull("because charge code value should not be null in the CIM XML document");
+            return chargeCodeElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
+
+            var chargeCodeElement = cimJsonDocument.RootElement
+                .GetProperty("NotifyWholesaleServices_MarketDocument")
+                .GetProperty("Series")
+                .EnumerateArray()
+                .ToList()
+                .Single()
+                .GetProperty("chargeType.mRID");
+
+            chargeCodeElement.Should().NotBeNull("because charge code should be present in the CIM JSON document");
+            return chargeCodeElement.GetString()!;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
+    }
+
+    protected async Task<string> GetResolutionFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
+    {
+        documentStream.Position = 0;
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var ebixAsserter = NotifyWholesaleServicesDocumentAsserter.CreateEbixAsserter(documentStream);
+            var resolutionElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/ObservationTimeSeriesPeriod/ResolutionDuration");
+
+            resolutionElement.Should().NotBeNull("because resolution should be present in the ebIX document");
+            resolutionElement!.Value.Should().NotBeNull("because resolution value should not be null in the ebIX document");
+            return resolutionElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var cimXmlAsserter = NotifyWholesaleServicesDocumentAsserter.CreateCimXmlAsserter(documentStream);
+
+            var resolutionElement = cimXmlAsserter.GetElement("Series[1]/Period/resolution");
+
+            resolutionElement.Should().NotBeNull("because resolution should be present in the CIM XML document");
+            resolutionElement!.Value.Should().NotBeNull("because resolution value should not be null in the CIM XML document");
+            return resolutionElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
+
+            var resolutionElement = cimJsonDocument.RootElement
+                .GetProperty("NotifyWholesaleServices_MarketDocument")
+                .GetProperty("Series")
+                .EnumerateArray()
+                .ToList()
+                .Single()
+                .GetProperty("Period")
+                .GetProperty("resolution");
+
+            resolutionElement.Should().NotBeNull("because resolution should be present in the CIM JSON document");
+            return resolutionElement.GetString()!;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
+    }
+
     protected Task GivenWholesaleServicesRequestAcceptedIsReceived(Guid processId, WholesaleServicesRequestAccepted acceptedMessage)
     {
         return GivenWholesaleServicesRequestResponseIsReceived(processId, acceptedMessage);
@@ -280,36 +367,24 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return response;
     }
 
-    protected async Task<WholesaleResultForAmountPerChargeDescription> GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
+    protected WholesaleResultForAmountPerChargeDescription GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
     {
-        var wholesaleResultForAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
-        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
-            _ediDatabricksOptions.Value,
-            wholesaleResultForAmountPerChargeDescription.GridAreaOwners,
-            EventId.From(Guid.NewGuid()),
-            wholesaleResultForAmountPerChargeDescription.CalculationId,
-            null);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeDescription.TestFilePath);
-        return wholesaleResultForAmountPerChargeDescription;
+        return new WholesaleResultForAmountPerChargeDescription();
     }
 
-    protected async Task<WholesaleResultForAmountPerChargeInTwoGridAreasDescription> GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas()
+    protected WholesaleResultForAmountPerChargeInTwoGridAreasDescription GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas()
     {
-        var wholesaleResultForAmountPerChargeInTwoGridAreasDescription = new WholesaleResultForAmountPerChargeInTwoGridAreasDescription();
-        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
-            _ediDatabricksOptions.Value,
-            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.GridAreaOwners,
-            EventId.From(Guid.NewGuid()),
-            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.CalculationId,
-            null);
+        return new WholesaleResultForAmountPerChargeInTwoGridAreasDescription();
+    }
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeInTwoGridAreasDescription.TestFilePath);
-        return wholesaleResultForAmountPerChargeInTwoGridAreasDescription;
+    protected WholesaleResultForMonthlyAmountPerChargeDescription GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge()
+    {
+        return new WholesaleResultForMonthlyAmountPerChargeDescription();
+    }
+
+    protected WholesaleResultForTotalAmountDescription GivenDatabricksResultDataForWholesaleResultTotalAmount()
+    {
+        return new WholesaleResultForTotalAmountDescription();
     }
 
     private static Action<WholesaleServicesRequest> GetAssertServiceBusMessage(
