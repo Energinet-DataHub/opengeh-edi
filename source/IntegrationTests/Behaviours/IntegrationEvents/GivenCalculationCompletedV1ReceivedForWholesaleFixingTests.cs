@@ -508,7 +508,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     {
         // Given (arrange)
         var expectedNumberOfPeekResults = 3;
-        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
+        var energySupplier = new Actor(ActorNumber.Create("5790001662234"), ActorRole.EnergySupplier);
         await GivenGridAreaOwnershipAsync("805", ActorNumber.Create("8500000000502"));
         var calculationId = Guid.Parse("61d60f89-bbc5-4f7a-be98-6139aab1c1b2");
         var wholesaleAmountPerChargeSchemaDefinition = GetWholesaleAmountPerChargeSchemaDefinition();
@@ -516,11 +516,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         await _fixture.DatabricksSchemaManager.InsertAsync(
             wholesaleAmountPerChargeSchemaDefinition.DataObjectName,
             [
-            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-01T23:00:00.000+00:00'", "2.000", "NULL", "12.756998", "25.513996"],
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662234'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-01T23:00:00.000+00:00'", "2.000", "NULL", "12.756998", "25.513996"],
             // "2023-02-02 23:00:00.000000" is missing
-            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-03T23:00:00.000+00:00'", "3.000",  "NULL", "12.756998", "38.270994"],
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662234'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-03T23:00:00.000+00:00'", "3.000",  "NULL", "12.756998", "38.270994"],
             // "2023-02-04 23:00:00.000000" is missing
-            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-05T23:00:00.000+00:00'", "1.000", "NULL", "12.756998", "12.756998"],
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'805'", "'5790001662234'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-05T23:00:00.000+00:00'", "1.000", "NULL", "12.756998", "12.756998"],
         ]);
 
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(calculationId, energySupplier, new Dictionary<string, ActorNumber>()
