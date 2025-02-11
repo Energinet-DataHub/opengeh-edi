@@ -34,7 +34,7 @@ public static class SettlementMethodMapper
         };
 
     public static SettlementMethod? FromTimeSeriesTypeDeltaTableValue(string timeSeriesType) =>
-        TimeSeriesTypeMapper.FromDeltaTableValue(timeSeriesType) switch
+        EnergyResults.TimeSeriesTypeMapper.FromDeltaTableValue(timeSeriesType) switch
         {
             TimeSeriesType.Production => null,
             TimeSeriesType.FlexConsumption => SettlementMethod.Flex,

@@ -46,6 +46,7 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;
 using AmountsPerChargeViewSchemaDefinition = Energinet.DataHub.EDI.B2BApi.AppTests.TestData.CalculationResults.AmountsPerChargeViewSchemaDefinition;
+using EnergyPerGaViewSchemaDefinition = Energinet.DataHub.EDI.B2BApi.AppTests.TestData.CalculationResults.EnergyPerGaViewSchemaDefinition;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -280,6 +281,9 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         await CreateCalculationResultDatabricksDataAsync();
         LogStopwatch(stopwatch, nameof(CreateCalculationResultDatabricksDataAsync));
+
+        await CreateEnergyCalculationResultDatabricksDataAsync();
+        LogStopwatch(stopwatch, nameof(CreateEnergyCalculationResultDatabricksDataAsync));
 
         LogStopwatch(initializeStopwatch, nameof(InitializeAsync));
     }
@@ -549,6 +553,20 @@ public class B2BApiAppFixture : IAsyncLifetime
             _calculationResultsDatabricksOptions.AMOUNTS_PER_CHARGE_V1_VIEW_NAME,
             AmountsPerChargeViewSchemaDefinition.SchemaDefinition,
             amountsPerChargeFilePath);
+    }
+
+    private async Task CreateEnergyCalculationResultDatabricksDataAsync()
+    {
+        await CalculationResultsDatabricksSchemaManager.CreateTableAsync(
+            _calculationResultsDatabricksOptions.ENERGY_V1_VIEW_NAME,
+            EnergyPerGaViewSchemaDefinition.SchemaDefinition);
+
+        const string energyPerGaFileName = "wholesale_calculation_results.energy_per_ga_v1.csv";
+        var energyPerGaFilePath = Path.Combine("TestData", "CalculationResults", energyPerGaFileName);
+        await CalculationResultsDatabricksSchemaManager.InsertFromCsvFileAsync(
+            _calculationResultsDatabricksOptions.ENERGY_V1_VIEW_NAME,
+            EnergyPerGaViewSchemaDefinition.SchemaDefinition,
+            energyPerGaFilePath);
     }
 
     private void LogStopwatch(Stopwatch stopwatch, string tag)

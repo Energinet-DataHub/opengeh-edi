@@ -59,7 +59,7 @@ public static class SqlResultValueConverters
 
     public static TimeSeriesType ToTimeSeriesType(string value)
     {
-        return TimeSeriesTypeMapper.FromDeltaTableValue(value);
+        return Databricks.CalculationResults.Mappers.EnergyResults.TimeSeriesTypeMapper.FromDeltaTableValue(value);
     }
 
     public static Guid ToGuid(string value)

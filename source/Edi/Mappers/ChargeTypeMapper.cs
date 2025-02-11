@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
 
@@ -23,9 +23,9 @@ public static class ChargeTypeMapper
     {
         return chargeType switch
         {
-            DataHubNames.ChargeType.Fee => ChargeType.Fee,
-            DataHubNames.ChargeType.Tariff => ChargeType.Tariff,
-            DataHubNames.ChargeType.Subscription => ChargeType.Subscription,
+            var name when name == PMTypes.ChargeType.Fee.Name => ChargeType.Fee,
+            var name when name == PMTypes.ChargeType.Tariff.Name => ChargeType.Tariff,
+            var name when name == PMTypes.ChargeType.Subscription.Name => ChargeType.Subscription,
             _ => throw new ArgumentOutOfRangeException(nameof(chargeType), chargeType, "Cannot map to ChargeType"),
         };
     }
