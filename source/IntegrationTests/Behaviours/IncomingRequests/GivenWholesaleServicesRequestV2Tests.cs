@@ -258,7 +258,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
         var expectedChargeCode = exampleWholesaleResultMessageForActor.First().Value.ChargeCode;
-        var exceptedChargeType = exampleWholesaleResultMessageForActor.First().Value.ChargeType!;
+        var expectedChargeType = exampleWholesaleResultMessageForActor.First().Value.ChargeType!;
         var expectedQuantityMeasurementUnit = exampleWholesaleResultMessageForActor.First().Value.MeasurementUnit!;
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
@@ -279,7 +279,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             energySupplier: energySupplierNumber,
             chargeOwner: chargeOwnerNumber,
             chargeCode: expectedChargeCode,
-            chargeType: exceptedChargeType,
+            chargeType: expectedChargeType,
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
@@ -304,7 +304,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                     Capacity = 0,
                 },
                 null,
-                new List<ChargeTypeInput> { new(exceptedChargeType.Name, expectedChargeCode) }));
+                new List<ChargeTypeInput> { new(expectedChargeType.Name, expectedChargeCode) }));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
@@ -361,7 +361,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                     SenderRole: ActorRole.MeteredDataAdministrator,
                     ChargeTypeOwner: chargeOwnerNumber.Value,
                     ChargeCode: expectedChargeCode,
-                    ChargeType: exceptedChargeType,
+                    ChargeType: expectedChargeType,
                     Currency: Currency.DanishCrowns,
                     EnergySupplierNumber: energySupplierNumber.Value,
                     SettlementMethod: exampleWholesaleResultMessageForActor[seriesRequestGridArea].SettlementMethod,
