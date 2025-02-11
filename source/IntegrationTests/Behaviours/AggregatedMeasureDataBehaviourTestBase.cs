@@ -15,16 +15,20 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit.Abstractions;
@@ -92,6 +96,11 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
             eventType: nameof(AggregatedTimeSeriesRequestAccepted),
             eventPayload: acceptedMessage,
             processId: processId);
+    }
+
+    protected async Task GivenAggregatedMeasureDataRequestAcceptedIsReceived(ServiceBusMessage acceptedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(acceptedMessage);
     }
 
     protected async Task<string> GetGridAreaFromNotifyAggregatedMeasureDataDocument(Stream documentStream, DocumentFormat documentFormat)
@@ -179,6 +188,17 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         return assertionResult.Single();
     }
 
+    protected StartOrchestrationInstanceV1 ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessageIsCorrect(
+        ServiceBusSenderSpy senderSpy,
+        RequestCalculatedEnergyTimeSeriesInputV1AssertionInput assertionInput)
+    {
+        var assertionResult = ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessagesAreCorrect(
+            senderSpy,
+            new List<RequestCalculatedEnergyTimeSeriesInputV1AssertionInput> { assertionInput });
+
+        return assertionResult.Single();
+    }
+
     protected Task<IList<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)>> ThenAggregatedTimeSeriesRequestServiceBusMessagesAreCorrect(
             ServiceBusSenderSpy senderSpy,
             IList<AggregatedTimeSeriesMessageAssertionInput> assertionInputs)
@@ -202,6 +222,29 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         return Task.FromResult(messages);
     }
 
+    protected IList<StartOrchestrationInstanceV1> ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessagesAreCorrect(
+        ServiceBusSenderSpy senderSpy,
+        List<RequestCalculatedEnergyTimeSeriesInputV1AssertionInput>
+            assertionInputs)
+    {
+        var messages = AssertProcessManagerServiceBusMessages(
+            senderSpy: senderSpy,
+            expectedCount: assertionInputs.Count,
+            parser: data => StartOrchestrationInstanceV1.Parser.ParseJson(data));
+
+        using var assertionScope = new AssertionScope();
+
+        var assertionMethods = assertionInputs
+            .Select(GetAssertServiceBusMessage);
+
+        messages
+            .Select(x => x.ParseInput<RequestCalculatedEnergyTimeSeriesInputV1>())
+            .Should()
+            .SatisfyRespectively(assertionMethods);
+
+        return messages;
+    }
+
     protected async Task WhenAggregatedMeasureDataProcessIsInitialized(ServiceBusMessage serviceBusMessage)
     {
         await InitializeProcess(serviceBusMessage, nameof(InitializeAggregatedMeasureDataProcessDto));
@@ -213,6 +256,21 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         {
             await InitializeProcess(serviceBusMessage, nameof(InitializeAggregatedMeasureDataProcessDto));
         }
+    }
+
+    protected EnergyResultPerGridAreaDescription GivenDatabricksResultDataForEnergyResultPerGridArea()
+    {
+        return new EnergyResultPerGridAreaDescription();
+    }
+
+    protected EnergyResultPerBrpGridAreaDescription GivenDatabricksResultDataForEnergyResultPerBalanceResponsible()
+    {
+        return new EnergyResultPerBrpGridAreaDescription();
+    }
+
+    protected EnergyResultPerEnergySupplierBrpGridAreaDescription GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
+    {
+        return new EnergyResultPerEnergySupplierBrpGridAreaDescription();
     }
 
     private Action<AggregatedTimeSeriesRequest> GetAggregatedTimeSeriesRequestAssertion(AggregatedTimeSeriesMessageAssertionInput assertionInput)
@@ -255,5 +313,36 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         }
 
         return Assertion;
+    }
+
+    private Action<RequestCalculatedEnergyTimeSeriesInputV1> GetAssertServiceBusMessage(
+        RequestCalculatedEnergyTimeSeriesInputV1AssertionInput input)
+    {
+        return (message) =>
+        {
+            message.TransactionId.Should().BeEquivalentTo(input.TransactionId.Value);
+            message.RequestedForActorNumber.Should().Be(input.RequestedForActorNumber);
+            message.RequestedForActorRole.Should().Be(input.RequestedForActorRole);
+            message.BusinessReason.Should().Be(input.BusinessReason.Name);
+            message.PeriodStart.Should().Be(input.PeriodStart.ToString());
+            message.PeriodEnd.Should().Be(input.PeriodEnd.ToString());
+            message.EnergySupplierNumber.Should().Be(input.EnergySupplierNumber);
+            message.BalanceResponsibleNumber.Should().Be(input.BalanceResponsibleNumber);
+            message.GridAreas.Should().BeEquivalentTo(input.GridAreas);
+            message.MeteringPointType.Should().Be(input.MeteringPointType?.Name);
+            message.SettlementMethod.Should().Be(input.SettlementMethod?.Name);
+            message.SettlementVersion.Should().Be(input.SettlementVersion);
+        };
+    }
+
+    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage message)
+    {
+        var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
+            messageId: Guid.NewGuid().ToString(),
+            subject: message.Subject,
+            body: message.Body,
+            properties: message.ApplicationProperties);
+        var enqueueHandler = GetService<EnqueueHandler_Brs_026_V1>();
+        await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
     }
 }

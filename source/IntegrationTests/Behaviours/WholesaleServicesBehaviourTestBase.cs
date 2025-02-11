@@ -219,11 +219,11 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return assertionResult.Single();
     }
 
-    protected async Task<StartOrchestrationInstanceV1> ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+    protected StartOrchestrationInstanceV1 ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
         RequestCalculatedWholesaleServicesInputV1AssertionInput assertionInput)
     {
-        var assertionResult = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessagesAreCorrect(
+        var assertionResult = ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessagesAreCorrect(
             senderSpy,
             new List<RequestCalculatedWholesaleServicesInputV1AssertionInput> { assertionInput });
 
@@ -253,7 +253,7 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return Task.FromResult(messages);
     }
 
-    protected Task<IList<StartOrchestrationInstanceV1>> ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessagesAreCorrect(
+    protected IList<StartOrchestrationInstanceV1> ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessagesAreCorrect(
         ServiceBusSenderSpy senderSpy,
         IList<RequestCalculatedWholesaleServicesInputV1AssertionInput> assertionInputs)
     {
@@ -272,7 +272,7 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
             .Should()
             .SatisfyRespectively(assertionMethods);
 
-        return Task.FromResult(messages);
+        return messages;
     }
 
     protected async Task ThenRejectRequestWholesaleSettlementDocumentIsCorrect(
