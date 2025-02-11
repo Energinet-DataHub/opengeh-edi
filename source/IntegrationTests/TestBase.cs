@@ -57,6 +57,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Google.Protobuf;
 using MediatR;
@@ -70,6 +71,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
 

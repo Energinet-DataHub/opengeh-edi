@@ -15,8 +15,15 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using NodaTime.Extensions;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using MeasurementUnit = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeasurementUnit;
+using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 

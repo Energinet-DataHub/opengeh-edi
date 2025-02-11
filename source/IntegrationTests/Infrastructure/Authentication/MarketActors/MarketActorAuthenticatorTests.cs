@@ -19,12 +19,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 

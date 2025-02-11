@@ -16,7 +16,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Microsoft.Extensions.Logging;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 

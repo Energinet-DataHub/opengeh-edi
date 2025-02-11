@@ -30,12 +30,15 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
 using RejectedEnergyResultMessageDtoBuilder = Energinet.DataHub.EDI.Tests.Factories.RejectedEnergyResultMessageDtoBuilder;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;

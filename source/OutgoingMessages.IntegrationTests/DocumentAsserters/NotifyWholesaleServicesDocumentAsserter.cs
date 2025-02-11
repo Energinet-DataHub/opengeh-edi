@@ -18,6 +18,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.Tests.DocumentValidation;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 

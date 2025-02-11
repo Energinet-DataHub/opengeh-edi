@@ -14,6 +14,11 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using MeasurementUnit = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeasurementUnit;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 

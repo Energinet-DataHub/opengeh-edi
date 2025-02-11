@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System.Security.Claims;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.B2BApi.Authentication;
 

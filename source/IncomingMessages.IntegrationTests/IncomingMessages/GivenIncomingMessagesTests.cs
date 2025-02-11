@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Azure;
@@ -31,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 

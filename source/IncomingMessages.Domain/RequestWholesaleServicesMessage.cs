@@ -58,16 +58,16 @@ public record RequestWholesaleServicesSeries(
     string? ChargeOwner,
     IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : BaseDelegatedSeries, IIncomingMessageSeries
 {
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
+    public PMTypes.ActorNumber? GetActorNumberForRole(ActorRole actorRole, PMTypes.ActorNumber? gridAreaOwner)
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
         return actorRole.Name switch
         {
-            var name when name == PMTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
+            var name when name == PMTypes.ActorRole.EnergySupplier.Name => PMTypes.ActorNumber.TryCreate(EnergySupplierId),
 
             var name when name == PMTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
-            var name when name == PMTypes.ActorRole.SystemOperator.Name => ActorNumber.TryCreate(ChargeOwner),
+            var name when name == PMTypes.ActorRole.SystemOperator.Name => PMTypes.ActorNumber.TryCreate(ChargeOwner),
             _ => null,
         };
     }

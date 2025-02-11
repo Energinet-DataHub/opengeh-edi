@@ -16,7 +16,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using NodaTime;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 

@@ -21,15 +21,21 @@ using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
+using MeasurementUnit = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeasurementUnit;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
+
 // ReSharper disable InconsistentNaming
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
@@ -102,18 +108,18 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var originalActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var originalActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
+        var delegatedToActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
         var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
-            : ActorNumber.Create("5555555555555");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5555555555555");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         await GivenGridAreaOwnershipAsync("512", gridAreaOwner);
@@ -208,7 +214,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                     null),
                 ReceiverId: delegatedToActor.ActorNumber,
                 //ReceiverRole: originalActor.ActorRole,
-                SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+                SenderId: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5790001330552"), // Sender is always DataHub
                 //SenderRole: ActorRole.MeteredDataAdministrator,
                 EnergySupplierNumber: energySupplierNumber,
                 BalanceResponsibleNumber: balanceResponsibleParty,
@@ -240,18 +246,18 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var originalActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var originalActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
+        var delegatedToActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
         var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
-            : ActorNumber.Create("5555555555555");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5555555555555");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         await GivenGridAreaOwnershipAsync("512", gridAreaOwner);
@@ -368,18 +374,18 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var originalActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var originalActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
+        var delegatedToActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
         var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
-            : ActorNumber.Create("5555555555555");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5555555555555");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         await GivenGridAreaOwnershipAsync("512", gridAreaOwner);
@@ -475,7 +481,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                     null),
                 ReceiverId: originalActor.ActorNumber,
                 //ReceiverRole: originalActor.ActorRole,
-                SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+                SenderId: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5790001330552"), // Sender is always DataHub
                 //SenderRole: ActorRole.MeteredDataAdministrator,
                 EnergySupplierNumber: energySupplierNumber,
                 BalanceResponsibleNumber: balanceResponsibleParty,
@@ -503,18 +509,18 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var originalActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var originalActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
+        var delegatedToActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
         var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
-            : ActorNumber.Create("5555555555555");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5555555555555");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         await GivenGridAreaOwnershipAsync("512", gridAreaOwner);
@@ -623,7 +629,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                         null),
                     ReceiverId: delegatedToActor.ActorNumber,
                     //ReceiverRole: originalActor.ActorRole,
-                    SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+                    SenderId: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5790001330552"), // Sender is always DataHub
                     //SenderRole: ActorRole.MeteredDataAdministrator,
                     EnergySupplierNumber: energySupplierNumber,
                     BalanceResponsibleNumber: balanceResponsibleParty,
@@ -658,18 +664,18 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var originalActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var originalActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
+        var delegatedToActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
         var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
-            : ActorNumber.Create("5555555555555");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5555555555555");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         await GivenGridAreaOwnershipAsync("512", gridAreaOwner);
@@ -797,8 +803,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var originalActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var originalActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
+        var delegatedToActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");

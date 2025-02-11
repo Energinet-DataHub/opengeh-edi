@@ -15,8 +15,10 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
 

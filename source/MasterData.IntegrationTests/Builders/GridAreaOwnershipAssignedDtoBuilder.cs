@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Builders;

@@ -83,12 +83,12 @@ public record MeteredDataForMeteringPointSeries(
     // TODO: when refactor incoming message module not all incomingMessageSeries has a gridArea.
     public string? GridArea => null;
 
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
+    public PMTypes.ActorNumber? GetActorNumberForRole(ActorRole actorRole, PMTypes.ActorNumber? gridAreaOwner)
     {
         return actorRole.Name switch
         {
-            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => ActorNumber.TryCreate(SenderNumber),
-            var name when name == PMTypes.ActorRole.Delegated.Name => ActorNumber.TryCreate(SenderNumber),
+            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => PMTypes.ActorNumber.TryCreate(SenderNumber),
+            var name when name == PMTypes.ActorRole.Delegated.Name => PMTypes.ActorNumber.TryCreate(SenderNumber),
             _ => null,
         };
     }

@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -31,8 +32,13 @@ using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using MeasurementUnit = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeasurementUnit;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -75,7 +81,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
             : ActorNumber.Create("3333333333333");

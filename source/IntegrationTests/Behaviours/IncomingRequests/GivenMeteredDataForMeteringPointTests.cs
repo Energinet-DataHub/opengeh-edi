@@ -16,11 +16,14 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -41,7 +44,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
+        var currentActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
@@ -71,7 +74,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(
-            ActorNumber.Create("8100000000115"),
+            ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("8100000000115"),
             ActorRole.EnergySupplier,
             documentFormat);
 
@@ -148,7 +151,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
+        var currentActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);

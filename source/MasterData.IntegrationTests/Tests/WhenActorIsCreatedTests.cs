@@ -77,7 +77,7 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
 
     private static CreateActorDto CreateDto()
     {
-        return new CreateActorDto(ExternalId, BuildingBlocks.Domain.Models.ActorNumber.Create(ActorNumber));
+        return new CreateActorDto(ExternalId, ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(ActorNumber));
     }
 
     private async Task<Actor?> GetActor()

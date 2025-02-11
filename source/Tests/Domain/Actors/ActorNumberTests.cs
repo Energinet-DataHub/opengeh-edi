@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.Actors;

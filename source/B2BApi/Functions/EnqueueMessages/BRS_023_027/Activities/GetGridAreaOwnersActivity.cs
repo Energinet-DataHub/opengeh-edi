@@ -15,6 +15,7 @@
 using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 

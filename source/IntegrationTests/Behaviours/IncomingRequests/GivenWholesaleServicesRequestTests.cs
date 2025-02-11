@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Data.SqlClient;
@@ -29,8 +30,14 @@ using NodaTime;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using MeasurementUnit = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeasurementUnit;
+using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -93,16 +100,16 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5799999933444");
         var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
@@ -213,16 +220,16 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
         var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5799999933444");
         var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
@@ -265,16 +272,16 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5799999933444");
         var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
@@ -406,7 +413,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierOrNull = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
             : null;
@@ -535,16 +542,16 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5799999933444");
         var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+            : ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
@@ -732,9 +739,9 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         // Arrange
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
-        var energySupplierNumber = ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = ActorNumber.Create("5799999933444");
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
+        var energySupplierNumber = ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("3333333333333");
+        var chargeOwnerNumber = ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("5799999933444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
@@ -844,7 +851,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var actor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
             : ActorNumber.Create("3333333333333");

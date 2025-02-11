@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Microsoft.Extensions.Logging;
 using Actor = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Actor;
 

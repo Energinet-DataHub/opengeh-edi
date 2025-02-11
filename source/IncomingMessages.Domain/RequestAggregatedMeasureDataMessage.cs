@@ -60,7 +60,7 @@ public record RequestAggregatedMeasureDataMessageSeries(
     string? BalanceResponsiblePartyId,
     string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries
 {
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
+    public PMTypes.ActorNumber? GetActorNumberForRole(ActorRole actorRole, PMTypes.ActorNumber? gridAreaOwner)
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
@@ -71,8 +71,8 @@ public record RequestAggregatedMeasureDataMessageSeries(
         // ActorRole.GridOperator, // Grid Operator can make requests because of DDM -> MDR hack
         return actorRole.Name switch
         {
-            var name when name == PMTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
-            var name when name == PMTypes.ActorRole.BalanceResponsibleParty.Name => ActorNumber.TryCreate(BalanceResponsiblePartyId),
+            var name when name == PMTypes.ActorRole.EnergySupplier.Name => PMTypes.ActorNumber.TryCreate(EnergySupplierId),
+            var name when name == PMTypes.ActorRole.BalanceResponsibleParty.Name => PMTypes.ActorNumber.TryCreate(BalanceResponsiblePartyId),
             var name when name == PMTypes.ActorRole.MeteredDataResponsible.Name => gridAreaOwner,
             var name when name == PMTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
             _ => null,

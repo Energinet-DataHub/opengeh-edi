@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;

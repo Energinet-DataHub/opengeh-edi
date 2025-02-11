@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;

@@ -30,7 +30,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public class WholesaleTotalAmountQuery(
     ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
-    ImmutableDictionary<string, ActorNumber> gridAreaOwners,
+    ImmutableDictionary<string, ProcessManager.Components.Abstractions.ValueObjects.ActorNumber> gridAreaOwners,
     EventId eventId,
     Guid calculationId,
     string? energySupplier)
@@ -40,7 +40,7 @@ public class WholesaleTotalAmountQuery(
         calculationId,
         energySupplier)
 {
-    private readonly ImmutableDictionary<string, ActorNumber> _gridAreaOwners = gridAreaOwners;
+    private readonly ImmutableDictionary<string, ProcessManager.Components.Abstractions.ValueObjects.ActorNumber> _gridAreaOwners = gridAreaOwners;
     private readonly EventId _eventId = eventId;
 
     public override string DataObjectName => "total_monthly_amounts_v1";
@@ -76,7 +76,7 @@ public class WholesaleTotalAmountQuery(
             calculationResultVersion: databricksSqlRow.ToLong(WholesaleResultColumnNames.CalculationVersion),
             receiverNumber: receiver.ActorNumber,
             receiverRole: receiver.ActorRole,
-            energySupplierId: ActorNumber.Create(
+            energySupplierId: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId)),
             businessReason: businessReason.Name,
             gridAreaCode: databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode),
@@ -97,22 +97,22 @@ public class WholesaleTotalAmountQuery(
                 .AsReadOnly()));
     }
 
-    private static ActorNumber? GetChargeOwnerNumber(DatabricksSqlRow databricksSqlRow)
+    private static ProcessManager.Components.Abstractions.ValueObjects.ActorNumber? GetChargeOwnerNumber(DatabricksSqlRow databricksSqlRow)
     {
         var databricksChargeOwnerId = databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeOwnerId);
         var chargeOwnerNumber =
-            databricksChargeOwnerId is not null ? ActorNumber.Create(databricksChargeOwnerId) : null;
+            databricksChargeOwnerId is not null ? ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(databricksChargeOwnerId) : null;
         return chargeOwnerNumber;
     }
 
-    private static (ActorNumber ActorNumber, ActorRole ActorRole) GetReceiver(
+    private static (ProcessManager.Components.Abstractions.ValueObjects.ActorNumber ActorNumber, ActorRole ActorRole) GetReceiver(
         DatabricksSqlRow databricksSqlRow,
-        ImmutableDictionary<string, ActorNumber> gridAreaOwnerDictionary)
+        ImmutableDictionary<string, ProcessManager.Components.Abstractions.ValueObjects.ActorNumber> gridAreaOwnerDictionary)
     {
         var chargeOwnerNumber = GetChargeOwnerNumber(databricksSqlRow);
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var energySupplierNumber =
-            ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId));
+            ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId));
 
         if (chargeOwnerNumber is null)
         {

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public sealed class Actor(ActorNumber actorNumber, ActorRole actorRole)

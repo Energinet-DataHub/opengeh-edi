@@ -24,14 +24,18 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
+using MeasurementUnit = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeasurementUnit;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -74,7 +78,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var currentActor = (ActorNumber: ProcessManager.Components.Abstractions.ValueObjects.ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = currentActor.ActorRole == ActorRole.EnergySupplier
             ? currentActor.ActorNumber
             : ActorNumber.Create("3333333333333");
@@ -154,7 +158,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
                     null),
                 ReceiverId: currentActor.ActorNumber,
                 // ReceiverRole: originalActor.ActorRole,
-                SenderId: BuildingBlocks.Domain.Models.ActorNumber.Create("5790001330552"),  // Sender is always DataHub
+                SenderId: ActorNumber.Create("5790001330552"),  // Sender is always DataHub
                 // SenderRole: ActorRole.MeteredDataAdministrator,
                 EnergySupplierNumber: energySupplierNumber,
                 BalanceResponsibleNumber: balanceResponsibleParty,

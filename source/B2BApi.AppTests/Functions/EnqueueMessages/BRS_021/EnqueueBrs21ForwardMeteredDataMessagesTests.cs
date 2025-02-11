@@ -126,7 +126,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
 
         var externalId = Guid.NewGuid().ToString();
-        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create("1111111111111"), externalId);
+        await _fixture.DatabaseManager.AddActorAsync(PMValueTypes.ActorNumber.Create("1111111111111"), externalId);
 
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/TimeSeries");
 

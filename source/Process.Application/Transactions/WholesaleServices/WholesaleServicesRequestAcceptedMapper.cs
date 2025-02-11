@@ -19,11 +19,16 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.M
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Google.Protobuf.Collections;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
+using MeasurementUnit = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeasurementUnit;
+using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod;
 using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
