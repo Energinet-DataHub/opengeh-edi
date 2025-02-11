@@ -28,11 +28,12 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     "Usage",
     "CA2007",
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-[IntegrationTest]
-[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [TestCaseOrderer(
     ordererTypeName: "Energinet.DataHub.EDI.SubsystemTests.TestOrdering.TestOrderer",
-    ordererAssemblyName: "Energinet.DataHub.EDI.SubsystemTests")]
+    ordererAssemblyName: "Energinet.DataHub.Wholesale.SubsystemTests")]
+[IntegrationTest]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
+
 // TODO: Rename this to brs026 when we have deleted the old request tests
 public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
 {
