@@ -16,7 +16,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
-using Azure.Messaging.ServiceBus.Administration;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
