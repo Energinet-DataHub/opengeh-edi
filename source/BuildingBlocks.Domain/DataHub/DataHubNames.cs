@@ -52,6 +52,7 @@ public static class DataHubNames
         public const string DanishCrowns = "DanishCrowns";
     }
 
+    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class MeasurementUnit
     {
         public const string Kwh = "Kwh";
