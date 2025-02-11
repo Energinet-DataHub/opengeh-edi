@@ -57,7 +57,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
     public async Task InitializeAsync()
     {
-        await _fixture.InsertDatabricksDataAsync(_ediDatabricksOptions);
+        await _fixture.InsertWholesaleDataDatabricksDataAsync(_ediDatabricksOptions);
     }
 
     public Task DisposeAsync()
