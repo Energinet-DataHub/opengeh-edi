@@ -53,6 +53,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
             SettlementMethod.NonProfiled,
             Resolution.Hourly,
             ActorNumber.Create("5790002105289"),
+            ActorNumber.Create("7080000729821"),
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
@@ -67,6 +68,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
             MeteringPointType.Production,
             null,
             Resolution.Hourly,
+            ActorNumber.Create("7080000729821"),
             ActorNumber.Create("7080000729821"),
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
