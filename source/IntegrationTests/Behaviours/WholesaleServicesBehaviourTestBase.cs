@@ -280,36 +280,14 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return response;
     }
 
-    protected async Task<WholesaleResultForAmountPerChargeDescription> GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
+    protected WholesaleResultForAmountPerChargeDescription GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
     {
-        var wholesaleResultForAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
-        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
-            _ediDatabricksOptions.Value,
-            wholesaleResultForAmountPerChargeDescription.GridAreaOwners,
-            EventId.From(Guid.NewGuid()),
-            wholesaleResultForAmountPerChargeDescription.CalculationId,
-            null);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeDescription.TestFilePath);
-        return wholesaleResultForAmountPerChargeDescription;
+        return new WholesaleResultForAmountPerChargeDescription();
     }
 
-    protected async Task<WholesaleResultForAmountPerChargeInTwoGridAreasDescription> GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas()
+    protected WholesaleResultForAmountPerChargeInTwoGridAreasDescription GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas()
     {
-        var wholesaleResultForAmountPerChargeInTwoGridAreasDescription = new WholesaleResultForAmountPerChargeInTwoGridAreasDescription();
-        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
-            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
-            _ediDatabricksOptions.Value,
-            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.GridAreaOwners,
-            EventId.From(Guid.NewGuid()),
-            wholesaleResultForAmountPerChargeInTwoGridAreasDescription.CalculationId,
-            null);
-
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeInTwoGridAreasDescription.TestFilePath);
-        return wholesaleResultForAmountPerChargeInTwoGridAreasDescription;
+        return new WholesaleResultForAmountPerChargeInTwoGridAreasDescription();
     }
 
     private static Action<WholesaleServicesRequest> GetAssertServiceBusMessage(
