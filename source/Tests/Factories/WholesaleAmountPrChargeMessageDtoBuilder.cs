@@ -43,7 +43,7 @@ public class WholesaleAmountPrChargeMessageDtoBuilder
             gridAreaCode: "805",
             isTax: false,
             period: new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
-            quantityUnit: MeasurementUnit.Kwh,
+            quantityUnit: MeasurementUnit.KilowattHour,
             currency: Currency.DanishCrowns,
             chargeType: ChargeType.Fee,
             resolution: Resolution.Hourly,

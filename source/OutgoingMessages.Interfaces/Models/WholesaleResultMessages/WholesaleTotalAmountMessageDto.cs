@@ -56,7 +56,7 @@ public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
             ChargeOwner: null,
             Period: period,
             SettlementVersion: settlementVersion,
-            QuantityMeasureUnit: MeasurementUnit.Kwh,
+            QuantityMeasureUnit: MeasurementUnit.KilowattHour,
             PriceMeasureUnit: null,
             Currency: currency,
             ChargeType: null,

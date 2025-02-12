@@ -311,7 +311,7 @@ public class WholesaleResultForAmountPerChargeInTwoGridAreasDescription
                     },
                     ChargeCode: "41000",
                     ChargeType: ChargeType.Tariff,
-                    MeasurementUnit: MeasurementUnit.Kwh)
+                    MeasurementUnit: MeasurementUnit.KilowattHour)
             },
             {
                 "804", new(
@@ -523,7 +523,7 @@ public class WholesaleResultForAmountPerChargeInTwoGridAreasDescription
                     },
                     ChargeCode: "41000",
                     ChargeType: ChargeType.Tariff,
-                    MeasurementUnit: MeasurementUnit.Kwh)
+                    MeasurementUnit: MeasurementUnit.KilowattHour)
             },
         };
 
