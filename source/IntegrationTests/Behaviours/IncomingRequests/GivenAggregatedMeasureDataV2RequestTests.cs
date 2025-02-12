@@ -197,7 +197,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                 GridAreaCode: testMessageData.ExampleMessageData.GridArea,
                 OriginalTransactionIdReference: transactionId,
                 ProductCode: ProductType.EnergyActive.Code,
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: testMessageData.ExampleMessageData.Version,
                 Resolution: testMessageData.ExampleMessageData.Resolution,
                 Period: new Period(
@@ -315,7 +315,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                     GridAreaCode: peekResultGridArea,
                     OriginalTransactionIdReference: transactionId,
                     ProductCode: ProductType.EnergyActive.Code,
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                     CalculationVersion: testMessageData.ExampleMessageData.Version,
                     Resolution: testMessageData.ExampleMessageData.Resolution,
                     Period: new Period(
@@ -447,7 +447,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                 GridAreaCode: testMessageData.ExampleMessageData.GridArea,
                 OriginalTransactionIdReference: transactionId,
                 ProductCode: ProductType.EnergyActive.Code,
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: testMessageData.ExampleMessageData.Version,
                 Resolution: testMessageData.ExampleMessageData.Resolution,
                 Period: new Period(

@@ -22,7 +22,7 @@ public static class MeasurementUnitMapper
     {
         return measurementUnit switch
         {
-            "kWh" => MeasurementUnit.Kwh,
+            "kWh" => MeasurementUnit.KilowattHour,
             "pcs" => MeasurementUnit.Pieces,
             _ => throw new ArgumentOutOfRangeException(
                 nameof(MeasurementUnit),

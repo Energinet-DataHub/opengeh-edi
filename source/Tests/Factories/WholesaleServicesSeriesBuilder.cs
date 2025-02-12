@@ -37,8 +37,8 @@ public class WholesaleServicesSeriesBuilder
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private SettlementMethod? _settlementMethod = SettlementMethod.NonProfiled;
-    private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
-    private MeasurementUnit _priceMeasureUnit = MeasurementUnit.Kwh;
+    private MeasurementUnit _measurementUnit = MeasurementUnit.KilowattHour;
+    private MeasurementUnit _priceMeasureUnit = MeasurementUnit.KilowattHour;
     private Resolution _resolution = Resolution.Monthly;
     private ActorNumber _energySupplierActorNumber = ActorNumber.Create("1234567894444");
     private string _chargeCode = "123";

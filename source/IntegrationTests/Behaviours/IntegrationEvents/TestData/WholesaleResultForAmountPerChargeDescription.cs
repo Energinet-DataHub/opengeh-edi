@@ -119,7 +119,7 @@ public class WholesaleResultForAmountPerChargeDescription
         },
         ChargeCode: "41000",
         ChargeType: ChargeType.Tariff,
-        MeasurementUnit: MeasurementUnit.Kwh);
+        MeasurementUnit: MeasurementUnit.KilowattHour);
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty

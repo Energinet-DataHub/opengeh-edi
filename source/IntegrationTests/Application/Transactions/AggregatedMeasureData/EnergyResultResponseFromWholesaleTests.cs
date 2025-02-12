@@ -176,7 +176,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
             gridarea,
             MeteringPointType.Production.Name,
             process.SettlementMethod,
-            MeasurementUnit.Kwh.Name,
+            MeasurementUnit.KilowattHour.Name,
             Resolution.QuarterHourly.Name,
             process.EnergySupplierId,
             process.BalanceResponsibleId,

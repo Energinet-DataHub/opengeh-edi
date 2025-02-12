@@ -119,7 +119,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 
 #pragma warning disable CS0618 // Type or member is obsolete
                     // <UnitType />
-                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityMeasureUnit), writer).ConfigureAwait(false);
+                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", series.QuantityMeasureUnit.Name == "Kwh" ? EbixCode.Of(MeasurementUnit.KilowattHour) : EbixCode.Of(series.QuantityMeasureUnit), writer).ConfigureAwait(false);
 #pragma warning restore CS0618 // Type or member is obsolete
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);

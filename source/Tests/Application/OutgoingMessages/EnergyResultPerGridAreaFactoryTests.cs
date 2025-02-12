@@ -83,7 +83,7 @@ public class EnergyResultPerGridAreaFactoryTests
         actual.Resolution.Should().Be(Resolution.Hourly);
         actual.CalculationVersion.Should().Be(63);
         actual.SettlementMethod.Should().BeNull();
-        actual.MeasureUnitType.Should().Be(MeasurementUnit.Kwh);
+        actual.MeasureUnitType.Should().Be(MeasurementUnit.KilowattHour);
     }
 
     private static EnergyResultPerGridArea CreateEnergyResultPerGridArea(
