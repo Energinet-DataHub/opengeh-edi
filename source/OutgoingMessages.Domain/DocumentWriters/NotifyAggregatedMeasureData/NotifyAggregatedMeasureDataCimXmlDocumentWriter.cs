@@ -89,11 +89,12 @@ public class NotifyAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocumentWri
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ProductType.EnergyActive.Code).ConfigureAwait(false);
 
+            var outdatedValue = string.Equals(timeSeries.MeasureUnitType, "Kwh", StringComparison.InvariantCultureIgnoreCase);
             await writer.WriteElementStringAsync(
                     DocumentDetails.Prefix,
                     "quantity_Measure_Unit.name",
                     null,
-                    timeSeries.MeasureUnitType == "KWH" ? MeasurementUnit.KilowattHour.Code : MeasurementUnit.FromName(timeSeries.MeasureUnitType).Code)
+                    outdatedValue ? MeasurementUnit.KilowattHour.Code : MeasurementUnit.FromName(timeSeries.MeasureUnitType).Code)
                 .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);
