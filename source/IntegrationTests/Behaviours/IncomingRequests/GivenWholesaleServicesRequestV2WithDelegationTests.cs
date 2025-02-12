@@ -170,7 +170,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             });
 
         // Assert
-        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
             new RequestCalculatedWholesaleServicesInputV1AssertionInput(
                 transactionId,
@@ -321,7 +321,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             });
 
         // Assert
-        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
             new RequestCalculatedWholesaleServicesInputV1AssertionInput(
                 transactionId,
@@ -484,7 +484,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             });
 
         // Assert
-        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
             new RequestCalculatedWholesaleServicesInputV1AssertionInput(
                 transactionId,
@@ -621,7 +621,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             });
 
         // Assert
-        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
             new RequestCalculatedWholesaleServicesInputV1AssertionInput(
                 transactionId,
@@ -762,7 +762,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             });
 
         // Assert
-        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
             new RequestCalculatedWholesaleServicesInputV1AssertionInput(
                 transactionId,
@@ -924,7 +924,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             });
 
         // Assert
-        var message = await ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
             new RequestCalculatedWholesaleServicesInputV1AssertionInput(
                 transactionId,

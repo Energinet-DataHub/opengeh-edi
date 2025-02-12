@@ -54,6 +54,7 @@ public class EnergyResultPerBrpGridAreaDescription
             SettlementMethod.Flex,
             Resolution.Hourly,
             null,
+            ActorNumber.Create("7080000729821"),
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
