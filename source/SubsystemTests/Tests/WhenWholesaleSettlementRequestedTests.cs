@@ -28,7 +28,9 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
+#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
+internal sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
+#pragma warning restore xUnit1000
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
     private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
@@ -57,7 +59,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
-    [Fact(Skip = "Confirm depends on feature flag. Which might be turned of")]
+    [Fact]
     public async Task Actor_can_request_wholesale_settlement()
     {
         var messageId = await _wholesaleSettlementRequest.Request(CancellationToken.None);
@@ -65,7 +67,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(messageId);
     }
 
-    [Fact(Skip = "Confirm depends on feature flag. Which might be turned of")]
+    [Fact]
     public async Task B2C_actor_can_request_wholesale_settlement()
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();
