@@ -53,21 +53,6 @@ public static class DataHubNames
     }
 
     // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class MeasurementUnit
-    {
-        public const string Kwh = "Kwh";
-        public const string Pieces = "Pieces";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class MeteringPointType
-    {
-        public const string Consumption = "Consumption";
-        public const string Production = "Production";
-        public const string Exchange = "Exchange";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class Resolution
     {
         public const string QuarterHourly = "QuarterHourly";

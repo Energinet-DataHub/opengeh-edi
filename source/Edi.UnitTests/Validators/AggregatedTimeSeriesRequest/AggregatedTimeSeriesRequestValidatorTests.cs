@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using FluentAssertions;
@@ -145,7 +146,7 @@ public class AggregatedTimeSeriesRequestValidatorTests : EdiTestBase
         // Arrange
         var request = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithMeteringPointType(DataHubNames.MeteringPointType.Consumption)
+            .WithMeteringPointType(MeteringPointType.Consumption.Name)
             .WithSettlementMethod(null)
             .WithRequestedByActorId(EnergySupplierValidatorTest.ValidGlnNumber)
             .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)

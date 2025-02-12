@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
@@ -27,12 +28,37 @@ public class TimeSeriesTypeValidatorTests
 
     private readonly TimeSeriesTypeValidationRule _sut = new();
 
+    public static IEnumerable<object[]> GetMeteringPointTypeData_Production()
+    {
+        yield return [MeteringPointType.Production.Name, null!];
+    }
+
+    public static IEnumerable<object[]> GetMeteringPointTypeData_Exchange()
+    {
+        yield return [MeteringPointType.Exchange.Name, null!];
+    }
+
+    public static IEnumerable<object[]> GetMeteringPointTypeData_Consumption()
+    {
+        yield return [MeteringPointType.Consumption.Name, null!];
+    }
+
+    public static IEnumerable<object[]> GetMeteringPointTypeData_Consumption_NonProfiled()
+    {
+        yield return [MeteringPointType.Consumption.Name, DataHubNames.SettlementMethod.NonProfiled];
+    }
+
+    public static IEnumerable<object[]> GetMeteringPointTypeData_Consumption_Flex()
+    {
+        yield return [MeteringPointType.Consumption.Name, DataHubNames.SettlementMethod.Flex];
+    }
+
     [Theory]
-    [InlineData(DataHubNames.MeteringPointType.Production, null)]
-    [InlineData(DataHubNames.MeteringPointType.Exchange, null)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption, null)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption, DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption, DataHubNames.SettlementMethod.Flex)]
+    [MemberData(nameof(GetMeteringPointTypeData_Production))]
+    [MemberData(nameof(GetMeteringPointTypeData_Exchange))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption_NonProfiled))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption_Flex))]
     public async Task Validate_AsMeteredDataResponsible_ReturnsNoValidationErrors(string meteringPointType, string? settlementMethod)
     {
         // Arrange
@@ -52,9 +78,9 @@ public class TimeSeriesTypeValidatorTests
     }
 
     [Theory]
-    [InlineData(DataHubNames.MeteringPointType.Production, null)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption, DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption, DataHubNames.SettlementMethod.Flex)]
+    [MemberData(nameof(GetMeteringPointTypeData_Production))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption_NonProfiled))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption_Flex))]
     public async Task Validate_AsEnergySupplier_ReturnsNoValidationErrors(string meteringPointType, string? settlementMethod)
     {
         // Arrange
@@ -74,9 +100,9 @@ public class TimeSeriesTypeValidatorTests
     }
 
     [Theory]
-    [InlineData(DataHubNames.MeteringPointType.Production, null)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption, DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption, DataHubNames.SettlementMethod.Flex)]
+    [MemberData(nameof(GetMeteringPointTypeData_Production))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption_NonProfiled))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption_Flex))]
     public async Task Validate_AsBalanceResponsible_ReturnsNoValidationErrors(string meteringPointType, string? settlementMethod)
     {
         // Arrange
@@ -96,15 +122,15 @@ public class TimeSeriesTypeValidatorTests
     }
 
     [Theory]
-    [InlineData(DataHubNames.MeteringPointType.Exchange)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption)]
-    public async Task Validate_AsEnergySupplierAndNoSettlementMethod_ReturnsExceptedValidationErrors(string meteringPointType)
+    [MemberData(nameof(GetMeteringPointTypeData_Exchange))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption))]
+    public async Task Validate_AsEnergySupplierAndNoSettlementMethod_ReturnsExceptedValidationErrors(string meteringPointType, string? settlementMethod)
     {
         // Arrange
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
             .WithMeteringPointType(meteringPointType)
-            .WithSettlementMethod(null)
+            .WithSettlementMethod(settlementMethod)
             .WithRequestedByActorId("1234567890123")
             .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
             .Build();
@@ -121,15 +147,15 @@ public class TimeSeriesTypeValidatorTests
     }
 
     [Theory]
-    [InlineData(DataHubNames.MeteringPointType.Exchange)]
-    [InlineData(DataHubNames.MeteringPointType.Consumption)]
-    public async Task Validate_AsBalanceResponsibleAndNoSettlementMethod_ValidationErrors(string meteringPointType)
+    [MemberData(nameof(GetMeteringPointTypeData_Exchange))]
+    [MemberData(nameof(GetMeteringPointTypeData_Consumption))]
+    public async Task Validate_AsBalanceResponsibleAndNoSettlementMethod_ValidationErrors(string meteringPointType, string? settlementMethod)
     {
         // Arrange
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
             .WithMeteringPointType(meteringPointType)
-            .WithSettlementMethod(null)
+            .WithSettlementMethod(settlementMethod)
             .WithRequestedByActorId("1234567890123")
             .WithRequestedByActorRole(DataHubNames.ActorRole.BalanceResponsibleParty)
             .Build();

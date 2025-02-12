@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using FluentAssertions;
@@ -35,7 +36,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             gridAreaCodes: [],
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
-            meteringPointType: DataHubNames.MeteringPointType.Production);
+            meteringPointType: MeteringPointType.Production.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -59,7 +60,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
         var request = CreateRequest(
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
-            balanceResponsible: balanceResponsibleId);
+            balanceResponsible: balanceResponsibleId,
+            meteringPointType: MeteringPointType.Production.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -83,7 +85,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
         var request = CreateRequest(
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
-            balanceResponsible: balanceResponsibleId);
+            balanceResponsible: balanceResponsibleId,
+            meteringPointType: MeteringPointType.Production.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -234,7 +237,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
         IReadOnlyCollection<string> gridAreaCodes,
         string? energySupplier,
         string? balanceResponsible,
-        string? meteringPointType = DataHubNames.MeteringPointType.Production,
+        string? meteringPointType,
         string? settlementMethod = DataHubNames.SettlementMethod.Flex)
     {
         var request = new AggregatedTimeSeriesRequest()
