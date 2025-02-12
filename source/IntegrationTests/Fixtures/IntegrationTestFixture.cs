@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
-    private bool _databricksDataInserted;
+    private bool _databricksWholesaleDataInserted;
+    private bool _databricksAggregatedMeasureDataInserted;
 
     public IntegrationTestFixture()
     {
@@ -66,7 +68,7 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        if (_databricksDataInserted)
+        if (_databricksWholesaleDataInserted || _databricksAggregatedMeasureDataInserted)
             await DatabricksSchemaManager.DropSchemaAsync();
         Dispose();
         await Task.CompletedTask;
@@ -125,15 +127,26 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         GC.SuppressFinalize(this);
     }
 
-    protected internal async Task InsertDatabricksDataAsync(IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    protected internal async Task InsertWholesaleDataDatabricksDataAsync(IOptions<EdiDatabricksOptions> ediDatabricksOptions)
     {
-        if (_databricksDataInserted)
+        if (_databricksWholesaleDataInserted)
             return;
         await GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreasAsync(ediDatabricksOptions);
         await GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerChargeAsync(ediDatabricksOptions);
         await GivenDatabricksResultDataForWholesaleResultTotalAmountAsync(ediDatabricksOptions);
 
-        _databricksDataInserted = true;
+        _databricksWholesaleDataInserted = true;
+    }
+
+    protected internal async Task InsertAggregatedMeasureDataDatabricksDataAsync(IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        if (_databricksAggregatedMeasureDataInserted)
+            return;
+        await GivenDatabricksResultDataForEnergyResultPerGridAreaAsync(ediDatabricksOptions);
+        await GivenDatabricksResultDataForEnergyResultPerBalanceResponsibleAsync(ediDatabricksOptions);
+        await GivenDatabricksResultDataForEnergyResultPerEnergySupplierAsync(ediDatabricksOptions);
+
+        _databricksAggregatedMeasureDataInserted = true;
     }
 
     protected virtual void Dispose(bool disposing)
@@ -217,5 +230,48 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
         await DatabricksSchemaManager.CreateTableAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition);
         await DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition, resultDataForWholesaleResultTotalAmount.TestFilePath);
+    }
+
+    private async Task GivenDatabricksResultDataForEnergyResultPerGridAreaAsync(
+        IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        var energyResultPerGridAreaTestDataDescription = new EnergyResultPerGridAreaDescription();
+        var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(
+            new LoggerSpy(),
+            ediDatabricksOptions.Value,
+            energyResultPerGridAreaTestDataDescription.GridAreaOwners,
+            EventId.From(Guid.NewGuid()),
+            energyResultPerGridAreaTestDataDescription.CalculationId);
+
+        await DatabricksSchemaManager.CreateTableAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition);
+        await DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition, energyResultPerGridAreaTestDataDescription.TestFilePath);
+    }
+
+    private async Task GivenDatabricksResultDataForEnergyResultPerBalanceResponsibleAsync(
+        IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        var energyResultPerBrpDescription = new EnergyResultPerBrpGridAreaDescription();
+        var energyResultPerBrpQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(
+            new LoggerSpy(),
+            ediDatabricksOptions.Value,
+            EventId.From(Guid.NewGuid()),
+            energyResultPerBrpDescription.CalculationId);
+
+        await DatabricksSchemaManager.CreateTableAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition);
+        await DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition, energyResultPerBrpDescription.TestFilePath);
+    }
+
+    private async Task GivenDatabricksResultDataForEnergyResultPerEnergySupplierAsync(
+        IOptions<EdiDatabricksOptions> ediDatabricksOptions)
+    {
+        var energyResultPerEnergySupplierDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        var energyResultPerEnergySupplierQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
+            new LoggerSpy(),
+            ediDatabricksOptions.Value,
+            EventId.From(Guid.NewGuid()),
+            energyResultPerEnergySupplierDescription.CalculationId);
+
+        await DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition);
+        await DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition, energyResultPerEnergySupplierDescription.TestFilePath);
     }
 }

@@ -70,7 +70,8 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 61754.247M, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 61754.247M, null),
+        MeasurementUnit: MeasurementUnit.Kwh);
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForChargeOwner => new(
         GridArea: GridAreaCodes.First(),
@@ -81,9 +82,10 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null),
+        MeasurementUnit: MeasurementUnit.Pieces);
 
-    public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForEnergySupplier => new(
+    public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator => new(
         GridArea: GridAreaCodes.First(),
         Currency.DanishCrowns,
         ActorNumber.Create("5790001662233"),
@@ -92,7 +94,8 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null),
+        MeasurementUnit: MeasurementUnit.Pieces);
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty

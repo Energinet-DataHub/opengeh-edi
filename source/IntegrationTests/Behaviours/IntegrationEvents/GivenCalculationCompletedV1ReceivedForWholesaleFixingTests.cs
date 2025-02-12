@@ -57,7 +57,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
     public async Task InitializeAsync()
     {
-        await _fixture.InsertDatabricksDataAsync(_ediDatabricksOptions);
+        await _fixture.InsertWholesaleDataDatabricksDataAsync(_ediDatabricksOptions);
     }
 
     public Task DisposeAsync()
@@ -294,19 +294,19 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             ChargeTypeOwner: gridOperator.ActorNumber.Value,
             ChargeCode: "Sub-804",
             ChargeType: ChargeType.Subscription,
-            Currency: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Currency,
-            EnergySupplierNumber: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.EnergySupplier.Value,
-            SettlementMethod: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.SettlementMethod,
-            MeteringPointType: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.MeteringPointType,
-            GridArea: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.GridArea,
+            Currency: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Currency,
+            EnergySupplierNumber: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.EnergySupplier.Value,
+            SettlementMethod: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.SettlementMethod,
+            MeteringPointType: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.MeteringPointType,
+            GridArea: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.GridArea,
             OriginalTransactionIdReference: null,
             PriceMeasurementUnit: MeasurementUnit.Pieces,
             ProductCode: "5790001330590",
             QuantityMeasurementUnit: MeasurementUnit.Pieces,
-            CalculationVersion: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Version,
-            Resolution: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Resolution,
+            CalculationVersion: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Version,
+            Resolution: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Resolution,
             Period: testDataDescription.Period,
-            Points: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Points);
+            Points: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator.Points);
 
         await ThenOneOfWholesaleServicesDocumentsAreCorrect(
             peekResultsForSystemOperator,
@@ -791,16 +791,6 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<WholesaleResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary(), energySupplier.ActorNumber.Value));
-    }
-
-    private WholesaleResultForMonthlyAmountPerChargeDescription GivenDatabricksResultDataForWholesaleResultMonthlyAmountPerCharge()
-    {
-        return new WholesaleResultForMonthlyAmountPerChargeDescription();
-    }
-
-    private WholesaleResultForTotalAmountDescription GivenDatabricksResultDataForWholesaleResultTotalAmount()
-    {
-        return new WholesaleResultForTotalAmountDescription();
     }
 
     /// <summary>
