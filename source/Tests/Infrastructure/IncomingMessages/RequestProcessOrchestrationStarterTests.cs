@@ -264,7 +264,7 @@ public class RequestProcessOrchestrationStarterTests
     }
 
     [Theory]
-    [InlineData("571313101700011887", "E17", "2023-05-31T22:00:00Z", "8716867000030", "KilowattHour", "PT1H")]
+    [InlineData("571313101700011887", "E17", "2023-05-31T22:00:00Z", "8716867000030", "KWH", "PT1H")]
     [InlineData(null, null, null, null, null, null)]
     public async Task Given_MeteredDataForMeteringPoint_When_StartForwardMeteredDataForMeteringPointCalled_Then_ProcessManagerMessageClientIsCalled(
         string? expectedMeteringPointId,
@@ -372,7 +372,7 @@ public class RequestProcessOrchestrationStarterTests
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,
                 ProductNumber: expectedProductNumber,
-                MeasureUnit: expectedMeasureUnit,
+                MeasureUnit: productUnitType?.Name,
                 RegistrationDateTime: expectedRegistrationDateFrom,
                 Resolution: resolution?.Name,
                 StartDateTime: expectedStart,
