@@ -38,7 +38,7 @@
         "originalTransactionIDReference_Series.mRID": "C1875000",
         "product": "8716867000030",
         "quantity_Measure_Unit.name": {
-          "value": "KilowattHour"
+          "value": "KWH"
         },
         "registration_DateAndOrTime.dateTime": "2022-12-17T07:30:00Z",
         "Period": {
