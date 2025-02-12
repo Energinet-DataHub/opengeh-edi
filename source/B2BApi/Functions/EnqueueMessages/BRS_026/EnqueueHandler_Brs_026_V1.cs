@@ -189,7 +189,7 @@ public class EnqueueHandler_Brs_026_V1(
             };
     }
 
-    private static CalculationType MapCalculationType(string businessReason, string? settlementVersion)
+    private static CalculationType? MapCalculationType(string businessReason, string? settlementVersion)
     {
         if (businessReason != DataHubNames.BusinessReason.Correction && settlementVersion != null)
         {
@@ -209,6 +209,7 @@ public class EnqueueHandler_Brs_026_V1(
                 DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
                 DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
                 DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                null => null, // CalculationType == null means get latest correction
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
                     settlementVersion,
