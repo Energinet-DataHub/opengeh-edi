@@ -182,6 +182,16 @@ public class EnqueueHandler_Brs_026_V1(
                     TimeSeriesType.TotalConsumption,
                     TimeSeriesType.NetExchangePerGa,
                 ],
+                // Grid Operator can make requests because of DDM -> MDR hack
+                _ when WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack &&
+                       requestedForActorRole.Name == DataHubNames.ActorRole.GridAccessProvider =>
+                [
+                    TimeSeriesType.Production,
+                    TimeSeriesType.FlexConsumption,
+                    TimeSeriesType.NonProfiledConsumption,
+                    TimeSeriesType.TotalConsumption,
+                    TimeSeriesType.NetExchangePerGa,
+                ],
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(requestedForActorRole),
                     requestedForActorRole,

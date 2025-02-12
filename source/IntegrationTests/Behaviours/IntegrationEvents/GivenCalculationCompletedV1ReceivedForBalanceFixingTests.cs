@@ -96,16 +96,16 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
                                                            // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: null,
             BalanceResponsibleNumber: null,
-            SettlementMethod: testMessageData.SettlementMethod,
-            MeteringPointType: testMessageData.MeteringPointType,
-            GridAreaCode: testMessageData.GridArea,
+            SettlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
+            MeteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
+            GridAreaCode: testMessageData.ExampleMessageData.GridArea,
             OriginalTransactionIdReference: null,
             ProductCode: ProductType.EnergyActive.Code,
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
-            CalculationVersion: testMessageData.Version,
-            Resolution: testMessageData.Resolution,
+            CalculationVersion: testMessageData.ExampleMessageData.Version,
+            Resolution: testMessageData.ExampleMessageData.Resolution,
             Period: testDataDescription.Period,
-            Points: testMessageData.Points);
+            Points: testMessageData.ExampleMessageData.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
             peekResultsForMeteredDataResponsible,
@@ -420,40 +420,5 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary()));
-    }
-
-    /// <summary>
-    /// Assert that one of the messages is correct and don't care about the rest. We have no way of knowing which
-    /// message is the correct one, so we will assert all of them and count the number of failed/successful assertions.
-    /// </summary>
-    private async Task ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
-        List<PeekResultDto> peekResults,
-        DocumentFormat documentFormat,
-        NotifyAggregatedMeasureDataDocumentAssertionInput assertionInput)
-    {
-        var failedAssertions = new List<Exception>();
-        var successfulAssertions = 0;
-        foreach (var peekResultDto in peekResults)
-        {
-            try
-            {
-                using (new AssertionScope())
-                {
-                    await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
-                        peekResultDto.Bundle,
-                        documentFormat,
-                        assertionInput);
-                }
-
-                successfulAssertions++;
-            }
-            catch (Exception e)
-            {
-                failedAssertions.Add(e);
-            }
-        }
-
-        failedAssertions.Should().HaveCount(peekResults.Count - 1);
-        successfulAssertions.Should().Be(1);
     }
 }

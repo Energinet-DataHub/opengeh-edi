@@ -48,18 +48,21 @@ public class EnergyResultPerGridAreaDescription
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleEnergyResultMessageForActor ExampleEnergyResultMessageData => new(
-        GridArea: GridAreaCodes.First(),
-        MeteringPointType.Consumption,
-        SettlementMethod.Flex,
-        Resolution.Hourly,
-        null,
-        null,
-        111,
-        TimeSeriesPointsFactory.CreatePointsForDay(
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleEnergyResultMessageData => new(
+        ActorNumber: ActorNumber.Create("1111111111111"),
+        ExpectedOutgoingMessagesCount: 5,
+        ExampleMessageData: new ExampleEnergyResultMessageForActor(
+            GridArea: GridAreaCodes.First(),
+            MeteringPointType.Consumption,
+            SettlementMethod.Flex,
+            Resolution.Hourly,
+            null,
+            null,
+            111,
+            TimeSeriesPointsFactory.CreatePointsForDay(
             Period.Start,
             1928898.153m,
-            CalculatedQuantityQuality.Incomplete));
+            CalculatedQuantityQuality.Incomplete)));
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty
