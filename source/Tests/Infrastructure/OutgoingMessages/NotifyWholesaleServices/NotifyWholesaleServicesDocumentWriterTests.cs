@@ -133,7 +133,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
             EnergySupplier: SampleData.EnergySupplier,
             Period: new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc),
             SettlementVersion: null,
-            QuantityMeasureUnit: MeasurementUnit.Kwh,
+            QuantityMeasureUnit: MeasurementUnit.KilowattHour,
             Currency: Currency.DanishCrowns,
             Resolution: Resolution.Monthly,
             Points: new Collection<WholesaleServicesPoint> { new(1, null, null, 100, null) },

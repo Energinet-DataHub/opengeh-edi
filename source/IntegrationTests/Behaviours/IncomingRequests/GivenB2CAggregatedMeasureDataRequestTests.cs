@@ -163,7 +163,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
                 GridAreaCode: "512",
                 OriginalTransactionIdReference: TransactionId.From(transactionId),
                 ProductCode: ProductType.EnergyActive.Code,
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Hourly,
                 Period: new Period(

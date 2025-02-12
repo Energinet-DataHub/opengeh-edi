@@ -185,7 +185,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 GridAreaCode: "512",
                 OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: ProductType.EnergyActive.Code,
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Hourly,
                 Period: new Period(
@@ -308,7 +308,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     GridAreaCode: seriesRequest.GridArea,
                     OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                     ProductCode: ProductType.EnergyActive.Code,
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
                     Resolution: Resolution.Hourly,
                     Period: new Period(
@@ -431,7 +431,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 GridAreaCode: "512",
                 OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: ProductType.EnergyActive.Code,
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Hourly,
                 Period: new Period(
@@ -597,7 +597,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     GridAreaCode: expectedGridArea,
                     OriginalTransactionIdReference: expectedTransactionId,
                     ProductCode: ProductType.EnergyActive.Code,
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
                     Resolution: Resolution.Hourly,
                     Period: new Period(

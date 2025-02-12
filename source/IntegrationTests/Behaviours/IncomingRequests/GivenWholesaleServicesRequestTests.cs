@@ -197,9 +197,9 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
                 TransactionId.From("12356478912356478912356478912356478"),
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
+                PriceMeasurementUnit: MeasurementUnit.KilowattHour,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Hourly,
                 Period: new Period(
@@ -382,9 +382,9 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     MeteringPointType: MeteringPointType.Consumption,
                     GridArea: seriesRequest.GridArea,
                     TransactionId.From("12356478912356478912356478912356478"),
-                    PriceMeasurementUnit: MeasurementUnit.Kwh,
+                    PriceMeasurementUnit: MeasurementUnit.KilowattHour,
                     ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
                     Resolution: Resolution.Hourly,
                     Period: new Period(
@@ -514,9 +514,9 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
                 TransactionId.From("12356478912356478912356478912356478"),
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
+                PriceMeasurementUnit: MeasurementUnit.KilowattHour,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Hourly,
                 Period: new Period(
@@ -710,9 +710,9 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     MeteringPointType: MeteringPointType.Consumption,
                     GridArea: seriesRequest.GridArea,
                     OriginalTransactionIdReference: expectedTransactionId,
-                    PriceMeasurementUnit: MeasurementUnit.Kwh,
+                    PriceMeasurementUnit: MeasurementUnit.KilowattHour,
                     ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
                     Resolution: Resolution.Hourly,
                     Period: new Period(
@@ -944,9 +944,9 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             MeteringPointType: MeteringPointType.Consumption,
             GridArea: "512",
             TransactionId.From("12356478912356478912356478912356478"),
-            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            PriceMeasurementUnit: MeasurementUnit.KilowattHour,
             ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
             CalculationVersion: GetNow().ToUnixTimeTicks(),
             Resolution: Resolution.Monthly,
             Period: new Period(
@@ -975,7 +975,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             TransactionId.From("12356478912356478912356478912356478"),
             PriceMeasurementUnit: null,
             ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
             CalculationVersion: GetNow().ToUnixTimeTicks(),
             Resolution: Resolution.Monthly,
             Period: new Period(

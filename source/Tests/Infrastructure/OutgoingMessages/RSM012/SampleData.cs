@@ -51,7 +51,7 @@ internal static class SampleData
 
     public static string Product => "8716867000030";
 
-    public static MeasurementUnit QuantityMeasureUnit => MeasurementUnit.Kwh;
+    public static MeasurementUnit QuantityMeasureUnit => MeasurementUnit.KilowattHour;
 
     public static Instant RegistrationDateTime => InstantPattern.General.Parse("2022-12-17T07:30:00Z").Value;
 

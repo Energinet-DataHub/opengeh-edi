@@ -99,7 +99,7 @@ public static class EbixCode
     {
         ArgumentNullException.ThrowIfNull(measurementUnit);
 
-        if (measurementUnit == MeasurementUnit.Kwh)
+        if (measurementUnit == MeasurementUnit.KilowattHour)
             return "KWH";
         if (measurementUnit == MeasurementUnit.Pieces)
             return "H87";

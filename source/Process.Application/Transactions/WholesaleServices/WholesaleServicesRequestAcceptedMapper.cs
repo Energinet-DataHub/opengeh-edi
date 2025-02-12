@@ -136,12 +136,12 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         if (wholesaleServicesRequest is
             { HasQuantityUnit: false, Resolution: WholesaleServicesRequestSeries.Types.Resolution.Monthly })
         {
-            return MeasurementUnit.Kwh;
+            return MeasurementUnit.KilowattHour;
         }
 
         return wholesaleServicesRequest.QuantityUnit switch
         {
-            WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
+            WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.KilowattHour,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map quantity unit"),
             _ => throw new InvalidOperationException("Unknown quantity unit"),
