@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Xml;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
@@ -26,6 +27,7 @@ public sealed class AggregatedMeasureDataRequestDsl
     private readonly EdiDriver _ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly WholesaleDriver _wholesaleDriver;
+    private readonly ProcessManagerDriver _processManagerDriver;
     private readonly B2CEdiDriver _b2cEdiDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
@@ -34,12 +36,14 @@ public sealed class AggregatedMeasureDataRequestDsl
         EdiDriver ediDriver,
         B2CEdiDriver b2cEdiDriver,
         EdiDatabaseDriver ediDatabaseDriver,
-        WholesaleDriver wholesaleDriver)
+        WholesaleDriver wholesaleDriver,
+        ProcessManagerDriver processManagerDriver)
     {
         _ediDriver = ediDriver;
         _b2cEdiDriver = b2cEdiDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
         _wholesaleDriver = wholesaleDriver;
+        _processManagerDriver = processManagerDriver;
     }
 
     internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload)
@@ -126,5 +130,20 @@ public sealed class AggregatedMeasureDataRequestDsl
 
         await _wholesaleDriver.PublishAggregatedMeasureDataRequestRejectedResponseAsync(processId, cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    internal async Task PublishAcceptedBrs026RequestAsync(
+        string gridAreaCode,
+        Actor actor)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _processManagerDriver.PublishAcceptedBrs026RequestAsync(gridAreaCode, actor);
+    }
+
+    internal async Task PublishRejectedBrs026RequestAsync(
+        Actor actor)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _processManagerDriver.PublishRejectedBrs026RequestAsync(actor);
     }
 }

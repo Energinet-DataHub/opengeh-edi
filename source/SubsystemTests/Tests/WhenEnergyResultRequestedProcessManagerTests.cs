@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
-using NodaTime;
+using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
+using FluentAssertions;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
@@ -26,17 +28,19 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     "Usage",
     "CA2007",
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
+[TestCaseOrderer(
+    ordererTypeName: "Energinet.DataHub.EDI.SubsystemTests.TestOrdering.TestOrderer",
+    ordererAssemblyName: "Energinet.DataHub.Wholesale.SubsystemTests")]
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
-internal sealed class WhenEnergyResultRequestedTests : BaseTestClass
-#pragma warning restore xUnit1000
+
+// TODO: Rename this to brs026 when we have deleted the old request tests
+public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
-    private readonly string _energySupplierActorNumber;
 
-    public WhenEnergyResultRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public WhenEnergyResultRequestedProcessManagerTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -55,30 +59,24 @@ internal sealed class WhenEnergyResultRequestedTests : BaseTestClass
                 new EdiDatabaseDriver(fixture.ConnectionString),
                 wholesaleDriver,
                 new ProcessManagerDriver(fixture.EdiTopicClient));
-
-        _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
     [Fact]
-    public async Task Actor_can_request_aggregated_measure_data()
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
+    public async Task B2B_actor_can_request_aggregated_measure_data()
     {
-        var messageId = await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
+        var act = async () => await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
 
-        await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
-            messageId,
-            CancellationToken.None);
+        await act.Should().NotThrowAsync("because the request should be valid");
     }
 
     [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task B2C_actor_can_request_aggregated_measure_data()
     {
-        var createdAfter = SystemClock.Instance.GetCurrentInstant();
-        var energySupplierActorNumber = _energySupplierActorNumber;
-        await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
+        var act = async () => await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
 
-        await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
-            createdAfter,
-            requestedByActorNumber: energySupplierActorNumber);
+        await act.Should().NotThrowAsync("because the request should be valid");
     }
 
     [Fact]
@@ -90,10 +88,9 @@ internal sealed class WhenEnergyResultRequestedTests : BaseTestClass
     [Fact]
     public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
     {
-        await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestAcceptedResponse(
+        await _aggregatedMeasureDataRequest.PublishAcceptedBrs026RequestAsync(
             "804",
-            SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
-            CancellationToken.None);
+            new Actor(ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber), ActorRole.EnergySupplier));
 
         await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailable();
     }
@@ -101,11 +98,9 @@ internal sealed class WhenEnergyResultRequestedTests : BaseTestClass
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
     {
-         await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestRejectedResponse(
-            "804",
-            SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
-            CancellationToken.None);
+        await _aggregatedMeasureDataRequest.PublishRejectedBrs026RequestAsync(
+            new Actor(ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber), ActorRole.EnergySupplier));
 
-         await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailable();
+        await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailable();
     }
 }
