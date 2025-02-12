@@ -62,7 +62,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    [Order(100)]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task B2B_actor_can_request_wholesale_settlement()
     {
         var act = async () => await _wholesaleSettlementRequest.Request(CancellationToken.None);
@@ -71,7 +71,7 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    [Order(100)]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task B2C_actor_can_request_wholesale_settlement()
     {
         var act = async () => await _wholesaleSettlementRequest.B2CRequest(CancellationToken.None);
@@ -80,14 +80,12 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    [Order(10)]
     public async Task Actor_get_sync_rejected_response_when_wholesale_settlement_request_is_invalid()
     {
         await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
-    [Order(11)]
     public async Task Actor_can_peek_and_dequeue_response_from_wholesale_settlement_request()
     {
         await _wholesaleSettlementRequest.PublishAcceptedBrs028RequestAsync(
@@ -100,7 +98,6 @@ public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTe
     }
 
     [Fact]
-    [Order(12)]
     public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_settlement_request()
     {
         await _wholesaleSettlementRequest.PublishRejectedBrs028RequestAsync(

@@ -45,7 +45,7 @@ public static class EnqueueBrs026MessageFactory
             PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             PeriodEnd: InstantPattern.General.Parse("2023-02-02T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             GridAreas: [gridArea],
-            EnergySupplierNumber: null, // This gives a successful response. But the peeking actor is an energy supplier. Hence this should not be null
+            EnergySupplierNumber: null, // "EnergySupplierNumber" should contain the peeking energy supplier number. But there is no data for the peeking actor resulting in a reject
             BalanceResponsibleNumber: balanceResponsible,
             MeteringPointType: ProcessManagerTypes.MeteringPointType.Consumption,
             SettlementMethod: ProcessManagerTypes.SettlementMethod.Flex,
@@ -89,7 +89,7 @@ public static class EnqueueBrs026MessageFactory
         enqueueActorMessages.SetData(data);
 
         return enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{_orchestrationName.ToLower()}",
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(_orchestrationName),
             idempotencyKey: Guid.NewGuid().ToString());
     }
 }

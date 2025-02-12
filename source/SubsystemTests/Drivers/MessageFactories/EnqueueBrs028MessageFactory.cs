@@ -88,7 +88,7 @@ public class EnqueueBrs028MessageFactory
         enqueueActorMessages.SetData(data);
 
         return enqueueActorMessages.ToServiceBusMessage(
-            subject: $"Enqueue_{_orchestrationName.ToLower()}",
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(_orchestrationName),
             idempotencyKey: Guid.NewGuid().ToString());
     }
 }

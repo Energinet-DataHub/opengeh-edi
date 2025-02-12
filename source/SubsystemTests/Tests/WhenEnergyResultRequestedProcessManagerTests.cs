@@ -62,7 +62,7 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
-    [Order(100)]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task B2B_actor_can_request_aggregated_measure_data()
     {
         var act = async () => await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
@@ -71,7 +71,7 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
-    [Order(100)]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task B2C_actor_can_request_aggregated_measure_data()
     {
         var act = async () => await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
@@ -80,14 +80,12 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
-    [Order(10)]
     public async Task Actor_get_bad_request_when_aggregated_measure_data_request_is_invalid()
     {
         await _aggregatedMeasureDataRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
-    [Order(11)]
     public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
     {
         await _aggregatedMeasureDataRequest.PublishAcceptedBrs026RequestAsync(
@@ -98,7 +96,6 @@ public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
     }
 
     [Fact]
-    [Order(12)]
     public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
     {
         await _aggregatedMeasureDataRequest.PublishRejectedBrs026RequestAsync(
