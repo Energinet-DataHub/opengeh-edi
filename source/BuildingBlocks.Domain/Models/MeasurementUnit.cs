@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public class MeasurementUnit : DataHubType<MeasurementUnit>
 {
     // Tariffs are measured in Kwh
-    public static readonly MeasurementUnit Kwh = new(PMTypes.MeasurementUnit.KilowattHour.Name, "KWH");
+    public static readonly MeasurementUnit KilowattHour = new(PMTypes.MeasurementUnit.KilowattHour.Name, "KWH");
 
     // Subscription and Fees are measured in pieces
     public static readonly MeasurementUnit Pieces = new(PMTypes.MeasurementUnit.Pieces.Name, "H87");
@@ -38,7 +38,7 @@ public class MeasurementUnit : DataHubType<MeasurementUnit>
 
         var chargeTypeToMeasurementUnitMap = new Dictionary<ChargeType, MeasurementUnit>
         {
-            { ChargeType.Tariff, Kwh },
+            { ChargeType.Tariff, KilowattHour },
             { ChargeType.Subscription, Pieces },
             { ChargeType.Fee, Pieces },
         };

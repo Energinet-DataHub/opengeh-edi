@@ -93,7 +93,7 @@ public class NotifyAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocumentWri
                     DocumentDetails.Prefix,
                     "quantity_Measure_Unit.name",
                     null,
-                    MeasurementUnit.FromName(timeSeries.MeasureUnitType).Code)
+                    timeSeries.MeasureUnitType == "KWH" ? MeasurementUnit.KilowattHour.Code : MeasurementUnit.FromName(timeSeries.MeasureUnitType).Code)
                 .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Period", null).ConfigureAwait(false);

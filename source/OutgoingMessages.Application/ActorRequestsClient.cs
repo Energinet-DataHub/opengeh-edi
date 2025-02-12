@@ -97,7 +97,7 @@ public class ActorRequestsClient(
                 gridAreaCode: result.GridArea,
                 meteringPointType: GetMeteringPointType(result.TimeSeriesType).Name,
                 settlementMethod: GetSettlementMethod(result.TimeSeriesType),
-                measureUnitType: MeasurementUnit.Kwh.Name, // "Unit is always Kwh for energy results" - it is hardcoded in the AggregatedTimeSeriesRequestAcceptedMessageFactory
+                measureUnitType: MeasurementUnit.KilowattHour.Name, // "Unit is always Kwh for energy results" - it is hardcoded in the AggregatedTimeSeriesRequestAcceptedMessageFactory
                 resolution: GetResolution(result.Resolution).Name,
                 energySupplierNumber: aggregatedTimeSeriesQueryParameters.EnergySupplierId,
                 balanceResponsibleNumber: aggregatedTimeSeriesQueryParameters.BalanceResponsibleId,
@@ -501,11 +501,11 @@ public class ActorRequestsClient(
     private MeasurementUnit GetQuantityMeasureUnit(QuantityUnit? quantityUnit, Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)
     {
         if (quantityUnit is null && resolution == Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month)
-            return MeasurementUnit.Kwh;
+            return MeasurementUnit.KilowattHour;
 
         return quantityUnit switch
         {
-            QuantityUnit.Kwh => MeasurementUnit.Kwh,
+            QuantityUnit.Kwh => MeasurementUnit.KilowattHour,
             QuantityUnit.Pieces => MeasurementUnit.Pieces,
             _ => throw new ArgumentException($"Invalid quantity unit {quantityUnit} and resolution {resolution} combination"),
         };

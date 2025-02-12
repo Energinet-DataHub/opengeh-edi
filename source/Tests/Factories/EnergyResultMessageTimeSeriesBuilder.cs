@@ -37,7 +37,7 @@ public class EnergyResultMessageTimeSeriesBuilder
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private SettlementMethod? _settlementMethod = SettlementMethod.NonProfiled;
-    private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
+    private MeasurementUnit _measurementUnit = MeasurementUnit.KilowattHour;
     private Resolution _resolution = Resolution.QuarterHourly;
     private string? _energySupplierNumber;
     private string? _balanceResponsibleNumber;

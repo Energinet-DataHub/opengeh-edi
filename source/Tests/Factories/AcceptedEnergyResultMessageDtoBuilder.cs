@@ -44,7 +44,7 @@ public class AcceptedEnergyResultMessageDtoBuilder
             GridAreaCode,
             MeteringPointType.Consumption.Name,
             SettlementMethod.NonProfiled.Name,
-            MeasurementUnit.Kwh.Name,
+            MeasurementUnit.KilowattHour.Name,
             Resolution.Hourly.Name,
             _receiverNumber.Value,
             null,

@@ -114,7 +114,7 @@ public sealed class NotifyAggregatedMeasureDataCimJsonDocumentWriter(
             writer.WriteProperty("product", ProductType.EnergyActive.Code);
             writer.WriteObject(
                 "quantity_Measure_Unit.name",
-                new KeyValuePair<string, string>("value", MeasurementUnit.FromName(series.MeasureUnitType).Code));
+                new KeyValuePair<string, string>("value", series.MeasureUnitType == "KWH" ? MeasurementUnit.KilowattHour.Code : MeasurementUnit.FromName(series.MeasureUnitType).Code));
 
             if (series.SettlementVersion is not null)
             {

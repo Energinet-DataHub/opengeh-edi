@@ -50,7 +50,7 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
                 "123",
                 MeteringPointType.Consumption.Name,
                 SettlementMethod.Flex.Name,
-                MeasurementUnit.Kwh.Name,
+                MeasurementUnit.KilowattHour.Name,
                 Resolution.QuarterHourly.Name,
                 "1234567891234",
                 null,

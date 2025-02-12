@@ -112,9 +112,10 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteStringAsync(ProductType.EnergyActive.Code).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
+            var ebixCode = timeSeries.MeasureUnitType == "KWH" ? EbixCode.Of(MeasurementUnit.KilowattHour) : EbixCode.Of(MeasurementUnit.FromName(timeSeries.MeasureUnitType));
             await WriteCodeWithCodeListReferenceAttributesAsync(
                     "UnitType",
-                    EbixCode.Of(MeasurementUnit.FromName(timeSeries.MeasureUnitType)),
+                    ebixCode,
                     writer)
                 .ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);

@@ -173,9 +173,9 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
                 OriginalTransactionIdReference: TransactionId.From(transactionId),
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
+                PriceMeasurementUnit: MeasurementUnit.KilowattHour,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Monthly,
                 Period: new Period(
