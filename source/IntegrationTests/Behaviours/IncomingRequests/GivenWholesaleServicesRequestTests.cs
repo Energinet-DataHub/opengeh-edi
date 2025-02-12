@@ -137,7 +137,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 energySupplierNumber.Value,
                 chargeOwnerNumber.Value,
                 null,
-                DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason.WholesaleFixing.Name,
                 new List<(string ChargeType, string? ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));
@@ -310,7 +310,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -449,7 +449,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 EnergySupplierId: energySupplierOrNull?.Value,
                 ChargeOwnerId: chargeOwnerOrNull?.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: null,
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
@@ -587,7 +587,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     EnergySupplierId: energySupplierNumber.Value,
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
-                    BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                    BusinessReason: BusinessReason.WholesaleFixing.Name,
                     ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -603,7 +603,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     EnergySupplierId: energySupplierNumber.Value,
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
-                    BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                    BusinessReason: BusinessReason.WholesaleFixing.Name,
                     ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -619,7 +619,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     EnergySupplierId: energySupplierNumber.Value,
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
-                    BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                    BusinessReason: BusinessReason.WholesaleFixing.Name,
                     ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -768,7 +768,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 energySupplierNumber.Value,
                 chargeOwnerNumber.Value,
                 null,
-                DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason.WholesaleFixing.Name,
                 new List<(string ChargeType, string? ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));
@@ -889,7 +889,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 energySupplierNumber.Value,
                 chargeOwnerNumber.Value,
                 Resolution.Monthly.Name,
-                DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason.WholesaleFixing.Name,
                 null,
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));

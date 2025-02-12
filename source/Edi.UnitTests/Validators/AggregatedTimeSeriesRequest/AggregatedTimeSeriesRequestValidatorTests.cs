@@ -128,7 +128,7 @@ public class AggregatedTimeSeriesRequestValidatorTests : EdiTestBase
         // Arrange
         var request = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithBusinessReason(DataHubNames.BusinessReason.Correction)
+            .WithBusinessReason(BusinessReason.Correction.Name)
             .WithSettlementVersion("invalid-settlement-version")
             .Build();
 

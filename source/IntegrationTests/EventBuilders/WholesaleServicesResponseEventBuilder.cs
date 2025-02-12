@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
@@ -91,7 +92,7 @@ public static class WholesaleServicesResponseEventBuilder
                                 StartOfPeriod = periodStart.ToTimestamp(), EndOfPeriod = periodEnd.ToTimestamp(),
                             },
                             Resolution = resolution,
-                            CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
+                            CalculationType = request.BusinessReason == BusinessReason.WholesaleFixing.Name
                                 ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
                                 : throw new NotImplementedException(
                                     "Builder only supports WholesaleFixing, not corrections"),
@@ -131,7 +132,7 @@ public static class WholesaleServicesResponseEventBuilder
                             EndOfPeriod = periodEnd.ToTimestamp(),
                         },
                         Resolution = WholesaleServicesRequestSeries.Types.Resolution.Monthly,
-                        CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
+                        CalculationType = request.BusinessReason == BusinessReason.WholesaleFixing.Name
                             ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
                             : throw new NotImplementedException("Builder only supports WholesaleFixing, not corrections"),
                         ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : defaultChargeOwnerId!,

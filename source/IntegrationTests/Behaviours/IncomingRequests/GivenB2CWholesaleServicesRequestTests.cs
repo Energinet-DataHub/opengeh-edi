@@ -110,7 +110,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
                 energySupplierNumber.Value,
                 null,
                 Resolution.Monthly.Name,
-                DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, null),

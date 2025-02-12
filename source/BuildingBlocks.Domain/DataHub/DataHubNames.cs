@@ -28,18 +28,6 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 public static class DataHubNames
 {
     // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class BusinessReason
-    {
-        public const string MoveIn = "MoveIn";
-        public const string BalanceFixing = "BalanceFixing";
-        public const string PreliminaryAggregation = "PreliminaryAggregation";
-        public const string WholesaleFixing = "WholesaleFixing";
-        public const string Correction = "Correction";
-        public const string PeriodicMetering = "PeriodicMetering";
-        public const string PeriodicFlexMetering = "PeriodicFlexMetering";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class ChargeType
     {
         public const string Subscription = "Subscription";

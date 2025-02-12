@@ -42,7 +42,7 @@ public class AggregatedTimeSeriesRequestBuilder
         _requestedByActorRole = DataHubNames.ActorRole.EnergySupplier;
         _requestedByActorNumber = EnergySupplierValidatorTest.ValidGlnNumber;
         _energySupplierId = _requestedByActorNumber;
-        _businessReason = DataHubNames.BusinessReason.BalanceFixing;
+        _businessReason = BusinessReason.BalanceFixing.Name;
     }
 
     public static AggregatedTimeSeriesRequestBuilder AggregatedTimeSeriesRequest()

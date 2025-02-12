@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
@@ -34,6 +35,8 @@ using PMMeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstract
 using PMSettlementMethod = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod;
 using PMSettlementVersion = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion;
 using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
+using SettlementVersion = Energinet.DataHub.Edi.Responses.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -77,7 +80,7 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                     TimeSeriesPoints = { points },
                 };
 
-                if (request.BusinessReason == DataHubNames.BusinessReason.Correction)
+                if (request.BusinessReason == BusinessReason.Correction.Name)
                 {
                     series.SettlementVersion = request.SettlementVersion switch
                     {

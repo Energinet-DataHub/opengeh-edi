@@ -250,7 +250,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             },
             RequestedForActorNumber = "1234567891234",
             RequestedForActorRole = DataHubNames.ActorRole.EnergySupplier,
-            BusinessReason = DataHubNames.BusinessReason.BalanceFixing,
+            BusinessReason = BusinessReason.BalanceFixing.Name,
 
             // Optional
             SettlementMethod = settlementMethod,

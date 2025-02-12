@@ -147,7 +147,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -298,7 +298,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -455,7 +455,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -598,7 +598,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -734,7 +734,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
@@ -887,7 +887,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
