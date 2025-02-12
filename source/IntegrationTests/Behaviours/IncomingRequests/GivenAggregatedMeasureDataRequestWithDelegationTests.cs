@@ -217,7 +217,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                 GridAreaCode: "512",
                 OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: "8716867000030", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Hourly,
                 Period: new Period(
@@ -484,7 +484,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                 GridAreaCode: "512",
                 OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: "8716867000030", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
                 Resolution: Resolution.Hourly,
                 Period: new Period(
@@ -632,7 +632,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                     GridAreaCode: seriesRequest.GridArea,
                     OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                     ProductCode: "8716867000030", // Example says "8716867000030", but document writes as "5790001330590"?
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
                     Resolution: Resolution.Hourly,
                     Period: new Period(
@@ -915,7 +915,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                     GridAreaCode: seriesRequest.GridArea,
                     OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                     ProductCode: ProductType.EnergyActive.Code,
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
                     Resolution: Resolution.Hourly,
                     Period: new Period(

@@ -112,9 +112,11 @@ public sealed class NotifyAggregatedMeasureDataCimJsonDocumentWriter(
                 "marketEvaluationPoint.type",
                 new KeyValuePair<string, string>("value", MeteringPointType.FromName(series.MeteringPointType).Code));
             writer.WriteProperty("product", ProductType.EnergyActive.Code);
+
+            var outdatedValue = string.Equals(series.MeasureUnitType, "Kwh", StringComparison.InvariantCultureIgnoreCase);
             writer.WriteObject(
                 "quantity_Measure_Unit.name",
-                new KeyValuePair<string, string>("value", MeasurementUnit.FromName(series.MeasureUnitType).Code));
+                new KeyValuePair<string, string>("value", outdatedValue ? MeasurementUnit.KilowattHour.Code : MeasurementUnit.FromName(series.MeasureUnitType).Code));
 
             if (series.SettlementVersion is not null)
             {

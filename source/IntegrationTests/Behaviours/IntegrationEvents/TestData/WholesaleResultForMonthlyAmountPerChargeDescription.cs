@@ -71,7 +71,7 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         65,
         Points: TimeSeriesPointsFactory
             .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 61754.247M, null),
-        MeasurementUnit: MeasurementUnit.Kwh);
+        MeasurementUnit: MeasurementUnit.KilowattHour);
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForChargeOwner => new(
         GridArea: GridAreaCodes.First(),
