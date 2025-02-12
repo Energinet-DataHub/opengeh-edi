@@ -405,7 +405,11 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
         // Generate a mock ServiceBus Message with RequestCalculatedEnergyTimeSeriesAcceptedV1 response from Process Manager,
         // based on the RequestCalculatedEnergyTimeSeriesInputV1
         // since (almost) all assertion after this point is based on this data
-        var defaultGridAreas = gridAreaOrNull == null ? new List<string> { testMessageData.ExampleMessageData.GridArea } : null;
+        var defaultGridAreas = gridAreaOrNull != null
+            ? null
+            : actorRole == ActorRole.EnergySupplier
+                ? GivenDatabricksResultDataForEnergyResultPerEnergySupplier().GridAreaCodes
+                : new List<string> { testMessageData.ExampleMessageData.GridArea };
         var requestCalculatedEnergyTimeSeriesInput = message.ParseInput<RequestCalculatedEnergyTimeSeriesInputV1>();
         var requestCalculatedEnergyTimeSeriesAccepted = AggregatedTimeSeriesResponseEventBuilder
             .GenerateAcceptedFrom(requestCalculatedEnergyTimeSeriesInput, defaultGridAreas);
