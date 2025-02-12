@@ -422,21 +422,6 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary()));
     }
 
-    private EnergyResultPerGridAreaDescription GivenDatabricksResultDataForEnergyResultPerGridArea()
-    {
-        return new EnergyResultPerGridAreaDescription();
-    }
-
-    private EnergyResultPerBrpGridAreaDescription GivenDatabricksResultDataForEnergyResultPerBalanceResponsible()
-    {
-        return new EnergyResultPerBrpGridAreaDescription();
-    }
-
-    private EnergyResultPerEnergySupplierBrpGridAreaDescription GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
-    {
-        return new EnergyResultPerEnergySupplierBrpGridAreaDescription();
-    }
-
     /// <summary>
     /// Assert that one of the messages is correct and don't care about the rest. We have no way of knowing which
     /// message is the correct one, so we will assert all of them and count the number of failed/successful assertions.

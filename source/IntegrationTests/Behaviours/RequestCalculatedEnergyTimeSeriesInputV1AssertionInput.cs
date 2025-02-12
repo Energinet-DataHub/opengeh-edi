@@ -13,16 +13,20 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
-public record ExampleEnergyResultMessageForActor(
-    string GridArea,
+public record RequestCalculatedEnergyTimeSeriesInputV1AssertionInput(
+    TransactionId TransactionId,
+    string RequestedForActorNumber,
+    string RequestedForActorRole,
+    BusinessReason BusinessReason,
+    Instant PeriodStart,
+    Instant? PeriodEnd,
+    string EnergySupplierNumber,
+    string BalanceResponsibleNumber,
+    IEnumerable<string> GridAreas,
     MeteringPointType MeteringPointType,
     SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+    string? SettlementVersion);
