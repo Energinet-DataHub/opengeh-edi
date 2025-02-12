@@ -28,6 +28,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Options;
 using NodaTime;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -454,6 +455,119 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                     CreateDateInstant(2022, 01, 12),
                     CreateDateInstant(2022, 01, 13)),
                 Points: testMessageData.ExampleMessageData.Points));
+    }
+
+    [Theory]
+    [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
+    public async Task
+        AndGiven_NoDataInGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneRejectNotifyAggregatedMeasureDataDocumentWithCorrectContent(
+            ActorRole actorRole,
+            DocumentFormat incomingDocumentFormat,
+            DocumentFormat peekDocumentFormat)
+    {
+        /*
+         *  --- PART 1: Receive request and send message to Process Manager ---
+         */
+
+        // Arrange
+        var testDataDescription = GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
+        var testMessageData = actorRole == ActorRole.EnergySupplier
+             ? testDataDescription.ExampleEnergySupplier
+             : testDataDescription.ExampleBalanceResponsible;
+
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
+        var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
+        var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
+        var transactionId = TransactionId.From("12356478912356478912356478912356478");
+
+        var gridAreaWithNoData = "000";
+
+        // Act
+        await GivenReceivedAggregatedMeasureDataRequest(
+            documentFormat: incomingDocumentFormat,
+            senderActorNumber: actor.ActorNumber,
+            senderActorRole: actor.ActorRole,
+            meteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
+            settlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
+            periodStart: (2022, 1, 1),
+            periodEnd: (2022, 2, 1),
+            energySupplier: energySupplierNumber,
+            balanceResponsibleParty: balanceResponsibleParty,
+            new (string? GridArea, TransactionId TransactionId)[]
+            {
+                (gridAreaWithNoData, transactionId),
+            });
+
+        // Assert
+        var message = ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessageIsCorrect(
+            senderSpy,
+            new RequestCalculatedEnergyTimeSeriesInputV1AssertionInput(
+                transactionId,
+                actor.ActorNumber.Value,
+                actor.ActorRole.Name,
+                BusinessReason.BalanceFixing,
+                PeriodStart: CreateDateInstant(2022, 1, 1),
+                PeriodEnd: CreateDateInstant(2022, 2, 1),
+                energySupplierNumber!.Value,
+                balanceResponsibleParty!.Value,
+                new List<string> { gridAreaWithNoData },
+                SettlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
+                MeteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
+                SettlementVersion: null));
+
+        /*
+         *  --- PART 2: Receive data from Process Manager and create RSM document ---
+         */
+
+        // Arrange
+        var expectedErrorMessage = "Ingen data tilgængelig / No data available";
+        var expectedErrorCode = "E0H";
+
+        // Generate a mock ServiceBus Message with RequestCalculatedEnergyTimeSeriesAcceptedV1 response from Process Manager,
+        // based on the RequestCalculatedEnergyTimeSeriesInputV1
+        // It is very important that the generated data is correct,
+        // since (almost) all assertion after this point is based on this data
+        var requestCalculatedEnergyTimeSeriesInput = message.ParseInput<RequestCalculatedEnergyTimeSeriesInputV1>();
+        var requestCalculatedEnergyTimeSeriesRejected = AggregatedTimeSeriesResponseEventBuilder
+            .GenerateRejectedFrom(requestCalculatedEnergyTimeSeriesInput, expectedErrorMessage, expectedErrorCode);
+
+        await GivenAggregatedMeasureDataRequestRejectedIsReceived(
+            requestCalculatedEnergyTimeSeriesRejected);
+
+        // Act
+        var peekResults = await WhenActorPeeksAllMessages(
+            actor.ActorNumber,
+            actor.ActorRole,
+            peekDocumentFormat);
+
+        // Assert
+        PeekResultDto peekResult;
+        using (new AssertionScope())
+        {
+            peekResult = peekResults
+                .Should()
+                .ContainSingle("because there should be one message when requesting for one grid area")
+                .Subject;
+        }
+
+        peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
+
+        await ThenRejectRequestAggregatedMeasureDataDocumentIsCorrect(
+            peekResult.Bundle,
+            peekDocumentFormat,
+            new(
+                BusinessReason.BalanceFixing,
+                "5790001330552",
+                actor.ActorNumber.Value,
+                InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value,
+                ReasonCode.FullyRejected.Code,
+                transactionId,
+                expectedErrorCode,
+                expectedErrorMessage));
     }
 
     public async Task InitializeAsync()

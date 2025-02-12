@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
@@ -181,6 +182,43 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         }
 
         return rejectedResponse;
+    }
+
+    public static ServiceBusMessage GenerateRejectedFrom(
+        RequestCalculatedEnergyTimeSeriesInputV1 requestCalculatedEnergyTimeSeriesInput,
+        string errorMessage,
+        string errorCode)
+    {
+        var validationErrors = new List<ValidationErrorDto>()
+        {
+            new(
+                errorMessage,
+                errorCode),
+        };
+        var rejectRequest = new RequestCalculatedEnergyTimeSeriesRejectedV1(
+            OriginalMessageId: requestCalculatedEnergyTimeSeriesInput.ActorMessageId,
+            OriginalTransactionId: requestCalculatedEnergyTimeSeriesInput.TransactionId,
+            RequestedForActorNumber: PMActorNumber.Create(requestCalculatedEnergyTimeSeriesInput.RequestedForActorNumber),
+            RequestedForActorRole: PMActorRole.FromName(requestCalculatedEnergyTimeSeriesInput.RequestedForActorRole),
+            RequestedByActorNumber: PMActorNumber.Create(requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber),
+            RequestedByActorRole: PMActorRole.FromName(requestCalculatedEnergyTimeSeriesInput.RequestedByActorRole),
+            BusinessReason: PMBusinessReason.FromName(requestCalculatedEnergyTimeSeriesInput.BusinessReason),
+            validationErrors);
+
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_026.Name,
+            OrchestrationVersion = Brs_026.V1.Version,
+            OrchestrationStartedByActorId = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+            OrchestrationInstanceId = Guid.NewGuid().ToString(),
+        };
+        enqueueActorMessages.SetData(rejectRequest);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_026.Name),
+            idempotencyKey: Guid.NewGuid().ToString());
+
+        return serviceBusMessage;
     }
 
     private static TimeSeriesType GetTimeSeriesType(string? settlementMethodName, string? meteringPointTypeName)

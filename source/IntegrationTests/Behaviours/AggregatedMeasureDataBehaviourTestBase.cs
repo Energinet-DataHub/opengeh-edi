@@ -104,6 +104,11 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         await GivenProcessManagerResponseIsReceived(acceptedMessage);
     }
 
+    protected async Task GivenAggregatedMeasureDataRequestRejectedIsReceived(ServiceBusMessage rejectedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(rejectedMessage);
+    }
+
     protected async Task<string> GetGridAreaFromNotifyAggregatedMeasureDataDocument(Stream documentStream, DocumentFormat documentFormat)
     {
         documentStream.Position = 0;
