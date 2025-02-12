@@ -120,7 +120,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
     {
         return aggregation.QuantityUnit switch
         {
-            QuantityUnit.Kwh => MeasurementUnit.Kwh,
+            QuantityUnit.Kwh => MeasurementUnit.KilowattHour,
             QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map unit type"),
             _ => throw new InvalidOperationException("Unknown unit type"),
         };

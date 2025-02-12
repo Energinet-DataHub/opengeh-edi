@@ -47,9 +47,9 @@ internal static class SampleData
 
     public static BusinessReason BusinessReason => BusinessReason.WholesaleFixing;
 
-    public static MeasurementUnit MeasurementUnit => MeasurementUnit.Kwh;
+    public static MeasurementUnit MeasurementUnit => MeasurementUnit.KilowattHour;
 
-    public static MeasurementUnit PriceMeasureUnit => MeasurementUnit.Kwh;
+    public static MeasurementUnit PriceMeasureUnit => MeasurementUnit.KilowattHour;
 
     public static Currency Currency => Currency.DanishCrowns;
 
