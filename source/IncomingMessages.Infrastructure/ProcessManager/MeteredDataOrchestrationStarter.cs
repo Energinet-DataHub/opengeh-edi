@@ -63,9 +63,9 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                     operatingIdentity: actorIdentityDto,
                     new MeteredDataForMeteringPointMessageInputV1(
                         MessageId: initializeProcessDto.MessageId,
-                        AuthenticatedActorId: Guid.Empty, // TODO: Is this used?
+                        AuthenticatedActorId: Guid.Empty, // TODO: This is not used and should be removed from the contract
                         ActorNumber: actorIdentityDto.ActorNumber,
-                        ActorRole: actorIdentityDto.ActorRole, // TODO: Why was this code? This is now the name, which it should be.
+                        ActorRole: actorIdentityDto.ActorRole,
                         TransactionId: transaction.TransactionId,
                         MeteringPointId: transaction.MeteringPointLocationId,
                         MeteringPointType: meteringPointType,

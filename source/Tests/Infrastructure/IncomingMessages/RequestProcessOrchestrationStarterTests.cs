@@ -339,13 +339,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup authenticated actor
         var expectedActor = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
-        var expectedActorClientId = Guid.NewGuid();
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
             ActorNumber.Create("1111111111111"),
             Restriction.None,
             ActorRole.GridAccessProvider,
-            expectedActorClientId));
+            Guid.NewGuid()));
 
         var sut = new MeteredDataOrchestrationStarter(
             processManagerClient.Object,
@@ -367,9 +366,9 @@ public class RequestProcessOrchestrationStarterTests
             operatingIdentity: new ActorIdentityDto(expectedActor.ActorNumber.Value, expectedActor.ActorRole.Name),
             inputParameter: new MeteredDataForMeteringPointMessageInputV1(
                 MessageId: messageId,
-                AuthenticatedActorId: expectedActorClientId,
+                AuthenticatedActorId: Guid.Empty, // This is not used and should be removed from the contract
                 ActorNumber: requestedByActor.ActorNumber.Value,
-                ActorRole: requestedByActor.ActorRole.Code,
+                ActorRole: requestedByActor.ActorRole.Name,
                 TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,
