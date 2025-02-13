@@ -67,7 +67,7 @@ public static class WholesaleServicesResponseEventBuilder
         // If no charge types are specified, add some default charge types representing the different charges an actor can have.
         var chargeTypes = request.ChargeTypes.ToList();
         if (chargeTypes.Count == 0)
-            chargeTypes.Add(new ChargeType { ChargeCode = "12345678", ChargeType_ = DataHubNames.ChargeType.Tariff });
+            chargeTypes.Add(new ChargeType { ChargeCode = "12345678", ChargeType_ = BuildingBlocks.Domain.Models.ChargeType.Tariff.Name });
 
         var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
         var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;

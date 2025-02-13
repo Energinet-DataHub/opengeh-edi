@@ -113,7 +113,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
                 BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
-                    (DataHubNames.ChargeType.Tariff, null),
+                    (ChargeType.Tariff.Name, null),
                 },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));

@@ -586,7 +586,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 chargeOwnerNumber.Value,
                 new List<string> { gridArea },
                 SettlementVersion: null,
-                new List<ChargeTypeInput> { new(DataHubNames.ChargeType.Tariff, "25361478") }));
+                new List<ChargeTypeInput> { new(ChargeType.Tariff.Name, "25361478") }));
 
         /*
          *  --- PART 2: Receive reject response from Process Manager and create RSM document ---

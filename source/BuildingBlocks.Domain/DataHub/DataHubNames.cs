@@ -27,14 +27,6 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Keep names in a single file to easily share with Wholesale")]
 public static class DataHubNames
 {
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class ChargeType
-    {
-        public const string Subscription = "Subscription";
-        public const string Fee = "Fee";
-        public const string Tariff = "Tariff";
-    }
-
     public static class Currency
     {
         public const string DanishCrowns = "DanishCrowns";
