@@ -14,6 +14,7 @@
 
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -46,6 +47,12 @@ public class ActorRole : DataHubType<ActorRole>
     private ActorRole(string name, string code)
         : base(name, code)
     {
+    }
+
+    public static ActorRole Create(ProcessManager.Components.Abstractions.ValueObjects.ActorRole actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        return FromName(actorNumber.Name) ?? throw InvalidActorNumberException.Create(actorNumber.Name);
     }
 
     public override string ToString()

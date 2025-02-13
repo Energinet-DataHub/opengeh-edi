@@ -75,7 +75,7 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             "MINIMUM_DEQUEUED_MESSAGES_COUNT",
             defaultValue: 0);
 
-        EdiInboxClient = new EdiInboxClient(
+        EdiInboxClient = new ServiceBusSenderClient(
             _serviceBusClient,
             GetConfigurationValue<string>(configuration, "sbq-edi-inbox-messagequeue-name"));
 
@@ -89,7 +89,7 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
         TelemetryClient = new TelemetryClient(telemetryConfiguration);
     }
 
-    internal EdiInboxClient EdiInboxClient { get; }
+    internal ServiceBusSenderClient EdiInboxClient { get; }
 
     internal Guid LoadTestCalculationId { get; }
 

@@ -90,6 +90,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         var serviceBusFullyQualifiedNamespace = $"{GetConfigurationValue<string>(root, "sb-domain-relay-namespace-name")}.servicebus.windows.net";
         var topicName = GetConfigurationValue<string>(root, "sbt-shres-integrationevent-received-name");
         var ediInboxQueueName = GetConfigurationValue<string>(root, "sbq-edi-inbox-messagequeue-name");
+        var ediTopicName = GetConfigurationValue<string>(root, "sbt-edi-name");
 
         _azureB2CTenantId = GetConfigurationValue<string>(root, "b2c-tenant-id", defaultValue: "e9aa9b15-7200-441e-b255-927506b3494");
         _azureEntraBackendAppId = GetConfigurationValue<string>(root, "backend-b2b-app-id");
@@ -175,7 +176,8 @@ public class SubsystemTestFixture : IAsyncLifetime
         var credential = new DefaultAzureCredential();
         ServiceBusClient = new ServiceBusClient(serviceBusFullyQualifiedNamespace, credential);
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
-        EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
+        EdiInboxClient = new ServiceBusSenderClient(ServiceBusClient, ediInboxQueueName);
+        EdiTopicClient = new ServiceBusSenderClient(ServiceBusClient, ediTopicName);
 
         DurableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
@@ -211,7 +213,9 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
-    internal EdiInboxClient EdiInboxClient { get; }
+    internal ServiceBusSenderClient EdiInboxClient { get; }
+
+    internal ServiceBusSenderClient EdiTopicClient { get; }
 
     internal string ConnectionString { get; }
 
@@ -224,7 +228,6 @@ public class SubsystemTestFixture : IAsyncLifetime
     public Task InitializeAsync()
     {
         DurableClient = DurableTaskManager.CreateClient("Edi01"); // Must be the same task hub name as used in B2BApi
-
         return Task.CompletedTask;
     }
 
@@ -233,6 +236,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         // Close subclients before client (ServiceBusClient)
         await EventPublisher.DisposeAsync();
         await EdiInboxClient.DisposeAsync();
+        await EdiTopicClient.DisposeAsync();
         await ServiceBusClient.DisposeAsync();
 
         await B2BClients.DisposeAsync();

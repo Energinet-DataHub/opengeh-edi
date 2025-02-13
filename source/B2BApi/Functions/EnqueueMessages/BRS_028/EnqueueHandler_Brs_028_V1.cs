@@ -82,10 +82,10 @@ public class EnqueueHandler_Brs_028_V1(
 
             var enqueuedCount = await _actorRequestsClient.EnqueueWholesaleServicesAsync(
                     wholesaleServicesQueryParameters: queryParamsForAmountType,
-                    requestedByActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedByActorNumber.Value),
-                    requestedByActorRole: BuildingBlocks.Domain.Models.ActorRole.FromName(acceptedData.RequestedByActorRole.Name),
-                    requestedForActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedForActorNumber.Value),
-                    requestedForActorRole: BuildingBlocks.Domain.Models.ActorRole.FromName(acceptedData.RequestedForActorRole.Name),
+                    requestedByActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedByActorNumber),
+                    requestedByActorRole: BuildingBlocks.Domain.Models.ActorRole.Create(acceptedData.RequestedByActorRole),
+                    requestedForActorNumber: BuildingBlocks.Domain.Models.ActorNumber.Create(acceptedData.RequestedForActorNumber),
+                    requestedForActorRole: BuildingBlocks.Domain.Models.ActorRole.Create(acceptedData.RequestedForActorRole),
                     orchestrationInstanceId: orchestrationInstanceId,
                     eventId: BuildingBlocks.Domain.Models.EventId.From(serviceBusMessageId),
                     originalMessageId: BuildingBlocks.Domain.Models.MessageId.Create(acceptedData.OriginalActorMessageId),

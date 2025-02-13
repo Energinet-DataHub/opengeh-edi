@@ -28,6 +28,12 @@ public class ActorNumber : ValueObject
 
     public string Value { get; }
 
+    public static ActorNumber Create(ProcessManager.Components.Abstractions.ValueObjects.ActorNumber actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        return TryCreate(actorNumber.Value) ?? throw InvalidActorNumberException.Create(actorNumber.Value);
+    }
+
     public static ActorNumber Create(string actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
