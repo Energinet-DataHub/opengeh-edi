@@ -365,10 +365,12 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
             : null;
 
         // Act
+        // GridAccessProviders must use MeteredDataResponsible as sender role
+        var senderActorRole = actor.ActorRole == ActorRole.GridAccessProvider ? ActorRole.MeteredDataResponsible : actor.ActorRole;
         await GivenReceivedAggregatedMeasureDataRequest(
             documentFormat: incomingDocumentFormat,
             senderActorNumber: actor.ActorNumber,
-            senderActorRole: actor.ActorRole,
+            senderActorRole: senderActorRole,
             meteringPointType: null,
             settlementMethod: null,
             periodStart: (2022, 1, 1),
@@ -386,7 +388,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
             new RequestCalculatedEnergyTimeSeriesInputV1AssertionInput(
                 transactionId,
                 actor.ActorNumber.Value,
-                actor.ActorRole.Name,
+                senderActorRole.Name,
                 BusinessReason.BalanceFixing,
                 PeriodStart: CreateDateInstant(2022, 1, 1),
                 PeriodEnd: CreateDateInstant(2022, 2, 1),
