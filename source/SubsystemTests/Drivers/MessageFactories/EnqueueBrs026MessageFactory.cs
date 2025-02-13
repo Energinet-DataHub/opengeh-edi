@@ -82,7 +82,11 @@ public static class EnqueueBrs026MessageFactory
         {
             OrchestrationName = _orchestrationName,
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actor.ActorNumber.Value,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = actor.ActorNumber.Value,
+                ActorRole = actor.ActorRole.Name,
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 

@@ -52,4 +52,9 @@ public class ActorIdentity
     {
         return Restriction.Name.Equals(suspect.Name, StringComparison.OrdinalIgnoreCase);
     }
+
+    public Actor ToActor()
+    {
+        return new Actor(ActorNumber, ActorRole);
+    }
 }

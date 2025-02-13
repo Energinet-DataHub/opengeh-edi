@@ -171,7 +171,6 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     {
         // => Given enqueue rejected BRS-028 service bus message
         var eventId = EventId.From(Guid.NewGuid());
-        var actorId = Guid.NewGuid().ToString();
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
         var businessReason = BusinessReason.BalanceFixing;
@@ -196,7 +195,11 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         {
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = enqueueMessagesData.RequestedByActorNumber.Value,
+                ActorRole = enqueueMessagesData.RequestedByActorRole.Name,
+            },
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
         enqueueActorMessages.SetData(enqueueMessagesData);
@@ -265,7 +268,11 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         {
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = Guid.NewGuid().ToString(),
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = enqueueMessagesData.RequestedByActorNumber.Value,
+                ActorRole = enqueueMessagesData.RequestedByActorRole.Name,
+            },
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
         enqueueActorMessages.SetData(enqueueMessagesData);

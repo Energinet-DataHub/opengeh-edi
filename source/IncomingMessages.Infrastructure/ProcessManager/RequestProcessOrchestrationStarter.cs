@@ -33,8 +33,7 @@ public class RequestProcessOrchestrationStarter(
         InitializeWholesaleServicesProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
-        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
-        var actorIdentity = new ActorIdentityDto(actorId);
+        var actorIdentity = GetAuthenticatedActorIdentity(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -92,8 +91,7 @@ public class RequestProcessOrchestrationStarter(
         InitializeAggregatedMeasureDataProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
-        var actorId = GetAuthenticatedActorId(initializeProcessDto.MessageId);
-        var actorIdentity = new ActorIdentityDto(actorId);
+        var actorIdentity = GetAuthenticatedActorIdentity(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -138,13 +136,17 @@ public class RequestProcessOrchestrationStarter(
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    private Guid GetAuthenticatedActorId(string messageId)
+    private ActorIdentityDto GetAuthenticatedActorIdentity(string messageId)
     {
         if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
             throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");
 
-        return actorIdentity?.ActorClientId
-               ?? throw new InvalidOperationException($"Current actor id was null when initializing process (MessageId={messageId})");
+        var actor = actorIdentity?.ToActor()
+               ?? throw new InvalidOperationException($"Current actor identity was null when initializing process (MessageId={messageId})");
+
+        return new ActorIdentityDto(
+            ActorNumber: actor.ActorNumber.Value,
+            ActorRole: actor.ActorRole.Name);
     }
 
     private string CreateIdempotencyKey(string transactionId, RequestedByActor actor) => $"{transactionId}_{actor.ActorNumber.Value}_{actor.ActorRole.Code}";

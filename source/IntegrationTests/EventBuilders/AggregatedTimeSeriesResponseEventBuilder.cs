@@ -148,7 +148,11 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         {
             OrchestrationName = Brs_026.Name,
             OrchestrationVersion = Brs_026.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+                ActorRole = requestCalculatedEnergyTimeSeriesInput.RequestedByActorRole,
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(acceptRequest);
@@ -209,7 +213,11 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         {
             OrchestrationName = Brs_026.Name,
             OrchestrationVersion = Brs_026.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+                ActorRole = requestCalculatedEnergyTimeSeriesInput.RequestedByActorRole,
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(rejectRequest);

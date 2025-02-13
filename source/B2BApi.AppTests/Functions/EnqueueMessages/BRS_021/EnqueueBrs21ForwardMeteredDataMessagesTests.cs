@@ -68,7 +68,6 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
-        var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new MeteredDataForMeteringPointRejectedV1(
             "EventId",
             PMValueTypes.BusinessReason.PeriodicMetering,
@@ -92,7 +91,11 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         {
             OrchestrationName = Brs_021_ForwardedMeteredData.Name,
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = "1111111111111",
+                ActorRole = ActorRole.GridAccessProvider.Name,
+            },
             Data = JsonSerializer.Serialize(enqueueMessagesData),
             DataType = nameof(MeteredDataForMeteringPointRejectedV1),
             DataFormat = EnqueueActorMessagesDataFormatV1.Json,

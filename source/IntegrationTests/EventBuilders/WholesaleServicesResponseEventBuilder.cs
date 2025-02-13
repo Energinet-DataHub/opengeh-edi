@@ -213,7 +213,11 @@ public static class WholesaleServicesResponseEventBuilder
         {
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = Brs_028.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+                ActorRole = requestCalculatedWholesaleServicesInputV1.RequestedByActorRole,
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(acceptRequest);
@@ -282,7 +286,11 @@ public static class WholesaleServicesResponseEventBuilder
         {
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = Brs_028.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+                ActorRole = requestCalculatedWholesaleServicesInputV1.RequestedByActorRole,
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(), // TODO, could be used to assert on when notifying the orchestration instance in pm
         };
         enqueueActorMessages.SetData(rejectRequest);

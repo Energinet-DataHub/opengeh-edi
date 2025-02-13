@@ -385,12 +385,15 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
         CalculationEnqueueActorMessagesV1 calculationCompletedEvent,
         Guid? orchestrationInstanceId = null)
     {
-        var actorId = Guid.NewGuid().ToString();
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = "Brs_023_027",
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = "1234567890123",
+                ActorRole = "DataHubAdministrator",
+            },
             OrchestrationInstanceId = orchestrationInstanceId?.ToString() ?? Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(calculationCompletedEvent);
