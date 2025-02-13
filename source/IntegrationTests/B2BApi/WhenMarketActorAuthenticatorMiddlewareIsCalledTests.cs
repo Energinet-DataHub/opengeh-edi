@@ -192,7 +192,7 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
     [Fact]
     public async Task When_calling_authentication_middleware_with_no_content_type_then_bearer_authentication_is_used()
     {
-        var actorClientId = "external-id";
+        var actorClientId = Guid.NewGuid().ToString();
 
         // Arrange
         await CreateActorInDatabaseAsync(ActorNumber.Create("1234567891234"), actorClientId);
