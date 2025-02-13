@@ -39,7 +39,7 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
 
     private static string ActorNumber => "5148796574821";
 
-    private static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
+    private static string ActorClientId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
 
     [Fact]
     public async Task Given_ActorIsCreated_When_ActorDoesNotExists_Then_ActorIsCreated()
@@ -52,7 +52,7 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
 
         Assert.NotNull(actor);
         Assert.Equal(ActorNumber, actor.ActorNumber);
-        Assert.Equal(ExternalId, actor.ExternalId);
+        Assert.Equal(ActorClientId, actor.ExternalId);
     }
 
     [Fact]
@@ -72,18 +72,18 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
 
         Assert.Single(actors);
         Assert.Equal(ActorNumber, actors.First().ActorNumber);
-        Assert.Equal(ExternalId, actors.First().ExternalId);
+        Assert.Equal(ActorClientId, actors.First().ExternalId);
     }
 
     private static CreateActorDto CreateDto()
     {
-        return new CreateActorDto(ExternalId, BuildingBlocks.Domain.Models.ActorNumber.Create(ActorNumber));
+        return new CreateActorDto(ActorClientId, BuildingBlocks.Domain.Models.ActorNumber.Create(ActorNumber));
     }
 
     private async Task<Actor?> GetActor()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{ExternalId}' AND ActorNumber = '{ActorNumber}'";
+        var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{ActorClientId}' AND ActorNumber = '{ActorNumber}'";
         return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
     }
 
@@ -93,7 +93,7 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
         var sql =
             $"SELECT Id, ActorNumber, ExternalId " +
             $"FROM [dbo].[Actor] " +
-            $"WHERE ExternalId = '{ExternalId}' " +
+            $"WHERE ExternalId = '{ActorClientId}' " +
             $"AND ActorNumber = '{ActorNumber}'";
 
         return await connection.QueryAsync<Actor>(sql);

@@ -22,12 +22,12 @@ public class ActorIdentity
         ActorNumber actorNumber,
         Restriction restriction,
         ActorRole actorRole,
-        Guid? actorId)
+        Guid? actorClientId)
     {
         ActorNumber = actorNumber;
         Restriction = restriction;
         ActorRole = actorRole;
-        ActorId = actorId;
+        ActorClientId = actorClientId;
     }
 
     public ActorNumber ActorNumber { get; }
@@ -36,7 +36,7 @@ public class ActorIdentity
 
     public ActorRole ActorRole { get; set; }
 
-    public Guid? ActorId { get; set; }
+    public Guid? ActorClientId { get; set; }
 
     public bool HasRole(ActorRole role)
     {

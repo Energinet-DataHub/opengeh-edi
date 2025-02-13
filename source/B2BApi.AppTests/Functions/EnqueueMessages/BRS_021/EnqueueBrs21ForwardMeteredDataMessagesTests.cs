@@ -125,14 +125,14 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         hostLog.Should().ContainMatch("*INSERT INTO [dbo].[OutgoingMessages]*");
         hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
 
-        var externalId = Guid.NewGuid().ToString();
-        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create("1111111111111"), externalId);
+        var actorClientId = Guid.NewGuid().ToString();
+        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create("1111111111111"), actorClientId);
 
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/TimeSeries");
 
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(ActorRole.GridAccessProvider).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);

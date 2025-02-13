@@ -39,9 +39,9 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
     {
         var actorIdentity = GetAuthenticatedActorId(initializeProcessDto.MessageId);
         var actorIdentityDto = new ActorIdentityDto(
-            actorIdentity.ActorId
+            actorIdentity.ActorClientId
             ?? throw new InvalidOperationException(
-                $"Current actor id was null when initializing process (MessageId={initializeProcessDto.MessageId})"));
+                $"Current actor client id was null when initializing process (MessageId={initializeProcessDto.MessageId})"));
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -67,7 +67,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                     operatingIdentity: actorIdentityDto,
                     new MeteredDataForMeteringPointMessageInputV1(
                         MessageId: initializeProcessDto.MessageId,
-                        AuthenticatedActorId: actorIdentity.ActorId.Value,
+                        AuthenticatedActorId: actorIdentity.ActorClientId.Value,
                         ActorNumber: actorIdentity.ActorNumber.Value,
                         ActorRole: actorIdentity.ActorRole.Code,
                         TransactionId: transaction.TransactionId,

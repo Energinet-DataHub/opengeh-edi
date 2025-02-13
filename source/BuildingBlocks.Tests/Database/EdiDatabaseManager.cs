@@ -90,7 +90,7 @@ public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContex
          connection.Close();
     }
 
-    public async Task AddActorAsync(ActorNumber actorNumber, string externalId)
+    public async Task AddActorAsync(ActorNumber actorNumber, string actorClientId)
     {
         await using var sqlConnection = new SqlConnection(ConnectionString);
 
@@ -98,7 +98,7 @@ public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContex
         sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
         sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
         sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
-        sqlCommand.Parameters.AddWithValue("@externalId", externalId);
+        sqlCommand.Parameters.AddWithValue("@externalId", actorClientId);
 
         await sqlConnection.OpenAsync();
         await sqlCommand.ExecuteNonQueryAsync();

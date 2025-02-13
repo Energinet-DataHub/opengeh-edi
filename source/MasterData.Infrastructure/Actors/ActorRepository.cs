@@ -33,13 +33,13 @@ public class ActorRepository : IActorRepository
         _masterDataContext = masterDataContext;
     }
 
-    public async Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken)
+    public async Task<ActorNumber?> GetActorNumberByActorClientIdAsync(string actorClientId, CancellationToken cancellationToken)
     {
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         var actorNumber = await connection
             .ExecuteScalarAsync<string>(
                 "SELECT ActorNumber AS Identifier FROM [dbo].[Actor] WHERE ExternalId=@ExternalId",
-                new { ExternalId = externalId, })
+                new { ExternalId = actorClientId, })
             .ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(actorNumber))
         {
@@ -49,22 +49,22 @@ public class ActorRepository : IActorRepository
         return ActorNumber.Create(actorNumber);
     }
 
-    public async Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
+    public async Task CreateIfNotExistAsync(ActorNumber actorNumber, string actorClientId, CancellationToken cancellationToken)
     {
-        if (await ActorDoesNotExistsAsync(actorNumber, externalId, cancellationToken).ConfigureAwait(false))
+        if (await ActorDoesNotExistsAsync(actorNumber, actorClientId, cancellationToken).ConfigureAwait(false))
         {
             await _masterDataContext.Actors
-                .AddAsync(new Actor(actorNumber, externalId), cancellationToken)
+                .AddAsync(new Actor(actorNumber, actorClientId), cancellationToken)
                 .ConfigureAwait(false);
         }
     }
 
-    private async Task<bool> ActorDoesNotExistsAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken)
+    private async Task<bool> ActorDoesNotExistsAsync(ActorNumber actorNumber, string actorClientId, CancellationToken cancellationToken)
     {
         return !await _masterDataContext.Actors
             .AnyAsync(
                 actor => actor.ActorNumber == actorNumber
-                               && actor.ExternalId == externalId,
+                               && actor.ExternalId == actorClientId,
                 cancellationToken)
             .ConfigureAwait(false);
     }

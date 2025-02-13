@@ -132,15 +132,15 @@ public static class HttpRequestExtensions
         HttpContent? content = null)
     {
         // The actor must exist in the database
-        var externalId = Guid.NewGuid().ToString();
-        await fixture.DatabaseManager.AddActorAsync(actor.ActorNumber, externalId);
+        var actorClientId = Guid.NewGuid().ToString();
+        await fixture.DatabaseManager.AddActorAsync(actor.ActorNumber, actorClientId);
 
         // The bearer token must contain:
         //  * the actor role matching the document content
         //  * the external id matching the actor in the database
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actor.ActorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         var request = new HttpRequestMessage(method, url)

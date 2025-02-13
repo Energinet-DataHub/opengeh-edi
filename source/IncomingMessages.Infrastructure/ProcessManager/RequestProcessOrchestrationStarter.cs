@@ -143,7 +143,7 @@ public class RequestProcessOrchestrationStarter(
         if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
             throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");
 
-        return actorIdentity?.ActorId
+        return actorIdentity?.ActorClientId
                ?? throw new InvalidOperationException($"Current actor id was null when initializing process (MessageId={messageId})");
     }
 
