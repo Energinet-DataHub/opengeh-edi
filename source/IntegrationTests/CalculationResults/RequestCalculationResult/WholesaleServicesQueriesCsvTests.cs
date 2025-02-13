@@ -397,7 +397,7 @@ public class WholesaleServicesQueriesCsvTests
 
         [Fact]
         public async Task
-            Given_GridAreaOwnerRequestsAmountPerChargeWithChargeOwner_WhenChargeIsNotTaxAndChargeOwnerIsSyo_Then_NoDataReturned()
+            Given_GridAreaOwnerRequestsAmountPerChargeWithChargeOwner_When_ChargeIsNotTaxAndChargeOwnerIsSyo_Then_NoDataReturned()
         {
             var gridAreaOwnerAsRequester = "8100000000007";
             var syoChargeOwner = "5790000432752";
@@ -576,7 +576,7 @@ public class WholesaleServicesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierOnlyHaveDataForHalfOfThePeriodAndIsSyo_Then_DataReturnedWithModifiedPeriod()
+        public async Task Given_EnergySupplierOnlyHaveDataForHalfOfThePeriodAndIsSyo_When_Queried_Then_DataReturnedWithModifiedPeriod()
         {
             /*
              Business case example:
@@ -735,7 +735,7 @@ public class WholesaleServicesQueriesCsvTests
         [InlineData(true)]
         [InlineData(false)]
         public async Task
-            Given_EnergySupplierAndChargeOwnerWithLatestCorrectionButOnlyOneGridAreaWithCorrectionData_Then_DataReturnedForGridArea(
+            Given_EnergySupplierAndChargeOwnerWithLatestCorrectionButOnlyOneGridAreaWithCorrectionData_When_Queried_Then_DataReturnedForGridArea(
                 bool isEnergySupplier)
         {
             await ClearAndAddDatabricksDataAsync(_fixture, _testOutputHelper);
