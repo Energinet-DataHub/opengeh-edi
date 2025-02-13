@@ -40,6 +40,8 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override int ExpectedCalculationResultsCount => 36 * 2; // 36 for each grid area
 
+    public int ExpectedCalculationResultsCountForInvalidDataSet => 35;
+
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
