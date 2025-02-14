@@ -42,19 +42,19 @@ public static class AggregatedTimeSeriesRequestFactory
             ? [TimeSeriesTypeMapper.MapTimeSeriesType(request.MeteringPointType.Name, request.SettlementMethod?.Name)]
             : request.RequestedForActorRole.Name switch
             {
-                nameof(ActorRole.EnergySupplier) =>
+                var actorRoleName when actorRoleName == ActorRole.EnergySupplier.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,
                     TimeSeriesType.NonProfiledConsumption,
                 ],
-                nameof(ActorRole.BalanceResponsibleParty) =>
+                var actorRoleName when actorRoleName == ActorRole.BalanceResponsibleParty.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,
                     TimeSeriesType.NonProfiledConsumption,
                 ],
-                nameof(ActorRole.MeteredDataResponsible) =>
+                var actorRoleName when actorRoleName == ActorRole.MeteredDataResponsible.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,

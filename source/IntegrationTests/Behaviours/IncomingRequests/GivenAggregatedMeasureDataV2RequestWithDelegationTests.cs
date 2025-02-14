@@ -103,12 +103,12 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
 
     public static IEnumerable<object[]> GetTestData()
     {
-        yield return ["Xml", ActorRole.GridAccessProvider.Name, ActorRole.Delegated.Name];
-        yield return ["Json", ActorRole.GridAccessProvider.Name, ActorRole.Delegated.Name];
-        yield return ["Xml", ActorRole.EnergySupplier.Name, ActorRole.Delegated.Name];
-        yield return ["Json", ActorRole.EnergySupplier.Name, ActorRole.Delegated.Name];
-        yield return ["Xml", ActorRole.BalanceResponsibleParty.Name, ActorRole.Delegated.Name];
-        yield return ["Json", ActorRole.BalanceResponsibleParty.Name, ActorRole.Delegated.Name];
+        yield return ["Xml", ActorRole.GridAccessProvider.Name];
+        yield return ["Json", ActorRole.GridAccessProvider.Name];
+        yield return ["Xml", ActorRole.EnergySupplier.Name];
+        yield return ["Json", ActorRole.EnergySupplier.Name];
+        yield return ["Xml", ActorRole.BalanceResponsibleParty.Name];
+        yield return ["Json", ActorRole.BalanceResponsibleParty.Name];
     }
 
     [Theory(Skip = "not updated yet")]
@@ -948,11 +948,11 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
 
     [Theory(Skip = "not updated yet")]
     [MemberData(nameof(GetTestData))]
-    public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName, string delegatedToRoleName)
+    public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName)
     {
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
         var originalActorRole = ActorRole.FromName(originalActorRoleName);
-        var delegatedToRole = ActorRole.FromName(delegatedToRoleName);
+        var delegatedToRole = ActorRole.FromName(ActorRole.Delegated.Name);
 
         var senderSpy = CreateServiceBusSenderSpy();
         var originalActor = new Actor(ActorNumber.Create("1111111111111"), actorRole: originalActorRole);

@@ -23,12 +23,12 @@ public static class TimeSeriesTypeMapper
     {
         return meteringPointType switch
         {
-            _ when meteringPointType == MeteringPointType.Production.Name => TimeSeriesType.Production,
-            _ when meteringPointType == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
-            _ when meteringPointType == MeteringPointType.Consumption.Name => settlementMethod switch
+            var mp when mp == MeteringPointType.Production.Name => TimeSeriesType.Production,
+            var mp when mp == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
+            var mp when mp == MeteringPointType.Consumption.Name => settlementMethod switch
             {
-                _ when settlementMethod == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
-                _ when settlementMethod == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
+                var sm when sm == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
+                var sm when sm == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
                 var method when
                     string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
 

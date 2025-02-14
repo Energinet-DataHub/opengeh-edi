@@ -84,9 +84,9 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                 {
                     series.SettlementVersion = request.SettlementVersion switch
                     {
-                        _ when request.SettlementVersion == BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection.Name => SettlementVersion.FirstCorrection,
-                        _ when request.SettlementVersion == BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection.Name => SettlementVersion.SecondCorrection,
-                        _ when request.SettlementVersion == BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Name => SettlementVersion.ThirdCorrection,
+                        var sm when sm == BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection.Name => SettlementVersion.FirstCorrection,
+                        var sm when sm == BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection.Name => SettlementVersion.SecondCorrection,
+                        var sm when sm == BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Name => SettlementVersion.ThirdCorrection,
                         _ => SettlementVersion.ThirdCorrection,
                     };
                 }
