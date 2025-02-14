@@ -103,10 +103,7 @@ public sealed class CalculationCompletedDsl
         await _ediDriver.EmptyQueueAsync();
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_balanceFixingCalculationId);
 
-        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant();
-        await _processManagerDriver.PublishEnqueueBrs023_027RequestAsync(_balanceFixingCalculationId);
-
-        await EnsureOrchestrationsHasCompletedAsync(_balanceFixingCalculationId, orchestrationStartedAfter);
+        await EnsureOrchestrationsHasCompletedAsync(_balanceFixingCalculationId);
     }
 
     internal async Task PublishBrs023_027WholesaleFixingCalculation()
@@ -114,10 +111,7 @@ public sealed class CalculationCompletedDsl
         await _ediDriver.EmptyQueueAsync();
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_wholesaleFixingCalculationId);
 
-        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant();
-        await _processManagerDriver.PublishEnqueueBrs023_027RequestAsync(_wholesaleFixingCalculationId);
-
-        await EnsureOrchestrationsHasCompletedAsync(_wholesaleFixingCalculationId, orchestrationStartedAfter);
+        await EnsureOrchestrationsHasCompletedAsync(_wholesaleFixingCalculationId);
     }
 
     /// <summary>
@@ -211,12 +205,14 @@ public sealed class CalculationCompletedDsl
     }
 
     private async Task EnsureOrchestrationsHasCompletedAsync(
-        Guid calculationId,
-        Instant startedAt)
+        Guid calculationId)
     {
-        _logger.WriteLine("Wait for message orchestration to be started after {0}", startedAt.ToString());
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant();
+        await _processManagerDriver.PublishEnqueueBrs023_027RequestAsync(calculationId);
 
-        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(startedAt);
+        _logger.WriteLine("Wait for message orchestration to be started after {0}", orchestrationStartedAfter.ToString());
+
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(orchestrationStartedAfter);
 
         orchestration.Input.Value<string>("CalculationId")
             .Should()
