@@ -39,7 +39,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         actorNumber: ActorNumber.Create("1234512345811"),
         restriction: Restriction.None,
         actorRole: ActorRole.MeteredDataAdministrator,
-        actorClientId: Guid.NewGuid(),
+        actorClientId: null,
         actorId: Guid.Parse("00000000-0000-0000-0000-000000000001"));
 
     public ArchivedMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
