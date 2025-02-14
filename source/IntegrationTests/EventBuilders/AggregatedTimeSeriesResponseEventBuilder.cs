@@ -81,9 +81,9 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                 {
                     series.SettlementVersion = request.SettlementVersion switch
                     {
-                        DataHubNames.SettlementVersion.FirstCorrection => SettlementVersion.FirstCorrection,
-                        DataHubNames.SettlementVersion.SecondCorrection => SettlementVersion.SecondCorrection,
-                        DataHubNames.SettlementVersion.ThirdCorrection => SettlementVersion.ThirdCorrection,
+                        _ when request.SettlementVersion == BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection.Name => SettlementVersion.FirstCorrection,
+                        _ when request.SettlementVersion == BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection.Name => SettlementVersion.SecondCorrection,
+                        _ when request.SettlementVersion == BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Name => SettlementVersion.ThirdCorrection,
                         _ => SettlementVersion.ThirdCorrection,
                     };
                 }

@@ -162,26 +162,28 @@ public class EnqueueHandler_Brs_026_V1(
             ? [MapTimeSeriesType(meteringPointType.Name, settlementMethod?.Name)]
             : requestedForActorRole.Name switch
             {
-                DataHubNames.ActorRole.EnergySupplier =>
-                [
-                    TimeSeriesType.Production,
-                    TimeSeriesType.FlexConsumption,
-                    TimeSeriesType.NonProfiledConsumption,
-                ],
-                DataHubNames.ActorRole.BalanceResponsibleParty =>
-                [
-                    TimeSeriesType.Production,
-                    TimeSeriesType.FlexConsumption,
-                    TimeSeriesType.NonProfiledConsumption,
-                ],
-                DataHubNames.ActorRole.MeteredDataResponsible =>
-                [
-                    TimeSeriesType.Production,
-                    TimeSeriesType.FlexConsumption,
-                    TimeSeriesType.NonProfiledConsumption,
-                    TimeSeriesType.TotalConsumption,
-                    TimeSeriesType.NetExchangePerGa,
-                ],
+                nameof(ActorRole.EnergySupplier) =>
+                    [
+                        TimeSeriesType.Production,
+                        TimeSeriesType.FlexConsumption,
+                        TimeSeriesType.NonProfiledConsumption,
+                    ],
+                nameof(ActorRole.BalanceResponsibleParty) =>
+                    new[]
+                    {
+                        TimeSeriesType.Production,
+                        TimeSeriesType.FlexConsumption,
+                        TimeSeriesType.NonProfiledConsumption,
+                    },
+                nameof(ActorRole.MeteredDataResponsible) =>
+                    new[]
+                    {
+                        TimeSeriesType.Production,
+                        TimeSeriesType.FlexConsumption,
+                        TimeSeriesType.NonProfiledConsumption,
+                        TimeSeriesType.TotalConsumption,
+                        TimeSeriesType.NetExchangePerGa,
+                    },
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(requestedForActorRole),
                     requestedForActorRole,
@@ -206,9 +208,9 @@ public class EnqueueHandler_Brs_026_V1(
             DataHubNames.BusinessReason.WholesaleFixing => CalculationType.WholesaleFixing,
             DataHubNames.BusinessReason.Correction => settlementVersion switch
             {
-                DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
-                DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
-                DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                _ when businessReason == SettlementVersion.FirstCorrection.Name => CalculationType.FirstCorrectionSettlement,
+                _ when businessReason == SettlementVersion.SecondCorrection.Name => CalculationType.SecondCorrectionSettlement,
+                _ when businessReason == SettlementVersion.ThirdCorrection.Name => CalculationType.ThirdCorrectionSettlement,
                 null => null, // CalculationType == null means get latest correction
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
@@ -230,8 +232,8 @@ public class EnqueueHandler_Brs_026_V1(
             DataHubNames.MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
             DataHubNames.MeteringPointType.Consumption => settlementMethod switch
             {
-                DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
+                _ when meteringPointType == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
+                _ when meteringPointType == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
                 var method when
                     string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
 

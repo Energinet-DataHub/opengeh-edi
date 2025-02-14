@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using FluentAssertions;
@@ -141,7 +142,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
             meteringPointType: null,
-            settlementMethod: DataHubNames.SettlementMethod.NonProfiled);
+            settlementMethod: SettlementMethod.NonProfiled.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -174,7 +175,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             meteringPointType: null,
             settlementMethod: string.Empty);
 
-        request.RequestedForActorRole = DataHubNames.ActorRole.BalanceResponsibleParty;
+        request.RequestedForActorRole = ActorRole.BalanceResponsibleParty.Name;
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -207,7 +208,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             meteringPointType: null,
             settlementMethod: string.Empty);
 
-        request.RequestedForActorRole = DataHubNames.ActorRole.MeteredDataResponsible;
+        request.RequestedForActorRole = ActorRole.MeteredDataResponsible.Name;
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -235,8 +236,13 @@ public class AggregatedTimeSeriesRequestFactoryTests
         string? energySupplier,
         string? balanceResponsible,
         string? meteringPointType = DataHubNames.MeteringPointType.Production,
-        string? settlementMethod = DataHubNames.SettlementMethod.Flex)
+        string? settlementMethod = "")
     {
+        if (string.IsNullOrEmpty(settlementMethod))
+        {
+            settlementMethod = SettlementMethod.Flex.Name;
+        }
+
         var request = new AggregatedTimeSeriesRequest()
         {
             // Required
@@ -246,7 +252,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
                 End = "2022-12-31T23:00:00Z",
             },
             RequestedForActorNumber = "1234567891234",
-            RequestedForActorRole = DataHubNames.ActorRole.EnergySupplier,
+            RequestedForActorRole = ActorRole.EnergySupplier.Name,
             BusinessReason = DataHubNames.BusinessReason.BalanceFixing,
 
             // Optional

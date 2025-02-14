@@ -75,35 +75,4 @@ public static class DataHubNames
         public const string Daily = "Daily";
         public const string Monthly = "Monthly";
     }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class SettlementMethod
-    {
-        public const string NonProfiled = "NonProfiled";
-        public const string Flex = "Flex";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class SettlementVersion
-    {
-        public const string FirstCorrection = "FirstCorrection";
-        public const string SecondCorrection = "SecondCorrection";
-        public const string ThirdCorrection = "ThirdCorrection";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class ActorRole
-    {
-        public const string MeteringPointAdministrator = "MeteringPointAdministrator";
-        public const string MeteredDataResponsible = "MeteredDataResponsible";
-        public const string EnergySupplier = "EnergySupplier";
-        public const string BalanceResponsibleParty = "BalanceResponsibleParty";
-        public const string GridAccessProvider = "GridAccessProvider";
-        public const string MeteredDataAdministrator = "MeteredDataAdministrator";
-        public const string ImbalanceSettlementResponsible = "ImbalanceSettlementResponsible";
-        public const string SystemOperator = "SystemOperator";
-        public const string DanishEnergyAgency = "DanishEnergyAgency";
-        public const string Delegated = "Delegated";
-        public const string DataHubAdministrator = "DataHubAdministrator";
-    }
 }
