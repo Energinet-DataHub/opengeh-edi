@@ -47,12 +47,12 @@ public class ActorIdentity
     public ActorRole ActorRole { get; }
 
     /// <summary>
-    /// Actor client id is only set if the current user has a B2B token.
+    /// Actor client id is only set if the current user is created from a B2B token.
     /// </summary>
     public Guid? ActorClientId { get; }
 
     /// <summary>
-    /// Actor id is only set if the current user has a B2C token.
+    /// Actor id is only set if the current user is created from a B2C token.
     /// </summary>
     public Guid? ActorId { get; }
 
