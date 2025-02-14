@@ -27,53 +27,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Keep names in a single file to easily share with Wholesale")]
 public static class DataHubNames
 {
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class BusinessReason
-    {
-        public const string MoveIn = "MoveIn";
-        public const string BalanceFixing = "BalanceFixing";
-        public const string PreliminaryAggregation = "PreliminaryAggregation";
-        public const string WholesaleFixing = "WholesaleFixing";
-        public const string Correction = "Correction";
-        public const string PeriodicMetering = "PeriodicMetering";
-        public const string PeriodicFlexMetering = "PeriodicFlexMetering";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class ChargeType
-    {
-        public const string Subscription = "Subscription";
-        public const string Fee = "Fee";
-        public const string Tariff = "Tariff";
-    }
-
     public static class Currency
     {
         public const string DanishCrowns = "DanishCrowns";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class MeasurementUnit
-    {
-        public const string Kwh = "Kwh";
-        public const string Pieces = "Pieces";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class MeteringPointType
-    {
-        public const string Consumption = "Consumption";
-        public const string Production = "Production";
-        public const string Exchange = "Exchange";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class Resolution
-    {
-        public const string QuarterHourly = "QuarterHourly";
-        public const string Hourly = "Hourly";
-        public const string Daily = "Daily";
-        public const string Monthly = "Monthly";
     }
 
     // TODO: Obsolete now that we get the name from PM.Components.Abstractions

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using FluentAssertions;
 using Xunit;
@@ -21,10 +22,15 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Mappers;
 
 public class ResolutionMapperTests
 {
+    public static IEnumerable<object[]> GetValidResolutions()
+    {
+        yield return [Resolution.Monthly.Name, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month];
+        yield return [Resolution.Hourly.Name, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Hour];
+        yield return [Resolution.Daily.Name, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Day];
+    }
+
     [Theory]
-    [InlineData(DataHubNames.Resolution.Monthly, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month)]
-    [InlineData(DataHubNames.Resolution.Hourly, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Hour)]
-    [InlineData(DataHubNames.Resolution.Daily, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Day)]
+    [MemberData(nameof(GetValidResolutions))]
     public void Map_WhenValid_ReturnsExpectedChargeType(string resolution, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution expectedResult)
     {
         // Act

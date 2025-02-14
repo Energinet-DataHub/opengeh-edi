@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using FluentAssertions;
 using Xunit;
@@ -21,10 +21,15 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Mappers;
 
 public class ChargeTypeMapperTests
 {
+    public static IEnumerable<object[]> GetChargeTypeTestData()
+    {
+        yield return [ChargeType.Tariff.Name, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff];
+        yield return [ChargeType.Fee.Name, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Fee];
+        yield return [ChargeType.Subscription.Name, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription];
+    }
+
     [Theory]
-    [InlineData(DataHubNames.ChargeType.Tariff, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff)]
-    [InlineData(DataHubNames.ChargeType.Fee, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Fee)]
-    [InlineData(DataHubNames.ChargeType.Subscription, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription)]
+    [MemberData(nameof(GetChargeTypeTestData))]
     public void Map_WhenValid_ReturnsExpectedChargeType(string chargeType, DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType expectedResult)
     {
         // Act

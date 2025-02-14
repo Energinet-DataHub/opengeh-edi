@@ -37,11 +37,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         InitializeMeteredDataForMeteringPointMessageProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
-        var actorIdentity = GetAuthenticatedActorId(initializeProcessDto.MessageId);
-        var actorIdentityDto = new ActorIdentityDto(
-            actorIdentity.ActorId
-            ?? throw new InvalidOperationException(
-                $"Current actor id was null when initializing process (MessageId={initializeProcessDto.MessageId})"));
+        var actorIdentityDto = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -67,9 +63,9 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                     operatingIdentity: actorIdentityDto,
                     new MeteredDataForMeteringPointMessageInputV1(
                         MessageId: initializeProcessDto.MessageId,
-                        AuthenticatedActorId: actorIdentity.ActorId.Value,
-                        ActorNumber: actorIdentity.ActorNumber.Value,
-                        ActorRole: actorIdentity.ActorRole.Code,
+                        AuthenticatedActorId: Guid.Empty, // TODO: This is not used and should be removed from the contract
+                        ActorNumber: actorIdentityDto.ActorNumber.Value,
+                        ActorRole: actorIdentityDto.ActorRole.Name,
                         TransactionId: transaction.TransactionId,
                         MeteringPointId: transaction.MeteringPointLocationId,
                         MeteringPointType: meteringPointType,
@@ -102,11 +98,16 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    private ActorIdentity GetAuthenticatedActorId(string messageId) =>
-        !_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
-            ? throw new InvalidOperationException(
-                $"Cannot get current actor when initializing process (MessageId={messageId})")
-            : actorIdentity
-              ?? throw new InvalidOperationException(
-                  $"Current actor id was null when initializing process (MessageId={messageId})");
+    private ActorIdentityDto GetAuthenticatedActorIdentityDto(string messageId)
+    {
+        if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
+            throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");
+
+        var actor = actorIdentity?.ToActor()
+                    ?? throw new InvalidOperationException($"Current actor identity was null when initializing process (MessageId={messageId})");
+
+        return new ActorIdentityDto(
+            ActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            ActorRole: actor.ActorRole.ToProcessManagerActorRole());
+    }
 }

@@ -24,10 +24,10 @@ public interface IActorRepository
     /// <summary>
     /// Get actor number by id
     /// </summary>
-    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
+    Task<ActorNumber?> GetActorNumberByActorClientIdAsync(string actorClientId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new actor
     /// </summary>
-    Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken);
+    Task CreateIfNotExistAsync(ActorNumber actorNumber, string actorClientId, CancellationToken cancellationToken);
 }

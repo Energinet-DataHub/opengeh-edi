@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
@@ -20,7 +21,7 @@ using Energinet.DataHub.ProcessManager.Shared.Extensions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
-public static class EnqueueBrs023_027MessageFactory
+public static class EnqueueBrs023027MessageFactory
 {
     private static readonly string _orchestrationName = Brs_023_027.Name;
 
@@ -37,7 +38,11 @@ public static class EnqueueBrs023_027MessageFactory
         {
             OrchestrationName = _orchestrationName,
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = Guid.NewGuid().ToString(),
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = DataHubDetails.DataHubActorNumber.Value,
+                ActorRole = ActorRoleV1.DataHubAdministrator,
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 

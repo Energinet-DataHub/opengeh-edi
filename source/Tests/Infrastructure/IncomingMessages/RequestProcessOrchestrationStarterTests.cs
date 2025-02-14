@@ -96,13 +96,14 @@ public class RequestProcessOrchestrationStarterTests
             .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken _) => actualCommand = command);
 
         // => Setup authenticated actor
-        var expectedActorId = Guid.NewGuid();
+        var expectedActor = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
-            ActorNumber.Create("1234567890123"),
+            expectedActor.ActorNumber,
             Restriction.None,
-            ActorRole.GridAccessProvider,
-            expectedActorId));
+            expectedActor.ActorRole,
+            null,
+            Guid.NewGuid()));
 
         var sut = new RequestProcessOrchestrationStarter(
             processManagerClient.Object,
@@ -121,7 +122,9 @@ public class RequestProcessOrchestrationStarterTests
             Times.Once);
 
         var expectedCommand = new RequestCalculatedWholesaleServicesCommandV1(
-            operatingIdentity: new ActorIdentityDto(expectedActorId),
+            operatingIdentity: new ActorIdentityDto(
+                expectedActor.ActorNumber.ToProcessManagerActorNumber(),
+                expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new RequestCalculatedWholesaleServicesInputV1(
                 ActorMessageId: messageId,
                 TransactionId: transactionId,
@@ -214,13 +217,15 @@ public class RequestProcessOrchestrationStarterTests
             .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken _) => actualCommand = command);
 
         // => Setup authenticated actor
-        var expectedActorId = Guid.NewGuid();
+
+        var expectedActor = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
-            ActorNumber.Create("1234567890123"),
+            expectedActor.ActorNumber,
             Restriction.None,
-            ActorRole.EnergySupplier,
-            expectedActorId));
+            expectedActor.ActorRole,
+            null,
+            Guid.NewGuid()));
 
         var sut = new RequestProcessOrchestrationStarter(
             processManagerClient.Object,
@@ -239,7 +244,9 @@ public class RequestProcessOrchestrationStarterTests
             Times.Once);
 
         var expectedCommand = new RequestCalculatedEnergyTimeSeriesCommandV1(
-            operatingIdentity: new ActorIdentityDto(expectedActorId),
+            operatingIdentity: new ActorIdentityDto(
+                expectedActor.ActorNumber.ToProcessManagerActorNumber(),
+                expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
                 ActorMessageId: messageId,
                 TransactionId: transactionId,
@@ -337,13 +344,14 @@ public class RequestProcessOrchestrationStarterTests
             .Callback((StartOrchestrationInstanceMessageCommand<MeteredDataForMeteringPointMessageInputV1> command, CancellationToken _) => actualCommand = command);
 
         // => Setup authenticated actor
-        var expectedActorId = Guid.NewGuid();
+        var expectedActor = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
             ActorNumber.Create("1111111111111"),
             Restriction.None,
             ActorRole.GridAccessProvider,
-            expectedActorId));
+            null,
+            Guid.NewGuid()));
 
         var sut = new MeteredDataOrchestrationStarter(
             processManagerClient.Object,
@@ -362,12 +370,14 @@ public class RequestProcessOrchestrationStarterTests
             Times.Once);
 
         var expectedCommand = new StartForwardMeteredDataCommandV1(
-            operatingIdentity: new ActorIdentityDto(expectedActorId),
+            operatingIdentity: new ActorIdentityDto(
+                expectedActor.ActorNumber.ToProcessManagerActorNumber(),
+                expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new MeteredDataForMeteringPointMessageInputV1(
                 MessageId: messageId,
-                AuthenticatedActorId: expectedActorId,
+                AuthenticatedActorId: Guid.Empty, // This is not used and should be removed from the contract
                 ActorNumber: requestedByActor.ActorNumber.Value,
-                ActorRole: requestedByActor.ActorRole.Code,
+                ActorRole: requestedByActor.ActorRole.Name,
                 TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,

@@ -15,33 +15,33 @@
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
-using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
 public class ActorRole : DataHubType<ActorRole>
 {
-    public static readonly ActorRole MeteringPointAdministrator = new(PMTypes.ActorRole.MeteringPointAdministrator.Name, "DDZ");
-    public static readonly ActorRole EnergySupplier = new(PMTypes.ActorRole.EnergySupplier.Name, "DDQ");
+    public static readonly ActorRole MeteringPointAdministrator = new(PMCoreTypes.ActorRole.MeteringPointAdministrator.Name, "DDZ");
+    public static readonly ActorRole EnergySupplier = new(PMCoreTypes.ActorRole.EnergySupplier.Name, "DDQ");
 
     // A grid operator has two roles.
     // GridOperator (DDM) when creating a new metering point
-    public static readonly ActorRole GridAccessProvider = new(PMTypes.ActorRole.GridAccessProvider.Name, "DDM");
-    public static readonly ActorRole MeteredDataAdministrator = new(PMTypes.ActorRole.MeteredDataAdministrator.Name, "DGL");
+    public static readonly ActorRole GridAccessProvider = new(PMCoreTypes.ActorRole.GridAccessProvider.Name, "DDM");
+    public static readonly ActorRole MeteredDataAdministrator = new(PMCoreTypes.ActorRole.MeteredDataAdministrator.Name, "DGL");
 
     // A grid operator has two roles.
     // MeteredDataResponsible (MDR) when requesting data from DataHub
-    public static readonly ActorRole MeteredDataResponsible = new(PMTypes.ActorRole.MeteredDataResponsible.Name, "MDR");
-    public static readonly ActorRole BalanceResponsibleParty = new(PMTypes.ActorRole.BalanceResponsibleParty.Name, "DDK");
+    public static readonly ActorRole MeteredDataResponsible = new(PMCoreTypes.ActorRole.MeteredDataResponsible.Name, "MDR");
+    public static readonly ActorRole BalanceResponsibleParty = new(PMCoreTypes.ActorRole.BalanceResponsibleParty.Name, "DDK");
 
-    public static readonly ActorRole ImbalanceSettlementResponsible = new(PMTypes.ActorRole.ImbalanceSettlementResponsible.Name, "DDX");
-    public static readonly ActorRole SystemOperator = new(PMTypes.ActorRole.SystemOperator.Name, "EZ");
-    public static readonly ActorRole DanishEnergyAgency = new(PMTypes.ActorRole.DanishEnergyAgency.Name, "STS");
-    public static readonly ActorRole Delegated = new(PMTypes.ActorRole.Delegated.Name, "DEL");
+    public static readonly ActorRole ImbalanceSettlementResponsible = new(PMCoreTypes.ActorRole.ImbalanceSettlementResponsible.Name, "DDX");
+    public static readonly ActorRole SystemOperator = new(PMCoreTypes.ActorRole.SystemOperator.Name, "EZ");
+    public static readonly ActorRole DanishEnergyAgency = new(PMCoreTypes.ActorRole.DanishEnergyAgency.Name, "STS");
+    public static readonly ActorRole Delegated = new(PMCoreTypes.ActorRole.Delegated.Name, "DEL");
 
     // DataHubAdministrator is a special role that is used to indicate that the user has special permissions.
-    public static readonly ActorRole DataHubAdministrator = new(PMTypes.ActorRole.DataHubAdministrator.Name, string.Empty);
+    public static readonly ActorRole DataHubAdministrator = new(PMCoreTypes.ActorRole.DataHubAdministrator.Name, string.Empty);
 
     [JsonConstructor]
     private ActorRole(string name, string code)
@@ -49,7 +49,7 @@ public class ActorRole : DataHubType<ActorRole>
     {
     }
 
-    public static ActorRole Create(ProcessManager.Components.Abstractions.ValueObjects.ActorRole actorNumber)
+    public static ActorRole Create(PMCoreTypes.ActorRole actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         return FromName(actorNumber.Name) ?? throw InvalidActorNumberException.Create(actorNumber.Name);
@@ -77,6 +77,11 @@ public class ActorRole : DataHubType<ActorRole>
     public ActorRole ForActorMessageDelegation()
     {
         return HackForMeteredDataResponsible();
+    }
+
+    public ProcessManager.Abstractions.Core.ValueObjects.ActorRole ToProcessManagerActorRole()
+    {
+        return ProcessManager.Abstractions.Core.ValueObjects.ActorRole.FromName(Name);
     }
 
     private ActorRole HackForMeteredDataResponsible()

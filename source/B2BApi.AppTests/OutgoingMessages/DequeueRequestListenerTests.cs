@@ -67,8 +67,8 @@ public class DequeueRequestListenerTests : IAsyncLifetime
 
         // The actor must exist in the database
         var actorNumber = ActorNumber.Create("1234567890123");
-        var externalId = Guid.NewGuid().ToString();
-        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
+        var actorClientId = Guid.NewGuid().ToString();
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, actorClientId);
 
         // The bearer token must contain:
         //  * the actor role matching any valid/known role in the ClaimsMap
@@ -76,7 +76,7 @@ public class DequeueRequestListenerTests : IAsyncLifetime
         var actorRole = ActorRole.BalanceResponsibleParty;
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
@@ -102,8 +102,8 @@ public class DequeueRequestListenerTests : IAsyncLifetime
 
         // The actor must exist in the database
         var actorNumber = ActorNumber.Create("1234567890123");
-        var externalId = Guid.NewGuid().ToString();
-        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
+        var actorClientId = Guid.NewGuid().ToString();
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, actorClientId);
 
         // The bearer token must contain:
         //  * the actor role matching any valid/known role in the ClaimsMap
@@ -111,7 +111,7 @@ public class DequeueRequestListenerTests : IAsyncLifetime
         var actorRole = ActorRole.BalanceResponsibleParty;
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");

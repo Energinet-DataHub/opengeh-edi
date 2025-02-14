@@ -32,6 +32,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
+using PMCoreValueTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
@@ -68,11 +69,10 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
-        var actorId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new MeteredDataForMeteringPointRejectedV1(
             "EventId",
             PMValueTypes.BusinessReason.PeriodicMetering,
-            new MarketActorRecipient("1111111111111", PMValueTypes.ActorRole.GridAccessProvider),
+            new MarketActorRecipient("1111111111111", PMCoreValueTypes.ActorRole.GridAccessProvider),
             Guid.NewGuid(),
             Guid.NewGuid(),
             new AcknowledgementV1(
@@ -92,7 +92,11 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         {
             OrchestrationName = Brs_021_ForwardedMeteredData.Name,
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = "1111111111111",
+                ActorRole = ActorRole.GridAccessProvider.ToProcessManagerActorRole().ToActorRoleV1(),
+            },
             Data = JsonSerializer.Serialize(enqueueMessagesData),
             DataType = nameof(MeteredDataForMeteringPointRejectedV1),
             DataFormat = EnqueueActorMessagesDataFormatV1.Json,
@@ -125,14 +129,14 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         hostLog.Should().ContainMatch("*INSERT INTO [dbo].[OutgoingMessages]*");
         hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
 
-        var externalId = Guid.NewGuid().ToString();
-        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create("1111111111111"), externalId);
+        var actorClientId = Guid.NewGuid().ToString();
+        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create("1111111111111"), actorClientId);
 
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/TimeSeries");
 
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(ActorRole.GridAccessProvider).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);

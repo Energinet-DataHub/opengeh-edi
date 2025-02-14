@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
@@ -27,12 +28,13 @@ using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 using Period = Energinet.DataHub.Edi.Responses.Period;
-using PMActorNumber = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorNumber;
-using PMActorRole = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorRole;
+using PMActorNumber = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber;
+using PMActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
 using PMBusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 using PMChargeType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ChargeType;
 using PMResolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
 using PMSettlementVersion = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -66,7 +68,7 @@ public static class WholesaleServicesResponseEventBuilder
         // If no charge types are specified, add some default charge types representing the different charges an actor can have.
         var chargeTypes = request.ChargeTypes.ToList();
         if (chargeTypes.Count == 0)
-            chargeTypes.Add(new ChargeType { ChargeCode = "12345678", ChargeType_ = DataHubNames.ChargeType.Tariff });
+            chargeTypes.Add(new ChargeType { ChargeCode = "12345678", ChargeType_ = BuildingBlocks.Domain.Models.ChargeType.Tariff.Name });
 
         var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
         var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;
@@ -77,7 +79,7 @@ public static class WholesaleServicesResponseEventBuilder
                 var series = chargeTypes.Select(
                     ct =>
                     {
-                        var resolution = request.Resolution == DataHubNames.Resolution.Monthly
+                        var resolution = request.Resolution == Resolution.Monthly.Name
                             ? WholesaleServicesRequestSeries.Types.Resolution.Monthly
                             : WholesaleServicesRequestSeries.Types.Resolution.Hour;
 
@@ -91,7 +93,7 @@ public static class WholesaleServicesResponseEventBuilder
                                 StartOfPeriod = periodStart.ToTimestamp(), EndOfPeriod = periodEnd.ToTimestamp(),
                             },
                             Resolution = resolution,
-                            CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
+                            CalculationType = request.BusinessReason == BusinessReason.WholesaleFixing.Name
                                 ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
                                 : throw new NotImplementedException(
                                     "Builder only supports WholesaleFixing, not corrections"),
@@ -119,7 +121,7 @@ public static class WholesaleServicesResponseEventBuilder
                     }).ToList();
 
                 // When the resolution is monthly and no charge types are specified, series should contain a total monthly amount result.
-                if (request.Resolution == DataHubNames.Resolution.Monthly
+                if (request.Resolution == Resolution.Monthly.Name
                     && request.ChargeTypes.Count == 0)
                 {
                     var totalMonthlyAmountSeries = new WholesaleServicesRequestSeries()
@@ -131,7 +133,7 @@ public static class WholesaleServicesResponseEventBuilder
                             EndOfPeriod = periodEnd.ToTimestamp(),
                         },
                         Resolution = WholesaleServicesRequestSeries.Types.Resolution.Monthly,
-                        CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
+                        CalculationType = request.BusinessReason == BusinessReason.WholesaleFixing.Name
                             ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
                             : throw new NotImplementedException("Builder only supports WholesaleFixing, not corrections"),
                         ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : defaultChargeOwnerId!,
@@ -213,7 +215,11 @@ public static class WholesaleServicesResponseEventBuilder
         {
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = Brs_028.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+                ActorRole = PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedByActorRole).ToActorRoleV1(),
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(acceptRequest);
@@ -282,7 +288,11 @@ public static class WholesaleServicesResponseEventBuilder
         {
             OrchestrationName = Brs_028.Name,
             OrchestrationVersion = Brs_028.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
+                ActorRole = PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedByActorRole).ToActorRoleV1(),
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(), // TODO, could be used to assert on when notifying the orchestration instance in pm
         };
         enqueueActorMessages.SetData(rejectRequest);
