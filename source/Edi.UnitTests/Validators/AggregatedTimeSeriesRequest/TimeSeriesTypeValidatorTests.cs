@@ -38,7 +38,7 @@ public class TimeSeriesTypeValidatorTests
         yield return [MeteringPointType.Exchange.Name, null!];
     }
 
-    public static IEnumerable<object[]> GetMeteringPointTypeData_Consumption()
+    public static IEnumerable<object[]> GetMeteringPointTypeData_Total_Consumption()
     {
         yield return [MeteringPointType.Consumption.Name, null!];
     }
@@ -56,7 +56,7 @@ public class TimeSeriesTypeValidatorTests
     [Theory]
     [MemberData(nameof(GetMeteringPointTypeData_Production))]
     [MemberData(nameof(GetMeteringPointTypeData_Exchange))]
-    [MemberData(nameof(GetMeteringPointTypeData_Consumption))]
+    [MemberData(nameof(GetMeteringPointTypeData_Total_Consumption))]
     [MemberData(nameof(GetMeteringPointTypeData_Consumption_NonProfiled))]
     [MemberData(nameof(GetMeteringPointTypeData_Consumption_Flex))]
     public async Task Validate_AsMeteredDataResponsible_ReturnsNoValidationErrors(string meteringPointType, string? settlementMethod)
@@ -123,7 +123,7 @@ public class TimeSeriesTypeValidatorTests
 
     [Theory]
     [MemberData(nameof(GetMeteringPointTypeData_Exchange))]
-    [MemberData(nameof(GetMeteringPointTypeData_Consumption))]
+    [MemberData(nameof(GetMeteringPointTypeData_Total_Consumption))]
     public async Task Validate_AsEnergySupplierAndNoSettlementMethod_ReturnsExceptedValidationErrors(string meteringPointType, string? settlementMethod)
     {
         // Arrange
@@ -148,7 +148,7 @@ public class TimeSeriesTypeValidatorTests
 
     [Theory]
     [MemberData(nameof(GetMeteringPointTypeData_Exchange))]
-    [MemberData(nameof(GetMeteringPointTypeData_Consumption))]
+    [MemberData(nameof(GetMeteringPointTypeData_Total_Consumption))]
     public async Task Validate_AsBalanceResponsibleAndNoSettlementMethod_ValidationErrors(string meteringPointType, string? settlementMethod)
     {
         // Arrange

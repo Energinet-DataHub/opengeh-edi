@@ -40,12 +40,9 @@ public class RequestedCalculationTypeMapperTests
         yield return [BusinessReason.BalanceFixing.Name, null!, RequestedCalculationType.BalanceFixing];
         yield return [BusinessReason.PreliminaryAggregation.Name, null!, RequestedCalculationType.PreliminaryAggregation];
         yield return [BusinessReason.WholesaleFixing.Name, null!, RequestedCalculationType.WholesaleFixing];
-        yield return [BusinessReason.Correction.Name, SettlementVersion.FirstCorrection.Name, RequestedCalculationType.FirstCorrection,
-        ];
-        yield return [BusinessReason.Correction.Name, SettlementVersion.SecondCorrection.Name, RequestedCalculationType.SecondCorrection,
-        ];
-        yield return [BusinessReason.Correction.Name, SettlementVersion.ThirdCorrection.Name, RequestedCalculationType.ThirdCorrection,
-        ];
+        yield return [BusinessReason.Correction.Name, SettlementVersion.FirstCorrection.Name, RequestedCalculationType.FirstCorrection];
+        yield return [BusinessReason.Correction.Name, SettlementVersion.SecondCorrection.Name, RequestedCalculationType.SecondCorrection];
+        yield return [BusinessReason.Correction.Name, SettlementVersion.ThirdCorrection.Name, RequestedCalculationType.ThirdCorrection];
         yield return [BusinessReason.Correction.Name, null!, RequestedCalculationType.LatestCorrection];
     }
 
