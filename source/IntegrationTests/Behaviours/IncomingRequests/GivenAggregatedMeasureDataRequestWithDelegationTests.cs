@@ -94,6 +94,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
 
     public static IEnumerable<object[]> GetTestData()
     {
+        yield return ["Xml", ActorRole.MeteredDataResponsible.Name];
+        yield return ["Json", ActorRole.MeteredDataResponsible.Name];
         yield return ["Xml", ActorRole.GridAccessProvider.Name];
         yield return ["Json", ActorRole.GridAccessProvider.Name];
         yield return ["Xml", ActorRole.EnergySupplier.Name];
