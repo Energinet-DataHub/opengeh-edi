@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest.Rules;
@@ -35,7 +36,7 @@ public class SettlementVersionValidatorTest
     {
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
-            .WithBusinessReason(DataHubNames.BusinessReason.Correction)
+            .WithBusinessReason(BusinessReason.Correction.Name)
             .WithSettlementVersion(invalidSettlementVersion)
             .Build();
 
@@ -58,7 +59,7 @@ public class SettlementVersionValidatorTest
     {
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
-            .WithBusinessReason(DataHubNames.BusinessReason.WholesaleFixing)
+            .WithBusinessReason(BusinessReason.WholesaleFixing.Name)
             .WithSettlementVersion(settlementVersion)
             .Build();
 
@@ -78,7 +79,7 @@ public class SettlementVersionValidatorTest
     {
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
-            .WithBusinessReason(DataHubNames.BusinessReason.Correction)
+            .WithBusinessReason(BusinessReason.Correction.Name)
             .WithSettlementVersion(validSettlementVersion)
             .Build();
 
@@ -94,7 +95,7 @@ public class SettlementVersionValidatorTest
     {
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
-            .WithBusinessReason(DataHubNames.BusinessReason.Correction)
+            .WithBusinessReason(BusinessReason.Correction.Name)
             .WithSettlementVersion(null)
             .Build();
 
@@ -110,7 +111,7 @@ public class SettlementVersionValidatorTest
     {
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
-            .WithBusinessReason(DataHubNames.BusinessReason.WholesaleFixing)
+            .WithBusinessReason(BusinessReason.WholesaleFixing.Name)
             .WithSettlementVersion(null)
             .Build();
 
