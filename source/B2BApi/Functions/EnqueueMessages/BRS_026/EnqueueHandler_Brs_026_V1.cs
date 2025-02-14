@@ -69,10 +69,10 @@ public class EnqueueHandler_Brs_026_V1(
             orchestrationInstanceId: orchestrationInstanceId,
             originalMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
             originalTransactionId: TransactionId.From(acceptedData.OriginalTransactionId),
-            requestedForActorNumber: ActorNumber.Create(acceptedData.RequestedForActorNumber.Value),
-            requestedForActorRole: ActorRole.FromName(acceptedData.RequestedForActorRole.Name),
-            requestedByActorNumber: ActorNumber.Create(acceptedData.RequestedByActorNumber.Value),
-            requestedByActorRole: ActorRole.FromName(acceptedData.RequestedByActorRole.Name),
+            requestedForActorNumber: ActorNumber.Create(acceptedData.RequestedForActorNumber),
+            requestedForActorRole: ActorRole.Create(acceptedData.RequestedForActorRole),
+            requestedByActorNumber: ActorNumber.Create(acceptedData.RequestedByActorNumber),
+            requestedByActorRole: ActorRole.Create(acceptedData.RequestedByActorRole),
             businessReason: BusinessReason.FromName(acceptedData.BusinessReason.Name),
             meteringPointType: acceptedData.MeteringPointType != null ? MeteringPointType.FromName(acceptedData.MeteringPointType.Name) : null,
             settlementMethod: acceptedData.SettlementMethod != null ? SettlementMethod.FromName(acceptedData.SettlementMethod.Name) : null,
@@ -189,7 +189,7 @@ public class EnqueueHandler_Brs_026_V1(
             };
     }
 
-    private static CalculationType MapCalculationType(string businessReason, string? settlementVersion)
+    private static CalculationType? MapCalculationType(string businessReason, string? settlementVersion)
     {
         if (businessReason == BusinessReason.Correction.Name && settlementVersion != null)
         {
@@ -209,6 +209,7 @@ public class EnqueueHandler_Brs_026_V1(
                 DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
                 DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
                 DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                null => null, // CalculationType == null means get latest correction
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
                     settlementVersion,

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
@@ -26,18 +27,21 @@ public sealed class WholesaleSettlementRequestDsl
     private readonly EdiDriver _ediDriver;
     private readonly B2CEdiDriver _b2cEdiDriver;
     private readonly WholesaleDriver _wholesaleDriver;
+    private readonly ProcessManagerDriver _processManagerDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
     internal WholesaleSettlementRequestDsl(
         EdiDatabaseDriver ediDatabaseDriver,
         EdiDriver ediDriver,
         B2CEdiDriver b2cEdiDriver,
-        WholesaleDriver wholesaleDriver)
+        WholesaleDriver wholesaleDriver,
+        ProcessManagerDriver processManagerDriver)
     {
         _ediDatabaseDriver = ediDatabaseDriver;
         _ediDriver = ediDriver;
         _b2cEdiDriver = b2cEdiDriver;
         _wholesaleDriver = wholesaleDriver;
+        _processManagerDriver = processManagerDriver;
     }
 
     internal async Task<Guid> Request(CancellationToken cancellationToken)
@@ -121,5 +125,22 @@ public sealed class WholesaleSettlementRequestDsl
         await _wholesaleDriver.PublishWholesaleServicesRequestRejectedResponseAsync(
             processId,
             cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAcceptedBrs028RequestAsync(
+        string gridArea,
+        Actor actor)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
+        await _processManagerDriver.PublishAcceptedBrs028RequestAsync(gridArea, actor);
+    }
+
+    internal async Task PublishRejectedBrs028RequestAsync(
+        Actor actor)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
+        await _processManagerDriver.PublishRejectedBrs028RequestAsync(actor);
     }
 }
