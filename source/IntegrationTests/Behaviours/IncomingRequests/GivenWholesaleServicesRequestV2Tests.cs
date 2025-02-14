@@ -116,7 +116,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
-        var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create("5790000432752") : ActorNumber.Create("8500000000502");
+        var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value) : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
         var actor = (ActorNumber: actorRole == ActorRole.EnergySupplier
             ? energySupplierNumber
@@ -251,7 +251,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
-        var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create("5790000432752") : ActorNumber.Create("8500000000502");
+        var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value) : ActorNumber.Create("8500000000502");
         var actor = (ActorNumber: actorRole == ActorRole.EnergySupplier
             ? energySupplierNumber
             : chargeOwnerNumber, ActorRole: actorRole);
@@ -403,7 +403,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             ? ActorNumber.Create("5790001662233")
             : null;
         var chargeOwnerOrNull = actorRole == ActorRole.SystemOperator
-            ? ActorNumber.Create("5790000432752")
+            ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
             : null;
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
         var actor = (ActorNumber: energySupplierOrNull != null
@@ -464,7 +464,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var defaultGridAreas = gridAreaOrNull == null ? testDataDescription.GridAreaCodes : null;
-        var defaultChargeOwner = chargeOwnerOrNull == null ? "5790000432752" : null;
+        var defaultChargeOwner = chargeOwnerOrNull == null ? DataHubDetails.SystemOperatorActorNumber.Value : null;
         var defaultEnergySupplier = energySupplierOrNull == null ? "5790001662233" : null;
         var requestCalculatedWholesaleServicesInputV1 = message.ParseInput<RequestCalculatedWholesaleServicesInputV1>();
         var requestCalculatedWholesaleServicesAccepted = WholesaleServicesResponseEventBuilder
@@ -479,7 +479,9 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             peekDocumentFormat);
 
         // Assert
-        var acceptedChargeCodes = new List<string>() { "40000", "41000", "45013", "EA-001" };
+        var acceptedChargeCodes = actorRole != ActorRole.SystemOperator
+         ? new List<string>() { "EA-001" }
+         : new List<string>() { "40000", "41000", "45013" };
         var acceptedResolutions = new List<Resolution>() { Resolution.Daily, Resolution.Hourly };
         using (new AssertionScope())
         {
@@ -514,7 +516,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                     ReceiverRole: actor.ActorRole,
                     SenderId: DataHubDetails.DataHubActorNumber.Value, // Sender is always DataHub
                     SenderRole: ActorRole.MeteredDataAdministrator,
-                    ChargeTypeOwner: chargeOwnerOrNull?.Value ?? "5790000432752",
+                    ChargeTypeOwner: chargeOwnerOrNull?.Value ?? DataHubDetails.SystemOperatorActorNumber.Value,
                     ChargeCode: peekResultChargeCode,
                     ChargeType: ChargeType.Tariff,
                     Currency: Currency.DanishCrowns,
@@ -672,7 +674,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = actorRole == ActorRole.SystemOperator
-                                ? ActorNumber.Create("5790000432752")
+                                ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
                                 : actorRole == ActorRole.GridAccessProvider
                                     ? ActorNumber.Create("8500000000502") : null;
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
@@ -747,10 +749,8 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
         // Assert
         var expectedResultsNumber = actorRole == ActorRole.EnergySupplier
-                ? 8 // 7 for each charge type (monthly) and 1 for charge owner (total amount)
-                : actorRole == ActorRole.GridAccessProvider
-                    ? 4 // 3 for each charge type (monthly) and 1 for charge owner (total amount)
-                    : 5; // 3 for each charge type (monthly) and 2 for charge owner (total amount)
+            ? 8 // 7 for each charge type (monthly) and 1 for charge owner (total amount)
+            : 4; // 3 for each charge type (monthly) and 1 for charge owner (total amount)
         using (new AssertionScope())
         {
            peekResults
