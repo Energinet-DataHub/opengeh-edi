@@ -162,28 +162,26 @@ public class EnqueueHandler_Brs_026_V1(
             ? [MapTimeSeriesType(meteringPointType.Name, settlementMethod?.Name)]
             : requestedForActorRole.Name switch
             {
-                nameof(ActorRole.EnergySupplier) =>
+                _ when requestedForActorRole.Name == ActorRole.EnergySupplier.Name =>
                     [
                         TimeSeriesType.Production,
                         TimeSeriesType.FlexConsumption,
                         TimeSeriesType.NonProfiledConsumption,
                     ],
-                nameof(ActorRole.BalanceResponsibleParty) =>
-                    new[]
-                    {
-                        TimeSeriesType.Production,
+                _ when requestedForActorRole.Name == ActorRole.BalanceResponsibleParty.Name =>
+                [
+                    TimeSeriesType.Production,
                         TimeSeriesType.FlexConsumption,
                         TimeSeriesType.NonProfiledConsumption,
-                    },
-                nameof(ActorRole.MeteredDataResponsible) =>
-                    new[]
-                    {
-                        TimeSeriesType.Production,
+                ],
+                _ when requestedForActorRole.Name == ActorRole.MeteredDataResponsible.Name =>
+                [
+                    TimeSeriesType.Production,
                         TimeSeriesType.FlexConsumption,
                         TimeSeriesType.NonProfiledConsumption,
                         TimeSeriesType.TotalConsumption,
                         TimeSeriesType.NetExchangePerGa,
-                    },
+                ],
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(requestedForActorRole),
                     requestedForActorRole,
@@ -232,8 +230,8 @@ public class EnqueueHandler_Brs_026_V1(
             _ when meteringPointType == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
             _ when meteringPointType == MeteringPointType.Consumption.Name => settlementMethod switch
             {
-                _ when meteringPointType == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
-                _ when meteringPointType == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
+                _ when settlementMethod == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
+                _ when settlementMethod == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
                 var method when
                     string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
 
