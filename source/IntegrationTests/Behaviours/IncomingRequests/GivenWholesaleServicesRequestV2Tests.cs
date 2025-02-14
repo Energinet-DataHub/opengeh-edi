@@ -747,10 +747,8 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
         // Assert
         var expectedResultsNumber = actorRole == ActorRole.EnergySupplier
-                ? 8 // 7 for each charge type (monthly) and 1 for charge owner (total amount)
-                : actorRole == ActorRole.GridAccessProvider
-                    ? 4 // 3 for each charge type (monthly) and 1 for charge owner (total amount)
-                    : 5; // 3 for each charge type (monthly) and 2 for charge owner (total amount)
+            ? 8 // 7 for each charge type (monthly) and 1 for charge owner (total amount)
+            : 4; // 3 for each charge type (monthly) and 1 for charge owner (total amount)
         using (new AssertionScope())
         {
            peekResults
