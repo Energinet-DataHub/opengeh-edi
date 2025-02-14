@@ -21,11 +21,11 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
+public class WhenCalculationCompletedIsProcessManagerPublishedTests : BaseTestClass
 {
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public WhenCalculationCompletedIsPublishedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public WhenCalculationCompletedIsProcessManagerPublishedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -46,7 +46,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
     [Fact]
     public async Task Actor_can_peek_and_dequeue_energy_result_from_balance_fixing()
     {
-        await _calculationCompleted.PublishForBalanceFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027BalanceFixingCalculation();
 
         await _calculationCompleted.ConfirmEnergyResultsAreAvailable();
     }
@@ -54,7 +54,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
     [Fact]
     public async Task Actor_can_peek_and_dequeue_wholesale_and_energy_result_from_wholesale_fixing()
     {
-        await _calculationCompleted.PublishForWholesaleFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027WholeSaleFixingCalculation();
 
         await _calculationCompleted.ConfirmWholesaleResultsAndEnergyResultsAreAvailable();
     }
