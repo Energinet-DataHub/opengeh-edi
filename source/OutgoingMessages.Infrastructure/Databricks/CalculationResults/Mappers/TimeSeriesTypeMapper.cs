@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 
@@ -28,8 +27,8 @@ public static class TimeSeriesTypeMapper
             _ when meteringPointType == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
             _ when meteringPointType == MeteringPointType.Consumption.Name => settlementMethod switch
             {
-                DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
+                _ when settlementMethod == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
+                _ when settlementMethod == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
                 var method when
                     string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
 

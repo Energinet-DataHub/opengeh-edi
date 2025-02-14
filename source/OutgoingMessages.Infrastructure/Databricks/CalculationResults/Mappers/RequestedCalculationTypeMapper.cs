@@ -38,9 +38,9 @@ public static class RequestedCalculationTypeMapper
             _ when businessReason == BusinessReason.WholesaleFixing.Name => CalculationType.WholesaleFixing,
             _ when businessReason == BusinessReason.Correction.Name => settlementVersion switch
             {
-                DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
-                DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
-                DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                _ when settlementVersion == SettlementVersion.FirstCorrection.Name => CalculationType.FirstCorrectionSettlement,
+                _ when settlementVersion == SettlementVersion.SecondCorrection.Name => CalculationType.SecondCorrectionSettlement,
+                _ when settlementVersion == SettlementVersion.ThirdCorrection.Name => CalculationType.ThirdCorrectionSettlement,
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
                     settlementVersion,

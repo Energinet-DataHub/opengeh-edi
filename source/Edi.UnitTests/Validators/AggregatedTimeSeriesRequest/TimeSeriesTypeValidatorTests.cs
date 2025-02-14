@@ -45,12 +45,12 @@ public class TimeSeriesTypeValidatorTests
 
     public static IEnumerable<object[]> GetMeteringPointTypeData_Consumption_NonProfiled()
     {
-        yield return [MeteringPointType.Consumption.Name, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [MeteringPointType.Consumption.Name, SettlementMethod.NonProfiled.Name];
     }
 
     public static IEnumerable<object[]> GetMeteringPointTypeData_Consumption_Flex()
     {
-        yield return [MeteringPointType.Consumption.Name, DataHubNames.SettlementMethod.Flex];
+        yield return [MeteringPointType.Consumption.Name, SettlementMethod.Flex.Name];
     }
 
     [Theory]
@@ -67,7 +67,7 @@ public class TimeSeriesTypeValidatorTests
             .WithMeteringPointType(meteringPointType)
             .WithSettlementMethod(settlementMethod)
             .WithRequestedByActorId("1234567890123")
-            .WithRequestedByActorRole(DataHubNames.ActorRole.MeteredDataResponsible)
+            .WithRequestedByActorRole(ActorRole.MeteredDataResponsible.Name)
             .Build();
 
         // Act
@@ -89,7 +89,7 @@ public class TimeSeriesTypeValidatorTests
             .WithMeteringPointType(meteringPointType)
             .WithSettlementMethod(settlementMethod)
             .WithRequestedByActorId("1234567890123")
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .Build();
 
         // Act
@@ -111,7 +111,7 @@ public class TimeSeriesTypeValidatorTests
             .WithMeteringPointType(meteringPointType)
             .WithSettlementMethod(settlementMethod)
             .WithRequestedByActorId("1234567890123")
-            .WithRequestedByActorRole(DataHubNames.ActorRole.BalanceResponsibleParty)
+            .WithRequestedByActorRole(ActorRole.BalanceResponsibleParty.Name)
             .Build();
 
         // Act
@@ -132,7 +132,7 @@ public class TimeSeriesTypeValidatorTests
             .WithMeteringPointType(meteringPointType)
             .WithSettlementMethod(settlementMethod)
             .WithRequestedByActorId("1234567890123")
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .Build();
 
         // Act
@@ -142,7 +142,7 @@ public class TimeSeriesTypeValidatorTests
         errors.Should().ContainSingle();
 
         var error = errors.First();
-        error.Message.Should().Be(_invalidTimeSeriesTypeForActor.WithPropertyName(DataHubNames.ActorRole.EnergySupplier).Message);
+        error.Message.Should().Be(_invalidTimeSeriesTypeForActor.WithPropertyName(ActorRole.EnergySupplier.Name).Message);
         error.ErrorCode.Should().Be(_invalidTimeSeriesTypeForActor.ErrorCode);
     }
 
@@ -157,7 +157,7 @@ public class TimeSeriesTypeValidatorTests
             .WithMeteringPointType(meteringPointType)
             .WithSettlementMethod(settlementMethod)
             .WithRequestedByActorId("1234567890123")
-            .WithRequestedByActorRole(DataHubNames.ActorRole.BalanceResponsibleParty)
+            .WithRequestedByActorRole(ActorRole.BalanceResponsibleParty.Name)
             .Build();
 
         // Act
@@ -167,7 +167,7 @@ public class TimeSeriesTypeValidatorTests
         errors.Should().ContainSingle();
 
         var error = errors.First();
-        error.Message.Should().Be(_invalidTimeSeriesTypeForActor.WithPropertyName(DataHubNames.ActorRole.BalanceResponsibleParty).Message);
+        error.Message.Should().Be(_invalidTimeSeriesTypeForActor.WithPropertyName(ActorRole.BalanceResponsibleParty.Name).Message);
         error.ErrorCode.Should().Be(_invalidTimeSeriesTypeForActor.ErrorCode);
     }
 }

@@ -30,33 +30,38 @@ public class SettlementMethodValidatorTest
 
     public static IEnumerable<object[]> GetTestData()
     {
-        yield return [MeteringPointType.Production.Name, DataHubNames.SettlementMethod.Flex];
-        yield return [MeteringPointType.Production.Name, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [MeteringPointType.Production.Name, SettlementMethod.Flex.Name];
+        yield return [MeteringPointType.Production.Name, SettlementMethod.NonProfiled.Name];
         yield return [MeteringPointType.Production.Name, "invalid-settlement-method"];
-        yield return [MeteringPointType.Exchange.Name, DataHubNames.SettlementMethod.Flex];
-        yield return [MeteringPointType.Exchange.Name, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [MeteringPointType.Exchange.Name, SettlementMethod.Flex.Name];
+        yield return [MeteringPointType.Exchange.Name, SettlementMethod.NonProfiled.Name];
         yield return [MeteringPointType.Exchange.Name, "invalid-settlement-method"];
-        yield return ["not-consumption-metering-point", DataHubNames.SettlementMethod.Flex];
-        yield return ["not-consumption-metering-point", DataHubNames.SettlementMethod.NonProfiled];
+        yield return ["not-consumption-metering-point", SettlementMethod.Flex.Name];
+        yield return ["not-consumption-metering-point", SettlementMethod.NonProfiled.Name];
         yield return ["not-consumption-metering-point", "invalid-settlement-method"];
-        yield return [string.Empty, DataHubNames.SettlementMethod.Flex];
-        yield return [string.Empty, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [string.Empty, SettlementMethod.Flex.Name];
+        yield return [string.Empty, SettlementMethod.NonProfiled.Name];
         yield return [string.Empty, "invalid-settlement-method"];
-        yield return [null!, DataHubNames.SettlementMethod.Flex];
-        yield return [null!, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [null!, SettlementMethod.Flex.Name];
+        yield return [null!, SettlementMethod.NonProfiled.Name];
         yield return [null!, "invalid-settlement-method"];
+    }
+
+    public static IEnumerable<object[]> GetValidSettlementMethods()
+    {
+        yield return [SettlementMethod.Flex.Name];
+        yield return [SettlementMethod.NonProfiled.Name];
     }
 
     public static IEnumerable<object[]> GetMeteringPointTypeTestData()
     {
-        yield return new object[] { MeteringPointType.Production.Name };
-        yield return new object[] { MeteringPointType.Exchange.Name };
-        yield return new object[] { "not-consumption" };
+        yield return [MeteringPointType.Production.Name];
+        yield return [MeteringPointType.Exchange.Name];
+        yield return ["not-consumption"];
     }
 
     [Theory]
-    [InlineData(DataHubNames.SettlementMethod.Flex)]
-    [InlineData(DataHubNames.SettlementMethod.NonProfiled)]
+    [MemberData(nameof(GetValidSettlementMethods))]
     public async Task Validate_WhenConsumptionAndSettlementMethodIsValid_ReturnsNoValidationErrorsAsync(string settlementMethod)
     {
         // Arrange
