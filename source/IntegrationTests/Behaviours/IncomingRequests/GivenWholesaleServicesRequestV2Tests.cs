@@ -479,7 +479,9 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             peekDocumentFormat);
 
         // Assert
-        var acceptedChargeCodes = new List<string>() { "40000", "41000", "45013", "EA-001" };
+        var acceptedChargeCodes = actorRole != ActorRole.SystemOperator
+         ? new List<string>() { "EA-001" }
+         : new List<string>() { "40000", "41000", "45013" };
         var acceptedResolutions = new List<Resolution>() { Resolution.Daily, Resolution.Hourly };
         using (new AssertionScope())
         {
