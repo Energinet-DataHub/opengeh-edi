@@ -107,9 +107,10 @@ public class ResolutionValidationRuleTests
     private static IEnumerable<string?> GetAllResolutionsInDatahub()
     {
         var resolutionType = typeof(Resolution);
-        return resolutionType
+        var resolutions = resolutionType
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
             .ToList()
-            .Select(res => (string)res.GetValue(null)!);
+            .Select(res => (Resolution)res.GetValue(null)!);
+        return resolutions.Select(x => x.Name);
     }
 }

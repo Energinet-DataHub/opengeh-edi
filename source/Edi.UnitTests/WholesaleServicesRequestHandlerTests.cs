@@ -120,6 +120,7 @@ public class WholesaleServicesRequestHandlerTests
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
             properties: new Dictionary<string, object> { { "ReferenceId", expectedReferenceId } },
             body: new BinaryData(new WholesaleServicesRequestBuilder()
+                .WithResolution(Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution.Monthly.Name)
                 .Build()
                 .ToByteArray()));
 
