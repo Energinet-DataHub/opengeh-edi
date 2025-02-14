@@ -21,7 +21,7 @@ using Energinet.DataHub.ProcessManager.Shared.Extensions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
-public static class EnqueueBrs023027MessageFactory
+public static class EnqueueBrs023_027MessageFactory
 {
     private static readonly string _orchestrationName = Brs_023_027.Name;
 

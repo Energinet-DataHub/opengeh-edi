@@ -103,7 +103,10 @@ public sealed class CalculationCompletedDsl
         await _ediDriver.EmptyQueueAsync();
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_balanceFixingCalculationId);
 
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant();
         await _processManagerDriver.PublishEnqueueBrs023_027RequestAsync(_balanceFixingCalculationId);
+
+        await EnsureOrchestrationsHasCompletedAsync(_balanceFixingCalculationId, orchestrationStartedAfter);
     }
 
     internal async Task PublishBrs023_027WholesaleFixingCalculation()
@@ -111,7 +114,10 @@ public sealed class CalculationCompletedDsl
         await _ediDriver.EmptyQueueAsync();
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_wholesaleFixingCalculationId);
 
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant();
         await _processManagerDriver.PublishEnqueueBrs023_027RequestAsync(_wholesaleFixingCalculationId);
+
+        await EnsureOrchestrationsHasCompletedAsync(_wholesaleFixingCalculationId, orchestrationStartedAfter);
     }
 
     /// <summary>
@@ -202,5 +208,23 @@ public sealed class CalculationCompletedDsl
             "Message orchestration completed for instance id {0}, took {1}",
             orchestration.InstanceId,
             SystemClock.Instance.GetCurrentInstant() - orchestrationStartedAt);
+    }
+
+    private async Task EnsureOrchestrationsHasCompletedAsync(
+        Guid calculationId,
+        Instant startedAt)
+    {
+        _logger.WriteLine("Wait for message orchestration to be started after {0}", startedAt.ToString());
+
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(startedAt);
+
+        orchestration.Input.Value<string>("CalculationId")
+            .Should()
+            .Be(
+                calculationId.ToString(),
+                $"because the orchestration should be for the given calculation id {calculationId}");
+
+        _logger.WriteLine("Orchestration started with instance id {0}", orchestration.InstanceId);
+        await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
     }
 }
