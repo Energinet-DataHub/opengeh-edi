@@ -54,7 +54,7 @@ public class WhenCalculationCompletedIsProcessManagerPublishedTests : BaseTestCl
     [Fact]
     public async Task Actor_can_peek_and_dequeue_wholesale_and_energy_result_from_wholesale_fixing()
     {
-        await _calculationCompleted.PublishBrs023_027WholeSaleFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027WholesaleFixingCalculation();
 
         await _calculationCompleted.ConfirmWholesaleResultsAndEnergyResultsAreAvailable();
     }

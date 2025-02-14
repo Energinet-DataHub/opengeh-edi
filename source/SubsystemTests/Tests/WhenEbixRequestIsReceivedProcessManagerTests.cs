@@ -79,7 +79,7 @@ public sealed class WhenEbixPeekRequestIsReceivedProcessManagerTests : BaseTestC
     {
         await _ebixEnergySupplier.EmptyQueueForActor();
 
-        await _calculationCompleted.PublishBrs023_027WholeSaleFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027WholesaleFixingCalculation();
 
         await _ebixEnergySupplier.ConfirmWholesaleResultIsAvailable();
     }

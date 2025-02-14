@@ -106,7 +106,7 @@ public sealed class CalculationCompletedDsl
         await _processManagerDriver.PublishEnqueueBrs023_027RequestAsync(_balanceFixingCalculationId);
     }
 
-    internal async Task PublishBrs023_027WholeSaleFixingCalculation()
+    internal async Task PublishBrs023_027WholesaleFixingCalculation()
     {
         await _ediDriver.EmptyQueueAsync();
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_wholesaleFixingCalculationId);
