@@ -105,13 +105,25 @@ jobs:
 
           - name: Integration tests - Behaviours - IncomingRequests V2
             paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName!~WholesaleServices)
+            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName!~WholesaleServices)&(DisplayName!~WithDelegation)
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: Integration tests - Behaviours - IncomingRequests V2 with Delegation
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName!~WholesaleServices)&(DisplayName~WithDelegation)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests V2 WholesaleServices
             paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName~WholesaleServices)
+            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName~WholesaleServices)&(DisplayName!~WithDelegation)
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: Integration tests - Behaviours - IncomingRequests V2 WholesaleServices with Delegation
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName~WholesaleServices)&(DisplayName~WithDelegation)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
