@@ -37,6 +37,7 @@ public static class EnqueueBrs023_027MessageFactory
         {
             OrchestrationName = _orchestrationName,
             OrchestrationVersion = 1,
+            OrchestrationStartedByActorId = Guid.NewGuid().ToString(),
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
 
