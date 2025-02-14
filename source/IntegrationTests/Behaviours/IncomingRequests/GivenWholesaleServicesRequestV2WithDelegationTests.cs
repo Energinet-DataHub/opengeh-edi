@@ -276,7 +276,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = delegatedFromRole == ActorRole.SystemOperator
-            ? ActorNumber.Create("5790000432752")
+            ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
             : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
 
@@ -580,7 +580,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
 
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
-        var chargeOwnerNumber = ActorNumber.Create("5790000432752");
+        var chargeOwnerNumber = ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value);
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
@@ -723,7 +723,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = delegatedFromRole == ActorRole.SystemOperator
-            ? ActorNumber.Create("5790000432752")
+            ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
             : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
 

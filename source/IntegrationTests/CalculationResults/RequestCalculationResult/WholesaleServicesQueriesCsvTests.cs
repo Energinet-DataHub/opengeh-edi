@@ -16,6 +16,7 @@ using AutoFixture;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
 using Energinet.DataHub.Core.TestCommon;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
@@ -260,12 +261,12 @@ public class WholesaleServicesQueriesCsvTests
                 AmountType: AmountType.MonthlyAmountPerCharge,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: "5790001687137",
-                ChargeOwnerId: isChargerOwner ? "5790000432752" : "8100000000047",
+                ChargeOwnerId: isChargerOwner ? DataHubDetails.SystemOperatorActorNumber.Value : "8100000000047",
                 ChargeTypes: [("40000", ChargeType.Tariff)],
                 CalculationType: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: false,
-                RequestedForActorNumber: "5790000432752");
+                RequestedForActorNumber: DataHubDetails.SystemOperatorActorNumber.Value);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
@@ -276,7 +277,7 @@ public class WholesaleServicesQueriesCsvTests
                     ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.ThirdCorrectionSettlement, 2, 1),
+                    ("804", "5790001687137", DataHubDetails.SystemOperatorActorNumber.Value, ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.ThirdCorrectionSettlement, 2, 1),
                 ]);
         }
 
@@ -292,7 +293,7 @@ public class WholesaleServicesQueriesCsvTests
                 AmountType: AmountType.AmountPerCharge,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: "5790001687137",
-                ChargeOwnerId: "5790000432752",
+                ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("EA-003", ChargeType.Tariff)],
                 CalculationType: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
@@ -315,7 +316,7 @@ public class WholesaleServicesQueriesCsvTests
                 AmountType: AmountType.MonthlyAmountPerCharge,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: "5790001687137",
-                ChargeOwnerId: "5790000432752",
+                ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("EA-003", ChargeType.Tariff)],
                 CalculationType: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
@@ -337,7 +338,7 @@ public class WholesaleServicesQueriesCsvTests
                 AmountType: AmountType.AmountPerCharge,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: "5790001687137",
-                ChargeOwnerId: "5790000432752",
+                ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [],
                 CalculationType: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
@@ -369,7 +370,7 @@ public class WholesaleServicesQueriesCsvTests
                 AmountType: AmountType.AmountPerCharge,
                 GridAreaCodes: ["804", "584"],
                 EnergySupplierId: null,
-                ChargeOwnerId: "5790000432752",
+                ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [],
                 CalculationType: null,
                 Period: totalPeriod,
@@ -400,7 +401,7 @@ public class WholesaleServicesQueriesCsvTests
             Given_GridAreaOwnerRequestsAmountPerChargeWithChargeOwner_When_ChargeIsNotTaxAndChargeOwnerIsSyo_Then_NoDataReturned()
         {
             var gridAreaOwnerAsRequester = "8100000000007";
-            var syoChargeOwner = "5790000432752";
+            var syoChargeOwner = DataHubDetails.SystemOperatorActorNumber.Value;
             var period = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 31, 23, 0));
@@ -440,7 +441,7 @@ public class WholesaleServicesQueriesCsvTests
                 CalculationType: CalculationType.SecondCorrectionSettlement,
                 Period: totalPeriod,
                 false,
-                "5790000432752");
+                DataHubDetails.SystemOperatorActorNumber.Value);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
@@ -601,12 +602,12 @@ public class WholesaleServicesQueriesCsvTests
                 AmountType: AmountType.AmountPerCharge,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: "5790001687137",
-                ChargeOwnerId: "5790000432752",
+                ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("40000", ChargeType.Tariff)],
                 CalculationType: CalculationType.SecondCorrectionSettlement,
                 Period: totalPeriod,
                 RequestedForEnergySupplier: false,
-                RequestedForActorNumber: "5790000432752");
+                RequestedForActorNumber: DataHubDetails.SystemOperatorActorNumber.Value);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
@@ -640,7 +641,7 @@ public class WholesaleServicesQueriesCsvTests
                 AmountType: AmountType.AmountPerCharge,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: "5790001687137",
-                ChargeOwnerId: "5790000432752",
+                ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("EA-001", ChargeType.Tariff)],
                 CalculationType: CalculationType.SecondCorrectionSettlement,
                 Period: totalPeriod,
@@ -722,7 +723,7 @@ public class WholesaleServicesQueriesCsvTests
                 CalculationType: null,
                 Period: totalPeriod,
                 RequestedForEnergySupplier: false,
-                RequestedForActorNumber: "5790000432752");
+                RequestedForActorNumber: DataHubDetails.SystemOperatorActorNumber.Value);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
