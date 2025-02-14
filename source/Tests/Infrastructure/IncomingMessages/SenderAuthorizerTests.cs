@@ -141,7 +141,7 @@ public class SenderAuthorizerTests
 
     private AuthenticatedActor CreateAuthenticatedActor(ActorNumber actorNumber, ActorRole actorRole)
     {
-        var actorIdentity = new ActorIdentity(actorNumber, Restriction.Owned, actorRole, _actorId);
+        var actorIdentity = new ActorIdentity(actorNumber, Restriction.Owned, actorRole, null, _actorId);
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(actorIdentity);
 

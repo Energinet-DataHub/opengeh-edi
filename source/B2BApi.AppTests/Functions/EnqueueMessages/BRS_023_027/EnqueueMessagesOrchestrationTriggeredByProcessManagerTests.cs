@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
@@ -385,12 +386,15 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
         CalculationEnqueueActorMessagesV1 calculationCompletedEvent,
         Guid? orchestrationInstanceId = null)
     {
-        var actorId = Guid.NewGuid().ToString();
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_023_027",
+            OrchestrationName = Brs_023_027.Name,
             OrchestrationVersion = 1,
-            OrchestrationStartedByActorId = actorId,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = "1234567890123",
+                ActorRole = ActorRoleV1.DataHubAdministrator,
+            },
             OrchestrationInstanceId = orchestrationInstanceId?.ToString() ?? Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(calculationCompletedEvent);

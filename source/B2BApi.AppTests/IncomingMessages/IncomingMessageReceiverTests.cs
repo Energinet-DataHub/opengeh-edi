@@ -116,15 +116,15 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         var jsonDocument = await File.ReadAllTextAsync("TestData/Messages/json/RequestAggregatedMeasureData.json");
 
         // The actor must exist in the database
-        var externalId = Guid.NewGuid().ToString();
-        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
+        var actorClientId = Guid.NewGuid().ToString();
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, actorClientId);
 
         // The bearer token must contain:
         //  * the actor role matching the document content
         //  * the external id matching the actor in the database
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}");
@@ -178,15 +178,15 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
                 .Replace("{TransactionId}", Guid.NewGuid().ToString());
 
             // The actor must exist in the database
-            var externalId = Guid.NewGuid().ToString();
-            await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
+            var actorClientId = Guid.NewGuid().ToString();
+            await Fixture.DatabaseManager.AddActorAsync(actorNumber, actorClientId);
 
             // The bearer token must contain:
             //  * the actor role matching the document content
             //  * the external id matching the actor in the database
             var b2bToken = new JwtBuilder()
                 .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-                .WithClaim(ClaimsMap.ActorId, externalId)
+                .WithClaim(ClaimsMap.ActorClientId, actorClientId)
                 .CreateToken();
 
             request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentType}")

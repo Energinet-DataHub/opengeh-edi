@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
-using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
 
@@ -64,10 +64,9 @@ public record RequestWholesaleServicesSeries(
 
         return actorRole.Name switch
         {
-            var name when name == PMTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
-
-            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
-            var name when name == PMTypes.ActorRole.SystemOperator.Name => ActorNumber.TryCreate(ChargeOwner),
+            var name when name == PMCoreTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
+            var name when name == PMCoreTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
+            var name when name == PMCoreTypes.ActorRole.SystemOperator.Name => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
         };
     }

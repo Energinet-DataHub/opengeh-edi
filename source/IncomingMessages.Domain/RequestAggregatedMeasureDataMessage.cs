@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
-using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
 
@@ -71,10 +71,10 @@ public record RequestAggregatedMeasureDataMessageSeries(
         // ActorRole.GridOperator, // Grid Operator can make requests because of DDM -> MDR hack
         return actorRole.Name switch
         {
-            var name when name == PMTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
-            var name when name == PMTypes.ActorRole.BalanceResponsibleParty.Name => ActorNumber.TryCreate(BalanceResponsiblePartyId),
-            var name when name == PMTypes.ActorRole.MeteredDataResponsible.Name => gridAreaOwner,
-            var name when name == PMTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
+            var name when name == PMCoreTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
+            var name when name == PMCoreTypes.ActorRole.BalanceResponsibleParty.Name => ActorNumber.TryCreate(BalanceResponsiblePartyId),
+            var name when name == PMCoreTypes.ActorRole.MeteredDataResponsible.Name => gridAreaOwner,
+            var name when name == PMCoreTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
             _ => null,
         };
     }

@@ -104,6 +104,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
             actorNumber: actorNumber,
             restriction: restriction,
             actorRole: role,
+            actorClientId: null,
             actorId: actorId));
     }
 }
