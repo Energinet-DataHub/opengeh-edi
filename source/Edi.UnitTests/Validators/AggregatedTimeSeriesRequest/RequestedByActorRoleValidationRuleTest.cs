@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
 using FluentAssertions;
 using Xunit;
@@ -21,10 +22,15 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.AggregatedTimeSer
 
 public sealed class RequestedByActorRoleValidationRuleTest
 {
+    public static IEnumerable<object[]> ValidActorRoles()
+    {
+        yield return [ActorRole.MeteredDataResponsible.Name];
+        yield return [ActorRole.EnergySupplier.Name];
+        yield return [ActorRole.BalanceResponsibleParty.Name];
+    }
+
     [Theory]
-    [InlineData(DataHubNames.ActorRole.MeteredDataResponsible)]
-    [InlineData(DataHubNames.ActorRole.EnergySupplier)]
-    [InlineData(DataHubNames.ActorRole.BalanceResponsibleParty)]
+    [MemberData(nameof(ValidActorRoles))]
     public async Task ValidateAsync_WhenRequestingWithValidActorRole_ReturnsEmptyErrorListAsync(string actorRole)
     {
         // Arrange

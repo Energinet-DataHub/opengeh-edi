@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using NodaTime.Extensions;
+using Period = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
@@ -40,19 +42,19 @@ public static class AggregatedTimeSeriesRequestFactory
             ? [TimeSeriesTypeMapper.MapTimeSeriesType(request.MeteringPointType.Name, request.SettlementMethod?.Name)]
             : request.RequestedForActorRole.Name switch
             {
-                DataHubNames.ActorRole.EnergySupplier =>
+                var actorRoleName when actorRoleName == ActorRole.EnergySupplier.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,
                     TimeSeriesType.NonProfiledConsumption,
                 ],
-                DataHubNames.ActorRole.BalanceResponsibleParty =>
+                var actorRoleName when actorRoleName == ActorRole.BalanceResponsibleParty.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,
                     TimeSeriesType.NonProfiledConsumption,
                 ],
-                DataHubNames.ActorRole.MeteredDataResponsible =>
+                var actorRoleName when actorRoleName == ActorRole.MeteredDataResponsible.Name =>
                 [
                     TimeSeriesType.Production,
                     TimeSeriesType.FlexConsumption,

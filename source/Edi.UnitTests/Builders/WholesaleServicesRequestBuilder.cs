@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.AggregatedTimeSeriesRequest;
 using NodaTime;
@@ -24,7 +23,7 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 public class WholesaleServicesRequestBuilder
 {
     private string _requestedByActorId = EnergySupplierValidatorTest.ValidGlnNumber;
-    private string _requestedByActorRole = DataHubNames.ActorRole.SystemOperator;
+    private string _requestedByActorRole = ActorRole.SystemOperator.Name;
     private string _businessReason = BusinessReason.WholesaleFixing.Name;
     private string? _resolution;
     private string _periodStart = Instant.FromUtc(2023, 1, 31, 23, 0, 0).ToString();

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
@@ -25,14 +24,14 @@ public class RequestedCalculationTypeMapperTests
 {
     public static IEnumerable<object[]> InvalidBusinessReasonAndSettlementVersionData()
     {
-        yield return [BusinessReason.BalanceFixing.Name, DataHubNames.SettlementVersion.FirstCorrection];
+        yield return [BusinessReason.BalanceFixing.Name, SettlementVersion.FirstCorrection.Name];
         yield return [BusinessReason.PreliminaryAggregation.Name, "random-string"];
-        yield return [BusinessReason.WholesaleFixing.Name, DataHubNames.SettlementVersion.FirstCorrection];
+        yield return [BusinessReason.WholesaleFixing.Name, SettlementVersion.FirstCorrection.Name];
         yield return [BusinessReason.Correction.Name, string.Empty];
         yield return [BusinessReason.Correction.Name, "random-string"];
         yield return [string.Empty, string.Empty];
         yield return ["random-string", string.Empty];
-        yield return ["random-string", DataHubNames.SettlementVersion.FirstCorrection];
+        yield return ["random-string", SettlementVersion.FirstCorrection.Name];
     }
 
     public static IEnumerable<object[]> ValidBusinessReasonAndSettlementVersionData()
@@ -40,9 +39,9 @@ public class RequestedCalculationTypeMapperTests
         yield return [BusinessReason.BalanceFixing.Name, null!, RequestedCalculationType.BalanceFixing];
         yield return [BusinessReason.PreliminaryAggregation.Name, null!, RequestedCalculationType.PreliminaryAggregation];
         yield return [BusinessReason.WholesaleFixing.Name, null!, RequestedCalculationType.WholesaleFixing];
-        yield return [BusinessReason.Correction.Name, DataHubNames.SettlementVersion.FirstCorrection, RequestedCalculationType.FirstCorrection];
-        yield return [BusinessReason.Correction.Name, DataHubNames.SettlementVersion.SecondCorrection, RequestedCalculationType.SecondCorrection];
-        yield return [BusinessReason.Correction.Name, DataHubNames.SettlementVersion.ThirdCorrection, RequestedCalculationType.ThirdCorrection];
+        yield return [BusinessReason.Correction.Name, SettlementVersion.FirstCorrection.Name, RequestedCalculationType.FirstCorrection];
+        yield return [BusinessReason.Correction.Name, SettlementVersion.SecondCorrection.Name, RequestedCalculationType.SecondCorrection];
+        yield return [BusinessReason.Correction.Name, SettlementVersion.ThirdCorrection.Name, RequestedCalculationType.ThirdCorrection];
         yield return [BusinessReason.Correction.Name, null!, RequestedCalculationType.LatestCorrection];
     }
 
