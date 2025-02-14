@@ -82,7 +82,8 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
             actorNumber: actorNumber,
             restriction: Restriction.Owned,
             actorRole: actorRole,
-            actorClientId: actorClientIdGuid));
+            actorClientId: actorClientIdGuid,
+            actorId: null));
         return true;
     }
 

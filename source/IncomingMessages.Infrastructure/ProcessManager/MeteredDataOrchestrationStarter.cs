@@ -37,7 +37,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         InitializeMeteredDataForMeteringPointMessageProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
-        var actorIdentityDto = GetAuthenticatedActorIdentity(initializeProcessDto.MessageId);
+        var actorIdentityDto = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -98,7 +98,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    private ActorIdentityDto GetAuthenticatedActorIdentity(string messageId)
+    private ActorIdentityDto GetAuthenticatedActorIdentityDto(string messageId)
     {
         if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
             throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");

@@ -16,6 +16,7 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime.Text;
@@ -25,8 +26,6 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
 public class EnqueueBrs028MessageFactory
 {
-    private static readonly string _orchestrationName = "BRS_028";
-
     public static ServiceBusMessage CreateAccept(
         Actor actor,
         string gridArea)
@@ -79,7 +78,7 @@ public class EnqueueBrs028MessageFactory
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = _orchestrationName,
+            OrchestrationName = Brs_028.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
@@ -92,7 +91,7 @@ public class EnqueueBrs028MessageFactory
         enqueueActorMessages.SetData(data);
 
         return enqueueActorMessages.ToServiceBusMessage(
-            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(_orchestrationName),
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
             idempotencyKey: Guid.NewGuid().ToString());
     }
 }

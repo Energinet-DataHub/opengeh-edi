@@ -102,6 +102,7 @@ public class RequestProcessOrchestrationStarterTests
             expectedActor.ActorNumber,
             Restriction.None,
             expectedActor.ActorRole,
+            null,
             Guid.NewGuid()));
 
         var sut = new RequestProcessOrchestrationStarter(
@@ -223,6 +224,7 @@ public class RequestProcessOrchestrationStarterTests
             expectedActor.ActorNumber,
             Restriction.None,
             expectedActor.ActorRole,
+            null,
             Guid.NewGuid()));
 
         var sut = new RequestProcessOrchestrationStarter(
@@ -348,6 +350,7 @@ public class RequestProcessOrchestrationStarterTests
             ActorNumber.Create("1111111111111"),
             Restriction.None,
             ActorRole.GridAccessProvider,
+            null,
             Guid.NewGuid()));
 
         var sut = new MeteredDataOrchestrationStarter(

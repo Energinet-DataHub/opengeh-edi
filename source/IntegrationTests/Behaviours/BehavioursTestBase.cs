@@ -152,7 +152,7 @@ public class BehavioursTestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator, _actorId));
+            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator, null, _actorId));
     }
 
     protected FeatureFlagManagerStub FeatureFlagManagerStub { get; }
@@ -243,7 +243,7 @@ public class BehavioursTestBase : IDisposable
 
     protected void GivenAuthenticatedActorIs(ActorNumber actorNumber, ActorRole actorRole)
     {
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole, _actorId));
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole, null, _actorId));
     }
 
     protected void GivenNowIs(int year, int month, int day)
@@ -367,7 +367,7 @@ public class BehavioursTestBase : IDisposable
         await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var authenticatedActor = scope.ServiceProvider.GetRequiredService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole, _actorId));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole, null, _actorId));
         var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, messageCategory, actorRole, documentFormat), CancellationToken.None);
         return peekResult;
     }

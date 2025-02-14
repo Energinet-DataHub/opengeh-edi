@@ -18,25 +18,43 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 
 public class ActorIdentity
 {
+    /// <summary>
+    /// Create a new instance of <see cref="ActorIdentity"/>.
+    /// </summary>
+    /// <param name="actorNumber"></param>
+    /// <param name="restriction"></param>
+    /// <param name="actorRole"></param>
+    /// <param name="actorClientId">The actor client id, typically retrieved from a B2B token.</param>
+    /// <param name="actorId">The actor id, typically retrieved from a B2C token.</param>
     public ActorIdentity(
         ActorNumber actorNumber,
         Restriction restriction,
         ActorRole actorRole,
-        Guid? actorClientId)
+        Guid? actorClientId,
+        Guid? actorId)
     {
         ActorNumber = actorNumber;
         Restriction = restriction;
         ActorRole = actorRole;
         ActorClientId = actorClientId;
+        ActorId = actorId;
     }
 
     public ActorNumber ActorNumber { get; }
 
-    public Restriction Restriction { get; set; }
+    public Restriction Restriction { get; }
 
-    public ActorRole ActorRole { get; set; }
+    public ActorRole ActorRole { get; }
 
-    public Guid? ActorClientId { get; set; }
+    /// <summary>
+    /// Actor client id is only set if the current user has a B2B token.
+    /// </summary>
+    public Guid? ActorClientId { get; }
+
+    /// <summary>
+    /// Actor id is only set if the current user has a B2C token.
+    /// </summary>
+    public Guid? ActorId { get; }
 
     public bool HasRole(ActorRole role)
     {

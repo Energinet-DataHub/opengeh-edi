@@ -33,7 +33,7 @@ public class RequestProcessOrchestrationStarter(
         InitializeWholesaleServicesProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
-        var actorIdentity = GetAuthenticatedActorIdentity(initializeProcessDto.MessageId);
+        var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -91,7 +91,7 @@ public class RequestProcessOrchestrationStarter(
         InitializeAggregatedMeasureDataProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
-        var actorIdentity = GetAuthenticatedActorIdentity(initializeProcessDto.MessageId);
+        var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -136,7 +136,7 @@ public class RequestProcessOrchestrationStarter(
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    private ActorIdentityDto GetAuthenticatedActorIdentity(string messageId)
+    private ActorIdentityDto GetAuthenticatedActorIdentityDto(string messageId)
     {
         if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))
             throw new InvalidOperationException($"Cannot get current actor when initializing process (MessageId={messageId})");

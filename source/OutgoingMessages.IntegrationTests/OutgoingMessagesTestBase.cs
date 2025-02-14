@@ -62,7 +62,7 @@ public class OutgoingMessagesTestBase : IDisposable
         Fixture.CleanupFileStorage();
         BuildServices(testOutputHelper);
         AuthenticatedActor = GetService<AuthenticatedActor>();
-        AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, _actorId));
+        AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, null, _actorId));
     }
 
     protected OutgoingMessagesTestFixture Fixture { get; }
@@ -153,7 +153,7 @@ public class OutgoingMessagesTestBase : IDisposable
 
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.Owned, actorRole ?? ActorRole.EnergySupplier, _actorId));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.Owned, actorRole ?? ActorRole.EnergySupplier, null, _actorId));
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 
