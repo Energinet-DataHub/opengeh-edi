@@ -27,8 +27,8 @@ using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 using Period = Energinet.DataHub.Edi.Responses.Period;
-using PMActorNumber = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorNumber;
-using PMActorRole = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorRole;
+using PMActorNumber = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber;
+using PMActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
 using PMBusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 using PMChargeType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ChargeType;
 using PMResolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
@@ -216,7 +216,7 @@ public static class WholesaleServicesResponseEventBuilder
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
-                ActorRole = requestCalculatedWholesaleServicesInputV1.RequestedByActorRole,
+                ActorRole = PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedByActorRole).ToActorRoleV1(),
             },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
@@ -289,7 +289,7 @@ public static class WholesaleServicesResponseEventBuilder
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = requestCalculatedWholesaleServicesInputV1.RequestedByActorNumber,
-                ActorRole = requestCalculatedWholesaleServicesInputV1.RequestedByActorRole,
+                ActorRole = PMActorRole.FromName(requestCalculatedWholesaleServicesInputV1.RequestedByActorRole).ToActorRoleV1(),
             },
             OrchestrationInstanceId = Guid.NewGuid().ToString(), // TODO, could be used to assert on when notifying the orchestration instance in pm
         };

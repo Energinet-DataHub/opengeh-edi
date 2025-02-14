@@ -392,7 +392,7 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = "1234567890123",
-                ActorRole = "DataHubAdministrator",
+                ActorRole = ActorRoleV1.DataHubAdministrator,
             },
             OrchestrationInstanceId = orchestrationInstanceId?.ToString() ?? Guid.NewGuid().ToString(),
         };

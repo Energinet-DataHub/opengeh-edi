@@ -31,16 +31,16 @@ public static class EnqueueBrs026MessageFactory
         Actor actor,
         string gridArea)
     {
-        var balanceResponsible = actor.ActorRole == ActorRole.BalanceResponsibleParty ? ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value) : null;
-        var energySupplier = actor.ActorRole == ActorRole.EnergySupplier ? ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value) : null;
+        var balanceResponsible = actor.ActorRole == ActorRole.BalanceResponsibleParty ? actor.ActorNumber.ToProcessManagerActorNumber() : null;
+        var energySupplier = actor.ActorRole == ActorRole.EnergySupplier ? actor.ActorNumber.ToProcessManagerActorNumber() : null;
 
         var accepted = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            RequestedForActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedForActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
-            RequestedByActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedByActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
+            RequestedForActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            RequestedForActorRole: actor.ActorRole.ToProcessManagerActorRole(),
+            RequestedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            RequestedByActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
             PeriodStart: InstantPattern.General.Parse("2023-01-31T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
             PeriodEnd: InstantPattern.General.Parse("2023-02-02T23:00:00Z").GetValueOrThrow().ToDateTimeOffset(),
@@ -60,10 +60,10 @@ public static class EnqueueBrs026MessageFactory
         var rejected = new RequestCalculatedEnergyTimeSeriesRejectedV1(
             OriginalMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            RequestedForActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedForActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
-            RequestedByActorNumber: ProcessManagerTypes.ActorNumber.Create(actor.ActorNumber.Value),
-            RequestedByActorRole: ProcessManagerTypes.ActorRole.FromName(actor.ActorRole.Name),
+            RequestedForActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            RequestedForActorRole: actor.ActorRole.ToProcessManagerActorRole(),
+            RequestedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            RequestedByActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
             ValidationErrors: new List<ValidationErrorDto>()
             {
@@ -85,7 +85,7 @@ public static class EnqueueBrs026MessageFactory
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = actor.ActorNumber.Value,
-                ActorRole = actor.ActorRole.Name,
+                ActorRole = actor.ActorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };

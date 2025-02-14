@@ -28,7 +28,7 @@ public class ActorNumber : ValueObject
 
     public string Value { get; }
 
-    public static ActorNumber Create(ProcessManager.Components.Abstractions.ValueObjects.ActorNumber actorNumber)
+    public static ActorNumber Create(ProcessManager.Abstractions.Core.ValueObjects.ActorNumber actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         return TryCreate(actorNumber.Value) ?? throw InvalidActorNumberException.Create(actorNumber.Value);
@@ -60,5 +60,10 @@ public class ActorNumber : ValueObject
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         return actorNumber.Length == 13;
+    }
+
+    public ProcessManager.Abstractions.Core.ValueObjects.ActorNumber ToProcessManagerActorNumber()
+    {
+        return ProcessManager.Abstractions.Core.ValueObjects.ActorNumber.Create(Value);
     }
 }

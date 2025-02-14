@@ -64,8 +64,8 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                     new MeteredDataForMeteringPointMessageInputV1(
                         MessageId: initializeProcessDto.MessageId,
                         AuthenticatedActorId: Guid.Empty, // TODO: This is not used and should be removed from the contract
-                        ActorNumber: actorIdentityDto.ActorNumber,
-                        ActorRole: actorIdentityDto.ActorRole,
+                        ActorNumber: actorIdentityDto.ActorNumber.Value,
+                        ActorRole: actorIdentityDto.ActorRole.Name,
                         TransactionId: transaction.TransactionId,
                         MeteringPointId: transaction.MeteringPointLocationId,
                         MeteringPointType: meteringPointType,
@@ -107,7 +107,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                     ?? throw new InvalidOperationException($"Current actor identity was null when initializing process (MessageId={messageId})");
 
         return new ActorIdentityDto(
-            ActorNumber: actor.ActorNumber.Value,
-            ActorRole: actor.ActorRole.Name);
+            ActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            ActorRole: actor.ActorRole.ToProcessManagerActorRole());
     }
 }

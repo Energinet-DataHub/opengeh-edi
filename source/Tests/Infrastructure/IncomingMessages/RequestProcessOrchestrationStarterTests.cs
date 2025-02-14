@@ -121,7 +121,9 @@ public class RequestProcessOrchestrationStarterTests
             Times.Once);
 
         var expectedCommand = new RequestCalculatedWholesaleServicesCommandV1(
-            operatingIdentity: new ActorIdentityDto(expectedActor.ActorNumber.Value, expectedActor.ActorRole.Name),
+            operatingIdentity: new ActorIdentityDto(
+                expectedActor.ActorNumber.ToProcessManagerActorNumber(),
+                expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new RequestCalculatedWholesaleServicesInputV1(
                 ActorMessageId: messageId,
                 TransactionId: transactionId,
@@ -240,7 +242,9 @@ public class RequestProcessOrchestrationStarterTests
             Times.Once);
 
         var expectedCommand = new RequestCalculatedEnergyTimeSeriesCommandV1(
-            operatingIdentity: new ActorIdentityDto(expectedActor.ActorNumber.Value, expectedActor.ActorRole.Name),
+            operatingIdentity: new ActorIdentityDto(
+                expectedActor.ActorNumber.ToProcessManagerActorNumber(),
+                expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new RequestCalculatedEnergyTimeSeriesInputV1(
                 ActorMessageId: messageId,
                 TransactionId: transactionId,
@@ -363,7 +367,9 @@ public class RequestProcessOrchestrationStarterTests
             Times.Once);
 
         var expectedCommand = new StartForwardMeteredDataCommandV1(
-            operatingIdentity: new ActorIdentityDto(expectedActor.ActorNumber.Value, expectedActor.ActorRole.Name),
+            operatingIdentity: new ActorIdentityDto(
+                expectedActor.ActorNumber.ToProcessManagerActorNumber(),
+                expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new MeteredDataForMeteringPointMessageInputV1(
                 MessageId: messageId,
                 AuthenticatedActorId: Guid.Empty, // This is not used and should be removed from the contract

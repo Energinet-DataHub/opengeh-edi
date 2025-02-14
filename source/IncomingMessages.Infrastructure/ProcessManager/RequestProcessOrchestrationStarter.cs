@@ -145,8 +145,8 @@ public class RequestProcessOrchestrationStarter(
                ?? throw new InvalidOperationException($"Current actor identity was null when initializing process (MessageId={messageId})");
 
         return new ActorIdentityDto(
-            ActorNumber: actor.ActorNumber.Value,
-            ActorRole: actor.ActorRole.Name);
+            ActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            ActorRole: actor.ActorRole.ToProcessManagerActorRole());
     }
 
     private string CreateIdempotencyKey(string transactionId, RequestedByActor actor) => $"{transactionId}_{actor.ActorNumber.Value}_{actor.ActorRole.Code}";

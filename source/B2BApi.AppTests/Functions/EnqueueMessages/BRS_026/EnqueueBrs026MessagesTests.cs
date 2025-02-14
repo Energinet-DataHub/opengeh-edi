@@ -32,9 +32,6 @@ using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
-using ActorNumber = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorNumber;
-using ActorRole = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorRole;
-using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_026;
 
@@ -128,11 +125,11 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesRejectedV1(
             OriginalMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: businessReason,
-            RequestedForActorNumber: requestedForActorNumber,
-            RequestedForActorRole: requestedForActorRole,
-            RequestedByActorNumber: requestedForActorNumber,
-            RequestedByActorRole: requestedForActorRole,
+            BusinessReason: businessReason.ToProcessManagerBusinessReason(),
+            RequestedForActorNumber: requestedForActorNumber.ToProcessManagerActorNumber(),
+            RequestedForActorRole: requestedForActorRole.ToProcessManagerActorRole(),
+            RequestedByActorNumber: requestedForActorNumber.ToProcessManagerActorNumber(),
+            RequestedByActorRole: requestedForActorRole.ToProcessManagerActorRole(),
             ValidationErrors: [
                 new ValidationErrorDto(
                     ErrorCode: "T01",
@@ -148,7 +145,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = enqueueMessagesData.RequestedByActorNumber.Value,
-                ActorRole = enqueueMessagesData.RequestedByActorRole.Name,
+                ActorRole = enqueueMessagesData.RequestedByActorRole.ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId,
         };
@@ -223,17 +220,17 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            BusinessReason: testDataResultSet.BusinessReason,
-            RequestedForActorNumber: requestedForActorNumber,
-            RequestedForActorRole: requestedForActorRole,
-            RequestedByActorNumber: requestedForActorNumber,
-            RequestedByActorRole: requestedForActorRole,
+            BusinessReason: testDataResultSet.BusinessReason.ToProcessManagerBusinessReason(),
+            RequestedForActorNumber: requestedForActorNumber.ToProcessManagerActorNumber(),
+            RequestedForActorRole: requestedForActorRole.ToProcessManagerActorRole(),
+            RequestedByActorNumber: requestedForActorNumber.ToProcessManagerActorNumber(),
+            RequestedByActorRole: requestedForActorRole.ToProcessManagerActorRole(),
             PeriodStart: testDataResultSet.PeriodStart.ToDateTimeOffset(),
             PeriodEnd: testDataResultSet.PeriodEnd.ToDateTimeOffset(),
             GridAreas: [overrideGridArea ?? testDataResultSet.GridArea],
             EnergySupplierNumber: null,
             BalanceResponsibleNumber: null,
-            MeteringPointType: testDataResultSet.MeteringPointType,
+            MeteringPointType: testDataResultSet.MeteringPointType.ToProcessManagerMeteringPointType(),
             SettlementMethod: null,
             SettlementVersion: null);
 
@@ -244,7 +241,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = enqueueMessagesData.RequestedByActorNumber.Value,
-                ActorRole = enqueueMessagesData.RequestedByActorRole.Name,
+                ActorRole = enqueueMessagesData.RequestedByActorRole.ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };

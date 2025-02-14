@@ -32,6 +32,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
+using PMCoreValueTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
@@ -71,7 +72,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var enqueueMessagesData = new MeteredDataForMeteringPointRejectedV1(
             "EventId",
             PMValueTypes.BusinessReason.PeriodicMetering,
-            new MarketActorRecipient("1111111111111", PMValueTypes.ActorRole.GridAccessProvider),
+            new MarketActorRecipient("1111111111111", PMCoreValueTypes.ActorRole.GridAccessProvider),
             Guid.NewGuid(),
             Guid.NewGuid(),
             new AcknowledgementV1(
@@ -94,7 +95,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = "1111111111111",
-                ActorRole = ActorRole.GridAccessProvider.Name,
+                ActorRole = ActorRole.GridAccessProvider.ToProcessManagerActorRole().ToActorRoleV1(),
             },
             Data = JsonSerializer.Serialize(enqueueMessagesData),
             DataType = nameof(MeteredDataForMeteringPointRejectedV1),

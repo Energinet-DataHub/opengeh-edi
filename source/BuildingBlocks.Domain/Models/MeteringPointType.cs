@@ -44,4 +44,9 @@ public class MeteringPointType : DataHubType<MeteringPointType>
         : base(name, code)
     {
     }
+
+    public ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType ToProcessManagerMeteringPointType()
+    {
+        return ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType.FromName(Name);
+    }
 }
