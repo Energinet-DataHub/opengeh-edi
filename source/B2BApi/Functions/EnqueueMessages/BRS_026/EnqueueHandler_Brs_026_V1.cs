@@ -191,7 +191,7 @@ public class EnqueueHandler_Brs_026_V1(
 
     private static CalculationType? MapCalculationType(string businessReason, string? settlementVersion)
     {
-        if (businessReason == BusinessReason.Correction.Name && settlementVersion != null)
+        if (businessReason != BusinessReason.Correction.Name && settlementVersion != null)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(settlementVersion),
