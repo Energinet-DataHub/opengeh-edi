@@ -36,7 +36,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
             gridAreaCodes: [],
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
-            meteringPointType: MeteringPointType.Production.Name);
+            meteringPointType: MeteringPointType.Production.Name,
+            settlementMethod: SettlementMethod.Flex.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -61,7 +62,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
-            meteringPointType: MeteringPointType.Production.Name);
+            meteringPointType: MeteringPointType.Production.Name,
+            settlementMethod: SettlementMethod.Flex.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -86,7 +88,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
-            meteringPointType: MeteringPointType.Production.Name);
+            meteringPointType: MeteringPointType.Production.Name,
+            settlementMethod: SettlementMethod.Flex.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -238,7 +241,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
         string? energySupplier,
         string? balanceResponsible,
         string? meteringPointType,
-        string? settlementMethod = DataHubNames.SettlementMethod.Flex)
+        string? settlementMethod)
     {
         var request = new AggregatedTimeSeriesRequest()
         {

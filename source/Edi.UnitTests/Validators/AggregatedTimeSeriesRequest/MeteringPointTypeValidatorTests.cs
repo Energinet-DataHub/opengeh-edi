@@ -33,10 +33,10 @@ public class MeteringPointTypeValidatorTests
 
     public static IEnumerable<object?[]> ValidMeteringPointTypes()
     {
-        yield return new object[] { MeteringPointType.Consumption.Name };
-        yield return new object[] { MeteringPointType.Production.Name };
-        yield return new object[] { MeteringPointType.Exchange.Name };
-        yield return new object?[] { null };
+        yield return [MeteringPointType.Consumption.Name];
+        yield return [MeteringPointType.Production.Name];
+        yield return [MeteringPointType.Exchange.Name];
+        yield return [null];
     }
 
     [Theory]
