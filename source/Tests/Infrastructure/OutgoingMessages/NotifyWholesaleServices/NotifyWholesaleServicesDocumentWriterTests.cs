@@ -146,7 +146,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
             SettlementMethod: null,
             OriginalTransactionIdReference: null);
         var header = new OutgoingMessageHeader(
-            DataHubNames.BusinessReason.WholesaleFixing,
+            BusinessReason.WholesaleFixing.Name,
             SampleData.SenderId.Value,
             ActorRole.EnergySupplier.Code,
             SampleData.ReceiverId.Value,
