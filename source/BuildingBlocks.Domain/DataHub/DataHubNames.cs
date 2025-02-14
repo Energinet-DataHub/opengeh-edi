@@ -33,15 +33,6 @@ public static class DataHubNames
     }
 
     // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class Resolution
-    {
-        public const string QuarterHourly = "QuarterHourly";
-        public const string Hourly = "Hourly";
-        public const string Daily = "Daily";
-        public const string Monthly = "Monthly";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
     public static class SettlementMethod
     {
         public const string NonProfiled = "NonProfiled";

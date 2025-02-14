@@ -34,6 +34,7 @@ using PMBusinessReason = Energinet.DataHub.ProcessManager.Components.Abstraction
 using PMChargeType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ChargeType;
 using PMResolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
 using PMSettlementVersion = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -78,7 +79,7 @@ public static class WholesaleServicesResponseEventBuilder
                 var series = chargeTypes.Select(
                     ct =>
                     {
-                        var resolution = request.Resolution == DataHubNames.Resolution.Monthly
+                        var resolution = request.Resolution == Resolution.Monthly.Name
                             ? WholesaleServicesRequestSeries.Types.Resolution.Monthly
                             : WholesaleServicesRequestSeries.Types.Resolution.Hour;
 
@@ -120,7 +121,7 @@ public static class WholesaleServicesResponseEventBuilder
                     }).ToList();
 
                 // When the resolution is monthly and no charge types are specified, series should contain a total monthly amount result.
-                if (request.Resolution == DataHubNames.Resolution.Monthly
+                if (request.Resolution == Resolution.Monthly.Name
                     && request.ChargeTypes.Count == 0)
                 {
                     var totalMonthlyAmountSeries = new WholesaleServicesRequestSeries()

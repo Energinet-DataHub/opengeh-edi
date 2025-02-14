@@ -14,6 +14,7 @@
 
 using System.Reflection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest.Rules;
@@ -45,7 +46,7 @@ public class ResolutionValidationRuleTests
         {
             new object[] { "Monthly" },
             new object[] { null! },
-            new object[] { DataHubNames.Resolution.Monthly },
+            new object[] { Resolution.Monthly.Name },
         };
     }
 
@@ -60,7 +61,7 @@ public class ResolutionValidationRuleTests
 
         var allResolutions = GetAllResolutionsInDatahub();
         var invalidResolutions = allResolutions
-            .Where(res => res != DataHubNames.Resolution.Monthly);
+            .Where(res => res != Resolution.Monthly.Name);
 
         var invalidResolutionsWithCustomResolutions = invalidResolutions.Concat(customResolutions)
             .Select(res => new object[] { res! });
@@ -105,7 +106,7 @@ public class ResolutionValidationRuleTests
 
     private static IEnumerable<string?> GetAllResolutionsInDatahub()
     {
-        var resolutionType = typeof(DataHubNames.Resolution);
+        var resolutionType = typeof(Resolution);
         return resolutionType
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
             .ToList()
