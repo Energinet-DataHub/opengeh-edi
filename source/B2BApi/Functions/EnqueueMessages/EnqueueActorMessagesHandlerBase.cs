@@ -81,7 +81,8 @@ public abstract class EnqueueActorMessagesHandlerBase(
                 enqueueActorMessages.OrchestrationVersion,
                 OperatingIdentity = new
                 {
-                    ActorId = enqueueActorMessages.OrchestrationStartedByActorId,
+                    ActorNumber = enqueueActorMessages.OrchestrationStartedByActor.ActorNumber,
+                    ActorRole = enqueueActorMessages.OrchestrationStartedByActor.ActorRole,
                     UserId = enqueueActorMessages.HasOrchestrationStartedByUserId
                         ? enqueueActorMessages.OrchestrationStartedByUserId
                         : null,

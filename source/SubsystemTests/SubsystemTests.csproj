@@ -79,7 +79,7 @@
         <PackageReference Include="Dapper" Version="2.1.35" />
         <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="7.1.1" />
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.1.1" />
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="1.0.1" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="1.2.0" />
         <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="11.0.0" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">

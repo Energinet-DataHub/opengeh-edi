@@ -57,18 +57,18 @@ public sealed class MasterDataClient : IMasterDataClient
 
         await _actorRepository.CreateIfNotExistAsync(
                 createActorDto.ActorNumber,
-                createActorDto.ExternalId,
+                createActorDto.ActorClientId,
                 cancellationToken)
             .ConfigureAwait(false);
 
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public Task<ActorNumber?> GetActorNumberByExternalIdAsync(
-        string externalId,
+    public Task<ActorNumber?> GetActorNumberByActorClientIdAsync(
+        string actorClientId,
         CancellationToken cancellationToken)
     {
-        return _actorRepository.GetActorNumberByExternalIdAsync(externalId, cancellationToken);
+        return _actorRepository.GetActorNumberByActorClientIdAsync(actorClientId, cancellationToken);
     }
 
     public async Task UpdateGridAreaOwnershipAsync(

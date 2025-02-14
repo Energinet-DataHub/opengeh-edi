@@ -49,6 +49,7 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
             ActorNumber.Create("1234567890123"),
             restriction: Restriction.None,
             ActorRole.FromCode("DDM"),
+            null,
             ActorId);
         authenticatedActor.SetAuthenticatedActor(_actorIdentity);
 
@@ -297,7 +298,7 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
         var documentFormat = DocumentFormat.Xml;
         var authenticatedActor = GetService<AuthenticatedActor>();
         var invalidSenderRole = ActorRole.EnergySupplier;
-        var actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None, invalidSenderRole, ActorId);
+        var actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None, invalidSenderRole, null, ActorId);
         authenticatedActor.SetAuthenticatedActor(actorIdentity);
         var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
             documentFormat,

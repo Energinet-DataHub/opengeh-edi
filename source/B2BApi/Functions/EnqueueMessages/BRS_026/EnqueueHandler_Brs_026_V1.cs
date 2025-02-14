@@ -156,7 +156,7 @@ public class EnqueueHandler_Brs_026_V1(
     private static TimeSeriesType[] GetTimeSeriesTypes(
         ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType? meteringPointType,
         ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod? settlementMethod,
-        ProcessManager.Components.Abstractions.ValueObjects.ActorRole requestedForActorRole)
+        ProcessManager.Abstractions.Core.ValueObjects.ActorRole requestedForActorRole)
     {
         return meteringPointType != null
             ? [MapTimeSeriesType(meteringPointType.Name, settlementMethod?.Name)]

@@ -192,13 +192,13 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
     [Fact]
     public async Task When_calling_authentication_middleware_with_no_content_type_then_bearer_authentication_is_used()
     {
-        var externalId = "external-id";
+        var actorClientId = Guid.NewGuid().ToString();
 
         // Arrange
-        await CreateActorInDatabaseAsync(ActorNumber.Create("1234567891234"), externalId);
+        await CreateActorInDatabaseAsync(ActorNumber.Create("1234567891234"), actorClientId);
         var token = new JwtBuilder()
             .WithRole("energysupplier")
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         var functionContext = _functionContextBuilder
@@ -254,7 +254,7 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
         });
     }
 
-    private async Task CreateActorInDatabaseAsync(ActorNumber actorNumber, string externalId)
+    private async Task CreateActorInDatabaseAsync(ActorNumber actorNumber, string actorClientId)
     {
         var connectionFactory = GetService<IDatabaseConnectionFactory>();
 
@@ -263,7 +263,7 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
         {
             id = Guid.NewGuid(),
             actorNumber = actorNumber.Value,
-            externalId = externalId,
+            externalId = actorClientId,
         });
     }
 }
