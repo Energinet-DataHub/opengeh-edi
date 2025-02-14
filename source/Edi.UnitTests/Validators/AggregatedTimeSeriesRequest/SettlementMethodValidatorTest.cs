@@ -28,7 +28,7 @@ public class SettlementMethodValidatorTest
 
     private readonly SettlementMethodValidationRule _sut = new();
 
-    public static IEnumerable<object[]> GetTestData()
+    public static IEnumerable<object[]> FaultedMeteringPointAndSettlementMethodCombinations()
     {
         yield return [MeteringPointType.Production.Name, DataHubNames.SettlementMethod.Flex];
         yield return [MeteringPointType.Production.Name, DataHubNames.SettlementMethod.NonProfiled];
@@ -113,7 +113,7 @@ public class SettlementMethodValidatorTest
     }
 
     [Theory]
-    [MemberData(nameof(GetTestData))]
+    [MemberData(nameof(FaultedMeteringPointAndSettlementMethodCombinations))]
     public async Task Validate_WhenNotConsumptionAndSettlementMethodIsGiven_ReturnsExpectedValidationErrorAsync(string? meteringPointType, string settlementMethod)
     {
         // Arrange
