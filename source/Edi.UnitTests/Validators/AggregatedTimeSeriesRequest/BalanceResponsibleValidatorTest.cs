@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
@@ -163,7 +164,7 @@ public class BalanceResponsibleValidatorTest
             .WithRequestedByActorId(ValidGlnNumber)
             .WithRequestedByActorRole(BalanceResponsibleRole)
             .WithBalanceResponsibleId(ValidGlnNumber)
-            .WithBusinessReason(DataHubNames.BusinessReason.BalanceFixing)
+            .WithBusinessReason(BusinessReason.BalanceFixing.Name)
             .Build();
 
         // Act
@@ -182,7 +183,7 @@ public class BalanceResponsibleValidatorTest
             .WithRequestedByActorId(ValidGlnNumber)
             .WithRequestedByActorRole(BalanceResponsibleRole)
             .WithBalanceResponsibleId(ValidGlnNumber)
-            .WithBusinessReason(DataHubNames.BusinessReason.PreliminaryAggregation)
+            .WithBusinessReason(BusinessReason.PreliminaryAggregation.Name)
             .Build();
 
         // Act
@@ -201,7 +202,7 @@ public class BalanceResponsibleValidatorTest
             .WithRequestedByActorId(ValidGlnNumber)
             .WithRequestedByActorRole(BalanceResponsibleRole)
             .WithBalanceResponsibleId(ValidGlnNumber)
-            .WithBusinessReason(DataHubNames.BusinessReason.WholesaleFixing)
+            .WithBusinessReason(BusinessReason.WholesaleFixing.Name)
             .Build();
 
         // Act
@@ -225,7 +226,7 @@ public class BalanceResponsibleValidatorTest
             .WithRequestedByActorId(ValidGlnNumber)
             .WithRequestedByActorRole(BalanceResponsibleRole)
             .WithBalanceResponsibleId("invalid-format")
-            .WithBusinessReason(DataHubNames.BusinessReason.Correction)
+            .WithBusinessReason(BusinessReason.Correction.Name)
             .Build();
 
         // Act

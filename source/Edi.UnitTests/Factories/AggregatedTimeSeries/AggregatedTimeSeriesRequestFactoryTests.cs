@@ -36,7 +36,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             gridAreaCodes: [],
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
-            meteringPointType: DataHubNames.MeteringPointType.Production);
+            meteringPointType: MeteringPointType.Production.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -60,7 +60,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
         var request = CreateRequest(
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
-            balanceResponsible: balanceResponsibleId);
+            balanceResponsible: balanceResponsibleId,
+            meteringPointType: MeteringPointType.Production.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -84,7 +85,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
         var request = CreateRequest(
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
-            balanceResponsible: balanceResponsibleId);
+            balanceResponsible: balanceResponsibleId,
+            meteringPointType: MeteringPointType.Production.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -235,7 +237,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
         IReadOnlyCollection<string> gridAreaCodes,
         string? energySupplier,
         string? balanceResponsible,
-        string? meteringPointType = DataHubNames.MeteringPointType.Production,
+        string? meteringPointType,
         string? settlementMethod = "")
     {
         if (string.IsNullOrEmpty(settlementMethod))
@@ -253,7 +255,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             },
             RequestedForActorNumber = "1234567891234",
             RequestedForActorRole = ActorRole.EnergySupplier.Name,
-            BusinessReason = DataHubNames.BusinessReason.BalanceFixing,
+            BusinessReason = BusinessReason.BalanceFixing.Name,
 
             // Optional
             SettlementMethod = settlementMethod,

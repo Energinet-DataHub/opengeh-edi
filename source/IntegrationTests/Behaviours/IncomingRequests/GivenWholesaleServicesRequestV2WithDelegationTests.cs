@@ -279,13 +279,15 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
 
         // Arrange
         var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas();
-        var exampleWholesaleResultMessageForActor = delegatedToRole == ActorRole.EnergySupplier
+        var exampleWholesaleResultMessageForActor = delegatedFromRole == ActorRole.EnergySupplier
             ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
             : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
 
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
-        var chargeOwnerNumber = ActorNumber.Create("5790000432752");
+        var chargeOwnerNumber = delegatedFromRole == ActorRole.SystemOperator
+            ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
+            : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
 
         var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
@@ -508,7 +510,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
                 chargeOwnerNumber.Value,
                 new List<string> { gridAreaCode },
                 null,
-                new List<ChargeTypeInput> { new(DataHubNames.ChargeType.Tariff, "25361478"), }));
+                new List<ChargeTypeInput> { new(ChargeType.Tariff.Name, "25361478"), }));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
@@ -588,7 +590,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
 
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
-        var chargeOwnerNumber = ActorNumber.Create("5790000432752");
+        var chargeOwnerNumber = ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value);
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
@@ -645,7 +647,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
                 chargeOwnerNumber.Value,
                 GridAreas: testDataDescription.GridAreaCodes,
                 null,
-                new List<ChargeTypeInput> { new(DataHubNames.ChargeType.Tariff, "25361478") }));
+                new List<ChargeTypeInput> { new(ChargeType.Tariff.Name, "25361478") }));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
@@ -711,7 +713,12 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
     /// </summary>
     [Theory]
     [MemberData(nameof(DocumentFormatsWithRoleCombinationsForNullGridArea))] // Grid operator can't make request without grid area
-    public async Task AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    public async Task
+        AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(
+            DocumentFormat incomingDocumentFormat,
+            DocumentFormat peekDocumentFormat,
+            ActorRole delegatedFromRole,
+            ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request and send message to Process Manager ---
@@ -719,13 +726,15 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
 
         // Arrange
         var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerChargeInTwoGridAreas();
-        var exampleWholesaleResultMessageForActor = delegatedToRole == ActorRole.EnergySupplier
+        var exampleWholesaleResultMessageForActor = delegatedFromRole == ActorRole.EnergySupplier
             ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
             : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
 
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
-        var chargeOwnerNumber = ActorNumber.Create("5790000432752");
+        var chargeOwnerNumber = delegatedFromRole == ActorRole.SystemOperator
+            ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
+            : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
 
         var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);

@@ -193,20 +193,20 @@ public class EnqueueHandler_Brs_026_V1(
 
     private static CalculationType? MapCalculationType(string businessReason, string? settlementVersion)
     {
-        if (businessReason != DataHubNames.BusinessReason.Correction && settlementVersion != null)
+        if (businessReason == BusinessReason.Correction.Name && settlementVersion != null)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(settlementVersion),
                 settlementVersion,
-                $"Value must be null when {nameof(businessReason)} is not {nameof(DataHubNames.BusinessReason.Correction)}.");
+                $"Value must be null when {nameof(businessReason)} is not {nameof(BusinessReason.Correction.Name)}.");
         }
 
         return businessReason switch
         {
-            DataHubNames.BusinessReason.BalanceFixing => CalculationType.BalanceFixing,
-            DataHubNames.BusinessReason.PreliminaryAggregation => CalculationType.Aggregation,
-            DataHubNames.BusinessReason.WholesaleFixing => CalculationType.WholesaleFixing,
-            DataHubNames.BusinessReason.Correction => settlementVersion switch
+            _ when businessReason == BusinessReason.BalanceFixing.Name => CalculationType.BalanceFixing,
+            _ when businessReason == BusinessReason.PreliminaryAggregation.Name => CalculationType.Aggregation,
+            _ when businessReason == BusinessReason.WholesaleFixing.Name => CalculationType.WholesaleFixing,
+            _ when businessReason == BusinessReason.Correction.Name => settlementVersion switch
             {
                 _ when businessReason == SettlementVersion.FirstCorrection.Name => CalculationType.FirstCorrectionSettlement,
                 _ when businessReason == SettlementVersion.SecondCorrection.Name => CalculationType.SecondCorrectionSettlement,
@@ -228,9 +228,9 @@ public class EnqueueHandler_Brs_026_V1(
     {
         return meteringPointType switch
         {
-            DataHubNames.MeteringPointType.Production => TimeSeriesType.Production,
-            DataHubNames.MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
-            DataHubNames.MeteringPointType.Consumption => settlementMethod switch
+            _ when meteringPointType == MeteringPointType.Production.Name => TimeSeriesType.Production,
+            _ when meteringPointType == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
+            _ when meteringPointType == MeteringPointType.Consumption.Name => settlementMethod switch
             {
                 _ when meteringPointType == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
                 _ when meteringPointType == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,

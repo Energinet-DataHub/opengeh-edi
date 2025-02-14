@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
@@ -27,6 +28,32 @@ public class SettlementMethodValidatorTest
 
     private readonly SettlementMethodValidationRule _sut = new();
 
+    public static IEnumerable<object[]> GetTestData()
+    {
+        yield return [MeteringPointType.Production.Name, DataHubNames.SettlementMethod.Flex];
+        yield return [MeteringPointType.Production.Name, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [MeteringPointType.Production.Name, "invalid-settlement-method"];
+        yield return [MeteringPointType.Exchange.Name, DataHubNames.SettlementMethod.Flex];
+        yield return [MeteringPointType.Exchange.Name, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [MeteringPointType.Exchange.Name, "invalid-settlement-method"];
+        yield return ["not-consumption-metering-point", DataHubNames.SettlementMethod.Flex];
+        yield return ["not-consumption-metering-point", DataHubNames.SettlementMethod.NonProfiled];
+        yield return ["not-consumption-metering-point", "invalid-settlement-method"];
+        yield return [string.Empty, DataHubNames.SettlementMethod.Flex];
+        yield return [string.Empty, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [string.Empty, "invalid-settlement-method"];
+        yield return [null!, DataHubNames.SettlementMethod.Flex];
+        yield return [null!, DataHubNames.SettlementMethod.NonProfiled];
+        yield return [null!, "invalid-settlement-method"];
+    }
+
+    public static IEnumerable<object[]> GetMeteringPointTypeTestData()
+    {
+        yield return new object[] { MeteringPointType.Production.Name };
+        yield return new object[] { MeteringPointType.Exchange.Name };
+        yield return new object[] { "not-consumption" };
+    }
+
     [Theory]
     [InlineData(DataHubNames.SettlementMethod.Flex)]
     [InlineData(DataHubNames.SettlementMethod.NonProfiled)]
@@ -35,7 +62,7 @@ public class SettlementMethodValidatorTest
         // Arrange
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithMeteringPointType(DataHubNames.MeteringPointType.Consumption)
+            .WithMeteringPointType(MeteringPointType.Consumption.Name)
             .WithSettlementMethod(settlementMethod)
             .Build();
 
@@ -47,9 +74,7 @@ public class SettlementMethodValidatorTest
     }
 
     [Theory]
-    [InlineData(DataHubNames.MeteringPointType.Production)]
-    [InlineData(DataHubNames.MeteringPointType.Exchange)]
-    [InlineData("not-consumption")]
+    [MemberData(nameof(GetMeteringPointTypeTestData))]
     public async Task Validate_WhenMeteringPointTypeIsGivenAndSettlementMethodIsNull_ReturnsNoValidationErrorsAsync(string meteringPointType)
     {
         // Arrange
@@ -72,7 +97,7 @@ public class SettlementMethodValidatorTest
         // Arrange
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithMeteringPointType(DataHubNames.MeteringPointType.Consumption)
+            .WithMeteringPointType(MeteringPointType.Consumption.Name)
             .WithSettlementMethod("invalid-settlement-method")
             .Build();
 
@@ -88,21 +113,7 @@ public class SettlementMethodValidatorTest
     }
 
     [Theory]
-    [InlineData(DataHubNames.MeteringPointType.Production, DataHubNames.SettlementMethod.Flex)]
-    [InlineData(DataHubNames.MeteringPointType.Production, DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData(DataHubNames.MeteringPointType.Production, "invalid-settlement-method")]
-    [InlineData(DataHubNames.MeteringPointType.Exchange, DataHubNames.SettlementMethod.Flex)]
-    [InlineData(DataHubNames.MeteringPointType.Exchange, DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData(DataHubNames.MeteringPointType.Exchange, "invalid-settlement-method")]
-    [InlineData("not-consumption-metering-point", DataHubNames.SettlementMethod.Flex)]
-    [InlineData("not-consumption-metering-point", DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData("not-consumption-metering-point", "invalid-settlement-method")]
-    [InlineData("", DataHubNames.SettlementMethod.Flex)]
-    [InlineData("", DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData("", "invalid-settlement-method")]
-    [InlineData(null, DataHubNames.SettlementMethod.Flex)]
-    [InlineData(null, DataHubNames.SettlementMethod.NonProfiled)]
-    [InlineData(null, "invalid-settlement-method")]
+    [MemberData(nameof(GetTestData))]
     public async Task Validate_WhenNotConsumptionAndSettlementMethodIsGiven_ReturnsExpectedValidationErrorAsync(string? meteringPointType, string settlementMethod)
     {
         // Arrange

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using FluentAssertions;
@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.WholesaleServicesRequest;
 
@@ -144,7 +145,7 @@ public sealed class WholesaleServicesRequestValidatorTests : EdiTestBase
     {
         // Arrange
         var request = new WholesaleServicesRequestBuilder()
-            .WithBusinessReason(DataHubNames.BusinessReason.Correction)
+            .WithBusinessReason(BusinessReason.Correction.Name)
             .WithSettlementVersion("invalid-settlement-version")
             .Build();
 

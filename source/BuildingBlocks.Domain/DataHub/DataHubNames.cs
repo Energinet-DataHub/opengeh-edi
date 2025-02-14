@@ -27,52 +27,39 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Keep names in a single file to easily share with Wholesale")]
 public static class DataHubNames
 {
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class BusinessReason
-    {
-        public const string MoveIn = "MoveIn";
-        public const string BalanceFixing = "BalanceFixing";
-        public const string PreliminaryAggregation = "PreliminaryAggregation";
-        public const string WholesaleFixing = "WholesaleFixing";
-        public const string Correction = "Correction";
-        public const string PeriodicMetering = "PeriodicMetering";
-        public const string PeriodicFlexMetering = "PeriodicFlexMetering";
-    }
-
-    // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class ChargeType
-    {
-        public const string Subscription = "Subscription";
-        public const string Fee = "Fee";
-        public const string Tariff = "Tariff";
-    }
-
     public static class Currency
     {
         public const string DanishCrowns = "DanishCrowns";
     }
 
     // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class MeasurementUnit
+    public static class SettlementMethod
     {
-        public const string Kwh = "Kwh";
-        public const string Pieces = "Pieces";
+        public const string NonProfiled = "NonProfiled";
+        public const string Flex = "Flex";
     }
 
     // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class MeteringPointType
+    public static class SettlementVersion
     {
-        public const string Consumption = "Consumption";
-        public const string Production = "Production";
-        public const string Exchange = "Exchange";
+        public const string FirstCorrection = "FirstCorrection";
+        public const string SecondCorrection = "SecondCorrection";
+        public const string ThirdCorrection = "ThirdCorrection";
     }
 
     // TODO: Obsolete now that we get the name from PM.Components.Abstractions
-    public static class Resolution
+    public static class ActorRole
     {
-        public const string QuarterHourly = "QuarterHourly";
-        public const string Hourly = "Hourly";
-        public const string Daily = "Daily";
-        public const string Monthly = "Monthly";
+        public const string MeteringPointAdministrator = "MeteringPointAdministrator";
+        public const string MeteredDataResponsible = "MeteredDataResponsible";
+        public const string EnergySupplier = "EnergySupplier";
+        public const string BalanceResponsibleParty = "BalanceResponsibleParty";
+        public const string GridAccessProvider = "GridAccessProvider";
+        public const string MeteredDataAdministrator = "MeteredDataAdministrator";
+        public const string ImbalanceSettlementResponsible = "ImbalanceSettlementResponsible";
+        public const string SystemOperator = "SystemOperator";
+        public const string DanishEnergyAgency = "DanishEnergyAgency";
+        public const string Delegated = "Delegated";
+        public const string DataHubAdministrator = "DataHubAdministrator";
     }
 }

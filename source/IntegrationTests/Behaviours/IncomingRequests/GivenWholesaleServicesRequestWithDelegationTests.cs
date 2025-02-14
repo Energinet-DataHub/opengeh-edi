@@ -157,10 +157,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
-                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                    (ChargeType.Tariff.Name, "25361478"),
                 },
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
@@ -308,10 +308,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
-                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                    (ChargeType.Tariff.Name, "25361478"),
                 },
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
@@ -465,10 +465,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
-                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                    (ChargeType.Tariff.Name, "25361478"),
                 },
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
@@ -608,10 +608,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
-                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                    (ChargeType.Tariff.Name, "25361478"),
                 },
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
@@ -744,10 +744,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
-                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                    (ChargeType.Tariff.Name, "25361478"),
                 },
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
@@ -897,10 +897,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 EnergySupplierId: energySupplierNumber.Value,
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
-                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing.Name,
                 ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
-                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                    (ChargeType.Tariff.Name, "25361478"),
                 },
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
