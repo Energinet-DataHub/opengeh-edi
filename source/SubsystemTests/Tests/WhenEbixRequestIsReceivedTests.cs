@@ -24,7 +24,9 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
+#pragma warning disable xUnit1000
+internal sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
+#pragma warning restore xUnit1000
 {
     private readonly string _meteredDataResponsibleCertificateThumbprint;
     private readonly EbixRequestDsl _ebixMeteredDataResponsible;

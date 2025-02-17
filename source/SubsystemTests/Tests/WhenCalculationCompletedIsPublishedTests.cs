@@ -21,7 +21,9 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
+#pragma warning disable xUnit1000
+internal class WhenCalculationCompletedIsPublishedTests : BaseTestClass
+#pragma warning restore xUnit1000
 {
     private readonly CalculationCompletedDsl _calculationCompleted;
 
