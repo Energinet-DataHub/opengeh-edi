@@ -35,7 +35,8 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 
 // TODO: Rename this to brs026 when we have deleted the old request tests
-public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
+#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
+internal sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;

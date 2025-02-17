@@ -35,7 +35,8 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 
 // TODO: Rename this to brs028 when we have deleted the old request tests
-public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTestClass
+#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
+internal sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTestClass
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
     private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;

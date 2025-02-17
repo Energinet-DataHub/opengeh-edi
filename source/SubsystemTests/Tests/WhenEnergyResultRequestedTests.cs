@@ -28,9 +28,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
-internal sealed class WhenEnergyResultRequestedTests : BaseTestClass
-#pragma warning restore xUnit1000
+public sealed class WhenEnergyResultRequestedTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
@@ -59,7 +57,7 @@ internal sealed class WhenEnergyResultRequestedTests : BaseTestClass
         _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
-    [Fact]
+    [Fact(Skip = "We not running requests which check the database")]
     public async Task Actor_can_request_aggregated_measure_data()
     {
         var messageId = await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
@@ -69,7 +67,7 @@ internal sealed class WhenEnergyResultRequestedTests : BaseTestClass
             CancellationToken.None);
     }
 
-    [Fact]
+    [Fact(Skip = "We not running requests which check the database")]
     public async Task B2C_actor_can_request_aggregated_measure_data()
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();
