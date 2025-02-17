@@ -49,7 +49,7 @@ public static class EnqueueBrs023_027MessageFactory
         enqueueActorMessages.SetData(data);
 
         return enqueueActorMessages.ToServiceBusMessage(
-            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(_orchestrationName),
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
             idempotencyKey: Guid.NewGuid().ToString());
     }
 }

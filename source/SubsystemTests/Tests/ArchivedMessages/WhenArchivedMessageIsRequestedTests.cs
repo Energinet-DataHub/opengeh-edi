@@ -24,7 +24,9 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests.ArchivedMessages;
 
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
-public class WhenArchivedMessageIsRequestedTests : BaseTestClass
+#pragma warning disable xUnit1000
+internal class WhenArchivedMessageIsRequestedTests : BaseTestClass
+#pragma warning restore xUnit1000
 {
     private readonly ArchivedMessageDsl _archivedMessages;
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
