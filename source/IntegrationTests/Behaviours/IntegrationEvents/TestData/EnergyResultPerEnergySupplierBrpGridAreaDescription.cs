@@ -28,7 +28,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 {
     public EnergyResultPerEnergySupplierBrpGridAreaDescription()
         : base(
-            "balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv",
+            "balance_fixing_01-11-2022_01-12-2022_ga_542_and_543_per_es_brp_ga_v1.csv",
             //Metering point type on row 146 contains an invalid value (="invalid") (row on a result set)
             "balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1_with_invalid_row.csv")
     {
@@ -36,9 +36,11 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override Guid CalculationId => Guid.Parse("a8cfe7c7-f197-405c-b922-52153fa0332d");
 
-    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "543" };
+    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "542", "543" };
 
-    public override int ExpectedCalculationResultsCount => 36;
+    public override int ExpectedCalculationResultsCount => 36 * 2; // 36 for each grid area
+
+    public int ExpectedCalculationResultsCountForInvalidDataSet => 35;
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
@@ -46,7 +48,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleEnergySupplier => new(
         ActorNumber: ActorNumber.Create("5790002105289"),
-        ExpectedOutgoingMessagesCount: 3,
+        ExpectedOutgoingMessagesCount: 3 * 2, // 3 for each grid area
         ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Consumption,
@@ -62,7 +64,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
         ActorNumber: ActorNumber.Create("7080000729821"),
-        ExpectedOutgoingMessagesCount: 6,
+        ExpectedOutgoingMessagesCount: 6 * 2, // 6 for each grid area
         ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Production,

@@ -85,6 +85,16 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             .ToArray();
     }
 
+    public static IEnumerable<object[]> GetTestData()
+    {
+        yield return ["Xml", ActorRole.GridAccessProvider.Name, ActorRole.Delegated.Name];
+        yield return ["Json", ActorRole.GridAccessProvider.Name, ActorRole.Delegated.Name];
+        yield return ["Xml", ActorRole.EnergySupplier.Name, ActorRole.Delegated.Name];
+        yield return ["Json", ActorRole.EnergySupplier.Name, ActorRole.Delegated.Name];
+        yield return ["Xml", ActorRole.SystemOperator.Name, ActorRole.Delegated.Name];
+        yield return ["Json", ActorRole.SystemOperator.Name, ActorRole.Delegated.Name];
+    }
+
     [Theory]
     [MemberData(nameof(DocumentFormatsWithAllRoleCombinations))]
     public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
@@ -968,12 +978,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
     }
 
     [Theory]
-    [InlineData("Xml", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
+    [MemberData(nameof(GetTestData))]
     public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName, string delegatedToRoleName)
     {
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);

@@ -33,6 +33,6 @@ public record NotifyAggregatedMeasureDataDocumentAssertionInput(
     MeasurementUnit QuantityMeasurementUnit,
     Period Period,
     Resolution Resolution,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points,
+    IReadOnlyCollection<TimeSeriesPointAssertionInput>? Points,
     SettlementMethod? SettlementMethod,
     TransactionId? OriginalTransactionIdReference);
