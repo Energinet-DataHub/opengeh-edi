@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
-using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
@@ -104,15 +102,13 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
         // Arrange
         var testDataDescription = GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
         var testMessageData = actorRole == ActorRole.EnergySupplier
-         ? testDataDescription.ExampleEnergySupplier
-         : testDataDescription.ExampleBalanceResponsible;
+             ? testDataDescription.ExampleEnergySupplier
+             : testDataDescription.ExampleBalanceResponsible;
 
         var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
-        var actor = (ActorNumber: actorRole == ActorRole.EnergySupplier
-            ? energySupplierNumber!
-                : balanceResponsibleParty!, ActorRole: actorRole);
+        var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
@@ -211,87 +207,88 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                 Points: testMessageData.ExampleMessageData.Points));
     }
 
-    [Theory(Skip = "not updated yet")]
+    [Theory]
     [MemberData(nameof(DocumentFormatsWithActorRoleCombinationsForNullGridArea))]
     public async Task AndGiven_DataInTwoGridAreas_When_ActorPeeksAllMessages_Then_ReceivesTwoNotifyAggregatedMeasureDataDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
     {
         /*
-         *  --- PART 1: Receive request, create process and send message to Wholesale ---
+         *  --- PART 1: Receive request and send message to Process Manager ---
          */
 
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy();
-        var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
-        var energySupplierNumber = currentActor.ActorRole == ActorRole.EnergySupplier
-            ? currentActor.ActorNumber
-            : ActorNumber.Create("3333333333333");
-        var balanceResponsibleParty = currentActor.ActorRole == ActorRole.BalanceResponsibleParty
-            ? currentActor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+        var testDataDescription = GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
+        var testMessageData = actorRole == ActorRole.EnergySupplier
+            ? testDataDescription.ExampleEnergySupplier
+            : testDataDescription.ExampleBalanceResponsible;
+
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
+        var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
+        var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
+        var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
+        // Act
         await GivenReceivedAggregatedMeasureDataRequest(
             documentFormat: incomingDocumentFormat,
-            senderActorNumber: currentActor.ActorNumber,
-            senderActorRole: currentActor.ActorRole,
-            meteringPointType: MeteringPointType.Consumption,
-            settlementMethod: SettlementMethod.Flex,
-            periodStart: (2024, 1, 1),
-            periodEnd: (2024, 1, 31),
+            senderActorNumber: actor.ActorNumber,
+            senderActorRole: actor.ActorRole,
+            meteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
+            settlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
+            periodStart: (2022, 1, 1),
+            periodEnd: (2022, 2, 1),
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("12356478912356478912356478912356478")),
+                (null, transactionId),
             });
 
-        // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
-
         // Assert
-        var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
-            senderSpy: senderSpy,
-            new AggregatedTimeSeriesMessageAssertionInput(
-                GridAreas: new List<string>(),
-                RequestedForActorNumber: currentActor.ActorNumber.Value,
-                RequestedForActorRole: currentActor.ActorRole.Name,
-                EnergySupplier: energySupplierNumber.Value,
-                BalanceResponsibleParty: balanceResponsibleParty.Value,
-                BusinessReason: BusinessReason.BalanceFixing,
-                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-                SettlementVersion: null,
-                SettlementMethod: SettlementMethod.Flex,
-                MeteringPointType: MeteringPointType.Consumption));
-
-        // TODO: Assert correct process is created?
+        var message = ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessageIsCorrect(
+            senderSpy,
+            new RequestCalculatedEnergyTimeSeriesInputV1AssertionInput(
+                transactionId,
+                actor.ActorNumber.Value,
+                actor.ActorRole.Name,
+                BusinessReason.BalanceFixing,
+                PeriodStart: CreateDateInstant(2022, 1, 1),
+                PeriodEnd: CreateDateInstant(2022, 2, 1),
+                energySupplierNumber!.Value,
+                balanceResponsibleParty!.Value,
+                new List<string>(),
+                SettlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
+                MeteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
+                SettlementVersion: null));
 
         /*
-         *  --- PART 2: Receive data from Wholesale and create RSM document ---
+         *  --- PART 2: Receive data from Process Manager and create RSM document ---
          */
 
         // Arrange
 
-        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
-        // It is very important that the generated data is correct,
+        // Generate a mock ServiceBus Message with RequestCalculatedEnergyTimeSeriesAcceptedV1 response from Process Manager,
+        // based on the RequestCalculatedEnergyTimeSeriesInputV1
         // since (almost) all assertion after this point is based on this data
-        var generateDataInGridAreas = new List<string> { "106", "509" };
-        var aggregatedMeasureDataRequestAcceptedMessage = AggregatedTimeSeriesResponseEventBuilder
-            .GenerateAcceptedFrom(message.AggregatedTimeSeriesRequest, GetNow(), generateDataInGridAreas);
+        var defaultGridAreas = testDataDescription.GridAreaCodes;
+        var requestCalculatedEnergyTimeSeriesInput = message.ParseInput<RequestCalculatedEnergyTimeSeriesInputV1>();
+        var requestCalculatedEnergyTimeSeriesAccepted = AggregatedTimeSeriesResponseEventBuilder
+            .GenerateAcceptedFrom(requestCalculatedEnergyTimeSeriesInput, defaultGridAreas);
 
-        await GivenAggregatedMeasureDataRequestAcceptedIsReceived(message.ProcessId, aggregatedMeasureDataRequestAcceptedMessage);
+        await GivenAggregatedMeasureDataRequestAcceptedIsReceived(requestCalculatedEnergyTimeSeriesAccepted);
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(
-            currentActor.ActorNumber,
-            currentActor.ActorRole,
+            actor.ActorNumber,
+            actor.ActorRole,
             peekDocumentFormat);
 
         // Assert
         using (new AssertionScope())
         {
-            peekResults.Should().HaveSameCount(generateDataInGridAreas, "because there should be one message for each grid area");
+            peekResults.Should().HaveSameCount(defaultGridAreas, "because there should be one message for each grid area");
         }
 
         var resultGridAreas = new List<string>();
@@ -302,10 +299,6 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
 
             resultGridAreas.Add(peekResultGridArea);
 
-            var seriesRequest = aggregatedMeasureDataRequestAcceptedMessage.Series
-                .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
-                .Subject;
-
             await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
                 peekResult.Bundle,
                 peekDocumentFormat,
@@ -314,316 +307,156 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                     BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
                         BusinessReason.BalanceFixing,
                         null),
-                    ReceiverId: currentActor.ActorNumber,
-                    // ReceiverRole: originalActor.ActorRole,
-                    SenderId: ActorNumber.Create("5790001330552"),  // Sender is always DataHub
-                    // SenderRole: ActorRole.MeteredDataAdministrator,
+                    ReceiverId: actor.ActorNumber,
+                    SenderId: DataHubDetails.DataHubActorNumber,
                     EnergySupplierNumber: energySupplierNumber,
                     BalanceResponsibleNumber: balanceResponsibleParty,
-                    SettlementMethod: SettlementMethod.Flex,
-                    MeteringPointType: MeteringPointType.Consumption,
-                    GridAreaCode: seriesRequest.GridArea,
-                    OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
+                    SettlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
+                    MeteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
+                    GridAreaCode: peekResultGridArea,
+                    OriginalTransactionIdReference: transactionId,
                     ProductCode: ProductType.EnergyActive.Code,
                     QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
-                    CalculationVersion: GetNow().ToUnixTimeTicks(),
-                    Resolution: Resolution.Hourly,
+                    CalculationVersion: testMessageData.ExampleMessageData.Version,
+                    Resolution: testMessageData.ExampleMessageData.Resolution,
                     Period: new Period(
-                        CreateDateInstant(2024, 1, 1),
-                        CreateDateInstant(2024, 1, 31)),
-                    Points: TimeSeriesPointAssertionInput.From(seriesRequest.TimeSeriesPoints)));
+                        CreateDateInstant(2022, 01, 12),
+                        CreateDateInstant(2022, 01, 13)),
+                    Points: testMessageData.ExampleMessageData.GridArea == peekResultGridArea ? testMessageData.ExampleMessageData.Points : null));
         }
 
-        resultGridAreas.Should().BeEquivalentTo("106", "509");
+        resultGridAreas.Should().BeEquivalentTo("542", "543");
     }
 
-    [Theory(Skip = "not updated yet")]
+    [Theory]
     [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
-    public async Task AndGiven_RequestHasNoDataInOptionalFields_When_ActorPeeksAllMessages_Then_ReceivesNotifyAggregatedMeasureDataDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
+    public async Task
+        AndGiven_RequestHasNoDataInOptionalFields_When_ActorPeeksAllMessages_Then_ReceivesNotifyAggregatedMeasureDataDocumentWithCorrectContent(
+            ActorRole actorRole,
+            DocumentFormat incomingDocumentFormat,
+            DocumentFormat peekDocumentFormat)
     {
         /*
-         *  --- PART 1: Receive request, create process and send message to Wholesale ---
+         *  --- PART 1: Receive request and send message to Process Manager ---
          */
 
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy();
-        var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
-        var energySupplierOrNull = currentActor.ActorRole == ActorRole.EnergySupplier
-            ? currentActor.ActorNumber
+        var testMessageData = actorRole == ActorRole.EnergySupplier
+            ? GivenDatabricksResultDataForEnergyResultPerEnergySupplier().ExampleEnergySupplier
+            : actorRole == ActorRole.BalanceResponsibleParty
+                ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
+                : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
+
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var energySupplierOrNull = actorRole == ActorRole.EnergySupplier
+            ? testMessageData.ExampleMessageData.EnergySupplier
             : null;
-        var balanceResponsibleOrNull = currentActor.ActorRole == ActorRole.BalanceResponsibleParty
-            ? currentActor.ActorNumber
+        var balanceResponsibleOrNull = actorRole == ActorRole.BalanceResponsibleParty
+            ? testMessageData.ExampleMessageData.BalanceResponsible
             : null;
-        var gridAreaOrNull = currentActor.ActorRole == ActorRole.GridAccessProvider || currentActor.ActorRole == ActorRole.MeteredDataResponsible
-            ? "512"
-            : null;
+        var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
 
+        var transactionId = TransactionId.From("12356478912356478912356478912356478");
+        var gridAreaOrNull = actor.ActorRole == ActorRole.GridAccessProvider || actor.ActorRole == ActorRole.MeteredDataResponsible
+            ? testMessageData.ExampleMessageData.GridArea
+            : null;
+
+        // Act
+        // GridAccessProviders must use MeteredDataResponsible as sender role
+        var senderActorRole = actor.ActorRole == ActorRole.GridAccessProvider ? ActorRole.MeteredDataResponsible : actor.ActorRole;
         await GivenReceivedAggregatedMeasureDataRequest(
             documentFormat: incomingDocumentFormat,
-            senderActorNumber: currentActor.ActorNumber,
-            senderActorRole: currentActor.ActorRole,
+            senderActorNumber: actor.ActorNumber,
+            senderActorRole: senderActorRole,
             meteringPointType: null,
             settlementMethod: null,
-            periodStart: (2024, 1, 1),
-            periodEnd: (2024, 1, 31),
+            periodStart: (2022, 1, 1),
+            periodEnd: (2022, 2, 1),
             energySupplier: energySupplierOrNull,
             balanceResponsibleParty: balanceResponsibleOrNull,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (gridAreaOrNull, TransactionId.From("12356478912356478912356478912356478")),
+                (gridAreaOrNull, transactionId),
             });
 
-        // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
-
         // Assert
-        var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
-            senderSpy: senderSpy,
-            new AggregatedTimeSeriesMessageAssertionInput(
-                GridAreas: gridAreaOrNull != null ? new List<string> { gridAreaOrNull } : new List<string>(),
-                RequestedForActorNumber: currentActor.ActorNumber.Value,
-                RequestedForActorRole: currentActor.ActorRole.Name,
-                EnergySupplier: energySupplierOrNull?.Value,
-                BalanceResponsibleParty: balanceResponsibleOrNull?.Value,
-                BusinessReason: BusinessReason.BalanceFixing,
-                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-                SettlementVersion: null,
+        var message = ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessageIsCorrect(
+            senderSpy,
+            new RequestCalculatedEnergyTimeSeriesInputV1AssertionInput(
+                transactionId,
+                actor.ActorNumber.Value,
+                senderActorRole.Name,
+                BusinessReason.BalanceFixing,
+                PeriodStart: CreateDateInstant(2022, 1, 1),
+                PeriodEnd: CreateDateInstant(2022, 2, 1),
+                energySupplierOrNull?.Value,
+                balanceResponsibleOrNull?.Value,
+                GridAreas: gridAreaOrNull != null ? [gridAreaOrNull] : new List<string>(),
                 SettlementMethod: null,
-                MeteringPointType: null));
-
-        // TODO: Assert correct process is created?
+                MeteringPointType: null,
+                SettlementVersion: null));
 
         /*
-         *  --- PART 2: Receive data from Wholesale and create RSM document ---
+         *  --- PART 2: Receive data from Process Manager and create RSM document ---
          */
 
         // Arrange
 
-        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
-        // It is very important that the generated data is correct,
+        // Generate a mock ServiceBus Message with RequestCalculatedEnergyTimeSeriesAcceptedV1 response from Process Manager,
+        // based on the RequestCalculatedEnergyTimeSeriesInputV1
         // since (almost) all assertion after this point is based on this data
-        var defaultGridAreas = gridAreaOrNull == null ? new List<string> { "512" } : null;
-        var acceptedResponse = AggregatedTimeSeriesResponseEventBuilder
-            .GenerateAcceptedFrom(message.AggregatedTimeSeriesRequest, GetNow(), defaultGridAreas);
+        var defaultGridAreas = gridAreaOrNull != null
+            ? null
+            : actorRole == ActorRole.EnergySupplier
+                ? GivenDatabricksResultDataForEnergyResultPerEnergySupplier().GridAreaCodes
+                : new List<string> { testMessageData.ExampleMessageData.GridArea };
+        var requestCalculatedEnergyTimeSeriesInput = message.ParseInput<RequestCalculatedEnergyTimeSeriesInputV1>();
+        var requestCalculatedEnergyTimeSeriesAccepted = AggregatedTimeSeriesResponseEventBuilder
+            .GenerateAcceptedFrom(requestCalculatedEnergyTimeSeriesInput, defaultGridAreas);
 
-        await GivenAggregatedMeasureDataRequestAcceptedIsReceived(message.ProcessId, acceptedResponse);
+        await GivenAggregatedMeasureDataRequestAcceptedIsReceived(requestCalculatedEnergyTimeSeriesAccepted);
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(
-            currentActor.ActorNumber,
-            currentActor.ActorRole,
+            actor.ActorNumber,
+            actor.ActorRole,
             peekDocumentFormat);
 
         // Assert
-        PeekResultDto peekResult;
+
+        // Assert
         using (new AssertionScope())
         {
-            peekResult = peekResults
-                .Should()
-                .ContainSingle("because there should be one message when requesting for one grid area")
-                .Subject;
+            peekResults.Count.Should().Be(testMessageData.ExpectedOutgoingMessagesCount, "because there should be one message for each grid area, metering point type and settlement method combination");
         }
 
-        peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-
-        await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
-            peekResult.Bundle,
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResults,
             peekDocumentFormat,
             new NotifyAggregatedMeasureDataDocumentAssertionInput(
                 Timestamp: "2024-07-01T14:57:09Z",
                 BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
                     BusinessReason.BalanceFixing,
                     null),
-                ReceiverId: currentActor.ActorNumber,
-                // ReceiverRole: originalActor.ActorRole,
-                SenderId: ActorNumber.Create("5790001330552"),  // Sender is always DataHub
-                // SenderRole: ActorRole.MeteredDataAdministrator,
+                ReceiverId: actor.ActorNumber,
+                SenderId: DataHubDetails.DataHubActorNumber,
                 EnergySupplierNumber: energySupplierOrNull,
                 BalanceResponsibleNumber: balanceResponsibleOrNull,
-                SettlementMethod: SettlementMethod.Flex,
-                MeteringPointType: MeteringPointType.Consumption,
-                GridAreaCode: "512",
-                OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
+                SettlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
+                MeteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
+                GridAreaCode: testMessageData.ExampleMessageData.GridArea,
+                OriginalTransactionIdReference: transactionId,
                 ProductCode: ProductType.EnergyActive.Code,
                 QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
-                CalculationVersion: GetNow().ToUnixTimeTicks(),
-                Resolution: Resolution.Hourly,
+                CalculationVersion: testMessageData.ExampleMessageData.Version,
+                Resolution: testMessageData.ExampleMessageData.Resolution,
                 Period: new Period(
-                    CreateDateInstant(2024, 1, 1),
-                    CreateDateInstant(2024, 1, 31)),
-                Points: TimeSeriesPointAssertionInput.From(acceptedResponse.Series.Single().TimeSeriesPoints)));
-    }
-
-    [Theory(Skip = "not updated yet")]
-    [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
-    public async Task AndGiven_RequestedThreeSeries_When_ActorPeeksAllMessages_Then_ReceivesThreeNotifyAggregatedMeasureDataDocumentsWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
-    {
-        /*
-         *  --- PART 1: Receive request, create process and send message to Wholesale ---
-         */
-
-        // Arrange
-        var senderSpy = CreateServiceBusSenderSpy();
-        var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
-        var energySupplierNumber = currentActor.ActorRole == ActorRole.EnergySupplier
-            ? currentActor.ActorNumber
-            : ActorNumber.Create("3333333333333");
-        var balanceResponsibleParty = currentActor.ActorRole == ActorRole.BalanceResponsibleParty
-            ? currentActor.ActorNumber
-            : ActorNumber.Create("4444444444444");
-
-        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
-
-        var gridAreasWithTransactionId = new (string? GridArea, TransactionId TransactionId)[]
-        {
-            ("143", TransactionId.From("12356478912356478912356478912356478")),
-            ("512", TransactionId.From("12356478912356478912356478912356479")),
-            ("877", TransactionId.From("12356478912356478912356478912356470")),
-        };
-
-        await GivenReceivedAggregatedMeasureDataRequest(
-            documentFormat: incomingDocumentFormat,
-            senderActorNumber: currentActor.ActorNumber,
-            senderActorRole: currentActor.ActorRole,
-            meteringPointType: MeteringPointType.Consumption,
-            settlementMethod: SettlementMethod.Flex,
-            periodStart: (2024, 1, 1),
-            periodEnd: (2024, 1, 31),
-            energySupplier: energySupplierNumber,
-            balanceResponsibleParty: balanceResponsibleParty,
-            series: gridAreasWithTransactionId);
-
-        // Act
-        await WhenAggregatedMeasureDataProcessesAreInitialized(senderSpy.MessagesSent.ToArray());
-
-        // Assert
-        var messages = await ThenAggregatedTimeSeriesRequestServiceBusMessagesAreCorrect(
-            senderSpy: senderSpy,
-            new List<AggregatedTimeSeriesMessageAssertionInput>
-            {
-                new(
-                    GridAreas: new List<string> { "143" },
-                    RequestedForActorNumber: currentActor.ActorNumber.Value,
-                    RequestedForActorRole: currentActor.ActorRole.Name,
-                    EnergySupplier: energySupplierNumber.Value,
-                    BalanceResponsibleParty: balanceResponsibleParty.Value,
-                    BusinessReason: BusinessReason.BalanceFixing,
-                    Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-                    SettlementVersion: null,
-                    SettlementMethod: SettlementMethod.Flex,
-                    MeteringPointType: MeteringPointType.Consumption),
-                new(
-                    GridAreas: new List<string> { "512" },
-                    RequestedForActorNumber: currentActor.ActorNumber.Value,
-                    RequestedForActorRole: currentActor.ActorRole.Name,
-                    EnergySupplier: energySupplierNumber.Value,
-                    BalanceResponsibleParty: balanceResponsibleParty.Value,
-                    BusinessReason: BusinessReason.BalanceFixing,
-                    Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-                    SettlementVersion: null,
-                    SettlementMethod: SettlementMethod.Flex,
-                    MeteringPointType: MeteringPointType.Consumption),
-                new(
-                    GridAreas: new List<string> { "877" },
-                    RequestedForActorNumber: currentActor.ActorNumber.Value,
-                    RequestedForActorRole: currentActor.ActorRole.Name,
-                    EnergySupplier: energySupplierNumber.Value,
-                    BalanceResponsibleParty: balanceResponsibleParty.Value,
-                    BusinessReason: BusinessReason.BalanceFixing,
-                    Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-                    SettlementVersion: null,
-                    SettlementMethod: SettlementMethod.Flex,
-                    MeteringPointType: MeteringPointType.Consumption),
-            });
-
-        // TODO: Assert correct process is created?
-
-        /*
-         *  --- PART 2: Receive data from Wholesale and create RSM document ---
-         */
-
-        // Arrange
-
-        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
-        // It is very important that the generated data is correct,
-        // since (almost) all assertion after this point is based on this data
-        var acceptedResponses = messages
-            .Select(message =>
-                (
-                    ProcessId: message.ProcessId,
-                    AcceptedResponse: AggregatedTimeSeriesResponseEventBuilder
-                        .GenerateAcceptedFrom(message.AggregatedTimeSeriesRequest, GetNow())))
-            .ToList();
-
-        foreach (var response in acceptedResponses)
-        {
-            await GivenAggregatedMeasureDataRequestAcceptedIsReceived(response.ProcessId, response.AcceptedResponse);
-        }
-
-        // Act
-        var peekResults = await WhenActorPeeksAllMessages(
-            currentActor.ActorNumber,
-            currentActor.ActorRole,
-            peekDocumentFormat);
-
-        // Assert
-        using (new AssertionScope())
-        {
-            peekResults
-                .Should()
-                .HaveCount(3, "because there should be three messages when requesting three series");
-        }
-
-        var gridAreas = new List<string>();
-        foreach (var peekResult in peekResults)
-        {
-            peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-
-            var expectedGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle, peekDocumentFormat);
-            gridAreas.Add(expectedGridArea);
-
-            var acceptedResponse = acceptedResponses
-                .Should()
-                .ContainSingle(r => r.AcceptedResponse.Series.Single().GridArea == expectedGridArea)
-                .Subject;
-
-            var expectedTransactionId = gridAreasWithTransactionId
-                .Single(ga => ga.GridArea == expectedGridArea)
-                .TransactionId;
-
-            await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
-                peekResult.Bundle,
-                peekDocumentFormat,
-                new NotifyAggregatedMeasureDataDocumentAssertionInput(
-                    Timestamp: "2024-07-01T14:57:09Z",
-                    BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
-                        BusinessReason.BalanceFixing,
-                        null),
-                    ReceiverId: currentActor.ActorNumber,
-                    // ReceiverRole: originalActor.ActorRole,
-                    SenderId: ActorNumber.Create("5790001330552"),  // Sender is always DataHub
-                    // SenderRole: ActorRole.MeteredDataAdministrator,
-                    EnergySupplierNumber: energySupplierNumber,
-                    BalanceResponsibleNumber: balanceResponsibleParty,
-                    SettlementMethod: SettlementMethod.Flex,
-                    MeteringPointType: MeteringPointType.Consumption,
-                    GridAreaCode: expectedGridArea,
-                    OriginalTransactionIdReference: expectedTransactionId,
-                    ProductCode: ProductType.EnergyActive.Code,
-                    QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
-                    CalculationVersion: GetNow().ToUnixTimeTicks(),
-                    Resolution: Resolution.Hourly,
-                    Period: new Period(
-                        CreateDateInstant(2024, 1, 1),
-                        CreateDateInstant(2024, 1, 31)),
-                    Points: TimeSeriesPointAssertionInput.From(acceptedResponse.AcceptedResponse.Series.Single().TimeSeriesPoints)));
-        }
-
-        gridAreas.Should().BeEquivalentTo("143", "512", "877");
+                    CreateDateInstant(2022, 01, 12),
+                    CreateDateInstant(2022, 01, 13)),
+                Points: testMessageData.ExampleMessageData.Points));
     }
 
     [Theory]

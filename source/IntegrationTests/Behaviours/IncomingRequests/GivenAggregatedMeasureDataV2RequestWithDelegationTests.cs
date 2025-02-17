@@ -101,6 +101,18 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
             .ToArray();
     }
 
+    public static IEnumerable<object[]> GetTestData()
+    {
+        yield return ["Xml", ActorRole.MeteredDataResponsible.Name];
+        yield return ["Json", ActorRole.MeteredDataResponsible.Name];
+        yield return ["Xml", ActorRole.GridAccessProvider.Name];
+        yield return ["Json", ActorRole.GridAccessProvider.Name];
+        yield return ["Xml", ActorRole.EnergySupplier.Name];
+        yield return ["Json", ActorRole.EnergySupplier.Name];
+        yield return ["Xml", ActorRole.BalanceResponsibleParty.Name];
+        yield return ["Json", ActorRole.BalanceResponsibleParty.Name];
+    }
+
     [Theory(Skip = "not updated yet")]
     [MemberData(nameof(DocumentFormatsWithAllRoleCombinations), MemberType = typeof(GivenAggregatedMeasureDataRequestWithDelegationTests))]
     public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
@@ -937,17 +949,12 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
     }
 
     [Theory(Skip = "not updated yet")]
-    [InlineData("Xml", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.BalanceResponsibleParty, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.BalanceResponsibleParty, DataHubNames.ActorRole.Delegated)]
-    public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName, string delegatedToRoleName)
+    [MemberData(nameof(GetTestData))]
+    public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName)
     {
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
         var originalActorRole = ActorRole.FromName(originalActorRoleName);
-        var delegatedToRole = ActorRole.FromName(delegatedToRoleName);
+        var delegatedToRole = ActorRole.FromName(ActorRole.Delegated.Name);
 
         var senderSpy = CreateServiceBusSenderSpy();
         var originalActor = new Actor(ActorNumber.Create("1111111111111"), actorRole: originalActorRole);

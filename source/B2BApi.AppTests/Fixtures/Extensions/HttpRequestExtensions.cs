@@ -30,7 +30,7 @@ public static class HttpRequestExtensions
     {
         var documentPath = actor.ActorRole.Name switch
         {
-            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/xml/RequestWholesaleSettlementForEnergySupplier.xml",
+            _ when actor.ActorRole.Name == ActorRole.EnergySupplier.Name => "TestData/Messages/xml/RequestWholesaleSettlementForEnergySupplier.xml",
             _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
         };
 
@@ -50,7 +50,7 @@ public static class HttpRequestExtensions
     {
         var documentPath = actor.ActorRole.Name switch
         {
-            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/json/RequestAggregatedMeasureDataForEnergySupplier.json",
+            _ when actor.ActorRole.Name == ActorRole.EnergySupplier.Name => "TestData/Messages/json/RequestAggregatedMeasureDataForEnergySupplier.json",
             _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
         };
 
