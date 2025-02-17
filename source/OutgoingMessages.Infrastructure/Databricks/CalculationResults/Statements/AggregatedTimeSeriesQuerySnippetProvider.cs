@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
@@ -66,10 +67,10 @@ public sealed class AggregatedTimeSeriesQuerySnippetProvider(
         string prefix,
         IReadOnlyCollection<CalculationTypeForGridArea> calculationTypeForGridAreas)
     {
-        if (_queryParameters.CalculationType is not null)
+        if (!IsQueryForLatestCorrection())
         {
             return $"""
-                    {prefix}.{DatabricksContract.GetCalculationTypeColumnName()} = '{CalculationTypeMapper.ToDeltaTableValue(_queryParameters.CalculationType.Value)}'
+                    {prefix}.{DatabricksContract.GetCalculationTypeColumnName()} = '{CalculationTypeMapper.ToDeltaTableValue(_queryParameters.BusinessReason, _queryParameters.SettlementVersion)}'
                     """;
         }
 
@@ -86,6 +87,12 @@ public sealed class AggregatedTimeSeriesQuerySnippetProvider(
                               """);
 
         return $"({string.Join(" OR ", calculationTypePerGridAreaConstraints)})";
+    }
+
+    private bool IsQueryForLatestCorrection()
+    {
+        return _queryParameters.BusinessReason == BusinessReason.Correction
+               && _queryParameters.SettlementVersion is null;
     }
 
     private string GetTimeSeriesTypeSelection(

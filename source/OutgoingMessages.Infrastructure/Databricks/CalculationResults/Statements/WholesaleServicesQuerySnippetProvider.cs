@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
 using ChargeTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ChargeTypeMapper;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
@@ -76,10 +78,10 @@ public sealed class WholesaleServicesQuerySnippetProvider(
         string prefix,
         IReadOnlyCollection<CalculationTypeForGridArea> calculationTypePerGridAreas)
     {
-        if (_queryParameters.CalculationType is not null)
+        if (!IsQueryForLatestCorrection())
         {
             return $"""
-                    {prefix}.{DatabricksContract.GetCalculationTypeColumnName()} = '{CalculationTypeMapper.ToDeltaTableValue(_queryParameters.CalculationType.Value)}'
+                    {prefix}.{DatabricksContract.GetCalculationTypeColumnName()} = '{CalculationTypeMapper.ToDeltaTableValue(_queryParameters.BusinessReason, _queryParameters.SettlementVersion)}'
                     """;
         }
 
@@ -98,6 +100,12 @@ public sealed class WholesaleServicesQuerySnippetProvider(
         return $"""
                 ({string.Join(" OR ", calculationTypePerGridAreaConstraints)})
                 """;
+    }
+
+    private bool IsQueryForLatestCorrection()
+    {
+        return _queryParameters.BusinessReason == BusinessReason.Correction
+               && _queryParameters.SettlementVersion is null;
     }
 
     private string GetActorsForTotalAmountsSelection(string table, string sql)

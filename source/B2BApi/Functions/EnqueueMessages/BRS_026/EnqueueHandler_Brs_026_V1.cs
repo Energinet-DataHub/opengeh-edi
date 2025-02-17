@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
@@ -61,7 +59,8 @@ public class EnqueueHandler_Brs_026_V1(
             acceptedData.GridAreas,
             acceptedData.EnergySupplierNumber?.Value,
             acceptedData.BalanceResponsibleNumber?.Value,
-            MapCalculationType(acceptedData.BusinessReason.Name, acceptedData.SettlementVersion?.Name),
+            BusinessReason.FromName(acceptedData.BusinessReason.Name),
+            acceptedData.SettlementVersion != null ? SettlementVersion.FromName(acceptedData.SettlementVersion.Name) : null,
             new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(acceptedData.PeriodStart.ToInstant(), acceptedData.PeriodEnd.ToInstant()));
 
         var enqueuedCount = await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(
@@ -187,39 +186,6 @@ public class EnqueueHandler_Brs_026_V1(
                     requestedForActorRole,
                     "Value does not contain a valid string representation of a requested by actor role."),
             };
-    }
-
-    private static CalculationType? MapCalculationType(string businessReason, string? settlementVersion)
-    {
-        if (businessReason != BusinessReason.Correction.Name && settlementVersion != null)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(settlementVersion),
-                settlementVersion,
-                $"Value must be null when {nameof(businessReason)} is not {nameof(BusinessReason.Correction.Name)}.");
-        }
-
-        return businessReason switch
-        {
-            var reason when reason == BusinessReason.BalanceFixing.Name => CalculationType.BalanceFixing,
-            var reason when reason == BusinessReason.PreliminaryAggregation.Name => CalculationType.Aggregation,
-            var reason when reason == BusinessReason.WholesaleFixing.Name => CalculationType.WholesaleFixing,
-            var reason when reason == BusinessReason.Correction.Name => settlementVersion switch
-            {
-                var settlement when settlement == SettlementVersion.FirstCorrection.Name => CalculationType.FirstCorrectionSettlement,
-                var settlement when settlement == SettlementVersion.SecondCorrection.Name => CalculationType.SecondCorrectionSettlement,
-                var settlement when settlement == SettlementVersion.ThirdCorrection.Name => CalculationType.ThirdCorrectionSettlement,
-                null => null, // CalculationType == null means get latest correction
-                _ => throw new ArgumentOutOfRangeException(
-                    nameof(settlementVersion),
-                    settlementVersion,
-                    $"Value cannot be mapped to a {nameof(CalculationType)}."),
-            },
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(businessReason),
-                businessReason,
-                $"Value cannot be mapped to a {nameof(CalculationType)}."),
-        };
     }
 
     private static TimeSeriesType MapTimeSeriesType(string meteringPointType, string? settlementMethod)

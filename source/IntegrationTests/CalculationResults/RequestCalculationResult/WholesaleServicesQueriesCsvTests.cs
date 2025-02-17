@@ -17,6 +17,7 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
@@ -29,8 +30,11 @@ using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
+using MeteringPointType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType;
 using Resolution =
     Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.CalculationResults.RequestCalculationResult;
 
@@ -80,7 +84,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790000701278",
                 ChargeOwnerId: null,
                 ChargeTypes: [],
-                CalculationType: CalculationType.WholesaleFixing,
+                BusinessReason: BusinessReason.WholesaleFixing,
+                SettlementVersion: null,
                 Period: totalPeriod,
                 RequestedForEnergySupplier: true,
                 RequestedForActorNumber: "5790000701278");
@@ -91,56 +96,56 @@ public class WholesaleServicesQueriesCsvTests
             using var assertionScope = new AssertionScope();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1009", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1009", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15003", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000392551", ChargeType.Tariff, "SEF3 NT-01", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1012", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1007", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790001089023", ChargeType.Subscription, "AB15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT10001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000392551", ChargeType.Subscription, "SEF2 E-50", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1010", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1032", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("804", "5790000701278", "8100000000047", ChargeType.Tariff, "4300", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000392551", ChargeType.Tariff, "SEF2 NT-01", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "45013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-004", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("804", "5790000701278", "8100000000047", ChargeType.Subscription, "4310", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1027", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1025", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000392551", ChargeType.Subscription, "SEF3 E-50", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB10001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "45013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000392551", ChargeType.Tariff, "SEF NT-02", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15004", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
-                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "45013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.WholesaleFixing, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1009", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, (SettlementVersion?)null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1009", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15003", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000392551", ChargeType.Tariff, "SEF3 NT-01", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1012", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1007", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Subscription, "AB15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT10001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000392551", ChargeType.Subscription, "SEF2 E-50", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1010", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1032", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("804", "5790000701278", "8100000000047", ChargeType.Tariff, "4300", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000392551", ChargeType.Tariff, "SEF2 NT-01", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "45013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-004", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("804", "5790000701278", "8100000000047", ChargeType.Subscription, "4310", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1027", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB1025", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000392551", ChargeType.Subscription, "SEF3 E-50", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Subscription, "AB10001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "45013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000392551", ChargeType.Tariff, "SEF NT-02", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15004", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "45013", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.WholesaleFixing, null, 24, 31),
 
-                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1009", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid, null, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid, null, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid, null, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid, null, CalculationType.WholesaleFixing, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1009", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid,  (SettlementMethod?)null, BusinessReason.WholesaleFixing, (SettlementVersion?)null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid, null, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "41000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid, null, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "42000", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetFromGrid, null, BusinessReason.WholesaleFixing, null, 24, 31),
 
-                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1010", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.OwnProduction, (SettlementMethod?)null, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1008", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.OwnProduction, null, CalculationType.WholesaleFixing, 24, 31),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "42030", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.OwnProduction, null, CalculationType.WholesaleFixing, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1010", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.OwnProduction, (SettlementMethod?)null, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000610976", ChargeType.Tariff, "NT1008", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.OwnProduction, null, BusinessReason.WholesaleFixing, null, 24, 31),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "42030", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.OwnProduction, null, BusinessReason.WholesaleFixing, null, 24, 31),
                 ]);
         }
 
@@ -161,7 +166,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790000701278",
                 ChargeOwnerId: "5790000610976",
                 ChargeTypes: [],
-                CalculationType: CalculationType.SecondCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: SettlementVersion.SecondCorrection,
                 Period: totalPeriod,
                 RequestedForEnergySupplier: isEnergySupplier,
                 RequestedForActorNumber: isEnergySupplier ? "5790000701278" : "5790000610976");
@@ -172,10 +178,10 @@ public class WholesaleServicesQueriesCsvTests
             using var assertionScope = new AssertionScope();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("543", "5790000701278", "5790000610976", (ChargeType?)null, (string?)null, AmountType.TotalMonthlyAmount, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.SecondCorrectionSettlement, 4, 1)
+                    ("543", "5790000701278", "5790000610976", (ChargeType?)null, (string?)null, AmountType.TotalMonthlyAmount, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 4, 1)
                 ]);
         }
 
@@ -192,7 +198,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790000701278",
                 ChargeOwnerId: null,
                 ChargeTypes: [],
-                CalculationType: CalculationType.SecondCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: SettlementVersion.SecondCorrection,
                 Period: totalPeriod,
                 RequestedForEnergySupplier: true,
                 RequestedForActorNumber: "5790000701278");
@@ -203,13 +210,13 @@ public class WholesaleServicesQueriesCsvTests
             using var assertionScope = new AssertionScope();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("533", "5790000701278", (string?)null, (ChargeType?)null, (string?)null, AmountType.TotalMonthlyAmount, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.SecondCorrectionSettlement, 3, 1),
-                    ("543", "5790000701278", null, null, null, AmountType.TotalMonthlyAmount, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 4, 1),
-                    ("584", "5790000701278", null, null, null, AmountType.TotalMonthlyAmount, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 3, 1),
-                    ("804", "5790000701278", null, null, null, AmountType.TotalMonthlyAmount, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 3, 1),
+                    ("533", "5790000701278", (string?)null, (ChargeType?)null, (string?)null, AmountType.TotalMonthlyAmount, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 1),
+                    ("543", "5790000701278", null, null, null, AmountType.TotalMonthlyAmount, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 4, 1),
+                    ("584", "5790000701278", null, null, null, AmountType.TotalMonthlyAmount, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 1),
+                    ("804", "5790000701278", null, null, null, AmountType.TotalMonthlyAmount, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 1),
                 ]);
         }
 
@@ -229,7 +236,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: "8100000000047",
                 ChargeTypes: [("4300", ChargeType.Tariff)],
-                CalculationType: null, // This is how we denote 'latest correction'
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: isEnergySupplier,
                 RequestedForActorNumber: isEnergySupplier ? "5790001687137" : "8100000000047");
@@ -240,10 +248,10 @@ public class WholesaleServicesQueriesCsvTests
             using var assertionScope = new AssertionScope();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "4300", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.ThirdCorrectionSettlement, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "4300", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
                 ]);
         }
 
@@ -263,7 +271,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: isChargerOwner ? DataHubDetails.SystemOperatorActorNumber.Value : "8100000000047",
                 ChargeTypes: [("40000", ChargeType.Tariff)],
-                CalculationType: null, // This is how we denote 'latest correction'
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: false,
                 RequestedForActorNumber: DataHubDetails.SystemOperatorActorNumber.Value);
@@ -274,10 +283,10 @@ public class WholesaleServicesQueriesCsvTests
             using var assertionScope = new AssertionScope();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", "5790001687137", DataHubDetails.SystemOperatorActorNumber.Value, ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.ThirdCorrectionSettlement, 2, 1),
+                    ("804", "5790001687137", DataHubDetails.SystemOperatorActorNumber.Value, ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
                 ]);
         }
 
@@ -295,7 +304,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("EA-003", ChargeType.Tariff)],
-                CalculationType: null, // This is how we denote 'latest correction'
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: true,
                 RequestedForActorNumber: "5790001687137");
@@ -318,7 +328,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("EA-003", ChargeType.Tariff)],
-                CalculationType: null, // This is how we denote 'latest correction'
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: true,
                 RequestedForActorNumber: "5790001687137");
@@ -340,7 +351,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [],
-                CalculationType: null, // This is how we denote 'latest correction'
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: true,
                 RequestedForActorNumber: "5790001687137");
@@ -372,7 +384,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: null,
                 ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [],
-                CalculationType: null,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: true,
                 RequestedForActorNumber: "5790001687137");
@@ -381,18 +394,18 @@ public class WholesaleServicesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.SecondCorrectionSettlement, 3, 31),
-                    ("584", "5790001095390", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.SecondCorrectionSettlement, 3, 31),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.Flex, CalculationType.ThirdCorrectionSettlement, 2, 31),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-002", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.Flex, CalculationType.ThirdCorrectionSettlement, 2, 31),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.ThirdCorrectionSettlement, 2, 31),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-002", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.ThirdCorrectionSettlement, 2, 31),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-003", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.ElectricalHeating, (SettlementMethod?)null, CalculationType.ThirdCorrectionSettlement, 2, 31),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.ElectricalHeating, null, CalculationType.ThirdCorrectionSettlement, 2, 31),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetConsumption, null, CalculationType.ThirdCorrectionSettlement, 2, 31),
+                    ("584", "5790000701278", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 31),
+                    ("584", "5790001095390", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 31),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.Flex, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 31),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-002", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.Flex, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 31),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 31),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-002", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 31),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-003", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.ElectricalHeating, (SettlementMethod?)null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 31),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.ElectricalHeating, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 31),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.NetConsumption, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 31),
                 ]);
         }
 
@@ -412,7 +425,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: null,
                 ChargeOwnerId: syoChargeOwner,
                 ChargeTypes: [("40000", ChargeType.Tariff)],
-                CalculationType: null, // This is how we denote 'latest correction'
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: period,
                 RequestedForEnergySupplier: false,
                 RequestedForActorNumber: gridAreaOwnerAsRequester);
@@ -438,7 +452,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: null,
                 ChargeOwnerId: null,
                 ChargeTypes: [("40000", ChargeType.Tariff), ("AB1025", ChargeType.Subscription)],
-                CalculationType: CalculationType.SecondCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: SettlementVersion.SecondCorrection,
                 Period: totalPeriod,
                 false,
                 DataHubDetails.SystemOperatorActorNumber.Value);
@@ -449,15 +464,15 @@ public class WholesaleServicesQueriesCsvTests
             using var assertionScope = new AssertionScope();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.SecondCorrectionSettlement, 3, 1),
-                    ("533", "5790001095390", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 3, 1),
-                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 4, 1),
-                    ("543", "5790001095390", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 4, 1),
-                    ("543", "5790001687137", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 4, 1),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.SecondCorrectionSettlement, 3, 1),
+                    ("533", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 1),
+                    ("533", "5790001095390", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 1),
+                    ("543", "5790000701278", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 4, 1),
+                    ("543", "5790001095390", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 4, 1),
+                    ("543", "5790001687137", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 4, 1),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "40000", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 1),
                 ]);
         }
 
@@ -475,7 +490,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: null,
                 ChargeOwnerId: null,
                 ChargeTypes: [],
-                CalculationType: null, // This is how we denote 'latest correction'
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: false,
                 RequestedForActorNumber: "8100000000047");
@@ -484,25 +500,25 @@ public class WholesaleServicesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
-                    ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod, ats.CalculationType,
-                    ats.Version, ats.TimeSeriesPoints.Count))
+            actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType,
+                    ats.ChargeCode, ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
                     // Tax charges for grid area
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-002", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-003", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-001", AmountType.MonthlyAmountPerCharge, Resolution.Month, (MeteringPointType?)null, (SettlementMethod?)null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-002", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "5790000432752", ChargeType.Tariff, "EA-003", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
                     // Charge owners own charges
-                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "100", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790000701278", "8100000000047", ChargeType.Tariff, "4300", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "4300", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "Rabat-T", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "Tarif_Ny", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "8100000000047", ChargeType.Subscription, "100", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790000701278", "8100000000047", ChargeType.Subscription, "4310", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "8100000000047", ChargeType.Subscription, "4310", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
-                    ("804", "5790001687137", "8100000000047", ChargeType.Subscription, "Abb Flex", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, CalculationType.ThirdCorrectionSettlement, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "100", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790000701278", "8100000000047", ChargeType.Tariff, "4300", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "4300", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "Rabat-T", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Tariff, "Tarif_Ny", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Subscription, "100", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790000701278", "8100000000047", ChargeType.Subscription, "4310", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Subscription, "4310", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
+                    ("804", "5790001687137", "8100000000047", ChargeType.Subscription, "Abb Flex", AmountType.MonthlyAmountPerCharge, Resolution.Month, null, null, BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2, 1),
                 ]);
         }
     }
@@ -555,7 +571,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: "8100000000047",
                 ChargeTypes: [("4310", ChargeType.Subscription)],
-                CalculationType: CalculationType.SecondCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: isEnergySupplier,
                 RequestedForActorNumber: isEnergySupplier ? "5790001687137" : "8100000000047");
@@ -604,7 +621,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("40000", ChargeType.Tariff)],
-                CalculationType: CalculationType.SecondCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: false,
                 RequestedForActorNumber: DataHubDetails.SystemOperatorActorNumber.Value);
@@ -643,7 +661,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790001687137",
                 ChargeOwnerId: DataHubDetails.SystemOperatorActorNumber.Value,
                 ChargeTypes: [("EA-001", ChargeType.Tariff)],
-                CalculationType: CalculationType.SecondCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: true,
                 RequestedForActorNumber: "5790001687137");
@@ -720,7 +739,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: null,
                 ChargeOwnerId: null,
                 ChargeTypes: [],
-                CalculationType: null,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: false,
                 RequestedForActorNumber: DataHubDetails.SystemOperatorActorNumber.Value);
@@ -750,7 +770,8 @@ public class WholesaleServicesQueriesCsvTests
                 EnergySupplierId: "5790000701278",
                 ChargeOwnerId: "5790001089023",
                 ChargeTypes: [],
-                CalculationType: null,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null, // This is how we denote 'latest correction'
                 Period: totalPeriod,
                 RequestedForEnergySupplier: isEnergySupplier,
                 RequestedForActorNumber: isEnergySupplier ? "5790000701278" : "5790001089023");
@@ -760,13 +781,13 @@ public class WholesaleServicesQueriesCsvTests
             using var assertionScope = new AssertionScope();
             actual.Select(ats => (ats.GridArea, ats.EnergySupplierId, ats.ChargeOwnerId, ats.ChargeType, ats.ChargeCode,
                     ats.AmountType, ats.Resolution, ats.MeteringPointType, ats.SettlementMethod,
-                    ats.CalculationType, ats.Version, ats.TimeSeriesPoints.Count))
+                    ats.BusinessReason, ats.SettlementVersion, ats.Version, ats.TimeSeriesPoints.Count))
                 .Should()
                 .BeEquivalentTo([
-                    ("584", "5790000701278", "5790001089023", ChargeType.Subscription, "AB15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.SecondCorrectionSettlement, 3, 31),
-                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.SecondCorrectionSettlement, 3, 31),
-                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15003", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.SecondCorrectionSettlement, 3, 31),
-                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15004", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, CalculationType.SecondCorrectionSettlement, 3, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Subscription, "AB15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15001", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15003", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 31),
+                    ("584", "5790000701278", "5790001089023", ChargeType.Tariff, "NT15004", AmountType.AmountPerCharge, Resolution.Day, MeteringPointType.Consumption, SettlementMethod.NonProfiled, BusinessReason.Correction, SettlementVersion.SecondCorrection, 3, 31),
                 ]);
         }
     }

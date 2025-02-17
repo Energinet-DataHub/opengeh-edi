@@ -93,17 +93,26 @@ public static class AggregatedTimeSeriesRequestAcceptedMessageFactory
 
     private static SettlementVersion? GetSettlementVersion(ATS series)
     {
-        return series.CalculationType switch {
-            CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
-            CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
-            CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
-            CalculationType.Aggregation => null,
-            CalculationType.BalanceFixing => null,
-            CalculationType.WholesaleFixing => null,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(series.CalculationType),
-                actualValue: series.CalculationType,
-                "Value does not contain a valid calculation type."),
+        if (series.SettlementVersion == null)
+        {
+            return null;
+        }
+
+        var settlementVersionMap = new Dictionary<Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion, SettlementVersion>
+        {
+            { EDI.BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection, SettlementVersion.FirstCorrection },
+            { EDI.BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection, SettlementVersion.SecondCorrection },
+            { EDI.BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection, SettlementVersion.ThirdCorrection },
         };
+
+        if (settlementVersionMap.TryGetValue(series.SettlementVersion, out var settlementVersion))
+        {
+            return settlementVersion;
+        }
+
+        throw new ArgumentOutOfRangeException(
+            nameof(series.SettlementVersion),
+            actualValue: series.SettlementVersion,
+            "Value does not contain a valid SettlementVersion.");
     }
 }

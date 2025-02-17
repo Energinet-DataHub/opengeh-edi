@@ -56,7 +56,8 @@ public class AggregatedTimeSeriesQueries(
                         new AggregatedTimeSeriesCalculationTypeForGridAreasQueryStatement(
                             _deltaTableOptions.Value,
                             querySnippetProvider),
-                        parameters.CalculationType)
+                        parameters.BusinessReason,
+                        parameters.SettlementVersion)
                     .ConfigureAwait(false);
 
             var sqlStatement = new AggregatedTimeSeriesQueryStatement(

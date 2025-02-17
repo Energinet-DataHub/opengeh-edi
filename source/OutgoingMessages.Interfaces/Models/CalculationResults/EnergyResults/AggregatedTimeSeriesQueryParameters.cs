@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 
 public record AggregatedTimeSeriesQueryParameters(
@@ -19,5 +21,6 @@ public record AggregatedTimeSeriesQueryParameters(
     IReadOnlyCollection<string> GridAreaCodes,
     string? EnergySupplierId,
     string? BalanceResponsibleId,
-    CalculationType? CalculationType,
+    BusinessReason BusinessReason,
+    SettlementVersion? SettlementVersion,
     Period Period);
