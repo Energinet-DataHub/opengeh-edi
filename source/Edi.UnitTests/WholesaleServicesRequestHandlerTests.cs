@@ -16,6 +16,7 @@ using AutoFixture.Xunit2;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
@@ -30,10 +31,14 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NodaTime;
 using Xunit;
+using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
+using Currency = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Currency;
+using MeteringPointType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType;
 using Period = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period;
 using QuantityQuality = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality;
 using QuantityUnit = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityUnit;
 using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
+using SettlementMethod = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.SettlementMethod;
 using WholesaleServicesRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests;
@@ -370,7 +375,7 @@ public class WholesaleServicesRequestHandlerTests
             body: new BinaryData(
                 new WholesaleServicesRequestBuilder()
                     .WithGridAreaCode("123")
-                    .WithRequestedByActorRole(DataHubNames.ActorRole.SystemOperator)
+                    .WithRequestedByActorRole(ActorRole.SystemOperator.Name)
                     .Build().ToByteArray()));
 
         queries

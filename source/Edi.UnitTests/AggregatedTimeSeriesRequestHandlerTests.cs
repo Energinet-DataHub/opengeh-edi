@@ -16,6 +16,7 @@ using AutoFixture.Xunit2;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
@@ -155,7 +156,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
         var expectedReferenceId = Guid.NewGuid().ToString();
         var request = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .Build();
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
             properties: new Dictionary<string, object> { { "ReferenceId", expectedReferenceId } },
@@ -198,7 +199,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
         var expectedReferenceId = Guid.NewGuid().ToString();
         var request = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithGridArea("303")
             .Build();
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
@@ -251,7 +252,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
         var expectedReferenceId = Guid.NewGuid().ToString();
         var request = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithGridArea("303")
             .Build();
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
@@ -295,7 +296,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
         var expectedReferenceId = Guid.NewGuid().ToString();
         var request = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithGridArea("303")
             .Build();
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
@@ -339,7 +340,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
         var expectedReferenceId = Guid.NewGuid().ToString();
         var request = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithGridArea("303")
             .Build();
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(

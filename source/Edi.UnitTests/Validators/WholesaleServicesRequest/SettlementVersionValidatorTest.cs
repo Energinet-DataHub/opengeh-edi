@@ -28,6 +28,23 @@ public class SettlementVersionValidatorTest
 
     private readonly SettlementVersionValidationRule _sut = new();
 
+    public static IEnumerable<object[]> SettlementVersionData()
+    {
+        yield return ["invalid-settlement-series-version"];
+        yield return ["D04"];
+        yield return [string.Empty];
+        yield return [SettlementVersion.FirstCorrection.Name];
+        yield return [SettlementVersion.SecondCorrection.Name];
+        yield return [SettlementVersion.ThirdCorrection.Name];
+    }
+
+    public static IEnumerable<object[]> ValidSettlementVersionData()
+    {
+        yield return [SettlementVersion.FirstCorrection.Name];
+        yield return [SettlementVersion.SecondCorrection.Name];
+        yield return [SettlementVersion.ThirdCorrection.Name];
+    }
+
     [Theory]
     [InlineData("invalid-settlement-series-version")]
     [InlineData("D04")]
@@ -49,12 +66,8 @@ public class SettlementVersionValidatorTest
     }
 
     [Theory]
-    [InlineData("invalid-settlement-series-version")]
-    [InlineData("D04")]
-    [InlineData("")]
-    [InlineData(DataHubNames.SettlementVersion.FirstCorrection)]
-    [InlineData(DataHubNames.SettlementVersion.SecondCorrection)]
-    [InlineData(DataHubNames.SettlementVersion.ThirdCorrection)]
+    [MemberData(nameof(SettlementVersionData))]
+
     public async Task Validate_WhenNotCorrectionAndSettlementVersionExists_ReturnsValidationErrorsAsync(string settlementVersion)
     {
         // Arrange
@@ -72,9 +85,7 @@ public class SettlementVersionValidatorTest
     }
 
     [Theory]
-    [InlineData(DataHubNames.SettlementVersion.FirstCorrection)]
-    [InlineData(DataHubNames.SettlementVersion.SecondCorrection)]
-    [InlineData(DataHubNames.SettlementVersion.ThirdCorrection)]
+    [MemberData(nameof(ValidSettlementVersionData))]
     public async Task Validate_WhenCorrectionAndValidSettlementVersion_ReturnsNoValidationErrorsAsync(string validSettlementVersion)
     {
         // Arrange

@@ -147,7 +147,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
             meteringPointType: null,
-            settlementMethod: DataHubNames.SettlementMethod.NonProfiled);
+            settlementMethod: SettlementMethod.NonProfiled.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -180,7 +180,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             meteringPointType: null,
             settlementMethod: string.Empty);
 
-        request.RequestedForActorRole = DataHubNames.ActorRole.BalanceResponsibleParty;
+        request.RequestedForActorRole = ActorRole.BalanceResponsibleParty.Name;
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -213,7 +213,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             meteringPointType: null,
             settlementMethod: string.Empty);
 
-        request.RequestedForActorRole = DataHubNames.ActorRole.MeteredDataResponsible;
+        request.RequestedForActorRole = ActorRole.MeteredDataResponsible.Name;
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -252,7 +252,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
                 End = "2022-12-31T23:00:00Z",
             },
             RequestedForActorNumber = "1234567891234",
-            RequestedForActorRole = DataHubNames.ActorRole.EnergySupplier,
+            RequestedForActorRole = ActorRole.EnergySupplier.Name,
             BusinessReason = BusinessReason.BalanceFixing.Name,
 
             // Optional

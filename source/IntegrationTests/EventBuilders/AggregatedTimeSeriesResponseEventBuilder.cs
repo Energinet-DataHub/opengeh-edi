@@ -28,8 +28,8 @@ using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Duration = NodaTime.Duration;
 using Period = Energinet.DataHub.Edi.Responses.Period;
-using PMActorNumber = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorNumber;
-using PMActorRole = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ActorRole;
+using PMActorNumber = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber;
+using PMActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
 using PMBusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 using PMMeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
 using PMSettlementMethod = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod;
@@ -84,9 +84,9 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                 {
                     series.SettlementVersion = request.SettlementVersion switch
                     {
-                        DataHubNames.SettlementVersion.FirstCorrection => SettlementVersion.FirstCorrection,
-                        DataHubNames.SettlementVersion.SecondCorrection => SettlementVersion.SecondCorrection,
-                        DataHubNames.SettlementVersion.ThirdCorrection => SettlementVersion.ThirdCorrection,
+                        var sm when sm == BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection.Name => SettlementVersion.FirstCorrection,
+                        var sm when sm == BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection.Name => SettlementVersion.SecondCorrection,
+                        var sm when sm == BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Name => SettlementVersion.ThirdCorrection,
                         _ => SettlementVersion.ThirdCorrection,
                     };
                 }
@@ -151,7 +151,11 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         {
             OrchestrationName = Brs_026.Name,
             OrchestrationVersion = Brs_026.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+                ActorRole = PMActorRole.FromName(requestCalculatedEnergyTimeSeriesInput.RequestedByActorRole).ToActorRoleV1(),
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(acceptRequest);
@@ -212,7 +216,11 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         {
             OrchestrationName = Brs_026.Name,
             OrchestrationVersion = Brs_026.V1.Version,
-            OrchestrationStartedByActorId = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestCalculatedEnergyTimeSeriesInput.RequestedByActorNumber,
+                ActorRole = PMActorRole.FromName(requestCalculatedEnergyTimeSeriesInput.RequestedByActorRole).ToActorRoleV1(),
+            },
             OrchestrationInstanceId = Guid.NewGuid().ToString(),
         };
         enqueueActorMessages.SetData(rejectRequest);

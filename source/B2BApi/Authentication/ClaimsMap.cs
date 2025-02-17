@@ -30,7 +30,7 @@ public static class ClaimsMap
         { "delegated", ActorRole.Delegated },
     };
 
-    public static string ActorId => "azp";
+    public static string ActorClientId => "azp";
 
     public static string Roles => "roles";
 

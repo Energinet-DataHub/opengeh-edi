@@ -33,14 +33,14 @@ public static class RequestedCalculationTypeMapper
 
         return businessReason switch
         {
-            _ when businessReason == BusinessReason.BalanceFixing.Name => CalculationType.BalanceFixing,
-            _ when businessReason == BusinessReason.PreliminaryAggregation.Name => CalculationType.Aggregation,
-            _ when businessReason == BusinessReason.WholesaleFixing.Name => CalculationType.WholesaleFixing,
-            _ when businessReason == BusinessReason.Correction.Name => settlementVersion switch
+            var br when br == BusinessReason.BalanceFixing.Name => CalculationType.BalanceFixing,
+            var br when br == BusinessReason.PreliminaryAggregation.Name => CalculationType.Aggregation,
+            var br when br == BusinessReason.WholesaleFixing.Name => CalculationType.WholesaleFixing,
+            var br when br == BusinessReason.Correction.Name => settlementVersion switch
             {
-                DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
-                DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
-                DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                var sm when sm == SettlementVersion.FirstCorrection.Name => CalculationType.FirstCorrectionSettlement,
+                var sm when sm == SettlementVersion.SecondCorrection.Name => CalculationType.SecondCorrectionSettlement,
+                var sm when sm == SettlementVersion.ThirdCorrection.Name => CalculationType.ThirdCorrectionSettlement,
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
                     settlementVersion,

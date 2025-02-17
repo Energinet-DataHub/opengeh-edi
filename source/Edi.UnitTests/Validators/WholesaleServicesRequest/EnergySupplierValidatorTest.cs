@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest.Rules;
@@ -40,7 +41,7 @@ public class EnergySupplierValidatorTest
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
             .WithRequestedByActorId(ValidGlnNumber)
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithEnergySupplierId(ValidGlnNumber)
             .Build();
 
@@ -57,7 +58,7 @@ public class EnergySupplierValidatorTest
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
             .WithRequestedByActorId(ValidEicNumber)
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithEnergySupplierId(ValidEicNumber)
             .Build();
 
@@ -74,7 +75,7 @@ public class EnergySupplierValidatorTest
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
             .WithRequestedByActorId(ValidGlnNumber)
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .Build();
 
         // Act
@@ -95,7 +96,7 @@ public class EnergySupplierValidatorTest
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
             .WithRequestedByActorId(ValidGlnNumber)
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithEnergySupplierId(ValidEicNumber)
             .Build();
 
@@ -117,7 +118,7 @@ public class EnergySupplierValidatorTest
         // Arrange
         var message = new WholesaleServicesRequestBuilder()
             .WithRequestedByActorId(ValidGlnNumber)
-            .WithRequestedByActorRole(DataHubNames.ActorRole.EnergySupplier)
+            .WithRequestedByActorRole(ActorRole.EnergySupplier.Name)
             .WithEnergySupplierId("invalid-format")
             .Build();
 

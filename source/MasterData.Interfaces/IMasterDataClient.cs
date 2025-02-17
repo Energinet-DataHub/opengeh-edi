@@ -31,7 +31,7 @@ public interface IMasterDataClient
     /// <summary>
     ///     Get the <see cref="ActorNumber" /> of the Actor with the provided external id.
     /// </summary>
-    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
+    Task<ActorNumber?> GetActorNumberByActorClientIdAsync(string actorClientId, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Create a new grid area owner entry.
