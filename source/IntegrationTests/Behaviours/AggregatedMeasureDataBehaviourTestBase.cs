@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
@@ -276,6 +277,41 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
     protected EnergyResultPerEnergySupplierBrpGridAreaDescription GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
     {
         return new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+    }
+
+    /// <summary>
+    /// Assert that one of the messages is correct and don't care about the rest. We have no way of knowing which
+    /// message is the correct one, so we will assert all of them and count the number of failed/successful assertions.
+    /// </summary>
+    protected async Task ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+        List<PeekResultDto> peekResults,
+        DocumentFormat documentFormat,
+        NotifyAggregatedMeasureDataDocumentAssertionInput assertionInput)
+    {
+        var failedAssertions = new List<Exception>();
+        var successfulAssertions = 0;
+        foreach (var peekResultDto in peekResults)
+        {
+            try
+            {
+                using (new AssertionScope())
+                {
+                    await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
+                        peekResultDto.Bundle,
+                        documentFormat,
+                        assertionInput);
+                }
+
+                successfulAssertions++;
+            }
+            catch (Exception e)
+            {
+                failedAssertions.Add(e);
+            }
+        }
+
+        failedAssertions.Should().HaveCount(peekResults.Count - 1);
+        successfulAssertions.Should().Be(1);
     }
 
     private Action<AggregatedTimeSeriesRequest> GetAggregatedTimeSeriesRequestAssertion(AggregatedTimeSeriesMessageAssertionInput assertionInput)

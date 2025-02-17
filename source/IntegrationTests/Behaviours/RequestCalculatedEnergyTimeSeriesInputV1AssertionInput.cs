@@ -24,9 +24,9 @@ public record RequestCalculatedEnergyTimeSeriesInputV1AssertionInput(
     BusinessReason BusinessReason,
     Instant PeriodStart,
     Instant? PeriodEnd,
-    string EnergySupplierNumber,
-    string BalanceResponsibleNumber,
+    string? EnergySupplierNumber,
+    string? BalanceResponsibleNumber,
     IEnumerable<string> GridAreas,
-    MeteringPointType MeteringPointType,
+    MeteringPointType? MeteringPointType,
     SettlementMethod? SettlementMethod,
     string? SettlementVersion);

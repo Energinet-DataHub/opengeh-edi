@@ -78,8 +78,10 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
             .HasProductCode(assertionInput.ProductCode)
             .HasQuantityMeasurementUnit(assertionInput.QuantityMeasurementUnit)
             .HasResolution(assertionInput.Resolution)
-            .HasPeriod(assertionInput.Period)
-            .HasPoints(assertionInput.Points);
+            .HasPeriod(assertionInput.Period);
+
+        if (assertionInput.Points != null)
+            asserter.HasPoints(assertionInput.Points);
 
         if (assertionInput.OriginalTransactionIdReference != null)
             asserter.HasOriginalTransactionIdReference(assertionInput.OriginalTransactionIdReference);
