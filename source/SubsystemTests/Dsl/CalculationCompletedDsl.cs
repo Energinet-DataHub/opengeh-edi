@@ -37,8 +37,9 @@ public sealed class CalculationCompletedDsl
     private readonly ITestOutputHelper _logger;
     private readonly EdiDriver _ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
+    private readonly ProcessManagerDriver _processManagerDriver;
 
-    internal CalculationCompletedDsl(EdiDriver ediDriver, EdiDatabaseDriver ediDatabaseDriver, WholesaleDriver wholesaleDriver, ITestOutputHelper logger, Guid balanceFixingCalculationId, Guid wholesaleFixingCalculationId)
+    internal CalculationCompletedDsl(EdiDriver ediDriver, EdiDatabaseDriver ediDatabaseDriver, WholesaleDriver wholesaleDriver, ProcessManagerDriver processManagerDriver, ITestOutputHelper logger, Guid balanceFixingCalculationId, Guid wholesaleFixingCalculationId)
     {
         _balanceFixingCalculationId = balanceFixingCalculationId;
         _wholesaleFixingCalculationId = wholesaleFixingCalculationId;
@@ -46,6 +47,7 @@ public sealed class CalculationCompletedDsl
         _logger = logger;
         _ediDriver = ediDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
+        _processManagerDriver = processManagerDriver;
     }
 
     internal static async Task<DurableOrchestrationStatus> StartEnqueueMessagesOrchestration(
@@ -94,6 +96,22 @@ public sealed class CalculationCompletedDsl
         await StartAndWaitForOrchestrationToComplete(
             CalculationType.WholesaleFixing,
             _wholesaleFixingCalculationId);
+    }
+
+    internal async Task PublishBrs023_027BalanceFixingCalculation()
+    {
+        await _ediDriver.EmptyQueueAsync();
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_balanceFixingCalculationId);
+
+        await EnsureOrchestrationsHasCompletedAsync(_balanceFixingCalculationId);
+    }
+
+    internal async Task PublishBrs023_027WholesaleFixingCalculation()
+    {
+        await _ediDriver.EmptyQueueAsync();
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_wholesaleFixingCalculationId);
+
+        await EnsureOrchestrationsHasCompletedAsync(_wholesaleFixingCalculationId);
     }
 
     /// <summary>
@@ -184,5 +202,25 @@ public sealed class CalculationCompletedDsl
             "Message orchestration completed for instance id {0}, took {1}",
             orchestration.InstanceId,
             SystemClock.Instance.GetCurrentInstant() - orchestrationStartedAt);
+    }
+
+    private async Task EnsureOrchestrationsHasCompletedAsync(
+        Guid calculationId)
+    {
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant();
+        await _processManagerDriver.PublishEnqueueBrs023_027RequestAsync(calculationId);
+
+        _logger.WriteLine("Wait for message orchestration to be started after {0}", orchestrationStartedAfter.ToString());
+
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(orchestrationStartedAfter);
+
+        orchestration.Input.Value<string>("CalculationId")
+            .Should()
+            .Be(
+                calculationId.ToString(),
+                $"because the orchestration should be for the given calculation id {calculationId}");
+
+        _logger.WriteLine("Orchestration started with instance id {0}", orchestration.InstanceId);
+        await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
     }
 }

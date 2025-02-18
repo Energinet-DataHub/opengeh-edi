@@ -24,13 +24,14 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests.ArchivedMessages;
 
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
-public class WhenArchivedMessageIsRequestedTests : BaseTestClass
+#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
+internal class WhenArchivedMessageIsRequestedProcessManagerTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessages;
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
+    public WhenArchivedMessageIsRequestedProcessManagerTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -58,7 +59,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_message()
     {
-        await _calculationCompleted.PublishForBalanceFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027BalanceFixingCalculation();
 
         var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
 
