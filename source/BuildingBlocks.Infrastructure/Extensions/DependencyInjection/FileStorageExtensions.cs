@@ -54,7 +54,7 @@ public static class FileStorageExtensions
             HealthCheckName,
             blobServiceClientConnectionOptions.ClientName);
 
-        services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
+        services.AddTransient<IFileStorageClient, BlobFileStorageClient>();
 
         return services;
     }

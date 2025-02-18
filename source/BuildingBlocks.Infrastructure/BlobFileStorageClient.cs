@@ -24,11 +24,11 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
-public class DataLakeFileStorageClient : IFileStorageClient
+public class BlobFileStorageClient : IFileStorageClient
 {
     private readonly BlobServiceClient _blobServiceClient;
 
-    public DataLakeFileStorageClient(
+    public BlobFileStorageClient(
         IAzureClientFactory<BlobServiceClient> clientFactory,
         IOptions<BlobServiceClientConnectionOptions> options)
     {
