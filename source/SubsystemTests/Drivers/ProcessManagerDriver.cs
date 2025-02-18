@@ -45,4 +45,10 @@ internal class ProcessManagerDriver(
         var message = EnqueueBrs028MessageFactory.CreateReject(actor);
         await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
+
+    internal async Task PublishEnqueueBrs023_027RequestAsync(Guid calculationId)
+    {
+        var message = EnqueueBrs023_027MessageFactory.CreateEnqueue(calculationId);
+        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+    }
 }

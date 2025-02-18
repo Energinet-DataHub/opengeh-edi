@@ -21,11 +21,13 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
+#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
+internal class WhenCalculationCompletedIsProcessManagerPublishedTests : BaseTestClass
+#pragma warning restore xUnit1000
 {
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public WhenCalculationCompletedIsPublishedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public WhenCalculationCompletedIsProcessManagerPublishedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -46,7 +48,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
     [Fact]
     public async Task Actor_can_peek_and_dequeue_energy_result_from_balance_fixing()
     {
-        await _calculationCompleted.PublishForBalanceFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027BalanceFixingCalculation();
 
         await _calculationCompleted.ConfirmEnergyResultsAreAvailable();
     }
@@ -54,7 +56,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
     [Fact]
     public async Task Actor_can_peek_and_dequeue_wholesale_and_energy_result_from_wholesale_fixing()
     {
-        await _calculationCompleted.PublishForWholesaleFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027WholesaleFixingCalculation();
 
         await _calculationCompleted.ConfirmWholesaleResultsAndEnergyResultsAreAvailable();
     }
