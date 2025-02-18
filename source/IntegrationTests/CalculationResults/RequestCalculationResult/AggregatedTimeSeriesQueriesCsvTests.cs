@@ -618,7 +618,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierTwo,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                BusinessReason: BusinessReason.BalanceFixing,
+                BusinessReason: BusinessReason.Correction,
                 SettlementVersion: null,
                 Period: totalPeriod);
 
@@ -629,8 +629,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason, ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("584", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.BalanceFixing, (SettlementVersion?)null, 3),
-                    ("584", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.BalanceFixing, null, 3),
+                    ("584", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
+                    ("584", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
                 ]);
         }
     }
