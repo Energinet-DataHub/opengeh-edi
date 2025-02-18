@@ -1,4 +1,4 @@
-﻿﻿// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             documentFormat);
 
         // Then (assert)
-        peekResultsForBalanceResponsible.Should().HaveCount(testDataDescription.ExampleBalanceResponsible.ExpectedOutgoingMessagesCount);
+        peekResultsForBalanceResponsible.Should().HaveCount(testDataDescription.ExampleBalanceResponsible.ExpectedOutgoingMessagesCount * testDataDescription.GridAreaCodes.Count);
 
         var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
