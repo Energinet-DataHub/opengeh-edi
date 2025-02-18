@@ -14,13 +14,14 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
-using Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Factories;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using Microsoft.Extensions.Logging;
+using ActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
 using Period = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period;
 
 namespace Energinet.DataHub.Wholesale.Edi;
@@ -102,9 +103,8 @@ public class RequestWholesaleServicesQueryHandler(
             request.EnergySupplierId,
             request.ChargeOwnerId,
             request.ChargeTypes.Select(c => (c.ChargeCode, c.ChargeType)).ToList(),
-            request.RequestedCalculationType == RequestedCalculationType.LatestCorrection
-                ? null
-                : CalculationTypeMapper.FromRequestedCalculationType(request.RequestedCalculationType),
+            BusinessReason.Correction,
+            SettlementVersion.FirstCorrection,
             new Period(request.Period.Start, request.Period.End),
             request.RequestedForActorRole == ActorRole.EnergySupplier.Name,
             request.RequestedForActorNumber);

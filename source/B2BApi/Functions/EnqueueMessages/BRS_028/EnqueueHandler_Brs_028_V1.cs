@@ -23,10 +23,8 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
 using ActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
-using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 using ChargeType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ChargeType;
 using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
-using SettlementVersion = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 
@@ -55,6 +53,9 @@ public class EnqueueHandler_Brs_028_V1(
             "Received enqueue accepted message(s) for BRS 028. Data: {0}",
             acceptedData);
 
+        var settlementVersion = acceptedData.SettlementVersion is not null
+            ? BuildingBlocks.Domain.Models.SettlementVersion.FromName(acceptedData.SettlementVersion.Name)
+            : null;
         var queryParams = new WholesaleServicesQueryParameters(
             AmountType: AmountType.AmountPerCharge, // Default to AmountPerCharge, will be replaced in foreach loop
             GridAreaCodes: acceptedData.GridAreas,
@@ -63,7 +64,8 @@ public class EnqueueHandler_Brs_028_V1(
             ChargeTypes: acceptedData.ChargeTypes.Select(
                     ct => (ct.ChargeCode, GetChargeType(ct.ChargeType)))
                 .ToList(),
-            CalculationType: GetCalculationType(acceptedData.BusinessReason, acceptedData.SettlementVersion),
+            BusinessReason: BuildingBlocks.Domain.Models.BusinessReason.FromName(acceptedData.BusinessReason.Name),
+            SettlementVersion: settlementVersion,
             Period: new Period(
                 acceptedData.PeriodStart.ToInstant(),
                 acceptedData.PeriodEnd.ToInstant()),
@@ -167,31 +169,6 @@ public class EnqueueHandler_Brs_028_V1(
                     RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
-    }
-
-    private CalculationType? GetCalculationType(
-        BusinessReason businessReason,
-        SettlementVersion? settlementVersion)
-    {
-        if (businessReason == BusinessReason.BalanceFixing)
-            return CalculationType.BalanceFixing;
-        if (businessReason == BusinessReason.PreliminaryAggregation)
-            return CalculationType.Aggregation;
-        if (businessReason == BusinessReason.WholesaleFixing)
-            return CalculationType.WholesaleFixing;
-        if (businessReason == BusinessReason.Correction)
-        {
-            if (settlementVersion is null)
-                return null; // CalculationType == null means get latest correction
-            if (settlementVersion == SettlementVersion.FirstCorrection)
-                return CalculationType.FirstCorrectionSettlement;
-            if (settlementVersion == SettlementVersion.SecondCorrection)
-                return CalculationType.SecondCorrectionSettlement;
-            if (settlementVersion == SettlementVersion.ThirdCorrection)
-                return CalculationType.ThirdCorrectionSettlement;
-        }
-
-        throw new InvalidOperationException($"Invalid business reason '{businessReason}' and settlement version '{settlementVersion}' combination.");
     }
 
     private Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? GetChargeType(

@@ -44,7 +44,8 @@ public class WholesaleServicesQueries(
                     querySnippetsProvider.DatabricksContract.GetGridAreaCodeColumnName(),
                     querySnippetsProvider.DatabricksContract.GetCalculationTypeColumnName(),
                     new WholesaleServicesCalculationTypeForGridAreasQueryStatement(_deltaTableOptions.Value, querySnippetsProvider),
-                    queryParameters.CalculationType)
+                    queryParameters.BusinessReason,
+                    queryParameters.SettlementVersion)
                 .ConfigureAwait(false);
 
         var sqlStatement = new WholesaleServicesQueryStatement(
@@ -79,7 +80,8 @@ public class WholesaleServicesQueries(
                     querySnippetsProvider.DatabricksContract.GetGridAreaCodeColumnName(),
                     querySnippetsProvider.DatabricksContract.GetCalculationTypeColumnName(),
                     new WholesaleServicesCalculationTypeForGridAreasQueryStatement(_deltaTableOptions.Value, querySnippetsProvider),
-                    queryParameters.CalculationType)
+                    queryParameters.BusinessReason,
+                    queryParameters.SettlementVersion)
                 .ConfigureAwait(false);
 
         var sqlStatement = new WholesaleServicesQueryStatement(
