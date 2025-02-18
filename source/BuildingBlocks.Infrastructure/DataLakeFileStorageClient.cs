@@ -18,32 +18,20 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NodaTime;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure;
 
 public class DataLakeFileStorageClient : IFileStorageClient
 {
-    private readonly IFeatureFlagManager _featureFlagManager;
-    private readonly ILogger<DataLakeFileStorageClient> _logger;
-    private readonly BlobServiceClient _blobServiceClientObsoleted;
     private readonly BlobServiceClient _blobServiceClient;
 
     public DataLakeFileStorageClient(
         IAzureClientFactory<BlobServiceClient> clientFactory,
-        IOptions<BlobServiceClientConnectionOptions> options,
-        IFeatureFlagManager featureFlagManager,
-        ILogger<DataLakeFileStorageClient> logger)
+        IOptions<BlobServiceClientConnectionOptions> options)
     {
-        _featureFlagManager = featureFlagManager;
-        _logger = logger;
-        _blobServiceClientObsoleted = clientFactory.CreateClient(options.Value.ClientNameObsoleted);
         _blobServiceClient = clientFactory.CreateClient(options.Value.ClientName);
     }
 
@@ -53,11 +41,6 @@ public class DataLakeFileStorageClient : IFileStorageClient
         ArgumentNullException.ThrowIfNull(reference);
 
         var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
-        if (!await _featureFlagManager.UseStandardBlobServiceClientAsync().ConfigureAwait(false))
-        {
-            container = _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value);
-        }
-
         stream.Position = 0; // Make sure we read the entire stream
         await container.UploadBlobAsync(reference.Path, stream).ConfigureAwait(false);
         stream.Position = 0; // Reset stream position so it can be read again
@@ -84,16 +67,6 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
         var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
         var blob = container.GetBlobClient(reference.Path);
-
-        var blobExists = await blob.ExistsAsync(cancellationToken).ConfigureAwait(false);
-        if (blobExists == null || blobExists is { Value: false })
-        {
-            // This logging is only temporary while we verify data migration is successful.
-            _logger.LogInformation("Blob does not exist in the new storage account, trying the obsoleted storage account. Category {Category}, Path {Path}", reference.Category.Value, reference.Path);
-            var containerObsoleted = _blobServiceClientObsoleted.GetBlobContainerClient(reference.Category.Value);
-            blob = containerObsoleted.GetBlobClient(reference.Path);
-        }
-
         // OpenReadAsync() returns a stream for the file, and the file is downloaded the first time the stream is read
         var downloadStream = await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
@@ -102,14 +75,8 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
     public async Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory, CancellationToken cancellationToken = default)
     {
-        await DeleteFromClientAsync(_blobServiceClientObsoleted, fileStorageReferences, fileStorageCategory, cancellationToken).ConfigureAwait(false);
-        await DeleteFromClientAsync(_blobServiceClient, fileStorageReferences, fileStorageCategory, cancellationToken).ConfigureAwait(false);
-    }
-
-    private async Task DeleteFromClientAsync(BlobServiceClient client, IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory, CancellationToken cancellationToken)
-    {
-        var container = client.GetBlobContainerClient(fileStorageCategory.Value);
-        var blobBatchClient = client.GetBlobBatchClient();
+        var container = _blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
+        var blobBatchClient = _blobServiceClient.GetBlobBatchClient();
 
         var blobUris = fileStorageReferences
             .Where(x => x.Category == fileStorageCategory)

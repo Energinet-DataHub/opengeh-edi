@@ -146,8 +146,6 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         var configuration = AddInMemoryConfigurations(ServiceCollection, new Dictionary<string, string?>()
         {
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
-            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}"] =
-                AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
             [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
                 AzuriteManager.BlobStorageServiceUri.AbsoluteUri,
             // TODO: fix this

@@ -458,9 +458,6 @@ public class BehavioursTestBase : IDisposable
         Environment.SetEnvironmentVariable(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
             _integrationTestFixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
-        Environment.SetEnvironmentVariable(
-            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
-            _integrationTestFixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()

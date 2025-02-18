@@ -55,11 +55,6 @@ public interface IFeatureFlagManager
     Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
 
     /// <summary>
-    /// Whether to use the StandardBlobServiceClient.
-    /// </summary>
-    Task<bool> UseStandardBlobServiceClientAsync();
-
-    /// <summary>
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
     /// </summary>
     Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync();
