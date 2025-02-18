@@ -106,7 +106,7 @@ public class ActorRequestsClient(
                 businessReasonName: businessReason.Name,
                 calculationResultVersion: result.Version,
                 originalTransactionIdReference: originalTransactionId,
-                settlementVersion: GetSettlementVersion(result.CalculationType)?.Name,
+                settlementVersion: result.SettlementVersion?.Name,
                 relatedToMessageId: originalMessageId);
 
             await _outgoingMessagesClient.EnqueueAsync(acceptedEnergyResult, cancellationToken).ConfigureAwait(false);
@@ -160,7 +160,7 @@ public class ActorRequestsClient(
                 EnergySupplier: ActorNumber.Create(data.EnergySupplierId),
                 ChargeOwner: GetChargeOwner(data.ChargeOwnerId, data.QuantityUnit),
                 Period: new Period(data.Period.Start, data.Period.End),
-                SettlementVersion: GetSettlementVersion(data.CalculationType),
+                SettlementVersion: data.SettlementVersion,
                 QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit, data.Resolution),
                 PriceMeasureUnit: GetPriceMeasureUnit(points, resolution, chargeType),
                 Currency: GetCurrency(data.Currency),
@@ -177,7 +177,7 @@ public class ActorRequestsClient(
                 documentReceiverRole: requestedForActorRole,
                 processId: orchestrationInstanceId,
                 eventId: eventId,
-                businessReason: GetBusinessReason(data.CalculationType).Name,
+                businessReason: data.BusinessReason.Name,
                 chargeOwnerId: ActorNumber.TryCreate(data.ChargeOwnerId),
                 relatedToMessageId: originalMessageId,
                 wholesaleSeries: series);
@@ -462,40 +462,6 @@ public class ActorRequestsClient(
     private CalculatedQuantityQuality GetCalculatedQuantityQualityForEnergy(IReadOnlyCollection<QuantityQuality> quantityQualities)
     {
         return CalculatedQuantityQualityMapper.MapForEnergy(quantityQualities);
-    }
-
-    private SettlementVersion? GetSettlementVersion(CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            CalculationType.BalanceFixing or
-                CalculationType.Aggregation or
-                CalculationType.WholesaleFixing => null,
-            CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
-            CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
-            CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                calculationType,
-                "Unknown calculation type when mapping to settlement version"),
-        };
-    }
-
-    private BusinessReason GetBusinessReason(CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            CalculationType.BalanceFixing => BusinessReason.BalanceFixing,
-            CalculationType.Aggregation => BusinessReason.PreliminaryAggregation,
-            CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing,
-            CalculationType.FirstCorrectionSettlement or
-                CalculationType.SecondCorrectionSettlement or
-                CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                calculationType,
-                "Unknown calculation type when mapping to business reason"),
-        };
     }
 
     private MeasurementUnit GetQuantityMeasureUnit(QuantityUnit? quantityUnit, Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)

@@ -15,6 +15,7 @@
 using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
@@ -76,8 +77,8 @@ public class EnergyResultPerGridAreaQuery(
         var gridArea = databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode);
         var gridAreaOwner = _gridAreaOwners[gridArea];
         var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
-        var calculationType = CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
-        var (businessReason, settlementVersion) = EnergyResultMessageDtoFactory.MapToBusinessReasonAndSettlementVersion(calculationType);
+        var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
+            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
 
         return Task.FromResult(
             new EnergyResultPerGridAreaMessageDto(

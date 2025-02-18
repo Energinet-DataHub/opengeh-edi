@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
@@ -20,68 +21,35 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Delta
 
 public static class CalculationTypeMapper
 {
-    public static CalculationType FromDeltaTableValue(string calculationType)
+    public static string ToDeltaTableValue(BusinessReason businessReason, SettlementVersion? settlementVersion)
     {
-        return calculationType switch
-        {
-            DeltaTableCalculationType.BalanceFixing => CalculationType.BalanceFixing,
-            DeltaTableCalculationType.Aggregation => CalculationType.Aggregation,
-            DeltaTableCalculationType.WholesaleFixing => CalculationType.WholesaleFixing,
-            DeltaTableCalculationType.FirstCorrectionSettlement => CalculationType.FirstCorrectionSettlement,
-            DeltaTableCalculationType.SecondCorrectionSettlement => CalculationType.SecondCorrectionSettlement,
-            DeltaTableCalculationType.ThirdCorrectionSettlement => CalculationType.ThirdCorrectionSettlement,
-
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                actualValue: calculationType,
-                "Value does not contain a valid string representation of a calculation type."),
-        };
-    }
-
-    public static string ToDeltaTableValue(CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            CalculationType.BalanceFixing => DeltaTableCalculationType.BalanceFixing,
-            CalculationType.Aggregation => DeltaTableCalculationType.Aggregation,
-            CalculationType.WholesaleFixing => DeltaTableCalculationType.WholesaleFixing,
-            CalculationType.FirstCorrectionSettlement => DeltaTableCalculationType.FirstCorrectionSettlement,
-            CalculationType.SecondCorrectionSettlement => DeltaTableCalculationType.SecondCorrectionSettlement,
-            CalculationType.ThirdCorrectionSettlement => DeltaTableCalculationType.ThirdCorrectionSettlement,
-
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                actualValue: calculationType,
-                "Value cannot be mapped to a string representation of a calculation type."),
-        };
-    }
-
-    /// <summary>
-    /// Maps a <see cref="RequestedCalculationType"/> to a <see cref="CalculationType"/>. Cannot map <see cref="RequestedCalculationType.LatestCorrection"/> to a <see cref="CalculationType"/>.
-    /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">Throws a ArgumentOutOfRangeException if the request calculation type is unknown or has the value LatestCorrection</exception>
-    public static CalculationType FromRequestedCalculationType(RequestedCalculationType requestedCalculationType)
-    {
-        if (requestedCalculationType == RequestedCalculationType.LatestCorrection)
+        if (businessReason != BusinessReason.Correction && settlementVersion != null)
         {
             throw new ArgumentOutOfRangeException(
-                nameof(requestedCalculationType),
-                actualValue: requestedCalculationType,
-                $"Value of type {nameof(RequestedCalculationType.LatestCorrection)} cannot be mapped to {nameof(CalculationType)}.");
+                nameof(settlementVersion),
+                settlementVersion,
+                $"Value must be null when {nameof(businessReason)} is not {nameof(BusinessReason.Correction)}.");
         }
 
-        return requestedCalculationType switch
+        return businessReason switch
         {
-            RequestedCalculationType.BalanceFixing => CalculationType.BalanceFixing,
-            RequestedCalculationType.PreliminaryAggregation => CalculationType.Aggregation,
-            RequestedCalculationType.WholesaleFixing => CalculationType.WholesaleFixing,
-            RequestedCalculationType.FirstCorrection => CalculationType.FirstCorrectionSettlement,
-            RequestedCalculationType.SecondCorrection => CalculationType.SecondCorrectionSettlement,
-            RequestedCalculationType.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+            var br when br == BusinessReason.BalanceFixing => DeltaTableCalculationType.BalanceFixing,
+            var br when br == BusinessReason.PreliminaryAggregation => DeltaTableCalculationType.Aggregation,
+            var br when br == BusinessReason.WholesaleFixing => DeltaTableCalculationType.WholesaleFixing,
+            var br when br == BusinessReason.Correction => settlementVersion switch
+            {
+                var sm when sm == SettlementVersion.FirstCorrection => DeltaTableCalculationType.FirstCorrectionSettlement,
+                var sm when sm == SettlementVersion.SecondCorrection => DeltaTableCalculationType.SecondCorrectionSettlement,
+                var sm when sm == SettlementVersion.ThirdCorrection => DeltaTableCalculationType.ThirdCorrectionSettlement,
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(settlementVersion),
+                    settlementVersion,
+                    $"Value cannot be mapped to a {nameof(DeltaTableCalculationType)}."),
+            },
             _ => throw new ArgumentOutOfRangeException(
-                nameof(requestedCalculationType),
-                actualValue: requestedCalculationType,
-                $"Value cannot be mapped to a {nameof(CalculationType)}."),
+                nameof(businessReason),
+                businessReason,
+                $"Value cannot be mapped to a {nameof(DeltaTableCalculationType)}."),
         };
     }
 }

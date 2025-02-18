@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
@@ -22,7 +23,8 @@ public class AggregatedTimeSeries
         string gridArea,
         EnergyTimeSeriesPoint[] timeSeriesPoints,
         TimeSeriesType timeSeriesType,
-        CalculationType calculationType,
+        BusinessReason businessReason,
+        SettlementVersion? settlementVersion,
         Instant periodStart,
         Instant periodEnd,
         Resolution resolution,
@@ -34,7 +36,8 @@ public class AggregatedTimeSeries
         GridArea = gridArea;
         TimeSeriesPoints = timeSeriesPoints;
         TimeSeriesType = timeSeriesType;
-        CalculationType = calculationType;
+        BusinessReason = businessReason;
+        SettlementVersion = settlementVersion;
         PeriodStart = periodStart;
         PeriodEnd = periodEnd;
         Resolution = resolution;
@@ -50,7 +53,9 @@ public class AggregatedTimeSeries
 
     public TimeSeriesType TimeSeriesType { get; init; }
 
-    public CalculationType CalculationType { get; init; }
+    public BusinessReason BusinessReason { get; }
+
+    public SettlementVersion? SettlementVersion { get; }
 
     public Instant PeriodStart { get; init; }
 

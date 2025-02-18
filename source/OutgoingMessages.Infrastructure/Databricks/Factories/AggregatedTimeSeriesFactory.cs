@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using ResolutionMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults.ResolutionMapper;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
@@ -28,15 +29,17 @@ public static class AggregatedTimeSeriesFactory
         IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         var gridArea = databricksSqlRow[databricksContract.GetGridAreaCodeColumnName()];
-        var calculationType = databricksSqlRow[databricksContract.GetCalculationTypeColumnName()];
         var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow[databricksContract.GetResolutionColumnName()]!);
         var (periodStart, periodEnd) = PeriodHelper.GetPeriod(timeSeriesPoints, resolution);
+        var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
+            databricksSqlRow.ToNonEmptyString(databricksContract.GetCalculationTypeColumnName()));
 
         return new AggregatedTimeSeries(
             gridArea: gridArea!,
             timeSeriesPoints: [.. timeSeriesPoints],
             timeSeriesType: timeSeriesType,
-            calculationType: DeltaTableMappers.CalculationTypeMapper.FromDeltaTableValue(calculationType!),
+            businessReason: businessReason,
+            settlementVersion: settlementVersion,
             periodStart: periodStart,
             periodEnd: periodEnd,
             resolution,
