@@ -36,7 +36,7 @@ public class BusinessReasonAndSettlementVersionMapperTests
 
     [Theory]
     [MemberData(nameof(GetValidCalculationType))]
-    public void FromDeltaTableValue_ValidInputs_ReturnsExpectedValue(
+    public void Given_CalculationTypeFromDeltaTableValue_When_IsValid_Then_ReturnsExpectedValue(
         string calculationType,
         BusinessReason expectedBusinessReason,
         SettlementVersion? expectedSettlementVersion)
@@ -51,7 +51,7 @@ public class BusinessReasonAndSettlementVersionMapperTests
     }
 
     [Fact]
-    public void FromDeltaTableValue_InvalidCalculationType_ThrowsArgumentOutOfRangeException()
+    public void Given_CalculationTypeFromDeltaTableValue_When_IsInvalid_Then_ThrowsExceptedException()
     {
         // Arrange
         var invalidCalculationType = "InvalidType";

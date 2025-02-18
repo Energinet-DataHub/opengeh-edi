@@ -69,7 +69,7 @@ public class CalculationTypeMapperTests
 
     [Theory]
     [MemberData(nameof(GetValidBusinessReasonAndSettlementVersionCombination))]
-    public void ToDeltaTableValue_ValidInputs_ReturnsExpectedValue(
+    public void Given_BusinessReasonAndSettlementVersion_When_CombinationIsValid_Then_ReturnsExpectedValue(
         BusinessReason businessReason,
         SettlementVersion? settlementVersion,
         string expectedValue)
@@ -83,7 +83,7 @@ public class CalculationTypeMapperTests
 
     [Theory]
     [MemberData(nameof(GetInvalidBusinessReasonAndSettlementVersionCombination))]
-    public void ToDeltaTableValue_InvalidBusinessReason_ThrowsArgumentOutOfRangeException(
+    public void Given_BusinessReasonAndSettlementVersion_When_CombinationIsInvalid_Then_ReturnsExpectedValue(
         BusinessReason businessReason,
         SettlementVersion? settlementVersion,
         Type expectedExceptionType)
