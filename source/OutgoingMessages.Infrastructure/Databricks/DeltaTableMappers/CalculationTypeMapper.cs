@@ -44,12 +44,12 @@ public static class CalculationTypeMapper
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
                     settlementVersion,
-                    $"Value cannot be mapped to a {nameof(RequestedCalculationType)}."),
+                    $"Value cannot be mapped to a {nameof(DeltaTableCalculationType)}."),
             },
             _ => throw new ArgumentOutOfRangeException(
                 nameof(businessReason),
                 businessReason,
-                $"Value cannot be mapped to a {nameof(RequestedCalculationType)}."),
+                $"Value cannot be mapped to a {nameof(DeltaTableCalculationType)}."),
         };
     }
 }

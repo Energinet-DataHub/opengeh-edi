@@ -54,7 +54,7 @@ public class EnqueueHandler_Brs_028_V1(
             acceptedData);
 
         var settlementVersion = acceptedData.SettlementVersion is not null
-            ? BuildingBlocks.Domain.Models.SettlementVersion.FromName(acceptedData.SettlementVersion!.Name)
+            ? BuildingBlocks.Domain.Models.SettlementVersion.FromName(acceptedData.SettlementVersion.Name)
             : null;
         var queryParams = new WholesaleServicesQueryParameters(
             AmountType: AmountType.AmountPerCharge, // Default to AmountPerCharge, will be replaced in foreach loop
