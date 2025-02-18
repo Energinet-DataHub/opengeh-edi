@@ -15,10 +15,10 @@
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.Azure.Storage.Blobs" Version="8.0.1"/>
-      <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.1" />
-      <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="11.0.0" />
+        <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.3"/>
+      <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="11.0.2" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
+      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

@@ -5,8 +5,8 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Core" Version="1.44.1" />
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+        <PackageReference Include="Azure.Core" Version="1.45.0"/>
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
