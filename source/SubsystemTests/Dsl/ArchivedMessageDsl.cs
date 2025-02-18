@@ -42,38 +42,6 @@ public class ArchivedMessageDsl
         _ediDatabaseDriver = ediDatabaseDriver;
     }
 
-    internal async Task ConfirmMessageIsArchived(string messageId)
-    {
-        var archivedMessageSearchResponse = await _b2cEdiDriver.SearchArchivedMessagesV2Async(
-            new SearchArchivedMessagesRequest
-            {
-                SearchCriteria = new SearchArchivedMessagesCriteriaV2
-                {
-                    MessageId = messageId,
-                    CreatedDuringPeriod = null,
-                    SenderNumber = null,
-                    ReceiverNumber = null,
-                    DocumentTypes = null,
-                    BusinessReasons = null,
-                    IncludeRelatedMessages = false,
-                },
-                Pagination = new SearchArchivedMessagesPagination
-                {
-                    PageSize = 100,
-                },
-            });
-
-        archivedMessageSearchResponse.Should().NotBeNull();
-        var archivedMessage = archivedMessageSearchResponse.Messages.Single();
-        Assert.NotNull(archivedMessage.Id);
-        Assert.NotNull(archivedMessage.MessageId);
-        Assert.NotNull(archivedMessage.DocumentType);
-        Assert.NotNull(archivedMessage.SenderNumber);
-        Assert.NotNull(archivedMessage.ReceiverNumber);
-        Assert.IsType<DateTimeOffset>(archivedMessage.CreatedAt);
-        Assert.NotNull(archivedMessage.BusinessReason);
-    }
-
     internal async Task ConfirmMessageIsArchivedV3(string messageId)
     {
         var archivedMessageSearchResponse = await _b2cEdiDriver.SearchArchivedMessagesV3Async(

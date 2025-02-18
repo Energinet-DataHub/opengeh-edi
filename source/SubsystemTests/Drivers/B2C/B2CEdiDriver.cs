@@ -71,6 +71,7 @@ public sealed class B2CEdiDriver : IDisposable
                     StartDate = InstantPattern.General.Format(start),
                     EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(1))),
                     GridArea = "804",
+                    EnergySupplierId = "5790001330552",
                 },
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);

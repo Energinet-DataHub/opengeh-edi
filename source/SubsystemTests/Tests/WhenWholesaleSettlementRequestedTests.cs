@@ -13,9 +13,12 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
+using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
+using FluentAssertions;
 using NodaTime;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -28,9 +31,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
-internal sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
-#pragma warning restore xUnit1000
+public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
     private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
@@ -59,7 +60,7 @@ internal sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
-    [Fact]
+    [Fact(Skip = "We not running requests which check the database")]
     public async Task Actor_can_request_wholesale_settlement()
     {
         var messageId = await _wholesaleSettlementRequest.Request(CancellationToken.None);
@@ -67,7 +68,7 @@ internal sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(messageId);
     }
 
-    [Fact]
+    [Fact(Skip = "We not running requests which check the database")]
     public async Task B2C_actor_can_request_wholesale_settlement()
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();
@@ -104,6 +105,92 @@ internal sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
             "888",
             SubsystemTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
+
+        await _notifyWholesaleServices.ConfirmRejectResultIsAvailable();
+    }
+}
+
+// TODO: Delete this test class and un-comment "WhenWholesaleSettlementRequestedProcessManagerTests" when the above is deprecated
+[SuppressMessage(
+    "Usage",
+    "CA2007",
+    Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
+[TestCaseOrderer(
+    ordererTypeName: "Energinet.DataHub.EDI.SubsystemTests.TestOrdering.TestOrderer",
+    ordererAssemblyName: "Energinet.DataHub.Wholesale.SubsystemTests")]
+[IntegrationTest]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
+
+// TODO: Rename this to brs028 when we have deleted the old request tests
+public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTestClass
+{
+    private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
+    private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
+
+    public WhenWholesaleSettlementRequestedProcessManagerTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+        : base(output, fixture)
+    {
+        ArgumentNullException.ThrowIfNull(fixture);
+
+        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.SystemOperator, output);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
+
+        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
+            ediDriver,
+            wholesaleDriver);
+
+        _wholesaleSettlementRequest =
+            new WholesaleSettlementRequestDsl(
+                new EdiDatabaseDriver(fixture.ConnectionString),
+                ediDriver,
+                new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
+                wholesaleDriver,
+                new ProcessManagerDriver(fixture.EdiTopicClient));
+    }
+
+    [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
+    public async Task B2B_actor_can_request_wholesale_settlement()
+    {
+        var act = async () => await _wholesaleSettlementRequest.Request(CancellationToken.None);
+
+        await act.Should().NotThrowAsync("because the request should be valid");
+    }
+
+    [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
+    public async Task B2C_actor_can_request_wholesale_settlement()
+    {
+        var act = async () => await _wholesaleSettlementRequest.B2CRequest(CancellationToken.None);
+
+        await act.Should().NotThrowAsync("because the request should be valid");
+    }
+
+    [Fact]
+    public async Task Actor_get_sync_rejected_response_when_wholesale_settlement_request_is_invalid()
+    {
+        await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_response_from_wholesale_settlement_request()
+    {
+        await _wholesaleSettlementRequest.PublishAcceptedBrs028RequestAsync(
+            "804",
+            new Actor(
+                ActorNumber.Create(SubsystemTestFixture.EZTestCimActorNumber),
+                ActorRole.SystemOperator));
+
+        await _notifyWholesaleServices.ConfirmResultIsAvailable();
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_settlement_request()
+    {
+        await _wholesaleSettlementRequest.PublishRejectedBrs028RequestAsync(
+            new Actor(
+                ActorNumber.Create(SubsystemTestFixture.EZTestCimActorNumber),
+                ActorRole.SystemOperator));
 
         await _notifyWholesaleServices.ConfirmRejectResultIsAvailable();
     }
