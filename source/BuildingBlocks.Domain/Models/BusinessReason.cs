@@ -30,4 +30,9 @@ public sealed class BusinessReason : DataHubTypeWithUnused<BusinessReason>
     [JsonConstructor]
     private BusinessReason(string name, string code, bool isUnused = false)
      : base(name, code, isUnused) { }
+
+    public ProcessManager.Components.Abstractions.ValueObjects.BusinessReason ToProcessManagerBusinessReason()
+    {
+        return ProcessManager.Components.Abstractions.ValueObjects.BusinessReason.FromName(Name);
+    }
 }

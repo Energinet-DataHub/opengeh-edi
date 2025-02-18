@@ -119,7 +119,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         };
         series.TimeSeriesPoints.AddRange(timeSeriesPoints.OrderBy(_ => Guid.NewGuid()));
 
-        if (aggregatedMeasureDataProcess.BusinessReason.Name == DataHubNames.BusinessReason.Correction)
+        if (aggregatedMeasureDataProcess.BusinessReason.Name == BusinessReason.Correction.Name)
         {
             switch (aggregatedMeasureDataProcess.SettlementVersion)
             {

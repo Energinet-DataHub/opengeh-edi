@@ -94,6 +94,16 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             .ToArray();
     }
 
+    public static IEnumerable<object[]> GetTestData()
+    {
+        yield return ["Xml", ActorRole.GridAccessProvider.Name, ActorRole.Delegated.Name];
+        yield return ["Json", ActorRole.GridAccessProvider.Name, ActorRole.Delegated.Name];
+        yield return ["Xml", ActorRole.EnergySupplier.Name, ActorRole.Delegated.Name];
+        yield return ["Json", ActorRole.EnergySupplier.Name, ActorRole.Delegated.Name];
+        yield return ["Xml", ActorRole.SystemOperator.Name, ActorRole.Delegated.Name];
+        yield return ["Json", ActorRole.SystemOperator.Name, ActorRole.Delegated.Name];
+    }
+
     public async Task InitializeAsync()
     {
         await _fixture.InsertWholesaleDataDatabricksDataAsync(_ediDatabricksOptions);
@@ -500,7 +510,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
                 chargeOwnerNumber.Value,
                 new List<string> { gridAreaCode },
                 null,
-                new List<ChargeTypeInput> { new(DataHubNames.ChargeType.Tariff, "25361478"), }));
+                new List<ChargeTypeInput> { new(ChargeType.Tariff.Name, "25361478"), }));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
@@ -637,7 +647,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
                 chargeOwnerNumber.Value,
                 GridAreas: testDataDescription.GridAreaCodes,
                 null,
-                new List<ChargeTypeInput> { new(DataHubNames.ChargeType.Tariff, "25361478") }));
+                new List<ChargeTypeInput> { new(ChargeType.Tariff.Name, "25361478") }));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
@@ -1018,12 +1028,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
     }
 
     [Theory]
-    [InlineData("Xml", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
+    [MemberData(nameof(GetTestData))]
     public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName, string delegatedToRoleName)
     {
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);

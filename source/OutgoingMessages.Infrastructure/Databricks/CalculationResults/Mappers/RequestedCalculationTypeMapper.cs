@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Request;
 
@@ -22,24 +23,24 @@ public static class RequestedCalculationTypeMapper
 {
     public static CalculationType ToRequestedCalculationType(string businessReason, string? settlementVersion)
     {
-        if (businessReason != DataHubNames.BusinessReason.Correction && settlementVersion != null)
+        if (businessReason != BusinessReason.Correction.Name && settlementVersion != null)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(settlementVersion),
                 settlementVersion,
-                $"Value must be null when {nameof(businessReason)} is not {nameof(DataHubNames.BusinessReason.Correction)}.");
+                $"Value must be null when {nameof(businessReason)} is not {nameof(BusinessReason.Correction)}.");
         }
 
         return businessReason switch
         {
-            DataHubNames.BusinessReason.BalanceFixing => CalculationType.BalanceFixing,
-            DataHubNames.BusinessReason.PreliminaryAggregation => CalculationType.Aggregation,
-            DataHubNames.BusinessReason.WholesaleFixing => CalculationType.WholesaleFixing,
-            DataHubNames.BusinessReason.Correction => settlementVersion switch
+            var br when br == BusinessReason.BalanceFixing.Name => CalculationType.BalanceFixing,
+            var br when br == BusinessReason.PreliminaryAggregation.Name => CalculationType.Aggregation,
+            var br when br == BusinessReason.WholesaleFixing.Name => CalculationType.WholesaleFixing,
+            var br when br == BusinessReason.Correction.Name => settlementVersion switch
             {
-                DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
-                DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
-                DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                var sm when sm == SettlementVersion.FirstCorrection.Name => CalculationType.FirstCorrectionSettlement,
+                var sm when sm == SettlementVersion.SecondCorrection.Name => CalculationType.SecondCorrectionSettlement,
+                var sm when sm == SettlementVersion.ThirdCorrection.Name => CalculationType.ThirdCorrectionSettlement,
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
                     settlementVersion,

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.AggregatedTimeSeriesRequest;
 using NodaTime;
 using AggregatedTimeSeriesRequest = Energinet.DataHub.Edi.Requests.AggregatedTimeSeriesRequest;
@@ -22,7 +23,7 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 public class AggregatedTimeSeriesRequestBuilder
 {
     private readonly List<string> _gridAreaCodes = [];
-    private string? _meteringPointType = DataHubNames.MeteringPointType.Production;
+    private string? _meteringPointType = MeteringPointType.Production.Name;
     private string _start;
     private string _end;
     private string? _energySupplierId;
@@ -38,10 +39,10 @@ public class AggregatedTimeSeriesRequestBuilder
         var now = SystemClock.Instance.GetCurrentInstant();
         _start = Instant.FromUtc(now.InUtc().Year, 1, 1, 23, 0, 0).ToString();
         _end = Instant.FromUtc(now.InUtc().Year, 1, 2, 23, 0, 0).ToString();
-        _requestedByActorRole = DataHubNames.ActorRole.EnergySupplier;
+        _requestedByActorRole = ActorRole.EnergySupplier.Name;
         _requestedByActorNumber = EnergySupplierValidatorTest.ValidGlnNumber;
         _energySupplierId = _requestedByActorNumber;
-        _businessReason = DataHubNames.BusinessReason.BalanceFixing;
+        _businessReason = BusinessReason.BalanceFixing.Name;
     }
 
     public static AggregatedTimeSeriesRequestBuilder AggregatedTimeSeriesRequest()

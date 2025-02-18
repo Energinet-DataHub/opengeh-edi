@@ -108,6 +108,18 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
             .ToArray();
     }
 
+    public static IEnumerable<object[]> GetTestData()
+    {
+        yield return ["Xml", ActorRole.MeteredDataResponsible.Name];
+        yield return ["Json", ActorRole.MeteredDataResponsible.Name];
+        yield return ["Xml", ActorRole.GridAccessProvider.Name];
+        yield return ["Json", ActorRole.GridAccessProvider.Name];
+        yield return ["Xml", ActorRole.EnergySupplier.Name];
+        yield return ["Json", ActorRole.EnergySupplier.Name];
+        yield return ["Xml", ActorRole.BalanceResponsibleParty.Name];
+        yield return ["Json", ActorRole.BalanceResponsibleParty.Name];
+    }
+
     [Theory]
     [MemberData(
         nameof(DocumentFormatsWithAllRoleCombinations),
@@ -1030,12 +1042,12 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
     }
 
     [Theory]
-    [InlineData("Xml", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Xml", DataHubNames.ActorRole.BalanceResponsibleParty, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.BalanceResponsibleParty, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Xml", "GridAccessProvider", "Delegated")]
+    [InlineData("Json", "GridAccessProvider", "Delegated")]
+    [InlineData("Xml", "EnergySupplier", "Delegated")]
+    [InlineData("Json", "EnergySupplier", "Delegated")]
+    [InlineData("Xml", "BalanceResponsibleParty", "Delegated")]
+    [InlineData("Json", "BalanceResponsibleParty", "Delegated")]
     public async Task
         AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(
             string incomingDocumentFormatName,

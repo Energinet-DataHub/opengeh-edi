@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using FluentAssertions;
@@ -35,7 +36,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
             gridAreaCodes: [],
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
-            meteringPointType: DataHubNames.MeteringPointType.Production);
+            meteringPointType: MeteringPointType.Production.Name,
+            settlementMethod: SettlementMethod.Flex.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -59,7 +61,9 @@ public class AggregatedTimeSeriesRequestFactoryTests
         var request = CreateRequest(
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
-            balanceResponsible: balanceResponsibleId);
+            balanceResponsible: balanceResponsibleId,
+            meteringPointType: MeteringPointType.Production.Name,
+            settlementMethod: SettlementMethod.Flex.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -83,7 +87,9 @@ public class AggregatedTimeSeriesRequestFactoryTests
         var request = CreateRequest(
             gridAreaCodes: [gridAreaCode],
             energySupplier: energySupplier,
-            balanceResponsible: balanceResponsibleId);
+            balanceResponsible: balanceResponsibleId,
+            meteringPointType: MeteringPointType.Production.Name,
+            settlementMethod: SettlementMethod.Flex.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -141,7 +147,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             energySupplier: energySupplier,
             balanceResponsible: balanceResponsibleId,
             meteringPointType: null,
-            settlementMethod: DataHubNames.SettlementMethod.NonProfiled);
+            settlementMethod: SettlementMethod.NonProfiled.Name);
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -174,7 +180,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             meteringPointType: null,
             settlementMethod: string.Empty);
 
-        request.RequestedForActorRole = DataHubNames.ActorRole.BalanceResponsibleParty;
+        request.RequestedForActorRole = ActorRole.BalanceResponsibleParty.Name;
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -207,7 +213,7 @@ public class AggregatedTimeSeriesRequestFactoryTests
             meteringPointType: null,
             settlementMethod: string.Empty);
 
-        request.RequestedForActorRole = DataHubNames.ActorRole.MeteredDataResponsible;
+        request.RequestedForActorRole = ActorRole.MeteredDataResponsible.Name;
 
         // Act
         var actual = AggregatedTimeSeriesRequestFactory.Parse(request);
@@ -234,8 +240,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
         IReadOnlyCollection<string> gridAreaCodes,
         string? energySupplier,
         string? balanceResponsible,
-        string? meteringPointType = DataHubNames.MeteringPointType.Production,
-        string? settlementMethod = DataHubNames.SettlementMethod.Flex)
+        string? meteringPointType,
+        string? settlementMethod)
     {
         var request = new AggregatedTimeSeriesRequest()
         {
@@ -246,8 +252,8 @@ public class AggregatedTimeSeriesRequestFactoryTests
                 End = "2022-12-31T23:00:00Z",
             },
             RequestedForActorNumber = "1234567891234",
-            RequestedForActorRole = DataHubNames.ActorRole.EnergySupplier,
-            BusinessReason = DataHubNames.BusinessReason.BalanceFixing,
+            RequestedForActorRole = ActorRole.EnergySupplier.Name,
+            BusinessReason = BusinessReason.BalanceFixing.Name,
 
             // Optional
             SettlementMethod = settlementMethod,

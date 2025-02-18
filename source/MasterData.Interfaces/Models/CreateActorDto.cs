@@ -16,4 +16,4 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-public sealed record CreateActorDto(string ExternalId, ActorNumber ActorNumber);
+public sealed record CreateActorDto(string ActorClientId, ActorNumber ActorNumber);

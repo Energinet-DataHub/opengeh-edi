@@ -156,32 +156,32 @@ public class EnqueueHandler_Brs_026_V1(
     private static TimeSeriesType[] GetTimeSeriesTypes(
         ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType? meteringPointType,
         ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod? settlementMethod,
-        ProcessManager.Components.Abstractions.ValueObjects.ActorRole requestedForActorRole)
+        ProcessManager.Abstractions.Core.ValueObjects.ActorRole requestedForActorRole)
     {
         return meteringPointType != null
             ? [MapTimeSeriesType(meteringPointType.Name, settlementMethod?.Name)]
             : requestedForActorRole.Name switch
             {
-                DataHubNames.ActorRole.EnergySupplier =>
-                [
-                    TimeSeriesType.Production,
-                    TimeSeriesType.FlexConsumption,
-                    TimeSeriesType.NonProfiledConsumption,
-                ],
-                DataHubNames.ActorRole.BalanceResponsibleParty =>
-                [
-                    TimeSeriesType.Production,
-                    TimeSeriesType.FlexConsumption,
-                    TimeSeriesType.NonProfiledConsumption,
-                ],
-                DataHubNames.ActorRole.MeteredDataResponsible =>
-                [
-                    TimeSeriesType.Production,
-                    TimeSeriesType.FlexConsumption,
-                    TimeSeriesType.NonProfiledConsumption,
-                    TimeSeriesType.TotalConsumption,
-                    TimeSeriesType.NetExchangePerGa,
-                ],
+                var role when role == ActorRole.EnergySupplier.Name =>
+                    [
+                        TimeSeriesType.Production,
+                        TimeSeriesType.FlexConsumption,
+                        TimeSeriesType.NonProfiledConsumption,
+                    ],
+                var role when role == ActorRole.BalanceResponsibleParty.Name =>
+                    [
+                        TimeSeriesType.Production,
+                        TimeSeriesType.FlexConsumption,
+                        TimeSeriesType.NonProfiledConsumption,
+                    ],
+                var role when role == ActorRole.MeteredDataResponsible.Name =>
+                    [
+                        TimeSeriesType.Production,
+                        TimeSeriesType.FlexConsumption,
+                        TimeSeriesType.NonProfiledConsumption,
+                        TimeSeriesType.TotalConsumption,
+                        TimeSeriesType.NetExchangePerGa,
+                    ],
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(requestedForActorRole),
                     requestedForActorRole,
@@ -191,24 +191,24 @@ public class EnqueueHandler_Brs_026_V1(
 
     private static CalculationType? MapCalculationType(string businessReason, string? settlementVersion)
     {
-        if (businessReason != DataHubNames.BusinessReason.Correction && settlementVersion != null)
+        if (businessReason != BusinessReason.Correction.Name && settlementVersion != null)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(settlementVersion),
                 settlementVersion,
-                $"Value must be null when {nameof(businessReason)} is not {nameof(DataHubNames.BusinessReason.Correction)}.");
+                $"Value must be null when {nameof(businessReason)} is not {nameof(BusinessReason.Correction.Name)}.");
         }
 
         return businessReason switch
         {
-            DataHubNames.BusinessReason.BalanceFixing => CalculationType.BalanceFixing,
-            DataHubNames.BusinessReason.PreliminaryAggregation => CalculationType.Aggregation,
-            DataHubNames.BusinessReason.WholesaleFixing => CalculationType.WholesaleFixing,
-            DataHubNames.BusinessReason.Correction => settlementVersion switch
+            var reason when reason == BusinessReason.BalanceFixing.Name => CalculationType.BalanceFixing,
+            var reason when reason == BusinessReason.PreliminaryAggregation.Name => CalculationType.Aggregation,
+            var reason when reason == BusinessReason.WholesaleFixing.Name => CalculationType.WholesaleFixing,
+            var reason when reason == BusinessReason.Correction.Name => settlementVersion switch
             {
-                DataHubNames.SettlementVersion.FirstCorrection => CalculationType.FirstCorrectionSettlement,
-                DataHubNames.SettlementVersion.SecondCorrection => CalculationType.SecondCorrectionSettlement,
-                DataHubNames.SettlementVersion.ThirdCorrection => CalculationType.ThirdCorrectionSettlement,
+                var settlement when settlement == SettlementVersion.FirstCorrection.Name => CalculationType.FirstCorrectionSettlement,
+                var settlement when settlement == SettlementVersion.SecondCorrection.Name => CalculationType.SecondCorrectionSettlement,
+                var settlement when settlement == SettlementVersion.ThirdCorrection.Name => CalculationType.ThirdCorrectionSettlement,
                 null => null, // CalculationType == null means get latest correction
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementVersion),
@@ -226,15 +226,13 @@ public class EnqueueHandler_Brs_026_V1(
     {
         return meteringPointType switch
         {
-            DataHubNames.MeteringPointType.Production => TimeSeriesType.Production,
-            DataHubNames.MeteringPointType.Exchange => TimeSeriesType.NetExchangePerGa,
-            DataHubNames.MeteringPointType.Consumption => settlementMethod switch
+            var mp when mp == MeteringPointType.Production.Name => TimeSeriesType.Production,
+            var mp when mp == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
+            var mp when mp == MeteringPointType.Consumption.Name => settlementMethod switch
             {
-                DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
-                var method when
-                    string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
-
+                var sm when sm == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
+                var sm when sm == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
+                var method when string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(settlementMethod),
                     actualValue: settlementMethod,

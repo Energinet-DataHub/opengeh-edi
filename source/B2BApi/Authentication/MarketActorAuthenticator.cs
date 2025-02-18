@@ -43,17 +43,17 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
         var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimsMap.Roles);
         var role = ParseRole(rolesFromClaims);
 
-        var actorIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.ActorId);
-        _logger.LogDebug("azp claim value: {Azp}", actorIdFromAzp ?? "null");
-        var actorNumber = !string.IsNullOrEmpty(actorIdFromAzp)
-            ? await _masterDataClient.GetActorNumberByExternalIdAsync(actorIdFromAzp, cancellationToken)
+        var actorClientIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.ActorClientId);
+        _logger.LogDebug("azp claim value: {Azp}", actorClientIdFromAzp ?? "null");
+        var actorNumber = !string.IsNullOrEmpty(actorClientIdFromAzp)
+            ? await _masterDataClient.GetActorNumberByActorClientIdAsync(actorClientIdFromAzp, cancellationToken)
                 .ConfigureAwait(false)
             : null;
 
-        return Authenticate(actorNumber, role, actorIdFromAzp);
+        return Authenticate(actorNumber, role, actorClientIdFromAzp);
     }
 
-    public bool Authenticate(ActorNumber? actorNumber, ActorRole? actorRole, string? actorId)
+    public bool Authenticate(ActorNumber? actorNumber, ActorRole? actorRole, string? actorClientId)
     {
         if (actorNumber is null)
         {
@@ -70,19 +70,20 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
             return false;
         }
 
-        var actorIdGuid = Guid.TryParse(actorId, out var guidParseResult) ? guidParseResult : (Guid?)null;
-        if (actorIdGuid is null)
+        var actorClientIdGuid = Guid.TryParse(actorClientId, out var guidParseResult) ? guidParseResult : (Guid?)null;
+        if (actorClientIdGuid is null)
         {
             // This is only possible in the case of certificate authentication (ebIX), since the actor number above
             // is retrieved from the actor id in case of token authentication.
-            _logger.LogWarning("Authenticated market actor identity has no valid actor id (ActorId={ActorId}, ActorNumber={ActorNumber}, ActorRole={ActorRole}).", actorId, actorNumber.Value, actorRole.Code);
+            _logger.LogWarning("Authenticated market actor identity has no valid actor id (ActorClientId={ActorClientId}, ActorNumber={ActorNumber}, ActorRole={ActorRole}).", actorClientId, actorNumber.Value, actorRole.Code);
         }
 
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
-            actorNumber,
-            Restriction.Owned,
+            actorNumber: actorNumber,
+            restriction: Restriction.Owned,
             actorRole: actorRole,
-            actorIdGuid));
+            actorClientId: actorClientIdGuid,
+            actorId: null));
         return true;
     }
 

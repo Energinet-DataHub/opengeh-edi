@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class Currency : DataHubType<Currency>
 {
-    public static readonly Currency DanishCrowns = new(DataHubNames.Currency.DanishCrowns, "DKK");
+    public static readonly Currency DanishCrowns = new("DanishCrowns", "DKK");
 
     [JsonConstructor]
     private Currency(string name, string code)

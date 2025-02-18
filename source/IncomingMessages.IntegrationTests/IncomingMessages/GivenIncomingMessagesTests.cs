@@ -115,6 +115,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 senderActorNumber,
                 Restriction.Owned,
                 actorRole,
+                null,
                 ActorId));
 
         // Act
@@ -150,7 +151,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridAccessProvider, ActorId));
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridAccessProvider, null, ActorId));
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -193,6 +194,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 senderActorNumber,
                 Restriction.Owned,
                 actorRole,
+                null,
                 ActorId));
 
         _senderSpy.ShouldFail = true;
@@ -234,6 +236,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 senderActorNumber,
                 Restriction.Owned,
                 actorRole,
+                null,
                 ActorId));
 
         // new scope to simulate a race condition.
@@ -243,7 +246,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
         authenticatedActorInSecondScope!.SetAuthenticatedActor(
-            new ActorIdentity(senderActorNumber, Restriction.None, ActorRole.BalanceResponsibleParty, Guid.Parse("00000000-0000-0000-0000-000000000002")));
+            new ActorIdentity(senderActorNumber, Restriction.None, ActorRole.BalanceResponsibleParty, null, Guid.Parse("00000000-0000-0000-0000-000000000002")));
 
         var task01 = _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
@@ -300,6 +303,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 senderActorNumber,
                 Restriction.Owned,
                 authenticatedActorRole,
+                null,
                 ActorId));
 
         // new scope to simulate a race condition.
@@ -313,6 +317,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 senderActorNumber,
                 Restriction.None,
                 authenticatedActorRole,
+                null,
                 ActorId));
 
         var task01 = _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -356,7 +361,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, ActorId));
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, null, ActorId));
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -386,7 +391,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, ActorId));
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, null, ActorId));
 
         var messageStream = ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json");
 
@@ -422,7 +427,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5790001330552");
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible, ActorId));
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible, null, ActorId));
 
         var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml");
 
@@ -466,7 +471,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, ActorId));
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, null, ActorId));
 
         var messageStream = ReadFile(path);
 

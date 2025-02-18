@@ -30,7 +30,7 @@ public static class HttpRequestExtensions
     {
         var documentPath = actor.ActorRole.Name switch
         {
-            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/xml/RequestWholesaleSettlementForEnergySupplier.xml",
+            _ when actor.ActorRole.Name == ActorRole.EnergySupplier.Name => "TestData/Messages/xml/RequestWholesaleSettlementForEnergySupplier.xml",
             _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
         };
 
@@ -50,7 +50,7 @@ public static class HttpRequestExtensions
     {
         var documentPath = actor.ActorRole.Name switch
         {
-            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/json/RequestAggregatedMeasureDataForEnergySupplier.json",
+            _ when actor.ActorRole.Name == ActorRole.EnergySupplier.Name => "TestData/Messages/json/RequestAggregatedMeasureDataForEnergySupplier.json",
             _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
         };
 
@@ -132,15 +132,15 @@ public static class HttpRequestExtensions
         HttpContent? content = null)
     {
         // The actor must exist in the database
-        var externalId = Guid.NewGuid().ToString();
-        await fixture.DatabaseManager.AddActorAsync(actor.ActorNumber, externalId);
+        var actorClientId = Guid.NewGuid().ToString();
+        await fixture.DatabaseManager.AddActorAsync(actor.ActorNumber, actorClientId);
 
         // The bearer token must contain:
         //  * the actor role matching the document content
         //  * the external id matching the actor in the database
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actor.ActorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 
         var request = new HttpRequestMessage(method, url)
