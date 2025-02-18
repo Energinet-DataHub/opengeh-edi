@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -22,8 +23,10 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
 using QuantityQuality = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality;
 using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
+using SettlementVersion = Energinet.DataHub.Edi.Responses.SettlementVersion;
 using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Factories.AggregatedTimeSeries;
@@ -91,7 +94,9 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
         // Arrange
         var expectedAcceptedSubject = nameof(AggregatedTimeSeriesRequestAccepted);
         var expectedReferenceId = "123456789";
-        var aggregatedTimeSeries = CreateAggregatedTimeSeries(calculationType: CalculationType.FirstCorrectionSettlement);
+        var aggregatedTimeSeries = CreateAggregatedTimeSeries(
+            businessReason: BusinessReason.Correction,
+            settlementVersion: DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection);
 
         // Act
         var actual = AggregatedTimeSeriesRequestAcceptedMessageFactory.Create(aggregatedTimeSeries, expectedReferenceId);
@@ -138,7 +143,8 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
 
     private IReadOnlyCollection<Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.AggregatedTimeSeries> CreateAggregatedTimeSeries(
         IReadOnlyCollection<QuantityQuality>? quantityQualities = null,
-        CalculationType calculationType = CalculationType.Aggregation)
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason? businessReason = null,
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion? settlementVersion = null)
     {
         quantityQualities ??= new List<QuantityQuality> { QuantityQuality.Estimated };
 
@@ -151,7 +157,8 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
                 new(new DateTime(2021, 1, 1, 0, 45, 0), 3, quantityQualities),
             },
             _timeSeriesType,
-            calculationType,
+            businessReason ?? Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PreliminaryAggregation,
+            settlementVersion,
             DateTimeOffset.Parse("2022-01-01T00:00Z").ToInstant(),
             DateTimeOffset.Parse("2022-01-01T00:45Z").ToInstant(),
             Resolution.Quarter,

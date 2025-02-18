@@ -16,6 +16,7 @@ using AutoFixture;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
 using Energinet.DataHub.Core.TestCommon;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
@@ -29,6 +30,7 @@ using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.CalculationResults.RequestCalculationResult;
 
@@ -93,7 +95,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: null,
-                CalculationType: CalculationType.BalanceFixing,
+                BusinessReason: BusinessReason.BalanceFixing,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -151,7 +154,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: EnergySupplierOne,
                 BalanceResponsibleId: null,
-                CalculationType: CalculationType.BalanceFixing,
+                BusinessReason: BusinessReason.BalanceFixing,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -202,7 +206,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: EnergySupplierOne,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: CalculationType.BalanceFixing,
+                BusinessReason: BusinessReason.BalanceFixing,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -247,7 +252,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: null,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: CalculationType.BalanceFixing,
+                BusinessReason: BusinessReason.BalanceFixing,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -294,7 +300,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["804"],
                 EnergySupplierId: null,
                 BalanceResponsibleId: null,
-                CalculationType: CalculationType.BalanceFixing,
+                BusinessReason: BusinessReason.BalanceFixing,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -340,7 +347,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: ["543"],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: CalculationType.Aggregation,
+                BusinessReason: BusinessReason.PreliminaryAggregation,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -383,18 +391,20 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: null,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.CalculationType, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
+                    ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), CalculationType.SecondCorrectionSettlement, 4),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), CalculationType.ThirdCorrectionSettlement, 2),
+                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 4),
+                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -424,7 +434,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: null,
                 BalanceResponsibleId: null,
-                CalculationType: CalculationType.Aggregation,
+                BusinessReason: BusinessReason.PreliminaryAggregation,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -490,18 +501,19 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: "5790002617263",
                 BalanceResponsibleId: null,
-                CalculationType: CalculationType.SecondCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: SettlementVersion.SecondCorrection,
                 Period: totalPeriod);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.CalculationType,
-                    ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
+                    ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 4, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), CalculationType.SecondCorrectionSettlement, 3),
+                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 4, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -538,19 +550,20 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: "5790002617263",
                 BalanceResponsibleId: null,
-                CalculationType: CalculationType.ThirdCorrectionSettlement,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: SettlementVersion.ThirdCorrection,
                 Period: totalPeriod);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.CalculationType,
-                    ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
+                    ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 3, 1, 0), CalculationType.ThirdCorrectionSettlement, 2),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 5, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), CalculationType.ThirdCorrectionSettlement, 2),
+                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 3, 1, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
+                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 5, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -579,7 +592,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: null,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: null,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
@@ -604,18 +618,19 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierTwo,
                 BalanceResponsibleId: BalanceResponsibleOne,
-                CalculationType: null,
+                BusinessReason: BusinessReason.Correction,
+                SettlementVersion: null,
                 Period: totalPeriod);
 
             // Act
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.CalculationType, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason, ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("584", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), CalculationType.SecondCorrectionSettlement, 3),
-                    ("584", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), CalculationType.SecondCorrectionSettlement, 3),
+                    ("584", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
+                    ("584", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
                 ]);
         }
     }

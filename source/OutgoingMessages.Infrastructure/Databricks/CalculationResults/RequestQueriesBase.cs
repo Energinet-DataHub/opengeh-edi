@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
@@ -30,7 +31,8 @@ public abstract class RequestQueriesBase(DatabricksSqlWarehouseQueryExecutor dat
         string gridAreaCodeColumnName,
         string calculationTypeColumnName,
         CalculationTypeForGridAreasQueryStatementBase calculationTypeForGridAreaQueryStatement,
-        CalculationType? queryParametersCalculationType)
+        BusinessReason queryParametersBusinessReason,
+        SettlementVersion? queryParametersSettlementVersion)
     {
         var calculationTypeForGridAreas = await _databricksSqlWarehouseQueryExecutor
             .ExecuteStatementAsync(calculationTypeForGridAreaQueryStatement, Format.JsonArray)
@@ -48,11 +50,13 @@ public abstract class RequestQueriesBase(DatabricksSqlWarehouseQueryExecutor dat
             .GroupBy(ctfga => ctfga.GridArea)
             .Select(grouping =>
             {
-                if (queryParametersCalculationType is not null)
+                if (!IsQueryForLatestCorrection(queryParametersBusinessReason, queryParametersSettlementVersion))
                 {
                     return new CalculationTypeForGridArea(
                         grouping.Key,
-                        CalculationTypeMapper.ToDeltaTableValue(queryParametersCalculationType.Value));
+                        CalculationTypeMapper.ToDeltaTableValue(
+                            queryParametersBusinessReason,
+                            queryParametersSettlementVersion));
                 }
 
                 var calculationTypes = grouping.Select(ctfga => ctfga.CalculationType).ToList();
@@ -74,8 +78,7 @@ public abstract class RequestQueriesBase(DatabricksSqlWarehouseQueryExecutor dat
 
                 return new CalculationTypeForGridArea(grouping.Key, DeltaTableCalculationType.WholesaleFixing);
             })
-            .Where(ctfga => queryParametersCalculationType is not null
-                            || ctfga.CalculationType != DeltaTableCalculationType.WholesaleFixing)
+            .Where(ctfga => ctfga.CalculationType != DeltaTableCalculationType.WholesaleFixing)
             .Distinct()
             .ToList();
     }
@@ -108,5 +111,11 @@ public abstract class RequestQueriesBase(DatabricksSqlWarehouseQueryExecutor dat
         {
             yield return createSeries(previous, points);
         }
+    }
+
+    private static bool IsQueryForLatestCorrection(BusinessReason businessReason, SettlementVersion? settlementVersion)
+    {
+        return businessReason == BusinessReason.Correction
+               && settlementVersion is null;
     }
 }

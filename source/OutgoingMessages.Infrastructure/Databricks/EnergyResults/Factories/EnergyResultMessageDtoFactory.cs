@@ -36,24 +36,6 @@ public class EnergyResultMessageDtoFactory()
             .AsReadOnly();
     }
 
-    public static (BusinessReason BusinessReason, SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(Interfaces.Models.CalculationResults.CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            Interfaces.Models.CalculationResults.CalculationType.Aggregation => (BusinessReason.PreliminaryAggregation, null),
-            Interfaces.Models.CalculationResults.CalculationType.BalanceFixing => (BusinessReason.BalanceFixing, null),
-            Interfaces.Models.CalculationResults.CalculationType.WholesaleFixing => (BusinessReason.WholesaleFixing, null),
-            Interfaces.Models.CalculationResults.CalculationType.FirstCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.FirstCorrection),
-            Interfaces.Models.CalculationResults.CalculationType.SecondCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.SecondCorrection),
-            Interfaces.Models.CalculationResults.CalculationType.ThirdCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.ThirdCorrection),
-
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                actualValue: calculationType,
-                "Value does not contain a valid calculation type."),
-        };
-    }
-
     private static CalculatedQuantityQuality MapToCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality> qualities)
     {
         ArgumentNullException.ThrowIfNull(qualities);

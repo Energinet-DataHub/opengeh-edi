@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 
 public record WholesaleServicesQueryParameters(
@@ -20,7 +22,8 @@ public record WholesaleServicesQueryParameters(
     string? EnergySupplierId,
     string? ChargeOwnerId,
     List<(string? ChargeCode, ChargeType? ChargeType)> ChargeTypes,
-    CalculationType? CalculationType,
+    BusinessReason BusinessReason,
+    SettlementVersion? SettlementVersion,
     Period Period,
     bool RequestedForEnergySupplier,
     string RequestedForActorNumber);
