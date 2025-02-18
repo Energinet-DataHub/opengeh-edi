@@ -60,9 +60,9 @@ public class EnergyResultPerGridAreaDescription
             null,
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
-            Period.Start,
-            1928898.153m,
-            CalculatedQuantityQuality.Incomplete)));
+                Period.Start,
+                1928898.153m,
+                CalculatedQuantityQuality.Incomplete)));
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty

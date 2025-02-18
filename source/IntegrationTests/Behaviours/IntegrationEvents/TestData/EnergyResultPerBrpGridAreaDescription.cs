@@ -29,7 +29,7 @@ public class EnergyResultPerBrpGridAreaDescription
 {
     public EnergyResultPerBrpGridAreaDescription()
         : base(
-        "balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv",
+        "balance_fixing_01-11-2022_01-12-2022_ga_542_and_543_per_brp_ga_v1.csv",
         //Metering point type on row 218 contains an invalid value (="invalid") (row on a result set)
         "balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1_with_invalid_row.csv")
     {
@@ -37,9 +37,9 @@ public class EnergyResultPerBrpGridAreaDescription
 
     public override Guid CalculationId => Guid.Parse("a8cfe7c7-f197-405c-b922-52153fa0332d");
 
-    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "543" };
+    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "542", "543" };
 
-    public override int ExpectedCalculationResultsCount => 20;
+    public override int ExpectedCalculationResultsCount => 20 * 2; // 20 for each grid area
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
