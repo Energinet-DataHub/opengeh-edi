@@ -17,7 +17,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 
 public record AggregatedTimeSeriesQueryParameters(
-    IReadOnlyCollection<TimeSeriesType> TimeSeriesTypes,
+    Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType? MeteringPointType,
+    Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod? SettlementMethod,
     IReadOnlyCollection<string> GridAreaCodes,
     string? EnergySupplierId,
     string? BalanceResponsibleId,

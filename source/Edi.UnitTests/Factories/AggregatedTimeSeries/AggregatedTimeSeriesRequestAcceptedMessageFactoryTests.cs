@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -27,7 +25,6 @@ using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Busine
 using QuantityQuality = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality;
 using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
 using SettlementVersion = Energinet.DataHub.Edi.Responses.SettlementVersion;
-using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Factories.AggregatedTimeSeries;
 
@@ -36,7 +33,6 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
     private readonly string _gridArea = "543";
     private readonly Instant _periodStart = Instant.FromUtc(2020, 12, 31, 23, 0);
     private readonly Instant _periodEnd = Instant.FromUtc(2021, 1, 1, 23, 0);
-    private readonly TimeSeriesType _timeSeriesType = TimeSeriesType.Production;
 
     public static IEnumerable<object[]> QuantityQualitySets()
     {
@@ -156,8 +152,9 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
                 new(new DateTime(2021, 1, 1, 0, 30, 0), 2, quantityQualities),
                 new(new DateTime(2021, 1, 1, 0, 45, 0), 3, quantityQualities),
             },
-            _timeSeriesType,
-            businessReason ?? Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PreliminaryAggregation,
+            meteringPointType: Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType.Production,
+            settlementMethod: null,
+            businessReason ?? BusinessReason.PreliminaryAggregation,
             settlementVersion,
             DateTimeOffset.Parse("2022-01-01T00:00Z").ToInstant(),
             DateTimeOffset.Parse("2022-01-01T00:45Z").ToInstant(),

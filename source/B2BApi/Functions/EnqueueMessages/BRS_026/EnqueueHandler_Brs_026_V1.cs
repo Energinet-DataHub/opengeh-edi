@@ -55,7 +55,8 @@ public class EnqueueHandler_Brs_026_V1(
             acceptedData);
 
         var query = new AggregatedTimeSeriesQueryParameters(
-            GetTimeSeriesTypes(acceptedData.MeteringPointType, acceptedData.SettlementMethod, acceptedData.RequestedForActorRole),
+            acceptedData.MeteringPointType != null ? MeteringPointType.FromName(acceptedData.MeteringPointType.Name) : null,
+            acceptedData.SettlementMethod != null ? SettlementMethod.FromName(acceptedData.SettlementMethod.Name) : null,
             acceptedData.GridAreas,
             acceptedData.EnergySupplierNumber?.Value,
             acceptedData.BalanceResponsibleNumber?.Value,
@@ -150,65 +151,5 @@ public class EnqueueHandler_Brs_026_V1(
                     RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
-    }
-
-    private static TimeSeriesType[] GetTimeSeriesTypes(
-        ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType? meteringPointType,
-        ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod? settlementMethod,
-        ProcessManager.Abstractions.Core.ValueObjects.ActorRole requestedForActorRole)
-    {
-        return meteringPointType != null
-            ? [MapTimeSeriesType(meteringPointType.Name, settlementMethod?.Name)]
-            : requestedForActorRole.Name switch
-            {
-                var role when role == ActorRole.EnergySupplier.Name =>
-                    [
-                        TimeSeriesType.Production,
-                        TimeSeriesType.FlexConsumption,
-                        TimeSeriesType.NonProfiledConsumption,
-                    ],
-                var role when role == ActorRole.BalanceResponsibleParty.Name =>
-                    [
-                        TimeSeriesType.Production,
-                        TimeSeriesType.FlexConsumption,
-                        TimeSeriesType.NonProfiledConsumption,
-                    ],
-                var role when role == ActorRole.MeteredDataResponsible.Name =>
-                    [
-                        TimeSeriesType.Production,
-                        TimeSeriesType.FlexConsumption,
-                        TimeSeriesType.NonProfiledConsumption,
-                        TimeSeriesType.TotalConsumption,
-                        TimeSeriesType.NetExchangePerGa,
-                    ],
-                _ => throw new ArgumentOutOfRangeException(
-                    nameof(requestedForActorRole),
-                    requestedForActorRole,
-                    "Value does not contain a valid string representation of a requested by actor role."),
-            };
-    }
-
-    private static TimeSeriesType MapTimeSeriesType(string meteringPointType, string? settlementMethod)
-    {
-        return meteringPointType switch
-        {
-            var mp when mp == MeteringPointType.Production.Name => TimeSeriesType.Production,
-            var mp when mp == MeteringPointType.Exchange.Name => TimeSeriesType.NetExchangePerGa,
-            var mp when mp == MeteringPointType.Consumption.Name => settlementMethod switch
-            {
-                var sm when sm == SettlementMethod.NonProfiled.Name => TimeSeriesType.NonProfiledConsumption,
-                var sm when sm == SettlementMethod.Flex.Name => TimeSeriesType.FlexConsumption,
-                var method when string.IsNullOrWhiteSpace(method) => TimeSeriesType.TotalConsumption,
-                _ => throw new ArgumentOutOfRangeException(
-                    nameof(settlementMethod),
-                    actualValue: settlementMethod,
-                    "Value does not contain a valid string representation of a settlement method."),
-            },
-
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(meteringPointType),
-                actualValue: meteringPointType,
-                "Value does not contain a valid string representation of a metering point type."),
-        };
     }
 }

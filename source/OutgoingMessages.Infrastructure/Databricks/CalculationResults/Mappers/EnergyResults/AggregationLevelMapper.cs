@@ -12,34 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 
 public static class AggregationLevelMapper
 {
-    public static string ToDeltaTableValue(TimeSeriesType timeSeriesType, string? energySupplierGln, string? balanceResponsiblePartyGln)
+    public static AggregationLevel Map(
+        MeteringPointType? meteringPointType,
+        SettlementMethod? settlementMethod,
+        string? energySupplierGln,
+        string? balanceResponsiblePartyGln)
     {
-        switch (timeSeriesType)
+        if (meteringPointType == MeteringPointType.Consumption
+            && settlementMethod == null)
         {
-            case TimeSeriesType.NonProfiledConsumption:
-            case TimeSeriesType.Production:
-            case TimeSeriesType.FlexConsumption:
                 if (energySupplierGln == null && balanceResponsiblePartyGln == null)
-                    return DeltaTableAggregationLevel.GridArea;
-                if (energySupplierGln == null && balanceResponsiblePartyGln != null)
-                    return DeltaTableAggregationLevel.BalanceResponsibleAndGridArea;
-                return DeltaTableAggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea;
-            case TimeSeriesType.NetExchangePerGa:
-            case TimeSeriesType.TotalConsumption:
-                if (energySupplierGln == null && balanceResponsiblePartyGln == null)
-                    return DeltaTableAggregationLevel.GridArea;
-                throw new InvalidOperationException($"Invalid combination of time series type: '{timeSeriesType}'," +
+                    return AggregationLevel.GridArea;
+
+                throw new InvalidOperationException("It is only Metered Data Responsible that can request data for consumption without a settlement method." +
+                                                    $"Invalid combination of metering point type: '{meteringPointType}' and settlement method {settlementMethod}," +
                                                     $" energy supplier: '{energySupplierGln}'" +
                                                     $" and balance responsible: '{balanceResponsiblePartyGln}'.");
-            default:
-                throw new NotImplementedException($"Mapping of '{timeSeriesType}' not implemented.");
         }
+
+        if (meteringPointType == MeteringPointType.Exchange)
+        {
+            if (energySupplierGln == null && balanceResponsiblePartyGln == null)
+                return AggregationLevel.GridArea;
+
+            throw new InvalidOperationException("It is only Metered Data Responsible that can request data for exchange without a settlement method." +
+                                                $"Invalid combination of metering point type: '{meteringPointType}' and settlement method {settlementMethod}," +
+                                                $" energy supplier: '{energySupplierGln}'" +
+                                                $" and balance responsible: '{balanceResponsiblePartyGln}'.");
+        }
+
+        return energySupplierGln switch
+        {
+            null when balanceResponsiblePartyGln == null => AggregationLevel.GridArea,
+            null when balanceResponsiblePartyGln != null => AggregationLevel.BalanceResponsibleAndGridArea,
+            _ => AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea,
+        };
     }
 }

@@ -18,7 +18,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Calcu
 
 public interface IAggregatedTimeSeriesDatabricksContract
 {
-    string GetAggregationLevel();
+    AggregationLevel GetAggregationLevel();
 
     string GetSource(DeltaTableOptions tableOptions);
 

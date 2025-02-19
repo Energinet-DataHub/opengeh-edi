@@ -12,19 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 
-public enum TimeSeriesType
+public enum AggregationLevel
 {
-    NonProfiledConsumption = 1,
-    FlexConsumption = 2,
-    Production = 3,
-    NetExchangePerGa = 4,
-    NetExchangePerNeighboringGa = 5,
-    GridLoss = 6,
-    NegativeGridLoss = 7,
-    PositiveGridLoss = 8,
-    TotalConsumption = 9,
-    TempFlexConsumption = 10,
-    TempProduction = 11,
+    GridArea,
+    BalanceResponsibleAndGridArea,
+    EnergySupplierAndBalanceResponsibleAndGridArea,
 }

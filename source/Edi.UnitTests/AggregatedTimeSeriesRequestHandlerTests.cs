@@ -15,10 +15,8 @@
 using AutoFixture.Xunit2;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Edi.Client;
@@ -34,7 +32,6 @@ using Xunit;
 using AggregatedTimeSeriesRequest = Energinet.DataHub.Edi.Requests.AggregatedTimeSeriesRequest;
 using QuantityQuality = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.QuantityQuality;
 using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
-using TimeSeriesType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.TimeSeriesType;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests;
 
@@ -389,7 +386,8 @@ public class AggregatedTimeSeriesRequestHandlerTests
             new(
                 gridArea: "543",
                 timeSeriesPoints: timeSeriesPoints.ToArray(),
-                timeSeriesType: TimeSeriesType.Production,
+                meteringPointType: MeteringPointType.Production,
+                settlementMethod: null,
                 businessReason: BusinessReason.PreliminaryAggregation,
                 settlementVersion: null,
                 DateTimeOffset.Parse("2022-01-01T00:00Z").ToInstant(),

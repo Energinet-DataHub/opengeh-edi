@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Google.Protobuf;
@@ -49,9 +48,9 @@ public static class AggregatedTimeSeriesRequestAcceptedMessageFactory
             var seriesToAdd = new Series
             {
                 GridArea = series.GridArea,
-                QuantityUnit = Energinet.DataHub.Edi.Responses.QuantityUnit.Kwh,
+                QuantityUnit = QuantityUnit.Kwh,
                 TimeSeriesPoints = { points },
-                TimeSeriesType = CalculationTimeSeriesTypeMapper.MapTimeSeriesTypeFromCalculationsResult(series.TimeSeriesType),
+                TimeSeriesType = TimeSeriesType.Unspecified,
                 Resolution = ResolutionMapper.Map(series.Resolution),
                 CalculationResultVersion = series.Version,
                 Period = new Period()

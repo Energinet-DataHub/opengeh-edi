@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
 /// <summary>
-/// Defines the settlement method
+/// This class contains the settlement methods that are used in the delta tables described here:
+/// https://energinet.atlassian.net/wiki/spaces/D3/pages/1014202369/Wholesale+Results
 /// </summary>
-public enum SettlementMethod
+public static class DeltaTableSettlementMethod
 {
-    Flex = 0,
-    NonProfiled = 1,
+    public const string Flex = "flex";
+    public const string NonProfiled = "non_profiled";
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
@@ -31,59 +30,56 @@ public class AggregatedTimeSeriesQueries(
     IOptions<DeltaTableOptions> deltaTableOptions)
     : RequestQueriesBase(databricksSqlWarehouseQueryExecutor), IAggregatedTimeSeriesQueries
 {
-    private readonly AggregatedTimeSeriesQuerySnippetProviderFactory _querySnippetProviderFactory = querySnippetProviderFactory;
+    private readonly AggregatedTimeSeriesQuerySnippetProviderFactory _querySnippetProviderFactory =
+        querySnippetProviderFactory;
+
     private readonly IOptions<DeltaTableOptions> _deltaTableOptions = deltaTableOptions;
 
     public async IAsyncEnumerable<AggregatedTimeSeries> GetAsync(AggregatedTimeSeriesQueryParameters parameters)
     {
-        /*
-         * We retain the usage of 'TimeSeriesType' here, to reduce the number of changes required.
-         * However, it is worth noting that the 'TimeSeriesType' is not used in the query per se,
-         * but rather translated to 'MeteringPointType' and 'SettlementMethod',
-         * as these are the proper values used in the raw data (and from the request from EDI).
-         * The reason for this is the existence of logic wrt validation and determination of "all types for an actor role"
-         * in the reception of the request from EDI that would have to be reimplemented to avoid using 'TimeSeriesType'.
-         * Once requests are brought back home to EDI, we should leave TimeSeriesType behind.
-         */
-        foreach (var timeSeriesType in parameters.TimeSeriesTypes)
+        var aggregationLevel = AggregationLevelMapper.Map(
+            parameters.MeteringPointType,
+            parameters.SettlementMethod,
+            parameters.EnergySupplierId,
+            parameters.BalanceResponsibleId);
+
+        var querySnippetProvider = _querySnippetProviderFactory.Create(parameters, aggregationLevel);
+
+        var calculationTypePerGridAreas =
+            await GetCalculationTypeForGridAreasAsync(
+                    querySnippetProvider.DatabricksContract.GetGridAreaCodeColumnName(),
+                    querySnippetProvider.DatabricksContract.GetCalculationTypeColumnName(),
+                    new AggregatedTimeSeriesCalculationTypeForGridAreasQueryStatement(
+                        _deltaTableOptions.Value,
+                        querySnippetProvider),
+                    parameters.BusinessReason,
+                    parameters.SettlementVersion)
+                .ConfigureAwait(false);
+
+        var sqlStatement = new AggregatedTimeSeriesQueryStatement(
+            calculationTypePerGridAreas,
+            querySnippetProvider,
+            _deltaTableOptions.Value);
+
+        var calculationIdColumnName = querySnippetProvider.DatabricksContract.GetCalculationIdColumnName();
+
+        await foreach (var aggregatedTimeSeries in CreateSeriesPackagesAsync(
+                           (row, points) => AggregatedTimeSeriesFactory.Create(
+                               querySnippetProvider.DatabricksContract,
+                               row,
+                               points),
+                           (currentRow, previousRow) =>
+                               querySnippetProvider.DatabricksContract.GetColumnsToAggregateBy()
+                                   .Any(column => currentRow[column] != previousRow[column])
+                               || currentRow[calculationIdColumnName] != previousRow[calculationIdColumnName]
+                               || !ResultStartEqualsPreviousResultEnd(
+                                   currentRow,
+                                   previousRow,
+                                   querySnippetProvider.DatabricksContract),
+                           EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint,
+                           sqlStatement))
         {
-            var querySnippetProvider = _querySnippetProviderFactory.Create(parameters, timeSeriesType);
-
-            var calculationTypePerGridAreas =
-                await GetCalculationTypeForGridAreasAsync(
-                        querySnippetProvider.DatabricksContract.GetGridAreaCodeColumnName(),
-                        querySnippetProvider.DatabricksContract.GetCalculationTypeColumnName(),
-                        new AggregatedTimeSeriesCalculationTypeForGridAreasQueryStatement(
-                            _deltaTableOptions.Value,
-                            querySnippetProvider),
-                        parameters.BusinessReason,
-                        parameters.SettlementVersion)
-                    .ConfigureAwait(false);
-
-            var sqlStatement = new AggregatedTimeSeriesQueryStatement(
-                calculationTypePerGridAreas,
-                querySnippetProvider,
-                timeSeriesType,
-                _deltaTableOptions.Value);
-
-            var calculationIdColumnName = querySnippetProvider.DatabricksContract.GetCalculationIdColumnName();
-
-            await foreach (var aggregatedTimeSeries in CreateSeriesPackagesAsync(
-                               (row, points) => AggregatedTimeSeriesFactory.Create(
-                                   querySnippetProvider.DatabricksContract,
-                                   timeSeriesType,
-                                   row,
-                                   points),
-                               (currentRow, previousRow) =>
-                                   querySnippetProvider.DatabricksContract.GetColumnsToAggregateBy()
-                                       .Any(column => currentRow[column] != previousRow[column])
-                                   || currentRow[calculationIdColumnName] != previousRow[calculationIdColumnName]
-                                   || !ResultStartEqualsPreviousResultEnd(currentRow, previousRow, querySnippetProvider.DatabricksContract),
-                               EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint,
-                               sqlStatement))
-            {
-                yield return aggregatedTimeSeries;
-            }
+            yield return aggregatedTimeSeries;
         }
     }
 

@@ -95,8 +95,8 @@ public class ActorRequestsClient(
                 processId: orchestrationInstanceId,
                 eventId: eventId,
                 gridAreaCode: result.GridArea,
-                meteringPointType: GetMeteringPointType(result.TimeSeriesType).Name,
-                settlementMethod: GetSettlementMethod(result.TimeSeriesType),
+                meteringPointType: result.MeteringPointType.Name,
+                settlementMethod: result.SettlementMethod?.Name,
                 measureUnitType: MeasurementUnit.KilowattHour.Name, // "Unit is always Kwh for energy results" - it is hardcoded in the AggregatedTimeSeriesRequestAcceptedMessageFactory
                 resolution: GetResolution(result.Resolution).Name,
                 energySupplierNumber: aggregatedTimeSeriesQueryParameters.EnergySupplierId,
@@ -166,8 +166,8 @@ public class ActorRequestsClient(
                 Currency: GetCurrency(data.Currency),
                 ChargeType: chargeType,
                 Resolution: resolution,
-                MeteringPointType: GetMeteringPointType(data.MeteringPointType),
-                SettlementMethod: GetSettlementMethod(data.SettlementMethod),
+                MeteringPointType: data.MeteringPointType,
+                SettlementMethod: data.SettlementMethod,
                 OriginalTransactionIdReference: originalTransactionId);
 
             var enqueueWholesaleServicesMessage = AcceptedWholesaleServicesMessageDto.Create(
@@ -339,47 +339,6 @@ public class ActorRequestsClient(
         return false;
     }
 
-    private SettlementMethod? GetSettlementMethod(Interfaces.Models.CalculationResults.SettlementMethod? settlementMethod)
-    {
-        return settlementMethod switch
-        {
-            Interfaces.Models.CalculationResults.SettlementMethod.Flex => SettlementMethod.Flex,
-            Interfaces.Models.CalculationResults.SettlementMethod.NonProfiled => SettlementMethod.NonProfiled,
-            null => null,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(settlementMethod),
-                settlementMethod,
-                "Unknown settlement method"),
-        };
-    }
-
-    private MeteringPointType? GetMeteringPointType(Interfaces.Models.CalculationResults.MeteringPointType? meteringPointType)
-    {
-        return meteringPointType switch
-        {
-            Interfaces.Models.CalculationResults.MeteringPointType.Consumption => MeteringPointType.Consumption,
-            Interfaces.Models.CalculationResults.MeteringPointType.Production => MeteringPointType.Production,
-            Interfaces.Models.CalculationResults.MeteringPointType.Exchange => MeteringPointType.Exchange,
-            Interfaces.Models.CalculationResults.MeteringPointType.VeProduction => MeteringPointType.VeProduction,
-            Interfaces.Models.CalculationResults.MeteringPointType.NetProduction => MeteringPointType.NetProduction,
-            Interfaces.Models.CalculationResults.MeteringPointType.SupplyToGrid => MeteringPointType.SupplyToGrid,
-            Interfaces.Models.CalculationResults.MeteringPointType.ConsumptionFromGrid => MeteringPointType.ConsumptionFromGrid,
-            Interfaces.Models.CalculationResults.MeteringPointType.WholesaleServicesInformation => MeteringPointType.WholesaleServicesInformation,
-            Interfaces.Models.CalculationResults.MeteringPointType.OwnProduction => MeteringPointType.OwnProduction,
-            Interfaces.Models.CalculationResults.MeteringPointType.NetFromGrid => MeteringPointType.NetFromGrid,
-            Interfaces.Models.CalculationResults.MeteringPointType.NetToGrid => MeteringPointType.NetToGrid,
-            Interfaces.Models.CalculationResults.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
-            Interfaces.Models.CalculationResults.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
-            Interfaces.Models.CalculationResults.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
-            Interfaces.Models.CalculationResults.MeteringPointType.EffectSettlement => MeteringPointType.CapacitySettlement,
-            null => null,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(meteringPointType),
-                meteringPointType,
-                "Unknown metering point type"),
-        };
-    }
-
     private Resolution GetResolution(Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)
     {
         return resolution switch {
@@ -491,46 +450,4 @@ public class ActorRequestsClient(
 
         return MeasurementUnit.TryFromChargeType(chargeType);
     }
-
-    private MeteringPointType GetMeteringPointType(TimeSeriesType timeSeriesType) =>
-        timeSeriesType switch
-    {
-        TimeSeriesType.Production => MeteringPointType.Production,
-        TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,
-        TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption,
-        TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
-        TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
-        TimeSeriesType.GridLoss => MeteringPointType.Consumption,
-        TimeSeriesType.NegativeGridLoss => MeteringPointType.Production,
-        TimeSeriesType.PositiveGridLoss => MeteringPointType.Consumption,
-        TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
-        TimeSeriesType.TempFlexConsumption => MeteringPointType.Consumption,
-        TimeSeriesType.TempProduction => MeteringPointType.Production,
-
-        _ => throw new ArgumentOutOfRangeException(
-            nameof(timeSeriesType),
-            actualValue: timeSeriesType,
-            "Value cannot be mapped to a metering point type."),
-    };
-
-    private string? GetSettlementMethod(TimeSeriesType timeSeriesType) =>
-        timeSeriesType switch
-    {
-        TimeSeriesType.Production => null,
-        TimeSeriesType.FlexConsumption => SettlementMethod.Flex.Name,
-        TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled.Name,
-        TimeSeriesType.NetExchangePerGa => null,
-        TimeSeriesType.NetExchangePerNeighboringGa => null,
-        TimeSeriesType.GridLoss => null,
-        TimeSeriesType.NegativeGridLoss => null,
-        TimeSeriesType.PositiveGridLoss => SettlementMethod.Flex.Name,
-        TimeSeriesType.TotalConsumption => null,
-        TimeSeriesType.TempFlexConsumption => null,
-        TimeSeriesType.TempProduction => null,
-
-        _ => throw new ArgumentOutOfRangeException(
-            nameof(timeSeriesType),
-            actualValue: timeSeriesType,
-            "Value cannot be mapped to a settlement method."),
-    };
 }

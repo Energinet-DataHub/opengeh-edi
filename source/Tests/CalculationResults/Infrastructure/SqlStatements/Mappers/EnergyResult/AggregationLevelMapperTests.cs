@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using FluentAssertions;
 using Xunit;
 
@@ -22,59 +22,74 @@ namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.SqlState
 
 public class AggregationLevelMapperTests
 {
+    public static IEnumerable<object?[]> AggregationLevelData =>
+        new List<object?[]>
+        {
+            new object?[] { MeteringPointType.Exchange, null, null, null, AggregationLevel.GridArea },
+            new object?[] { MeteringPointType.Consumption, null, null, null, AggregationLevel.GridArea },
+            new object?[] { MeteringPointType.Production, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            new object?[] { MeteringPointType.Production, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
+            new object?[] { MeteringPointType.Production, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            new object?[] { null, null, null, null, AggregationLevel.GridArea },
+            new object?[] { null, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            new object?[] { null, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
+            new object?[] { null, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+        };
+
+    public static IEnumerable<object?[]> InvalidAggregationLevelData =>
+        new List<object?[]>
+        {
+            new object?[] { MeteringPointType.Exchange, null, "energySupplierGln", null, typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, null, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, null, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, SettlementMethod.NonProfiled, "energySupplierGln", null, typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, SettlementMethod.NonProfiled, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, SettlementMethod.NonProfiled, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, SettlementMethod.Flex, "energySupplierGln", null, typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, SettlementMethod.Flex, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Exchange, SettlementMethod.Flex, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Consumption, null, "energySupplierGln", null, typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Consumption, null, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            new object?[] { MeteringPointType.Consumption, null, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+        };
+
     [Theory]
-    [InlineData(TimeSeriesType.Production)]
-    [InlineData(TimeSeriesType.FlexConsumption)]
-    [InlineData(TimeSeriesType.NonProfiledConsumption)]
-    public void ToDeltaTableValue_WhenNoActorsSpecified_ReturnsExpectedAggLevel(TimeSeriesType type)
+    [MemberData(nameof(AggregationLevelData))]
+    public void Map_ReturnsExpectedAggregationLevel(
+        MeteringPointType? meteringPointType,
+        SettlementMethod? settlementMethod,
+        string? energySupplierGln,
+        string? balanceResponsiblePartyGln,
+        AggregationLevel expected)
     {
         // Act
-        const string expected = DeltaTableAggregationLevel.GridArea;
-        var actual = AggregationLevelMapper.ToDeltaTableValue(type, null, null);
+        var actual = AggregationLevelMapper.Map(
+            meteringPointType,
+            settlementMethod,
+            energySupplierGln,
+            balanceResponsiblePartyGln);
 
         // Assert
         actual.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData(TimeSeriesType.Production)]
-    [InlineData(TimeSeriesType.FlexConsumption)]
-    [InlineData(TimeSeriesType.NonProfiledConsumption)]
-    public void ToDeltaTableValue_WhenEnergySupplierIsNotNull_ReturnsExpectedAggLevel(TimeSeriesType type)
+    [MemberData(nameof(InvalidAggregationLevelData))]
+    public void Map_WhenInvalidCombinationForConsumption_ThrowsInvalidOperationException(
+        MeteringPointType? meteringPointType,
+        SettlementMethod? settlementMethod,
+        string? energySupplierGln,
+        string? balanceResponsiblePartyGln,
+        Type expectedException)
     {
-        // Act
-        const string expected = DeltaTableAggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea;
-        var actual = AggregationLevelMapper.ToDeltaTableValue(type, "someEnergySupplier", null);
+        // Arrange & Act
+        var act = () => (object?)AggregationLevelMapper.Map(
+            meteringPointType,
+            settlementMethod,
+            energySupplierGln,
+            balanceResponsiblePartyGln);
 
         // Assert
-        actual.Should().Be(expected);
-    }
-
-    [Theory]
-    [InlineData(TimeSeriesType.Production)]
-    [InlineData(TimeSeriesType.FlexConsumption)]
-    [InlineData(TimeSeriesType.NonProfiledConsumption)]
-    public void ToDeltaTableValue_WhenBalanceResponsibleIsNotNull_ReturnsExpectedAggLevel(TimeSeriesType type)
-    {
-        // Act
-        const string expected = DeltaTableAggregationLevel.BalanceResponsibleAndGridArea;
-        var actual = AggregationLevelMapper.ToDeltaTableValue(type, null, "somBalanceResponsible");
-
-        // Assert
-        actual.Should().Be(expected);
-    }
-
-    [Theory]
-    [InlineData(TimeSeriesType.Production)]
-    [InlineData(TimeSeriesType.FlexConsumption)]
-    [InlineData(TimeSeriesType.NonProfiledConsumption)]
-    public void ToDeltaTableValue_WhenNeitherEnergySupplierAndBalanceResponsibleIsNull_ReturnsExpectedAggLevel(TimeSeriesType type)
-    {
-        // Act
-        const string expected = DeltaTableAggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea;
-        var actual = AggregationLevelMapper.ToDeltaTableValue(type, "someEnergySupplier", "somBalanceResponsible");
-
-        // Assert
-        actual.Should().Be(expected);
+        Assert.Throws(expectedException, act);
     }
 }

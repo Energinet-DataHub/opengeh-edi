@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.Wholesale.Edi.Client;
 using Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
-using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Microsoft.Extensions.Logging;
@@ -130,7 +129,8 @@ public class AggregatedTimeSeriesRequestHandler(
         AggregatedTimeSeriesRequest request)
     {
         return new AggregatedTimeSeriesQueryParameters(
-            request.TimeSeriesTypes.Select(CalculationTimeSeriesTypeMapper.MapTimeSeriesTypeFromEdi).ToList(),
+            MeteringPointType.Production,
+            SettlementMethod.NonProfiled,
             request.AggregationPerRoleAndGridArea.GridAreaCodes,
             request.AggregationPerRoleAndGridArea.EnergySupplierId,
             request.AggregationPerRoleAndGridArea.BalanceResponsibleId,

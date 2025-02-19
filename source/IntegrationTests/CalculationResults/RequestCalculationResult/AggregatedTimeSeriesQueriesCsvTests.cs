@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Calculati
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -91,7 +90,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.FlexConsumption, TimeSeriesType.NonProfiledConsumption],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.NonProfiled,
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: null,
@@ -104,27 +104,21 @@ public class AggregatedTimeSeriesQueriesCsvTests
 
             using var assertionScope = new AssertionScope();
             actual.Should().HaveCount(18);
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 16),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 16),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -150,7 +144,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.FlexConsumption, TimeSeriesType.Production],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.Flex,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: EnergySupplierOne,
                 BalanceResponsibleId: null,
@@ -162,21 +157,15 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -202,7 +191,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.FlexConsumption, TimeSeriesType.Production],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.Flex,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: EnergySupplierOne,
                 BalanceResponsibleId: BalanceResponsibleOne,
@@ -214,15 +204,15 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -248,7 +238,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.FlexConsumption],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.Flex,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: null,
                 BalanceResponsibleId: BalanceResponsibleOne,
@@ -261,16 +252,16 @@ public class AggregatedTimeSeriesQueriesCsvTests
 
             using var assertionScope = new AssertionScope();
             actual.Should().HaveCount(6);
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.Version))
                 .OrderBy(t => t.PeriodStart)
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("804", TimeSeriesType.FlexConsumption, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -296,7 +287,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.Production],
+                MeteringPointType: MeteringPointType.Production,
+                SettlementMethod: null,
                 GridAreaCodes: ["804"],
                 EnergySupplierId: null,
                 BalanceResponsibleId: null,
@@ -309,15 +301,15 @@ public class AggregatedTimeSeriesQueriesCsvTests
 
             using var assertionScope = new AssertionScope();
             actual.Should().HaveCount(6);
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
-                    ("804", TimeSeriesType.Production, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
+                    ("804", MeteringPointType.Production, (SettlementMethod?)null, Instant.FromUtc(2022, 1, 5, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 6),
+                    ("804", MeteringPointType.Production, null, Instant.FromUtc(2022, 1, 7, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 6),
+                    ("804", MeteringPointType.Production, null, Instant.FromUtc(2022, 1, 1, 23, 0), Instant.FromUtc(2022, 1, 3, 23, 0), 8),
+                    ("804", MeteringPointType.Production, null, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 7, 23, 0), 8),
+                    ("804", MeteringPointType.Production, null, Instant.FromUtc(2022, 1, 3, 23, 0), Instant.FromUtc(2022, 1, 5, 23, 0), 8),
+                    ("804", MeteringPointType.Production, null, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 1, 23, 0), 7),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -343,7 +335,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.NonProfiledConsumption],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.NonProfiled,
                 GridAreaCodes: ["543"],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: BalanceResponsibleOne,
@@ -355,13 +348,13 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 2, 23, 0), 9),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 2, 23, 0), Instant.FromUtc(2022, 1, 4, 23, 0), 10),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 4, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 11),
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 9),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 2, 23, 0), 9),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 2, 23, 0), Instant.FromUtc(2022, 1, 4, 23, 0), 10),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 4, 23, 0), Instant.FromUtc(2022, 1, 6, 23, 0), 11),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 6, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), 9),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -387,7 +380,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.NonProfiledConsumption],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.NonProfiled,
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierThree,
                 BalanceResponsibleId: BalanceResponsibleOne,
@@ -399,12 +393,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
                     ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("543", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 4),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
+                    ("543", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 4),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -430,7 +424,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.NonProfiledConsumption],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.NonProfiled,
                 GridAreaCodes: [],
                 EnergySupplierId: null,
                 BalanceResponsibleId: null,
@@ -497,7 +492,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.NonProfiledConsumption],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.NonProfiled,
                 GridAreaCodes: [],
                 EnergySupplierId: "5790002617263",
                 BalanceResponsibleId: null,
@@ -509,11 +505,11 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
                     ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 4, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 4, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -546,7 +542,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.NonProfiledConsumption],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.NonProfiled,
                 GridAreaCodes: [],
                 EnergySupplierId: "5790002617263",
                 BalanceResponsibleId: null,
@@ -558,12 +555,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason,
                     ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 3, 1, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
-                    ("804", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2022, 1, 5, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 3, 1, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
+                    ("804", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2022, 1, 5, 1, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.ThirdCorrection, 2),
                 ]);
 
             actual.Should().AllSatisfy(ats =>
@@ -588,7 +585,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.NonProfiledConsumption, TimeSeriesType.FlexConsumption, TimeSeriesType.Production],
+                MeteringPointType: MeteringPointType.Production,
+                SettlementMethod: null,
                 GridAreaCodes: [],
                 EnergySupplierId: null,
                 BalanceResponsibleId: BalanceResponsibleOne,
@@ -614,7 +612,8 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                TimeSeriesTypes: [TimeSeriesType.NonProfiledConsumption, TimeSeriesType.FlexConsumption, TimeSeriesType.Production],
+                MeteringPointType: MeteringPointType.Consumption,
+                SettlementMethod: SettlementMethod.Flex,
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierTwo,
                 BalanceResponsibleId: BalanceResponsibleOne,
@@ -626,11 +625,10 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Select(ats => (ats.GridArea, ats.TimeSeriesType, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason, ats.SettlementVersion, ats.Version))
+            actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.BusinessReason, ats.SettlementVersion, ats.Version))
                 .Should()
                 .BeEquivalentTo([
-                    ("584", TimeSeriesType.FlexConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
-                    ("584", TimeSeriesType.NonProfiledConsumption, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
+                    ("584", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
                 ]);
         }
     }

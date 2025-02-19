@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
@@ -25,20 +24,17 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Calcu
 public sealed class AggregatedTimeSeriesQuerySnippetProviderFactory(
     IEnumerable<IAggregatedTimeSeriesDatabricksContract> databricksContracts)
 {
-    private readonly Dictionary<string, IAggregatedTimeSeriesDatabricksContract> _databricksContracts =
+    private readonly Dictionary<AggregationLevel, IAggregatedTimeSeriesDatabricksContract> _databricksContracts =
         databricksContracts
             .DistinctBy(dc => dc.GetAggregationLevel())
             .ToDictionary(dc => dc.GetAggregationLevel());
 
     public AggregatedTimeSeriesQuerySnippetProvider Create(
         AggregatedTimeSeriesQueryParameters parameters,
-        TimeSeriesType timeSeriesType)
+        AggregationLevel aggregationLevel)
     {
         return new AggregatedTimeSeriesQuerySnippetProvider(
             parameters,
-            _databricksContracts[AggregationLevelMapper.ToDeltaTableValue(
-                timeSeriesType,
-                parameters.EnergySupplierId,
-                parameters.BalanceResponsibleId)]);
+            _databricksContracts[aggregationLevel]);
     }
 }

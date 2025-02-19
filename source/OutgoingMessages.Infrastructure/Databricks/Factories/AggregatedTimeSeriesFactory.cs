@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
@@ -24,20 +25,26 @@ public static class AggregatedTimeSeriesFactory
 {
     public static AggregatedTimeSeries Create(
         IAggregatedTimeSeriesDatabricksContract databricksContract,
-        TimeSeriesType timeSeriesType,
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         var gridArea = databricksSqlRow[databricksContract.GetGridAreaCodeColumnName()];
-        var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow[databricksContract.GetResolutionColumnName()]!);
+        var resolution = ResolutionMapper.FromDeltaTableValue(
+            databricksSqlRow.ToNonEmptyString(databricksContract.GetResolutionColumnName()));
         var (periodStart, periodEnd) = PeriodHelper.GetPeriod(timeSeriesPoints, resolution);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(databricksContract.GetCalculationTypeColumnName()));
+        var meteringPointType = MeteringPointTypeMapper.FromDeltaTableValue(
+            databricksSqlRow.ToNonEmptyString(databricksContract.GetMeteringPointTypeColumnName()));
+        var settlementMethod =
+            SettlementMethodMapper.FromDeltaTableValue(
+                databricksSqlRow[databricksContract.GetSettlementMethodColumnName()]);
 
         return new AggregatedTimeSeries(
             gridArea: gridArea!,
             timeSeriesPoints: [.. timeSeriesPoints],
-            timeSeriesType: timeSeriesType,
+            meteringPointType: meteringPointType,
+            settlementMethod: settlementMethod,
             businessReason: businessReason,
             settlementVersion: settlementVersion,
             periodStart: periodStart,

@@ -13,16 +13,18 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 
+// TODO: add unit tests
 public static class SettlementMethodMapper
 {
     public static SettlementMethod? FromDeltaTableValue(string? settlementMethod) =>
         settlementMethod switch
         {
-            "flex" => SettlementMethod.Flex,
-            "non_profiled" => SettlementMethod.NonProfiled,
+            DeltaTableSettlementMethod.Flex => SettlementMethod.Flex,
+            DeltaTableSettlementMethod.NonProfiled => SettlementMethod.NonProfiled,
             null => null,
 
             _ => throw new ArgumentOutOfRangeException(
@@ -30,4 +32,22 @@ public static class SettlementMethodMapper
                 actualValue: settlementMethod,
                 "Value does not contain a valid string representation of a settlement method."),
         };
+
+    public static string? ToDeltaTableValue(SettlementMethod? settlementMethod)
+    {
+        if (settlementMethod == null) return null;
+
+        Dictionary<SettlementMethod, string> settlementMethodMap = new()
+        {
+            { SettlementMethod.Flex, DeltaTableSettlementMethod.Flex },
+            { SettlementMethod.NonProfiled, DeltaTableSettlementMethod.NonProfiled },
+        };
+
+        if (!settlementMethodMap.TryGetValue(settlementMethod, out var value))
+        {
+            throw new ArgumentOutOfRangeException(nameof(settlementMethod), settlementMethod, "Value does not contain a valid string representation of a settlement method.");
+        }
+
+        return value;
+    }
 }

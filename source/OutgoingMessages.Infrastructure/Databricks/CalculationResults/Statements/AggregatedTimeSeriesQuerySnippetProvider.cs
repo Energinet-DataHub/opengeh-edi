@@ -39,27 +39,12 @@ public sealed class AggregatedTimeSeriesQuerySnippetProvider(
                 """;
     }
 
-    internal string GetSelection(string table, TimeSeriesType? timeSeriesType)
+    internal string GetSelection(string table)
     {
-        if (timeSeriesType is not null)
-        {
-            return $"""
-                    ({GetTimeSeriesTypeSelection(
-                        _queryParameters,
-                        timeSeriesType.Value,
-                        table)})
-                    """;
-        }
-
         return $"""
-                ({string.Join(
-                    " OR ",
-                    _queryParameters.TimeSeriesTypes
-                        .Select(tst => GetTimeSeriesTypeSelection(
-                            _queryParameters,
-                            tst,
-                            table))
-                        .Select(s => $"({s})"))})
+                ({GetTimeSeriesTypeSelection(
+                    _queryParameters,
+                    table)})
                 """;
     }
 
@@ -97,23 +82,18 @@ public sealed class AggregatedTimeSeriesQuerySnippetProvider(
 
     private string GetTimeSeriesTypeSelection(
         AggregatedTimeSeriesQueryParameters parameters,
-        TimeSeriesType timeSeriesType,
         string table)
     {
-        var meteringPointType = Mappers.MeteringPointTypeMapper.ToDeltaTableValue(
-            Mappers.MeteringPointTypeMapper.FromTimeSeriesTypeDeltaTableValue(
-                TimeSeriesTypeMapper.ToDeltaTableValue(timeSeriesType)));
-        var settlementMethod = Mappers.SettlementMethodMapper.ToDeltaTableValue(
-            Mappers.SettlementMethodMapper.FromTimeSeriesTypeDeltaTableValue(
-                TimeSeriesTypeMapper.ToDeltaTableValue(timeSeriesType)));
+        var meteringPointTypeDeltaTableValue = MeteringPointTypeMapper.ToDeltaTableValue(parameters.MeteringPointType);
+        var settlementMethodDeltaTableValue = SettlementMethodMapper.ToDeltaTableValue(parameters.SettlementMethod);
 
         var sqlConstraint =
-            $"""
-             {table}.{DatabricksContract.GetMeteringPointTypeColumnName()} = '{meteringPointType}'
-             {(settlementMethod is not null ? $"AND {table}.{DatabricksContract.GetSettlementMethodColumnName()} = '{settlementMethod}'" : $"AND {table}.{DatabricksContract.GetSettlementMethodColumnName()} is null")} 
-             AND ({table}.{DatabricksContract.GetTimeColumnName()} >= '{parameters.Period.Start}'
-                  AND {table}.{DatabricksContract.GetTimeColumnName()} < '{parameters.Period.End}')
-             """;
+                $"""
+                     {(meteringPointTypeDeltaTableValue is not null ? $"{table}.{DatabricksContract.GetMeteringPointTypeColumnName()} = '{meteringPointTypeDeltaTableValue}' AND " : string.Empty)}
+                     {(settlementMethodDeltaTableValue is not null ? $"{table}.{DatabricksContract.GetSettlementMethodColumnName()} = '{settlementMethodDeltaTableValue}' AND " : string.Empty)} 
+                     ({table}.{DatabricksContract.GetTimeColumnName()} >= '{parameters.Period.Start}'
+                          AND {table}.{DatabricksContract.GetTimeColumnName()} < '{parameters.Period.End}')
+                     """.Trim();
 
         if (parameters.GridAreaCodes.Count > 0)
         {
