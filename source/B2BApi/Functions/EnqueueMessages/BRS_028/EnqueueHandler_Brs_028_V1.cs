@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Mappers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -74,7 +75,7 @@ public class EnqueueHandler_Brs_028_V1(
             RequestedForEnergySupplier: acceptedData.RequestedForActorRole == ActorRole.EnergySupplier,
             RequestedForActorNumber: acceptedData.RequestedForActorNumber.Value);
 
-        var amountTypes = GetAmountTypes(acceptedData.Resolution, acceptedData.ChargeTypes);
+        var amountTypes = AmountTypeMapper.Map(acceptedData.Resolution, acceptedData.ChargeTypes);
 
         var totalEnqueuedCount = 0;
         foreach (var amountType in amountTypes)

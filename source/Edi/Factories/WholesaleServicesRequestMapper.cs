@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using Google.Protobuf.Collections;
@@ -36,7 +37,8 @@ public class WholesaleServicesRequestMapper(DateTimeZone dateTimeZone)
         var resolution = request.HasResolution ? ResolutionMapper.Map(request.Resolution) : (Resolution?)null;
 
         // If no charge types are requested, both monthly amount and total monthly amount is requested
-        var amountTypes = AmountTypeMapper.Map(resolution, AllChargesIsRequested(request));
+        // NOT USED!
+        var amountTypes = new List<AmountType>();
 
         return amountTypes.Select(amountType => new WholesaleServicesRequest(
                 amountType,
@@ -53,11 +55,6 @@ public class WholesaleServicesRequestMapper(DateTimeZone dateTimeZone)
                 request.RequestedForActorRole,
                 request.RequestedForActorNumber))
             .ToList();
-    }
-
-    private static bool AllChargesIsRequested(DataHub.Edi.Requests.WholesaleServicesRequest request)
-    {
-        return request.ChargeTypes.Count == 0;
     }
 
     private List<ChargeCodeAndType> MapChargeTypes(RepeatedField<Energinet.DataHub.Edi.Requests.ChargeType> chargeTypes)
