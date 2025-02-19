@@ -30,13 +30,13 @@ public class ChargeTypeMapperTests
 
     [Theory]
     [MemberData(nameof(GetChargeTypeTestData))]
-    public void FromDeltaTableValue_WhenValidDeltaTableValue_ReturnsExpectedType(string deltaTableValue, ChargeType buildingBlockType)
+    public void FromDeltaTableValue_WhenValidDeltaTableValue_ReturnsExpectedType(string deltaTableValue, ChargeType expectedChargeType)
     {
         // Act
         var actualType = ChargeTypeMapper.FromDeltaTableValue(deltaTableValue);
 
         // Assert
-        actualType.Should().Be(buildingBlockType);
+        actualType.Should().Be(expectedChargeType);
     }
 
     [Theory]
