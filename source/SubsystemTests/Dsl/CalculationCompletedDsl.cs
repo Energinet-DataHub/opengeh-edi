@@ -75,6 +75,34 @@ public sealed class CalculationCompletedDsl
         return orchestration;
     }
 
+    internal static async Task<DurableOrchestrationStatus> StartEnqueueMessagesOrchestration(
+        ITestOutputHelper logger,
+        WholesaleDriver wholesaleDriver,
+        EdiDriver ediDriver,
+        Guid calculationId,
+        CalculationType calculationType)
+    {
+        // Get current instant and subtract 10 second to ensure that the orchestration is started after the instant
+        // In some cases the orchestration can be started before a second has passed which meant that the orchestration
+        // would not be retrieved by the durable client
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(10));
+
+        logger.WriteLine("Publish calculation completed for calculation with id {0}", calculationId);
+        await wholesaleDriver.PublishCalculationCompletedAsync(calculationId, calculationType);
+
+        logger.WriteLine(
+            "Wait for message orchestration to be started after {0}",
+            orchestrationStartedAfter.ToString());
+        var orchestration = await ediDriver.WaitForOrchestrationStartedAsync(orchestrationStartedAfter);
+        orchestration.Input.Value<string>("CalculationId")
+            .Should()
+            .Be(
+                calculationId.ToString(),
+                $"because the orchestration should be for the given calculation id {calculationId}");
+
+        return orchestration;
+    }
+
     internal async Task PublishForBalanceFixingCalculation()
     {
         await _ediDriver.EmptyQueueAsync();
@@ -187,9 +215,10 @@ public sealed class CalculationCompletedDsl
         var orchestrationStartedAt = SystemClock.Instance.GetCurrentInstant();
         var orchestration = await StartEnqueueMessagesOrchestration(
             _logger,
-            _processManagerDriver,
+            _wholesaleDriver,
             _ediDriver,
-            calculationId);
+            calculationId,
+            calculationType);
 
         _logger.WriteLine("Wait for message orchestration to be completed for instance id {0}", orchestration.InstanceId);
         await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
