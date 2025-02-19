@@ -52,9 +52,8 @@ public sealed class CalculationCompletedDsl
 
     internal static async Task<DurableOrchestrationStatus> StartEnqueueMessagesOrchestration(
         ITestOutputHelper logger,
-        WholesaleDriver wholesaleDriver,
+        ProcessManagerDriver processManagerDriver,
         EdiDriver ediDriver,
-        CalculationType calculationType,
         Guid calculationId)
     {
         // Get current instant and subtract 10 second to ensure that the orchestration is started after the instant
@@ -63,9 +62,7 @@ public sealed class CalculationCompletedDsl
         var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(10));
 
         logger.WriteLine("Publish calculation completed for calculation with id {0}", calculationId);
-        await wholesaleDriver.PublishCalculationCompletedAsync(
-            calculationId,
-            calculationType);
+        await processManagerDriver.PublishEnqueueBrs023_027RequestAsync(calculationId);
 
         logger.WriteLine("Wait for message orchestration to be started after {0}", orchestrationStartedAfter.ToString());
         var orchestration = await ediDriver.WaitForOrchestrationStartedAsync(orchestrationStartedAfter);
@@ -190,9 +187,8 @@ public sealed class CalculationCompletedDsl
         var orchestrationStartedAt = SystemClock.Instance.GetCurrentInstant();
         var orchestration = await StartEnqueueMessagesOrchestration(
             _logger,
-            _wholesaleDriver,
+            _processManagerDriver,
             _ediDriver,
-            calculationType,
             calculationId);
 
         _logger.WriteLine("Wait for message orchestration to be completed for instance id {0}", orchestration.InstanceId);
