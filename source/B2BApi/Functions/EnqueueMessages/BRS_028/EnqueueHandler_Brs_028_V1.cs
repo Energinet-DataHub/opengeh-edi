@@ -23,7 +23,6 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
 using ActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
-using ChargeType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.ChargeType;
 using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
@@ -62,7 +61,9 @@ public class EnqueueHandler_Brs_028_V1(
             EnergySupplierId: acceptedData.EnergySupplierNumber?.Value,
             ChargeOwnerId: acceptedData.ChargeOwnerNumber?.Value,
             ChargeTypes: acceptedData.ChargeTypes.Select(
-                    ct => (ct.ChargeCode, GetChargeType(ct.ChargeType)))
+                    ct => (
+                        ct.ChargeCode,
+                        ct.ChargeType == null ? null : BuildingBlocks.Domain.Models.ChargeType.FromName(ct.ChargeType.Name)))
                 .ToList(),
             BusinessReason: BuildingBlocks.Domain.Models.BusinessReason.FromName(acceptedData.BusinessReason.Name),
             SettlementVersion: settlementVersion,
@@ -169,25 +170,6 @@ public class EnqueueHandler_Brs_028_V1(
                     RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)
             .ConfigureAwait(false);
-    }
-
-    private Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? GetChargeType(
-        ChargeType? chargeType)
-    {
-        if (chargeType is null)
-            return null;
-
-        if (chargeType == ChargeType.Subscription)
-            return EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription;
-        if (chargeType == ChargeType.Fee)
-            return EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Fee;
-        if (chargeType == ChargeType.Tariff)
-            return EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff;
-
-        throw new ArgumentOutOfRangeException(
-            nameof(chargeType),
-            chargeType,
-            "Unknown charge type name");
     }
 
     private IReadOnlyCollection<AmountType> GetAmountTypes(

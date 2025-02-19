@@ -21,7 +21,7 @@ public record WholesaleServices(
     string GridArea,
     string EnergySupplierId,
     string? ChargeCode,
-    ChargeType? ChargeType,
+    Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType? ChargeType,
     string? ChargeOwnerId,
     AmountType AmountType,
     Resolution Resolution,

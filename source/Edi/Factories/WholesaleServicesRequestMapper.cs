@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using Google.Protobuf.Collections;
@@ -64,7 +65,7 @@ public class WholesaleServicesRequestMapper(DateTimeZone dateTimeZone)
         return chargeTypes
             .Select(c => new ChargeCodeAndType(
                 c.HasChargeCode ? c.ChargeCode : null,
-                c.HasChargeType_ ? ChargeTypeMapper.Map(c.ChargeType_) : null))
+                c.HasChargeType_ ? ChargeType.FromName(c.ChargeType_) : null))
             .ToList();
     }
 
