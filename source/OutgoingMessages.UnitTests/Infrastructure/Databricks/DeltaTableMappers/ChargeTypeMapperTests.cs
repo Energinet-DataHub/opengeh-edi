@@ -15,9 +15,8 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.SqlStatements.Mappers.WholesaleResult;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databricks.DeltaTableMappers;
 
 public class ChargeTypeMapperTests
 {
@@ -30,28 +29,19 @@ public class ChargeTypeMapperTests
 
     [Theory]
     [MemberData(nameof(GetChargeTypeTestData))]
-    public void FromDeltaTableValue_WhenValidDeltaTableValue_ReturnsExpectedType(string deltaTableValue, ChargeType expectedChargeType)
+    public void Given_ChargeType_When_MappingToAndFromDeltaTable_Then_ReturnsExpectedValue(string deltaTableValue, ChargeType chargeType)
     {
         // Act
         var actualType = ChargeTypeMapper.FromDeltaTableValue(deltaTableValue);
-
-        // Assert
-        actualType.Should().Be(expectedChargeType);
-    }
-
-    [Theory]
-    [MemberData(nameof(GetChargeTypeTestData))]
-    public void ToDeltaTableValue_WhenValidChargeTypeValue_ReturnsExpectedString(string expectedDeltaTableValue, ChargeType chargeType)
-    {
-        // Act
         var actualDeltaTableValue = ChargeTypeMapper.ToDeltaTableValue(chargeType);
 
         // Assert
-        actualDeltaTableValue.Should().Be(expectedDeltaTableValue);
+        actualType.Should().Be(chargeType);
+        actualDeltaTableValue.Should().Be(deltaTableValue);
     }
 
     [Fact]
-    public void FromDeltaTableValue_WhenInvalidDeltaTableValue_ThrowsArgumentOutOfRangeException()
+    public void Given_invalidDatabricksChargeType_When_MappingToChargeType_Then_ThrowsException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
@@ -65,7 +55,7 @@ public class ChargeTypeMapperTests
     }
 
     [Fact]
-    public void ToDeltaTableValue_WhenInvalidChargeTypeValue_ThrowsArgumentOutOfRangeException()
+    public void Given_invalidChargeType_When_MappingToDatabricksChargeType_Then_ThrowsException()
     {
         // Arrange
         ChargeType invalidChargeTypeValue = null!;
