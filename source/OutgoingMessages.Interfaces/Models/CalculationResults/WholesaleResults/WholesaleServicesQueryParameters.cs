@@ -21,7 +21,7 @@ public record WholesaleServicesQueryParameters(
     IReadOnlyCollection<string> GridAreaCodes,
     string? EnergySupplierId,
     string? ChargeOwnerId,
-    List<(string? ChargeCode, Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType? ChargeType)> ChargeTypes,
+    List<(string? ChargeCode, ChargeType? ChargeType)> ChargeTypes,
     BusinessReason BusinessReason,
     SettlementVersion? SettlementVersion,
     Period Period,
