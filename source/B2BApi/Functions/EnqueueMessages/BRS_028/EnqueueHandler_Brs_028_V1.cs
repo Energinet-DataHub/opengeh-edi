@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Mappers;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
@@ -72,7 +73,7 @@ public class EnqueueHandler_Brs_028_V1(
             RequestedForEnergySupplier: acceptedData.RequestedForActorRole == ActorRole.EnergySupplier,
             RequestedForActorNumber: acceptedData.RequestedForActorNumber.Value);
 
-        var amountTypes = GetAmountTypes(acceptedData.Resolution, acceptedData.ChargeTypes);
+        var amountTypes = AmountTypeMapper.Map(acceptedData.Resolution, acceptedData.ChargeTypes);
 
         var totalEnqueuedCount = 0;
         foreach (var amountType in amountTypes)
@@ -188,36 +189,5 @@ public class EnqueueHandler_Brs_028_V1(
             nameof(chargeType),
             chargeType,
             "Unknown charge type name");
-    }
-
-    private IReadOnlyCollection<AmountType> GetAmountTypes(
-        Resolution? resolution,
-        IReadOnlyCollection<RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType> chargeTypes)
-    {
-        if (resolution is null)
-            return [AmountType.AmountPerCharge];
-
-        if (resolution == Resolution.Monthly)
-        {
-            var isRequestForAllCharges = chargeTypes.Count == 0;
-            return isRequestForAllCharges
-                ? [AmountType.MonthlyAmountPerCharge, AmountType.TotalMonthlyAmount]
-                : [AmountType.MonthlyAmountPerCharge];
-        }
-
-        // This case shouldn't be possible, since it should be enforced by our validation that the resolution
-        // is either null for a Resolution.Month for monthly_amount_per_charge or null for a amount_per_charge
-        if (resolution == Resolution.Hourly || resolution == Resolution.Daily || resolution == Resolution.QuarterHourly)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(resolution),
-                resolution,
-                $"{nameof(Resolution)} should be either {nameof(Resolution.Monthly)} or null while converting to {nameof(AmountType)}");
-        }
-
-        throw new ArgumentOutOfRangeException(
-            nameof(resolution),
-            resolution,
-            $"Unknown {nameof(Resolution)} value while converting to {nameof(AmountType)}");
     }
 }
