@@ -16,4 +16,4 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.Wholesale.Edi.Models;
 
-public record ChargeCodeAndType(string? ChargeCod, ChargeType? ChargeType);
+public record ChargeCodeAndType(string? ChargeCode, ChargeType? ChargeType);
