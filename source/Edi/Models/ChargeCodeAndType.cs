@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.Wholesale.Edi.Models;
 
-public record ChargeCodeAndType(string? ChargeCode, Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType? ChargeType);
+public record ChargeCodeAndType(string? ChargeCod, ChargeType? ChargeType);

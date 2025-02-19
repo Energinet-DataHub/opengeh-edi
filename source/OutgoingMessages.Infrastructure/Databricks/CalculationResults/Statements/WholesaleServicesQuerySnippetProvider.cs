@@ -61,7 +61,7 @@ public sealed class WholesaleServicesQuerySnippetProvider(
         if (_queryParameters.ChargeTypes.Count != 0)
         {
             var chargeTypesSql = _queryParameters.ChargeTypes
-                .Select<(string? ChargeCode, Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType? ChargeType), string>(c =>
+                .Select<(string? ChargeCode, ChargeType? ChargeType), string>(c =>
                     GetChargeTypeSelection(c.ChargeCode, c.ChargeType, table))
                 .ToList();
 
@@ -222,7 +222,7 @@ public sealed class WholesaleServicesQuerySnippetProvider(
 
     private string GetChargeTypeSelection(
         string? chargeCode,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType? chargeType,
+        ChargeType? chargeType,
         string table)
     {
         if (chargeCode == null && chargeType == null)
