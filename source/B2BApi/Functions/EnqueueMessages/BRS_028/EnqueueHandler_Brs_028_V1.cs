@@ -173,35 +173,4 @@ public class EnqueueHandler_Brs_028_V1(
                 CancellationToken.None)
             .ConfigureAwait(false);
     }
-
-    private IReadOnlyCollection<AmountType> GetAmountTypes(
-        Resolution? resolution,
-        IReadOnlyCollection<RequestCalculatedWholesaleServicesAcceptedV1.AcceptedChargeType> chargeTypes)
-    {
-        if (resolution is null)
-            return [AmountType.AmountPerCharge];
-
-        if (resolution == Resolution.Monthly)
-        {
-            var isRequestForAllCharges = chargeTypes.Count == 0;
-            return isRequestForAllCharges
-                ? [AmountType.MonthlyAmountPerCharge, AmountType.TotalMonthlyAmount]
-                : [AmountType.MonthlyAmountPerCharge];
-        }
-
-        // This case shouldn't be possible, since it should be enforced by our validation that the resolution
-        // is either null for a Resolution.Month for monthly_amount_per_charge or null for a amount_per_charge
-        if (resolution == Resolution.Hourly || resolution == Resolution.Daily || resolution == Resolution.QuarterHourly)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(resolution),
-                resolution,
-                $"{nameof(Resolution)} should be either {nameof(Resolution.Monthly)} or null while converting to {nameof(AmountType)}");
-        }
-
-        throw new ArgumentOutOfRangeException(
-            nameof(resolution),
-            resolution,
-            $"Unknown {nameof(Resolution)} value while converting to {nameof(AmountType)}");
-    }
 }
