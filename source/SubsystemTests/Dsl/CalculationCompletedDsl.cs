@@ -14,6 +14,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -61,7 +63,10 @@ public sealed class CalculationCompletedDsl
         // would not be retrieved by the durable client
         var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(10));
 
-        logger.WriteLine("Publish nameof(EnqueueActorMessagesV1) with nameof(CalculationEnqueueActorMessagesV1) for calculation with id {0}", calculationId);
+        logger.WriteLine(
+            $"Publish {nameof(EnqueueActorMessagesV1)} with {nameof(CalculationEnqueueActorMessagesV1)} for calculation with id {0}",
+            calculationId);
+
         await processManagerDriver.PublishEnqueueBrs023_027RequestAsync(calculationId);
 
         logger.WriteLine("Wait for message orchestration to be started after {0}", orchestrationStartedAfter.ToString());
