@@ -163,9 +163,6 @@ public class IncomingMessagesTestBase : IDisposable
     {
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
-            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
-            Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
-        Environment.SetEnvironmentVariable(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 

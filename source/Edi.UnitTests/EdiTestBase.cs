@@ -50,8 +50,6 @@ public class EdiTestBase
             ["DB_CONNECTION_STRING"] = _ediFixture.DatabaseManager.ConnectionString,
             [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}"] =
                 "https://fake.fakeurl.com",
-            [$"{BlobServiceClientConnectionOptions.SectionName}:{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}"] =
-                "https://fake.fakeurl.com",
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
         });
 

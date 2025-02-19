@@ -51,11 +51,6 @@ public enum FeatureFlagName
     UseRequestAggregatedMeasureDataProcessOrchestration,
 
     /// <summary>
-    /// Whether to start using standard blob service client.
-    /// </summary>
-    UseStandardBlobServiceClient,
-
-    /// <summary>
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
     /// </summary>
     UseProcessManagerToEnqueueBrs023027Messages,

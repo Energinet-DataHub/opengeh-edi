@@ -67,9 +67,6 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
             TestEnvironment.CreateFakeStorageUrl());
-        Environment.SetEnvironmentVariable(
-            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
-            TestEnvironment.CreateFakeStorageUrl());
 
         Environment.SetEnvironmentVariable($"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", TestEnvironment.CreateFakeServiceBusFullyQualifiedNamespace());
 
