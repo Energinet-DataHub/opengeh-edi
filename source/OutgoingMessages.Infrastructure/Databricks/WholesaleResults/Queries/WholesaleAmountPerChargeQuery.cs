@@ -15,7 +15,6 @@
 using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
@@ -123,7 +122,7 @@ public class WholesaleAmountPerChargeQuery(
             chargeType: chargeType,
             resolution: resolution,
             settlementVersion: settlementVersion,
-            meteringPointType: MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.MeteringPointType)),
+            meteringPointType: CalculationResults.Mappers.WholesaleResults.MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.MeteringPointType)),
             settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.SettlementMethod)),
             chargeCode: databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeCode),
             points: timeSeriesPoints
