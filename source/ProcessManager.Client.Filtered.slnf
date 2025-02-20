@@ -1,9 +1,0 @@
-{
-  "solution": {
-    "path": "Edi.Repository.sln",
-    "projects": [
-      "ProcessManager.Client.Tests\\ProcessManager.Client.Tests.csproj",
-      "ProcessManager.Client\\ProcessManager.Client.csproj"
-    ]
-  }
-}
