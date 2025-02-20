@@ -79,6 +79,10 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             _serviceBusClient,
             GetConfigurationValue<string>(configuration, "sbq-edi-inbox-messagequeue-name"));
 
+        EdiTopicClient = new ServiceBusSenderClient(
+            _serviceBusClient,
+            GetConfigurationValue<string>(configuration, "sbt-edi-name"));
+
         _durableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
             GetConfigurationValue<string>(configuration, "func-edi-api-taskhub-storage-connection-string"));
@@ -88,6 +92,8 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
         telemetryConfiguration.SetAzureTokenCredential(credential);
         TelemetryClient = new TelemetryClient(telemetryConfiguration);
     }
+
+    internal ServiceBusSenderClient EdiTopicClient { get; }
 
     internal ServiceBusSenderClient EdiInboxClient { get; }
 

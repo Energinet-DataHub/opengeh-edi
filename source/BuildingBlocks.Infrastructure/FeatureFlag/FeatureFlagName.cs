@@ -31,11 +31,6 @@ public enum FeatureFlagName
     UsePeekTimeSeriesMessages,
 
     /// <summary>
-    /// Whether to send requests for aggregated measured data to Wholesale, or handle it in EDI.
-    /// </summary>
-    RequestStaysInEdi,
-
-    /// <summary>
     /// Whether to allow receiving metered data for metering points.
     /// </summary>
     ReceiveMeteredDataForMeasurementPoints,

@@ -506,10 +506,6 @@ public class B2BApiAppFixture : IAsyncLifetime
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.RequestStaysInEdi.ToString()}",
-            false.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}",
             false.ToString().ToLower());
 
