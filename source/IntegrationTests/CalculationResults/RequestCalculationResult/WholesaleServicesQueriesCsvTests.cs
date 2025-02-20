@@ -29,7 +29,6 @@ using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
 using Resolution =
     Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
 

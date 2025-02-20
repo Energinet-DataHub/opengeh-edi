@@ -29,7 +29,7 @@ public class SettlementMethodMapperTests
 
     [Theory]
     [MemberData(nameof(ValidSettlementMethod))]
-    public void FromDeltaTableValue_ReturnsValidSettlementMethod(string? deltaValue, SettlementMethod? expected)
+    public void Given_DeltaTableValue_When_IsValid_Then_ReturnsExceptedSettlementMethod(string? deltaValue, SettlementMethod? expected)
     {
         // Act
         var actual = SettlementMethodMapper.FromDeltaTableValue(deltaValue);
@@ -39,7 +39,7 @@ public class SettlementMethodMapperTests
     }
 
     [Fact]
-    public void FromDeltaTableValue_WhenDeltaValueIsNull_ReturnsNull()
+    public void Given_DeltaTableValue_When_IsNull_Then_ReturnsNull()
     {
         // Act
         var actual = SettlementMethodMapper.FromDeltaTableValue(null);
@@ -49,7 +49,7 @@ public class SettlementMethodMapperTests
     }
 
     [Fact]
-    public void FromDeltaTableValue_WhenInvalidDeltaTableValue_ThrowsArgumentOutOfRangeException()
+    public void Given_DeltaTableValue_When_IsInvalid_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
