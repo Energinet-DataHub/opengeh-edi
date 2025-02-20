@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using FluentAssertions;
 using Xunit;
 
@@ -21,10 +21,15 @@ namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.SqlState
 
 public class ResolutionMapperTests
 {
+    public static IEnumerable<object[]> GetResolutionTestData()
+    {
+        yield return ["P1M", Resolution.Monthly];
+        yield return ["P1D", Resolution.Daily];
+        yield return ["PT1H", Resolution.Hourly];
+    }
+
     [Theory]
-    [InlineData("P1M", Resolution.Month)]
-    [InlineData("P1D", Resolution.Day)]
-    [InlineData("PT1H", Resolution.Hour)]
+    [MemberData(nameof(GetResolutionTestData))]
     public void FromDeltaTableValue_WhenValidDeltaTableValue_ReturnsExpectedType(string deltaTableValue, Resolution expectedType)
     {
         // Act
@@ -49,9 +54,7 @@ public class ResolutionMapperTests
     }
 
     [Theory]
-    [InlineData("P1M", Resolution.Month)]
-    [InlineData("P1D", Resolution.Day)]
-    [InlineData("PT1H", Resolution.Hour)]
+    [MemberData(nameof(GetResolutionTestData))]
     public void ToDeltaTableValue_WhenValidResolutionValue_ReturnsExpectedString(string expectedDeltaTableValue, Resolution resolution)
     {
         // Act
@@ -59,19 +62,5 @@ public class ResolutionMapperTests
 
         // Assert
         actualDeltaTableValue.Should().Be(expectedDeltaTableValue);
-    }
-
-    [Fact]
-    public void ToDeltaTableValue_WhenInvalidResolutionValue_ThrowsArgumentOutOfRangeException()
-    {
-        // Arrange
-        var invalidResolutionValue = (Resolution)int.MinValue;
-
-        // Act
-        var act = () => ResolutionMapper.ToDeltaTableValue(invalidResolutionValue);
-
-        // Assert
-        act.Should().Throw<ArgumentOutOfRangeException>()
-            .And.ActualValue.Should().Be(invalidResolutionValue);
     }
 }

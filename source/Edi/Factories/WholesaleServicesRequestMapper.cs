@@ -18,7 +18,6 @@ using Google.Protobuf.Collections;
 using NodaTime;
 using NodaTime.Text;
 using Period = Energinet.DataHub.Wholesale.Edi.Models.Period;
-using Resolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
 
 namespace Energinet.DataHub.Wholesale.Edi.Factories;
 
@@ -32,7 +31,7 @@ public class WholesaleServicesRequestMapper(DateTimeZone dateTimeZone)
             ? InstantPattern.General.Parse(request.PeriodEnd).Value
             : CalculateMaxPeriodEnd(periodStart);
 
-        var resolution = request.HasResolution ? ResolutionMapper.Map(request.Resolution) : (Resolution?)null;
+        var resolution = request.HasResolution ? ResolutionMapper.Map(request.Resolution) : null;
 
         // If no charge types are requested, both monthly amount and total monthly amount is requested
         var amountTypes = AmountTypeMapper.Map(resolution, AllChargesIsRequested(request));

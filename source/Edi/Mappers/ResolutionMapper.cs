@@ -12,31 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
-using EnergyResultResolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
-using WholesaleResolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
 
 public static class ResolutionMapper
 {
-    public static WholesaleResolution Map(string resolution)
+    public static Resolution Map(string resolution)
     {
         return resolution switch
         {
-            var name when name == Resolution.Hourly.Name => WholesaleResolution.Hour,
-            var name when name == Resolution.Daily.Name => WholesaleResolution.Day,
-            var name when name == Resolution.Monthly.Name => WholesaleResolution.Month,
+            var name when name == Resolution.Hourly.Name => Resolution.Hourly,
+            var name when name == Resolution.Daily.Name => Resolution.Daily,
+            var name when name == Resolution.Monthly.Name => Resolution.Monthly,
             _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown Resolution"),
         };
     }
 
-    public static Energinet.DataHub.Edi.Responses.Resolution Map(EnergyResultResolution resolution)
+    public static Energinet.DataHub.Edi.Responses.Resolution Map(Resolution resolution)
     {
         return resolution switch
         {
-            EnergyResultResolution.Hour => Energinet.DataHub.Edi.Responses.Resolution.Pt1H,
-            EnergyResultResolution.Quarter => Energinet.DataHub.Edi.Responses.Resolution.Pt15M,
+            var res when res == Resolution.Hourly => Energinet.DataHub.Edi.Responses.Resolution.Pt1H,
+            var res when res == Resolution.QuarterHourly => Energinet.DataHub.Edi.Responses.Resolution.Pt15M,
             _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown Resolution"),
         };
     }

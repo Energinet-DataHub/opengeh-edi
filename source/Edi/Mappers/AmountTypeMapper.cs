@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 
 namespace Energinet.DataHub.Wholesale.Edi.Mappers;
@@ -23,16 +24,16 @@ public static class AmountTypeMapper
         return resolution switch
         {
             null => [AmountType.AmountPerCharge],
-            Resolution.Month => includeTotalMonthlyAmount
+            var res when res == Resolution.Monthly => includeTotalMonthlyAmount
                 ? [AmountType.MonthlyAmountPerCharge, AmountType.TotalMonthlyAmount]
                 : [AmountType.MonthlyAmountPerCharge],
 
             // This case shouldn't be possible, since it should be enforced by our validation that the resolution
             // is either null for a Resolution.Month for monthly_amount_per_charge or null for a amount_per_charge
-            Resolution.Hour or Resolution.Day => throw new ArgumentOutOfRangeException(
+            var res when res == Resolution.Hourly || res == Resolution.Daily => throw new ArgumentOutOfRangeException(
                 nameof(resolution),
                 resolution,
-                $"{nameof(Resolution)} should be either {nameof(Resolution.Month)} or null while converting to {nameof(AmountType)}"),
+                $"{nameof(Resolution)} should be either {nameof(Resolution.Monthly)} or null while converting to {nameof(AmountType)}"),
 
             _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, $"Unknown {nameof(Resolution)} value while converting to {nameof(AmountType)}"),
         };

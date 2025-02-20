@@ -98,7 +98,7 @@ public class ActorRequestsClient(
                 meteringPointType: GetMeteringPointType(result.TimeSeriesType).Name,
                 settlementMethod: GetSettlementMethod(result.TimeSeriesType),
                 measureUnitType: MeasurementUnit.KilowattHour.Name, // "Unit is always Kwh for energy results" - it is hardcoded in the AggregatedTimeSeriesRequestAcceptedMessageFactory
-                resolution: GetResolution(result.Resolution).Name,
+                resolution: result.Resolution.Name,
                 energySupplierNumber: aggregatedTimeSeriesQueryParameters.EnergySupplierId,
                 balanceResponsibleNumber: aggregatedTimeSeriesQueryParameters.BalanceResponsibleId,
                 period: new Period(result.PeriodStart, result.PeriodEnd),
@@ -134,7 +134,6 @@ public class ActorRequestsClient(
         await foreach (var data in wholesaleServicesQuery)
         {
             var chargeType = GetChargeType(data.ChargeType);
-            var resolution = GetResolution(data.Resolution);
 
             var points = data.TimeSeriesPoints.OrderBy(p => p.Time)
                 .Select(
@@ -145,7 +144,7 @@ public class ActorRequestsClient(
                         Amount: p.Amount,
                         QuantityQuality: GetCalculatedQuantityQualityForWholesaleServices(
                             quantityQualities: p.Qualities,
-                            resolution: resolution,
+                            resolution: data.Resolution,
                             chargeType: chargeType,
                             hasPrice: p.Price != null)))
                 .ToList();
@@ -162,10 +161,10 @@ public class ActorRequestsClient(
                 Period: new Period(data.Period.Start, data.Period.End),
                 SettlementVersion: data.SettlementVersion,
                 QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit, data.Resolution),
-                PriceMeasureUnit: GetPriceMeasureUnit(points, resolution, chargeType),
+                PriceMeasureUnit: GetPriceMeasureUnit(points, data.Resolution, chargeType),
                 Currency: GetCurrency(data.Currency),
                 ChargeType: chargeType,
-                Resolution: resolution,
+                Resolution: data.Resolution,
                 MeteringPointType: GetMeteringPointType(data.MeteringPointType),
                 SettlementMethod: GetSettlementMethod(data.SettlementMethod),
                 OriginalTransactionIdReference: originalTransactionId);
@@ -380,32 +379,6 @@ public class ActorRequestsClient(
         };
     }
 
-    private Resolution GetResolution(Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)
-    {
-        return resolution switch {
-            Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month => Resolution.Monthly,
-            Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Hour => Resolution.Hourly,
-            Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Day => Resolution.Daily,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(resolution),
-                resolution,
-                "Unknown resolution"),
-        };
-    }
-
-    private Resolution GetResolution(Interfaces.Models.CalculationResults.EnergyResults.Resolution resolution)
-    {
-        return resolution switch
-        {
-            Interfaces.Models.CalculationResults.EnergyResults.Resolution.Quarter => Resolution.QuarterHourly,
-            Interfaces.Models.CalculationResults.EnergyResults.Resolution.Hour => Resolution.Hourly,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(resolution),
-                resolution,
-                "Unknown resolution"),
-        };
-    }
-
     private ChargeType? GetChargeType(Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? chargeType)
     {
         return chargeType switch
@@ -464,9 +437,9 @@ public class ActorRequestsClient(
         return CalculatedQuantityQualityMapper.MapForEnergy(quantityQualities);
     }
 
-    private MeasurementUnit GetQuantityMeasureUnit(QuantityUnit? quantityUnit, Interfaces.Models.CalculationResults.WholesaleResults.Resolution resolution)
+    private MeasurementUnit GetQuantityMeasureUnit(QuantityUnit? quantityUnit, Resolution resolution)
     {
-        if (quantityUnit is null && resolution == Interfaces.Models.CalculationResults.WholesaleResults.Resolution.Month)
+        if (quantityUnit is null && resolution == Resolution.Monthly)
             return MeasurementUnit.KilowattHour;
 
         return quantityUnit switch
