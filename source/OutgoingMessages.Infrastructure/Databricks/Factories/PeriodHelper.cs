@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using NodaTime;
 using NodaTime.Extensions;
-using EnergyResultsResolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.Resolution;
 using InternalPeriod = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period;
-using WholesaleResultsResolution = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Resolution;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
@@ -26,16 +25,16 @@ public static class PeriodHelper
 {
     private static readonly DateTimeZone _dkTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
 
-    public static (Instant Start, Instant End) GetPeriod(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints, EnergyResultsResolution resolution)
+    public static (Instant Start, Instant End) GetPeriod(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
         var start = timeSeriesPoints.Min(x => x.Time);
         var end = timeSeriesPoints.Max(x => x.Time);
         // The end date is the start of the next period.
-        var endWithResolutionOffset = GetDateTimeWithResolutionOffset(resolution, end);
+        var endWithResolutionOffset = GetDateTimeWithResolutionOffsetForEnergy(resolution, end);
         return (start.ToInstant(), endWithResolutionOffset.ToInstant());
     }
 
-    public static InternalPeriod GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, WholesaleResultsResolution resolution)
+    public static InternalPeriod GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
         var start = timeSeriesPoints.Min(x => x.Time);
         var end = timeSeriesPoints.Max(x => x.Time);
@@ -44,16 +43,16 @@ public static class PeriodHelper
         return new InternalPeriod(start.ToInstant(), endWithResolutionOffset.ToInstant());
     }
 
-    public static DateTimeOffset GetDateTimeWithResolutionOffset(EnergyResultsResolution resolution, DateTimeOffset dateTime) => resolution switch
+    public static DateTimeOffset GetDateTimeWithResolutionOffsetForEnergy(Resolution resolution, DateTimeOffset dateTime) => resolution switch
     {
-        EnergyResultsResolution.Quarter => dateTime.AddMinutes(15),
+        var res when res == Resolution.QuarterHourly => dateTime.AddMinutes(15),
         _ => dateTime.AddMinutes(60),
     };
 
-    public static DateTimeOffset GetDateTimeWithResolutionOffset(WholesaleResultsResolution resolution, DateTimeOffset dateTime) => resolution switch
+    public static DateTimeOffset GetDateTimeWithResolutionOffset(Resolution resolution, DateTimeOffset dateTime) => resolution switch
     {
-        WholesaleResultsResolution.Hour => dateTime.AddMinutes(60),
-        WholesaleResultsResolution.Day => EnsureMidnight(dateTime.ToInstant(), daysToAdd: 1),
+        var res when res == Resolution.Hourly => dateTime.AddMinutes(60),
+        var res when res == Resolution.Daily => EnsureMidnight(dateTime.ToInstant(), daysToAdd: 1),
         _ => EnsureMidnight(dateTime.ToInstant(), monthsToAdd: 1),
     };
 
