@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
@@ -30,29 +31,9 @@ public class EnergyResultMessageDtoFactory()
                 (p, index) => new EnergyResultMessagePoint(
                     index + 1, // Position starts at 1, so position = index + 1
                     p.Quantity,
-                    MapToCalculatedQuantityQuality(p.Qualities),
+                    CalculatedQuantityQualityMapper.MapForEnergy(p.Qualities),
                     p.TimeUtc.ToString()))
             .ToList()
             .AsReadOnly();
-    }
-
-    private static CalculatedQuantityQuality MapToCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality> qualities)
-    {
-        ArgumentNullException.ThrowIfNull(qualities);
-
-        return (
-            missing: qualities.Contains(QuantityQuality.Missing),
-            estimated: qualities.Contains(QuantityQuality.Estimated),
-            measured: qualities.Contains(QuantityQuality.Measured),
-            calculated: qualities.Contains(QuantityQuality.Calculated)) switch
-        {
-            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
-            (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-            (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-            (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
-            (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-
-            _ => CalculatedQuantityQuality.NotAvailable,
-        };
     }
 }

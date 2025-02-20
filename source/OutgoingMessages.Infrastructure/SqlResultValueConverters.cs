@@ -54,7 +54,7 @@ public static class SqlResultValueConverters
 
     public static IReadOnlyCollection<QuantityQuality>? ToQuantityQualities(string? value)
     {
-        return QuantityQualitiesMapper.FromDeltaTableValue(value);
+        return QuantityQualityMapper.TryFromDeltaTableValues(value);
     }
 
     public static TimeSeriesType ToTimeSeriesType(string value)

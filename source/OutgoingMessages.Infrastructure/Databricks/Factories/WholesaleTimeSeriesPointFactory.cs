@@ -43,7 +43,7 @@ public static class WholesaleTimeSeriesPointFactory
         return new WholesaleTimeSeriesPoint(
             SqlResultValueConverters.ToDateTimeOffset(time)!.Value,
             SqlResultValueConverters.ToDecimal(quantity),
-            QuantityQualitiesMapper.FromDeltaTableValue(qualities),
+            QuantityQualityMapper.TryFromDeltaTableValues(qualities),
             SqlResultValueConverters.ToDecimal(price),
             SqlResultValueConverters.ToDecimal(amount));
     }

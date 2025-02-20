@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
@@ -32,5 +33,22 @@ public static class QuantityQualityMapper
                 actualValue: pointQuality,
                 "Value does not contain a valid string representation of a quantity quality."),
         };
+    }
+
+    public static IReadOnlyCollection<QuantityQuality> FromDeltaTableValues(string value)
+    {
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(FromDeltaTableValue).ToArray();
+    }
+
+    public static IReadOnlyCollection<QuantityQuality> TryFromDeltaTableValues(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return [];
+
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(FromDeltaTableValue).ToArray();
     }
 }

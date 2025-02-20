@@ -99,6 +99,32 @@ public static class CalculatedQuantityQualityMapper
             return null;
         }
 
+        return MapWholesaleQuantityQuality(quantityQualities, hasPrice, chargeType);
+    }
+
+    public static CalculatedQuantityQuality MapForWholesaleAmountPerCharge(IReadOnlyCollection<QuantityQuality> quantityQualities, bool hasPrice, ChargeType? chargeType)
+    {
+        return MapWholesaleQuantityQuality(quantityQualities, hasPrice, chargeType);
+    }
+
+    public static CalculatedQuantityQuality MapForEnergy(IReadOnlyCollection<QuantityQuality> quantityQualities)
+    {
+        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
+                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
+                measured: quantityQualities.Contains(QuantityQuality.Measured),
+                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
+        {
+            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
+            (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
+            (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
+            (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
+            (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
+            _ => CalculatedQuantityQuality.NotAvailable,
+        };
+    }
+
+    private static CalculatedQuantityQuality MapWholesaleQuantityQuality(IReadOnlyCollection<QuantityQuality> quantityQualities, bool hasPrice, ChargeType? chargeType)
+    {
         if (!hasPrice)
         {
             return CalculatedQuantityQuality.Missing;
@@ -114,28 +140,12 @@ public static class CalculatedQuantityQualityMapper
                 estimated: quantityQualities.Contains(QuantityQuality.Estimated),
                 measured: quantityQualities.Contains(QuantityQuality.Measured),
                 calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
-            {
-                (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality
-                    .Missing,
-                (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
-                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-                _ => CalculatedQuantityQuality.NotAvailable,
-            };
-    }
-
-    public static CalculatedQuantityQuality MapForEnergy(IReadOnlyCollection<QuantityQuality> quantityQualities)
-    {
-        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
-                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
-                measured: quantityQualities.Contains(QuantityQuality.Measured),
-                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
         {
-            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
+            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality
+                .Missing,
             (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-            (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-            (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
+            (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
+            (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
             (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
             _ => CalculatedQuantityQuality.NotAvailable,
         };

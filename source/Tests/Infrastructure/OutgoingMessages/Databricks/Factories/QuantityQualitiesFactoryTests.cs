@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Databricks.Factories;
 
-public class QuantityQualitiesFactorTests
+public class QuantityQualitiesFactoryTests
 {
     public static IEnumerable<object?[]> QuantityQualityWholesaleServiceMappingData()
     {
@@ -52,8 +53,7 @@ public class QuantityQualitiesFactorTests
             null,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
+                QuantityQuality.Missing,
             },
             ChargeType.Subscription,
             CalculatedQuantityQuality.Missing,
@@ -65,8 +65,7 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
+                QuantityQuality.Missing,
             },
             ChargeType.Subscription,
             CalculatedQuantityQuality.Calculated,
@@ -78,8 +77,7 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
+                QuantityQuality.Missing,
             },
             ChargeType.Fee,
             CalculatedQuantityQuality.Calculated,
@@ -91,8 +89,7 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
+                QuantityQuality.Missing,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Missing,
@@ -103,10 +100,8 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Estimated,
+                QuantityQuality.Missing,
+                QuantityQuality.Estimated,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Incomplete,
@@ -117,10 +112,8 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Measured,
+                QuantityQuality.Missing,
+                QuantityQuality.Measured,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Incomplete,
@@ -131,12 +124,9 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Estimated,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Measured,
+                QuantityQuality.Missing,
+                QuantityQuality.Estimated,
+                QuantityQuality.Measured,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Incomplete,
@@ -147,10 +137,8 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Estimated,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Measured,
+                QuantityQuality.Estimated,
+                QuantityQuality.Measured,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Calculated,
@@ -161,8 +149,7 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Estimated,
+                QuantityQuality.Estimated,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Calculated,
@@ -173,8 +160,7 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Measured,
+                QuantityQuality.Measured,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Calculated,
@@ -185,8 +171,7 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Calculated,
+                QuantityQuality.Calculated,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Calculated,
@@ -197,10 +182,8 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Missing,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Calculated,
+                QuantityQuality.Missing,
+                QuantityQuality.Calculated,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Incomplete,
@@ -211,10 +194,8 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Estimated,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Calculated,
+                QuantityQuality.Estimated,
+                QuantityQuality.Calculated,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Calculated,
@@ -225,12 +206,9 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Estimated,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Calculated,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Measured,
+                QuantityQuality.Estimated,
+                QuantityQuality.Calculated,
+                QuantityQuality.Measured,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Calculated,
@@ -240,8 +218,7 @@ public class QuantityQualitiesFactorTests
         yield return new object?[]
         {
             99m,
-            new List<Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.
-                QuantityQuality>(),
+            new List<QuantityQuality>(),
             ChargeType.Tariff,
             CalculatedQuantityQuality.NotAvailable,
         };
@@ -252,12 +229,9 @@ public class QuantityQualitiesFactorTests
             99m,
             new[]
             {
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Measured,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Measured,
-                Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants
-                    .QuantityQuality.Calculated,
+                QuantityQuality.Measured,
+                QuantityQuality.Measured,
+                QuantityQuality.Calculated,
             },
             ChargeType.Tariff,
             CalculatedQuantityQuality.Calculated,
@@ -268,15 +242,14 @@ public class QuantityQualitiesFactorTests
     [MemberData(nameof(QuantityQualityWholesaleServiceMappingData))]
     public void Maps_wholesale_services_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
         decimal? price,
-        IReadOnlyCollection<Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.
-            QuantityQuality> qualities,
+        IReadOnlyCollection<QuantityQuality> qualities,
         ChargeType? chargeType,
         CalculatedQuantityQuality expectedCalculatedQuantityQuality)
     {
         // Act
-        var actual = QuantityQualitiesFactory.CreateQuantityQuality(
-            price,
+        var actual = CalculatedQuantityQualityMapper.MapForWholesaleAmountPerCharge(
             qualities,
+            price != null,
             chargeType);
 
         // Assert
