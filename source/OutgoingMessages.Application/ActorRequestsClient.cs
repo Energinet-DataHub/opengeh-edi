@@ -133,8 +133,6 @@ public class ActorRequestsClient(
         var enqueuedCount = 0;
         await foreach (var data in wholesaleServicesQuery)
         {
-            var chargeType = GetChargeType(data.ChargeType);
-
             var points = data.TimeSeriesPoints.OrderBy(p => p.Time)
                 .Select(
                     (p, index) => new WholesaleServicesPoint(
@@ -145,7 +143,7 @@ public class ActorRequestsClient(
                         QuantityQuality: GetCalculatedQuantityQualityForWholesaleServices(
                             quantityQualities: p.Qualities,
                             resolution: data.Resolution,
-                            chargeType: chargeType,
+                            chargeType: data.ChargeType,
                             hasPrice: p.Price != null)))
                 .ToList();
 
@@ -161,9 +159,9 @@ public class ActorRequestsClient(
                 Period: new Period(data.Period.Start, data.Period.End),
                 SettlementVersion: data.SettlementVersion,
                 QuantityMeasureUnit: GetQuantityMeasureUnit(data.QuantityUnit, data.Resolution),
-                PriceMeasureUnit: GetPriceMeasureUnit(points, data.Resolution, chargeType),
+                PriceMeasureUnit: GetPriceMeasureUnit(points, data.Resolution, data.ChargeType),
                 Currency: GetCurrency(data.Currency),
-                ChargeType: chargeType,
+                ChargeType: data.ChargeType,
                 Resolution: data.Resolution,
                 MeteringPointType: GetMeteringPointType(data.MeteringPointType),
                 SettlementMethod: GetSettlementMethod(data.SettlementMethod),
@@ -376,18 +374,6 @@ public class ActorRequestsClient(
                 nameof(meteringPointType),
                 meteringPointType,
                 "Unknown metering point type"),
-        };
-    }
-
-    private ChargeType? GetChargeType(Interfaces.Models.CalculationResults.WholesaleResults.ChargeType? chargeType)
-    {
-        return chargeType switch
-        {
-            Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Tariff => ChargeType.Tariff,
-            Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Fee => ChargeType.Fee,
-            Interfaces.Models.CalculationResults.WholesaleResults.ChargeType.Subscription => ChargeType.Subscription,
-            null => null,
-            _ => throw new ArgumentOutOfRangeException(nameof(chargeType), chargeType, "Unknown charge type"),
         };
     }
 
