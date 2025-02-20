@@ -433,7 +433,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var expectedHistory = new List<(string?, string?)>
         {
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", $"Enqueue messages activity failed. CalculationId='{energyCalculationId}' EventId='{energyEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{perGridAreaDataDescription.ExpectedCalculationResultsCount - 1}'"),
-            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", $"Enqueue messages activity failed. CalculationId='{energyCalculationId}' EventId='{energyEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{perBrpGridAreaDataDescription.ExpectedCalculationResultsCount - 1}'"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", $"Enqueue messages activity failed. CalculationId='{energyCalculationId}' EventId='{energyEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{perBrpGridAreaDataDescription.ExpectedFailedCalculationResultsCount}'"),
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", $"Enqueue messages activity failed. CalculationId='{energyCalculationId}' EventId='{energyEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{perBrpAndEsGridAreaDataDescription.ExpectedCalculationResultsCountForInvalidDataSet}'"),
         };
 
