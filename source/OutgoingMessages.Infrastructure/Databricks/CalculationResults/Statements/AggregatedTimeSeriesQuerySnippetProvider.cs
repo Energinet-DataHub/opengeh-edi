@@ -90,7 +90,7 @@ public sealed class AggregatedTimeSeriesQuerySnippetProvider(
         var sqlConstraint =
                 $"""
                      {(meteringPointTypeDeltaTableValue is not null ? $"{table}.{DatabricksContract.GetMeteringPointTypeColumnName()} = '{meteringPointTypeDeltaTableValue}' AND " : string.Empty)}
-                     {(settlementMethodDeltaTableValue is not null ? $"{table}.{DatabricksContract.GetSettlementMethodColumnName()} = '{settlementMethodDeltaTableValue}' AND " : string.Empty)} 
+                     {(meteringPointTypeDeltaTableValue is not null ? $"{table}.{DatabricksContract.GetSettlementMethodColumnName()} = '{settlementMethodDeltaTableValue}' AND " : string.Empty)} 
                      ({table}.{DatabricksContract.GetTimeColumnName()} >= '{parameters.Period.Start}'
                           AND {table}.{DatabricksContract.GetTimeColumnName()} < '{parameters.Period.End}')
                      """.Trim();

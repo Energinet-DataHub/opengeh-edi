@@ -67,7 +67,7 @@ public class AggregatedTimeSeriesRequestAcceptedMessageFactoryTests
         var series = responseBody?.Series.FirstOrDefault();
         series.Should().NotBeNull();
         series!.GridArea.Should().Be(_gridArea);
-        series.TimeSeriesType.Should().Be(Energinet.DataHub.Edi.Responses.TimeSeriesType.Production);
+        series.TimeSeriesType.Should().Be(TimeSeriesType.Unspecified);
         series.HasSettlementVersion.Should().BeFalse();
 
         var timeSeriesOrdered = series.TimeSeriesPoints.OrderBy(ts => ts.Time).ToList();

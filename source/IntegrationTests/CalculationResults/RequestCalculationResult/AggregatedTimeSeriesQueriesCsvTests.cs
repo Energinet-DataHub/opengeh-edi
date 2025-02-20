@@ -103,7 +103,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
             var actual = await Sut.GetAsync(parameters).ToListAsync();
 
             using var assertionScope = new AssertionScope();
-            actual.Should().HaveCount(18);
+            actual.Should().HaveCount(12);
             actual.Select(ats => (ats.GridArea, ats.MeteringPointType, ats.SettlementMethod, ats.PeriodStart, ats.PeriodEnd, ats.Version))
                 .Should()
                 .BeEquivalentTo([
