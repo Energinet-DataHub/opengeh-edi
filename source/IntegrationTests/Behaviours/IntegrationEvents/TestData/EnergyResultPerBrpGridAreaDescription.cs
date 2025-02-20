@@ -39,7 +39,7 @@ public class EnergyResultPerBrpGridAreaDescription
 
     public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "542", "543" };
 
-    public override int ExpectedCalculationResultsCount => 20 * 2; // 20 for each grid area
+    public override int ExpectedCalculationResultsCount => 20 * GridAreaCodes.Count; // 20 for each grid area
 
     public int ExpectedFailedCalculationResultsCount => 19;
 

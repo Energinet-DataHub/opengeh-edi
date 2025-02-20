@@ -278,8 +278,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
     [MemberData(
         nameof(DocumentFormatsWithAllRoleCombinations),
         MemberType = typeof(GivenAggregatedMeasureDataV2RequestWithDelegationTests))]
-    public async Task
-        AndGiven_DelegationInOneGridArea_AndGiven_InvalidRequest_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectAggregatedMeasureDataDocumentsWithCorrectContent(
+    public async Task AndGiven_DelegationInOneGridArea_AndGiven_InvalidRequest_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectAggregatedMeasureDataDocumentsWithCorrectContent(
             DocumentFormat incomingDocumentFormat,
             DocumentFormat peekDocumentFormat,
             ActorRole delegatedFromRole,
@@ -364,9 +363,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
          */
 
         // Arrange
-        var expectedErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse"
-                                   + " med en balancefiksering eller korrektioner / It is only possible to request"
-                                   + " data for a full month in relation to balancefixing or corrections";
+        var expectedErrorMessage = "Dato må kun være for 1 måned af gangen / Can maximum be for a 1 month period";
         var expectedErrorCode = "E17";
 
         // Generate a mock ServiceBus Message with RequestCalculatedEnergyTimeSeriesAcceptedV1 response from Process Manager,
@@ -612,24 +609,22 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 : gridAreaOwner, ActorRole: delegatedFromRole);
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
-        await GivenGridAreaOwnershipAsync("542", gridAreaOwner);
-        await GivenGridAreaOwnershipAsync("543", gridAreaOwner);
+        var gridAreasWithDelegation = new List<string>() { "542", "543" };
+
+        foreach (var gridAreaWithDelegation in gridAreasWithDelegation)
+        {
+            await GivenGridAreaOwnershipAsync(gridAreaWithDelegation, gridAreaOwner);
+
+            await GivenDelegation(
+                new(originalActor.ActorNumber, originalActor.ActorRole),
+                new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+                gridAreaWithDelegation,
+                ProcessType.RequestEnergyResults,
+                GetNow());
+        }
+
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
-
-        await GivenDelegation(
-            new(originalActor.ActorNumber, originalActor.ActorRole),
-            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-            "542",
-            ProcessType.RequestEnergyResults,
-            GetNow());
-
-        await GivenDelegation(
-            new(originalActor.ActorNumber, originalActor.ActorRole),
-            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-            "543",
-            ProcessType.RequestEnergyResults,
-            GetNow());
 
         // Act
         await GivenReceivedAggregatedMeasureDataRequest(
@@ -656,7 +651,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 PeriodEnd: CreateDateInstant(2022, 2, 1),
                 energySupplierNumber?.Value,
                 balanceResponsibleParty?.Value,
-                new List<string>() { "542", "543" },
+                gridAreasWithDelegation,
                 SettlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
                 MeteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
                 SettlementVersion: null));
@@ -782,24 +777,21 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 : gridAreaOwner, ActorRole: delegatedFromRole);
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
-        await GivenGridAreaOwnershipAsync("542", gridAreaOwner);
-        await GivenGridAreaOwnershipAsync("543", gridAreaOwner);
+        var gridAreasWithDelegation = new List<string>() { "542", "543" };
+        foreach (var gridAreaWithDelegation in gridAreasWithDelegation)
+        {
+            await GivenGridAreaOwnershipAsync(gridAreaWithDelegation, gridAreaOwner);
+
+            await GivenDelegation(
+                new(originalActor.ActorNumber, originalActor.ActorRole),
+                new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+                gridAreaWithDelegation,
+                ProcessType.RequestEnergyResults,
+                GetNow());
+        }
+
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
-
-        await GivenDelegation(
-            new(originalActor.ActorNumber, originalActor.ActorRole),
-            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-            "542",
-            ProcessType.RequestEnergyResults,
-            GetNow());
-
-        await GivenDelegation(
-            new(originalActor.ActorNumber, originalActor.ActorRole),
-            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-            "543",
-            ProcessType.RequestEnergyResults,
-            GetNow());
 
         // Act
         // Setup fake request (period end is before period start)
@@ -827,7 +819,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 PeriodEnd: CreateDateInstant(2022, 1, 1),
                 energySupplierNumber?.Value,
                 balanceResponsibleParty?.Value,
-                new List<string>() { "542", "543" },
+                gridAreasWithDelegation,
                 SettlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
                 MeteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
                 SettlementVersion: null));
@@ -837,9 +829,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
          */
 
         // Arrange
-        var expectedErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse"
-                                   + " med en balancefiksering eller korrektioner / It is only possible to request"
-                                   + " data for a full month in relation to balancefixing or corrections";
+        var expectedErrorMessage = "Dato må kun være for 1 måned af gangen / Can maximum be for a 1 month period";
         var expectedErrorCode = "E17";
 
         // Generate a mock ServiceBus Message with RequestCalculatedEnergyTimeSeriesAcceptedV1 response from Process Manager,
@@ -899,8 +889,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
     [MemberData(
         nameof(DocumentFormatsWithRoleCombinationsForNullGridArea),
         MemberType = typeof(GivenAggregatedMeasureDataV2RequestWithDelegationTests))]
-    public async Task
-        AndGiven_DelegationInOneGridArea_AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesThreeNotifyAggregatedMeasureDataDocumentWithCorrectContent(
+    public async Task AndGiven_DelegationInOneGridArea_AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesThreeNotifyAggregatedMeasureDataDocumentWithCorrectContent(
             DocumentFormat incomingDocumentFormat,
             DocumentFormat peekDocumentFormat,
             ActorRole delegatedFromRole,
@@ -1042,14 +1031,13 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
     }
 
     [Theory]
-    [InlineData("Xml", "GridAccessProvider", "Delegated")]
-    [InlineData("Json", "GridAccessProvider", "Delegated")]
+    [InlineData("Xml", "MeteredDataResponsible", "Delegated")]
+    [InlineData("Json", "MeteredDataResponsible", "Delegated")]
     [InlineData("Xml", "EnergySupplier", "Delegated")]
     [InlineData("Json", "EnergySupplier", "Delegated")]
     [InlineData("Xml", "BalanceResponsibleParty", "Delegated")]
     [InlineData("Json", "BalanceResponsibleParty", "Delegated")]
-    public async Task
-        AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(
+    public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(
             string incomingDocumentFormatName,
             string delegatedFromRole,
             string delegatedToRole)
