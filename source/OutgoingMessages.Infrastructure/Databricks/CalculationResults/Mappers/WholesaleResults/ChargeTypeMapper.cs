@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults;
 
@@ -34,9 +34,9 @@ public static class ChargeTypeMapper
     public static string ToDeltaTableValue(ChargeType chargeType) =>
         chargeType switch
         {
-            ChargeType.Tariff => "tariff",
-            ChargeType.Fee => "fee",
-            ChargeType.Subscription => "subscription",
+            var ct when ct == ChargeType.Tariff => "tariff",
+            var ct when ct == ChargeType.Fee => "fee",
+            var ct when ct == ChargeType.Subscription => "subscription",
             _ => throw new ArgumentOutOfRangeException(
                 nameof(chargeType),
                 actualValue: chargeType,
