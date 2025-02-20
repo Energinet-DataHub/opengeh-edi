@@ -21,8 +21,6 @@ using Nito.AsyncEx;
 using NodaTime;
 using Xunit.Abstractions;
 
-using CalculationType = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.CalculationCompletedV1.Types.CalculationType;
-
 namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 
 /// <summary>
@@ -42,7 +40,7 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
     private readonly ITestOutputHelper _logger;
     private readonly EdiDriver _ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
-    private readonly WholesaleDriver _wholesaleDriver;
+    private readonly ProcessManagerDriver _processManagerDriver;
 
     public LoadTestHelper(LoadTestFixture fixture, ITestOutputHelper logger)
     {
@@ -54,7 +52,7 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
             new AsyncLazy<HttpClient>(() => throw new NotImplementedException("Not used in load test")),
             logger);
         _ediDatabaseDriver = new EdiDatabaseDriver(_fixture.DatabaseConnectionString);
-        _wholesaleDriver = new WholesaleDriver(_fixture.IntegrationEventPublisher, _fixture.EdiInboxClient);
+        _processManagerDriver = new ProcessManagerDriver(_fixture.EdiTopicClient);
     }
 
     [Fact]
@@ -63,9 +61,8 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
         await CalculationCompletedDsl.StartEnqueueMessagesOrchestration(
             _logger,
-            _wholesaleDriver,
+            _processManagerDriver,
             _ediDriver,
-            CalculationType.WholesaleFixing,
             _fixture.LoadTestCalculationId);
     }
 
