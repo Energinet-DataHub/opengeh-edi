@@ -27,7 +27,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     {
         { FeatureFlagName.UsePeekMessages, true },
         { FeatureFlagName.UsePeekTimeSeriesMessages, true },
-        { FeatureFlagName.RequestStaysInEdi, false },
         { FeatureFlagName.ReceiveMeteredDataForMeasurementPoints, true },
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
@@ -42,8 +41,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekMessages]);
 
     public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekTimeSeriesMessages]);
-
-    public Task<bool> RequestStaysInEdiAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.RequestStaysInEdi]);
 
     public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ReceiveMeteredDataForMeasurementPoints]);
 
