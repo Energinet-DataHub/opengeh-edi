@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
@@ -19,47 +20,51 @@ using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
 /// <summary>
-/// Test data description for scenario using the view described by <see cref="EnergyResultPerBalanceResponsiblePerGridAreaQuery"/>.
+/// Test data description for scenario using the view described by <see cref="EnergyResultPerGridAreaQuery"/>.
 /// </summary>
-public class EnergyResultPerBrpGridAreaDescription
+public class EnergyResultPerGridAreaDescription
     : TestDataDescription
 {
-    public EnergyResultPerBrpGridAreaDescription()
+    public EnergyResultPerGridAreaDescription()
         : base(
-        "balance_fixing_01-11-2022_01-12-2022_ga_542_and_543_per_brp_ga_v1.csv",
-        //Metering point type on row 218 contains an invalid value (="invalid") (row on a result set)
-        "balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1_with_invalid_row.csv")
+            "balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv",
+            //Metering point type on row 74 contains an invalid value (="invalid") (row on a result set)
+            "balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1_with_invalid_row.csv")
     {
     }
 
     public override Guid CalculationId => Guid.Parse("a8cfe7c7-f197-405c-b922-52153fa0332d");
 
-    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "542", "543" };
+    public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "543" };
 
-    public override int ExpectedCalculationResultsCount => 20 * GridAreaCodes.Count; // 20 for each grid area
+    public override int ExpectedCalculationResultsCount => 5;
 
-    public int ExpectedFailedCalculationResultsCount => 19;
+    public int ExpectedOutgoingMessagesForGridOwnerCount => ExpectedCalculationResultsCount;
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
-        ActorNumber: ActorNumber.Create("7080000729821"),
-        ExpectedOutgoingMessagesCount: 3,
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleEnergyResultMessageData => new(
+        ActorNumber: ActorNumber.Create("1111111111111"),
+        ExpectedOutgoingMessagesCount: 5,
         ExampleMessageData: new ExampleEnergyResultMessageForActor(
-            GridArea: "543",
+            GridArea: GridAreaCodes.First(),
             MeteringPointType.Consumption,
             SettlementMethod.Flex,
             Resolution.Hourly,
             null,
-            ActorNumber.Create("7080000729821"),
+            null,
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
-                1211.912m,
-                CalculatedQuantityQuality.Measured)));
+                1928898.153m,
+                CalculatedQuantityQuality.Incomplete)));
+
+    public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
+        ImmutableDictionary<string, ActorNumber>.Empty
+            .Add(GridAreaCodes.First(), ActorNumber.Create("1111111111111"));
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Immutable;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
@@ -22,7 +21,7 @@ using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
 public class WholesaleResultForAmountPerChargeDescription
     : TestDataDescription

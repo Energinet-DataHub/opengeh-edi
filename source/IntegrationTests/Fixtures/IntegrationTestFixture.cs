@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activit
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
-using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+using Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;

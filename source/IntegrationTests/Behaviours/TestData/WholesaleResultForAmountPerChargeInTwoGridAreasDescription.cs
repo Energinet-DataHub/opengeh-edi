@@ -21,7 +21,7 @@ using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
 public class WholesaleResultForAmountPerChargeInTwoGridAreasDescription
     : TestDataDescription
