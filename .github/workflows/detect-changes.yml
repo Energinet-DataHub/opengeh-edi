@@ -60,10 +60,6 @@ jobs:
               - 'source/!(ApplyDBMigrationsApp/**)**'
             db_migrations:
               - 'source/ApplyDBMigrationsApp/**'
-            processmanager_client:
-              - 'docs/ProcessManager.Client/**'
-              - 'source/ProcessManager.Client*/**'
-              - '.github/workflows/processmanager-client-bundle-publish.yml'
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
