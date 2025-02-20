@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
 /// <summary>
 /// Test data description for scenario using the view described by <see cref="EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery"/>.

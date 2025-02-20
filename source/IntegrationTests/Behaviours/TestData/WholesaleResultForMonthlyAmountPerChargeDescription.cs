@@ -18,15 +18,14 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
-using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
-public class WholesaleResultForTotalAmountDescription
+public class WholesaleResultForMonthlyAmountPerChargeDescription
     : TestDataDescription
 {
     /// <summary>
-    /// Test data description for scenario using the view described by <see cref="WholesaleTotalAmountQuery"/>.
+    /// Test data description for scenario using the view described by <see cref="WholesaleMonthlyAmountPerChargeQuery"/>.
     /// </summary>
     /// <remarks>
     /// Test data is exported from Databricks using the view 'wholesale_results_amount_per_charge'
@@ -38,11 +37,11 @@ public class WholesaleResultForTotalAmountDescription
     ///    and calculation_version  = 65
     /// Environment: Dev002.
     /// </remarks>
-    public WholesaleResultForTotalAmountDescription()
+    public WholesaleResultForMonthlyAmountPerChargeDescription()
         : base(
-            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_total_amount_v1.csv",
-            //Currency on row 3 contains an invalid value (="invalid") (row on a result set)
-            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_total_amount_v1_with_invalid_row.csv")
+            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1.csv",
+            //Charge type on row 5 contains an invalid value (="invalid") (row on a result set)
+            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1_with_invalid_row.csv")
     {
     }
 
@@ -50,13 +49,13 @@ public class WholesaleResultForTotalAmountDescription
 
     public override IReadOnlyCollection<string> GridAreaCodes => new List<string>() { "804" };
 
-    public override int ExpectedCalculationResultsCount => 3;
+    public override int ExpectedCalculationResultsCount => 7;
 
-    public int ExpectedOutgoingMessagesForSystemOperatorCount => 1;
+    public int ExpectedOutgoingMessagesForSystemOperatorCount => 3;
 
-    public int ExpectedOutgoingMessagesForGridOwnerCount => 1;
+    public int ExpectedOutgoingMessagesForGridOwnerCount => 4;
 
-    public int ExpectedOutgoingMessagesForEnergySupplierCount => 1;
+    public int ExpectedOutgoingMessagesForEnergySupplierCount => ExpectedCalculationResultsCount;
 
     public override Period Period => new(
         Instant.FromUtc(2023, 1, 31, 23, 0, 0),
@@ -71,7 +70,8 @@ public class WholesaleResultForTotalAmountDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 128533.784M, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 61754.247M, null),
+        MeasurementUnit: MeasurementUnit.KilowattHour);
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForChargeOwner => new(
         GridArea: GridAreaCodes.First(),
@@ -82,9 +82,10 @@ public class WholesaleResultForTotalAmountDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 220886.159m, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null),
+        MeasurementUnit: MeasurementUnit.Pieces);
 
-    public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForEnergySupplier => new(
+    public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForEnergySupplierAndGridOperator => new(
         GridArea: GridAreaCodes.First(),
         Currency.DanishCrowns,
         ActorNumber.Create("5790001662233"),
@@ -93,9 +94,10 @@ public class WholesaleResultForTotalAmountDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 349419.943m, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null),
+        MeasurementUnit: MeasurementUnit.Pieces);
 
     public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
         ImmutableDictionary<string, ActorNumber>.Empty
-        .Add(GridAreaCodes.First(), ActorNumber.Create("8500000000502"));
+            .Add(GridAreaCodes.First(), ActorNumber.Create("8500000000502"));
 }
