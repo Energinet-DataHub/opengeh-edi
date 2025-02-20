@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
 using Energinet.DataHub.Wholesale.Edi.Models;
 using Google.Protobuf.Collections;
@@ -34,7 +35,8 @@ public class WholesaleServicesRequestMapper(DateTimeZone dateTimeZone)
         var resolution = request.HasResolution ? ResolutionMapper.Map(request.Resolution) : null;
 
         // If no charge types are requested, both monthly amount and total monthly amount is requested
-        var amountTypes = AmountTypeMapper.Map(resolution, AllChargesIsRequested(request));
+        // NOT USED!
+        var amountTypes = new List<AmountType>();
 
         return amountTypes.Select(amountType => new WholesaleServicesRequest(
                 amountType,
