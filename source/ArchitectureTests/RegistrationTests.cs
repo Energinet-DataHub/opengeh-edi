@@ -67,9 +67,6 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
             TestEnvironment.CreateFakeStorageUrl());
-        Environment.SetEnvironmentVariable(
-            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
-            TestEnvironment.CreateFakeStorageUrl());
 
         Environment.SetEnvironmentVariable($"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", TestEnvironment.CreateFakeServiceBusFullyQualifiedNamespace());
 
@@ -114,7 +111,6 @@ public class RegistrationTests
                 typeof(ExecuteDataRetentionJobs).Assembly,
                 typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
                 typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
-                typeof(Wholesale.Edi.AggregatedTimeSeriesRequestHandler).Assembly,
                 });
     }
 

@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.Process.Domain.Wholesale;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
-using Energinet.DataHub.Wholesale.Edi;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 
@@ -28,21 +27,12 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
 public class WholesaleInboxClient : IWholesaleInboxClient
 {
-    private readonly IFeatureFlagManager _featureFlagManager;
-    private readonly IWholesaleServicesRequestHandler _wholesaleServicesRequestHandler;
-    private readonly IAggregatedTimeSeriesRequestHandler _aggregatedTimeSeriesRequestHandler;
     private readonly ServiceBusSender _sender;
 
     public WholesaleInboxClient(
         IOptions<WholesaleInboxQueueOptions> options,
-        IAzureClientFactory<ServiceBusSender> senderFactory,
-        IFeatureFlagManager featureFlagManager,
-        IWholesaleServicesRequestHandler wholesaleServicesRequestHandler,
-        IAggregatedTimeSeriesRequestHandler aggregatedTimeSeriesRequestHandler)
+        IAzureClientFactory<ServiceBusSender> senderFactory)
     {
-        _featureFlagManager = featureFlagManager;
-        _wholesaleServicesRequestHandler = wholesaleServicesRequestHandler;
-        _aggregatedTimeSeriesRequestHandler = aggregatedTimeSeriesRequestHandler;
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
 
@@ -57,14 +47,7 @@ public class WholesaleInboxClient : IWholesaleInboxClient
 
         var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(aggregatedMeasureDataProcess);
 
-        if (await _featureFlagManager.RequestStaysInEdiAsync().ConfigureAwait(false))
-        {
-            await _aggregatedTimeSeriesRequestHandler.ProcessAsync(serviceBusMessage.Body, aggregatedMeasureDataProcess.ProcessId.Id.ToString(), cancellationToken).ConfigureAwait(false);
-        }
-        else
-        {
-            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
-        }
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task SendProcessAsync(
@@ -73,13 +56,7 @@ public class WholesaleInboxClient : IWholesaleInboxClient
     {
         ArgumentNullException.ThrowIfNull(wholesaleServicesProcess);
         var serviceBusMessage = WholesaleServicesRequestFactory.CreateServiceBusMessage(wholesaleServicesProcess);
-        if (await _featureFlagManager.RequestStaysInEdiAsync().ConfigureAwait(false))
-        {
-            await _wholesaleServicesRequestHandler.ProcessAsync(serviceBusMessage.Body, wholesaleServicesProcess.ProcessId.Id.ToString(), cancellationToken).ConfigureAwait(false);
-        }
-        else
-        {
-            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
-        }
+
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }

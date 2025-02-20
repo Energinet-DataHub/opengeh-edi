@@ -35,11 +35,6 @@ public interface IFeatureFlagManager
     Task<bool> UsePeekTimeSeriesMessagesAsync();
 
     /// <summary>
-    /// Whether to send RequestForAggregatedMeasuredData to Wholesale or handle it in EDI.
-    /// </summary>
-    Task<bool> RequestStaysInEdiAsync();
-
-    /// <summary>
     /// Whether to allow receiving metered data for metering points.
     /// </summary>
     Task<bool> ReceiveMeteredDataForMeasurementPointsAsync();
@@ -53,11 +48,6 @@ public interface IFeatureFlagManager
     /// Whether to use the RequestAggregatedMeasureData process orchestration.
     /// </summary>
     Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
-
-    /// <summary>
-    /// Whether to use the StandardBlobServiceClient.
-    /// </summary>
-    Task<bool> UseStandardBlobServiceClientAsync();
 
     /// <summary>
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.

@@ -27,11 +27,9 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     {
         { FeatureFlagName.UsePeekMessages, true },
         { FeatureFlagName.UsePeekTimeSeriesMessages, true },
-        { FeatureFlagName.RequestStaysInEdi, false },
         { FeatureFlagName.ReceiveMeteredDataForMeasurementPoints, true },
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
-        { FeatureFlagName.UseStandardBlobServiceClient, false },
         { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
     };
 
@@ -44,15 +42,11 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekTimeSeriesMessages]);
 
-    public Task<bool> RequestStaysInEdiAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.RequestStaysInEdi]);
-
     public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ReceiveMeteredDataForMeasurementPoints]);
 
     public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration]);
 
     public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration]);
-
-    public Task<bool> UseStandardBlobServiceClientAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseStandardBlobServiceClient]);
 
     public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages]);
 }

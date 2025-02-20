@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="AdaskoTheBeAsT.Dapper.NodaTime" Version="4.0.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
+      <PackageReference Include="Dapper" Version="2.1.66"/>
+      <PackageReference Include="AdaskoTheBeAsT.Dapper.NodaTime" Version="5.0.0"/>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

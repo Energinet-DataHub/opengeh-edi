@@ -22,14 +22,14 @@ limitations under the License.
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.1.1" />
-        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="3.0.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
-        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.2.1"/>
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="3.0.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.4"/>
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.9.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-        <PackageReference Include="Microsoft.OpenApi" Version="1.6.22" />
+        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.10.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
+        <PackageReference Include="Microsoft.OpenApi" Version="1.6.23" />
         <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.1" />
         <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     </ItemGroup>

@@ -454,9 +454,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrl)}",
             AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{BlobServiceClientConnectionOptions.SectionName}__{nameof(BlobServiceClientConnectionOptions.StorageAccountUrlObsoleted)}",
-            AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         // Dead-letter logging
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -507,10 +504,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.UsePeekMessages.ToString()}",
             true.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.RequestStaysInEdi.ToString()}",
-            false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}",

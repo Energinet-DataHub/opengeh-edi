@@ -4,10 +4,10 @@
         <RootNamespace>Energinet.DataHub.EDI.Outbox.Infrastructure</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.Outbox" Version="1.0.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
+        <PackageReference Include="Energinet.DataHub.Core.Outbox" Version="1.0.2"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.13" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

@@ -4,11 +4,11 @@
     <RootNamespace>Energinet.DataHub.EDI.ArchivedMessages.Interfaces</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NodaTime" Version="3.2.0" />
+    <PackageReference Include="NodaTime" Version="3.2.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />

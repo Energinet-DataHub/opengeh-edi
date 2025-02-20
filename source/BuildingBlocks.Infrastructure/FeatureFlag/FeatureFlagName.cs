@@ -31,11 +31,6 @@ public enum FeatureFlagName
     UsePeekTimeSeriesMessages,
 
     /// <summary>
-    /// Whether to send requests for aggregated measured data to Wholesale, or handle it in EDI.
-    /// </summary>
-    RequestStaysInEdi,
-
-    /// <summary>
     /// Whether to allow receiving metered data for metering points.
     /// </summary>
     ReceiveMeteredDataForMeasurementPoints,
@@ -49,11 +44,6 @@ public enum FeatureFlagName
     /// Whether to use orchestration for handling RequestAggregatedMeasureData processes.
     /// </summary>
     UseRequestAggregatedMeasureDataProcessOrchestration,
-
-    /// <summary>
-    /// Whether to start using standard blob service client.
-    /// </summary>
-    UseStandardBlobServiceClient,
 
     /// <summary>
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
