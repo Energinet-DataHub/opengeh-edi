@@ -45,8 +45,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
     "StyleCop.CSharp.OrderingRules",
     "SA1201:Elements should appear in the correct order",
     Justification = "Test class")]
-public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : AggregatedMeasureDataBehaviourTestBase,
-    IAsyncLifetime
+public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
+    : AggregatedMeasureDataBehaviourTestBase, IAsyncLifetime
 {
     private readonly IntegrationTestFixture _fixture;
     private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions;
@@ -63,10 +63,11 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
         _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 
-    public static object[][] DocumentFormatsWithAllRoleCombinations() => DocumentFormatsWithRoleCombinations(false);
+    public static object[][] DocumentFormatsWithAllRoleCombinations()
+        => DocumentFormatsWithRoleCombinations(false);
 
-    public static object[][] DocumentFormatsWithRoleCombinationsForNullGridArea() =>
-        DocumentFormatsWithRoleCombinations(true);
+    public static object[][] DocumentFormatsWithRoleCombinationsForNullGridArea()
+        => DocumentFormatsWithRoleCombinations(true);
 
     public static object[][] DocumentFormatsWithRoleCombinations(bool nullGridArea)
     {
@@ -328,15 +329,15 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
             GetNow());
 
         // Act
-        // Setup fake request (period end is before period start)
+        // Setup fake request (period is more than a month)
         await GivenReceivedAggregatedMeasureDataRequest(
             documentFormat: incomingDocumentFormat,
             senderActorNumber: delegatedToActor.ActorNumber,
             senderActorRole: originalActor.ActorRole,
             meteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
             settlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
-            periodStart: (2022, 2, 1),
-            periodEnd: (2022, 1, 1),
+            periodStart: (2022, 1, 1),
+            periodEnd: (2022, 3, 1),
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[] { (gridAreaWithDelegation, transactionId), });
@@ -349,8 +350,8 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 originalActor.ActorNumber.Value,
                 originalActor.ActorRole.Name,
                 BusinessReason.BalanceFixing,
-                PeriodStart: CreateDateInstant(2022, 2, 1),
-                PeriodEnd: CreateDateInstant(2022, 1, 1),
+                PeriodStart: CreateDateInstant(2022, 1, 1),
+                PeriodEnd: CreateDateInstant(2022, 3, 1),
                 energySupplierNumber?.Value,
                 balanceResponsibleParty?.Value,
                 new List<string> { testMessageData.ExampleMessageData.GridArea },
@@ -611,6 +612,8 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
 
         var gridAreasWithDelegation = new List<string>() { "542", "543" };
 
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
         foreach (var gridAreaWithDelegation in gridAreasWithDelegation)
         {
             await GivenGridAreaOwnershipAsync(gridAreaWithDelegation, gridAreaOwner);
@@ -622,9 +625,6 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 ProcessType.RequestEnergyResults,
                 GetNow());
         }
-
-        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         // Act
         await GivenReceivedAggregatedMeasureDataRequest(
@@ -737,8 +737,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
     [MemberData(
         nameof(DocumentFormatsWithRoleCombinationsForNullGridArea),
         MemberType = typeof(GivenAggregatedMeasureDataV2RequestWithDelegationTests))]
-    public async Task
-        AndGiven_DelegationInTwoGridAreas_AndGiven_InvalidRequest_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectAggregatedMeasureDataDocumentsWithCorrectContent(
+    public async Task AndGiven_DelegationInTwoGridAreas_AndGiven_InvalidRequest_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectAggregatedMeasureDataDocumentsWithCorrectContent(
             DocumentFormat incomingDocumentFormat,
             DocumentFormat peekDocumentFormat,
             ActorRole delegatedFromRole,
@@ -777,6 +776,9 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 : gridAreaOwner, ActorRole: delegatedFromRole);
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
 
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+
         var gridAreasWithDelegation = new List<string>() { "542", "543" };
         foreach (var gridAreaWithDelegation in gridAreasWithDelegation)
         {
@@ -790,19 +792,16 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 GetNow());
         }
 
-        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
-
         // Act
-        // Setup fake request (period end is before period start)
+        // Setup fake request (period is more than a month)
         await GivenReceivedAggregatedMeasureDataRequest(
             documentFormat: incomingDocumentFormat,
             senderActorNumber: delegatedToActor.ActorNumber,
             senderActorRole: originalActor.ActorRole,
             meteringPointType: testMessageData.ExampleMessageData.MeteringPointType,
             settlementMethod: testMessageData.ExampleMessageData.SettlementMethod,
-            periodStart: (2022, 2, 1),
-            periodEnd: (2022, 1, 1),
+            periodStart: (2022, 1, 1),
+            periodEnd: (2022, 3, 1),
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[] { (null, transactionId), });
@@ -815,8 +814,8 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests : Aggregated
                 originalActor.ActorNumber.Value,
                 originalActor.ActorRole.Name,
                 BusinessReason.BalanceFixing,
-                PeriodStart: CreateDateInstant(2022, 2, 1),
-                PeriodEnd: CreateDateInstant(2022, 1, 1),
+                PeriodStart: CreateDateInstant(2022, 1, 1),
+                PeriodEnd: CreateDateInstant(2022, 3, 1),
                 energySupplierNumber?.Value,
                 balanceResponsibleParty?.Value,
                 gridAreasWithDelegation,
