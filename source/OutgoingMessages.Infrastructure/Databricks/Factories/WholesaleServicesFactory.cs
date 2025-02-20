@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults;
@@ -19,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTabl
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using ChargeTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ChargeTypeMapper;
+using Currency = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Currency;
 using MeteringPointTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.MeteringPointTypeMapper;
 using ResolutionMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ResolutionMapper;
 using SettlementMethodMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.SettlementMethodMapper;
@@ -73,7 +75,7 @@ public static class WholesaleServicesFactory
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        var period = PeriodHelper.GetPeriod(timeSeriesPoints, Resolution.Month);
+        var period = PeriodHelper.GetPeriod(timeSeriesPoints, Resolution.Monthly);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
 
@@ -85,7 +87,7 @@ public static class WholesaleServicesFactory
             ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow[MonthlyAmountsPerChargeViewColumnNames.ChargeType]!),
             databricksSqlRow[MonthlyAmountsPerChargeViewColumnNames.ChargeOwnerId]!,
             AmountType.MonthlyAmountPerCharge,
-            Resolution.Month,
+            Resolution.Monthly,
             QuantityUnitMapper.FromDeltaTableValue(databricksSqlRow[MonthlyAmountsPerChargeViewColumnNames.QuantityUnit]!),
             null,
             null,
@@ -100,7 +102,7 @@ public static class WholesaleServicesFactory
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        var period = PeriodHelper.GetPeriod(timeSeriesPoints, Resolution.Month);
+        var period = PeriodHelper.GetPeriod(timeSeriesPoints, Resolution.Monthly);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
 
@@ -112,7 +114,7 @@ public static class WholesaleServicesFactory
             null,
             databricksSqlRow[TotalMonthlyAmountsViewColumnNames.ChargeOwnerId],
             AmountType.TotalMonthlyAmount,
-            Resolution.Month,
+            Resolution.Monthly,
             null,
             null,
             null,
