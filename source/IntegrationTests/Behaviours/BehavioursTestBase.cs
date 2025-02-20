@@ -53,7 +53,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
-using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
@@ -500,8 +499,7 @@ public class BehavioursTestBase : IDisposable
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule()
-            .AddEnqueueActorMessagesFromProcessManager(new DefaultAzureCredential())
-            .AddEdiModule(config);
+            .AddEnqueueActorMessagesFromProcessManager(new DefaultAzureCredential());
 
         _services.AddTransient<InboxEventsProcessor>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(

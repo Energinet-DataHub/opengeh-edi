@@ -16,7 +16,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
-using Energinet.DataHub.Wholesale.Edi.Models;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
