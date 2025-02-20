@@ -60,7 +60,7 @@ public class ResolutionMapperTests
     }
 
     [Fact]
-    public void Given_InvalidDeltaTableValue_When_InvalidDeltaTableValue_Then_ThrowsArgumentOutOfRangeException()
+    public void Given_InvalidDeltaTableValue_When_MappingToResolution_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
@@ -75,7 +75,7 @@ public class ResolutionMapperTests
 
     [Theory]
     [MemberData(nameof(GetInvalidResolutions))]
-    public void Given_InvalidResolutionDeltaTableValue_When_InvalidDeltaTableValue_Then_ThrowsArgumentOutOfRangeException(Resolution invalidResolution)
+    public void Given_InvalidResolution_When_MappingToDeltaTableValue_Then_ThrowsArgumentOutOfRangeException(Resolution invalidResolution)
     {
         // Act
         var act = () => ResolutionMapper.ToDeltaTableValue(invalidResolution);
