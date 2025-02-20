@@ -12,30 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.SqlStatements.Mappers.WholesaleResult;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databricks.DeltaTableMappers;
 
 public class ChargeTypeMapperTests
 {
+    public static TheoryData<string, ChargeType> GetChargeTypeTestData =>
+        new()
+        {
+            { "fee", ChargeType.Fee },
+            { "subscription", ChargeType.Subscription },
+            { "tariff", ChargeType.Tariff },
+        };
+
     [Theory]
-    [InlineData("fee", ChargeType.Fee)]
-    [InlineData("subscription", ChargeType.Subscription)]
-    [InlineData("tariff", ChargeType.Tariff)]
-    public void FromDeltaTableValue_WhenValidDeltaTableValue_ReturnsExpectedType(string deltaTableValue, ChargeType expectedType)
+    [MemberData(nameof(GetChargeTypeTestData))]
+    public void Given_ChargeType_When_MappingToAndFromDeltaTable_Then_ReturnsExpectedValue(string deltaTableValue, ChargeType chargeType)
     {
         // Act
         var actualType = ChargeTypeMapper.FromDeltaTableValue(deltaTableValue);
+        var actualDeltaTableValue = ChargeTypeMapper.ToDeltaTableValue(chargeType);
 
         // Assert
-        actualType.Should().Be(expectedType);
+        actualType.Should().Be(chargeType);
+        actualDeltaTableValue.Should().Be(deltaTableValue);
     }
 
     [Fact]
-    public void FromDeltaTableValue_WhenInvalidDeltaTableValue_ThrowsArgumentOutOfRangeException()
+    public void Given_invalidDatabricksChargeType_When_MappingToChargeType_Then_ThrowsException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
@@ -48,27 +55,14 @@ public class ChargeTypeMapperTests
             .And.ActualValue.Should().Be(invalidDeltaTableValue);
     }
 
-    [Theory]
-    [InlineData("fee", ChargeType.Fee)]
-    [InlineData("subscription", ChargeType.Subscription)]
-    [InlineData("tariff", ChargeType.Tariff)]
-    public void ToDeltaTableValue_WhenValidChargeTypeValue_ReturnsExpectedString(string expectedDeltaTableValue, ChargeType chargeType)
-    {
-        // Act
-        var actualDeltaTableValue = ChargeTypeMapper.ToDeltaTableValue(chargeType);
-
-        // Assert
-        actualDeltaTableValue.Should().Be(expectedDeltaTableValue);
-    }
-
     [Fact]
-    public void ToDeltaTableValue_WhenInvalidChargeTypeValue_ThrowsArgumentOutOfRangeException()
+    public void Given_invalidChargeType_When_MappingToDatabricksChargeType_Then_ThrowsException()
     {
         // Arrange
-        var invalidChargeTypeValue = (ChargeType)int.MinValue;
+        ChargeType invalidChargeTypeValue = null!;
 
         // Act
-        var act = () => ChargeTypeMapper.ToDeltaTableValue(invalidChargeTypeValue);
+        var act = () => ChargeTypeMapper.ToDeltaTableValue(null!);
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()

@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
-using ChargeType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.ChargeType;
 using ChargeTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ChargeTypeMapper;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
@@ -237,7 +236,7 @@ public sealed class WholesaleServicesQuerySnippetProvider(
         if (chargeType != null)
         {
             sqlStatements.Add(
-                $"{table}.{DatabricksContract.GetChargeTypeColumnName()} = '{ChargeTypeMapper.ToDeltaTableValue(chargeType.Value)}'");
+                $"{table}.{DatabricksContract.GetChargeTypeColumnName()} = '{ChargeTypeMapper.ToDeltaTableValue(chargeType)}'");
         }
 
         var combinedString = string.Join(" AND ", sqlStatements);
