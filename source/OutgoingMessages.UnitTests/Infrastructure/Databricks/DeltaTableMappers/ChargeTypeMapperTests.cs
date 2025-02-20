@@ -20,12 +20,13 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databr
 
 public class ChargeTypeMapperTests
 {
-    public static IEnumerable<object[]> GetChargeTypeTestData()
-    {
-        yield return ["fee", ChargeType.Fee];
-        yield return ["subscription", ChargeType.Subscription];
-        yield return ["tariff", ChargeType.Tariff];
-    }
+    public static TheoryData<string, ChargeType> GetChargeTypeTestData =>
+        new()
+        {
+            { "fee", ChargeType.Fee },
+            { "subscription", ChargeType.Subscription },
+            { "tariff", ChargeType.Tariff },
+        };
 
     [Theory]
     [MemberData(nameof(GetChargeTypeTestData))]
