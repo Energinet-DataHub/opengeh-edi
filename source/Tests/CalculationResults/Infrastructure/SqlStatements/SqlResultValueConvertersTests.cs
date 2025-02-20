@@ -104,20 +104,6 @@ public class SqlResultValueConvertersTests
     }
 
     [Fact]
-    public void ToQuantityQualities_WhenValueIsValid_ReturnsQuantityQualities()
-    {
-        // Arrange
-        const string value = "[\"measured\", \"calculated\"]";
-        var expected = new List<QuantityQuality> { QuantityQuality.Measured, QuantityQuality.Calculated };
-
-        // Act
-        var actual = SqlResultValueConverters.ToQuantityQualities(value);
-
-        // Assert
-        actual.Should().BeEquivalentTo(expected);
-    }
-
-    [Fact]
     public void ToTimeSeriesType_WhenValueIsValid_ReturnsTimeSeriesType()
     {
         // Arrange

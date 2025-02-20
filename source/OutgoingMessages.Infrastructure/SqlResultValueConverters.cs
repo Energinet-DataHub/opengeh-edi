@@ -52,18 +52,8 @@ public static class SqlResultValueConverters
         return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
     }
 
-    public static IReadOnlyCollection<QuantityQuality>? ToQuantityQualities(string? value)
-    {
-        return QuantityQualityMapper.TryFromDeltaTableValues(value);
-    }
-
     public static TimeSeriesType ToTimeSeriesType(string value)
     {
         return Databricks.CalculationResults.Mappers.EnergyResults.TimeSeriesTypeMapper.FromDeltaTableValue(value);
-    }
-
-    public static Guid ToGuid(string value)
-    {
-        return Guid.Parse(value);
     }
 }
