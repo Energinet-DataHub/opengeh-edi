@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Immutable;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
@@ -118,7 +117,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
         return new WholesaleTimeSeriesPoint(
             databricksSqlRow.ToInstant(WholesaleResultColumnNames.Time),
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Quantity),
-            QuantityQualitiesMapper.TryFromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityQualities)),
+            QuantityQualityMapper.TryFromDeltaTableValues(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityQualities)),
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Price),
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Amount));
     }
