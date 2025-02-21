@@ -117,7 +117,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [TestCaseOrderer(
     ordererTypeName: "Energinet.DataHub.EDI.SubsystemTests.TestOrdering.TestOrderer",
-    ordererAssemblyName: "Energinet.DataHub.Wholesale.SubsystemTests")]
+    ordererAssemblyName: "Energinet.DataHub.EDI.SubsystemTests")]
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 
