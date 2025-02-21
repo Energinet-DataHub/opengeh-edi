@@ -13,16 +13,20 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.Edi.Responses;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
-public record ExampleEnergyResultMessageForActor(
+public record ExampleWholesaleResultMessageForActor(
     string GridArea,
-    MeteringPointType MeteringPointType,
+    Currency Currency,
+    ActorNumber EnergySupplier,
+    MeteringPointType? MeteringPointType,
     SettlementMethod? SettlementMethod,
     Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
     int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points,
+    string? ChargeCode = null,
+    ChargeType? ChargeType = null,
+    MeasurementUnit? MeasurementUnit = null);
