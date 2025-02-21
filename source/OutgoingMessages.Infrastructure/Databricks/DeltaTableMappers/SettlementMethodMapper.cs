@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Calculati
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 
-// TODO: add unit tests
 public static class SettlementMethodMapper
 {
     public static SettlementMethod? FromDeltaTableValue(string? settlementMethod) =>

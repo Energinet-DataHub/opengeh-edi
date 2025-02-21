@@ -16,9 +16,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.SqlStatements.Mappers.EnergyResult;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
 
 public class AggregationLevelMapperTests
 {
@@ -28,12 +27,12 @@ public class AggregationLevelMapperTests
             new object?[] { MeteringPointType.Exchange, null, null, null, AggregationLevel.GridArea },
             new object?[] { MeteringPointType.Consumption, null, null, null, AggregationLevel.GridArea },
             new object?[] { MeteringPointType.Production, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
-            new object?[] { MeteringPointType.Production, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
             new object?[] { MeteringPointType.Production, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            new object?[] { MeteringPointType.Production, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
             new object?[] { null, null, null, null, AggregationLevel.GridArea },
             new object?[] { null, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
-            new object?[] { null, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
             new object?[] { null, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            new object?[] { null, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
         };
 
     public static IEnumerable<object?[]> InvalidAggregationLevelData =>

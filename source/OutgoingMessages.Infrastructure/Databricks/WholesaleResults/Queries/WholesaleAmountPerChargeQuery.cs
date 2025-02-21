@@ -25,7 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
-using ResolutionMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers.ResolutionMapper;
+using ResolutionMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ResolutionMapper;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 

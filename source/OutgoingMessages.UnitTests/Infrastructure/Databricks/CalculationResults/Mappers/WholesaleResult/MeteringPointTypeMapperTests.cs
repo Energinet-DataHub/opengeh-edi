@@ -16,9 +16,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.SqlStatements.Mappers.WholesaleResult;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResult;
 
 public class MeteringPointTypeMapperTests
 {
@@ -44,7 +43,7 @@ public class MeteringPointTypeMapperTests
 
     [Theory]
     [MemberData(nameof(MeteringPointTypeData))]
-    public void FromDeltaTableValue_ReturnsExpectedMeteringPointType(string? deltaValue, MeteringPointType? expected)
+    public void Given_DeltaTableValue_WhenIsValid_Then_ReturnsExpectedMeteringPointType(string? deltaValue, MeteringPointType? expected)
     {
         // Act
         var actual = MeteringPointTypeMapper.FromDeltaTableValue(deltaValue);
@@ -54,7 +53,7 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void FromDeltaTableValue_WhenDeltaValueIsNull_ReturnsNull()
+    public void Given_DeltaTableValue_WhenIsNull_Then_ReturnsNull()
     {
         // Act
         var actual = MeteringPointTypeMapper.FromDeltaTableValue(null);
@@ -64,7 +63,7 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void FromDeltaTableValue_WhenInvalidDeltaTableValue_ThrowsArgumentOutOfRangeException()
+    public void Given_DeltaTableValue_WhenIsInvalid_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();

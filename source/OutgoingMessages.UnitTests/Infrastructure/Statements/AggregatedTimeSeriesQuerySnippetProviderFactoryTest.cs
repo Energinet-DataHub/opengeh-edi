@@ -16,9 +16,8 @@ using System.Reflection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.Statements;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Statements;
 
 public class AggregatedTimeSeriesQuerySnippetProviderFactoryTest
 {

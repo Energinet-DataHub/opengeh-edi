@@ -36,8 +36,7 @@ public static class AggregatedTimeSeriesFactory
             databricksSqlRow.ToNonEmptyString(databricksContract.GetCalculationTypeColumnName()));
         var meteringPointType = MeteringPointTypeMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(databricksContract.GetMeteringPointTypeColumnName()));
-        var settlementMethod =
-            SettlementMethodMapper.FromDeltaTableValue(
+        var settlementMethod = SettlementMethodMapper.FromDeltaTableValue(
                 databricksSqlRow[databricksContract.GetSettlementMethodColumnName()]);
 
         return new AggregatedTimeSeries(

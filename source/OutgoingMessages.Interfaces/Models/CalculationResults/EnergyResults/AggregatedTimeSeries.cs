@@ -53,7 +53,7 @@ public class AggregatedTimeSeries
     /// </summary>
     public EnergyTimeSeriesPoint[] TimeSeriesPoints { get; init; }
 
-    public Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType MeteringPointType { get; }
+    public MeteringPointType MeteringPointType { get; }
 
     public Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod? SettlementMethod { get; }
 
