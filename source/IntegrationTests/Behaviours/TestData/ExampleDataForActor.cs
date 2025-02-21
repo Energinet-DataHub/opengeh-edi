@@ -14,6 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
 public record ExampleDataForActor<TMessageData>(ActorNumber ActorNumber, int ExpectedOutgoingMessagesCount, TMessageData ExampleMessageData);
