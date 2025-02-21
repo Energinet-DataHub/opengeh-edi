@@ -25,7 +25,6 @@ jobs:
       solution_file_path: source/Edi.Repository.sln
 
   # Tests that do not require the integration test environment
-  # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   tests:
     strategy:
       fail-fast: false
@@ -49,36 +48,11 @@ jobs:
       tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
 
   # Tests that require the integration test environment
-  # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   integration_tests:
     strategy:
       fail-fast: false
       matrix:
         tests_filter_expression:
-          - name: ProcessManager Tests
-            paths: \source\ProcessManager.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Tests.dll
-            filter: empty # Means skip
-            use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip
-
-          - name: ProcessManager Orchestrations Tests
-            paths: \source\ProcessManager.Orchestrations.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll
-            filter: empty # Means skip
-            use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip
-
-          - name: ProcessManager Core Tests
-            paths: \source\ProcessManager.Core.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Core.Tests.dll
-            filter: empty # Means skip
-            use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip
-
-          - name: ProcessManager Subsystem Tests
-            paths: \source\ProcessManager.SubsystemTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.SubsystemTests.dll
-            filter: empty # Means skip
-            use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip
-
           - name: B2BApi AppTests
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
             filter: empty # Means skip
