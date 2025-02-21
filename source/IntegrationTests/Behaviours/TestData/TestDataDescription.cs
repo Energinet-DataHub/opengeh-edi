@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 
 /// <summary>
 /// Contains information to prepare test input from a file, as well as
@@ -26,8 +26,8 @@ public abstract class TestDataDescription
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(testFilename);
 
-        TestFilePath = Path.Combine("Behaviours", "IntegrationEvents", "TestData", testFilename);
-        TestFilePathWithAInvalidRow = Path.Combine("Behaviours", "IntegrationEvents", "TestData", testFilenameWithAInvalidRow);
+        TestFilePath = Path.Combine("Behaviours", "TestData", testFilename);
+        TestFilePathWithAInvalidRow = Path.Combine("Behaviours", "TestData", testFilenameWithAInvalidRow);
     }
 
     /// <summary>
