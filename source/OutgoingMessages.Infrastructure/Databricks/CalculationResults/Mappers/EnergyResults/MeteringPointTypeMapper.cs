@@ -23,40 +23,31 @@ public static class MeteringPointTypeMapper
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(meteringPointType);
 
-        Dictionary<string, MeteringPointType> meteringPointTypeMap = new()
+        return meteringPointType switch
         {
-            { DeltaTableMeteringPointType.Consumption, MeteringPointType.Consumption },
-            { DeltaTableMeteringPointType.Production, MeteringPointType.Production },
-            { DeltaTableMeteringPointType.Exchange, MeteringPointType.Exchange },
-        };
-
-        if (!meteringPointTypeMap.TryGetValue(meteringPointType, out var value))
-        {
-            throw new ArgumentOutOfRangeException(
+            DeltaTableMeteringPointType.Consumption => MeteringPointType.Consumption,
+            DeltaTableMeteringPointType.Production => MeteringPointType.Production,
+            DeltaTableMeteringPointType.Exchange => MeteringPointType.Exchange,
+            _ => throw new ArgumentOutOfRangeException(
                 nameof(meteringPointType),
                 actualValue: meteringPointType,
-                "Value does not contain a valid string representation of a metering point type.");
-        }
-
-        return value;
+                "Value does not contain a valid string representation of a metering point type."),
+        };
     }
 
     public static string? ToDeltaTableValue(MeteringPointType? meteringPointType)
     {
-        if (meteringPointType is null) return null;
-
-        Dictionary<string, string> meteringPointTypeMap = new()
+        return meteringPointType switch
         {
-            { MeteringPointType.Consumption.Name, DeltaTableMeteringPointType.Consumption },
-            { MeteringPointType.Production.Name, DeltaTableMeteringPointType.Production },
-            { MeteringPointType.Exchange.Name, DeltaTableMeteringPointType.Exchange },
+            var mp when mp == MeteringPointType.Consumption => DeltaTableMeteringPointType.Consumption,
+            var mp when mp == MeteringPointType.Production => DeltaTableMeteringPointType.Production,
+            var mp when mp == MeteringPointType.Exchange => DeltaTableMeteringPointType.Exchange,
+            null => null,
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(meteringPointType),
+                meteringPointType,
+                null),
         };
-
-        if (!meteringPointTypeMap.TryGetValue(meteringPointType.Name, out var value))
-        {
-            throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, null);
-        }
-
-        return value;
     }
 }

@@ -34,19 +34,16 @@ public static class SettlementMethodMapper
 
     public static string? ToDeltaTableValue(SettlementMethod? settlementMethod)
     {
-        if (settlementMethod == null) return null;
-
-        Dictionary<SettlementMethod, string> settlementMethodMap = new()
+        return settlementMethod switch
         {
-            { SettlementMethod.Flex, DeltaTableSettlementMethod.Flex },
-            { SettlementMethod.NonProfiled, DeltaTableSettlementMethod.NonProfiled },
+            var sm when sm == SettlementMethod.Flex => DeltaTableSettlementMethod.Flex,
+            var sm when sm == SettlementMethod.NonProfiled => DeltaTableSettlementMethod.NonProfiled,
+            null => null,
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(settlementMethod),
+                settlementMethod,
+                "Value does not contain a valid string representation of a settlement method."),
         };
-
-        if (!settlementMethodMap.TryGetValue(settlementMethod, out var value))
-        {
-            throw new ArgumentOutOfRangeException(nameof(settlementMethod), settlementMethod, "Value does not contain a valid string representation of a settlement method.");
-        }
-
-        return value;
     }
 }

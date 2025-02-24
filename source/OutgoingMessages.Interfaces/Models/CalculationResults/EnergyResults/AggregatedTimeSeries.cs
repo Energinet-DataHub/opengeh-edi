@@ -22,8 +22,8 @@ public class AggregatedTimeSeries
     public AggregatedTimeSeries(
         string gridArea,
         EnergyTimeSeriesPoint[] timeSeriesPoints,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType meteringPointType,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod? settlementMethod,
+        MeteringPointType meteringPointType,
+        SettlementMethod? settlementMethod,
         BusinessReason businessReason,
         SettlementVersion? settlementVersion,
         Instant periodStart,
@@ -55,7 +55,7 @@ public class AggregatedTimeSeries
 
     public MeteringPointType MeteringPointType { get; }
 
-    public Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementMethod? SettlementMethod { get; }
+    public SettlementMethod? SettlementMethod { get; }
 
     public BusinessReason BusinessReason { get; }
 

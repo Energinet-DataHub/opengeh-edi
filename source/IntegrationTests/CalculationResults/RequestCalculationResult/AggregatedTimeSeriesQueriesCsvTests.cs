@@ -585,7 +585,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                MeteringPointType: MeteringPointType.Production,
+                MeteringPointType: null,
                 SettlementMethod: null,
                 GridAreaCodes: [],
                 EnergySupplierId: null,
@@ -612,7 +612,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
-                MeteringPointType: MeteringPointType.Consumption,
+                MeteringPointType: null,
                 SettlementMethod: SettlementMethod.Flex,
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierTwo,
@@ -629,6 +629,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 .Should()
                 .BeEquivalentTo([
                     ("584", MeteringPointType.Consumption, SettlementMethod.Flex, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
+                    ("584", MeteringPointType.Consumption, SettlementMethod.NonProfiled, Instant.FromUtc(2021, 12, 31, 23, 0), Instant.FromUtc(2022, 1, 8, 23, 0), BusinessReason.Correction, SettlementVersion.SecondCorrection, 3),
                 ]);
         }
     }
