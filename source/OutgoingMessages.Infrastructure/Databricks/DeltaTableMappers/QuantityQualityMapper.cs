@@ -36,6 +36,16 @@ public static class QuantityQualityMapper
         return qualities.Select(FromDeltaTableValue).ToArray();
     }
 
+    public static IReadOnlyCollection<QuantityQuality>? TryFromDeltaTableValuesNullReturn(string? value)
+    {
+        if (value == null)
+            return null;
+
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(FromDeltaTableValue).ToArray();
+    }
+
     internal static QuantityQuality FromDeltaTableValue(string pointQuality)
     {
         return pointQuality switch
