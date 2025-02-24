@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults;
 
@@ -21,9 +21,9 @@ public static class ResolutionMapper
     public static Resolution FromDeltaTableValue(string resolution) =>
         resolution switch
         {
-            "P1M" => Resolution.Month,
-            "P1D" => Resolution.Day,
-            "PT1H" => Resolution.Hour,
+            "P1M" => Resolution.Monthly,
+            "P1D" => Resolution.Daily,
+            "PT1H" => Resolution.Hourly,
             _ => throw new ArgumentOutOfRangeException(
                 nameof(resolution),
                 actualValue: resolution,
@@ -33,9 +33,9 @@ public static class ResolutionMapper
     public static string ToDeltaTableValue(Resolution resolution) =>
         resolution switch
         {
-            Resolution.Month => "P1M",
-            Resolution.Day => "P1D",
-            Resolution.Hour => "PT1H",
+            var res when res == Resolution.Monthly => "P1M",
+            var res when res == Resolution.Daily => "P1D",
+            var res when res == Resolution.Hourly => "PT1H",
             _ => throw new ArgumentOutOfRangeException(
                 nameof(resolution),
                 actualValue: resolution,

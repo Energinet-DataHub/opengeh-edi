@@ -1,4 +1,4 @@
-﻿﻿// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
@@ -136,7 +135,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             documentFormat);
 
         // Then (assert)
-        peekResultsForBalanceResponsible.Should().HaveCount(testDataDescription.ExampleBalanceResponsible.ExpectedOutgoingMessagesCount);
+        peekResultsForBalanceResponsible.Should().HaveCount(testDataDescription.ExampleBalanceResponsible.ExpectedOutgoingMessagesCount * testDataDescription.GridAreaCodes.Count);
 
         var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
