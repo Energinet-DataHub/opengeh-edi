@@ -69,6 +69,6 @@ public class QuantityQualityMapperTests
         var act = QuantityQualityMapper.TryFromDeltaTableValues(nullDeltaTableValue);
 
         // Act
-        act.Should().BeNull();
+        act.Should().BeEmpty();
     }
 }
