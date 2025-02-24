@@ -613,7 +613,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
 
             var parameters = new AggregatedTimeSeriesQueryParameters(
                 MeteringPointType: null,
-                SettlementMethod: SettlementMethod.Flex,
+                SettlementMethod: null,
                 GridAreaCodes: [],
                 EnergySupplierId: EnergySupplierTwo,
                 BalanceResponsibleId: BalanceResponsibleOne,
