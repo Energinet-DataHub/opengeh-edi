@@ -32,7 +32,7 @@ public class QuantityQualityMapperTests
 
     [Theory]
     [MemberData(nameof(GetQuantityQualityTestData))]
-    public void FromDeltaTableValues_ReturnsValidQuantityQuality(string deltaValue, QuantityQuality expected)
+    public void Given_QuantityQuality_When_MappingToAndFromDeltaTable_Then_ReturnsExpectedValue(string deltaValue, QuantityQuality expected)
     {
         // Arrange
         var value = $"[\"{deltaValue}\"]";
@@ -45,7 +45,7 @@ public class QuantityQualityMapperTests
     }
 
     [Fact]
-    public void FromDeltaTableValues_WhenInvalidDeltaTableValue_ThrowsArgumentOutOfRangeException()
+    public void Given_InvalidDatabricksQuantityQuality_When_MappingToQuantityQuality_Then_ThrowsException()
     {
         // Arrange
         var expectedGuid = Guid.NewGuid().ToString();
@@ -60,7 +60,7 @@ public class QuantityQualityMapperTests
     }
 
     [Fact]
-    public void TryFromDeltaTableValues_WhenNullDeltaTableValue_ReturnNull()
+    public void Given_NullDatabricksQuantityQuality_When_MappingToQuantityQuality_Then_ReturnsNull()
     {
         // Arrange
         string? nullDeltaTableValue = null;
