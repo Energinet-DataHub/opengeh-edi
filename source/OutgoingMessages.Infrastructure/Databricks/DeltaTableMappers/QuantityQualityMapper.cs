@@ -19,7 +19,24 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Delta
 
 public static class QuantityQualityMapper
 {
-    public static QuantityQuality FromDeltaTableValue(string pointQuality)
+    public static IReadOnlyCollection<QuantityQuality> FromDeltaTableValues(string value)
+    {
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(FromDeltaTableValue).ToArray();
+    }
+
+    public static IReadOnlyCollection<QuantityQuality>? TryFromDeltaTableValues(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(FromDeltaTableValue).ToArray();
+    }
+
+    internal static QuantityQuality FromDeltaTableValue(string pointQuality)
     {
         return pointQuality switch
         {
@@ -33,22 +50,5 @@ public static class QuantityQualityMapper
                 actualValue: pointQuality,
                 "Value does not contain a valid string representation of a quantity quality."),
         };
-    }
-
-    public static IReadOnlyCollection<QuantityQuality> FromDeltaTableValues(string value)
-    {
-        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
-
-        return qualities.Select(FromDeltaTableValue).ToArray();
-    }
-
-    public static IReadOnlyCollection<QuantityQuality> TryFromDeltaTableValues(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return [];
-
-        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
-
-        return qualities.Select(FromDeltaTableValue).ToArray();
     }
 }

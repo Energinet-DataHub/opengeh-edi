@@ -102,8 +102,10 @@ public static class CalculatedQuantityQualityMapper
         return MapWholesaleQuantityQuality(quantityQualities, hasPrice, chargeType);
     }
 
-    public static CalculatedQuantityQuality MapForWholesaleAmountPerCharge(IReadOnlyCollection<QuantityQuality> quantityQualities, bool hasPrice, ChargeType? chargeType)
+    public static CalculatedQuantityQuality MapForWholesaleAmountPerCharge(IReadOnlyCollection<QuantityQuality>? quantityQualities, bool hasPrice, ChargeType? chargeType)
     {
+        ArgumentNullException.ThrowIfNull(quantityQualities);
+
         return MapWholesaleQuantityQuality(quantityQualities, hasPrice, chargeType);
     }
 

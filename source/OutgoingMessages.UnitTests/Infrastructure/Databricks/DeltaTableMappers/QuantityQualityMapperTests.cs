@@ -12,28 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.SqlStatements.Mappers;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databricks.DeltaTableMappers;
 
 public class QuantityQualityMapperTests
 {
+    public static TheoryData<string, QuantityQuality> GetQuantityQualityTestData =>
+    new()
+    {
+                { "caluclated", QuantityQuality.Calculated },
+                { "estimated", QuantityQuality.Estimated },
+                { "measured", QuantityQuality.Measured },
+                { "missing", QuantityQuality.Missing },
+    };
+
     [Theory]
-    [InlineAutoMoqData("calculated", QuantityQuality.Calculated)]
-    [InlineAutoMoqData("estimated", QuantityQuality.Estimated)]
-    [InlineAutoMoqData("measured", QuantityQuality.Measured)]
-    [InlineAutoMoqData("missing", QuantityQuality.Missing)]
-    public void FromDeltaTableValue_ReturnsValidQuantityQuality(string deltaValue, QuantityQuality? expected)
+    [MemberData(nameof(GetQuantityQualityTestData))]
+    public void FromDeltaTableValue_ReturnsValidQuantityQuality(string deltaValue, QuantityQuality expected)
     {
         // Act
-        var actual = QuantityQualityMapper.FromDeltaTableValue(deltaValue);
+        var actual = QuantityQualityMapper.FromDeltaTableValues(deltaValue);
 
         // Assert
-        actual.Should().Be(expected);
+        actual.Should().Contain(expected);
     }
 
     [Fact]
@@ -43,10 +47,23 @@ public class QuantityQualityMapperTests
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
 
         // Act
-        var act = () => QuantityQualityMapper.FromDeltaTableValue(invalidDeltaTableValue);
+        var act = () => QuantityQualityMapper.FromDeltaTableValues(invalidDeltaTableValue);
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()
             .And.ActualValue.Should().Be(invalidDeltaTableValue);
+    }
+
+    [Fact]
+    public void TryFromDeltaTableValue_WhenNullDeltaTableValue_ReturnNull()
+    {
+        // Arrange
+        string? nullDeltaTableValue = null;
+
+        // Assert
+        var act = QuantityQualityMapper.TryFromDeltaTableValues(nullDeltaTableValue);
+
+        // Act
+        act.Should().BeNull();
     }
 }
