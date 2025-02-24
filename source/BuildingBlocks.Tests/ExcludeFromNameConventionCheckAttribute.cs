@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Tests;
 
-[System.AttributeUsage(System.AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Method)]
 public sealed class ExcludeFromNameConventionCheckAttribute
-    : System.Attribute
+    : Attribute
 {
 }

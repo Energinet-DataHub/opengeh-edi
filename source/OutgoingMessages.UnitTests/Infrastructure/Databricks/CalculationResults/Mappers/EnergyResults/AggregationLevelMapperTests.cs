@@ -54,7 +54,7 @@ public class AggregationLevelMapperTests
 
     [Theory]
     [MemberData(nameof(AggregationLevelData))]
-    public void Map_ReturnsExpectedAggregationLevel(
+    public void Given_ValidInput_When_Mapping_Then_ReturnsExpectedAggregationLevel(
         MeteringPointType? meteringPointType,
         SettlementMethod? settlementMethod,
         string? energySupplierGln,
@@ -74,7 +74,7 @@ public class AggregationLevelMapperTests
 
     [Theory]
     [MemberData(nameof(InvalidAggregationLevelData))]
-    public void Map_WhenInvalidCombinationForConsumption_ThrowsInvalidOperationException(
+    public void Given_InvalidInput_When_Mapping_Then_ThrowsInvalidOperationException(
         MeteringPointType? meteringPointType,
         SettlementMethod? settlementMethod,
         string? energySupplierGln,

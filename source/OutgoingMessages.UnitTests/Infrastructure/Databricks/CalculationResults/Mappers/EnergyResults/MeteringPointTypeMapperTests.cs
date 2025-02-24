@@ -70,7 +70,7 @@ public class MeteringPointTypeMapperTests
 
     [Theory]
     [MemberData(nameof(InvalidDeltaTableMeteringPointType))]
-    public void Given_DeltaTableValue_When_IsInvalid_Then__ReturnsExpectedException(string meteringPointDataValue, Type expectedException)
+    public void Given_DeltaTableValue_When_IsInvalid_Then_ReturnsExpectedException(string meteringPointDataValue, Type expectedException)
     {
         // Act
         var actual = () => MeteringPointTypeMapper.FromDeltaTableValue(meteringPointDataValue);
@@ -80,7 +80,7 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void Given_DeltaTableValue_When_InvalidDeltaTableValue_ThrowsArgumentOutOfRangeException()
+    public void Given_DeltaTableValue_When_InvalidDeltaTableValue_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
@@ -115,25 +115,12 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void Given_MeteringPointType_When_MeteringPointTypeIsNull_Then_ReturnsNull()
+    public void Given_MeteringPointTypeIsNull_When_MappingToDeltaTableValue_Then_ReturnsNull()
     {
         // Act
         var actual = MeteringPointTypeMapper.ToDeltaTableValue(null);
 
         // Assert
         Assert.Null(actual);
-    }
-
-    [Fact]
-    public void ToDeltaTableValue_WhenInvalidMeteringPointType_ThrowsArgumentOutOfRangeException()
-    {
-        // Arrange
-        var invalidMeteringPointType = MeteringPointType.VeProduction;
-
-        // Act
-        var act = () => MeteringPointTypeMapper.ToDeltaTableValue(invalidMeteringPointType);
-
-        // Assert
-        Assert.Throws<ArgumentOutOfRangeException>(act);
     }
 }

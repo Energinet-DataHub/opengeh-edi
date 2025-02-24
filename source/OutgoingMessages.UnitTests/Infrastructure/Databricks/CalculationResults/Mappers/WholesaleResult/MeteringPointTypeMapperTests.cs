@@ -43,7 +43,7 @@ public class MeteringPointTypeMapperTests
 
     [Theory]
     [MemberData(nameof(MeteringPointTypeData))]
-    public void Given_DeltaTableValue_WhenIsValid_Then_ReturnsExpectedMeteringPointType(string? deltaValue, MeteringPointType? expected)
+    public void Given_DeltaTableValue_When_IsValid_Then_ReturnsExpectedMeteringPointType(string? deltaValue, MeteringPointType? expected)
     {
         // Act
         var actual = MeteringPointTypeMapper.FromDeltaTableValue(deltaValue);
@@ -53,7 +53,7 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void Given_DeltaTableValue_WhenIsNull_Then_ReturnsNull()
+    public void Given_DeltaTableValue_When_IsNull_Then_ReturnsNull()
     {
         // Act
         var actual = MeteringPointTypeMapper.FromDeltaTableValue(null);
@@ -63,7 +63,7 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void Given_DeltaTableValue_WhenIsInvalid_Then_ThrowsArgumentOutOfRangeException()
+    public void Given_DeltaTableValue_When_IsInvalid_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
