@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using FluentAssertions;
@@ -23,7 +24,7 @@ public class QuantityQualityMapperTests
     public static TheoryData<string, QuantityQuality> GetQuantityQualityTestData =>
     new()
     {
-                { "caluclated", QuantityQuality.Calculated },
+                { "calculated", QuantityQuality.Calculated },
                 { "estimated", QuantityQuality.Estimated },
                 { "measured", QuantityQuality.Measured },
                 { "missing", QuantityQuality.Missing },
@@ -33,8 +34,11 @@ public class QuantityQualityMapperTests
     [MemberData(nameof(GetQuantityQualityTestData))]
     public void FromDeltaTableValue_ReturnsValidQuantityQuality(string deltaValue, QuantityQuality expected)
     {
+        // Arrange
+        var value = $"[\"{deltaValue}\"]";
+
         // Act
-        var actual = QuantityQualityMapper.FromDeltaTableValues(deltaValue);
+        var actual = QuantityQualityMapper.FromDeltaTableValues(value);
 
         // Assert
         actual.Should().Contain(expected);
@@ -44,14 +48,15 @@ public class QuantityQualityMapperTests
     public void FromDeltaTableValue_WhenInvalidDeltaTableValue_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
-        var invalidDeltaTableValue = Guid.NewGuid().ToString();
+        var expectedGuid = Guid.NewGuid().ToString();
+        var invalidDeltaTableValue = $"[\"{expectedGuid}\"]";
 
         // Act
         var act = () => QuantityQualityMapper.FromDeltaTableValues(invalidDeltaTableValue);
 
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()
-            .And.ActualValue.Should().Be(invalidDeltaTableValue);
+            .And.ActualValue.Should().Be(expectedGuid);
     }
 
     [Fact]
