@@ -24,34 +24,25 @@ public static class AggregationLevelMapper
         string? energySupplierGln,
         string? balanceResponsiblePartyGln)
     {
-        if (meteringPointType == MeteringPointType.Consumption
-            && settlementMethod == null)
+        return (energySupplierGln, balanceResponsiblePartyGln) switch
         {
-                if (energySupplierGln == null && balanceResponsiblePartyGln == null)
-                    return AggregationLevel.GridArea;
-
-                throw new InvalidOperationException("It is only Metered Data Responsible that can request data for consumption without a settlement method." +
-                                                    $"Invalid combination of metering point type: '{meteringPointType}' and settlement method {settlementMethod}," +
-                                                    $" energy supplier: '{energySupplierGln}'" +
-                                                    $" and balance responsible: '{balanceResponsiblePartyGln}'.");
-        }
-
-        if (meteringPointType == MeteringPointType.Exchange)
-        {
-            if (energySupplierGln == null && balanceResponsiblePartyGln == null)
-                return AggregationLevel.GridArea;
-
-            throw new InvalidOperationException("It is only Metered Data Responsible that can request data for exchange without a settlement method." +
-                                                $"Invalid combination of metering point type: '{meteringPointType}' and settlement method {settlementMethod}," +
-                                                $" energy supplier: '{energySupplierGln}'" +
-                                                $" and balance responsible: '{balanceResponsiblePartyGln}'.");
-        }
-
-        return energySupplierGln switch
-        {
-            null when balanceResponsiblePartyGln == null => AggregationLevel.GridArea,
-            null when balanceResponsiblePartyGln != null => AggregationLevel.BalanceResponsibleAndGridArea,
-            _ => AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea,
+            (null, null) => AggregationLevel.GridArea,
+            _ => meteringPointType switch
+            {
+                var mpt when mpt == MeteringPointType.Consumption && settlementMethod == null =>
+                    throw new InvalidOperationException(
+                        "It is only Metered Data Responsible that can request data for consumption without a settlement method."
+                        + $"Invalid combination of metering point type: '{meteringPointType}' and settlement method {settlementMethod},"
+                        + $" energy supplier: '{energySupplierGln}'"
+                        + $" and balance responsible: '{balanceResponsiblePartyGln}'."),
+                var mpt when mpt == MeteringPointType.Exchange =>
+                    throw new InvalidOperationException(
+                        "It is only Metered Data Responsible that can request data for exchange without a settlement method."
+                        + $"Invalid combination of metering point type: '{meteringPointType}' and settlement method {settlementMethod},"
+                        + $" energy supplier: '{energySupplierGln}'"
+                        + $" and balance responsible: '{balanceResponsiblePartyGln}'."),
+                _ => energySupplierGln != null ? AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea : AggregationLevel.BalanceResponsibleAndGridArea,
+            },
         };
     }
 }
