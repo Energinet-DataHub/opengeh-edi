@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
     </ItemGroup>
 

@@ -15,16 +15,17 @@
 using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using ResolutionMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ResolutionMapper;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
@@ -121,7 +122,7 @@ public class WholesaleAmountPerChargeQuery(
             chargeType: chargeType,
             resolution: resolution,
             settlementVersion: settlementVersion,
-            meteringPointType: MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.MeteringPointType)),
+            meteringPointType: CalculationResults.Mappers.WholesaleResults.MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.MeteringPointType)),
             settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.SettlementMethod)),
             chargeCode: databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeCode),
             points: timeSeriesPoints
@@ -131,7 +132,7 @@ public class WholesaleAmountPerChargeQuery(
                         p.Quantity,
                         p.Price,
                         p.Amount,
-                        QuantityQualitiesFactory.CreateQuantityQuality(p.Price, p.Qualities, chargeType)))
+                        CalculatedQuantityQualityMapper.MapForWholesaleAmountPerCharge(p.Qualities, p.Price != null, chargeType)))
                 .ToList()
                 .AsReadOnly()));
     }

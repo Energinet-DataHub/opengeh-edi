@@ -12,13 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using System.Text.Json;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 
 public static class QuantityQualityMapper
 {
-    public static QuantityQuality FromDeltaTableValue(string pointQuality)
+    public static IReadOnlyCollection<QuantityQuality> FromDeltaTableValues(string value)
+    {
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(FromDeltaTableValue).ToArray();
+    }
+
+    public static IReadOnlyCollection<QuantityQuality> TryFromDeltaTableValues(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value)
+            ? []
+            : FromDeltaTableValues(value);
+    }
+
+    internal static QuantityQuality FromDeltaTableValue(string pointQuality)
     {
         return pointQuality switch
         {

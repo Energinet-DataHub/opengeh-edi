@@ -90,7 +90,7 @@ public abstract class EnergyResultQueryBase<TResult>(
         return new EnergyTimeSeriesPoint(
             databricksSqlRow.ToInstant(EnergyResultColumnNames.Time),
             databricksSqlRow.ToDecimal(EnergyResultColumnNames.Quantity),
-            QuantityQualitiesMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities)));
+            QuantityQualityMapper.FromDeltaTableValues(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities)));
     }
 
     /// <summary>
