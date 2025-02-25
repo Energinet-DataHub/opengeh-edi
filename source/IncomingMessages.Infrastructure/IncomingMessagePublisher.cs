@@ -136,14 +136,5 @@ public class IncomingMessagePublisher
             initializeMeteredDataForMeteringPointMessageProcessDto,
             cancellationToken)
         .ConfigureAwait(false);
-
-        // Enqueue message directly
-        // var serviceBusMessage =
-        //     new ServiceBusMessage(
-        //         _serializer.Serialize(initializeMeteredDataForMeteringPointMessageProcessDto))
-        //     {
-        //         Subject = nameof(InitializeMeteredDataForMeteringPointMessageProcessDto),
-        //     };
-        // await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }
