@@ -21,4 +21,4 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 /// Time series point from wholesale results.
 /// Immutable value object.
 /// </summary>
-public sealed record WholesaleTimeSeriesPoint(Instant TimeUtc, decimal? Quantity, IReadOnlyCollection<QuantityQuality>? Qualities, decimal? Price, decimal? Amount);
+public sealed record WholesaleTimeSeriesPoint(Instant TimeUtc, decimal? Quantity, IReadOnlyCollection<QuantityQuality> Qualities, decimal? Price, decimal? Amount);
