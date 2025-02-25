@@ -54,7 +54,7 @@ public class AggregationLevelMapperTests
             { MeteringPointType.Consumption, null, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
             { MeteringPointType.Consumption, null, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
         };
-        }
+    }
 
     [Theory]
     [MemberData(nameof(AggregationLevelData))]
