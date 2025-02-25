@@ -21,36 +21,40 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databr
 
 public class AggregationLevelMapperTests
 {
-    public static IEnumerable<object?[]> AggregationLevelData =>
-        new List<object?[]>
+    public static TheoryData<MeteringPointType?, SettlementMethod?, string?, string?, AggregationLevel> AggregationLevelData()
+    {
+        return new TheoryData<MeteringPointType?, SettlementMethod?, string?, string?, AggregationLevel>
         {
-            new object?[] { MeteringPointType.Exchange, null, null, null, AggregationLevel.GridArea },
-            new object?[] { MeteringPointType.Consumption, null, null, null, AggregationLevel.GridArea },
-            new object?[] { MeteringPointType.Production, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
-            new object?[] { MeteringPointType.Production, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
-            new object?[] { MeteringPointType.Production, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
-            new object?[] { null, null, null, null, AggregationLevel.GridArea },
-            new object?[] { null, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
-            new object?[] { null, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
-            new object?[] { null, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
+            { MeteringPointType.Exchange, null, null, null, AggregationLevel.GridArea },
+            { MeteringPointType.Consumption, null, null, null, AggregationLevel.GridArea },
+            { MeteringPointType.Production, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            { MeteringPointType.Production, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            { MeteringPointType.Production, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
+            { null, null, null, null, AggregationLevel.GridArea },
+            { null, null, "energySupplierGln", null, AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            { null, null, "energySupplierGln", "balanceResponsiblePartyGln", AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea },
+            { null, null, null, "balanceResponsiblePartyGln", AggregationLevel.BalanceResponsibleAndGridArea },
         };
+    }
 
-    public static IEnumerable<object?[]> InvalidAggregationLevelData =>
-        new List<object?[]>
+    public static TheoryData<MeteringPointType?, SettlementMethod?, string?, string?, Type> InvalidAggregationLevelData()
+    {
+        return new TheoryData<MeteringPointType?, SettlementMethod?, string?, string?, Type>
         {
-            new object?[] { MeteringPointType.Exchange, null, "energySupplierGln", null, typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, null, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, null, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, SettlementMethod.NonProfiled, "energySupplierGln", null, typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, SettlementMethod.NonProfiled, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, SettlementMethod.NonProfiled, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, SettlementMethod.Flex, "energySupplierGln", null, typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, SettlementMethod.Flex, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Exchange, SettlementMethod.Flex, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Consumption, null, "energySupplierGln", null, typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Consumption, null, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
-            new object?[] { MeteringPointType.Consumption, null, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, null, "energySupplierGln", null, typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, null, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, null, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, SettlementMethod.NonProfiled, "energySupplierGln", null, typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, SettlementMethod.NonProfiled, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, SettlementMethod.NonProfiled, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, SettlementMethod.Flex, "energySupplierGln", null, typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, SettlementMethod.Flex, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Exchange, SettlementMethod.Flex, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Consumption, null, "energySupplierGln", null, typeof(InvalidOperationException) },
+            { MeteringPointType.Consumption, null, null, "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
+            { MeteringPointType.Consumption, null, "energySupplierGln", "balanceResponsiblePartyGln", typeof(InvalidOperationException) },
         };
+        }
 
     [Theory]
     [MemberData(nameof(AggregationLevelData))]
