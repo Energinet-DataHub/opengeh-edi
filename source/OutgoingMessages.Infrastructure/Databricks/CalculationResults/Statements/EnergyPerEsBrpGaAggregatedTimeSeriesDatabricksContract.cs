@@ -49,9 +49,9 @@ public sealed class EnergyPerEsBrpGaAggregatedTimeSeriesDatabricksContract : IAg
         ];
     }
 
-    public string GetAggregationLevel()
+    public AggregationLevel GetAggregationLevel()
     {
-        return DeltaTableAggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea;
+        return AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea;
     }
 
     public string GetSource(DeltaTableOptions tableOptions)

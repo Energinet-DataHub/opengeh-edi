@@ -116,17 +116,4 @@ public class SqlResultValueConvertersTests
         // Assert
         actual.Should().BeEquivalentTo(expected);
     }
-
-    [Fact]
-    public void ToTimeSeriesType_WhenValueIsValid_ReturnsTimeSeriesType()
-    {
-        // Arrange
-        var value = "production";
-
-        // Act
-        var actual = SqlResultValueConverters.ToTimeSeriesType(value);
-
-        // Assert
-        actual.Should().Be(TimeSeriesType.Production);
-    }
 }

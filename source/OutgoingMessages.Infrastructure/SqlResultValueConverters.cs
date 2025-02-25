@@ -57,11 +57,6 @@ public static class SqlResultValueConverters
         return QuantityQualitiesMapper.FromDeltaTableValue(value);
     }
 
-    public static TimeSeriesType ToTimeSeriesType(string value)
-    {
-        return Databricks.CalculationResults.Mappers.EnergyResults.TimeSeriesTypeMapper.FromDeltaTableValue(value);
-    }
-
     public static Guid ToGuid(string value)
     {
         return Guid.Parse(value);

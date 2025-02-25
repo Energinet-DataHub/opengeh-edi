@@ -29,8 +29,6 @@ using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using MeteringPointType = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType;
-using SettlementMethod = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.CalculationResults.RequestCalculationResult;
 
