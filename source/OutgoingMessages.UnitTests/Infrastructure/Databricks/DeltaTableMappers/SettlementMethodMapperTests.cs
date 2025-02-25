@@ -20,16 +20,18 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databr
 
 public class SettlementMethodMapperTests
 {
-    public static IEnumerable<object[]> ValidSettlementMethod =>
-        new Dictionary<string, SettlementMethod>
+    public static TheoryData<string, SettlementMethod> ValidSettlementMethod()
+    {
+        return new TheoryData<string, SettlementMethod>
         {
             { DeltaTableSettlementMethod.NonProfiled, SettlementMethod.NonProfiled },
             { DeltaTableSettlementMethod.Flex, SettlementMethod.Flex },
-        }.Select(kvp => new object[] { kvp.Key, kvp.Value });
+        };
+    }
 
     [Theory]
     [MemberData(nameof(ValidSettlementMethod))]
-    public void Given_DeltaTableValue_When_IsValid_Then_ReturnsExceptedSettlementMethod(string? deltaValue, SettlementMethod? expected)
+    public void Given_ValidDeltaTableValue_When_MappingToSettlementMethod_Then_ReturnsExcepted(string? deltaValue, SettlementMethod? expected)
     {
         // Act
         var actual = SettlementMethodMapper.FromDeltaTableValue(deltaValue);
@@ -39,7 +41,7 @@ public class SettlementMethodMapperTests
     }
 
     [Fact]
-    public void Given_DeltaTableValue_When_IsNull_Then_ReturnsNull()
+    public void Given_DeltaTableValueIsNull_When_MappingToSettlementMethod_Then_ReturnsNull()
     {
         // Act
         var actual = SettlementMethodMapper.FromDeltaTableValue(null);
@@ -49,7 +51,7 @@ public class SettlementMethodMapperTests
     }
 
     [Fact]
-    public void Given_DeltaTableValue_When_IsInvalid_Then_ThrowsArgumentOutOfRangeException()
+    public void Given_InvalidDeltaTableValue_When_MappingToSettlementMethod_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();

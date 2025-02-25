@@ -21,8 +21,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databr
 
 public class MeteringPointTypeMapperTests
 {
-    public static IEnumerable<object?[]> MeteringPointTypeData =>
-        new Dictionary<string, MeteringPointType?>
+    public static TheoryData<string, MeteringPointType> MeteringPointTypeData()
+    {
+        return new TheoryData<string, MeteringPointType>
         {
             { DeltaTableMeteringPointType.Consumption, MeteringPointType.Consumption },
             { DeltaTableMeteringPointType.Production, MeteringPointType.Production },
@@ -39,11 +40,12 @@ public class MeteringPointTypeMapperTests
             { DeltaTableMeteringPointType.ElectricalHeating, MeteringPointType.ElectricalHeating },
             { DeltaTableMeteringPointType.NetConsumption, MeteringPointType.NetConsumption },
             { DeltaTableMeteringPointType.CapacitySettlement, MeteringPointType.CapacitySettlement },
-        }.Select(kvp => new object?[] { kvp.Key, kvp.Value });
+        };
+    }
 
     [Theory]
     [MemberData(nameof(MeteringPointTypeData))]
-    public void Given_DeltaTableValue_When_IsValid_Then_ReturnsExpectedMeteringPointType(string? deltaValue, MeteringPointType? expected)
+    public void Given_ValidDeltaTableValue_When_MappedToMeteringPointType_Then_ReturnsExpected(string? deltaValue, MeteringPointType? expected)
     {
         // Act
         var actual = MeteringPointTypeMapper.FromDeltaTableValue(deltaValue);
@@ -53,7 +55,7 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void Given_DeltaTableValue_When_IsNull_Then_ReturnsNull()
+    public void Given_DeltaTableValueIsNull_When_MappedToMeteringPointType_Then_ReturnsNull()
     {
         // Act
         var actual = MeteringPointTypeMapper.FromDeltaTableValue(null);
@@ -63,7 +65,7 @@ public class MeteringPointTypeMapperTests
     }
 
     [Fact]
-    public void Given_DeltaTableValue_When_IsInvalid_Then_ThrowsArgumentOutOfRangeException()
+    public void Given_InvalidDeltaTableValue_When_MappedToMeteringPointType_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();

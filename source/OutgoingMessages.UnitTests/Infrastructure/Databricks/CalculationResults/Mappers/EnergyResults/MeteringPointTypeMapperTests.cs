@@ -21,45 +21,61 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Databr
 
 public class MeteringPointTypeMapperTests
 {
-    public static IEnumerable<object[]> ValidDeltaTableMeteringPointType =>
-        new Dictionary<string, MeteringPointType>
+    public static TheoryData<string, MeteringPointType> ValidDeltaTableMeteringPointType()
+    {
+        return new TheoryData<string, MeteringPointType>
         {
             { DeltaTableMeteringPointType.Consumption, MeteringPointType.Consumption },
             { DeltaTableMeteringPointType.Production, MeteringPointType.Production },
             { DeltaTableMeteringPointType.Exchange, MeteringPointType.Exchange },
-        }.Select(kvp => new object[] { kvp.Key, kvp.Value });
+        };
+    }
 
-    public static IEnumerable<object[]> ValidMeteringPointType =>
-        new Dictionary<MeteringPointType, string>
+    public static TheoryData<MeteringPointType, string> ValidMeteringPointType()
+    {
+        return new TheoryData<MeteringPointType, string>
         {
             { MeteringPointType.Consumption, DeltaTableMeteringPointType.Consumption },
             { MeteringPointType.Production, DeltaTableMeteringPointType.Production },
             { MeteringPointType.Exchange, DeltaTableMeteringPointType.Exchange },
-        }.Select(kvp => new object[] { kvp.Key, kvp.Value });
+        };
+    }
 
-    public static IEnumerable<object[]> InvalidDeltaTableMeteringPointType()
+    public static TheoryData<string> InvalidDeltaTableMeteringPointType()
     {
         var fields = typeof(DeltaTableMeteringPointType).GetFields(
             BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
         var allDeltaTableMeteringPointTypes = fields.Select(f => f.GetValue(null)!.ToString());
-        var validDeltaTableMeteringPointTypes = ValidDeltaTableMeteringPointType
+        var validDeltaTableMeteringPointTypes = ValidDeltaTableMeteringPointType()
             .Select(valid => valid[0].ToString());
-        return allDeltaTableMeteringPointTypes.Except(validDeltaTableMeteringPointTypes)
-            .Select(invalid => new object[] { invalid!.ToString(), typeof(ArgumentOutOfRangeException) });
+        var data = new TheoryData<string>();
+
+        foreach (var deltaTableValue in allDeltaTableMeteringPointTypes.Except(validDeltaTableMeteringPointTypes))
+        {
+            data.Add(deltaTableValue!);
+        }
+
+        return data;
     }
 
-    public static IEnumerable<object[]> InvalidMeteringPointType()
+    public static TheoryData<MeteringPointType> InvalidMeteringPointType()
     {
         var allMeteringPointTypes = EnumerationType.GetAll<MeteringPointType>();
-        var validMeteringPointTypes = ValidMeteringPointType
+        var validMeteringPointTypes = ValidMeteringPointType()
             .Select(valid => (MeteringPointType)valid[0]);
-        return allMeteringPointTypes.Except(validMeteringPointTypes)
-            .Select(invalid => new object[] { invalid, typeof(ArgumentOutOfRangeException) });
+        var data = new TheoryData<MeteringPointType>();
+
+        foreach (var deltaTableValue in allMeteringPointTypes.Except(validMeteringPointTypes))
+        {
+            data.Add(deltaTableValue!);
+        }
+
+        return data;
     }
 
     [Theory]
     [MemberData(nameof(ValidDeltaTableMeteringPointType))]
-    public void Given_DeltaTableValue_When_IsValid_Then_ReturnsExpectedMeteringPointType(string meteringPointDataValue, MeteringPointType expectedMeteringPointType)
+    public void Given_ValidDeltaTableValue_When_MappingToMeteringPointType_Then_ReturnsExpected(string meteringPointDataValue, MeteringPointType expectedMeteringPointType)
     {
         // Act
         var actual = MeteringPointTypeMapper.FromDeltaTableValue(meteringPointDataValue);
@@ -70,17 +86,17 @@ public class MeteringPointTypeMapperTests
 
     [Theory]
     [MemberData(nameof(InvalidDeltaTableMeteringPointType))]
-    public void Given_DeltaTableValue_When_IsInvalid_Then_ReturnsExpectedException(string meteringPointDataValue, Type expectedException)
+    public void Given_InvalidDeltaTableValue_When_MappingToMeteringPointType_Then_ThrowsExpectedException(string meteringPointDataValue)
     {
         // Act
         var actual = () => MeteringPointTypeMapper.FromDeltaTableValue(meteringPointDataValue);
 
         // Assert
-        Assert.Throws(expectedException, actual);
+        Assert.Throws<ArgumentOutOfRangeException>(actual);
     }
 
     [Fact]
-    public void Given_DeltaTableValue_When_InvalidDeltaTableValue_Then_ThrowsArgumentOutOfRangeException()
+    public void Given_InvalidDeltaTableValue_When_MappingToMeteringPointType_Then_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
         var invalidDeltaTableValue = Guid.NewGuid().ToString();
@@ -94,7 +110,7 @@ public class MeteringPointTypeMapperTests
 
     [Theory]
     [MemberData(nameof(ValidMeteringPointType))]
-    public void Given_MeteringPointType_When_IsValid_Then_ReturnsExpectedDeltaTableValue(MeteringPointType meteringPointType, string expectedMeteringPointDataValue)
+    public void Given_ValidMeteringPointType_When_MappingToDeltaTableValue_Then_ReturnsExpected(MeteringPointType meteringPointType, string expectedMeteringPointDataValue)
     {
         // Act
         var actual = MeteringPointTypeMapper.ToDeltaTableValue(meteringPointType);
@@ -105,13 +121,13 @@ public class MeteringPointTypeMapperTests
 
     [Theory]
     [MemberData(nameof(InvalidMeteringPointType))]
-    public void Given_MeteringPointType_When_IsInvalid_Then_ReturnsExpectedDeltaTableValue(MeteringPointType meteringPointType, Type expectedException)
+    public void Given_InvalidMeteringPointType_When_MappingToDeltaTableValue_Then_ThrowsArgumentOutOfRangeException(MeteringPointType meteringPointType)
     {
         // Act
         var actual = () => MeteringPointTypeMapper.ToDeltaTableValue(meteringPointType);
 
         // Assert
-        Assert.Throws(expectedException, actual);
+        Assert.Throws<ArgumentOutOfRangeException>(actual);
     }
 
     [Fact]
