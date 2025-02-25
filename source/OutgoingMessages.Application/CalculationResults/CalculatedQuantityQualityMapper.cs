@@ -143,8 +143,7 @@ public static class CalculatedQuantityQualityMapper
                 measured: quantityQualities.Contains(QuantityQuality.Measured),
                 calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
         {
-            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality
-                .Missing,
+            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
             (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
             (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
             (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,

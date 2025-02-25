@@ -28,22 +28,9 @@ public static class QuantityQualityMapper
 
     public static IReadOnlyCollection<QuantityQuality> TryFromDeltaTableValues(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return [];
-
-        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
-
-        return qualities.Select(FromDeltaTableValue).ToArray();
-    }
-
-    public static IReadOnlyCollection<QuantityQuality>? TryFromDeltaTableValuesNullReturn(string? value)
-    {
-        if (value == null)
-            return null;
-
-        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
-
-        return qualities.Select(FromDeltaTableValue).ToArray();
+        return string.IsNullOrWhiteSpace(value)
+            ? []
+            : FromDeltaTableValues(value);
     }
 
     internal static QuantityQuality FromDeltaTableValue(string pointQuality)

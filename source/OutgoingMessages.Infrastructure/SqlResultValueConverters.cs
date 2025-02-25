@@ -14,8 +14,6 @@
 
 using System.Globalization;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using NodaTime;
 using NodaTime.Text;
@@ -54,6 +52,6 @@ public static class SqlResultValueConverters
 
     public static TimeSeriesType ToTimeSeriesType(string value)
     {
-        return Databricks.CalculationResults.Mappers.EnergyResults.TimeSeriesTypeMapper.FromDeltaTableValue(value);
+        return TimeSeriesTypeMapper.FromDeltaTableValue(value);
     }
 }
