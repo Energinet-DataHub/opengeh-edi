@@ -14,6 +14,7 @@
 
 using System.Reflection;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;

@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using NodaTime;
 using NodaTime.Text;
 
@@ -48,10 +46,5 @@ public static class SqlResultValueConverters
         if (value == null)
             return null;
         return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
-    }
-
-    public static TimeSeriesType ToTimeSeriesType(string value)
-    {
-        return TimeSeriesTypeMapper.FromDeltaTableValue(value);
     }
 }

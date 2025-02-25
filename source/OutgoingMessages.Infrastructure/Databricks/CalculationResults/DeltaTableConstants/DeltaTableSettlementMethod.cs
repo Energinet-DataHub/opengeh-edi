@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 
-[System.AttributeUsage(System.AttributeTargets.Method)]
-public sealed class ExcludeFromNameConventionCheckAttribute
-    : System.Attribute
+/// <summary>
+/// This class contains the settlement methods that are used in the delta tables described here:
+/// https://energinet.atlassian.net/wiki/spaces/D3/pages/1014202369/Wholesale+Results
+/// </summary>
+public static class DeltaTableSettlementMethod
 {
+    public const string Flex = "flex";
+    public const string NonProfiled = "non_profiled";
 }

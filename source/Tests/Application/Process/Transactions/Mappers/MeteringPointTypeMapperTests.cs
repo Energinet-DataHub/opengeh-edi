@@ -28,13 +28,4 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
                 .MeteringPointTypeMapper.Map(value),
             value,
             unspecifiedValue: WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified);
-
-    [Theory]
-    [MemberData(nameof(GetEnumValues), typeof(EDI.OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType))]
-    public void Given_WholesaleServiceCalculationResultMeteringPointType_When_Mapping_Then_HandlesExpectedValues(
-        EDI.OutgoingMessages.Interfaces.Models.CalculationResults.MeteringPointType value)
-        => EnsureCanMapOrThrows(
-            () => Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers
-                .MeteringPointTypeMapper.Map(value),
-            value);
 }

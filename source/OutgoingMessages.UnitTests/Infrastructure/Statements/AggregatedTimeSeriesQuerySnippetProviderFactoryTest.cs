@@ -13,17 +13,17 @@
 // limitations under the License.
 
 using System.Reflection;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Statements;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CalculationResults.Infrastructure.Statements;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Infrastructure.Statements;
 
 public class AggregatedTimeSeriesQuerySnippetProviderFactoryTest
 {
     [Fact]
-    public void All_implemented_providers_have_distinct_keys_and_are_available()
+    public void Given_AggregatedDatabricksContracts_When_Resolved_Then_ResolvesToExpectedDictionary()
     {
         var expectedContracts = Assembly.GetAssembly(typeof(IAggregatedTimeSeriesDatabricksContract))!
             .GetTypes()
@@ -41,7 +41,7 @@ public class AggregatedTimeSeriesQuerySnippetProviderFactoryTest
                 BindingFlags.NonPublic | BindingFlags.Instance)
             ?? throw new InvalidOperationException("Field '_databricksContracts' not found.");
 
-        var actualContracts = (Dictionary<string, IAggregatedTimeSeriesDatabricksContract>)fieldInfo.GetValue(sut)!;
+        var actualContracts = (Dictionary<AggregationLevel, IAggregatedTimeSeriesDatabricksContract>)fieldInfo.GetValue(sut)!;
 
         expectedContracts.Should().OnlyHaveUniqueItems(ec => ec.GetAggregationLevel());
 
@@ -55,6 +55,7 @@ public class AggregatedTimeSeriesQuerySnippetProviderFactoryTest
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Provider_keys_are_limited_to_delta_table_aggregation_levels()
     {
         var contracts = Assembly.GetAssembly(typeof(IAggregatedTimeSeriesDatabricksContract))!
@@ -65,11 +66,13 @@ public class AggregatedTimeSeriesQuerySnippetProviderFactoryTest
             .Select(t => (IAggregatedTimeSeriesDatabricksContract)Activator.CreateInstance(t)!)
             .ToList();
 
-        contracts.Select(c => c.GetAggregationLevel())
-            .Should()
-            .BeEquivalentTo(
-                DeltaTableAggregationLevel.GridArea,
-                DeltaTableAggregationLevel.BalanceResponsibleAndGridArea,
-                DeltaTableAggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea);
+        var expectedNameSequence = new List<AggregationLevel>()
+        {
+            AggregationLevel.GridArea,
+            AggregationLevel.BalanceResponsibleAndGridArea,
+            AggregationLevel.EnergySupplierAndBalanceResponsibleAndGridArea,
+        };
+
+        Assert.Equal(contracts.Select(contract => contract.GetAggregationLevel()).Order(), expectedNameSequence);
     }
 }

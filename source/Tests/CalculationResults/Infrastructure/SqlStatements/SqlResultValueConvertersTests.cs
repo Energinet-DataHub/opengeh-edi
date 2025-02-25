@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
@@ -101,18 +99,5 @@ public class SqlResultValueConvertersTests
 
         // Assert
         actual.Should().Be(new DateTimeOffset(2021, 1, 1, 0, 0, 0, TimeSpan.Zero));
-    }
-
-    [Fact]
-    public void ToTimeSeriesType_WhenValueIsValid_ReturnsTimeSeriesType()
-    {
-        // Arrange
-        var value = "production";
-
-        // Act
-        var actual = SqlResultValueConverters.ToTimeSeriesType(value);
-
-        // Assert
-        actual.Should().Be(TimeSeriesType.Production);
     }
 }
