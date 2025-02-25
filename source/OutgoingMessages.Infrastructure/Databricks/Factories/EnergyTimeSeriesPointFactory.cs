@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
@@ -24,7 +25,7 @@ public static class EnergyTimeSeriesPointFactory
     {
         var time = databricksSqlRow[EnergyResultColumnNames.Time];
         var quantity = databricksSqlRow[EnergyResultColumnNames.Quantity];
-        var qualities = databricksSqlRow[EnergyResultColumnNames.QuantityQualities];
+        var qualities = databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities);
 
         if (qualities == null)
             throw new ArgumentNullException(nameof(qualities));
@@ -32,6 +33,6 @@ public static class EnergyTimeSeriesPointFactory
         return new EnergyTimeSeriesPoint(
             SqlResultValueConverters.ToDateTimeOffset(time)!.Value,
             SqlResultValueConverters.ToDecimal(quantity)!.Value,
-            SqlResultValueConverters.ToQuantityQualities(qualities)!);
+            QuantityQualityMapper.FromDeltaTableValues(qualities));
     }
 }

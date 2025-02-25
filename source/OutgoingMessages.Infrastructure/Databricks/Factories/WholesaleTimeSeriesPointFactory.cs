@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 
@@ -43,7 +43,7 @@ public static class WholesaleTimeSeriesPointFactory
         return new WholesaleTimeSeriesPoint(
             SqlResultValueConverters.ToDateTimeOffset(time)!.Value,
             SqlResultValueConverters.ToDecimal(quantity),
-            QuantityQualitiesMapper.FromDeltaTableValue(qualities),
+            QuantityQualityMapper.TryFromDeltaTableValues(qualities),
             SqlResultValueConverters.ToDecimal(price),
             SqlResultValueConverters.ToDecimal(amount));
     }

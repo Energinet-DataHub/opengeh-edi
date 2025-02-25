@@ -13,10 +13,6 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using NodaTime;
 using NodaTime.Text;
 
@@ -50,15 +46,5 @@ public static class SqlResultValueConverters
         if (value == null)
             return null;
         return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
-    }
-
-    public static IReadOnlyCollection<QuantityQuality>? ToQuantityQualities(string? value)
-    {
-        return QuantityQualitiesMapper.FromDeltaTableValue(value);
-    }
-
-    public static Guid ToGuid(string value)
-    {
-        return Guid.Parse(value);
     }
 }

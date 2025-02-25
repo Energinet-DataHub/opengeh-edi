@@ -40,7 +40,7 @@ public class WholesaleTimeSeriesPointFactoryTests
         actual.Quantity.Should().BeNull();
         actual.Price.Should().BeNull();
         actual.Amount.Should().BeNull();
-        actual.Qualities.Should().BeNull();
+        actual.Qualities.Should().BeEmpty();
     }
 
     private static DatabricksSqlRow CreateDefaultSqlResultRow(string time, string? quantity, string? quantityQualities, string? price, string? amount)

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using FluentAssertions;
 using NodaTime;
 using NodaTime.Text;
@@ -34,7 +34,7 @@ public class PeriodFactoryTests
 
         var pointForAMonthlyResolution = new List<WholesaleTimeSeriesPoint>
         {
-            new(InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
+            new(InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value, null, [QuantityQuality.Missing], null, null),
         };
 
         // Act
@@ -55,7 +55,7 @@ public class PeriodFactoryTests
 
         var pointForAMonthlyResolution = new List<WholesaleTimeSeriesPoint>
         {
-            new(InstantPattern.General.Parse("2023-02-28T23:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
+            new(InstantPattern.General.Parse("2023-02-28T23:00:00Z").Value, null, [QuantityQuality.Missing], null, null),
         };
 
         // Act
@@ -76,7 +76,7 @@ public class PeriodFactoryTests
 
         var pointForAMonthlyResolution = new List<WholesaleTimeSeriesPoint>
         {
-            new(InstantPattern.General.Parse("2023-09-30T22:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
+            new(InstantPattern.General.Parse("2023-09-30T22:00:00Z").Value, null, [QuantityQuality.Missing], null, null),
         };
 
         // Act
@@ -100,7 +100,7 @@ public class PeriodFactoryTests
         // 28 days in February
         while (points.Count < 28)
         {
-            points.Add(new WholesaleTimeSeriesPoint(currentTime, null, new[] { QuantityQuality.Missing }, null, null));
+            points.Add(new WholesaleTimeSeriesPoint(currentTime, null, [QuantityQuality.Missing], null, null));
             currentTime = currentTime.Plus(Duration.FromDays(1));
         }
 
@@ -125,7 +125,7 @@ public class PeriodFactoryTests
         // 24 hours in a day
         while (points.Count < 24)
         {
-            points.Add(new WholesaleTimeSeriesPoint(currentTime, null, new[] { QuantityQuality.Missing }, null, null));
+            points.Add(new WholesaleTimeSeriesPoint(currentTime, null, [QuantityQuality.Missing], null, null));
             currentTime = currentTime.Plus(Duration.FromHours(1));
         }
 

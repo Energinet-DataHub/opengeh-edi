@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
@@ -101,19 +99,5 @@ public class SqlResultValueConvertersTests
 
         // Assert
         actual.Should().Be(new DateTimeOffset(2021, 1, 1, 0, 0, 0, TimeSpan.Zero));
-    }
-
-    [Fact]
-    public void ToQuantityQualities_WhenValueIsValid_ReturnsQuantityQualities()
-    {
-        // Arrange
-        const string value = "[\"measured\", \"calculated\"]";
-        var expected = new List<QuantityQuality> { QuantityQuality.Measured, QuantityQuality.Calculated };
-
-        // Act
-        var actual = SqlResultValueConverters.ToQuantityQualities(value);
-
-        // Assert
-        actual.Should().BeEquivalentTo(expected);
     }
 }
