@@ -27,7 +27,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResult
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
-using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;

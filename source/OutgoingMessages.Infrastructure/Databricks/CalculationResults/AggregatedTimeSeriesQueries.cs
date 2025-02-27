@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Microsoft.Extensions.Options;
 using NodaTime;
-using EnergyTimeSeriesPoint = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models.EnergyTimeSeriesPoint;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 

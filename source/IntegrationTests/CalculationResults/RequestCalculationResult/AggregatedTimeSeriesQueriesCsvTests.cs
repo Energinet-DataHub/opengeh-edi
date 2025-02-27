@@ -26,7 +26,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResult
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
-using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 using AggregatedTimeSeriesQueryParameters = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.AggregatedTimeSeriesQueryParameters;
@@ -569,9 +568,9 @@ public class AggregatedTimeSeriesQueriesCsvTests
             {
                 ats.TimeSeriesPoints.Should().AllSatisfy(etsp =>
                 {
-                    ((object)etsp.Time).Should().Match<DateTimeOffset>(time =>
-                        time <= new DateTimeOffset(2022, 1, 3, 0, 0, 0, TimeSpan.Zero)
-                        || time > new DateTimeOffset(2022, 1, 5, 0, 0, 0, TimeSpan.Zero));
+                    ((object)etsp.Time).Should().Match<Instant>(time =>
+                        time <= Instant.FromUtc(2022, 1, 3, 0, 0, 0)
+                        || time > Instant.FromUtc(2022, 1, 5, 0, 0, 0));
                 });
             });
         }
