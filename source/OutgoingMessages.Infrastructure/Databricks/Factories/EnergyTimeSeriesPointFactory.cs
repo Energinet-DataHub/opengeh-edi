@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
@@ -31,7 +31,7 @@ public static class EnergyTimeSeriesPointFactory
             throw new ArgumentNullException(nameof(qualities));
 
         return new EnergyTimeSeriesPoint(
-            SqlResultValueConverters.ToDateTimeOffset(time)!.Value,
+            SqlResultValueConverters.ToInstant(time)!.Value,
             SqlResultValueConverters.ToDecimal(quantity)!.Value,
             QuantityQualityMapper.FromDeltaTableValues(qualities));
     }

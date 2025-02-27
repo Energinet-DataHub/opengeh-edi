@@ -22,6 +22,7 @@ using ChargeTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.D
 using Currency = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.Currency;
 using MeteringPointTypeMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.MeteringPointTypeMapper;
 using ResolutionMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.WholesaleResults.ResolutionMapper;
+using WholesaleTimeSeriesPoint = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models.WholesaleTimeSeriesPoint;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
@@ -46,7 +47,7 @@ public static class WholesaleServicesFactory
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
         var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow[WholesaleResultColumnNames.Resolution]!);
-        var period = PeriodHelper.GetPeriod(timeSeriesPoints, resolution);
+        var period = PeriodFactory.GetPeriod(timeSeriesPoints, resolution);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
 
@@ -65,7 +66,7 @@ public static class WholesaleServicesFactory
             Currency.DKK,
             businessReason,
             settlementVersion,
-            timeSeriesPoints,
+            MapPoints(timeSeriesPoints),
             SqlResultValueConverters.ToInt(databricksSqlRow[AmountsPerChargeViewColumnNames.CalculationVersion]!)!.Value);
     }
 
@@ -73,7 +74,7 @@ public static class WholesaleServicesFactory
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        var period = PeriodHelper.GetPeriod(timeSeriesPoints, Resolution.Monthly);
+        var period = PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
 
@@ -92,7 +93,7 @@ public static class WholesaleServicesFactory
             Currency.DKK,
             businessReason,
             settlementVersion,
-            timeSeriesPoints,
+            MapPoints(timeSeriesPoints),
             SqlResultValueConverters.ToInt(databricksSqlRow[MonthlyAmountsPerChargeViewColumnNames.CalculationVersion]!)!.Value);
     }
 
@@ -100,7 +101,7 @@ public static class WholesaleServicesFactory
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        var period = PeriodHelper.GetPeriod(timeSeriesPoints, Resolution.Monthly);
+        var period = PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
 
@@ -119,7 +120,23 @@ public static class WholesaleServicesFactory
             Currency.DKK,
             businessReason,
             settlementVersion,
-            timeSeriesPoints,
+            MapPoints(timeSeriesPoints),
             SqlResultValueConverters.ToInt(databricksSqlRow[TotalMonthlyAmountsViewColumnNames.CalculationVersion]!)!.Value);
+    }
+
+    private static
+        IReadOnlyCollection<Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.
+        WholesaleTimeSeriesPoint> MapPoints(IReadOnlyCollection<WholesaleTimeSeriesPoint> points)
+    {
+        return points.Select(
+                point =>
+                    new Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults.
+                        WholesaleTimeSeriesPoint(
+                            Time: point.TimeUtc,
+                            Quantity: point.Quantity,
+                            Price: point.Price,
+                            Qualities: point.Qualities,
+                            Amount: point.Amount))
+            .ToArray();
     }
 }

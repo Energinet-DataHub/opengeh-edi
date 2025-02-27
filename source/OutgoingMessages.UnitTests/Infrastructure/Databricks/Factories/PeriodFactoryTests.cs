@@ -38,7 +38,7 @@ public class PeriodFactoryTests
         var expectedDate = InstantPattern.ExtendedIso.Parse(expected).Value;
 
         // Act
-        var actual = PeriodFactory.GetEndDateWithResolutionOffset(domainResolution, dateAsInstant);
+        var actual = PeriodFactory.GetInstantWithResolutionOffset(domainResolution, dateAsInstant);
 
         // Assert
         actual.Should().Be(expectedDate);
@@ -63,7 +63,7 @@ public class PeriodFactoryTests
         var expectedDate = InstantPattern.ExtendedIso.Parse(expected).Value;
 
         // Act
-        var actual = PeriodFactory.GetEndDateWithResolutionOffset(domainResolution, dateAsInstant);
+        var actual = PeriodFactory.GetInstantWithResolutionOffset(domainResolution, dateAsInstant);
 
         // Assert
         actual.Should().Be(expectedDate);

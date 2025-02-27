@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Calculati
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
+using EnergyTimeSeriesPoint = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models.EnergyTimeSeriesPoint;
 using ResolutionMapper = Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.Mappers.EnergyResults.ResolutionMapper;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
@@ -31,7 +32,7 @@ public static class AggregatedTimeSeriesFactory
         var gridArea = databricksSqlRow[databricksContract.GetGridAreaCodeColumnName()];
         var resolution = ResolutionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(databricksContract.GetResolutionColumnName()));
-        var (periodStart, periodEnd) = PeriodHelper.GetPeriod(timeSeriesPoints, resolution);
+        var (periodStart, periodEnd) = PeriodFactory.GetPeriod(timeSeriesPoints, resolution);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(databricksContract.GetCalculationTypeColumnName()));
         var meteringPointType = MeteringPointTypeMapper.FromDeltaTableValue(
@@ -41,7 +42,10 @@ public static class AggregatedTimeSeriesFactory
 
         return new AggregatedTimeSeries(
             gridArea: gridArea!,
-            timeSeriesPoints: [.. timeSeriesPoints],
+            timeSeriesPoints: timeSeriesPoints.Select(point => new Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.EnergyTimeSeriesPoint(
+                Time: point.TimeUtc,
+                Quantity: point.Quantity,
+                Qualities: point.Qualities)).ToArray(),
             meteringPointType: meteringPointType,
             settlementMethod: settlementMethod,
             businessReason: businessReason,

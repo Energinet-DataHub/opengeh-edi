@@ -62,7 +62,7 @@ public class EnqueueHandler_Brs_026_V1(
             acceptedData.BalanceResponsibleNumber?.Value,
             BusinessReason.FromName(acceptedData.BusinessReason.Name),
             acceptedData.SettlementVersion != null ? SettlementVersion.FromName(acceptedData.SettlementVersion.Name) : null,
-            new EDI.OutgoingMessages.Interfaces.Models.CalculationResults.Period(acceptedData.PeriodStart.ToInstant(), acceptedData.PeriodEnd.ToInstant()));
+            new Period(acceptedData.PeriodStart.ToInstant(), acceptedData.PeriodEnd.ToInstant()));
 
         var enqueuedCount = await _actorRequestsClient.EnqueueAggregatedMeasureDataAsync(
             eventId: EventId.From(serviceBusMessageId),

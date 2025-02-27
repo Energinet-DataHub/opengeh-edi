@@ -37,7 +37,7 @@ public static class PeriodFactory
         var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
         // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
-        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
+        var calculationEnd = GetInstantWithResolutionOffset(resolution, timeForNewestPoint);
         return new Period(calculationStart, calculationEnd);
     }
 
@@ -46,19 +46,17 @@ public static class PeriodFactory
     /// The oldest point is the start of the calculation period.
     /// The newest point plus the resolution is the end of the calculation period.
     /// </summary>
-    public static Period GetPeriod(
-        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
-        Resolution resolution)
+    public static Period GetPeriod(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
         var calculationStart = timeSeriesPoints.Min(x => x.TimeUtc);
         var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
         // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
-        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
+        var calculationEnd = GetInstantWithResolutionOffset(resolution, timeForNewestPoint);
         return new Period(calculationStart, calculationEnd);
     }
 
-    public static Instant GetEndDateWithResolutionOffset(
+    public static Instant GetInstantWithResolutionOffset(
         Resolution resolution,
         Instant timeForLatestPoint)
     {

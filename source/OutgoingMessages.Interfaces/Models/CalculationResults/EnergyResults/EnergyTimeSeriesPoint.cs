@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 
 /// <summary>
@@ -22,6 +24,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationRe
 /// <param name="Quantity"></param>
 /// <param name="Qualities"></param>
 public sealed record EnergyTimeSeriesPoint(
-    DateTimeOffset Time,
+    Instant Time,
     decimal Quantity,
     IReadOnlyCollection<QuantityQuality> Qualities);

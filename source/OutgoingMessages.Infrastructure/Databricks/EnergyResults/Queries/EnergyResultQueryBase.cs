@@ -112,7 +112,7 @@ public abstract class EnergyResultQueryBase<TResult>(
                 previousResult.ToNonEmptyString(EnergyResultColumnNames.Resolution));
         var startTimeOfPreviousResult = previousResult.ToInstant(EnergyResultColumnNames.Time);
 
-        return PeriodFactory.GetEndDateWithResolutionOffset(
+        return PeriodFactory.GetInstantWithResolutionOffset(
             resolutionOfPreviousResult,
             startTimeOfPreviousResult);
     }

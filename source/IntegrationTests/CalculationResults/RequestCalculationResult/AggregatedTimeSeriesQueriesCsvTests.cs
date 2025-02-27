@@ -26,10 +26,11 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResult
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
-using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
+using AggregatedTimeSeriesQueryParameters = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults.AggregatedTimeSeriesQueryParameters;
 using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.CalculationResults.RequestCalculationResult;
 
@@ -85,7 +86,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAcrossGridAreas_When_Queried_Then_RelevantDataFromRelevantGridAreasReturned()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -124,12 +125,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.HaveCount((int)ats.PeriodEnd.Minus(ats.PeriodStart).TotalHours)
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
@@ -139,7 +140,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAndGridArea_When_Queried_Then_RelevantDataFromSpecifiedGridAreaReturned()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -171,12 +172,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.HaveCount((int)ats.PeriodEnd.Minus(ats.PeriodStart).TotalHours)
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
@@ -186,7 +187,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAndBalanceResponsibleAndGridArea_When_Queried_Then_DataFilteredCorrectlyReturned()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -218,12 +219,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.HaveCount((int)ats.PeriodEnd.Minus(ats.PeriodStart).TotalHours)
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
@@ -233,7 +234,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_BalanceResponsibleAndGridArea_When_Queried_Then_RelevantDataFromGridAreaReturned()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -267,12 +268,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.HaveCount((int)ats.PeriodEnd.Minus(ats.PeriodStart).TotalHours)
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
@@ -282,7 +283,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_GridArea_When_Queried_Then_GridOperatorDataForGridAreaReturned()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -315,12 +316,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.HaveCount((int)ats.PeriodEnd.Minus(ats.PeriodStart).TotalHours)
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
@@ -330,7 +331,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_FullQueryParametersForAggregation_When_Queried_Then_DataFromNewestVersionsReturned()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -360,12 +361,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.HaveCount((int)ats.PeriodEnd.Minus(ats.PeriodStart).TotalHours)
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
@@ -375,7 +376,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_EnergySupplierAndBalanceResponsibleWithLatestCorrection_When_Queried_Then_DataFromNewestCorrectionsReturned()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -404,12 +405,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.HaveCount((int)ats.PeriodEnd.Minus(ats.PeriodStart).TotalHours)
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
@@ -419,7 +420,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         [Fact]
         public async Task Given_NoEnergySupplierAndBalanceResponsibleAndGridArea_When_Queried_Then_IdenticalToRequestsForEachGridAreaIndividually()
         {
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -487,7 +488,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 4, 0, 0),
                 null);
 
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -515,12 +516,12 @@ public class AggregatedTimeSeriesQueriesCsvTests
             actual.Should().AllSatisfy(ats =>
             {
                 ats.TimeSeriesPoints.Should()
-                    .AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeGreaterOrEqualTo(ats.PeriodStart))
-                    .And.AllSatisfy(etsp => etsp.Time.ToInstant().Should().BeLessThan(ats.PeriodEnd))
+                    .AllSatisfy(etsp => etsp.Time.Should().BeGreaterOrEqualTo(ats.PeriodStart))
+                    .And.AllSatisfy(etsp => etsp.Time.Should().BeLessThan(ats.PeriodEnd))
                     .And.AllSatisfy(etsp =>
                     {
-                        etsp.Time.Minute.Should().Be(0);
-                        etsp.Time.Second.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Minute.Should().Be(0);
+                        etsp.Time.ToDateTimeOffset().Second.Should().Be(0);
                     })
                     .And.OnlyHaveUniqueItems(etsp => etsp.Time);
             });
@@ -537,7 +538,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
                 Instant.FromUtc(2022, 1, 5, 0, 0),
                 Instant.FromUtc(2022, 1, 3, 0, 0));
 
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -567,9 +568,9 @@ public class AggregatedTimeSeriesQueriesCsvTests
             {
                 ats.TimeSeriesPoints.Should().AllSatisfy(etsp =>
                 {
-                    ((object)etsp.Time).Should().Match<DateTimeOffset>(time =>
-                        time <= new DateTimeOffset(2022, 1, 3, 0, 0, 0, TimeSpan.Zero)
-                        || time > new DateTimeOffset(2022, 1, 5, 0, 0, 0, TimeSpan.Zero));
+                    ((object)etsp.Time).Should().Match<Instant>(time =>
+                        time <= Instant.FromUtc(2022, 1, 3, 0, 0, 0)
+                        || time > Instant.FromUtc(2022, 1, 5, 0, 0, 0));
                 });
             });
         }
@@ -580,7 +581,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
             await ClearAndAddDatabricksDataAsync(_fixture.DatabricksSchemaManager, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, []);
 
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 
@@ -607,7 +608,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
             await ClearAndAddDatabricksDataAsync(_fixture.DatabricksSchemaManager, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, ["804", "543"]);
 
-            var totalPeriod = new OutgoingMessages.Interfaces.Models.CalculationResults.Period(
+            var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
                 Instant.FromUtc(2022, 1, 8, 23, 0));
 

@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.EnergyResults;
 using Microsoft.Extensions.Options;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults;
 
@@ -93,13 +94,13 @@ public class AggregatedTimeSeriesQueries(
     {
         var endTimeFromPreviousResult = GetEndTimeOfPreviousResult(previousResult, databricksContract);
         var startTimeFromCurrentResult = SqlResultValueConverters
-            .ToDateTimeOffset(currentResult[databricksContract.GetTimeColumnName()])!.Value;
+            .ToInstant(currentResult[databricksContract.GetTimeColumnName()])!.Value;
 
         // The start time of the current result should be the same as the end time of the previous result if the result is in sequence with the previous result.
         return endTimeFromPreviousResult == startTimeFromCurrentResult;
     }
 
-    private DateTimeOffset GetEndTimeOfPreviousResult(
+    private Instant GetEndTimeOfPreviousResult(
         DatabricksSqlRow previousResult,
         IAggregatedTimeSeriesDatabricksContract databricksContract)
     {
@@ -107,9 +108,9 @@ public class AggregatedTimeSeriesQueries(
             .FromDeltaTableValue(previousResult[databricksContract.GetResolutionColumnName()]!);
 
         var startTimeOfPreviousResult = SqlResultValueConverters
-            .ToDateTimeOffset(previousResult[databricksContract.GetTimeColumnName()])!.Value;
+            .ToInstant(previousResult[databricksContract.GetTimeColumnName()])!.Value;
 
-        return PeriodHelper.GetDateTimeWithResolutionOffset(
+        return PeriodFactory.GetInstantWithResolutionOffset(
             resolutionOfPreviousResult,
             startTimeOfPreviousResult);
     }
