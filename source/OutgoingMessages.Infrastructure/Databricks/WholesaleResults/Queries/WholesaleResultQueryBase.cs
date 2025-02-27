@@ -139,7 +139,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
             previousResult.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
         var startTimeOfPreviousResult = previousResult.ToInstant(WholesaleResultColumnNames.Time);
 
-        return PeriodFactory.GetEndDateWithResolutionOffset(resolutionOfPreviousResult, startTimeOfPreviousResult);
+        return PeriodFactory.GetInstantWithResolutionOffset(resolutionOfPreviousResult, startTimeOfPreviousResult);
     }
 
     private string BuildActorsSqlQuery()

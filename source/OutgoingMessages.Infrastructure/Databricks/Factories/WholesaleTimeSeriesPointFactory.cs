@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.CalculationResults.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
@@ -41,7 +41,7 @@ public static class WholesaleTimeSeriesPointFactory
             : null;
 
         return new WholesaleTimeSeriesPoint(
-            SqlResultValueConverters.ToDateTimeOffset(time)!.Value,
+            SqlResultValueConverters.ToInstant(time)!.Value,
             SqlResultValueConverters.ToDecimal(quantity),
             QuantityQualityMapper.TryFromDeltaTableValues(qualities),
             SqlResultValueConverters.ToDecimal(price),
