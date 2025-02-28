@@ -51,9 +51,9 @@ public static class HostFactory
                 {
                     // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                     builder.UseWhen<UnHandledExceptionMiddleware>(
-                        functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
+                        functionContext => functionContext.IsProtectedHttpTrigger());
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
-                        functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
+                        functionContext => functionContext.IsProtectedHttpTrigger());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
 
                     // Host the Durable Function Monitor as a part of this app.
@@ -62,6 +62,10 @@ public static class HostFactory
                         (settings, _) =>
                         {
                             settings.Mode = DfmMode.ReadOnly;
+
+                            #if DEBUG
+                            settings.DisableAuthentication = true;
+                            #endif
                         });
                 })
             .ConfigureServices(
