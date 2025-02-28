@@ -56,7 +56,7 @@ public static class HostFactory
                         functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
 
-                    // Host Durable Function Monitor as a part of this app.
+                    // Host the Durable Function Monitor as a part of this app.
                     // The Durable Function Monitor can be accessed at: {host url}/api/durable-functions-monitor
                     builder.UseDurableFunctionsMonitor(
                         (settings, _) =>
