@@ -18,13 +18,11 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Xunit.Abstractions;
 
-#pragma warning disable CS0162 // Unreachable code detected
-
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests.ArchivedMessages;
 
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
-public class WhenArchivedMessageIsRequestedTests : BaseTestClass
+public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessages;
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
@@ -58,7 +56,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_message()
     {
-        await _calculationCompleted.PublishForBalanceFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027BalanceFixingCalculation();
 
         var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
 
