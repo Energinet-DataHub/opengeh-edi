@@ -24,7 +24,9 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
+#pragma warning disable xUnit1000 // Skipping the tests in this class, since it's internal
+internal sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
+#pragma warning restore xUnit1000
 {
     private readonly string _meteredDataResponsibleCertificateThumbprint;
     private readonly EbixRequestDsl _ebixMeteredDataResponsible;
@@ -68,7 +70,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     {
         await _ebixMeteredDataResponsible.EmptyQueueForActor();
 
-        await _calculationCompleted.PublishForBalanceFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027BalanceFixingCalculation();
 
         await _ebixMeteredDataResponsible.ConfirmEnergyResultIsAvailable();
     }
@@ -79,7 +81,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     {
         await _ebixEnergySupplier.EmptyQueueForActor();
 
-        await _calculationCompleted.PublishForWholesaleFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027WholesaleFixingCalculation();
 
         await _ebixEnergySupplier.ConfirmWholesaleResultIsAvailable();
     }
