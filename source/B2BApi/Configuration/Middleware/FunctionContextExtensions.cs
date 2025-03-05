@@ -20,15 +20,16 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 
 public static class FunctionContextExtensions
 {
-    internal static bool IsHttpTriggerAndNotHealthCheck(this FunctionContext context)
+    internal static bool IsProtectedHttpTrigger(this FunctionContext context)
     {
         var isHttpTrigger = context.FunctionDefinition.InputBindings.Values
             .First(metadata => metadata.Type.EndsWith("Trigger"))
             .Type == "httpTrigger";
 
         var isHealthCheckEndpoint = context.FunctionDefinition.Name == "HealthCheck";
+        var isDurableFunctionMonitorEndpoint = context.FunctionDefinition.PathToAssembly.EndsWith("durablefunctionsmonitor.dotnetisolated.core.dll");
 
-        return isHttpTrigger && !isHealthCheckEndpoint;
+        return isHttpTrigger && !isHealthCheckEndpoint && !isDurableFunctionMonitorEndpoint;
     }
 
     /// <summary>
