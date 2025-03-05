@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -50,7 +50,7 @@
 
         <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net60) run Drivers/B2C/Client/nswagV3.json /variables:Configuration=$(Configuration)" Condition="$(SwaggerConfigurationIsNewer) &gt; 0" />
     </Target>
-    
+
     <ItemGroup>
       <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json" />
       <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json" />
@@ -82,7 +82,7 @@
         <PackageReference Include="Dapper" Version="2.1.66"/>
         <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="7.2.1"/>
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.2.1"/>
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="1.2.0" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="2.0.0" />
         <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="11.0.2" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
