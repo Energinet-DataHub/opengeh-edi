@@ -78,10 +78,8 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(IntegrationTestConfiguration));
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
+        AzuriteManager.CleanupAzuriteStorage();
         LogStopwatch(stopwatch, nameof(AzuriteManager));
-
-        CleanupAzuriteStorage();
-        LogStopwatch(stopwatch, nameof(CleanupAzuriteStorage));
 
         DurableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
@@ -374,41 +372,6 @@ public class B2BApiAppFixture : IAsyncLifetime
 #endif
     }
 
-    /// <summary>
-    /// Cleanup Azurite storage to avoid situations where Durable Functions
-    /// would otherwise continue working on old orchestrations that e.g. failed in
-    /// previous runs.
-    /// </summary>
-    private void CleanupAzuriteStorage()
-    {
-        if (Directory.Exists("__blobstorage__"))
-            Directory.Delete("__blobstorage__", true);
-
-        if (Directory.Exists("__queuestorage__"))
-            Directory.Delete("__queuestorage__", true);
-
-        if (Directory.Exists("__tablestorage__"))
-            Directory.Delete("__tablestorage__", true);
-
-        if (File.Exists("__azurite_db_blob__.json"))
-            File.Delete("__azurite_db_blob__.json");
-
-        if (File.Exists("__azurite_db_blob_extent__.json"))
-            File.Delete("__azurite_db_blob_extent__.json");
-
-        if (File.Exists("__azurite_db_queue__.json"))
-            File.Delete("__azurite_db_queue__.json");
-
-        if (File.Exists("__azurite_db_queue_extent__.json"))
-            File.Delete("__azurite_db_queue_extent__.json");
-
-        if (File.Exists("__azurite_db_table__.json"))
-            File.Delete("__azurite_db_table__.json");
-
-        if (File.Exists("__azurite_db_table_extent__.json"))
-            File.Delete("__azurite_db_table_extent__.json");
-    }
-
     private void CreateRequiredContainers()
     {
         List<FileStorageCategory> containerCategories = [
@@ -452,10 +415,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "Logging__LogLevel__Default",
             "Information");
-        // => Disable extensive logging from EF Core
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            "Logging__LogLevel__Microsoft.EntityFrameworkCore",
-            "Warning");
         // => Disable extensive logging when using Azure Storage
         appHostSettings.ProcessEnvironmentVariables.Add(
             "Logging__LogLevel__Azure.Core",
