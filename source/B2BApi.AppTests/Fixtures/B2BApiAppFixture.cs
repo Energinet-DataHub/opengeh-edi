@@ -147,7 +147,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     public TopicResource? IntegrationEventsTopicResource { get; private set; }
 
     [NotNull]
-    public TopicResource? ProcessManagerTopicResource { get; private set; }
+    public TopicResource? ProcessManagerStartTopicResource { get; private set; }
 
     [NotNull]
     public TopicResource? EdiTopicResource { get; private set; }
@@ -202,16 +202,16 @@ public class B2BApiAppFixture : IAsyncLifetime
             .CreateAsync();
         LogStopwatch(stopwatch, nameof(IntegrationEventsTopicResource));
 
-        ProcessManagerTopicResource = await ServiceBusResourceProvider
-            .BuildTopic("process-manager")
+        ProcessManagerStartTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("process-manager-start")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", topic.Name))
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", topic.Name))
             .AddSubscription("process-manager-subscription")
             .CreateAsync();
-        LogStopwatch(stopwatch, nameof(ProcessManagerTopicResource));
+        LogStopwatch(stopwatch, nameof(ProcessManagerStartTopicResource));
         await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
-            topicName: ProcessManagerTopicResource.Name,
-            subscriptionName: ProcessManagerTopicResource.Subscriptions.Single().SubscriptionName);
+            topicName: ProcessManagerStartTopicResource.Name,
+            subscriptionName: ProcessManagerStartTopicResource.Subscriptions.Single().SubscriptionName);
 
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
