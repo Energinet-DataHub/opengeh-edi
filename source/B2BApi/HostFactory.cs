@@ -62,10 +62,6 @@ public static class HostFactory
                         (settings, _) =>
                         {
                             settings.Mode = DfmMode.ReadOnly;
-
-                            #if DEBUG
-                            settings.DisableAuthentication = true;
-                            #endif
                         });
                 })
             .ConfigureServices(
