@@ -150,6 +150,9 @@ public class B2BApiAppFixture : IAsyncLifetime
     public TopicResource? ProcessManagerStartTopicResource { get; private set; }
 
     [NotNull]
+    public TopicResource? ProcessManagerNotifyTopicResource { get; private set; }
+
+    [NotNull]
     public TopicResource? EdiTopicResource { get; private set; }
 
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
@@ -212,6 +215,17 @@ public class B2BApiAppFixture : IAsyncLifetime
         await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
             topicName: ProcessManagerStartTopicResource.Name,
             subscriptionName: ProcessManagerStartTopicResource.Subscriptions.Single().SubscriptionName);
+
+        ProcessManagerNotifyTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("process-manager-notify")
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", topic.Name))
+            .AddSubscription("process-manager-subscription")
+            .CreateAsync();
+        LogStopwatch(stopwatch, nameof(ProcessManagerNotifyTopicResource));
+        await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
+            topicName: ProcessManagerNotifyTopicResource.Name,
+            subscriptionName: ProcessManagerNotifyTopicResource.Subscriptions.Single().SubscriptionName);
 
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
@@ -433,6 +447,19 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
+
+        // Logging
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "Logging__LogLevel__Default",
+            "Information");
+        // => Disable extensive logging from EF Core
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "Logging__LogLevel__Microsoft.EntityFrameworkCore",
+            "Warning");
+        // => Disable extensive logging when using Azure Storage
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "Logging__LogLevel__Azure.Core",
+            "Error");
 
         // Durable Functions
         // => Task Hub Name
