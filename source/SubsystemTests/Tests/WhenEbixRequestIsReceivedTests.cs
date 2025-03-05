@@ -68,7 +68,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     {
         await _ebixMeteredDataResponsible.EmptyQueueForActor();
 
-        await _calculationCompleted.PublishForBalanceFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027BalanceFixingCalculation();
 
         await _ebixMeteredDataResponsible.ConfirmEnergyResultIsAvailable();
     }
@@ -79,7 +79,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     {
         await _ebixEnergySupplier.EmptyQueueForActor();
 
-        await _calculationCompleted.PublishForWholesaleFixingCalculation();
+        await _calculationCompleted.PublishBrs023_027WholesaleFixingCalculation();
 
         await _ebixEnergySupplier.ConfirmWholesaleResultIsAvailable();
     }

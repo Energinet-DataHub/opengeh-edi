@@ -19,99 +19,11 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
 using FluentAssertions;
-using NodaTime;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
-[SuppressMessage(
-    "Usage",
-    "CA2007",
-    Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-[IntegrationTest]
-[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class WhenEnergyResultRequestedTests : BaseTestClass
-{
-    private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
-    private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
-    private readonly string _energySupplierActorNumber;
-
-    public WhenEnergyResultRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
-        : base(output, fixture)
-    {
-        ArgumentNullException.ThrowIfNull(fixture);
-
-        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.EnergySupplier, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
-
-        _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResultDsl(
-            ediDriver,
-            wholesaleDriver);
-
-        _aggregatedMeasureDataRequest =
-            new AggregatedMeasureDataRequestDsl(
-                ediDriver,
-                new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
-                new EdiDatabaseDriver(fixture.ConnectionString),
-                wholesaleDriver,
-                new ProcessManagerDriver(fixture.EdiTopicClient));
-
-        _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
-    }
-
-    [Fact(Skip = "We not running requests which check the database")]
-    public async Task Actor_can_request_aggregated_measure_data()
-    {
-        var messageId = await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
-
-        await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
-            messageId,
-            CancellationToken.None);
-    }
-
-    [Fact(Skip = "We not running requests which check the database")]
-    public async Task B2C_actor_can_request_aggregated_measure_data()
-    {
-        var createdAfter = SystemClock.Instance.GetCurrentInstant();
-        var energySupplierActorNumber = _energySupplierActorNumber;
-        await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
-
-        await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
-            createdAfter,
-            requestedByActorNumber: energySupplierActorNumber);
-    }
-
-    [Fact]
-    public async Task Actor_get_bad_request_when_aggregated_measure_data_request_is_invalid()
-    {
-        await _aggregatedMeasureDataRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
-    }
-
-    [Fact]
-    public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
-    {
-        await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestAcceptedResponse(
-            "804",
-            SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
-            CancellationToken.None);
-
-        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailable();
-    }
-
-    [Fact]
-    public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
-    {
-         await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestRejectedResponse(
-            "804",
-            SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
-            CancellationToken.None);
-
-         await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailable();
-    }
-}
-
-// TODO: Delete this test class and un-comment "WhenEnergyResultRequestedProcessManagerTests" when the above is deprecated
 [SuppressMessage(
     "Usage",
     "CA2007",
@@ -123,12 +35,12 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 
 // TODO: Rename this to brs026 when we have deleted the old request tests
-public sealed class WhenEnergyResultRequestedProcessManagerTests : BaseTestClass
+public sealed class WhenEnergyResultRequestedTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
 
-    public WhenEnergyResultRequestedProcessManagerTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public WhenEnergyResultRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
