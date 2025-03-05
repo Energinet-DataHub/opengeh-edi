@@ -18,6 +18,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
@@ -382,7 +383,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasPoints(
-        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points,
+        IReadOnlyCollection<WholesaleServicesPoint> points,
         Resolution resolution)
     {
         var pointsInDocument = _documentAsserter
@@ -390,21 +391,21 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
         pointsInDocument.Should().HaveSameCount(points);
 
-        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+        var expectedPoints = points.OrderBy(p => p.Position).ToList();
 
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
-            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount.ToDecimal());
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount);
 
-            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity.ToDecimal());
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity);
 
             AssertPosition(pointsInDocument, i);
 
-            AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price);
 
             // QuantityQuality should not be present in the document if resolution is monthly
-            QuantityQuality? expectedQuantityQuality = resolution == Resolution.Monthly
-                ? null : expectedPoints[i].QuantityQualities.SingleOrDefault();
+            var expectedQuantityQuality = resolution == Resolution.Monthly
+                ? null : expectedPoints[i].QuantityQuality;
             AssertQuantityQuality(pointsInDocument, i, expectedQuantityQuality);
         }
 
@@ -438,7 +439,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
-        DecimalValue expectedAmount,
+        decimal expectedAmount,
         QuantityQuality? expectedQuantityQuality)
     {
         var pointsInDocument = _documentAsserter
@@ -453,7 +454,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
             .Value
             .ToDecimal()
             .Should()
-            .Be(expectedAmount.ToDecimal());
+            .Be(expectedAmount);
 
         pointInDocument
             .XPathSelectElement(

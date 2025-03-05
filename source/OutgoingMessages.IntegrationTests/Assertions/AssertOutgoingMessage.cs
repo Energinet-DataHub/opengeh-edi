@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
@@ -193,7 +193,7 @@ public class AssertOutgoingMessage
 
     public AssertOutgoingMessage HasPointsInCorrectOrder<TMessageRecord, TType>(
         Func<TMessageRecord, List<TType>> propertySelector,
-        IList<TimeSeriesPoint> expectedPointsInRightOrder)
+        IList<WholesaleServicesPoint> expectedPointsInRightOrder)
     {
         ArgumentNullException.ThrowIfNull(propertySelector);
         ArgumentNullException.ThrowIfNull(expectedPointsInRightOrder);
@@ -202,7 +202,7 @@ public class AssertOutgoingMessage
         for (var i = 0; i < expectedPointsInRightOrder.Count; i++)
         {
             propertySelector(sut)[i].Should()
-                .Be(decimal.Parse($"{expectedPointsInRightOrder[i].Quantity.Units}.{expectedPointsInRightOrder[i].Quantity.Nanos}", CultureInfo.InvariantCulture));
+                .Be(decimal.Parse($"{expectedPointsInRightOrder[i].Quantity}", CultureInfo.InvariantCulture)); //TODO: LRN
         }
 
         return this;
