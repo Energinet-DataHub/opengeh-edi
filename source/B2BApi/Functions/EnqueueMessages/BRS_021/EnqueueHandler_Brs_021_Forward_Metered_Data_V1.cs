@@ -30,7 +30,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
     ILogger<EnqueueHandler_Brs_021_Forward_Metered_Data_V1> logger)
-    : EnqueueActorMessagesValidatedHandlerBase<MeteredDataForMeteringPointAcceptedV1, MeteredDataForMeteringPointRejectedV1>(logger)
+    : EnqueueActorMessagesValidatedHandlerBase<ForwardMeteredDataAcceptedV1, ForwardMeteredDataRejectedV1>(logger)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
@@ -39,7 +39,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
-        MeteredDataForMeteringPointAcceptedV1 acceptedData,
+        ForwardMeteredDataAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
     {
         var series = acceptedData.AcceptedEnergyObservations.Select(x =>
@@ -50,9 +50,9 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         {
             var meteredDataForMeteringPointMessageProcessDto = new MeteredDataForMeteringPointMessageProcessDto(
                 eventId: EventId.From(orchestrationInstanceId),
-                receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorId), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
+                receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorNumber), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
                 businessReason: BusinessReason.PeriodicMetering,
-                relatedToMessageId: MessageId.Create(acceptedData.MessageId),
+                relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
                 series: new MeteredDataForMeteringPointMessageSeriesDto(
                     TransactionId: TransactionId.New(),
                     MarketEvaluationPointNumber: acceptedData.MeteringPointId,
@@ -78,14 +78,14 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
                     orchestrationInstanceId.ToString(),
-                    MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
+                    ForwardMeteredDataNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)).ConfigureAwait(false);
     }
 
     protected override async Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
-        MeteredDataForMeteringPointRejectedV1 rejectedData,
+        ForwardMeteredDataRejectedV1 rejectedData,
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
@@ -95,7 +95,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
             rejectedData.EventId,
             BusinessReason.FromName(rejectedData.BusinessReason.Name),
-            ActorNumber.Create(rejectedData.MarketActorRecipient.ActorId),
+            ActorNumber.Create(rejectedData.MarketActorRecipient.ActorNumber),
             ActorRole.FromName(rejectedData.MarketActorRecipient.ActorRole.Name),
             rejectedData.ProcessId,
             rejectedData.ExternalId,
@@ -143,7 +143,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
                 new NotifyOrchestrationInstanceEvent(
                     orchestrationInstanceId.ToString(),
-                    MeteredDataForMeteringPointMessagesEnqueuedNotifyEventsV1.MeteredDataForMeteringPointMessagesEnqueuedCompleted),
+                    ForwardMeteredDataNotifyEventsV1.EnqueueActorMessagesCompleted),
                 CancellationToken.None)).ConfigureAwait(false);
     }
 }

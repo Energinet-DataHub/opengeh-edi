@@ -21,7 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Energinet.DataHub.ProcessManager.Abstractions" Version="1.5.0" />
     <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="1.5.0" />
-    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.4.0" />
+    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.5.0-alpha-141" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.10.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">

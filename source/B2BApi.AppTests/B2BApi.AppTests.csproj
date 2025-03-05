@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="7.2.1"/>
     <PackageReference Include="Energinet.DataHub.ProcessManager.Abstractions" Version="1.5.0" />
-    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.4.0" />
+    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.5.0-alpha-141" />
     <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="11.0.2" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
       <PrivateAssets>all</PrivateAssets>
