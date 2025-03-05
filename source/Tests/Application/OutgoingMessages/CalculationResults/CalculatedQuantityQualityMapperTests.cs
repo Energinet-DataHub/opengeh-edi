@@ -27,9 +27,6 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 
 namespace Energinet.DataHub.EDI.Tests.Application.OutgoingMessages.CalculationResults;
 
-/// <summary>
-/// This is a copy of the existing <see cref="Energinet.DataHub.EDI.Tests.Domain.Transactions.Mappers.CalculatedQuantityQualityMapperTests"/>
-/// </summary>
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Test class")]
 public sealed class CalculatedQuantityQualityMapperTests
 {

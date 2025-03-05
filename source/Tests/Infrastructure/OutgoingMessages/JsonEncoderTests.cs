@@ -17,7 +17,6 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Google.Protobuf;
 using Xunit;

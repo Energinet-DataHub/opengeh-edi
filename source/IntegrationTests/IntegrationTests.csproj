@@ -179,7 +179,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Application\Process\" />
+      <Folder Include="Infrastructure\Configuration\" />
     </ItemGroup>
 
     <ItemDefinitionGroup>
