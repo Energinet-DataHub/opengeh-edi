@@ -33,9 +33,6 @@
     // See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
     "OrchestrationsTaskHubName": "Edi01",
     // => Task Hub Storage account connection string
-    "OrchestrationsStorageConnectionString": "UseDevelopmentStorage=true",
-
-    "DeadLetterLogging__StorageAccountUrl": "UseDevelopmentStorage=true",
-    "DeadLetterLogging__ContainerName": "<container name>"
+    "OrchestrationsStorageConnectionString": "UseDevelopmentStorage=true"
   }
 }
