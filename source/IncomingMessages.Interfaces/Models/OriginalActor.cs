@@ -15,17 +15,17 @@
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Process.Interfaces;
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 /// <summary>
-/// The actor who created the request/process. This is typically the one who owns the request/process, but in
-/// case of delegation it could be someone else.
+/// The actor who a request/process is made on behalf of (the original actor is the actor who owns the data,
+/// not necessarily the actor who made the request, in case of delegation).
 /// </summary>
 [Serializable]
-public record RequestedByActor
+public record OriginalActor
 {
     [JsonConstructor]
-    private RequestedByActor(ActorNumber actorNumber, ActorRole actorRole)
+    private OriginalActor(ActorNumber actorNumber, ActorRole actorRole)
     {
         ActorNumber = actorNumber;
         ActorRole = actorRole;
@@ -35,14 +35,20 @@ public record RequestedByActor
 
     public ActorRole ActorRole { get; init; }
 
-    public static RequestedByActor From(Actor actor)
+    public static OriginalActor From(RequestedByActor actor)
     {
         ArgumentNullException.ThrowIfNull(actor);
-        return new RequestedByActor(actor.ActorNumber, actor.ActorRole);
+        return new OriginalActor(actor.ActorNumber, actor.ActorRole);
     }
 
-    public static RequestedByActor From(ActorNumber actorNumber, ActorRole actorRole)
+    public static OriginalActor From(Actor actor)
     {
-        return new RequestedByActor(actorNumber, actorRole);
+        ArgumentNullException.ThrowIfNull(actor);
+        return new OriginalActor(actor.ActorNumber, actor.ActorRole);
+    }
+
+    public static OriginalActor From(ActorNumber actorNumber, ActorRole actorRole)
+    {
+        return new OriginalActor(actorNumber, actorRole);
     }
 }

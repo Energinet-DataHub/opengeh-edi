@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.Process.Interfaces;
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 /// <summary>
 /// Responsible for carrying the market message data from the incoming message before any data validation.

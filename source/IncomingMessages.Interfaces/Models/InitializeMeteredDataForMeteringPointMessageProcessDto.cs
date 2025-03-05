@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Process.Interfaces;
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 public record InitializeMeteredDataForMeteringPointMessageProcessDto(
     string MessageId,

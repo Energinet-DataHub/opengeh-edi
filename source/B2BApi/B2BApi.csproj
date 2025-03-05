@@ -49,6 +49,7 @@ limitations under the License.
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Polly" Version="8.5.0" />
       <PackageReference Include="System.Linq.Async" Version="6.0.1" />
       <PackageReference Include="System.Text.Json" Version="9.0.0" />
     </ItemGroup>
@@ -68,9 +69,6 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
-      <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
-      <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
-      <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
     </ItemGroup>
   <ItemDefinitionGroup>
     <ProjectReference>

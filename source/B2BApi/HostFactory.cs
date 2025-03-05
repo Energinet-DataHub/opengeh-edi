@@ -29,7 +29,6 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyI
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OutboxContext = Energinet.DataHub.EDI.Outbox.Infrastructure.OutboxContext;
@@ -87,7 +86,6 @@ public static class HostFactory
                         .AddArchivedMessagesModule(context.Configuration)
                         .AddIncomingMessagesModule(context.Configuration)
                         .AddOutgoingMessagesModule(context.Configuration)
-                        .AddProcessModule(context.Configuration)
                         .AddMasterDataModule(context.Configuration)
                         .AddDataAccessUnitOfWorkModule()
                         .AddAuditLog()
