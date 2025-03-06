@@ -20,16 +20,20 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInject
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IncomingMessages.Application;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM016;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM017;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.MessageId;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.Response;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.TransactionId;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
@@ -44,7 +48,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
 
 public static class IncomingMessagesExtensions
 {

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.MessageId;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.TransactionId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
 using Microsoft.EntityFrameworkCore;
