@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults.WholesaleResults;
 
 /// <summary>
 /// Time series point from wholesale results.
 /// Immutable value object.
 /// </summary>
-public sealed record WholesaleTimeSeriesPoint(DateTimeOffset Time, decimal? Quantity, IReadOnlyCollection<QuantityQuality>? Qualities, decimal? Price, decimal? Amount);
+public sealed record WholesaleTimeSeriesPoint(Instant Time, decimal? Quantity, IReadOnlyCollection<QuantityQuality>? Qualities, decimal? Price, decimal? Amount);

@@ -19,98 +19,11 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
 using FluentAssertions;
-using NodaTime;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
-[SuppressMessage(
-    "Usage",
-    "CA2007",
-    Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
-[IntegrationTest]
-[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
-{
-    private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
-    private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
-    private readonly string _energySupplierActorNumber;
-
-    public WhenWholesaleSettlementRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
-        : base(output, fixture)
-    {
-        ArgumentNullException.ThrowIfNull(fixture);
-
-        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.SystemOperator, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
-
-        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
-            ediDriver,
-            wholesaleDriver);
-
-        _wholesaleSettlementRequest =
-            new WholesaleSettlementRequestDsl(
-                new EdiDatabaseDriver(fixture.ConnectionString),
-                ediDriver,
-                new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
-                wholesaleDriver,
-                new ProcessManagerDriver(fixture.EdiTopicClient));
-
-        _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
-    }
-
-    [Fact(Skip = "We not running requests which check the database")]
-    public async Task Actor_can_request_wholesale_settlement()
-    {
-        var messageId = await _wholesaleSettlementRequest.Request(CancellationToken.None);
-
-        await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(messageId);
-    }
-
-    [Fact(Skip = "We not running requests which check the database")]
-    public async Task B2C_actor_can_request_wholesale_settlement()
-    {
-        var createdAfter = SystemClock.Instance.GetCurrentInstant();
-        var energySupplierActorNumber = _energySupplierActorNumber;
-        await _wholesaleSettlementRequest.B2CRequest(CancellationToken.None);
-
-        await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(
-            createdAfter,
-            requestedByActorNumber: energySupplierActorNumber);
-    }
-
-    [Fact]
-    public async Task Actor_get_sync_rejected_response_when_wholesale_settlement_request_is_invalid()
-    {
-        await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
-    }
-
-    [Fact]
-    public async Task Actor_can_peek_and_dequeue_response_from_wholesale_settlement_request()
-    {
-        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestAcceptedResponse(
-            "888",
-            SubsystemTestFixture.ActorNumber,
-            SubsystemTestFixture.EZTestCimActorNumber,
-            CancellationToken.None);
-
-        await _notifyWholesaleServices.ConfirmResultIsAvailable();
-    }
-
-    [Fact]
-    public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_settlement_request()
-    {
-        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestRejectedResponse(
-            "888",
-            SubsystemTestFixture.EZTestCimActorNumber,
-            CancellationToken.None);
-
-        await _notifyWholesaleServices.ConfirmRejectResultIsAvailable();
-    }
-}
-
-// TODO: Delete this test class and un-comment "WhenWholesaleSettlementRequestedProcessManagerTests" when the above is deprecated
 [SuppressMessage(
     "Usage",
     "CA2007",
@@ -122,12 +35,12 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 
 // TODO: Rename this to brs028 when we have deleted the old request tests
-public sealed class WhenWholesaleSettlementRequestedProcessManagerTests : BaseTestClass
+public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
     private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
 
-    public WhenWholesaleSettlementRequestedProcessManagerTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public WhenWholesaleSettlementRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
