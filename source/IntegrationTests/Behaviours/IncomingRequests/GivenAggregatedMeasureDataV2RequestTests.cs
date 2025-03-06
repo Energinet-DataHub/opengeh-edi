@@ -105,7 +105,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
              ? testDataDescription.ExampleEnergySupplier
              : testDataDescription.ExampleBalanceResponsible;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
@@ -221,7 +221,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
             ? testDataDescription.ExampleEnergySupplier
             : testDataDescription.ExampleBalanceResponsible;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
@@ -347,7 +347,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierOrNull = actorRole == ActorRole.EnergySupplier
             ? testMessageData.ExampleMessageData.EnergySupplier
             : null;
@@ -477,7 +477,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
              ? testDataDescription.ExampleEnergySupplier
              : testDataDescription.ExampleBalanceResponsible;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
