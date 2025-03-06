@@ -262,7 +262,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
                 _documentAsserter
                     .HasValue(
                         $"Series[{seriesIndex}]/Period/Point[{i + 1}]/quality",
-                        optionalPointDocumentFields.Quality);
+                        optionalPointDocumentFields.Quality.Code);
             }
             else
             {

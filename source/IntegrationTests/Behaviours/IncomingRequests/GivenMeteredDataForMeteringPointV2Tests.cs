@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
@@ -171,13 +170,13 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                                                 new OptionalPointDocumentFields(null, null)),
                                             new AssertPointDocumentFieldsInput(
                                                 new RequiredPointDocumentFields(2),
-                                                new OptionalPointDocumentFields("A03", null)),
+                                                new OptionalPointDocumentFields(Quality.FromCode("A03"), null)),
                                             new AssertPointDocumentFieldsInput(
                                                 new RequiredPointDocumentFields(3),
                                                 new OptionalPointDocumentFields(null, 123.456M)),
                                             new AssertPointDocumentFieldsInput(
                                                 new RequiredPointDocumentFields(4),
-                                                new OptionalPointDocumentFields("A03", 654.321M)),
+                                                new OptionalPointDocumentFields(Quality.FromCode("A03"), 654.321M)),
                                         ])),
                                 OptionalSeriesFields: new OptionalSeriesFields(
                                     OriginalTransactionIdReferenceId: transactionId,

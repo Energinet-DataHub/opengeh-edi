@@ -339,7 +339,7 @@ public class AssertMeteredDateForMeteringPointJsonDocument : IAssertMeteredDateF
                     .GetProperty("value")
                     .GetString()
                     .Should()
-                    .Be(optionalPointDocumentFields.Quality);
+                    .Be(optionalPointDocumentFields.Quality.Code);
             }
             else
             {

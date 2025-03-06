@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
-public sealed record OptionalPointDocumentFields(string? Quality, decimal? Quantity)
+public sealed record OptionalPointDocumentFields(Quality? Quality, decimal? Quantity)
 {
     public static OptionalPointDocumentFields NoOptionalFields() => new(null, null);
 }

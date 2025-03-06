@@ -62,7 +62,7 @@ public static class MeteredDataForMeteringPointEventBuilder
             .Select(eo => new AcceptedEnergyObservation(
                 int.Parse(eo.Position!),
                 eo.EnergyQuantity != null ? decimal.Parse(eo.EnergyQuantity.TrimEnd('M'), CultureInfo.InvariantCulture) : null,
-                eo.QuantityQuality != null ? GetPMQuality(eo.QuantityQuality) : null))
+                eo.QuantityQuality != null ? PMQuality.FromName(Quality.FromCode(eo.QuantityQuality).Name) : null))
             .ToList();
 
         var marketActorRecipients = new List<MarketActorRecipient>
@@ -104,19 +104,5 @@ public static class MeteredDataForMeteringPointEventBuilder
             idempotencyKey: Guid.NewGuid().ToString());
 
         return serviceBusMessage;
-    }
-
-    // TODO: This should probably be moved to somewhere else.
-    private static PMQuality GetPMQuality(string? quantityQuality)
-    {
-        return quantityQuality switch
-        {
-            "A02" => PMQuality.NotAvailable,
-            "A03" => PMQuality.Estimated,
-            "A04" => PMQuality.AsProvided,
-            "A05" => PMQuality.Incomplete,
-            "A06" => PMQuality.Calculated,
-            _ => throw new ArgumentOutOfRangeException(nameof(quantityQuality), quantityQuality, "QuantityQuality value does not map to a Process Manager value."),
-        };
     }
 }
