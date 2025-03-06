@@ -48,7 +48,7 @@ limitations under the License.
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-      <PackageReference Include="System.Text.Json" Version="9.0.0" />
+      <PackageReference Include="System.Text.Json" Version="9.0.2" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
