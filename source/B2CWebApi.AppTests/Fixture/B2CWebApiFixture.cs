@@ -78,12 +78,17 @@ public class B2CWebApiFixture : IAsyncLifetime
         var incomingMessagesQueue = await ServiceBusResourceProvider.BuildQueue(IncomingMessagesQueueName)
             .CreateAsync();
 
-        var processManagerTopic = await ServiceBusResourceProvider.BuildTopic("process-manager")
+        var processManagerStartTopic = await ServiceBusResourceProvider
+            .BuildTopic("process-manager-start")
+            .CreateAsync();
+        var processManagerNotifyTopic = await ServiceBusResourceProvider
+            .BuildTopic("process-manager-notify")
             .CreateAsync();
 
         var appSettings = GetWebApiAppSettings(
             incomingMessagesQueue.Name,
-            processManagerTopic.Name);
+            processManagerStartTopic.Name,
+            processManagerNotifyTopic.Name);
 
         B2CWebApiApplicationFactory.AppSettings = appSettings;
 
@@ -113,7 +118,10 @@ public class B2CWebApiFixture : IAsyncLifetime
         TestLogger.TestOutputHelper = testOutputHelper;
     }
 
-    private Dictionary<string, string?> GetWebApiAppSettings(string incomingMessagesQueueName, string processManagerTopicName)
+    private Dictionary<string, string?> GetWebApiAppSettings(
+        string incomingMessagesQueueName,
+        string processManagerStartTopicName,
+        string processManagerNotifyTopicName)
     {
         var dbConnectionString = DatabaseManager.ConnectionString;
         if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
@@ -131,7 +139,8 @@ public class B2CWebApiFixture : IAsyncLifetime
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },
             { "UserAuthentication:BackendBffAppId", OpenIdJwtManager.TestBffAppId },
             { $"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", ServiceBusResourceProvider.FullyQualifiedNamespace },
-            { $"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", processManagerTopicName },
+            { $"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", processManagerStartTopicName },
+            { $"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", processManagerNotifyTopicName },
             { $"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },

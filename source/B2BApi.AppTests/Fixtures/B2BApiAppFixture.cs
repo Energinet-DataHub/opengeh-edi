@@ -78,10 +78,8 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(IntegrationTestConfiguration));
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
+        AzuriteManager.CleanupAzuriteStorage();
         LogStopwatch(stopwatch, nameof(AzuriteManager));
-
-        CleanupAzuriteStorage();
-        LogStopwatch(stopwatch, nameof(CleanupAzuriteStorage));
 
         DurableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
@@ -147,7 +145,10 @@ public class B2BApiAppFixture : IAsyncLifetime
     public TopicResource? IntegrationEventsTopicResource { get; private set; }
 
     [NotNull]
-    public TopicResource? ProcessManagerTopicResource { get; private set; }
+    public TopicResource? ProcessManagerStartTopicResource { get; private set; }
+
+    [NotNull]
+    public TopicResource? ProcessManagerNotifyTopicResource { get; private set; }
 
     [NotNull]
     public TopicResource? EdiTopicResource { get; private set; }
@@ -202,16 +203,27 @@ public class B2BApiAppFixture : IAsyncLifetime
             .CreateAsync();
         LogStopwatch(stopwatch, nameof(IntegrationEventsTopicResource));
 
-        ProcessManagerTopicResource = await ServiceBusResourceProvider
-            .BuildTopic("process-manager")
+        ProcessManagerStartTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("process-manager-start")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", topic.Name))
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", topic.Name))
             .AddSubscription("process-manager-subscription")
             .CreateAsync();
-        LogStopwatch(stopwatch, nameof(ProcessManagerTopicResource));
+        LogStopwatch(stopwatch, nameof(ProcessManagerStartTopicResource));
         await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
-            topicName: ProcessManagerTopicResource.Name,
-            subscriptionName: ProcessManagerTopicResource.Subscriptions.Single().SubscriptionName);
+            topicName: ProcessManagerStartTopicResource.Name,
+            subscriptionName: ProcessManagerStartTopicResource.Subscriptions.Single().SubscriptionName);
+
+        ProcessManagerNotifyTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("process-manager-notify")
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", topic.Name))
+            .AddSubscription("process-manager-subscription")
+            .CreateAsync();
+        LogStopwatch(stopwatch, nameof(ProcessManagerNotifyTopicResource));
+        await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
+            topicName: ProcessManagerNotifyTopicResource.Name,
+            subscriptionName: ProcessManagerNotifyTopicResource.Subscriptions.Single().SubscriptionName);
 
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
@@ -360,41 +372,6 @@ public class B2BApiAppFixture : IAsyncLifetime
 #endif
     }
 
-    /// <summary>
-    /// Cleanup Azurite storage to avoid situations where Durable Functions
-    /// would otherwise continue working on old orchestrations that e.g. failed in
-    /// previous runs.
-    /// </summary>
-    private void CleanupAzuriteStorage()
-    {
-        if (Directory.Exists("__blobstorage__"))
-            Directory.Delete("__blobstorage__", true);
-
-        if (Directory.Exists("__queuestorage__"))
-            Directory.Delete("__queuestorage__", true);
-
-        if (Directory.Exists("__tablestorage__"))
-            Directory.Delete("__tablestorage__", true);
-
-        if (File.Exists("__azurite_db_blob__.json"))
-            File.Delete("__azurite_db_blob__.json");
-
-        if (File.Exists("__azurite_db_blob_extent__.json"))
-            File.Delete("__azurite_db_blob_extent__.json");
-
-        if (File.Exists("__azurite_db_queue__.json"))
-            File.Delete("__azurite_db_queue__.json");
-
-        if (File.Exists("__azurite_db_queue_extent__.json"))
-            File.Delete("__azurite_db_queue_extent__.json");
-
-        if (File.Exists("__azurite_db_table__.json"))
-            File.Delete("__azurite_db_table__.json");
-
-        if (File.Exists("__azurite_db_table_extent__.json"))
-            File.Delete("__azurite_db_table_extent__.json");
-    }
-
     private void CreateRequiredContainers()
     {
         List<FileStorageCategory> containerCategories = [
@@ -433,6 +410,15 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
+
+        // Logging
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "Logging__LogLevel__Default",
+            "Information");
+        // => Disable extensive logging when using Azure Storage
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "Logging__LogLevel__Azure.Core",
+            "Error");
 
         // Durable Functions
         // => Task Hub Name
