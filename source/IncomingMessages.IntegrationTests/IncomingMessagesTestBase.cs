@@ -27,9 +27,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyI
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;

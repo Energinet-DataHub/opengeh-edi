@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 

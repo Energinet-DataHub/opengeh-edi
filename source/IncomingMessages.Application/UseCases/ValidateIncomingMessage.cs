@@ -14,11 +14,11 @@
 
 using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.MessageId;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.TransactionId;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
