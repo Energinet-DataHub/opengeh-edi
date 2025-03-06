@@ -142,7 +142,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -295,7 +295,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -436,7 +436,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -600,7 +600,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -749,7 +749,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -896,7 +896,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier.Name
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;

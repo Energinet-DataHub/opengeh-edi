@@ -133,7 +133,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescription.ExampleWholesaleResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
@@ -283,7 +283,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
             : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = delegatedFromRole == ActorRole.SystemOperator
             ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
@@ -451,7 +451,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescription.ExampleWholesaleResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
@@ -588,7 +588,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
             : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value);
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
@@ -730,7 +730,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
             : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = delegatedFromRole == ActorRole.SystemOperator
             ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)
@@ -895,7 +895,7 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
             ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescription.ExampleWholesaleResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");

@@ -120,9 +120,14 @@ public static class IncomingMessagesExtensions
                 [HealthChecksConstants.StatusHealthCheckTag])
             .AddAzureServiceBusTopic(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
-                sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.TopicName,
+                sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.StartTopicName,
                 tokenCredentialFactory: _ => defaultAzureCredential,
-                name: "ProcessManager topic");
+                name: "Process Manager Start Topic")
+            .AddAzureServiceBusTopic(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.NotifyTopicName,
+                tokenCredentialFactory: _ => defaultAzureCredential,
+                name: "Process Manager Notify Topic");
 
         /*
         // RegisterSchemaProviders
