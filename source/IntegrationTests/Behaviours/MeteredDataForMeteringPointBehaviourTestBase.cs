@@ -16,14 +16,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
@@ -32,6 +30,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit.Abstractions;
+using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataInputV1;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -109,7 +108,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
 
     protected StartOrchestrationInstanceV1 ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
-        RequestMeteredDataForMeteringPointMessageInputV1AssertionInput assertionInput)
+        ForwardMeteredDataInputV1AssertionInput assertionInput)
     {
         var assertionResult = ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessagesAreCorrect(
             senderSpy,
@@ -120,7 +119,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
 
     protected IList<StartOrchestrationInstanceV1> ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessagesAreCorrect(
         ServiceBusSenderSpy senderSpy,
-        IList<RequestMeteredDataForMeteringPointMessageInputV1AssertionInput> assertionInputs)
+        IList<ForwardMeteredDataInputV1AssertionInput> assertionInputs)
     {
         var messages = AssertProcessManagerServiceBusMessages(
             senderSpy: senderSpy,
@@ -133,7 +132,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
             .Select(GetAssertServiceBusMessage);
 
         messages
-            .Select(x => x.ParseInput<MeteredDataForMeteringPointMessageInputV1>())
+            .Select(x => x.ParseInput<ForwardMeteredDataInputV1>())
             .Should()
             .SatisfyRespectively(assertionMethods);
 
@@ -145,8 +144,8 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
         await GivenProcessManagerResponseIsReceived(acceptedMessage);
     }
 
-    private static Action<MeteredDataForMeteringPointMessageInputV1> GetAssertServiceBusMessage(
-        RequestMeteredDataForMeteringPointMessageInputV1AssertionInput input)
+    private static Action<ForwardMeteredDataInputV1> GetAssertServiceBusMessage(
+        ForwardMeteredDataInputV1AssertionInput input)
     {
         return (message) =>
         {

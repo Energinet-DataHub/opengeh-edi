@@ -26,6 +26,7 @@ using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataInputV1;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -49,7 +50,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
          */
 
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var senderActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
         var receiverActor = (ActorNumber: ActorNumber.Create("8100000000115"), ActorRole: ActorRole.EnergySupplier);
         var resolution = Resolution.Hourly;
@@ -85,7 +86,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         // Assert
         var message = ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
-            new RequestMeteredDataForMeteringPointMessageInputV1AssertionInput(
+            new ForwardMeteredDataInputV1AssertionInput(
                 ActorNumber: senderActor.ActorNumber.Value,
                 ActorRole: senderActor.ActorRole.Name,
                 TransactionId: TransactionId.From(transactionId),
@@ -111,7 +112,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
          */
 
         // Arrange
-        var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<MeteredDataForMeteringPointMessageInputV1>();
+        var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
         var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
             .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor);
 

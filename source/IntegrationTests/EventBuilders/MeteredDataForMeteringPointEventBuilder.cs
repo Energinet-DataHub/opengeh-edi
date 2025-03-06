@@ -20,6 +20,8 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime.Text;
+using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataAcceptedV1;
+using PMActorNumber = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber;
 using PMActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
 using PMMeasureUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
 using PMMeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
@@ -31,7 +33,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 public static class MeteredDataForMeteringPointEventBuilder
 {
     public static ServiceBusMessage GenerateAcceptedFrom(
-        MeteredDataForMeteringPointMessageInputV1 requestMeteredDataForMeteringPointMessageInputV1,
+        ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointMessageInputV1,
         (ActorNumber ActorNumber, ActorRole ActorRole) receiverActor)
     {
         var invariantPattern = InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd'T'HH':'mm'Z'");
@@ -65,15 +67,15 @@ public static class MeteredDataForMeteringPointEventBuilder
                 eo.QuantityQuality != null ? PMQuality.FromName(Quality.FromCode(eo.QuantityQuality).Name) : null))
             .ToList();
 
-        var marketActorRecipients = new List<MarketActorRecipient>
+        var marketActorRecipients = new List<MarketActorRecipientV1>
         {
             new(
-                receiverActor.ActorNumber.Value,
-                ActorRole.FromName(receiverActor.ActorRole.Name).ToProcessManagerActorRole()),
+                PMActorNumber.Create(receiverActor.ActorNumber.Value),
+                PMActorRole.FromName(receiverActor.ActorRole.Name)),
         };
 
-        var acceptRequest = new MeteredDataForMeteringPointAcceptedV1(
-            MessageId: requestMeteredDataForMeteringPointMessageInputV1.MessageId,
+        var acceptRequest = new ForwardMeteredDataAcceptedV1(
+            OriginalActorMessageId: requestMeteredDataForMeteringPointMessageInputV1.MessageId,
             MeteringPointId: requestMeteredDataForMeteringPointMessageInputV1.MeteringPointId,
             MeteringPointType: meteringPointType,
             OriginalTransactionId: requestMeteredDataForMeteringPointMessageInputV1.TransactionId,

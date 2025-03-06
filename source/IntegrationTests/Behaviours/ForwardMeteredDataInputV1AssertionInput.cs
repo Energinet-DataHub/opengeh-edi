@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using NodaTime;
+using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataInputV1;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
-public record RequestMeteredDataForMeteringPointMessageInputV1AssertionInput(
+public record ForwardMeteredDataInputV1AssertionInput(
     string ActorNumber,
     string ActorRole,
     TransactionId TransactionId,
