@@ -88,6 +88,12 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
+    public IAssertMeteredDateForMeteringPointDocumentDocument TransactionIdExists(int seriesIndex)
+    {
+        _documentAsserter.ElementExists($"Series[{seriesIndex}]/mRID");
+        return this;
+    }
+
     public IAssertMeteredDateForMeteringPointDocumentDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId)
@@ -107,9 +113,9 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
 
     public IAssertMeteredDateForMeteringPointDocumentDocument HasMeteringPointType(
         int seriesIndex,
-        string expectedMeteringPointType)
+        MeteringPointType expectedMeteringPointType)
     {
-        _documentAsserter.HasValue($"Series[{seriesIndex}]/marketEvaluationPoint.type", expectedMeteringPointType);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
         return this;
     }
 

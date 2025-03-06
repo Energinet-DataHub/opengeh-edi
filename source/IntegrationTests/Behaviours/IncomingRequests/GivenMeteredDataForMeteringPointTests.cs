@@ -111,7 +111,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
                                             isTransOne ? transactionId1.Reverse() : transactionId2.Reverse())),
                                     "579999993331812345",
                                     "A10",
-                                    "E17",
+                                    MeteringPointType.FromCode("E17"),
                                     "KWH",
                                     new RequiredPeriodDocumentFields(
                                         isTransOne ? "PT1H" : "PT15M",

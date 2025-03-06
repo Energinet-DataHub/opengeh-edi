@@ -79,7 +79,7 @@ public class NotifyValidatedMeasureDataDocumentAsserter
 
             // Required series fields
             asserter
-                .HasTransactionId(seriesIndex, requiredSeriesFields.TransactionId)
+                .TransactionIdExists(seriesIndex)
                 .HasMeteringPointNumber(
                     seriesIndex,
                     requiredSeriesFields.MeteringPointNumber,

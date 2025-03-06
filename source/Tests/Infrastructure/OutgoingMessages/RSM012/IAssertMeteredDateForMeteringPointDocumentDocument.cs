@@ -34,6 +34,8 @@ public interface IAssertMeteredDateForMeteringPointDocumentDocument
 
     IAssertMeteredDateForMeteringPointDocumentDocument HasBusinessSectorType(string? expectedBusinessSectorType);
 
+    IAssertMeteredDateForMeteringPointDocumentDocument TransactionIdExists(int seriesIndex);
+
     IAssertMeteredDateForMeteringPointDocumentDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId);
@@ -45,7 +47,7 @@ public interface IAssertMeteredDateForMeteringPointDocumentDocument
 
     IAssertMeteredDateForMeteringPointDocumentDocument HasMeteringPointType(
         int seriesIndex,
-        string expectedMeteringPointType);
+        MeteringPointType expectedMeteringPointType);
 
     IAssertMeteredDateForMeteringPointDocumentDocument HasOriginalTransactionIdReferenceId(
         int seriesIndex,

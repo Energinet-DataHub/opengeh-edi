@@ -131,7 +131,6 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        // Go through ProcessManager
         await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
             initializeMeteredDataForMeteringPointMessageProcessDto,
             cancellationToken)
