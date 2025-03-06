@@ -102,6 +102,16 @@ public class AssertMeteredDateForMeteringPointJsonDocument : IAssertMeteredDateF
         return this;
     }
 
+    public IAssertMeteredDateForMeteringPointDocumentDocument TransactionIdExists(int seriesIndex)
+    {
+        GetTimeSeriesElement(seriesIndex)
+            .TryGetProperty("mRID", out _)
+            .Should()
+            .BeTrue("property 'mRID' should be present");
+
+        return this;
+    }
+
     public IAssertMeteredDateForMeteringPointDocumentDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId)
@@ -134,14 +144,14 @@ public class AssertMeteredDateForMeteringPointJsonDocument : IAssertMeteredDateF
 
     public IAssertMeteredDateForMeteringPointDocumentDocument HasMeteringPointType(
         int seriesIndex,
-        string expectedMeteringPointType)
+        MeteringPointType expectedMeteringPointType)
     {
         GetTimeSeriesElement(seriesIndex)
             .GetProperty("marketEvaluationPoint.type")
             .GetProperty("value")
             .GetString()
             .Should()
-            .Be(expectedMeteringPointType);
+            .Be(expectedMeteringPointType.Code);
 
         return this;
     }
@@ -329,7 +339,7 @@ public class AssertMeteredDateForMeteringPointJsonDocument : IAssertMeteredDateF
                     .GetProperty("value")
                     .GetString()
                     .Should()
-                    .Be(optionalPointDocumentFields.Quality);
+                    .Be(optionalPointDocumentFields.Quality.Code);
             }
             else
             {

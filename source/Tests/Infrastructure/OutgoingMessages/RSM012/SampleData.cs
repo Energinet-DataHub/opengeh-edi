@@ -45,7 +45,7 @@ internal static class SampleData
 
     public static string MeteringPointNumber => "579999993331812345";
 
-    public static string MeteringPointType => "E17";
+    public static MeteringPointType MeteringPointType => MeteringPointType.FromCode("E17");
 
     public static TransactionId? OriginalTransactionIdReferenceId => TransactionId.From("C1875000");
 
@@ -61,15 +61,15 @@ internal static class SampleData
 
     public static Instant EndedDateTime => InstantPattern.General.Parse("2022-08-15T04:00:00Z").Value;
 
-    public static IReadOnlyList<PointActivityRecord> Points => new List<PointActivityRecord>
-    {
-        new(1, "A03", 242),
+    public static IReadOnlyList<PointActivityRecord> Points =>
+    [
+        new(1, Quality.FromCode("A03"), 242),
         new(2, null, 242),
         new(3, null, 222),
         new(4, null, 202),
         new(5, null, 191),
-        new(6, "A02", null),
-    };
+        new(6, Quality.FromCode("A02"), null),
+    ];
 
     public static IReadOnlyList<PointActivityRecord> MinimalPoints => [new(2, null, null)];
 

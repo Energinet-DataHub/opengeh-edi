@@ -43,7 +43,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         CancellationToken cancellationToken)
     {
         var series = acceptedData.AcceptedEnergyObservations.Select(x =>
-            new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality?.Name))
+            new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality != null ? Quality.FromName(x.QuantityQuality.Name) : null))
             .ToList();
 
         foreach (var acceptedDataMarketActorRecipient in acceptedData.MarketActorRecipients)
@@ -56,7 +56,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
                 series: new MeteredDataForMeteringPointMessageSeriesDto(
                     TransactionId: TransactionId.New(),
                     MarketEvaluationPointNumber: acceptedData.MeteringPointId,
-                    MarketEvaluationPointType: acceptedData.MeteringPointType.Name,
+                    MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
                     OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
                     Product: acceptedData.ProductNumber,
                     QuantityMeasureUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),

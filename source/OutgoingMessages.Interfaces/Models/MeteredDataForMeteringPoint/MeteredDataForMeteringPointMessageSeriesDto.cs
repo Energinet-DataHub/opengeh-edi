@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataFo
 public sealed record MeteredDataForMeteringPointMessageSeriesDto(
     TransactionId TransactionId,
     string MarketEvaluationPointNumber,
-    string MarketEvaluationPointType,
+    MeteringPointType MarketEvaluationPointType,
     TransactionId? OriginalTransactionIdReferenceId,
     string Product,
     MeasurementUnit QuantityMeasureUnit,

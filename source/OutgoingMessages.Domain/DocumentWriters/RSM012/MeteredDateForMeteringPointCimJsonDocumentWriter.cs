@@ -157,7 +157,7 @@ internal class MeteredDateForMeteringPoint(
 internal class MeteredDataForMeasurementSeries(
     string transactionId,
     string marketEvaluationPointNumber,
-    string marketEvaluationPointType,
+    MeteringPointType marketEvaluationPointType,
     string? originalTransactionIdReferenceId,
     string? product,
     string quantityMeasureUnit,
@@ -171,7 +171,7 @@ internal class MeteredDataForMeasurementSeries(
     public ValueObjectWithScheme MeteringPointNumber { get; init; } = ValueObjectWithScheme.Create("A10", marketEvaluationPointNumber);
 
     [JsonPropertyName("marketEvaluationPoint.type")]
-    public ValueObject<string> MeteringPointType { get; init; } = ValueObject<string>.Create(marketEvaluationPointType);
+    public ValueObject<string> MeteringPointType { get; init; } = ValueObject<string>.Create(marketEvaluationPointType.Code);
 
     [JsonPropertyName("originalTransactionIDReference_Series.mRID")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -213,14 +213,14 @@ internal class TimeInterval(string startedDateTime, string endedDateTime)
     public ValueObject<string> EndedDateTime { get; init; } = ValueObject<string>.Create(endedDateTime);
 }
 
-internal class Point(int position, string? quality, decimal? quantity)
+internal class Point(int position, Quality? quality, decimal? quantity)
 {
     [JsonPropertyName("position")]
     public ValueObject<int> Position { get; init; } = ValueObject<int>.Create(position);
 
     [JsonPropertyName("quality")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public ValueObject<string>? Quality { get; init; } = quality == null ? null : ValueObject<string>.Create(quality);
+    public ValueObject<string>? Quality { get; init; } = quality == null ? null : ValueObject<string>.Create(quality.Code);
 
     [JsonPropertyName("quantity")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
