@@ -153,10 +153,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                             new AssertSeriesDocumentFieldsInput(
                                 1,
                                 RequiredSeriesFields: new RequiredSeriesFields(
-                                    TransactionId: TransactionId.From(
-                                        string.Join(
-                                            string.Empty,
-                                            transactionId.Reverse())),
+                                    TransactionId: TransactionId.From(Guid.NewGuid().ToString()),
                                     MeteringPointNumber: "579999993331812345",
                                     MeteringPointScheme: "A10",
                                     MeteringPointType: MeteringPointType.FromCode("E17"),
