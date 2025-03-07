@@ -31,6 +31,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjec
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OutboxContext = Energinet.DataHub.EDI.Outbox.Infrastructure.OutboxContext;
@@ -64,6 +65,19 @@ public static class HostFactory
                             settings.Mode = DfmMode.ReadOnly;
                         });
                 })
+            .ConfigureAppConfiguration((context, configBuilder) =>
+            {
+                var settings = configBuilder.Build();
+                var appConfigEndpoint = settings["AppConfigEndpoint"]!;
+                configBuilder.AddAzureAppConfiguration(options =>
+                {
+                    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
+                        .UseFeatureFlags(featureFlagOptions =>
+                        {
+                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(5));
+                        });
+                });
+            })
             .ConfigureServices(
                 (context, services) =>
                 {
@@ -75,6 +89,9 @@ public static class HostFactory
 
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
+
+                        // Azure App Configuration
+                        .AddAzureAppConfiguration()
 
                         // Data retention
                         .AddDataRetention()

@@ -26,8 +26,9 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     private readonly Dictionary<FeatureFlagName, bool> _featureFlagDictionary = new()
     {
         { FeatureFlagName.UsePeekMessages, true },
-        { FeatureFlagName.UsePeekTimeSeriesMessages, true },
-        { FeatureFlagName.ReceiveMeteredDataForMeasurementPoints, true },
+        { FeatureFlagName.PM25_CIM, true },
+        { FeatureFlagName.PM25_EBIX, true },
+        { FeatureFlagName.PM25_MESSAGES, true },
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
         { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
@@ -40,9 +41,11 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekMessages]);
 
-    public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekTimeSeriesMessages]);
+    public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25_MESSAGES]);
 
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ReceiveMeteredDataForMeasurementPoints]);
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25_CIM]);
+
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25_EBIX]);
 
     public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration]);
 

@@ -61,7 +61,7 @@ public class IncomingMessageReceiver
 
         if (incomingDocumentTypeName != null &&
             incomingDocumentTypeName.Equals(IncomingDocumentType.NotifyValidatedMeasureData.Name, StringComparison.OrdinalIgnoreCase)
-            && !await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))
+            && !await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsInCimAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request

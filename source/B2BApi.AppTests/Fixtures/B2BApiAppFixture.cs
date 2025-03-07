@@ -333,7 +333,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UsePeekTimeSeriesMessages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.PM25_MESSAGES.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }
@@ -496,7 +496,11 @@ public class B2BApiAppFixture : IAsyncLifetime
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.ReceiveMeteredDataForMeasurementPoints.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25_CIM.ToString()}",
+            true.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"FeatureManagement__{FeatureFlagName.PM25_EBIX.ToString()}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
