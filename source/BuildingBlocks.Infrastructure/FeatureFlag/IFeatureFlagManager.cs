@@ -35,9 +35,14 @@ public interface IFeatureFlagManager
     Task<bool> UsePeekTimeSeriesMessagesAsync();
 
     /// <summary>
-    /// Whether to allow receiving metered data for metering points.
+    /// Whether to allow receiving metered data for metering points in CIM.
     /// </summary>
-    Task<bool> ReceiveMeteredDataForMeasurementPointsAsync();
+    Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync();
+
+    /// <summary>
+    /// Whether to allow receiving metered data for metering points Ebix.
+    /// </summary>
+    Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync();
 
     /// <summary>
     /// Whether to use the RequestWholesaleServices process orchestration.

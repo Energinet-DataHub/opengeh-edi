@@ -26,14 +26,19 @@ public enum FeatureFlagName
     UsePeekMessages,
 
     /// <summary>
-    /// Whether to disable peek time series messages
+    /// Whether to allow receiving metered data for metering points in CIM.
     /// </summary>
-    UsePeekTimeSeriesMessages,
+    PM25_CIM,
 
     /// <summary>
-    /// Whether to allow receiving metered data for metering points.
+    /// Whether to allow receiving metered data for metering points in Ebix.
     /// </summary>
-    ReceiveMeteredDataForMeasurementPoints,
+    PM25_EBIX,
+
+    /// <summary>
+    /// Whether to allow actors to peek metered data for metering points.
+    /// </summary>
+    PM25_MESSAGES,
 
     /// <summary>
     /// Whether to use orchestration for handling RequestWholesaleServices processes.
