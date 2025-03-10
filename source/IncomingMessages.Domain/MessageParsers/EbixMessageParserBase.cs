@@ -57,7 +57,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         var ns = XNamespace.Get(@namespace);
 
         var header = ParseHeader(document, ns);
-        var transactions = ParseTransactions(document, ns, header.SenderId);
+        var transactions = ParseTransactions(document, ns, header.SenderId, header.CreatedAt);
 
         return CreateResult(header, transactions);
     }
@@ -94,7 +94,19 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         return (xmlSchema, null);
     }
 
-    protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber);
+    /// <summary>
+    /// Parse transaction.
+    /// </summary>
+    /// <param name="document"></param>
+    /// <param name="ns"></param>
+    /// <param name="senderNumber"></param>
+    /// <param name="createdAt">Transactions in EBIX doesn't contain a timestamp for when the measured data was collected, so
+    /// it has been decided that we should extract a timestamp from the header, and use it for each transaction.</param>
+    protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(
+        XDocument document,
+        XNamespace ns,
+        string senderNumber,
+        string createdAt);
 
     protected abstract IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions);
 
