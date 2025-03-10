@@ -14,8 +14,6 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
@@ -30,30 +28,21 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 public class IncomingMessagePublisher
 {
     private readonly AuthenticatedActor _authenticatedActor;
-    private readonly ISerializer _serializer;
-    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
     private readonly MeteredDataOrchestrationStarter _meteredDataOrchestrationStarter;
-    private readonly ServiceBusSender _sender;
 
     public IncomingMessagePublisher(
         AuthenticatedActor authenticatedActor,
         IOptions<IncomingMessagesQueueOptions> options,
         IAzureClientFactory<ServiceBusSender> senderFactory,
-        ISerializer serializer,
-        IFeatureFlagManager featureFlagManager,
         IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter,
         MeteredDataOrchestrationStarter meteredDataOrchestrationStarter)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
         _authenticatedActor = authenticatedActor;
-        _serializer = serializer;
-        _featureFlagManager = featureFlagManager;
         _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
         _meteredDataOrchestrationStarter = meteredDataOrchestrationStarter;
-
-        _sender = senderFactory.CreateClient(options.Value.QueueName);
     }
 
     public async Task PublishAsync(
@@ -101,19 +90,9 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        // Go through ProcessManager
         await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
             initializeMeteredDataForMeteringPointMessageProcessDto,
             cancellationToken)
         .ConfigureAwait(false);
-
-        // Enqueue message directly
-        // var serviceBusMessage =
-        //     new ServiceBusMessage(
-        //         _serializer.Serialize(initializeMeteredDataForMeteringPointMessageProcessDto))
-        //     {
-        //         Subject = nameof(InitializeMeteredDataForMeteringPointMessageProcessDto),
-        //     };
-        // await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }
