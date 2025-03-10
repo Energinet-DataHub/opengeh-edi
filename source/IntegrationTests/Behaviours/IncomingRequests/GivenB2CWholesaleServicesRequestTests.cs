@@ -46,7 +46,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
         var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
         var exampleWholesaleResultMessageForActor = testDataDescription.ExampleWholesaleResultMessageData;
         var actorRole = ActorRole.EnergySupplier;
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value) : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");

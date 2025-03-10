@@ -48,7 +48,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
         var testDataDescription = GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
         var testMessageData = testDataDescription.ExampleEnergySupplier;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerTopic);
+        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: ActorRole.EnergySupplier);

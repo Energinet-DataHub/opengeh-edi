@@ -40,17 +40,15 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
             ediDatabaseDriver);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.MeteredDataResponsible, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
         var processManagerDriver = new ProcessManagerDriver(fixture.EdiTopicClient);
         _calculationCompleted = new CalculationCompletedDsl(
             ediDriver,
             ediDatabaseDriver,
-            wholesaleDriver,
             processManagerDriver,
             output,
             fixture.BalanceFixingCalculationId,
             fixture.WholesaleFixingCalculationId);
-        _notifyAggregatedMeasureData = new NotifyAggregatedMeasureDataResultDsl(ediDriver, wholesaleDriver);
+        _notifyAggregatedMeasureData = new NotifyAggregatedMeasureDataResultDsl(ediDriver);
     }
 
     [Fact]
