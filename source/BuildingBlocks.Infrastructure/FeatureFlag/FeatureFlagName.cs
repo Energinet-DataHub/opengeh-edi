@@ -49,4 +49,9 @@ public enum FeatureFlagName
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
     /// </summary>
     UseProcessManagerToEnqueueBrs023027Messages,
+
+    /// <summary>
+    /// Whether to archive brs012 messages.
+    /// </summary>
+    ArchiveBrs012Messages,
 }
