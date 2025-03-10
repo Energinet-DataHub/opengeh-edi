@@ -50,10 +50,13 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
          */
 
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpyStart = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpyNotify = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerNotifySender);
         var senderActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
         var receiverActor = (ActorNumber: ActorNumber.Create("8100000000115"), ActorRole: ActorRole.EnergySupplier);
+        var orchestrationInstanceId = Guid.NewGuid();
         var resolution = Resolution.Hourly;
+        var notifyEventName = ForwardMeteredDataNotifyEventsV1.EnqueueActorMessagesCompleted;
 
         var registeredAt = Instant.FromUtc(2022, 12, 17, 9, 30, 00);
         var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
@@ -85,7 +88,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
 
         // Assert
         var message = ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessageIsCorrect(
-            senderSpy,
+            senderSpyStart,
             new ForwardMeteredDataInputV1AssertionInput(
                 ActorNumber: senderActor.ActorNumber.Value,
                 ActorRole: senderActor.ActorRole.Name,
@@ -114,9 +117,15 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
         var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
-            .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor);
+            .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor, orchestrationInstanceId);
 
         await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
+
+        AssertCorrectProcessManagerNotification(
+            senderSpyNotify.LatestMessage!,
+            new NotifyOrchestrationInstanceEventV1AssertionInput(
+                orchestrationInstanceId,
+                notifyEventName));
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(

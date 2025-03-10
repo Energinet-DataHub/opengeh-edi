@@ -34,7 +34,8 @@ public static class MeteredDataForMeteringPointEventBuilder
 {
     public static ServiceBusMessage GenerateAcceptedFrom(
         ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointMessageInputV1,
-        (ActorNumber ActorNumber, ActorRole ActorRole) receiverActor)
+        (ActorNumber ActorNumber, ActorRole ActorRole) receiverActor,
+        Guid orchestrationInstanceId)
     {
         var invariantPattern = InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd'T'HH':'mm'Z'");
 
@@ -97,7 +98,7 @@ public static class MeteredDataForMeteringPointEventBuilder
                 ActorNumber = requestMeteredDataForMeteringPointMessageInputV1.ActorNumber,
                 ActorRole = PMActorRole.FromName(requestMeteredDataForMeteringPointMessageInputV1.ActorRole).ToActorRoleV1(),
             },
-            OrchestrationInstanceId = Guid.NewGuid().ToString(),
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
         enqueueActorMessages.SetData(acceptRequest);
 

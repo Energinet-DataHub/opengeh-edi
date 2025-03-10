@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
@@ -142,6 +143,18 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
     protected async Task GivenForwardMeteredDataRequestAcceptedIsReceived(ServiceBusMessage acceptedMessage)
     {
         await GivenProcessManagerResponseIsReceived(acceptedMessage);
+    }
+
+    protected NotifyOrchestrationInstanceV1 AssertCorrectProcessManagerNotification(
+        ServiceBusMessage serviceBusMessage,
+        NotifyOrchestrationInstanceEventV1AssertionInput assertionInput)
+    {
+        var message = NotifyOrchestrationInstanceV1.Parser.ParseJson(serviceBusMessage.Body.ToString());
+
+        message.OrchestrationInstanceId.Should().BeEquivalentTo(assertionInput.InstanceId.ToString());
+        message.EventName.Should().BeEquivalentTo(assertionInput.EventName);
+
+        return message;
     }
 
     private static Action<ForwardMeteredDataInputV1> GetAssertServiceBusMessage(
