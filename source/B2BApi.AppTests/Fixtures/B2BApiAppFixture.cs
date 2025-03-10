@@ -496,11 +496,11 @@ public class B2BApiAppFixture : IAsyncLifetime
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25_CIM.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25CIM.ToString()}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25_EBIX.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25Ebix.ToString()}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(

@@ -23,18 +23,18 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Tests")]
 public class FeatureFlagManagerStub : IFeatureFlagManager
 {
-    private readonly Dictionary<FeatureFlagName, bool> _featureFlagDictionary = new()
+    private readonly Dictionary<string, bool> _featureFlagDictionary = new()
     {
         { FeatureFlagName.UsePeekMessages, true },
-        { FeatureFlagName.PM25_CIM, true },
-        { FeatureFlagName.PM25_EBIX, true },
+        { FeatureFlagName.PM25CIM, true },
+        { FeatureFlagName.PM25Ebix, true },
         { FeatureFlagName.PM25Messages, true },
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
         { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
     };
 
-    public void SetFeatureFlag(FeatureFlagName featureFlagName, bool value)
+    public void SetFeatureFlag(string featureFlagName, bool value)
     {
         _featureFlagDictionary[featureFlagName] = value;
     }
@@ -43,9 +43,9 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UsePeekMeasureDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Messages]);
 
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25_CIM]);
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25CIM]);
 
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25_EBIX]);
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Ebix]);
 
     public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration]);
 
