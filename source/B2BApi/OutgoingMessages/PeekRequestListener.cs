@@ -106,7 +106,7 @@ public class PeekRequestListener
             ? EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
 
-        if (parsedMessageCategory == MessageCategory.TimeSeries && !await _featureFlagManager.UsePeekTimeSeriesMessagesAsync().ConfigureAwait(false))
+        if (parsedMessageCategory == MessageCategory.MeasureData && !await _featureFlagManager.UsePeekTimeSeriesMessagesAsync().ConfigureAwait(false))
         {
             var noContentResponse = HttpResponseData.CreateResponse(request);
             noContentResponse.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
