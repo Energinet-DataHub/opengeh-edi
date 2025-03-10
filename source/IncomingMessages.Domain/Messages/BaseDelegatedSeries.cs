@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public abstract record BaseDelegatedSeries : IDelegatedIncomingMessageSeries
 {

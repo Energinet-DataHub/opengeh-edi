@@ -14,9 +14,9 @@
 
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.MessageId;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.TransactionId;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageId;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.TransactionId;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;

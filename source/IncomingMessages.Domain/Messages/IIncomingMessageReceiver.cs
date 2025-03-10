@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Models.TransactionId;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 
-public class TransactionIdForSender
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+
+/// <summary>
+/// Responsible for receiving a incoming message.
+/// </summary>
+public interface IIncomingMessageReceiver
 {
-    public TransactionIdForSender(string transactionId, string senderId)
-    {
-        TransactionId = transactionId;
-        SenderId = senderId;
-    }
-
-    public string TransactionId { get; set; }
-
-    public string SenderId { get; set; }
+    /// <summary>
+    /// Responsible for receiving the incoming message.
+    /// </summary>
+    Task<Result> ReceiveAsync(
+        IIncomingMessage incomingMessage,
+        CancellationToken cancellationToken);
 }

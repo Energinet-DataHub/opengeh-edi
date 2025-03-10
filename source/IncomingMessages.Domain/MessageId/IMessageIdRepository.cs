@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
-
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageId;
 
 /// <summary>
-/// Responsible for receiving a incoming message.
+/// Store containing message id for all received market documents
 /// </summary>
-public interface IIncomingMessageReceiver
+public interface IMessageIdRepository
 {
     /// <summary>
-    /// Responsible for receiving the incoming message.
+    /// Store message id for the sender
     /// </summary>
-    Task<Result> ReceiveAsync(
-        IIncomingMessage incomingMessage,
-        CancellationToken cancellationToken);
+    Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>
+    /// </summary>
+    Task<bool> MessageIdExistsAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
 }

@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
 using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 /// <summary>
 /// Represents the message for metered data for metering point known as RSM-012.
@@ -54,11 +53,11 @@ public class MeteredDataForMeteringPointMessageBase(
     public IReadOnlyCollection<IIncomingMessageSeries> Series { get; } = series;
 
     public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageType.ValidatedMeteredData,
+        BuildingBlocks.Domain.Models.MessageType.ValidatedMeteredData,
     ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons => [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PeriodicMetering,
+        BuildingBlocks.Domain.Models.BusinessReason.PeriodicMetering,
     ];
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [

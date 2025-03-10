@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 

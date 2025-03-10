@@ -15,7 +15,7 @@
 using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.Response;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 

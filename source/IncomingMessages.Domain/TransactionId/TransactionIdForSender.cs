@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Models.MessageId;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.TransactionId;
 
-public class MessageIdForSender
+public class TransactionIdForSender
 {
-    public MessageIdForSender(string messageId, string senderId)
+    public TransactionIdForSender(string transactionId, string senderId)
     {
-        MessageId = messageId;
+        TransactionId = transactionId;
         SenderId = senderId;
     }
 
-    public string MessageId { get; set; }
+    public string TransactionId { get; set; }
 
     public string SenderId { get; set; }
 }

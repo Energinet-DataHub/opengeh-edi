@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Models.Response;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Response;
 
 /// <summary>
 /// Factory responsible for creating B2B response messages

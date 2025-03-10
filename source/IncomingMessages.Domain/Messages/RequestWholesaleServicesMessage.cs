@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Models.IncomingMessage;
 using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
-public record RequestAggregatedMeasureDataMessage(
+public record RequestWholesaleServicesMessage(
     string SenderNumber,
     string SenderRoleCode,
     string ReceiverNumber,
@@ -31,51 +30,45 @@ public record RequestAggregatedMeasureDataMessage(
     IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage
 {
     public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageType.RequestAggregatedMeteredData,
+        BuildingBlocks.Domain.Models.MessageType.RequestForAggregatedBillingInformation,
     ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
     [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PreliminaryAggregation,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.BalanceFixing,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.Correction,
+        BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
+        BuildingBlocks.Domain.Models.BusinessReason.Correction,
     ];
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [
         ActorRole.EnergySupplier,
-        ActorRole.MeteredDataResponsible,
-        ActorRole.BalanceResponsibleParty,
+        ActorRole.GridAccessProvider,
+        ActorRole.SystemOperator,
     ];
 }
 
-public record RequestAggregatedMeasureDataMessageSeries(
+public record RequestWholesaleServicesSeries(
     string TransactionId,
-    string? MeteringPointType,
-    string? SettlementMethod,
     string StartDateTime,
     string? EndDateTime,
     string? GridArea,
     string? EnergySupplierId,
-    string? BalanceResponsiblePartyId,
-    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries
+    string? SettlementVersion,
+    string? Resolution,
+    string? ChargeOwner,
+    IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : BaseDelegatedSeries, IIncomingMessageSeries
 {
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        // Roles who can make a request for aggregated measure data:
-        // ActorRole.EnergySupplier,
-        // ActorRole.MeteredDataResponsible,
-        // ActorRole.BalanceResponsibleParty,
-        // ActorRole.GridOperator, // Grid Operator can make requests because of DDM -> MDR hack
         return actorRole.Name switch
         {
             var name when name == PMCoreTypes.ActorRole.EnergySupplier.Name => ActorNumber.TryCreate(EnergySupplierId),
-            var name when name == PMCoreTypes.ActorRole.BalanceResponsibleParty.Name => ActorNumber.TryCreate(BalanceResponsiblePartyId),
-            var name when name == PMCoreTypes.ActorRole.MeteredDataResponsible.Name => gridAreaOwner,
             var name when name == PMCoreTypes.ActorRole.GridAccessProvider.Name => gridAreaOwner,
+            var name when name == PMCoreTypes.ActorRole.SystemOperator.Name => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
         };
     }
 }
+
+public record RequestWholesaleServicesChargeType(string? Id, string? Type);
