@@ -331,10 +331,10 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
-            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.PM25Messages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.PM25Messages}", usePeekTimeSeriesMessages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }
 
@@ -488,23 +488,23 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UsePeekMessages.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.UsePeekMessages}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}",
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25CIM.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25Ebix.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25Ebix}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}",
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -520,6 +520,9 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.{nameof(OutboxPublisher)}.Disabled",
             "true");
+
+        // App Configuration settings
+        Environment.SetEnvironmentVariable(nameof(AppConfigurationOptions.AppConfigEndpoint), IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ID"]);
 
         return appHostSettings;
     }

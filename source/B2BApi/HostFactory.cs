@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -68,7 +69,7 @@ public static class HostFactory
             .ConfigureAppConfiguration((context, configBuilder) =>
             {
                 var settings = configBuilder.Build();
-                var appConfigEndpoint = settings["AppConfigEndpoint"]!;
+                var appConfigEndpoint = settings[AppConfigurationOptions.AppConfigEndpoint]!;
                 configBuilder.AddAzureAppConfiguration(options =>
                 {
                     options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
