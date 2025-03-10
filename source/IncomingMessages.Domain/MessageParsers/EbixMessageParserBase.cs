@@ -100,7 +100,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     /// <param name="document"></param>
     /// <param name="ns"></param>
     /// <param name="senderNumber"></param>
-    /// <param name="createdAt">Transactions in EBIX doesn't contain a timestamp for when the measured data was collected, so
+    /// <param name="createdAt">Transactions in EBIX doesn't contain a timestamp for when the measured data was collected/registered, so
     /// it has been decided that we should extract a timestamp from the header, and use it for each transaction.</param>
     protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(
         XDocument document,
