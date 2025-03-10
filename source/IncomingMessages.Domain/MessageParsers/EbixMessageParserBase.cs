@@ -17,7 +17,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 

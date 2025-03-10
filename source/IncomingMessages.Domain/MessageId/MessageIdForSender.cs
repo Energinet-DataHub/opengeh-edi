@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageId;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
-
-/// <summary>
-/// Authorization policy used for authorizing the sender of a market document
-/// </summary>
-public interface ISenderAuthorizer
+public class MessageIdForSender
 {
-    /// <summary>
-    /// Authorize sender
-    /// </summary>
-    Task<Result> AuthorizeAsync(IIncomingMessage message, bool allSeriesAreDelegated);
+    public MessageIdForSender(string messageId, string senderId)
+    {
+        MessageId = messageId;
+        SenderId = senderId;
+    }
+
+    public string MessageId { get; set; }
+
+    public string SenderId { get; set; }
 }
