@@ -103,7 +103,7 @@
             "description": "",
             "type": "string",
             "enum": [
-                "9"
+                ""
             ]
         },
         "LocalContractType": {
