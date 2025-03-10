@@ -148,7 +148,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                //TODO: LRN Guessing the name of the service bus message
                 if (msg.Subject != EnqueueActorMessagesV1.Descriptor.Name)
                 {
                     return false;

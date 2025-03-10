@@ -159,22 +159,6 @@ public class RegistrationTests
         Assert.True(scope.ServiceProvider.RequirementIsPartOfCollection<IDocumentWriter>(requirement));
     }
 
-    // [Theory(DisplayName = nameof(All_request_handlers_are_registered))]
-    // [MemberData(nameof(GetRequestHandlerRequirements))]
-    // public void All_request_handlers_are_registered(Requirement requirement)
-    // {
-    //     using var scope = _host.Services.CreateScope();
-    //     Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
-    // }
-    //
-    // [Theory(DisplayName = nameof(All_notification_handlers_are_registered))]
-    // [MemberData(nameof(GetNotificationsHandlerRequirements))]
-    // public void All_notification_handlers_are_registered(Requirement requirement)
-    // {
-    //     using var scope = _host.Services.CreateScope();
-    //     Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
-    // }
-
     [Theory(DisplayName = nameof(All_document_writers_are_registered))]
     [MemberData(nameof(GetDocumentWritersRequirements))]
     public void All_document_writers_are_registered(Requirement requirement)

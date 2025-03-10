@@ -202,7 +202,7 @@ public class AssertOutgoingMessage
         for (var i = 0; i < expectedPointsInRightOrder.Count; i++)
         {
             propertySelector(sut)[i].Should()
-                .Be(decimal.Parse($"{expectedPointsInRightOrder[i].Quantity}", CultureInfo.InvariantCulture)); //TODO: LRN
+                .Be(decimal.Parse($"{expectedPointsInRightOrder[i].Quantity}", CultureInfo.InvariantCulture));
         }
 
         return this;

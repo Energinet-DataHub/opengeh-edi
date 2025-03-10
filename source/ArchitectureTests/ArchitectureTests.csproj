@@ -56,10 +56,6 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Application\" />
-    </ItemGroup>
-
     <ItemDefinitionGroup>
         <ProjectReference>
             <PrivateAssets>all</PrivateAssets>

@@ -86,12 +86,12 @@ public static class NotifyWholesaleServicesDocumentAsserter
             var isTotalMonthlyAmount = assertionInput.Points.First().Price is null;
             if (!isTotalMonthlyAmount)
             {
-                //asserter.HasPoints(assertionInput.Points, assertionInput.Resolution); TODO: LRN
+                asserter.HasPoints(assertionInput.Points, assertionInput.Resolution);
             }
             else
             {
                 // QuantityQuality should not be present in any format if resolution is monthly
-                //asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount, null); TODO: LRN
+                asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount!.Value, null);
             }
         }
 
