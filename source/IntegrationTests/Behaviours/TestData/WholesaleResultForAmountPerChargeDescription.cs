@@ -16,7 +16,7 @@ using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
@@ -72,7 +72,7 @@ public class WholesaleResultForAmountPerChargeDescription
         Resolution.Daily,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Daily, 0.348m, 2, 0.697M, QuantityQuality.Calculated),
+            .CreatePointsForPeriod(Period, Resolution.Daily, 0.348m, 2, 0.697M, CalculatedQuantityQuality.Calculated),
         ChargeCode: "Sub-804",
         ChargeType: ChargeType.Subscription,
         MeasurementUnit: MeasurementUnit.Pieces);
@@ -85,36 +85,36 @@ public class WholesaleResultForAmountPerChargeDescription
         SettlementMethod.Flex,
         Resolution.Daily,
         65,
-        Points: new List<WholesaleServicesRequestSeries.Types.Point>()
+        Points: new List<WholesaleServicesPoint>()
         {
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(0.000m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(0.000m), QuantityQualities = { QuantityQuality.Missing } },
-            new() { Quantity = DecimalValue.FromDecimal(0.000m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(0.000m), QuantityQualities = { QuantityQuality.Missing } },
-            new() { Quantity = DecimalValue.FromDecimal(0.000m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(0.000m), QuantityQualities = { QuantityQuality.Missing } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
-            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 1117.728m, 1.757m, 1963.846m, CalculatedQuantityQuality.Calculated),
+            new(1, 0.000m, 1.757m, 0.000m, CalculatedQuantityQuality.Missing),
+            new(1, 0.000m, 1.757m, 0.000m, CalculatedQuantityQuality.Missing),
+            new(1, 0.000m, 1.757m, 0.000m, CalculatedQuantityQuality.Missing),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
+            new(1, 1002.720m, 1.757m, 1761.777m, CalculatedQuantityQuality.Calculated),
         },
         ChargeCode: "41000",
         ChargeType: ChargeType.Tariff,

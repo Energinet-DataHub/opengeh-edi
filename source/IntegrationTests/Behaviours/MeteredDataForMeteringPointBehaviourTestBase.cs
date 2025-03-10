@@ -79,11 +79,6 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
         return response;
     }
 
-    protected async Task WhenMeteredDataForMeteringPointProcessIsInitialized(ServiceBusMessage serviceBusMessage)
-    {
-        await InitializeProcess(serviceBusMessage, nameof(InitializeMeteredDataForMeteringPointMessageProcessDto));
-    }
-
     protected async Task ThenNotifyValidatedMeasureDataDocumentIsCorrect(
         Stream? peekResultDocumentStream,
         DocumentFormat documentFormat,

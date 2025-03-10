@@ -15,8 +15,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
@@ -25,22 +23,16 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
-using Energinet.DataHub.Edi.Requests;
-using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Google.Protobuf;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Xunit.Abstractions;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
-using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -187,16 +179,6 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
     }
 
-    protected Task GivenWholesaleServicesRequestAcceptedIsReceived(Guid processId, WholesaleServicesRequestAccepted acceptedMessage)
-    {
-        return GivenWholesaleServicesRequestResponseIsReceived(processId, acceptedMessage);
-    }
-
-    protected Task GivenWholesaleServicesRequestRejectedIsReceived(Guid processId, WholesaleServicesRequestRejected rejectedMessage)
-    {
-        return GivenWholesaleServicesRequestResponseIsReceived(processId, rejectedMessage);
-    }
-
     protected async Task GivenWholesaleServicesRequestRejectedIsReceived(ServiceBusMessage rejectedMessage)
     {
         await GivenProcessManagerResponseIsReceived(rejectedMessage);
@@ -205,17 +187,6 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
     protected async Task GivenWholesaleServicesRequestAcceptedIsReceived(ServiceBusMessage message)
     {
         await GivenProcessManagerResponseIsReceived(message);
-    }
-
-    protected async Task<(WholesaleServicesRequest WholesaleServicesRequest, Guid ProcessId)> ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
-        ServiceBusSenderSpy senderSpy,
-        WholesaleServicesMessageAssertionInput assertionInput)
-    {
-        var assertionResult = await ThenWholesaleServicesRequestServiceBusMessagesAreCorrect(
-            senderSpy,
-            new List<WholesaleServicesMessageAssertionInput> { assertionInput });
-
-        return assertionResult.Single();
     }
 
     protected StartOrchestrationInstanceV1 ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
@@ -227,29 +198,6 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
             new List<RequestCalculatedWholesaleServicesInputV1AssertionInput> { assertionInput });
 
         return assertionResult.Single();
-    }
-
-    protected Task<IList<(WholesaleServicesRequest WholesaleServicesRequest, Guid ProcessId)>> ThenWholesaleServicesRequestServiceBusMessagesAreCorrect(
-        ServiceBusSenderSpy senderSpy,
-        IList<WholesaleServicesMessageAssertionInput> assertionInputs)
-    {
-        var messages = AssertServiceBusMessages(
-            senderSpy: senderSpy,
-            expectedCount: assertionInputs.Count,
-            parser: data => WholesaleServicesRequest.Parser.ParseFrom(data));
-
-        using var assertionScope = new AssertionScope();
-
-        var assertionMethods = assertionInputs
-            .OrderBy(i => string.Join(",", i.GridAreas))
-            .Select(GetAssertServiceBusMessage);
-
-        messages.Select(m => m.Message)
-            .OrderBy(m => string.Join(",", m.GridAreaCodes))
-            .Should()
-            .SatisfyRespectively(assertionMethods);
-
-        return Task.FromResult(messages);
     }
 
     protected IList<StartOrchestrationInstanceV1> ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessagesAreCorrect(
@@ -304,19 +252,6 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
             documentFormat,
             peekResultDocumentStream,
             assertionInput);
-    }
-
-    protected async Task WhenWholesaleServicesProcessIsInitialized(ServiceBusMessage serviceBusMessage)
-    {
-        await InitializeProcess(serviceBusMessage, nameof(InitializeWholesaleServicesProcessDto));
-    }
-
-    protected async Task WhenWholesaleServicesProcessesAreInitialized(IList<ServiceBusMessage> serviceBusMessages)
-    {
-        foreach (var serviceBusMessage in serviceBusMessages)
-        {
-            await InitializeProcess(serviceBusMessage, nameof(InitializeWholesaleServicesProcessDto));
-        }
     }
 
     protected async Task<ResponseMessage> GivenReceivedWholesaleServicesRequest(
@@ -386,57 +321,6 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         return new WholesaleResultForTotalAmountDescription();
     }
 
-    private static Action<WholesaleServicesRequest> GetAssertServiceBusMessage(
-        WholesaleServicesMessageAssertionInput input)
-    {
-        return (message) =>
-        {
-            message.GridAreaCodes.Should().BeEquivalentTo(input.GridAreas);
-            message.RequestedForActorNumber.Should().Be(input.RequestedForActorNumber);
-            message.RequestedForActorRole.Should().Be(input.RequestedForActorRole);
-
-            if (input.EnergySupplierId == null)
-                message.HasEnergySupplierId.Should().BeFalse();
-            else
-                message.EnergySupplierId.Should().Be(input.EnergySupplierId);
-
-            if (input.ChargeOwnerId == null)
-                message.HasChargeOwnerId.Should().BeFalse();
-            else
-                message.ChargeOwnerId.Should().Be(input.ChargeOwnerId);
-
-            if (input.Resolution == null)
-                message.HasResolution.Should().BeFalse();
-            else
-                message.Resolution.Should().Be(input.Resolution);
-
-            message.BusinessReason.Should().Be(input.BusinessReason);
-
-            if (input.ChargeTypes == null)
-            {
-                message.ChargeTypes.Should().BeEmpty();
-            }
-            else
-            {
-                message.ChargeTypes.Should()
-                    .BeEquivalentTo(
-                        input.ChargeTypes.Select(
-                            ct => new Edi.Requests.ChargeType
-                            {
-                                ChargeType_ = ct.ChargeType, ChargeCode = ct.ChargeCode ?? string.Empty,
-                            }));
-            }
-
-            message.PeriodStart.Should().Be(input.Period.Start.ToString());
-            message.PeriodEnd.Should().Be(input.Period.End.ToString());
-
-            if (input.SettlementVersion == null)
-                message.HasSettlementVersion.Should().BeFalse();
-            else
-                message.SettlementVersion.Should().Be(input.SettlementVersion);
-        };
-    }
-
     private static Action<RequestCalculatedWholesaleServicesInputV1> GetAssertServiceBusMessage(
         RequestCalculatedWholesaleServicesInputV1AssertionInput input)
     {
@@ -468,15 +352,6 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
                                 ct.ChargeCode)));
             }
         };
-    }
-
-    private Task GivenWholesaleServicesRequestResponseIsReceived<TType>(Guid processId, TType wholesaleServicesRequestResponseMessage)
-        where TType : IMessage
-    {
-        return HavingReceivedInboxEventAsync(
-            eventType: typeof(TType).Name,
-            eventPayload: wholesaleServicesRequestResponseMessage,
-            processId: processId);
     }
 
     private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage message)

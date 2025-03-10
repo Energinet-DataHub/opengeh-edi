@@ -74,6 +74,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
 
         var message =
             RequestAggregatedMeasureDataDtoFactory.Create(
+                TransactionId.New(),
                 request,
                 currentUser.ActorNumber,
                 currentUser.MarketRole,

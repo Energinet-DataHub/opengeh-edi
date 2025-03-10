@@ -25,8 +25,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.Edi.Requests;
-using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using FluentAssertions;
@@ -88,14 +86,6 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         }
 
         return response;
-    }
-
-    protected Task GivenAggregatedMeasureDataRequestAcceptedIsReceived(Guid processId, AggregatedTimeSeriesRequestAccepted acceptedMessage)
-    {
-        return HavingReceivedInboxEventAsync(
-            eventType: nameof(AggregatedTimeSeriesRequestAccepted),
-            eventPayload: acceptedMessage,
-            processId: processId);
     }
 
     protected async Task GivenAggregatedMeasureDataRequestAcceptedIsReceived(ServiceBusMessage acceptedMessage)
@@ -182,17 +172,6 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
             assertionInput);
     }
 
-    protected async Task<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)> ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
-            ServiceBusSenderSpy senderSpy,
-            AggregatedTimeSeriesMessageAssertionInput assertionInput)
-    {
-        var assertionResult = await ThenAggregatedTimeSeriesRequestServiceBusMessagesAreCorrect(
-            senderSpy,
-            new List<AggregatedTimeSeriesMessageAssertionInput> { assertionInput });
-
-        return assertionResult.Single();
-    }
-
     protected StartOrchestrationInstanceV1 ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
         RequestCalculatedEnergyTimeSeriesInputV1AssertionInput assertionInput)
@@ -202,29 +181,6 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
             new List<RequestCalculatedEnergyTimeSeriesInputV1AssertionInput> { assertionInput });
 
         return assertionResult.Single();
-    }
-
-    protected Task<IList<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)>> ThenAggregatedTimeSeriesRequestServiceBusMessagesAreCorrect(
-            ServiceBusSenderSpy senderSpy,
-            IList<AggregatedTimeSeriesMessageAssertionInput> assertionInputs)
-    {
-        var messages = AssertServiceBusMessages(
-            senderSpy: senderSpy,
-            expectedCount: assertionInputs.Count,
-            parser: data => AggregatedTimeSeriesRequest.Parser.ParseFrom(data));
-
-        using var assertionScope = new AssertionScope();
-
-        var assertionMethods = assertionInputs
-            .OrderBy(i => string.Join(",", i.GridAreas))
-            .Select(GetAggregatedTimeSeriesRequestAssertion);
-
-        messages.Select(m => m.Message)
-            .OrderBy(m => string.Join(",", m.GridAreaCodes))
-            .Should()
-            .SatisfyRespectively(assertionMethods);
-
-        return Task.FromResult(messages);
     }
 
     protected IList<StartOrchestrationInstanceV1> ThenRequestCalculatedEnergyTimeSeriesInputV1ServiceBusMessagesAreCorrect(
@@ -248,19 +204,6 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
             .SatisfyRespectively(assertionMethods);
 
         return messages;
-    }
-
-    protected async Task WhenAggregatedMeasureDataProcessIsInitialized(ServiceBusMessage serviceBusMessage)
-    {
-        await InitializeProcess(serviceBusMessage, nameof(InitializeAggregatedMeasureDataProcessDto));
-    }
-
-    protected async Task WhenAggregatedMeasureDataProcessesAreInitialized(IReadOnlyCollection<ServiceBusMessage> serviceBusMessages)
-    {
-        foreach (var serviceBusMessage in serviceBusMessages)
-        {
-            await InitializeProcess(serviceBusMessage, nameof(InitializeAggregatedMeasureDataProcessDto));
-        }
     }
 
     protected EnergyResultPerGridAreaDescription GivenDatabricksResultDataForEnergyResultPerGridArea()
@@ -311,48 +254,6 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
 
         failedAssertions.Should().HaveCount(peekResults.Count - 1);
         successfulAssertions.Should().Be(1);
-    }
-
-    private Action<AggregatedTimeSeriesRequest> GetAggregatedTimeSeriesRequestAssertion(AggregatedTimeSeriesMessageAssertionInput assertionInput)
-    {
-        void Assertion(AggregatedTimeSeriesRequest message)
-        {
-            message.GridAreaCodes.Should().BeEquivalentTo(assertionInput.GridAreas);
-            message.RequestedForActorNumber.Should().Be(assertionInput.RequestedForActorNumber);
-            message.RequestedForActorRole.Should().Be(assertionInput.RequestedForActorRole);
-
-            if (assertionInput.EnergySupplier == null)
-                message.HasEnergySupplierId.Should().BeFalse();
-            else
-                message.EnergySupplierId.Should().Be(assertionInput.EnergySupplier);
-
-            if (assertionInput.BalanceResponsibleParty == null)
-                message.HasBalanceResponsibleId.Should().BeFalse();
-            else
-                message.BalanceResponsibleId.Should().Be(assertionInput.BalanceResponsibleParty);
-
-            message.BusinessReason.Should().Be(assertionInput.BusinessReason.Name);
-
-            message.Period.Start.Should().Be(assertionInput.Period.Start.ToString());
-            message.Period.End.Should().Be(assertionInput.Period.End.ToString());
-
-            if (assertionInput.SettlementVersion == null)
-                message.HasSettlementVersion.Should().BeFalse();
-            else
-                message.SettlementVersion.Should().Be(assertionInput.SettlementVersion.Name);
-
-            if (assertionInput.SettlementMethod == null)
-                message.HasSettlementMethod.Should().BeFalse();
-            else
-                message.SettlementMethod.Should().Be(assertionInput.SettlementMethod.Name);
-
-            if (assertionInput.MeteringPointType == null)
-                message.MeteringPointType.Should().BeEmpty(); // Contract is incorrect and doesn't have MeteringPointType as optional
-            else
-                message.MeteringPointType.Should().Be(assertionInput.MeteringPointType.Name);
-        }
-
-        return Assertion;
     }
 
     private Action<RequestCalculatedEnergyTimeSeriesInputV1> GetAssertServiceBusMessage(

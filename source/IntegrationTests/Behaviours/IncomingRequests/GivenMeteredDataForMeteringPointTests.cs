@@ -65,7 +65,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
                     Resolution.QuarterHourly),
             ]);
 
-        await WhenMeteredDataForMeteringPointProcessIsInitialized(senderSpy.LatestMessage!);
+        // await WhenMeteredDataForMeteringPointProcessIsInitialized(senderSpy.LatestMessage!); TODO: LRN
 
         // ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect
 
@@ -158,7 +158,7 @@ public sealed class GivenMeteredDataForMeteringPointTests(
             senderActorNumber: currentActor.ActorNumber,
             []);
 
-        await WhenMeteredDataForMeteringPointProcessIsInitialized(senderSpy.LatestMessage!);
+        // await WhenMeteredDataForMeteringPointProcessIsInitialized(senderSpy.LatestMessage!); TODO: LRN
 
         // Act
         var peekResults = await WhenActorPeeksAllMessages(

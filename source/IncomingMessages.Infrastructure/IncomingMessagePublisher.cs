@@ -81,50 +81,20 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeAggregatedMeasureDataProcessDto);
 
-        if (await _featureFlagManager.UseRequestAggregatedMeasureDataProcessOrchestrationAsync()
-                .ConfigureAwait(false))
-        {
-            await _requestProcessOrchestrationStarter.StartRequestAggregatedMeasureDataOrchestrationAsync(
+        await _requestProcessOrchestrationStarter.StartRequestAggregatedMeasureDataOrchestrationAsync(
                     initializeAggregatedMeasureDataProcessDto,
                     cancellationToken)
                 .ConfigureAwait(false);
-        }
-        else
-        {
-            var serviceBusMessage =
-                new ServiceBusMessage(
-                    new BinaryData(_serializer.Serialize(initializeAggregatedMeasureDataProcessDto)))
-                {
-                    Subject = nameof(InitializeAggregatedMeasureDataProcessDto),
-                };
-
-            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
-        }
     }
 
     private async Task SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(initializeWholesaleServicesProcessDto);
 
-        if (await _featureFlagManager.UseRequestWholesaleServicesProcessOrchestrationAsync()
-                .ConfigureAwait(false))
-        {
-            await _requestProcessOrchestrationStarter.StartRequestWholesaleServicesOrchestrationAsync(
+        await _requestProcessOrchestrationStarter.StartRequestWholesaleServicesOrchestrationAsync(
                     initializeWholesaleServicesProcessDto,
                     cancellationToken)
                 .ConfigureAwait(false);
-        }
-        else
-        {
-            var serviceBusMessage =
-                new ServiceBusMessage(
-                    _serializer.Serialize(initializeWholesaleServicesProcessDto))
-                {
-                    Subject = nameof(InitializeWholesaleServicesProcessDto),
-                };
-
-            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
-        }
     }
 
     private async Task SendInitializeMeteredDataForMeteringPointMessageProcessAsync(InitializeMeteredDataForMeteringPointMessageProcessDto initializeMeteredDataForMeteringPointMessageProcessDto, CancellationToken cancellationToken)
