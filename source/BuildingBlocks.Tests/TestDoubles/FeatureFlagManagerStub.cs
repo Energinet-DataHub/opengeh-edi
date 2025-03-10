@@ -28,7 +28,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.UsePeekMessages, true },
         { FeatureFlagName.PM25_CIM, true },
         { FeatureFlagName.PM25_EBIX, true },
-        { FeatureFlagName.PM25_MESSAGES, true },
+        { FeatureFlagName.PM25Messages, true },
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
         { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
@@ -41,7 +41,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekMessages]);
 
-    public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25_MESSAGES]);
+    public Task<bool> UsePeekMeasureDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Messages]);
 
     public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25_CIM]);
 

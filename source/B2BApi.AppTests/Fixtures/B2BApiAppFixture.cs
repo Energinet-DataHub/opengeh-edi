@@ -333,7 +333,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.PM25_MESSAGES.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.PM25Messages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }

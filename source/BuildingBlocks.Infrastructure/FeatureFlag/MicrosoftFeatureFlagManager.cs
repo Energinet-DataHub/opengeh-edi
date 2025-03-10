@@ -37,18 +37,15 @@ public class MicrosoftFeatureFlagManager(
     public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => IsEnabledAsync(FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages);
 
     // Product Goals
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => IsEnabledAsync(FeatureFlagName.PM25_CIM);
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => IsEnabledAsync(FeatureFlagName.PM25CIM);
 
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => IsEnabledAsync(FeatureFlagName.PM25_EBIX);
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => IsEnabledAsync(FeatureFlagName.PM25Ebix);
 
-    public Task<bool> UsePeekTimeSeriesMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25_MESSAGES);
+    public Task<bool> UsePeekMeasureDataMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25Messages);
 
-    private async Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName)
+    private async Task<bool> IsEnabledAsync(string featureFlagName)
     {
         await _refresher.TryRefreshAsync().ConfigureAwait(false);
-        var featureFlag = featureFlagName.ToString().Contains('_')
-            ? featureFlagName.ToString().Replace('_', '-')
-            : featureFlagName.ToString();
-        return await _featureManager.IsEnabledAsync(featureFlag).ConfigureAwait(false);
+        return await _featureManager.IsEnabledAsync(featureFlagName).ConfigureAwait(false);
     }
 }
