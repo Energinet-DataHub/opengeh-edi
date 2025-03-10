@@ -58,7 +58,7 @@ public class MeteredDateForMeteringPointCimXmlDocumentWriter(
                     activityRecord.MarketEvaluationPointNumber));
 
             seriesElement.Add(
-                new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType));
+                new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType.Code));
 
             if (activityRecord.RegistrationDateTime is not null)
             {
@@ -103,7 +103,7 @@ public class MeteredDateForMeteringPointCimXmlDocumentWriter(
 
         if (point.Quality != null)
         {
-            pointElement.Add(new XElement(@namespace + "quality", point.Quality?.ToString(NumberFormatInfo.InvariantInfo)));
+            pointElement.Add(new XElement(@namespace + "quality", point.Quality?.Code.ToString(NumberFormatInfo.InvariantInfo)));
         }
 
         return pointElement;

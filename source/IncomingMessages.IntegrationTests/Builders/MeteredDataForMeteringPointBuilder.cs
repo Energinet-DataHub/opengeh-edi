@@ -172,15 +172,15 @@ public static class MeteredDataForMeteringPointBuilder
             <!--    -->
             <cim:marketEvaluationPoint.type>E17</cim:marketEvaluationPoint.type>
             <!--   -->
-            <cim:registration_DateAndOrTime.dateTime>2022-12-17T07:30:00Z</cim:registration_DateAndOrTime.dateTime>
+            <cim:registration_DateAndOrTime.dateTime>2022-12-17T09:30:00Z</cim:registration_DateAndOrTime.dateTime>
             <!--    -->
             <cim:product>8716867000030</cim:product>
             <cim:quantity_Measure_Unit.name>KWH</cim:quantity_Measure_Unit.name>
             <cim:Period>
                 <cim:resolution>{s.Resolution.Code}</cim:resolution>
                 <cim:timeInterval>
-                    <cim:start>{s.PeriodStart.ToString("yyyy-MM-ddTHH:mm'Z'", null)}</cim:start>
-                    <cim:end>{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", null)}</cim:end>
+                    <cim:start>{s.PeriodStart.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)}</cim:start>
+                    <cim:end>{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)}</cim:end>
                 </cim:timeInterval>
 
             {EnergyObservationXmlBuilder(GetEnergyObservations())}
@@ -247,15 +247,15 @@ public static class MeteredDataForMeteringPointBuilder
                         "quantity_Measure_Unit.name": {
                           "value": "KWH"
                         },
-                        "registration_DateAndOrTime.dateTime": "2022-12-17T07:30:00Z",
+                        "registration_DateAndOrTime.dateTime": "2022-12-17T09:30:00Z",
                         "Period": {
                           "resolution": "{{s.Resolution.Code}}",
                           "timeInterval": {
                             "start": {
-                              "value": "{{s.PeriodStart.ToString("yyyy-MM-ddTHH:mm'Z'", null)}}"
+                              "value": "{{s.PeriodStart.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)}}"
                             },
                             "end": {
-                              "value": "{{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", null)}}"
+                              "value": "{{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)}}"
                             }
                           },
                           "Point": [
