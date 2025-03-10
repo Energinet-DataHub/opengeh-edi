@@ -50,8 +50,8 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
          */
 
         // Arrange
-        var senderSpyStart = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
-        var senderSpyNotify = CreateServiceBusSenderSpy(NotifySenderClientNames.ProcessManagerNotifySender);
+        var senderSpyStart = CreateServiceBusSenderSpy(StartSenderClientNames.Brs021ForwardMeteredDataStartSender);
+        var senderSpyNotify = CreateServiceBusSenderSpy(NotifySenderClientNames.Brs021ForwardMeteredDataNotifySender);
         var senderActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
         var receiverActor = (ActorNumber: ActorNumber.Create("8100000000115"), ActorRole: ActorRole.EnergySupplier);
         var orchestrationInstanceId = Guid.NewGuid();
