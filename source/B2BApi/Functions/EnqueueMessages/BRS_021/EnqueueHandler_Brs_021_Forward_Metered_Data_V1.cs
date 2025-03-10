@@ -76,9 +76,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
         await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                new NotifyOrchestrationInstanceEvent(
-                    orchestrationInstanceId.ToString(),
-                    ForwardMeteredDataNotifyEventsV1.EnqueueActorMessagesCompleted),
+                new ForwardMeteredDataNotifyEventV1(orchestrationInstanceId.ToString()),
                 CancellationToken.None)).ConfigureAwait(false);
     }
 
@@ -141,9 +139,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
         await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                new NotifyOrchestrationInstanceEvent(
-                    orchestrationInstanceId.ToString(),
-                    ForwardMeteredDataNotifyEventsV1.EnqueueActorMessagesCompleted),
+                new ForwardMeteredDataNotifyEventV1(orchestrationInstanceId.ToString()),
                 CancellationToken.None)).ConfigureAwait(false);
     }
 }
