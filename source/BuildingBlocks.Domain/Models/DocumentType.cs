@@ -20,8 +20,8 @@ public class DocumentType : EnumerationType
     public static readonly DocumentType RejectRequestAggregatedMeasureData = new(nameof(RejectRequestAggregatedMeasureData), MessageCategory.Aggregations);
     public static readonly DocumentType NotifyWholesaleServices = new(nameof(NotifyWholesaleServices), MessageCategory.Aggregations);
     public static readonly DocumentType RejectRequestWholesaleSettlement = new(nameof(RejectRequestWholesaleSettlement), MessageCategory.Aggregations);
-    public static readonly DocumentType NotifyValidatedMeasureData = new(nameof(NotifyValidatedMeasureData), MessageCategory.TimeSeries);
-    public static readonly DocumentType Acknowledgement = new(nameof(Acknowledgement), MessageCategory.TimeSeries);
+    public static readonly DocumentType NotifyValidatedMeasureData = new(nameof(NotifyValidatedMeasureData), MessageCategory.MeasureData);
+    public static readonly DocumentType Acknowledgement = new(nameof(Acknowledgement), MessageCategory.MeasureData);
 
     private DocumentType(string name, MessageCategory category)
         : base(name)

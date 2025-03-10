@@ -18,7 +18,7 @@ public class MessageCategory : EnumerationType
 {
     public static readonly MessageCategory None = new(nameof(None));
     public static readonly MessageCategory Aggregations = new(nameof(Aggregations));
-    public static readonly MessageCategory TimeSeries = new(nameof(TimeSeries));
+    public static readonly MessageCategory MeasureData = new(nameof(MeasureData));
 
     // Message category can not be peeked
 
