@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
-using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -50,13 +50,13 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
          */
 
         // Arrange
-        var senderSpyStart = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
-        var senderSpyNotify = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerNotifySender);
+        var senderSpyStart = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var senderSpyNotify = CreateServiceBusSenderSpy(NotifySenderClientNames.ProcessManagerNotifySender);
         var senderActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
         var receiverActor = (ActorNumber: ActorNumber.Create("8100000000115"), ActorRole: ActorRole.EnergySupplier);
         var orchestrationInstanceId = Guid.NewGuid();
         var resolution = Resolution.Hourly;
-        var notifyEventName = ForwardMeteredDataNotifyEventsV1.EnqueueActorMessagesCompleted;
+        var notifyEventName = ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName;
 
         var registeredAt = Instant.FromUtc(2022, 12, 17, 9, 30, 00);
         var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
