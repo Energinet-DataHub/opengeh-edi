@@ -103,7 +103,9 @@ public class PeekRequestListener
         }
 
         var parsedMessageCategory = messageCategory != null && desiredDocumentFormat != DocumentFormat.Ebix
-            ? EnumerationType.FromName<MessageCategory>(messageCategory)
+            ? messageCategory.Equals("timeseries", StringComparison.InvariantCultureIgnoreCase)
+                ? MessageCategory.MeasureData
+                : EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
 
         if (parsedMessageCategory == MessageCategory.MeasureData && !await _featureFlagManager.UsePeekTimeSeriesMessagesAsync().ConfigureAwait(false))
