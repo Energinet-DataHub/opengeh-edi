@@ -131,8 +131,8 @@ public class IncomingMessagePublisher
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
         await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
-            initializeMeteredDataForMeteringPointMessageProcessDto,
-            cancellationToken)
-        .ConfigureAwait(false);
+                initializeMeteredDataForMeteringPointMessageProcessDto,
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 }
