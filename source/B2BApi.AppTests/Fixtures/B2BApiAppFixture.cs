@@ -522,7 +522,7 @@ public class B2BApiAppFixture : IAsyncLifetime
             "true");
 
         // App Configuration settings
-        Environment.SetEnvironmentVariable(nameof(AppConfigurationOptions.AppConfigEndpoint), IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ID"]);
+        Environment.SetEnvironmentVariable(nameof(AppConfigurationOptions.AppConfigEndpoint), IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]);
 
         return appHostSettings;
     }
