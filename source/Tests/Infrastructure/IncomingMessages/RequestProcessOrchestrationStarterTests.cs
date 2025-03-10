@@ -336,12 +336,12 @@ public class RequestProcessOrchestrationStarterTests
 
         // => Setup Process Manager client and callback
         var processManagerClient = new Mock<IProcessManagerMessageClient>();
-        StartOrchestrationInstanceMessageCommand<MeteredDataForMeteringPointMessageInputV1>? actualCommand = null;
+        StartOrchestrationInstanceMessageCommand<ForwardMeteredDataInputV1>? actualCommand = null;
         processManagerClient.Setup(
                 client => client.StartNewOrchestrationInstanceAsync(
-                    It.IsAny<StartForwardMeteredDataCommandV1>(),
+                    It.IsAny<ForwardMeteredDataCommandV1>(),
                     It.IsAny<CancellationToken>()))
-            .Callback((StartOrchestrationInstanceMessageCommand<MeteredDataForMeteringPointMessageInputV1> command, CancellationToken _) => actualCommand = command);
+            .Callback((StartOrchestrationInstanceMessageCommand<ForwardMeteredDataInputV1> command, CancellationToken _) => actualCommand = command);
 
         // => Setup authenticated actor
         var expectedActor = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
@@ -365,15 +365,15 @@ public class RequestProcessOrchestrationStarterTests
         // Assert
         processManagerClient.Verify(
             client => client.StartNewOrchestrationInstanceAsync(
-                It.IsAny<StartForwardMeteredDataCommandV1>(),
+                It.IsAny<ForwardMeteredDataCommandV1>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);
 
-        var expectedCommand = new StartForwardMeteredDataCommandV1(
+        var expectedCommand = new ForwardMeteredDataCommandV1(
             operatingIdentity: new ActorIdentityDto(
                 expectedActor.ActorNumber.ToProcessManagerActorNumber(),
                 expectedActor.ActorRole.ToProcessManagerActorRole()),
-            inputParameter: new MeteredDataForMeteringPointMessageInputV1(
+            inputParameter: new ForwardMeteredDataInputV1(
                 MessageId: messageId,
                 AuthenticatedActorId: Guid.Empty, // This is not used and should be removed from the contract
                 ActorNumber: requestedByActor.ActorNumber.Value,
@@ -391,10 +391,10 @@ public class RequestProcessOrchestrationStarterTests
                 DelegatedGridAreaCodes: null,
                 EnergyObservations:
                 [
-                    new EnergyObservation(
+                    new ForwardMeteredDataInputV1.EnergyObservation(
                         Position: expectedPosition,
                         EnergyQuantity: expectedEnergyQuantity,
-                        QuantityQuality: expectedQuantityQuality)
+                        QuantityQuality: expectedQuantityQuality),
                 ]),
             idempotencyKey: expectedIdempotencyKey);
 

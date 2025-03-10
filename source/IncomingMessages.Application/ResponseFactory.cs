@@ -13,25 +13,25 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
-/// <summary>
-/// Factory responsible for creating B2B response messages
-/// </summary>
-public interface IResponseFactory
+public class ResponseFactory(IEnumerable<IResponseFactory> factories)
 {
-    /// <summary>
-    /// Specifies the handled CIM format
-    /// </summary>
-    public DocumentFormat HandledFormat { get; }
+    private readonly IEnumerable<IResponseFactory> _factories = factories;
 
-    /// <summary>
-    /// Create response message
-    /// </summary>
-    /// <param name="result"></param>
-    /// <returns><see cref="ResponseMessage"/></returns>
-    public ResponseMessage From(Result result);
+    public ResponseMessage From(Result result, DocumentFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        ArgumentNullException.ThrowIfNull(format);
+
+        var factory = _factories.FirstOrDefault(factory => factory.HandledFormat.Equals(format))
+                      ?? throw new InvalidOperationException(
+                          $"Could not generate response message in format {format.Name}");
+
+        return factory.From(result);
+    }
 }

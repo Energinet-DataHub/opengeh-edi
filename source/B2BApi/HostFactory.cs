@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Identity;
+using DurableFunctionsMonitor.DotNetIsolated;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
@@ -24,7 +25,7 @@ using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
@@ -49,10 +50,18 @@ public static class HostFactory
                 {
                     // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                     builder.UseWhen<UnHandledExceptionMiddleware>(
-                        functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
+                        functionContext => functionContext.IsProtectedHttpTrigger());
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
-                        functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
+                        functionContext => functionContext.IsProtectedHttpTrigger());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
+
+                    // Host the Durable Function Monitor as a part of this app.
+                    // The Durable Function Monitor can be accessed at: {host url}/api/durable-functions-monitor
+                    builder.UseDurableFunctionsMonitor(
+                        (settings, _) =>
+                        {
+                            settings.Mode = DfmMode.ReadOnly;
+                        });
                 })
             .ConfigureServices(
                 (context, services) =>

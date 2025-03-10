@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 

@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public record RequestAggregatedMeasureDataMessage(
     string SenderNumber,
@@ -31,15 +30,15 @@ public record RequestAggregatedMeasureDataMessage(
     IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage
 {
     public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageType.RequestAggregatedMeteredData,
+        BuildingBlocks.Domain.Models.MessageType.RequestAggregatedMeteredData,
     ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
     [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.PreliminaryAggregation,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.BalanceFixing,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.Correction,
+        BuildingBlocks.Domain.Models.BusinessReason.PreliminaryAggregation,
+        BuildingBlocks.Domain.Models.BusinessReason.BalanceFixing,
+        BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
+        BuildingBlocks.Domain.Models.BusinessReason.Correction,
     ];
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [

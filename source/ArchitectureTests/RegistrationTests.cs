@@ -68,7 +68,8 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable($"{EdiDatabricksOptions.SectionName}__{nameof(EdiDatabricksOptions.CatalogName)}", "FakeCatalogName");
         Environment.SetEnvironmentVariable($"{nameof(DeltaTableOptions.DatabricksCatalogName)}", "FakeCatalogName");
 
-        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.TopicName)}", "FakeTopicName");
+        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", "FakeTopicName");
+        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", "FakeTopicName");
 
         // Dead-letter logging
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}", TestEnvironment.CreateFakeStorageUrl());

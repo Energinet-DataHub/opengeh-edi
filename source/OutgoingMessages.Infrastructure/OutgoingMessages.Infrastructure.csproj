@@ -4,11 +4,11 @@
     <AssemblyName>Energinet.DataHub.EDI.OutgoingMessages.Infrastructure</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.OutgoingMessages.Infrastructure</RootNamespace>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Energinet.DataHub.Core.Databricks.SqlStatementExecution" Version="12.0.2"/>
-    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.2.1"/>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.5.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.13" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
@@ -16,7 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />

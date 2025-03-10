@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.TransactionId;
 
 /// <summary>
 /// Store containing transaction id for all received market activity records

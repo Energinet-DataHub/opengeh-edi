@@ -12,20 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Response;
 
 /// <summary>
-/// Store containing message id for all received market documents
+/// Factory responsible for creating B2B response messages
 /// </summary>
-public interface IMessageIdRepository
+public interface IResponseFactory
 {
     /// <summary>
-    /// Store message id for the sender
+    /// Specifies the handled CIM format
     /// </summary>
-    Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
+    public DocumentFormat HandledFormat { get; }
 
     /// <summary>
-    /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>
+    /// Create response message
     /// </summary>
-    Task<bool> MessageIdExistsAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
+    /// <param name="result"></param>
+    /// <returns><see cref="ResponseMessage"/></returns>
+    public ResponseMessage From(Result result);
 }

@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -27,7 +27,7 @@ limitations under the License.
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
           <PrivateAssets>all</PrivateAssets>
@@ -48,6 +48,7 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />

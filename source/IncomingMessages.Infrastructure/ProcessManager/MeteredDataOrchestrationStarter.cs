@@ -59,9 +59,9 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                 : null;
 
             var startCommand =
-                new StartForwardMeteredDataCommandV1(
+                new ForwardMeteredDataCommandV1(
                     operatingIdentity: actorIdentityDto,
-                    new MeteredDataForMeteringPointMessageInputV1(
+                    new ForwardMeteredDataInputV1(
                         MessageId: initializeProcessDto.MessageId,
                         AuthenticatedActorId: Guid.Empty, // TODO: This is not used and should be removed from the contract
                         ActorNumber: actorIdentityDto.ActorNumber.Value,
@@ -81,14 +81,13 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                         GridAccessProviderNumber: transaction.RequestedByActor.ActorNumber.Value,
                         DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
                         EnergyObservations:
-                            new ReadOnlyCollection<EnergyObservation>(
                                 transaction.EnergyObservations
                                     .Select(energyObservation =>
-                                        new EnergyObservation(
+                                        new ForwardMeteredDataInputV1.EnergyObservation(
                                             Position: energyObservation.Position,
                                             EnergyQuantity: energyObservation.EnergyQuantity,
                                             QuantityQuality: energyObservation.QuantityQuality))
-                                    .ToList())),
+                                    .ToList()),
                     $"{transaction.RequestedByActor.ActorNumber.Value}-{transaction.TransactionId}");
 
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, CancellationToken.None);
