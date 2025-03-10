@@ -67,9 +67,9 @@ public sealed class MessageParserTests
             { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure), "invalid child element" },
             { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionMeteredDataForMeteringPoint.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad" },
             { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure), "invalid child element" },
-            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeteringPointMissingRegistration.xml"), nameof(InvalidMessageStructure), "todo-update-xml-schema-file" },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeteringPointMissingRegistration.xml"), nameof(InvalidMessageStructure), "elements expected: 'registration_DateAndOrTime.dateTime'" },
             { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeteringPoint.json"), nameof(InvalidMessageStructure), "[required, Required properties [\"sender_MarketParticipant.mRID\"] are not present]" },
-            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeteringPointMissingRegistration.json"), nameof(InvalidMessageStructure), "todo-update-json-schema-file" },
+            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeteringPointMissingRegistration.json"), nameof(InvalidMessageStructure), "[required, Required properties [\"registration_DateAndOrTime.dateTime\"] are not present]" },
         };
 
         return data;
