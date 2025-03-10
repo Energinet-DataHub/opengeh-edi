@@ -14,20 +14,22 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
+using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataInputV1;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
-public sealed record MeteredDateForMeteringPointMarketActivityRecord(
+public record ForwardMeteredDataInputV1AssertionInput(
+    string ActorNumber,
+    string ActorRole,
     TransactionId TransactionId,
-    string MarketEvaluationPointNumber,
-    MeteringPointType MarketEvaluationPointType,
-    TransactionId? OriginalTransactionIdReferenceId,
-    string? Product,
-    MeasurementUnit QuantityMeasureUnit,
-    Instant? RegistrationDateTime,
-    Resolution Resolution,
-    Instant StartedDateTime,
-    Instant EndedDateTime,
-    IReadOnlyList<PointActivityRecord> EnergyObservations);
-
-public sealed record PointActivityRecord(int Position, Quality? Quality, decimal? Quantity);
+    string? MeteringPointId,
+    string? MeteringPointType,
+    string? ProductNumber,
+    string? MeasureUnit,
+    Instant RegistrationDateTime,
+    Resolution? Resolution,
+    Instant StartDateTime,
+    Instant? EndDateTime,
+    string? GridAccessProviderNumber,
+    IReadOnlyCollection<string>? DelegatedGridAreas,
+    IReadOnlyCollection<EnergyObservation> EnergyObservations);

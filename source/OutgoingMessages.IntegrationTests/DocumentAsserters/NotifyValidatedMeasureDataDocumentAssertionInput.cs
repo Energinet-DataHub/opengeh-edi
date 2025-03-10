@@ -44,7 +44,7 @@ public sealed record RequiredSeriesFields(
     TransactionId TransactionId,
     string MeteringPointNumber,
     string MeteringPointScheme,
-    string MeteringPointType,
+    MeteringPointType MeteringPointType,
     string QuantityMeasureUnit,
     RequiredPeriodDocumentFields RequiredPeriodDocumentFields);
 
