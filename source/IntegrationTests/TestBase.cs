@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using System.Text;
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Dapper;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -285,6 +287,15 @@ public class TestBase : IDisposable
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
+                .AddAzureAppConfiguration(options =>
+                {
+                    var appConfigEndpoint = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
+                    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
+                        .UseFeatureFlags(featureFlagOptions =>
+                        {
+                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(1));
+                        });
+                })
             .AddEnvironmentVariables()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
@@ -310,6 +321,8 @@ public class TestBase : IDisposable
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
+                    // => Calculation Result views
+                    [$"{nameof(AppConfigurationOptions.AppConfigEndpoint)}"] = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"],
                 })
             .Build();
 
@@ -342,6 +355,9 @@ public class TestBase : IDisposable
             .AddOutboxContext(config)
             .AddOutboxClient<OutboxContext>()
             .AddOutboxProcessor<OutboxContext>();
+
+        // Azure App Configuration
+        _services.AddAzureAppConfiguration();
 
         // Replace the services with stub implementations.
         // - Building blocks

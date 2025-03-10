@@ -86,6 +86,9 @@ builder.Services
     // Serializer
     .AddSerializer()
 
+    // Azure App Configuration
+    .AddAzureAppConfiguration()
+
     // Http
     .AddHttpClient()
     .AddControllers();

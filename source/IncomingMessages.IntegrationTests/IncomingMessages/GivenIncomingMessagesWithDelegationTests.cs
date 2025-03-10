@@ -349,7 +349,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         }
     }
 
-    [Fact]
+    [Fact(Skip = "Ebix is not supported.")]
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
