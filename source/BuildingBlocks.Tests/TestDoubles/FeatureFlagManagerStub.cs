@@ -32,6 +32,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
         { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
+        { FeatureFlagName.ArchiveBrs012Messages, false },
     };
 
     public void SetFeatureFlag(FeatureFlagName featureFlagName, bool value)

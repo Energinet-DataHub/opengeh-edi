@@ -19,6 +19,7 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
@@ -419,8 +420,10 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     }
 
     [Fact]
-    public async Task When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
+    public async Task Given_ArchivingIsDisabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
     {
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs012Messages, false);
+
         // Assert
         const string messageIdFromFile = "111131835";
 
@@ -443,6 +446,35 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
 
         archivedMessage?.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Given_ArchivingIsEnabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsArchived()
+    {
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs012Messages, true);
+
+        // Assert
+        const string messageIdFromFile = "111131835";
+
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5790001330552");
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible, null, ActorId));
+
+        var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml");
+
+        // Act
+        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            DocumentFormat.Ebix,
+            IncomingDocumentType.NotifyValidatedMeasureData,
+            DocumentFormat.Ebix,
+            CancellationToken.None);
+
+        // Assert
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
+
+        Assert.NotNull(archivedMessage);
     }
 
     [Theory]
