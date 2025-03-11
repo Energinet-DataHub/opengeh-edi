@@ -53,5 +53,5 @@ public enum FeatureFlagName
     /// <summary>
     /// Whether to archive brs012 messages.
     /// </summary>
-    ArchiveBrs012Messages,
+    ArchiveBrs021Messages,
 }

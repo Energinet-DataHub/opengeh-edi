@@ -25,8 +25,12 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
+/// <summary>
+/// The sole purpose of this test is to verify that brs012 messages are stored in the database and not searchable.
+/// It is currently being treated as a special case, as the messages are not supposed to be archived this way.
+/// </summary>
 [Collection(nameof(ArchivedMessagesCollection))]
-public class ArchivedMessagesBrs012Tests : IAsyncLifetime
+public class ArchivedMessagesBrs021Tests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -38,7 +42,7 @@ public class ArchivedMessagesBrs012Tests : IAsyncLifetime
         actorClientId: null,
         actorId: Guid.Parse("00000000-0000-0000-0000-000000000001"));
 
-    public ArchivedMessagesBrs012Tests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
+    public ArchivedMessagesBrs021Tests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
 
@@ -61,7 +65,7 @@ public class ArchivedMessagesBrs012Tests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_Brs012ArchivedMessages_When_Creating_Then_MessageIsStoredInDatabaseAndNotSearchable()
+    public async Task Given_Brs021ArchivedMessages_When_Creating_Then_MessageIsStoredInDatabaseAndNotSearchable()
     {
         // Arrange
         var incomingMessage = await _fixture.CreateArchivedMessageAsync(
@@ -78,6 +82,7 @@ public class ArchivedMessagesBrs012Tests : IAsyncLifetime
         await _sut.CreateAsync(incomingMessage, CancellationToken.None);
         await _sut.CreateAsync(outgoingMessage, CancellationToken.None);
 
+        // Assert
         var dbResult = await _fixture.GetAllMessagesInDatabase();
         var searchResult = await _sut.SearchAsync(
             new GetMessagesQueryDto(

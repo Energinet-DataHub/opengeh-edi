@@ -41,7 +41,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => IsEnabledAsync(FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages);
 
-    public Task<bool> ArchiveBrs012MessagesAsync() => IsEnabledAsync(FeatureFlagName.ArchiveBrs012Messages);
+    public Task<bool> ArchiveBrs021MessagesAsync() => IsEnabledAsync(FeatureFlagName.ArchiveBrs021Messages);
 
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

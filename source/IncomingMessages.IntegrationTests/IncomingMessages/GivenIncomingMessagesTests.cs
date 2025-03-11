@@ -422,7 +422,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     [Fact]
     public async Task Given_ArchivingIsDisabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
     {
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs012Messages, false);
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs021Messages, false);
 
         // Assert
         const string messageIdFromFile = "111131835";
@@ -451,7 +451,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     [Fact]
     public async Task Given_ArchivingIsEnabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsArchived()
     {
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs012Messages, true);
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs021Messages, true);
 
         // Assert
         const string messageIdFromFile = "111131835";

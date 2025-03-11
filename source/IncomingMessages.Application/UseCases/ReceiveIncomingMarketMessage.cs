@@ -163,7 +163,7 @@ public class ReceiveIncomingMarketMessage
     {
         if (documentType == IncomingDocumentType.NotifyValidatedMeasureData)
         {
-            return await _featureFlagManager.ArchiveBrs012MessagesAsync().ConfigureAwait(false);
+            return await _featureFlagManager.ArchiveBrs021MessagesAsync().ConfigureAwait(false);
         }
 
         return true;

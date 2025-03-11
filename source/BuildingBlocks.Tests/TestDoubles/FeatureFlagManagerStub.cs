@@ -32,7 +32,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
         { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
-        { FeatureFlagName.ArchiveBrs012Messages, false },
+        { FeatureFlagName.ArchiveBrs021Messages, false },
     };
 
     public void SetFeatureFlag(FeatureFlagName featureFlagName, bool value)
@@ -52,5 +52,5 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages]);
 
-    public Task<bool> ArchiveBrs012MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ArchiveBrs012Messages]);
+    public Task<bool> ArchiveBrs021MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ArchiveBrs021Messages]);
 }

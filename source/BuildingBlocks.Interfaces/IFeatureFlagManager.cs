@@ -57,5 +57,5 @@ public interface IFeatureFlagManager
     /// <summary>
     /// Whether to archive brs012 messages.
     /// </summary>
-    Task<bool> ArchiveBrs012MessagesAsync();
+    Task<bool> ArchiveBrs021MessagesAsync();
 }
