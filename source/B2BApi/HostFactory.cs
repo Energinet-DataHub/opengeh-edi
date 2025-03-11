@@ -52,7 +52,7 @@ public static class HostFactory
             .ConfigureFunctionsWebApplication(
                 builder =>
                 {
-                    // If the endpoint is omitted from auth, we dont want to intercept except   ions.
+                    // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                     builder.UseWhen<UnHandledExceptionMiddleware>(
                         functionContext => functionContext.IsProtectedHttpTrigger());
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(

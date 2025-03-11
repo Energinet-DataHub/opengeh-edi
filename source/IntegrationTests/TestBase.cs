@@ -321,7 +321,7 @@ public class TestBase : IDisposable
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
-                    // => Calculation Result views
+                    // => App Configuration
                     [$"{nameof(AppConfigurationOptions.AppConfigEndpoint)}"] = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"],
                 })
             .Build();

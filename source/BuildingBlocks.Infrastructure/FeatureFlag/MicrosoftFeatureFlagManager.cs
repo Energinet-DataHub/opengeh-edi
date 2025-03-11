@@ -21,11 +21,11 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 /// A <see cref="IFeatureFlagManager"/> implementation using the Microsoft.FeatureManagement package
 /// </summary>
 public class MicrosoftFeatureFlagManager(
-    IVariantFeatureManager featureManager,
+    IFeatureManager featureManager,
     IConfigurationRefresherProvider refresherProvider)
     : IFeatureFlagManager
 {
-    private readonly IVariantFeatureManager _featureManager = featureManager;
+    private readonly IFeatureManager _featureManager = featureManager;
     private readonly IConfigurationRefresher _refresher = refresherProvider.Refreshers.First();
 
     public Task<bool> UsePeekMessagesAsync() => IsEnabledAsync(FeatureFlagName.UsePeekMessages);
