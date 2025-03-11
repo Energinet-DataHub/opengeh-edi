@@ -65,7 +65,7 @@ public static class MeteredDataForMeteringPointEventBuilder
             .Select(eo => new AcceptedEnergyObservation(
                 int.Parse(eo.Position!),
                 eo.EnergyQuantity != null ? decimal.Parse(eo.EnergyQuantity.TrimEnd('M'), CultureInfo.InvariantCulture) : null,
-                eo.QuantityQuality != null ? PMQuality.FromName(Quality.FromCode(eo.QuantityQuality).Name) : null))
+                eo.QuantityQuality != null ? PMQuality.FromName(eo.QuantityQuality) : null))
             .ToList();
 
         var marketActorRecipients = new List<MarketActorRecipientV1>
