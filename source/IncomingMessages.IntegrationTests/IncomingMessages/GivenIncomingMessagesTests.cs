@@ -420,7 +420,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     }
 
     [Fact]
-    public async Task Given_ArchivingIsDisabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
+    public async Task Given_ArchivingBrs021IsDisabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
     {
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs021Messages, false);
 
@@ -449,7 +449,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     }
 
     [Fact]
-    public async Task Given_ArchivingIsEnabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsArchived()
+    public async Task Given_ArchivingBrs021IsEnabled_When_MeteredDataForMeteringPointMessageIsReceived_Then_IncomingMessageIsArchived()
     {
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.ArchiveBrs021Messages, true);
 
