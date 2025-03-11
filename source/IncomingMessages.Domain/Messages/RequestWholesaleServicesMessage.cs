@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain;
+namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public record RequestWholesaleServicesMessage(
     string SenderNumber,
@@ -31,13 +30,13 @@ public record RequestWholesaleServicesMessage(
     IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage
 {
     public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MessageType.RequestForAggregatedBillingInformation,
+        BuildingBlocks.Domain.Models.MessageType.RequestForAggregatedBillingInformation,
     ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
     [
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason.Correction,
+        BuildingBlocks.Domain.Models.BusinessReason.WholesaleFixing,
+        BuildingBlocks.Domain.Models.BusinessReason.Correction,
     ];
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [

@@ -14,7 +14,7 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM017;

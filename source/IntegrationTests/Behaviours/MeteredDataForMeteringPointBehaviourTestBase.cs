@@ -13,19 +13,25 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+using System.Globalization;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit.Abstractions;
+using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataInputV1;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -99,5 +105,104 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
             documentFormat,
             peekResultDocumentStream,
             assertionInput);
+    }
+
+    protected StartOrchestrationInstanceV1 ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessageIsCorrect(
+        ServiceBusSenderSpy senderSpy,
+        ForwardMeteredDataInputV1AssertionInput assertionInput)
+    {
+        var assertionResult = ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessagesAreCorrect(
+            senderSpy,
+            [assertionInput]);
+
+        return assertionResult.Single();
+    }
+
+    protected IList<StartOrchestrationInstanceV1> ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessagesAreCorrect(
+        ServiceBusSenderSpy senderSpy,
+        IList<ForwardMeteredDataInputV1AssertionInput> assertionInputs)
+    {
+        var messages = AssertProcessManagerServiceBusMessages(
+            senderSpy: senderSpy,
+            expectedCount: assertionInputs.Count,
+            parser: data => StartOrchestrationInstanceV1.Parser.ParseJson(data));
+
+        using var assertionScope = new AssertionScope();
+
+        var assertionMethods = assertionInputs
+            .Select(GetAssertServiceBusMessage);
+
+        messages
+            .Select(x => x.ParseInput<ForwardMeteredDataInputV1>())
+            .Should()
+            .SatisfyRespectively(assertionMethods);
+
+        return messages;
+    }
+
+    protected async Task GivenForwardMeteredDataRequestAcceptedIsReceived(ServiceBusMessage acceptedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(acceptedMessage);
+    }
+
+    protected NotifyOrchestrationInstanceV1 AssertCorrectProcessManagerNotification(
+        ServiceBusMessage serviceBusMessage,
+        NotifyOrchestrationInstanceEventV1AssertionInput assertionInput)
+    {
+        var message = NotifyOrchestrationInstanceV1.Parser.ParseJson(serviceBusMessage.Body.ToString());
+
+        message.OrchestrationInstanceId.Should().BeEquivalentTo(assertionInput.InstanceId.ToString());
+        message.EventName.Should().BeEquivalentTo(assertionInput.EventName);
+
+        return message;
+    }
+
+    private static Action<ForwardMeteredDataInputV1> GetAssertServiceBusMessage(
+        ForwardMeteredDataInputV1AssertionInput input)
+    {
+        return (message) =>
+        {
+            message.ActorNumber.Should().BeEquivalentTo(input.ActorNumber);
+            message.ActorRole.Should().BeEquivalentTo(input.ActorRole);
+            message.TransactionId.Should().BeEquivalentTo(input.TransactionId.Value);
+            message.MeteringPointId.Should().BeEquivalentTo(input.MeteringPointId);
+            message.MeteringPointType.Should().BeEquivalentTo(input.MeteringPointType);
+            message.ProductNumber.Should().BeEquivalentTo(input.ProductNumber);
+            message.MeasureUnit.Should().BeEquivalentTo(input.MeasureUnit);
+            message.RegistrationDateTime.Should().BeEquivalentTo(input.RegistrationDateTime.ToString());
+            message.Resolution.Should().BeEquivalentTo(input.Resolution?.Name);
+            message.StartDateTime.Should().BeEquivalentTo(input.StartDateTime.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
+            message.EndDateTime.Should().BeEquivalentTo(input.EndDateTime?.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
+            message.GridAccessProviderNumber.Should().BeEquivalentTo(input.GridAccessProviderNumber);
+
+            if (input.DelegatedGridAreas == null)
+            {
+                message.DelegatedGridAreaCodes.Should().BeEmpty();
+            }
+            else
+            {
+                message.DelegatedGridAreaCodes.Should()
+                    .BeEquivalentTo(
+                        input.DelegatedGridAreas.Select(delegatedGridArea => delegatedGridArea));
+            }
+
+            message.EnergyObservations.Should()
+                .BeEquivalentTo(
+                    input.EnergyObservations.Select(eo => new EnergyObservation(
+                        eo.Position,
+                        eo.EnergyQuantity,
+                        eo.QuantityQuality)));
+        };
+    }
+
+    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage message)
+    {
+        var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
+            messageId: Guid.NewGuid().ToString(),
+            subject: message.Subject,
+            body: message.Body,
+            properties: message.ApplicationProperties);
+        var enqueueHandler = GetService<EnqueueHandler_Brs_021_Forward_Metered_Data_V1>();
+        await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
     }
 }

@@ -12,20 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-
-/// <summary>
-/// Responsible for receiving a incoming message.
-/// </summary>
-public interface IIncomingMessageReceiver
-{
-    /// <summary>
-    /// Responsible for receiving the incoming message.
-    /// </summary>
-    Task<Result> ReceiveAsync(
-        IIncomingMessage incomingMessage,
-        CancellationToken cancellationToken);
-}
+public record NotifyOrchestrationInstanceEventV1AssertionInput(
+    Guid InstanceId,
+    string EventName);

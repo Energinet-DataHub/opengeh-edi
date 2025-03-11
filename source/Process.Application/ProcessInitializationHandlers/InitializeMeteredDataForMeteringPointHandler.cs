@@ -65,7 +65,7 @@ public class InitializeMeteredDataForMeteringPointHandler(
                         new MeteredDataForMeteringPointMessageSeriesDto(
                             TransactionId.From(string.Join(string.Empty, series.TransactionId.Reverse())),
                             series.MeteringPointLocationId!,
-                            series.MeteringPointType!,
+                            MeteringPointType.FromCode(series.MeteringPointType!),
                             TransactionId.From(series.TransactionId),
                             series.ProductNumber!,
                             MeasurementUnit.FromCode(series.ProductUnitType!),
@@ -87,7 +87,7 @@ public class InitializeMeteredDataForMeteringPointHandler(
                                         o.EnergyQuantity != null
                                             ? decimal.Parse(o.EnergyQuantity, CultureInfo.InvariantCulture)
                                             : null,
-                                        o.QuantityQuality))
+                                        o.QuantityQuality != null ? Quality.FromCode(o.QuantityQuality) : null))
                                 .ToList())),
                     CancellationToken.None)
                 .ConfigureAwait(false);

@@ -16,8 +16,7 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.IncomingMessages.Domain;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
@@ -131,19 +130,9 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        // Go through ProcessManager
         await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
             initializeMeteredDataForMeteringPointMessageProcessDto,
             cancellationToken)
         .ConfigureAwait(false);
-
-        // Enqueue message directly
-        // var serviceBusMessage =
-        //     new ServiceBusMessage(
-        //         _serializer.Serialize(initializeMeteredDataForMeteringPointMessageProcessDto))
-        //     {
-        //         Subject = nameof(InitializeMeteredDataForMeteringPointMessageProcessDto),
-        //     };
-        // await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }
