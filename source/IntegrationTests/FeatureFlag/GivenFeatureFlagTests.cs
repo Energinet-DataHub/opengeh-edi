@@ -35,7 +35,7 @@ public class GivenFeatureFlagTests : TestBase
     public async Task Given_DisabledFeatureFlag_When_IsToggled_Then_FeatureIsEnabled()
     {
         // Arrange
-        var featureManager = GetService<IVariantFeatureManager>();
+        var featureManager = GetService<IFeatureManager>();
         var refresherProvider = GetService<IConfigurationRefresherProvider>();
         var featureFlagManager = new MicrosoftFeatureFlagManagerSpy(featureManager, refresherProvider);
         var featureFlagToggler = new FeatureFlagToggler(Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!);
@@ -66,7 +66,7 @@ public class GivenFeatureFlagTests : TestBase
     public async Task Given_FeatureFlag_When_IsMissing_Then_FeatureIsDisabled()
     {
         // Arrange
-        var featureManager = GetService<IVariantFeatureManager>();
+        var featureManager = GetService<IFeatureManager>();
         var refresherProvider = GetService<IConfigurationRefresherProvider>();
 
         var featureFlagManager = new MicrosoftFeatureFlagManagerSpy(featureManager, refresherProvider);
@@ -82,7 +82,7 @@ public class GivenFeatureFlagTests : TestBase
 }
 
 public class MicrosoftFeatureFlagManagerSpy(
-    IVariantFeatureManager featureManager,
+    IFeatureManager featureManager,
     IConfigurationRefresherProvider refresherProvider) : MicrosoftFeatureFlagManager(featureManager, refresherProvider)
 {
     public Task<bool> IsEnabledSpyAsync(string featureFlagName)
