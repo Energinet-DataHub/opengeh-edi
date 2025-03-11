@@ -207,6 +207,8 @@ public class B2BApiAppFixture : IAsyncLifetime
             .BuildTopic("process-manager-start")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", topic.Name))
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables // TODO: Do we need a separate topic for tests as well?
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataStartTopicName)}", topic.Name))
             .AddSubscription("process-manager-subscription")
             .CreateAsync();
         LogStopwatch(stopwatch, nameof(ProcessManagerStartTopicResource));
@@ -218,6 +220,8 @@ public class B2BApiAppFixture : IAsyncLifetime
             .BuildTopic("process-manager-notify")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", topic.Name))
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables // TODO: Do we need a separate topic for tests as well?
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataNotifyTopicName)}", topic.Name))
             .AddSubscription("process-manager-subscription")
             .CreateAsync();
         LogStopwatch(stopwatch, nameof(ProcessManagerNotifyTopicResource));
