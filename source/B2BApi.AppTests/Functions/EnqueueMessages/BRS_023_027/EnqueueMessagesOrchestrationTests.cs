@@ -20,12 +20,15 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
@@ -148,14 +151,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                if (msg.Subject != EnqueueActorMessagesV1.Descriptor.Name)
+                if (msg.Subject != "NotifyOrchestration")
                 {
                     return false;
                 }
 
-                var parsedEvent = EnqueueActorMessagesV1.Parser.ParseFrom(msg.Body);
-
-                return parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+                var parser = new MessageParser<NotifyOrchestrationInstanceV1>(() => new NotifyOrchestrationInstanceV1());
+                var notifyOrchestrationInstanceV1 = parser.ParseJson(msg.Body.ToString());
+                return notifyOrchestrationInstanceV1.OrchestrationInstanceId == calculationOrchestrationId;
             })
             .VerifyCountAsync(1);
 
@@ -248,14 +251,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                if (msg.Subject != EnqueueActorMessagesV1.Descriptor.Name)
+                if (msg.Subject != "NotifyOrchestration")
                 {
                     return false;
                 }
 
-                var parsedEvent = EnqueueActorMessagesV1.Parser.ParseFrom(msg.Body);
-
-                return parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+                var parser = new MessageParser<NotifyOrchestrationInstanceV1>(() => new NotifyOrchestrationInstanceV1());
+                var notifyOrchestrationInstanceV1 = parser.ParseJson(msg.Body.ToString());
+                return notifyOrchestrationInstanceV1.OrchestrationInstanceId == calculationOrchestrationId;
             })
             .VerifyCountAsync(1);
 
