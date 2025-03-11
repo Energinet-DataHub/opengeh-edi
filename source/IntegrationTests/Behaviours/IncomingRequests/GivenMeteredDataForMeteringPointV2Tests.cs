@@ -107,7 +107,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                     .Select(eo => new EnergyObservation(
                         eo.Position.ToString(),
                         eo.Quantity.HasValue ? eo.Quantity.Value.ToString(CultureInfo.InvariantCulture) : null,
-                        eo.QualityName))
+                        eo.QualityName != null ? Quality.TryGetNameFromCode(eo.QualityName!, fallbackValue: eo.QualityName) : null))
                     .ToList()));
 
         /*
