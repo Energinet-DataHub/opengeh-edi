@@ -293,7 +293,7 @@ public class RequestProcessOrchestrationStarterTests
         const string expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
         const string expectedPosition = "1";
         const string expectedEnergyQuantity = "1001";
-        const string expectedQuantityQuality = "A03";
+        var expectedQuantityQuality = Quality.Estimated.Name;
 
         var meteringPointType = expectedMeteringPointType is not null
             ? MeteringPointType.FromCode(expectedMeteringPointType)

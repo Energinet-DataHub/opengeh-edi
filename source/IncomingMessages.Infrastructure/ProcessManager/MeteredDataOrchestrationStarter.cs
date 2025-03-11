@@ -82,11 +82,7 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                         DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
                         EnergyObservations:
                                 transaction.EnergyObservations
-                                    .Select(energyObservation =>
-                                        new ForwardMeteredDataInputV1.EnergyObservation(
-                                            Position: energyObservation.Position,
-                                            EnergyQuantity: energyObservation.EnergyQuantity,
-                                            QuantityQuality: energyObservation.QuantityQuality))
+                                    .Select(MapEnergyObservation)
                                     .ToList()),
                     $"{transaction.RequestedByActor.ActorNumber.Value}-{transaction.TransactionId}");
 
@@ -95,6 +91,17 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         }
 
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
+    }
+
+    private static ForwardMeteredDataInputV1.EnergyObservation MapEnergyObservation(InitializeEnergyObservation energyObservation)
+    {
+        var quantityQuality = energyObservation.QuantityQuality is not null
+            ? Quality.TryGetNameFromCode(energyObservation.QuantityQuality, fallbackValue: energyObservation.QuantityQuality)
+            : null;
+        return new ForwardMeteredDataInputV1.EnergyObservation(
+            Position: energyObservation.Position,
+            EnergyQuantity: energyObservation.EnergyQuantity,
+            QuantityQuality: quantityQuality);
     }
 
     private ActorIdentityDto GetAuthenticatedActorIdentityDto(string messageId)
