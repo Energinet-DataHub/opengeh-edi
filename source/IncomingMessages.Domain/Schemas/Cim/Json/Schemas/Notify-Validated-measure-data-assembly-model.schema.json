@@ -183,6 +183,7 @@
                 "marketEvaluationPoint.mRID",
                 "marketEvaluationPoint.type",
                 "quantity_Measure_Unit.name",
+                "registration_DateAndOrTime.dateTime",
                 "Period"
             ]
         },

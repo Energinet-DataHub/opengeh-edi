@@ -92,7 +92,7 @@
 			<xs:element name="originalTransactionIDReference_Series.mRID" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
 			<xs:element name="marketEvaluationPoint.mRID" type="cim:MeasurementPointID_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
 			<xs:element name="marketEvaluationPoint.type" type="cim:MarketEvaluationPointKind_String" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#Ext_MarketEvaluationPoint.type"/>
-			<xs:element name="registration_DateAndOrTime.dateTime" type="xs:dateTime" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#DateAndOrTime.dateTime"/>
+			<xs:element name="registration_DateAndOrTime.dateTime" type="xs:dateTime" minOccurs="1" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#DateAndOrTime.dateTime"/>
 			<xs:element name="in_Domain.mRID" type="cim:AreaID_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
 			<xs:element name="out_Domain.mRID" type="cim:AreaID_String" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#IdentifiedObject.mRID"/>
 			<xs:element name="product" type="xs:string" minOccurs="0" maxOccurs="1" sawsdl:modelReference="http://iec.ch/TC57/CIM101#TimeSeries.product"/>

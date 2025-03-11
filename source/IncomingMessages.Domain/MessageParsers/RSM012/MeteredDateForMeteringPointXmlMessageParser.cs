@@ -82,7 +82,7 @@ public class MeteredDateForMeteringPointXmlMessageParser(CimXmlSchemaProvider sc
             startDateAndOrTimeDateTime,
             endDateAndOrTimeDateTime,
             productNumber,
-            registrationDateAndOrTime,
+            registrationDateAndOrTime!,
             productUnitType,
             meteringPointType,
             meteringPointLocationId,
