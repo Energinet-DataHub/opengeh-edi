@@ -43,7 +43,11 @@ public class MeteredDateForMeteringPointEbixMessageParser(EbixSchemaProvider sch
 
     protected override string RootPayloadElementName => "DK_MeteredDataTimeSeries";
 
-    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
+    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(
+        XDocument document,
+        XNamespace ns,
+        string senderNumber,
+        string createdAt)
     {
         var transactionElements = document.Descendants(ns + SeriesElementName);
         var result = new List<MeteredDataForMeteringPointSeries>();
@@ -74,7 +78,7 @@ public class MeteredDateForMeteringPointEbixMessageParser(EbixSchemaProvider sch
                 startDateAndOrTimeDateTime,
                 endDateAndOrTimeDateTime,
                 productNumber,
-                null,
+                createdAt,
                 productUnitType,
                 meteringPointType,
                 meteringPointLocationId,

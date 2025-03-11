@@ -160,10 +160,10 @@ public class EnqueueMessagesOrchestrationTriggeredByProcessManagerTests : IAsync
                     msg.Body.ToString());
 
                 var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == processManagerOrchestrationId.ToString();
-                var matchingCalculationId = parsedNotification.EventName == CalculationEnqueueActorMessagesCompletedNotifyEventV1.EventName;
-                var enqueueFinishedV1 = JsonConvert.DeserializeObject<CalculationEnqueueActorMessagesCompletedNotifyEventV1>(parsedNotification.Data.Data)!;
+                var matchingCalculationId = parsedNotification.EventName == CalculationEnqueueActorMessagesCompletedNotifyEventV1.OrchestrationInstanceEventName;
+                var enqueueActorMessagesCompletedData = parsedNotification.ParseData<CalculationEnqueueActorMessagesCompletedNotifyEventDataV1>();
 
-                return matchingOrchestrationId && matchingCalculationId && enqueueFinishedV1.Success;
+                return matchingOrchestrationId && matchingCalculationId && (enqueueActorMessagesCompletedData?.Success ?? false);
             })
             .VerifyCountAsync(1);
 

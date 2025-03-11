@@ -78,6 +78,8 @@ public class RegistrationTests
 
         Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", "FakeTopicName");
         Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", "FakeTopicName");
+        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataStartTopicName)}", "FakeBrs021TopicName");
+        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataNotifyTopicName)}", "FakeBrs021TopicName");
 
         // Dead-letter logging
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}", TestEnvironment.CreateFakeStorageUrl());

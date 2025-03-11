@@ -101,9 +101,7 @@ public class EnqueueHandler_Brs_026_V1(
         await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
-                    RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
+                new RequestCalculatedEnergyTimeSeriesNotifyEventV1(orchestrationInstanceId.ToString()),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }
@@ -146,9 +144,7 @@ public class EnqueueHandler_Brs_026_V1(
         await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                new NotifyOrchestrationInstanceEvent(
-                    OrchestrationInstanceId: orchestrationInstanceId.ToString(),
-                    RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted),
+                new RequestCalculatedEnergyTimeSeriesNotifyEventV1(orchestrationInstanceId.ToString()),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }

@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -142,7 +142,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -295,7 +295,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -436,7 +436,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -600,7 +600,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -749,7 +749,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
@@ -896,7 +896,7 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = delegatedFromRole == ActorRole.EnergySupplier.Name
             ? testMessageData.ActorNumber
             : testMessageData.ExampleMessageData.EnergySupplier;
