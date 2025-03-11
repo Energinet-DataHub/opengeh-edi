@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -46,7 +47,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
         var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
         var exampleWholesaleResultMessageForActor = testDataDescription.ExampleWholesaleResultMessageData;
         var actorRole = ActorRole.EnergySupplier;
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value) : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");

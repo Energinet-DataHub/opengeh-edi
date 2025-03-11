@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -48,7 +49,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
         var testDataDescription = GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
         var testMessageData = testDataDescription.ExampleEnergySupplier;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: ActorRole.EnergySupplier);

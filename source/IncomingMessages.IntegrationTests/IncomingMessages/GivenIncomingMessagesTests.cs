@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -98,7 +99,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(
@@ -140,7 +141,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     public async Task AndGiven_DdmMdrHackIsApplicable_When_MessageIsReceived_Then_BodyAndTransactionAndMessageIdArePresentOnTheInternalRepresentation()
     {
         // Assert
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
@@ -174,7 +175,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
         // Service bus is not used when receiving NotifyValidatedMeasureData
         if (incomingDocumentType == IncomingDocumentType.NotifyValidatedMeasureData)
@@ -225,7 +226,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
@@ -357,7 +358,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();

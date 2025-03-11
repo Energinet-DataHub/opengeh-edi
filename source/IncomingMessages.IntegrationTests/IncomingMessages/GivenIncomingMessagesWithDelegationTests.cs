@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
@@ -53,7 +54,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageFromDelegated_When_Received_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         const string gridAreaCode = "512";
@@ -122,7 +123,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageFromDelegated_AndGiven_DelegationHasStopped_When_Received_Then_ErrorResponseToActor()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         const string gridAreaCode = "512";
@@ -193,7 +194,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         string requesterActorRole)
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         const string gridAreaCode = "512";
@@ -261,7 +262,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             string requesterActorRoleName)
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         const string expectedGridAreaCode = "512";
@@ -354,7 +355,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         const string expectedMessageId = "123456";
@@ -415,7 +416,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationDoesNotExists_Then_ReturnsErrorMessage()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
@@ -456,7 +457,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsGridAccessProviderAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         const string expectedMessageId = "123456";
@@ -517,7 +518,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsGridAccessProviderAndDelegationDoesNotExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var sut = GetService<IIncomingMessageClient>();
 
         const string expectedMessageId = "123456";
