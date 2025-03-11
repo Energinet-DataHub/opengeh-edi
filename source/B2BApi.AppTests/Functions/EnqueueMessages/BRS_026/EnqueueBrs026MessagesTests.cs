@@ -109,7 +109,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
 
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
             orchestrationInstanceId,
-            RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted);
+            RequestCalculatedEnergyTimeSeriesNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
     }
 
@@ -198,7 +198,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
                     msg.Body.ToString());
 
                 var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
-                var matchingEvent = parsedNotification.EventName == RequestCalculatedEnergyTimeSeriesNotifyEventsV1.EnqueueActorMessagesCompleted;
+                var matchingEvent = parsedNotification.EventName == RequestCalculatedEnergyTimeSeriesNotifyEventV1.OrchestrationInstanceEventName;
 
                 return matchingOrchestrationId && matchingEvent;
             })

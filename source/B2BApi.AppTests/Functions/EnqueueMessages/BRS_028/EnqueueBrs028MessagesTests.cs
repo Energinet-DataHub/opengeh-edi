@@ -108,7 +108,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // Verify that the expected notify message was sent on the ServiceBus
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
             orchestrationInstanceId,
-            RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted);
+            RequestCalculatedWholesaleServicesNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
     }
 
@@ -159,7 +159,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // Verify that the expected notify message was sent on the ServiceBus
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
             orchestrationInstanceId,
-            RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted);
+            RequestCalculatedWholesaleServicesNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
     }
 
@@ -231,7 +231,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // => Verify that the expected message was sent on the ServiceBus
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
             orchestrationInstanceId,
-            RequestCalculatedWholesaleServicesNotifyEventsV1.EnqueueActorMessagesCompleted);
+            RequestCalculatedWholesaleServicesNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
     }
 
