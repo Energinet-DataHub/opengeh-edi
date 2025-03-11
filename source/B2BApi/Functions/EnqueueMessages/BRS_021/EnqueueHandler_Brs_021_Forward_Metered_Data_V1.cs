@@ -94,8 +94,8 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
             EventId: EventId.From(serviceBusMessageId),
             BusinessReason: BusinessReason.PeriodicMetering,
-            ReceiverId: ActorNumber.Create("1234567890123"),
-            ReceiverRole: ActorRole.GridAccessProvider,
+            ReceiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
+            ReceiverRole: ActorRole.Create(rejectedData.ForwardedByActorRole),
             ProcessId: orchestrationInstanceId,
             ExternalId: Guid.NewGuid(),
             AcknowledgementDto: new AcknowledgementDto(

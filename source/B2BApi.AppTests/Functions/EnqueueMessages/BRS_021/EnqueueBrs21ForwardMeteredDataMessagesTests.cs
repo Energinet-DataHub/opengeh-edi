@@ -70,17 +70,19 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
+        const string actorNumber = "1234567890123";
+        var actorRole = ActorRole.GridAccessProvider;
         var enqueueMessagesData = new ForwardMeteredDataRejectedV1(
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
+            ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
+            actorRole.ToProcessManagerActorRole(),
             [
                 new ValidationErrorDto(
                     Message: "Invalid end date",
                     ErrorCode: "X01"),
             ]);
 
-        const string actorNumber = "1234567890123";
-        var actorRole = ActorRole.GridAccessProvider;
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_021_ForwardedMeteredData.Name,
