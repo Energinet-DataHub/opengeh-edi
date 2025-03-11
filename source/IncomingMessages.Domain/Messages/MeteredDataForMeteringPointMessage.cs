@@ -71,8 +71,7 @@ public record MeteredDataForMeteringPointSeries(
     string StartDateTime,
     string? EndDateTime,
     string? ProductNumber,
-    // This field is not used in Ebix
-    string? RegisteredAt,
+    string RegisteredAt,
     string? ProductUnitType,
     string? MeteringPointType,
     string? MeteringPointLocationId,

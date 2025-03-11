@@ -115,7 +115,7 @@ public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFi
             .HasOriginalTransactionIdReferenceId(1, null)
             .HasProduct(1, null)
             .HasQuantityMeasureUnit(1, SampleData.QuantityMeasureUnit.Code)
-            .HasRegistrationDateTime(1, null)
+            .HasRegistrationDateTime(1, SampleData.RegistrationDateTime.ToString())
             .HasResolution(1, SampleData.Resolution.Code)
             .HasStartedDateTime(
                 1,
