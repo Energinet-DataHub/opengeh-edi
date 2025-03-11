@@ -55,7 +55,7 @@ public interface IFeatureFlagManager
     Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync();
 
     /// <summary>
-    /// Whether to archive brs012 messages.
+    /// Whether to archive BRS-021 messages.
     /// </summary>
     Task<bool> ArchiveBrs021MessagesAsync();
 }

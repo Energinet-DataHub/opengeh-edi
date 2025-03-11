@@ -26,7 +26,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 /// <summary>
-/// The sole purpose of this test is to verify that brs012 messages are stored in the database and not searchable.
+/// The sole purpose of this test is to verify that BRS-021 messages are stored in the database and not searchable.
 /// It is currently being treated as a special case, as the messages are not supposed to be archived this way.
 /// </summary>
 [Collection(nameof(ArchivedMessagesCollection))]
