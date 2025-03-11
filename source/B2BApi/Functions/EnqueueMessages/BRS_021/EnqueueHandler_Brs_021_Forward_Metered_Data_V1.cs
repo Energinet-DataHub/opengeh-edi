@@ -90,45 +90,35 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
+        // TODO: Fix when we have the correct data from ForwardMeteredDataRejectedV1
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
             EventId: EventId.From(serviceBusMessageId),
-            BusinessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
-            ReceiverId: ActorNumber.Create(rejectedData.MarketActorRecipient.ActorNumber),
-            ReceiverRole: ActorRole.FromName(rejectedData.MarketActorRecipient.ActorRole.Name),
+            BusinessReason: BusinessReason.PeriodicMetering,
+            ReceiverId: ActorNumber.Create("1234567890123"),
+            ReceiverRole: ActorRole.GridAccessProvider,
             ProcessId: orchestrationInstanceId,
-            ExternalId: rejectedData.ExternalId,
+            ExternalId: Guid.NewGuid(),
             AcknowledgementDto: new AcknowledgementDto(
-                rejectedData.AcknowledgementV1.ReceivedMarketDocumentCreatedDateTime,
-                rejectedData.AcknowledgementV1.ReceivedMarketDocumentTransactionId,
-                rejectedData.AcknowledgementV1.ReceivedMarketDocumentProcessProcessType,
-                rejectedData.AcknowledgementV1.ReceivedMarketDocumentRevisionNumber,
-                rejectedData.AcknowledgementV1.ReceivedMarketDocumentTitle,
-                rejectedData.AcknowledgementV1.ReceivedMarketDocumentType,
-                rejectedData.AcknowledgementV1.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList(),
-                rejectedData.AcknowledgementV1.InErrorPeriod.Select(
-                        p => new TimePeriodDto(
-                            new Interval(p.TimeInterval.Start.ToInstant(), p.TimeInterval.End.ToInstant()),
-                            p.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
+                ReceivedMarketDocumentCreatedDateTime: null,
+                ReceivedMarketDocumentTransactionId: null,
+                ReceivedMarketDocumentProcessProcessType: null,
+                ReceivedMarketDocumentRevisionNumber: null,
+                ReceivedMarketDocumentTitle: null,
+                ReceivedMarketDocumentType: null,
+                Reason: [],
+                InErrorPeriod: [],
+                Series: rejectedData.ValidationErrors.Select(
+                        validationError => new SeriesDto(
+                            MRID: Guid.NewGuid().ToString(),
+                            Reason:
+                            [
+                                new ReasonDto(
+                                    Code: validationError.ErrorCode,
+                                    Text: validationError.Message)
+                            ]))
                     .ToList(),
-                rejectedData.AcknowledgementV1.Series.Select(
-                        s => new SeriesDto(s.MRID, s.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
-                    .ToList(),
-                rejectedData.AcknowledgementV1.OriginalMktActivityRecord.Select(
-                        o => new MktActivityRecordDto(
-                            o.MRID,
-                            o.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
-                    .ToList(),
-                rejectedData.AcknowledgementV1.RejectedTimeSeries.Select(
-                        t => new TimeSeriesDto(
-                            t.MRID,
-                            t.Version,
-                            t.InErrorPeriod.Select(
-                                    p => new TimePeriodDto(
-                                        new Interval(p.TimeInterval.Start.ToInstant(), p.TimeInterval.End.ToInstant()),
-                                        p.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
-                                .ToList(),
-                            t.Reason.Select(r => new ReasonDto(r.Code, r.Text)).ToList()))
-                    .ToList()));
+                OriginalMktActivityRecord: [],
+                RejectedTimeSeries: []));
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointRejectedDto, CancellationToken.None).ConfigureAwait(false);
 

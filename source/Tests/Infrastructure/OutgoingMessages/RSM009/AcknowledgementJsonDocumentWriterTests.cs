@@ -19,11 +19,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
+using Reason = Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009.Reason;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
@@ -40,22 +40,22 @@ public class AcknowledgementJsonDocumentWriterTests
     [Fact]
     public async Task Given_MaximalMessage_When_WriteAsync_Then_CanWriteSchemaValidDocument()
     {
-        var reasons = new ReasonV1[] { new("A22", "Some error occured"), new("A23", "Some other error occured"), };
-        var timePeriods = new TimePeriodV1[]
+        var reasons = new Reason[] { new("A22", "Some error occured"), new("A23", "Some other error occured"), };
+        var timePeriods = new TimePeriod[]
         {
             new(
-                new TimeInterval(
-                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset(),
-                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset()),
+                new Interval(
+                    SystemClock.Instance.GetCurrentInstant(),
+                    SystemClock.Instance.GetCurrentInstant()),
                 reasons),
             new(
-                new TimeInterval(
-                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset(),
-                    SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset()),
+                new Interval(
+                    SystemClock.Instance.GetCurrentInstant(),
+                    SystemClock.Instance.GetCurrentInstant()),
                 reasons),
         };
 
-        var acknowledgementRecord = new AcknowledgementV1(
+        var acknowledgementRecord = new Acknowledgement(
             SystemClock.Instance.GetCurrentInstant().ToDateTimeOffset(),
             TransactionId.New().Value,
             "A10",
@@ -64,9 +64,9 @@ public class AcknowledgementJsonDocumentWriterTests
             "ERR",
             reasons,
             timePeriods,
-            [new SeriesV1("bbf014de7733", reasons), new SeriesV1("aa0484c10e6d", reasons)],
-            [new MktActivityRecordV1("680048962dd2", reasons), new MktActivityRecordV1("b455eba88025", reasons)],
-            [new TimeSeriesV1("123", "1", timePeriods, reasons), new TimeSeriesV1("456", "2", timePeriods, reasons)]);
+            [new Series("bbf014de7733", reasons), new Series("aa0484c10e6d", reasons)],
+            [new MktActivityRecord("680048962dd2", reasons), new MktActivityRecord("b455eba88025", reasons)],
+            [new TimeSeries("123", "1", timePeriods, reasons), new TimeSeries("456", "2", timePeriods, reasons)]);
 
         var marketDocumentStream = await _sut.WriteAsync(
             new OutgoingMessageHeader(
@@ -96,7 +96,7 @@ public class AcknowledgementJsonDocumentWriterTests
     [Fact]
     public async Task Given_MinimalMessage_When_WriteAsync_Then_CanWriteSchemaValidDocument()
     {
-        var acknowledgementRecord = new AcknowledgementV1(
+        var acknowledgementRecord = new Acknowledgement(
             null,
             null,
             null,
