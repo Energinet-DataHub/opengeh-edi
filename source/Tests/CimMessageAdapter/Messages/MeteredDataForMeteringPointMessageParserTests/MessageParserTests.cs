@@ -59,15 +59,17 @@ public sealed class MessageParserTests
         return data;
     }
 
-    public static TheoryData<DocumentFormat, Stream, string> CreateBadMessages()
+    public static TheoryData<DocumentFormat, Stream, string, string> CreateBadMessages()
     {
-        var data = new TheoryData<DocumentFormat, Stream, string>
+        var data = new TheoryData<DocumentFormat, Stream, string, string>
         {
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDataForMeteringPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure) },
-            { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionMeteredDataForMeteringPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
-            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure) },
-            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeteringPoint.json"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDataForMeteringPoint.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad-version" },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure), "invalid child element" },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionMeteredDataForMeteringPoint.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad" },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeteringPoint.xml"), nameof(InvalidMessageStructure), "invalid child element" },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidMeteredDataForMeteringPointMissingRegistration.xml"), nameof(InvalidMessageStructure), "elements expected: 'registration_DateAndOrTime.dateTime'" },
+            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeteringPoint.json"), nameof(InvalidMessageStructure), "[required, Required properties [\"sender_MarketParticipant.mRID\"] are not present]" },
+            { DocumentFormat.Json, CreateBaseJsonMessage("InvalidMeteredDataForMeteringPointMissingRegistration.json"), nameof(InvalidMessageStructure), "[required, Required properties [\"registration_DateAndOrTime.dateTime\"] are not present]" },
         };
 
         return data;
@@ -152,7 +154,7 @@ public sealed class MessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateBadMessages))]
-    public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
+    public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedErrorType, string expectedErrorMessageContains)
     {
         var result = await _marketMessageParser.GetValueOrDefault(format)!.ParseAsync(
             new IncomingMarketMessageStream(message),
@@ -160,8 +162,8 @@ public sealed class MessageParserTests
 
         result.Success.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();
-        expectedError.Should().NotBeNull();
-        result.Errors.Should().Contain(error => error.GetType().Name == expectedError);
+        expectedErrorType.Should().NotBeNull();
+        result.Errors.Should().Contain(error => error.GetType().Name == expectedErrorType && error.Message.Contains(expectedErrorMessageContains));
     }
 
     private static MemoryStream CreateBaseEbixMessage(string fileName)

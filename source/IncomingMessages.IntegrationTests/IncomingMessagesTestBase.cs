@@ -190,6 +190,10 @@ public class IncomingMessagesTestBase : IDisposable
                         "Fake",
                     [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}"] =
                         "Fake",
+                    [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataStartTopicName)}"] =
+                        "Fake",
+                    [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataNotifyTopicName)}"] =
+                        "Fake",
                 })
             .Build();
         _services = [];

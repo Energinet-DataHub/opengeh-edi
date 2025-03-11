@@ -40,10 +40,9 @@ public class SendActorMessagesEnqueuedActivity
         [ActivityTrigger] SendMessagesEnqueuedInput input)
     {
         await _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                new NotifyOrchestrationInstanceEvent<CalculationEnqueueActorMessagesCompletedNotifyEventV1>(
-                    OrchestrationInstanceId: input.CalculationOrchestrationInstanceId,
-                    EventName: CalculationEnqueueActorMessagesCompletedNotifyEventV1.EventName,
-                    Data: new CalculationEnqueueActorMessagesCompletedNotifyEventV1 { Success = input.Success }),
+                new CalculationEnqueueActorMessagesCompletedNotifyEventV1(
+                    input.CalculationOrchestrationInstanceId,
+                    new CalculationEnqueueActorMessagesCompletedNotifyEventDataV1(Success: input.Success)),
                 CancellationToken.None)
             .ConfigureAwait(false);
     }
