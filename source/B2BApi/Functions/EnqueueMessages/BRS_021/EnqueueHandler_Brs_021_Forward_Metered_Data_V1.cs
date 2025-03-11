@@ -91,13 +91,13 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             rejectedData);
 
         var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
-            rejectedData.EventId,
-            BusinessReason.FromName(rejectedData.BusinessReason.Name),
-            ActorNumber.Create(rejectedData.MarketActorRecipient.ActorNumber),
-            ActorRole.FromName(rejectedData.MarketActorRecipient.ActorRole.Name),
-            rejectedData.ProcessId,
-            rejectedData.ExternalId,
-            new AcknowledgementDto(
+            EventId: EventId.From(serviceBusMessageId),
+            BusinessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
+            ReceiverId: ActorNumber.Create(rejectedData.MarketActorRecipient.ActorNumber),
+            ReceiverRole: ActorRole.FromName(rejectedData.MarketActorRecipient.ActorRole.Name),
+            ProcessId: orchestrationInstanceId,
+            ExternalId: rejectedData.ExternalId,
+            AcknowledgementDto: new AcknowledgementDto(
                 rejectedData.AcknowledgementV1.ReceivedMarketDocumentCreatedDateTime,
                 rejectedData.AcknowledgementV1.ReceivedMarketDocumentTransactionId,
                 rejectedData.AcknowledgementV1.ReceivedMarketDocumentProcessProcessType,
