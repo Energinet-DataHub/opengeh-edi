@@ -47,11 +47,12 @@ public static class HostFactory
     {
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
+        var defaultAzureCredential = new DefaultAzureCredential();
         return new HostBuilder()
             .ConfigureFunctionsWebApplication(
                 builder =>
                 {
-                    // If the endpoint is omitted from auth, we dont want to intercept exceptions.
+                    // If the endpoint is omitted from auth, we dont want to intercept except   ions.
                     builder.UseWhen<UnHandledExceptionMiddleware>(
                         functionContext => functionContext.IsProtectedHttpTrigger());
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
@@ -72,7 +73,7 @@ public static class HostFactory
                 var appConfigEndpoint = settings[AppConfigurationOptions.AppConfigEndpoint]!;
                 configBuilder.AddAzureAppConfiguration(options =>
                 {
-                    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
+                    options.Connect(new Uri(appConfigEndpoint), defaultAzureCredential)
                         .UseFeatureFlags(featureFlagOptions =>
                         {
                             featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(5));
@@ -82,7 +83,7 @@ public static class HostFactory
             .ConfigureServices(
                 (context, services) =>
                 {
-                    var azureCredential = new DefaultAzureCredential();
+                    var azureCredential = defaultAzureCredential;
 
                     services
                         // Logging

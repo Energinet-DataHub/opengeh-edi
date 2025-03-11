@@ -326,14 +326,14 @@ public class B2BApiAppFixture : IAsyncLifetime
     public void EnsureAppHostUsesFeatureFlagValue(
         bool useRequestWholesaleServicesOrchestration = false,
         bool useRequestAggregatedMeasureDataOrchestration = false,
-        bool usePeekTimeSeriesMessages = false,
+        bool usePeekMeasureDataMessages = false,
         bool useProcessManagerToEnqueueBrs023027Messages = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
             { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.PM25Messages}", usePeekTimeSeriesMessages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.PM25Messages}", usePeekMeasureDataMessages.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }
