@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 /// <summary>
-/// Manage feature flags in the application. If using <see cref="MicrosoftFeatureFlagManager"/>
-/// then the feature flags are managed through the app configuration, and the name
+/// Manage feature flags in the application.
+/// The feature flags are managed through the app configuration, and the name
 /// of a feature flag configuration must be prefixed with "FeatureManagement__",
 /// ie. "FeatureManagement__UseMonthlyAmountPerChargeResultProduced".
 /// The "Feature Flags in EDI" documentation page in confluence should be kept
@@ -53,4 +53,9 @@ public interface IFeatureFlagManager
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
     /// </summary>
     Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync();
+
+    /// <summary>
+    /// Whether to archive BRS-021 messages.
+    /// </summary>
+    Task<bool> ArchiveBrs021MessagesAsync();
 }
