@@ -24,6 +24,13 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
+/// <summary>
+/// Tests the Outgoing Messages idempotency logic, which is the unique combination of the following 4 properties:
+/// 1. Receiver actor number
+/// 2. Receiver actor role
+/// 3. External id
+/// 4. Start period
+/// </summary>
 public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMessagesTestBase
 {
     public WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests(
