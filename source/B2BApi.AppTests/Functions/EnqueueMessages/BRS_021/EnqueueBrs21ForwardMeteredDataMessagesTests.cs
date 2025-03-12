@@ -109,10 +109,10 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         };
 
         // Act
-        var eventId = Guid.NewGuid();
+        var eventId = EventId.From(Guid.NewGuid());
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
-            idempotencyKey: eventId.ToString());
+            idempotencyKey: eventId.Value);
 
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
@@ -128,7 +128,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId == EventId.From(eventId))
+            .Where(om => om.EventId == eventId)
             .ToListAsync();
         enqueuedOutgoingMessages.Should().HaveCount(1);
 
