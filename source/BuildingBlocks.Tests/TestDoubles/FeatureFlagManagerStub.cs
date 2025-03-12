@@ -24,27 +24,30 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Tests")]
 public class FeatureFlagManagerStub : IFeatureFlagManager
 {
-    private readonly Dictionary<FeatureFlagName, bool> _featureFlagDictionary = new()
+    private readonly Dictionary<string, bool> _featureFlagDictionary = new()
     {
         { FeatureFlagName.UsePeekMessages, true },
-        { FeatureFlagName.UsePeekTimeSeriesMessages, true },
-        { FeatureFlagName.ReceiveMeteredDataForMeasurementPoints, true },
+        { FeatureFlagName.PM25CIM, true },
+        { FeatureFlagName.PM25Ebix, true },
+        { FeatureFlagName.PM25Messages, true },
         { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
         { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
         { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
         { FeatureFlagName.ArchiveBrs021Messages, false },
     };
 
-    public void SetFeatureFlag(FeatureFlagName featureFlagName, bool value)
+    public void SetFeatureFlag(string featureFlagName, bool value)
     {
         _featureFlagDictionary[featureFlagName] = value;
     }
 
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekMessages]);
 
-    public Task<bool> UsePeekTimeSeriesMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekTimeSeriesMessages]);
+    public Task<bool> UsePeekMeteredDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Messages]);
 
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ReceiveMeteredDataForMeasurementPoints]);
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25CIM]);
+
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Ebix]);
 
     public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration]);
 

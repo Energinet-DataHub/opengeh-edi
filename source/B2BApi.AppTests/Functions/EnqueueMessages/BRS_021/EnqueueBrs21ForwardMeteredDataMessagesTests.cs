@@ -70,7 +70,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     [Fact]
     public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_Then_RejectedMessagesIsEnqueued()
     {
-        _fixture.EnsureAppHostUsesFeatureFlagValue(usePeekTimeSeriesMessages: true);
+        _fixture.EnsureAppHostUsesFeatureFlagValue(usePeekMeasureDataMessages: true);
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
