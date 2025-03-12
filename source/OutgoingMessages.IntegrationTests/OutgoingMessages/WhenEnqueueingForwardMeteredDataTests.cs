@@ -1,0 +1,164 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
+using Xunit.Abstractions;
+
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
+
+public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
+{
+    public WhenEnqueueingForwardMeteredDataTests(
+        OutgoingMessagesTestFixture outgoingMessagesTestFixture,
+        ITestOutputHelper testOutputHelper)
+        : base(outgoingMessagesTestFixture, testOutputHelper)
+    {
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithDifferentReceiverActorNumbers_When_EnqueueingForwardMeteredData_Then_BothMessagesAreEnqueued()
+    {
+        // Given multiple messages with the same idempotency data except for the receiver actor number
+        var externalId = new ExternalId(Guid.NewGuid());
+        var start = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var end = Instant.FromUtc(2025, 01, 31, 23, 00);
+        var receiver1 = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
+        var receiver2 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+
+        var message1 = CreateAcceptedForwardMeteredDataMessage(
+            externalId,
+            receiver1,
+            start,
+            end);
+
+        var message2 = CreateAcceptedForwardMeteredDataMessage(
+            externalId,
+            receiver2,
+            start,
+            end);
+
+        // When enqueueing the messages
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+
+        // Then both messages are enqueued
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        Assert.Collection(
+            outgoingMessages,
+            [
+                om => Assert.Equal(message1.RelatedToMessageId, om.RelatedToMessageId),
+                om => Assert.Equal(message2.RelatedToMessageId, om.RelatedToMessageId),
+            ]);
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredData_Then_OnlyOneMessageIsEnqueued()
+    {
+        // Given multiple messages with the same idempotency data
+        var externalId = new ExternalId(Guid.NewGuid());
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
+        var start = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var end = Instant.FromUtc(2025, 01, 31, 23, 00);
+
+        var message1 = CreateAcceptedForwardMeteredDataMessage(
+            externalId,
+            receiver,
+            start,
+            end);
+
+        var message2 = CreateAcceptedForwardMeteredDataMessage(
+            externalId,
+            receiver,
+            start,
+            end);
+
+        // When enqueueing the messages
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+
+        // Then only one message is enqueued
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        Assert.Multiple(
+            () => Assert.Single(outgoingMessages),
+            () => Assert.Equal(message1.RelatedToMessageId, outgoingMessages.First().RelatedToMessageId),
+            () => Assert.NotEqual(message2.RelatedToMessageId, outgoingMessages.First().RelatedToMessageId));
+    }
+
+    private AcceptedForwardMeteredDataMessageDto CreateAcceptedForwardMeteredDataMessage(
+        ExternalId externalId,
+        Actor receiver,
+        Instant start,
+        Instant end)
+    {
+        var resolution = Resolution.QuarterHourly;
+
+        return new AcceptedForwardMeteredDataMessageDto(
+            eventId: EventId.From(Guid.NewGuid()),
+            externalId: externalId,
+            receiver: receiver,
+            businessReason: BusinessReason.PeriodicMetering,
+            relatedToMessageId: MessageId.New(),
+            series: new ForwardMeteredDataMessageSeriesDto(
+                TransactionId.New(),
+                "1234567890123",
+                MeteringPointType.Consumption,
+                TransactionId.New(),
+                "test-product",
+                MeasurementUnit.KilowattHour,
+                start,
+                Resolution.QuarterHourly,
+                start,
+                end,
+                GenerateEnergyObservations(start, end, resolution)));
+    }
+
+    private IReadOnlyCollection<EnergyObservationDto> GenerateEnergyObservations(Instant start, Instant end, Resolution resolution)
+    {
+        var resolutionInMinutes = resolution switch
+        {
+            var r when r == Resolution.QuarterHourly => 15,
+            var r when r == Resolution.Hourly => 60,
+            var r when r == Resolution.Daily => 1440,
+            _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unsupported resolution"),
+        };
+
+        var minutesInPeriod = (int)(end - start).TotalMinutes;
+        var totalNumberOfObservations = minutesInPeriod / resolutionInMinutes;
+
+        return Enumerable.Range(0, totalNumberOfObservations)
+            .Select(
+                i => new EnergyObservationDto(
+                    Position: i + 1,
+                    Quantity: 7,
+                    Quality: Quality.Measured))
+            .ToList();
+    }
+}
