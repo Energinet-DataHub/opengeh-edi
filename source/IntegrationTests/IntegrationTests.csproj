@@ -179,10 +179,6 @@ limitations under the License.
         </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Infrastructure\Configuration\" />
-    </ItemGroup>
-
     <ItemDefinitionGroup>
         <ProjectReference>
             <PrivateAssets>all</PrivateAssets>

@@ -62,6 +62,173 @@ public sealed class CalculatedQuantityQualityMapperTests
         return powerSet;
     }
 
+    public sealed class EnergyTests
+    {
+        [Fact]
+        public void Given_EnergyQuantityQualityTestCases_When_Unpacked_Then_ContainsAllPossibleCases()
+        {
+            new EnergyQuantityQualityTestCases()
+                .Select(testCase => testCase[0])
+                .Should()
+                .BeEquivalentTo(_quantityQualityPowerSet);
+        }
+
+        [Fact]
+        public void Given_EnergyQuantityQualityTestCases_When_Unpacked_Then_ContainsExamplesFromBusinessDocumentation()
+        {
+            /*
+             * Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
+             * Only available to Energinet employees.
+             * Note that this is used for RSM-014 in the CIM format
+             *
+             * | Combination QQ from RSM-014       | Calculated quantity quality |
+             * |-----------------------------------+-----------------------------|
+             * | Missing + Missing                 | Missing                     |
+             * | Missing + Estimated               | Incomplete                  |
+             * | Missing + Measured                | Incomplete                  |
+             * | Missing + Estimated + Measured    | Incomplete                  |
+             * | Estimated + Measured              | Estimated                   |
+             * | Estimated + Estimated             | Estimated                   |
+             * | Measured + Measured               | Measured                    |
+             * | Calculated + Calculated           | Calculated                  |
+             * | Missing + Calculated              | Incomplete                  |
+             * | Estimated + Calculated            | Estimated                   |
+             * | Measured + Estimated + Calculated | Estimated                   |
+             */
+
+            var energyQuantityQualityTestCases = new EnergyQuantityQualityTestCases();
+
+            energyQuantityQualityTestCases
+                .Should()
+                .ContainEquivalentOf(
+                    new object[] { new[] { QuantityQuality.Missing }, CalculatedQuantityQuality.Missing, })
+                .And.ContainEquivalentOf(
+                    new object[]
+                    {
+                        new[] { QuantityQuality.Missing, QuantityQuality.Estimated },
+                        CalculatedQuantityQuality.Incomplete,
+                    })
+                .And.ContainEquivalentOf(
+                    new object[]
+                    {
+                        new[] { QuantityQuality.Missing, QuantityQuality.Measured },
+                        CalculatedQuantityQuality.Incomplete,
+                    })
+                .And.ContainEquivalentOf(
+                    new object[]
+                    {
+                        new[] { QuantityQuality.Missing, QuantityQuality.Estimated, QuantityQuality.Measured },
+                        CalculatedQuantityQuality.Incomplete,
+                    })
+                .And.ContainEquivalentOf(
+                    new object[]
+                    {
+                        new[] { QuantityQuality.Estimated, QuantityQuality.Measured },
+                        CalculatedQuantityQuality.Estimated,
+                    })
+                .And.ContainEquivalentOf(
+                    new object[] { new[] { QuantityQuality.Estimated }, CalculatedQuantityQuality.Estimated, })
+                .And.ContainEquivalentOf(
+                    new object[] { new[] { QuantityQuality.Measured }, CalculatedQuantityQuality.Measured, })
+                .And.ContainEquivalentOf(
+                    new object[] { new[] { QuantityQuality.Calculated }, CalculatedQuantityQuality.Calculated, })
+                .And.ContainEquivalentOf(
+                    new object[]
+                    {
+                        new[] { QuantityQuality.Missing, QuantityQuality.Calculated },
+                        CalculatedQuantityQuality.Incomplete,
+                    })
+                .And.ContainEquivalentOf(
+                    new object[]
+                    {
+                        new[] { QuantityQuality.Estimated, QuantityQuality.Calculated },
+                        CalculatedQuantityQuality.Estimated,
+                    })
+                .And.ContainEquivalentOf(
+                    new object[]
+                    {
+                        new[] { QuantityQuality.Measured, QuantityQuality.Estimated, QuantityQuality.Calculated },
+                        CalculatedQuantityQuality.Estimated,
+                    });
+        }
+
+        [Theory]
+        [ClassData(typeof(EnergyQuantityQualityTestCases))]
+        public void
+            Given_QuantityQualitySetForEnergyFromWholesale_When_MappedToEdiQuantityQuality_Then_MappingIsCorrect(
+                ICollection<QuantityQuality> quantityQualitiesFromWholesale,
+                CalculatedQuantityQuality expectedCalculatedQuantityQuality)
+        {
+            // Act
+            var actual = CalculatedQuantityQualityMapper.MapForEnergy(quantityQualitiesFromWholesale.ToList());
+
+            // Assert
+            actual.Should().Be(expectedCalculatedQuantityQuality);
+        }
+
+        private sealed class EnergyQuantityQualityTestCases
+            : TheoryData<IReadOnlyCollection<QuantityQuality>, CalculatedQuantityQuality>
+        {
+            public EnergyQuantityQualityTestCases()
+            {
+                // Missing cases
+                foreach (var quantityQualities in _quantityQualityPowerSet
+                             .Where(qqs => qqs.Contains(QuantityQuality.Missing))
+                             // We need to inspect the Length because we need the set that ONLY contain Missing.
+                             .Where(qqs => qqs.Length == 1))
+                {
+                    Add(quantityQualities, CalculatedQuantityQuality.Missing);
+                }
+
+                // Incomplete cases
+                foreach (var quantityQualities in _quantityQualityPowerSet
+                             .Where(qqs => qqs.Contains(QuantityQuality.Missing))
+                             // We need to inspect the Length because we need the set that NOT ONLY contain Missing.
+                             .Where(qqs => qqs.Length > 1))
+                {
+                    Add(quantityQualities, CalculatedQuantityQuality.Incomplete);
+                }
+
+                // Estimated cases
+                foreach (var quantityQualities in _quantityQualityPowerSet
+                             .Where(qqs => qqs.Contains(QuantityQuality.Estimated))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Missing)))
+                {
+                    Add(quantityQualities, CalculatedQuantityQuality.Estimated);
+                }
+
+                // Measured cases
+                foreach (var quantityQualities in _quantityQualityPowerSet
+                             .Where(qqs => qqs.Contains(QuantityQuality.Measured))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Missing))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Estimated)))
+                {
+                    Add(quantityQualities, CalculatedQuantityQuality.Measured);
+                }
+
+                // Calculated cases
+                foreach (var quantityQualities in _quantityQualityPowerSet
+                             .Where(qqs => qqs.Contains(QuantityQuality.Calculated))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Missing))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Estimated))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Measured)))
+                {
+                    Add(quantityQualities, CalculatedQuantityQuality.Calculated);
+                }
+
+                // Not available cases
+                foreach (var quantityQualities in _quantityQualityPowerSet
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Missing))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Estimated))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Measured))
+                             .Where(qqs => !qqs.Contains(QuantityQuality.Calculated)))
+                {
+                    Add(quantityQualities, CalculatedQuantityQuality.NotAvailable);
+                }
+            }
+        }
+    }
+
     public sealed class WholesaleTests
     {
         [Fact]
