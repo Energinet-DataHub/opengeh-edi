@@ -63,7 +63,7 @@ public class InitializeMeteredDataForMeteringPointHandler(
                             : new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),
                         BusinessReason.FromCode(marketMessage.BusinessReason),
                         MessageId.Create(marketMessage.MessageId),
-                        new MeteredDataForMeteringPointMessageSeriesDto(
+                        new ForwardMeteredDataMessageSeriesDto(
                             TransactionId.From(string.Join(string.Empty, series.TransactionId.Reverse())),
                             series.MeteringPointLocationId!,
                             MeteringPointType.FromCode(series.MeteringPointType!),

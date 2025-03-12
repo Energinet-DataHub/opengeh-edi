@@ -17,7 +17,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed record MeteredDataForMeteringPointMessageSeriesDto(
+public sealed record ForwardMeteredDataMessageSeriesDto(
     TransactionId TransactionId,
     string MarketEvaluationPointNumber,
     MeteringPointType MarketEvaluationPointType,

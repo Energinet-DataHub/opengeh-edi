@@ -22,7 +22,7 @@ public sealed class AcceptedForwardMeteredDataMessageDto(
     Actor receiver,
     BusinessReason businessReason,
     MessageId relatedToMessageId,
-    MeteredDataForMeteringPointMessageSeriesDto series)
+    ForwardMeteredDataMessageSeriesDto series)
     : OutgoingMessageDto(
         DocumentType.NotifyValidatedMeasureData,
         receiver.ActorNumber,
@@ -33,5 +33,5 @@ public sealed class AcceptedForwardMeteredDataMessageDto(
         externalId,
         relatedToMessageId)
 {
-    public MeteredDataForMeteringPointMessageSeriesDto Series { get; } = series;
+    public ForwardMeteredDataMessageSeriesDto Series { get; } = series;
 }
