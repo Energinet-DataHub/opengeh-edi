@@ -13,27 +13,24 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
-/// A <see cref="IFeatureFlagManager"/> implementation using the Microsoft.FeatureManagement package
+/// A <see cref="IFeatureFlagManager"/> implementation that combines feature flags from Azure App Configuration
+/// with the Microsoft.FeatureManagement package.
 /// </summary>
-public class MicrosoftFeatureFlagManager : IFeatureFlagManager
+public class MicrosoftFeatureFlagManager(
+    IFeatureManager featureManager,
+    IConfigurationRefresherProvider refresherProvider)
+    : IFeatureFlagManager
 {
-    private readonly IFeatureManager _featureManager;
-
-    public MicrosoftFeatureFlagManager(IFeatureManager featureManager)
-    {
-        _featureManager = featureManager;
-    }
+    private readonly IFeatureManager _featureManager = featureManager;
+    private readonly IConfigurationRefresher _refresher = refresherProvider.Refreshers.First();
 
     public Task<bool> UsePeekMessagesAsync() => IsEnabledAsync(FeatureFlagName.UsePeekMessages);
-
-    public Task<bool> UsePeekTimeSeriesMessagesAsync() => IsEnabledAsync(FeatureFlagName.UsePeekTimeSeriesMessages);
-
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => IsEnabledAsync(FeatureFlagName.ReceiveMeteredDataForMeasurementPoints);
 
     public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => IsEnabledAsync(FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration);
 
@@ -43,5 +40,16 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> ArchiveBrs021MessagesAsync() => IsEnabledAsync(FeatureFlagName.ArchiveBrs021Messages);
 
-    private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
+    // Product Goals
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => IsEnabledAsync(FeatureFlagName.PM25CIM);
+
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => IsEnabledAsync(FeatureFlagName.PM25Ebix);
+
+    public Task<bool> UsePeekMeteredDataMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25Messages);
+
+    protected async Task<bool> IsEnabledAsync(string featureFlagName)
+    {
+        await _refresher.TryRefreshAsync().ConfigureAwait(false);
+        return await _featureManager.IsEnabledAsync(featureFlagName).ConfigureAwait(false);
+    }
 }
