@@ -419,6 +419,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "Logging__LogLevel__Default",
             "Information");
+        // => Disable extensive logging from EF Core
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "Logging__LogLevel__Microsoft.EntityFrameworkCore",
+            "Warning");
         // => Disable extensive logging when using Azure Storage
         appHostSettings.ProcessEnvironmentVariables.Add(
             "Logging__LogLevel__Azure.Core",
