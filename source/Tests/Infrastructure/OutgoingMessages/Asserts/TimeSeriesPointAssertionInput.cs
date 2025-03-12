@@ -24,17 +24,6 @@ public record TimeSeriesPointAssertionInput(
     decimal Quantity,
     CalculatedQuantityQuality Quality)
 {
-    // public static implicit operator TimeSeriesPointAssertionInput(TimeSeriesPoint tsp) => From(tsp); TODO: LRN
-    //
-    // public static List<TimeSeriesPointAssertionInput> From(RepeatedField<TimeSeriesPoint> timeSeriesPoints) => timeSeriesPoints
-    //     .Select(From)
-    //     .ToList();
-    //
-    // public static TimeSeriesPointAssertionInput From(TimeSeriesPoint timeSeriesPoint) => new(
-    //     timeSeriesPoint.Time.ToDateTimeOffset().ToInstant(),
-    //     timeSeriesPoint.Quantity.ToDecimal(),
-    //     ConvertQuality(timeSeriesPoint.QuantityQualities));
-
     private static CalculatedQuantityQuality ConvertQuality(RepeatedField<QuantityQuality> qualities)
     {
         var expectedQuantityQuality = qualities.Single() switch
