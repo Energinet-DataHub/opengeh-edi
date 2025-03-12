@@ -212,11 +212,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAndCommitAsync(
-        MeteredDataForMeteringPointMessageProcessDto meteredDataForMeteringPointMessageProcessDto,
+        ForwardMeteredDataMessageDto forwardMeteredDataMessageDto,
         CancellationToken cancellationToken)
     {
         var message = OutgoingMessageFactory.CreateMessage(
-            meteredDataForMeteringPointMessageProcessDto,
+            forwardMeteredDataMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 

@@ -116,11 +116,11 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
 
         var didFinish = await Awaiter.TryWaitUntilConditionAsync(
-            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)}"),
+            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)}"),
             timeLimit: TimeSpan.FromSeconds(30));
 
         didFinish.Should()
-            .BeTrue($"the {nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1)} should have been executed");
+            .BeTrue($"the {nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)} should have been executed");
 
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
 

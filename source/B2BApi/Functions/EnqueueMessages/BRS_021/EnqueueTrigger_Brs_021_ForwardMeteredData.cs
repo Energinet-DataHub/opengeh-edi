@@ -20,14 +20,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
-public sealed class EnqueueTrigger_Brs_021_Forward_Metered_Data_V1(
-    ILogger<EnqueueTrigger_Brs_021_Forward_Metered_Data_V1> logger,
-    EnqueueHandler_Brs_021_Forward_Metered_Data_V1 enqueueHandler)
+public sealed class EnqueueTrigger_Brs_021_ForwardMeteredData(
+    ILogger<EnqueueTrigger_Brs_021_ForwardMeteredData> logger,
+    EnqueueHandler_Brs_021_ForwardMeteredData_V1 enqueueHandler)
 {
-    private readonly ILogger<EnqueueTrigger_Brs_021_Forward_Metered_Data_V1> _logger = logger;
-    private readonly EnqueueHandler_Brs_021_Forward_Metered_Data_V1 _enqueueHandler = enqueueHandler;
+    private readonly ILogger<EnqueueTrigger_Brs_021_ForwardMeteredData> _logger = logger;
+    private readonly EnqueueHandler_Brs_021_ForwardMeteredData_V1 _enqueueHandler = enqueueHandler;
 
-    [Function(nameof(EnqueueTrigger_Brs_021_Forward_Metered_Data_V1))]
+    [Function(nameof(EnqueueTrigger_Brs_021_ForwardMeteredData))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{EdiTopicOptions.SectionName}:{nameof(EdiTopicOptions.Name)}%",

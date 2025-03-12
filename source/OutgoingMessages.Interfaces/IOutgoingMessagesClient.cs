@@ -108,7 +108,7 @@ public interface IOutgoingMessagesClient
     /// Enqueue metered data for metering point messages, handles enqueuing messages to all appropriate parties in a single transaction.
     /// </summary>
     Task<Guid> EnqueueAndCommitAsync(
-        MeteredDataForMeteringPointMessageProcessDto meteredDataForMeteringPointMessageProcessDto,
+        ForwardMeteredDataMessageDto forwardMeteredDataMessageDto,
         CancellationToken cancellationToken);
 
     /// <summary>

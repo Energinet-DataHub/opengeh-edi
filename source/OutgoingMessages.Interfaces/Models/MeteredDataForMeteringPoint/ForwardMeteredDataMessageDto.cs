@@ -16,8 +16,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed class MeteredDataForMeteringPointMessageProcessDto(
+public sealed class ForwardMeteredDataMessageDto(
     EventId eventId,
+    ExternalId externalId,
     Actor receiver,
     BusinessReason businessReason,
     MessageId relatedToMessageId,
@@ -29,7 +30,7 @@ public sealed class MeteredDataForMeteringPointMessageProcessDto(
         eventId,
         businessReason.Name,
         receiver.ActorRole,
-        new ExternalId(Guid.NewGuid()),
+        externalId,
         relatedToMessageId)
 {
     public MeteredDataForMeteringPointMessageSeriesDto Series { get; } = series;

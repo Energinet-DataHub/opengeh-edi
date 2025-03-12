@@ -68,7 +68,7 @@ public static class EdiTopicExtensions
             .AddTransient<EnqueueHandler_Brs_023_027_V1>()
             .AddTransient<EnqueueHandler_Brs_026_V1>()
             .AddTransient<EnqueueHandler_Brs_028_V1>()
-            .AddTransient<EnqueueHandler_Brs_021_Forward_Metered_Data_V1>();
+            .AddTransient<EnqueueHandler_Brs_021_ForwardMeteredData_V1>();
 
         return services;
     }

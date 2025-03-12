@@ -380,7 +380,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        MeteredDataForMeteringPointMessageProcessDto message,
+        ForwardMeteredDataMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {
