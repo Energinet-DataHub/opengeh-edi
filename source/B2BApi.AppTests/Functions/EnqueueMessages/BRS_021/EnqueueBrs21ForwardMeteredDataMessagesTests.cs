@@ -124,9 +124,9 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
 
-        hostLog.Should().ContainMatch("*Executing 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1'*");
+        hostLog.Should().ContainMatch($"*Executing 'Functions.{nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)}'*");
         hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 021*");
-        hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
+        hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)}' (Succeeded,*");
 
         // Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
