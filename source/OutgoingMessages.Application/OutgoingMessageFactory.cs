@@ -417,7 +417,7 @@ public static class OutgoingMessageFactory
             : null;
 
         return new OutgoingMessage(
-            eventId: EventId.From(message.EventId),
+            eventId: message.EventId,
             documentType: DocumentType.Acknowledgement,
             receiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
             documentReceiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
