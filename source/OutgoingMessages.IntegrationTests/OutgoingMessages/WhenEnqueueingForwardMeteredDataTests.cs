@@ -40,13 +40,11 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
         var externalId = new ExternalId(Guid.NewGuid());
         var start = Instant.FromUtc(2024, 12, 31, 23, 00);
         var end = Instant.FromUtc(2025, 01, 31, 23, 00);
-        var receiver1 = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
-        var receiver2 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
 
         var relatedToMessageId1 = MessageId.New();
         var message1 = CreateAcceptedForwardMeteredDataMessage(
             externalId: externalId,
-            receiver: receiver1,
+            receiver: new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider),
             start: start,
             end: end,
             relatedToMessageId: relatedToMessageId1);
@@ -54,8 +52,142 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
         var relatedToMessageId2 = MessageId.New();
         var message2 = CreateAcceptedForwardMeteredDataMessage(
             externalId: externalId,
-            receiver: receiver2,
+            receiver: new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider),
             start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId2);
+
+        // When enqueueing the messages
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+
+        // Then both messages are enqueued
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
+        Assert.Collection(
+            outgoingMessages,
+            [
+                om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
+                om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
+            ]);
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithDifferentReceiverActorRoles_When_EnqueueingForwardMeteredData_Then_BothMessagesAreEnqueued()
+    {
+        // Given multiple messages with the same idempotency data except for the receiver actor number
+        var externalId = new ExternalId(Guid.NewGuid());
+        var start = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var end = Instant.FromUtc(2025, 01, 31, 23, 00);
+
+        var relatedToMessageId1 = MessageId.New();
+        var message1 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: externalId,
+            receiver: new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider),
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId1);
+
+        var relatedToMessageId2 = MessageId.New();
+        var message2 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: externalId,
+            receiver: new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier),
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId2);
+
+        // When enqueueing the messages
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+
+        // Then both messages are enqueued
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
+        Assert.Collection(
+            outgoingMessages,
+            [
+                om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
+                om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
+            ]);
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithDifferentExternalIds_When_EnqueueingForwardMeteredData_Then_BothMessagesAreEnqueued()
+    {
+        // Given multiple messages with the same idempotency data except for the receiver actor number
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
+        var start = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var end = Instant.FromUtc(2025, 01, 31, 23, 00);
+
+        var relatedToMessageId1 = MessageId.New();
+        var message1 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: new ExternalId(Guid.NewGuid()),
+            receiver: receiver,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId1);
+
+        var relatedToMessageId2 = MessageId.New();
+        var message2 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: new ExternalId(Guid.NewGuid()),
+            receiver: receiver,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId2);
+
+        // When enqueueing the messages
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+
+        // Then both messages are enqueued
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
+        Assert.Collection(
+            outgoingMessages,
+            [
+                om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
+                om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
+            ]);
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithDifferentStartPeriods_When_EnqueueingForwardMeteredData_Then_BothMessagesAreEnqueued()
+    {
+        // Given multiple messages with the same idempotency data except for the receiver actor number
+        var externalId = new ExternalId(Guid.NewGuid());
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
+        var end = Instant.FromUtc(2025, 01, 31, 23, 00);
+
+        var start1 = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var relatedToMessageId1 = MessageId.New();
+        var message1 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: externalId,
+            receiver: receiver,
+            start: start1,
+            end: end,
+            relatedToMessageId: relatedToMessageId1);
+
+        var start2 = Instant.FromUtc(2025, 01, 15, 23, 00);
+        var relatedToMessageId2 = MessageId.New();
+        var message2 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: externalId,
+            receiver: receiver,
+            start: start2,
             end: end,
             relatedToMessageId: relatedToMessageId2);
 
@@ -138,17 +270,17 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
             businessReason: BusinessReason.PeriodicMetering,
             relatedToMessageId: relatedToMessageId,
             series: new ForwardMeteredDataMessageSeriesDto(
-                TransactionId.New(),
-                "1234567890123",
-                MeteringPointType.Consumption,
-                TransactionId.New(),
-                "test-product",
-                MeasurementUnit.KilowattHour,
-                start,
-                Resolution.QuarterHourly,
-                start,
-                end,
-                GenerateEnergyObservations(start, end, resolution)));
+                TransactionId: TransactionId.New(),
+                MarketEvaluationPointNumber: "1234567890123",
+                MarketEvaluationPointType: MeteringPointType.Consumption,
+                OriginalTransactionIdReferenceId: TransactionId.New(),
+                Product: "test-product",
+                QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                RegistrationDateTime: start,
+                Resolution: Resolution.QuarterHourly,
+                StartedDateTime: start,
+                EndedDateTime: end,
+                EnergyObservations: GenerateEnergyObservations(start, end, resolution)));
     }
 
     private IReadOnlyCollection<EnergyObservationDto> GenerateEnergyObservations(Instant start, Instant end, Resolution resolution)
