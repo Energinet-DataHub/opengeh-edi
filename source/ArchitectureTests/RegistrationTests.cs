@@ -19,8 +19,8 @@ using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi;
-using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
@@ -87,7 +87,7 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.ContainerName)}", "fake-container-name");
 
         // App Configuration settings
-        Environment.SetEnvironmentVariable(nameof(AppConfigurationOptions.AppConfigEndpoint), "https://appcs-intgra-t-we-002.azconfig.io");
+        Environment.SetEnvironmentVariable(nameof(AppConfiguration.AppConfigEndpoint), "https://appcs-intgra-t-we-002.azconfig.io");
 
         _host = HostFactory.CreateHost(Program.TokenValidationParameters);
     }

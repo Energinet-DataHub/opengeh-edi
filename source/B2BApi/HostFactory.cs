@@ -20,10 +20,10 @@ using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.AuditLog;
-using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
@@ -70,7 +70,7 @@ public static class HostFactory
             .ConfigureAppConfiguration((context, configBuilder) =>
             {
                 var settings = configBuilder.Build();
-                var appConfigEndpoint = settings[AppConfigurationOptions.AppConfigEndpoint]!;
+                var appConfigEndpoint = settings[AppConfiguration.AppConfigEndpoint]!;
                 configBuilder.AddAzureAppConfiguration(options =>
                 {
                     options.Connect(new Uri(appConfigEndpoint), defaultAzureCredential)
@@ -83,8 +83,6 @@ public static class HostFactory
             .ConfigureServices(
                 (context, services) =>
                 {
-                    var azureCredential = defaultAzureCredential;
-
                     services
                         // Logging
                         .AddApplicationInsightsForIsolatedWorker(SubsystemName)
@@ -130,7 +128,7 @@ public static class HostFactory
                         .AddOutboxRetention()
 
                         // Enqueue messages from PM (using Edi Topic)
-                        .AddEnqueueActorMessagesFromProcessManager(azureCredential);
+                        .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential);
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>

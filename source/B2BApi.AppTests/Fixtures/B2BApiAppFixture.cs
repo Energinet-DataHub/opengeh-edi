@@ -28,6 +28,7 @@ using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
@@ -126,6 +127,8 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(AuditLogMockServer));
 
         LogStopwatch(constructorStopwatch, "B2BApiAppFixture constructor");
+
+        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public AuditLogMockServer AuditLogMockServer { get; }
@@ -170,6 +173,8 @@ public class B2BApiAppFixture : IAsyncLifetime
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
+
+    private string AppConfigEndpoint { get; }
 
     public async Task InitializeAsync()
     {
@@ -530,7 +535,9 @@ public class B2BApiAppFixture : IAsyncLifetime
             "true");
 
         // App Configuration settings
-        Environment.SetEnvironmentVariable(nameof(AppConfigurationOptions.AppConfigEndpoint), IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(AppConfiguration.AppConfigEndpoint),
+            AppConfigEndpoint);
 
         return appHostSettings;
     }

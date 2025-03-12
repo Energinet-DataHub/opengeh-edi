@@ -20,15 +20,14 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
@@ -39,7 +38,9 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationTests.AppConfiguration;
 using Energinet.DataHub.EDI.IntegrationTests.DataRetention;
+using Energinet.DataHub.EDI.IntegrationTests.FeatureFlag;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -99,6 +100,8 @@ public class TestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, null, ActorId));
+
+        AppConfigurationClient = new AppConfigurationClient(Fixture.AppConfigEndpoint, Fixture.IntegrationTestConfiguration.Credential);
     }
 
     protected Guid ActorId => Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -110,6 +113,8 @@ public class TestBase : IDisposable
     protected AuthenticatedActor AuthenticatedActor { get; }
 
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
+
+    protected AppConfigurationClient AppConfigurationClient { get; private set; } = null!;
 
     private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
@@ -322,7 +327,7 @@ public class TestBase : IDisposable
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
                     // => App Configuration
-                    [$"{nameof(AppConfigurationOptions.AppConfigEndpoint)}"] = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"],
+                    [$"{nameof(BuildingBlocks.Infrastructure.Configuration.AppConfiguration.AppConfigEndpoint)}"] = Fixture.AppConfigEndpoint,
                 })
             .Build();
 

@@ -20,9 +20,9 @@ using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.B2CWebApi.Configuration;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
@@ -36,7 +36,7 @@ const string subsystemName = "EDI";
 // Add Azure App Configuration
 builder.Configuration.AddAzureAppConfiguration(options =>
 {
-    var appConfigEndpoint = builder.Configuration[AppConfigurationOptions.AppConfigEndpoint]!;
+    var appConfigEndpoint = builder.Configuration[AppConfiguration.AppConfigEndpoint]!;
     options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
         .UseFeatureFlags(featureFlagOptions =>
         {

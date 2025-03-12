@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Configuration;
+using Azure.Core;
+using Azure.Data.AppConfiguration;
 
-public class AppConfigurationOptions
+namespace Energinet.DataHub.EDI.IntegrationTests.AppConfiguration;
+
+public class AppConfigurationClient(string appConfigEndpoint, TokenCredential defaultAzureCredential)
 {
-    public const string AppConfigEndpoint = "AppConfigEndpoint";
+    private readonly ConfigurationClient _client = new(new Uri(appConfigEndpoint), defaultAzureCredential);
+
+    public async Task SetFeatureFlagAsync(string featureFlagName, bool isEnabled)
+    {
+        await _client.SetConfigurationSettingAsync(new FeatureFlagConfigurationSetting(featureFlagName, isEnabled));
+    }
 }

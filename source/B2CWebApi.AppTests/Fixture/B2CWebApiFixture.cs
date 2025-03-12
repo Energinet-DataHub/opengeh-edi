@@ -20,8 +20,8 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.OpenIdJwt;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
-using Energinet.DataHub.EDI.B2CWebApi.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
@@ -48,6 +48,8 @@ public class B2CWebApiFixture : IAsyncLifetime
             IntegrationTestConfiguration.Credential);
 
         B2CWebApiApplicationFactory = new B2CWebApiApplicationFactory();
+
+        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public EdiDatabaseManager DatabaseManager { get; }
@@ -66,6 +68,8 @@ public class B2CWebApiFixture : IAsyncLifetime
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private B2CWebApiApplicationFactory B2CWebApiApplicationFactory { get; }
+
+    private string AppConfigEndpoint { get; }
 
     public async Task InitializeAsync()
     {
@@ -147,7 +151,7 @@ public class B2CWebApiFixture : IAsyncLifetime
             { $"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
-            { AppConfigurationOptions.AppConfigEndpoint, IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"] },
+            { AppConfiguration.AppConfigEndpoint, AppConfigEndpoint },
         };
 
         return appSettings;

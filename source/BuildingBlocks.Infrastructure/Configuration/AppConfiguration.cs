@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Configuration;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 
-public class AppConfigurationOptions
+public class AppConfiguration
 {
     public const string AppConfigEndpoint = "AppConfigEndpoint";
 }

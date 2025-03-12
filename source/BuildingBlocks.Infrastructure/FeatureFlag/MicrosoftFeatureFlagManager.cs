@@ -19,7 +19,8 @@ using Microsoft.FeatureManagement;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
-/// A <see cref="IFeatureFlagManager"/> implementation using the Microsoft.FeatureManagement package
+/// A <see cref="IFeatureFlagManager"/> implementation that combines feature flags from Azure App Configuration
+/// with the Microsoft.FeatureManagement package.
 /// </summary>
 public class MicrosoftFeatureFlagManager(
     IFeatureManager featureManager,
