@@ -40,6 +40,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var request = RequestAggregatedMeasureDataMarketRequest();
 
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
+            TransactionId.New(),
             request,
             SenderId,
             ActorRole.MeteredDataResponsible.Name,
@@ -71,6 +72,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var request = RequestAggregatedMeasureDataMarketRequest(998);
 
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
+            TransactionId.New(),
             request,
             "9876543210987",
             ActorRole.MeteredDataResponsible.Name,
@@ -94,6 +96,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var request = RequestAggregatedMeasureDataMarketRequest();
 
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
+            TransactionId.New(),
             request,
             "9876543210987",
             ActorRole.GridAccessProvider.Name,

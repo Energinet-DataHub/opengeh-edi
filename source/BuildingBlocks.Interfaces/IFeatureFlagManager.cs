@@ -45,21 +45,6 @@ public interface IFeatureFlagManager
     Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync();
 
     /// <summary>
-    /// Whether to use the RequestWholesaleServices process orchestration.
-    /// </summary>
-    Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync();
-
-    /// <summary>
-    /// Whether to use the RequestAggregatedMeasureData process orchestration.
-    /// </summary>
-    Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync();
-
-    /// <summary>
-    /// Whether to enqueue BRS-023/027 messages via the Process Manager.
-    /// </summary>
-    Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync();
-
-    /// <summary>
     /// Whether to archive BRS-021 messages.
     /// </summary>
     Task<bool> ArchiveBrs021MessagesAsync();

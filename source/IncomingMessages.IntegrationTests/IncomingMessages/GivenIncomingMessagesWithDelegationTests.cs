@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.Extensions.Azure;
+using Google.Protobuf;
 using NodaTime;
 using Xunit.Abstractions;
 
@@ -34,12 +37,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessag
 public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesTestBase
 {
     private readonly ClockStub _clockStub;
-    private readonly IIncomingMessageClient _incomingMessagesRequest;
-
     private readonly Actor _originalActor = new(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
     private readonly Actor _delegatedTo = new(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
-    [SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Disposed in test")]
-    private readonly ServiceBusSenderSpy _senderSpy;
     private readonly AuthenticatedActor _authenticatedActor;
 
     public GivenIncomingMessagesWithDelegationTests(
@@ -47,12 +46,6 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         ITestOutputHelper testOutputHelper)
         : base(incomingMessagesTestFixture, testOutputHelper)
     {
-        _senderSpy = new ServiceBusSenderSpy("Fake");
-        var serviceBusClientSenderFactory =
-            (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
-
-        serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
-        _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _clockStub = (ClockStub)GetService<IClock>();
         _authenticatedActor = GetService<AuthenticatedActor>();
     }
@@ -61,6 +54,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageFromDelegated_When_Received_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         const string gridAreaCode = "512";
 
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -94,7 +90,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -107,20 +103,19 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().BeNullOrEmpty();
 
-            _senderSpy.LatestMessage.Should().NotBeNull();
+            senderSpy.LatestMessage.Should().NotBeNull();
         }
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
-            var series = message!.Series.Should().ContainSingle().Subject;
-            series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
-            series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
-            series.OriginalActor.ActorRole.Should().Be(_originalActor.ActorRole);
-            series.OriginalActor.ActorNumber.Should().Be(_originalActor.ActorNumber);
-            series.EnergySupplierNumber.Should().Be(_originalActor.ActorNumber.Value);
-            series.RequestedGridAreaCode.Should().Be(gridAreaCode);
-            series.GridAreas.Should().Equal(gridAreaCode);
+            var requestInput = GetRequestCalculatedEnergyTimeSeriesInputV1(senderSpy);
+            response.IsErrorResponse.Should().BeFalse();
+            requestInput.RequestedByActorRole.Should().Be(_delegatedTo.ActorRole.Name);
+            requestInput.RequestedByActorNumber.Should().Be(_delegatedTo.ActorNumber.Value);
+            requestInput.RequestedForActorRole.Should().Be(_originalActor.ActorRole.Name);
+            requestInput.RequestedForActorNumber.Should().Be(_originalActor.ActorNumber.Value);
+            requestInput.EnergySupplierNumber.Should().Be(_originalActor.ActorNumber.Value);
+            requestInput.GridAreas.Should().Contain(gridAreaCode);
         }
     }
 
@@ -128,6 +123,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageFromDelegated_AndGiven_DelegationHasStopped_When_Received_Then_ErrorResponseToActor()
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         const string gridAreaCode = "512";
 
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -173,7 +171,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             2);
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -184,7 +182,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using var scope = new AssertionScope();
         response.IsErrorResponse.Should().BeTrue();
         response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
-        _senderSpy.LatestMessage.Should().BeNull();
+        senderSpy.LatestMessage.Should().BeNull();
     }
 
     [Theory]
@@ -196,6 +194,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         string requesterActorRole)
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         const string gridAreaCode = "512";
 
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -235,7 +236,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -246,7 +247,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using var scope = new AssertionScope();
         response.IsErrorResponse.Should().BeTrue();
         response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
-        _senderSpy.LatestMessage.Should()
+        senderSpy.LatestMessage.Should()
             .BeNull(
                 "Since there does not exist a delegation from the energySupplier/balanceResponsible on the requested grid area");
     }
@@ -261,6 +262,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             string requesterActorRoleName)
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         const string expectedGridAreaCode = "512";
         const string anotherGridAreaCode = "804";
 
@@ -318,7 +322,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -331,21 +335,19 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().BeNullOrEmpty();
 
-            _senderSpy.LatestMessage.Should().NotBeNull();
+            senderSpy.LatestMessage.Should().NotBeNull();
         }
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
-            var series = message!.Series.Should().ContainSingle().Subject;
-            series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
-            series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
-            series.OriginalActor.ActorRole.Should().Be(originalActorRole);
-            series.OriginalActor.ActorNumber.Should().Be(_originalActor.ActorNumber);
-            series.EnergySupplierNumber.Should().Be(energySupplier?.Value);
-            series.BalanceResponsibleNumber.Should().Be(balanceResponsibleParty?.Value);
-            series.RequestedGridAreaCode.Should().BeNull();
-            series.GridAreas.Should().Equal(expectedGridAreaCode);
+            var requestInput = GetRequestCalculatedEnergyTimeSeriesInputV1(senderSpy);
+            requestInput.RequestedByActorRole.Should().Be(_delegatedTo.ActorRole.Name);
+            requestInput.RequestedByActorNumber.Should().Be(_delegatedTo.ActorNumber.Value);
+            requestInput.RequestedForActorRole.Should().Be(originalActorRole.Name);
+            requestInput.RequestedForActorNumber.Should().Be(_originalActor.ActorNumber.Value);
+            requestInput.EnergySupplierNumber.Should().Be(energySupplier?.Value);
+            requestInput.BalanceResponsibleNumber.Should().Be(balanceResponsibleParty?.Value);
+            requestInput.GridAreas.Should().Equal(expectedGridAreaCode);
         }
     }
 
@@ -353,6 +355,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         const string expectedMessageId = "123456";
         const string expectedGridAreaCode = "512";
         var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
@@ -381,7 +386,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.NotifyValidatedMeasureData,
@@ -394,12 +399,12 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().Contain(expectedMessageId);
 
-            _senderSpy.LatestMessage.Should().NotBeNull();
+            senderSpy.LatestMessage.Should().NotBeNull();
         }
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
+            var message = senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsDelegated.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber);
@@ -411,6 +416,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationDoesNotExists_Then_ReturnsErrorMessage()
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         _clockStub.SetCurrentInstant(now);
@@ -428,7 +436,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             ]);
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.NotifyValidatedMeasureData,
@@ -441,7 +449,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeTrue();
             response.MessageBody.Should().Contain("The user of the SendMessage operation is not allowed to send this type of message (DocumentType) for its role");
 
-            _senderSpy.LatestMessage.Should().BeNull();
+            senderSpy.LatestMessage.Should().BeNull();
         }
     }
 
@@ -449,6 +457,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsGridAccessProviderAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         const string expectedMessageId = "123456";
         const string expectedGridAreaCode = "512";
         var delegatedToAsGridAccessProvider = new Actor(ActorNumber.Create("2222222222222"), ActorRole.GridAccessProvider);
@@ -477,7 +488,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.NotifyValidatedMeasureData,
@@ -490,12 +501,12 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().Contain(expectedMessageId);
 
-            _senderSpy.LatestMessage.Should().NotBeNull();
+            senderSpy.LatestMessage.Should().NotBeNull();
         }
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
+            var message = senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsGridAccessProvider.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsGridAccessProvider.ActorNumber);
@@ -507,6 +518,9 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsGridAccessProviderAndDelegationDoesNotExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
+
         const string expectedMessageId = "123456";
         var delegatedToAsGridAccessProvider = new Actor(ActorNumber.Create("2222222222222"), ActorRole.GridAccessProvider);
 
@@ -526,7 +540,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             messageId: expectedMessageId);
 
         // Act
-        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var response = await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.NotifyValidatedMeasureData,
@@ -539,17 +553,27 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().Contain(expectedMessageId);
 
-            _senderSpy.LatestMessage.Should().NotBeNull();
+            senderSpy.LatestMessage.Should().NotBeNull();
         }
 
         using (new AssertionScope())
         {
-            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
+            var message = senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeteringPointMessageProcessDto>();
             var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);
             series.DelegatedGridAreaCodes.Should().BeEmpty();
         }
+    }
+
+    private static RequestCalculatedEnergyTimeSeriesInputV1 GetRequestCalculatedEnergyTimeSeriesInputV1(
+        ServiceBusSenderSpy senderSpy)
+    {
+        var serializer = new Serializer();
+        var parser = new MessageParser<StartOrchestrationInstanceV1>(() => new StartOrchestrationInstanceV1());
+        var message = parser.ParseJson(senderSpy.LatestMessage!.Body.ToString());
+        var input = serializer.Deserialize<RequestCalculatedEnergyTimeSeriesInputV1>(message.Input);
+        return input;
     }
 
     private async Task AddDelegationAsync(

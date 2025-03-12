@@ -35,7 +35,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
@@ -235,20 +234,6 @@ public class B2BApiAppFixture : IAsyncLifetime
             subscriptionName: ProcessManagerNotifyTopicResource.Subscriptions.Single().SubscriptionName);
 
         await ServiceBusResourceProvider
-            .BuildQueue("edi-inbox")
-            .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", queue.Name))
-            .CreateAsync();
-        LogStopwatch(stopwatch, "ServiceBusQueue (edi-inbox)");
-
-        var wholesaleInboxQueueResource = await ServiceBusResourceProvider
-            .BuildQueue("wholesale-inbox")
-            .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", queue.Name))
-            .CreateAsync();
-        LogStopwatch(stopwatch, "ServiceBusQueue (wholesale-inbox)");
-
-        await ServiceBusResourceProvider
             .BuildQueue("incoming-messages")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
@@ -277,8 +262,6 @@ public class B2BApiAppFixture : IAsyncLifetime
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
 
-        // => Receive messages on Wholesale Inbox Queue
-        await ServiceBusListenerMock.AddQueueListenerAsync(wholesaleInboxQueueResource.Name);
         LogStopwatch(stopwatch, nameof(ServiceBusListenerMock.AddQueueListenerAsync));
 
         AuditLogMockServer.StartServer();
@@ -340,10 +323,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
-            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.PM25Messages}", usePeekMeasureDataMessages.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }
 
@@ -505,20 +485,12 @@ public class B2BApiAppFixture : IAsyncLifetime
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}",
-            false.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.PM25Ebix}",
             true.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}",
-            false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",

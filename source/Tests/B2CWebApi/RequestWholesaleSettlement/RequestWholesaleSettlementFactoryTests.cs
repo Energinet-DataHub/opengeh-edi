@@ -83,6 +83,7 @@ public class RequestWholesaleSettlementFactoryTests
             priceType);
 
         var result = RequestWholesaleSettlementDtoFactory.Create(
+            TransactionId.New(),
             request,
             senderId,
             ActorRole.GridAccessProvider.Name,
@@ -140,6 +141,7 @@ public class RequestWholesaleSettlementFactoryTests
             null);
 
         var result = RequestWholesaleSettlementDtoFactory.Create(
+            TransactionId.New(),
             request,
             "9876543210987",
             ActorRole.SystemOperator.Name,
@@ -160,6 +162,7 @@ public class RequestWholesaleSettlementFactoryTests
         var request = GetRequestWithCalculationType(calculationType);
 
         var result = RequestWholesaleSettlementDtoFactory.Create(
+            TransactionId.New(),
             request,
             "9876543210987",
             ActorRole.GridAccessProvider.Name,
@@ -177,6 +180,7 @@ public class RequestWholesaleSettlementFactoryTests
         var request = GetRequestWithCalculationType(CalculationType.WholesaleFixing);
 
         var result = RequestWholesaleSettlementDtoFactory.Create(
+            TransactionId.New(),
             request,
             "9876543210987",
             actorRole,
@@ -193,6 +197,7 @@ public class RequestWholesaleSettlementFactoryTests
         var request = GetRequestWithCalculationType(CalculationType.WholesaleFixing);
 
         var act = () => RequestWholesaleSettlementDtoFactory.Create(
+            TransactionId.New(),
             request,
             "9876543210987",
             actorRole,

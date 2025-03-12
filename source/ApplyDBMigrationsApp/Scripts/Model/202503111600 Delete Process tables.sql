@@ -1,0 +1,7 @@
+DROP TABLE [dbo].[AggregatedMeasureDataProcessGridAreas]
+DROP TABLE [dbo].[AggregatedMeasureDataProcesses]
+DROP TABLE [dbo].[QueuedInternalCommands]
+DROP TABLE [dbo].[ReceivedInboxEvents]
+DROP TABLE [dbo].[WholesaleServicesProcessChargeTypes] 
+DROP TABLE [dbo].[WholesaleServicesProcessGridAreas]
+DROP TABLE [dbo].[WholesaleServicesProcesses]

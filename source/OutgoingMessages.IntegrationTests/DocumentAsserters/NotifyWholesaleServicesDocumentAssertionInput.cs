@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
@@ -42,7 +42,7 @@ public record NotifyWholesaleServicesDocumentAssertionInput(
     long CalculationVersion,
     Resolution Resolution,
     Period Period,
-    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point>? Points);
+    IReadOnlyCollection<WholesaleServicesPoint>? Points);
 
 public record BusinessReasonWithSettlementVersion(
     BusinessReason BusinessReason,

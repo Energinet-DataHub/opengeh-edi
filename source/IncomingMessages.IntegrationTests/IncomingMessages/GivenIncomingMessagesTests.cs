@@ -25,9 +25,10 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NodaTime.Extensions;
@@ -41,10 +42,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessag
     Justification = "Readability in test-setup")]
 public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 {
-    private readonly IIncomingMessageClient _incomingMessagesRequest;
-#pragma warning disable CA2213 // Disposable fields should be disposed
-    private readonly ServiceBusSenderSpy _senderSpy;
-#pragma warning restore CA2213 // Disposable fields should be disposed
     private readonly IncomingMessagesContext _incomingMessageContext;
     private readonly ClockStub _clockStub;
 
@@ -53,12 +50,6 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         ITestOutputHelper testOutputHelper)
         : base(incomingMessagesTestFixture, testOutputHelper)
     {
-        _senderSpy = new ServiceBusSenderSpy("Fake");
-        var serviceBusClientSenderFactory =
-            (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
-
-        serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
-        _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _incomingMessageContext = GetService<IncomingMessagesContext>();
         _clockStub = (ClockStub)GetService<IClock>();
     }
@@ -109,6 +100,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(
@@ -118,9 +110,10 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 actorRole,
                 null,
                 ActorId));
+        var sut = GetService<IIncomingMessageClient>();
 
         // Act
-        var registerAndSendAsync = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var registerAndSendAsync = await sut.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
             format,
             incomingDocumentType,
@@ -136,7 +129,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Service bus is not used when receiving NotifyValidatedMeasureData
         if (incomingDocumentType != IncomingDocumentType.NotifyValidatedMeasureData)
         {
-            var message = _senderSpy.LatestMessage;
+            var message = senderSpy.LatestMessage;
             Assert.NotNull(message);
         }
 
@@ -149,13 +142,15 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     public async Task AndGiven_DdmMdrHackIsApplicable_When_MessageIsReceived_Then_BodyAndTransactionAndMessageIdArePresentOnTheInternalRepresentation()
     {
         // Assert
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridAccessProvider, null, ActorId));
 
         // Act
-        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        await sut.ReceiveIncomingMarketMessageAsync(
             ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsMdr.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -165,7 +160,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.LatestMessage;
+        var message = senderSpy.LatestMessage;
 
         using var assertionScope = new AssertionScope();
         message.Should().NotBeNull();
@@ -181,6 +176,8 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
         // Service bus is not used when receiving NotifyValidatedMeasureData
         if (incomingDocumentType == IncomingDocumentType.NotifyValidatedMeasureData)
         {
@@ -198,11 +195,11 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 null,
                 ActorId));
 
-        _senderSpy.ShouldFail = true;
+        senderSpy.ShouldFail = true;
 
         // Act & Assert
         await Assert.ThrowsAsync<ServiceBusException>(
-            () => _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            () => sut.ReceiveIncomingMarketMessageAsync(
                 incomingMarketMessageStream,
                 format,
                 incomingDocumentType,
@@ -211,14 +208,14 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.LatestMessage;
+        var message = senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.Null(message),
             () => Assert.Empty(transactionIds),
             () => Assert.Empty(messageIds));
 
-        _senderSpy.ShouldFail = false;
+        senderSpy.ShouldFail = false;
     }
 
     [Theory]
@@ -230,6 +227,8 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         authenticatedActor.SetAuthenticatedActor(
@@ -249,7 +248,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         authenticatedActorInSecondScope!.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.None, ActorRole.BalanceResponsibleParty, null, Guid.Parse("00000000-0000-0000-0000-000000000002")));
 
-        var task01 = _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var task01 = sut.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
             format,
             incomingDocumentType,
@@ -273,7 +272,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Service bus is not used when receiving NotifyValidatedMeasureData
         if (incomingDocumentType != IncomingDocumentType.NotifyValidatedMeasureData)
         {
-            var message = _senderSpy.LatestMessage;
+            var message = senderSpy.LatestMessage;
             Assert.NotNull(message);
         }
 
@@ -292,6 +291,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
+        var sut = GetService<IIncomingMessageClient>();
         var exceptedDuplicateTransactionIdDetectedErrorCode = format == DocumentFormat.Ebix ? "B2B-009" : "00102";
         var exceptedDuplicateMessageIdDetectedErrorCode = format == DocumentFormat.Ebix ? "B2B-003" : "00101";
 
@@ -321,7 +321,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
                 null,
                 ActorId));
 
-        var task01 = _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        var task01 = sut.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
             format,
             incomingDocumentType,
@@ -359,13 +359,15 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var sut = GetService<IIncomingMessageClient>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, null, ActorId));
 
         // Act
-        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        await sut.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
             format,
             incomingDocumentType,
@@ -375,7 +377,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.LatestMessage;
+        var message = senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.Null(message),
@@ -395,9 +397,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, null, ActorId));
 
         var messageStream = ReadFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json");
-
+        var sut = GetService<IIncomingMessageClient>();
         // Act
-        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -433,9 +435,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible, null, ActorId));
 
         var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml");
-
+        var sut = GetService<IIncomingMessageClient>();
         // Act
-        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             DocumentFormat.Ebix,
             IncomingDocumentType.NotifyValidatedMeasureData,
@@ -463,8 +465,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml");
 
+        var sut = GetService<IIncomingMessageClient>();
         // Act
-        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             DocumentFormat.Ebix,
             IncomingDocumentType.NotifyValidatedMeasureData,
@@ -506,9 +509,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty, null, ActorId));
 
         var messageStream = ReadFile(path);
-
+        var sut = GetService<IIncomingMessageClient>();
         // Act
-        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             DocumentFormat.Json,
             incomingDocumentType,
