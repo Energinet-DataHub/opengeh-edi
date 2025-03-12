@@ -43,17 +43,21 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
         var receiver1 = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
         var receiver2 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
 
+        var relatedToMessageId1 = MessageId.New();
         var message1 = CreateAcceptedForwardMeteredDataMessage(
-            externalId,
-            receiver1,
-            start,
-            end);
+            externalId: externalId,
+            receiver: receiver1,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId1);
 
+        var relatedToMessageId2 = MessageId.New();
         var message2 = CreateAcceptedForwardMeteredDataMessage(
-            externalId,
-            receiver2,
-            start,
-            end);
+            externalId: externalId,
+            receiver: receiver2,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId2);
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
@@ -66,11 +70,12 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
 
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
 
+        // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
         Assert.Collection(
             outgoingMessages,
             [
-                om => Assert.Equal(message1.RelatedToMessageId, om.RelatedToMessageId),
-                om => Assert.Equal(message2.RelatedToMessageId, om.RelatedToMessageId),
+                om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
+                om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
             ]);
     }
 
@@ -83,17 +88,21 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
         var start = Instant.FromUtc(2024, 12, 31, 23, 00);
         var end = Instant.FromUtc(2025, 01, 31, 23, 00);
 
+        var relatedToMessageId1 = MessageId.New();
         var message1 = CreateAcceptedForwardMeteredDataMessage(
-            externalId,
-            receiver,
-            start,
-            end);
+            externalId: externalId,
+            receiver: receiver,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId1);
 
+        var relatedToMessageId2 = MessageId.New();
         var message2 = CreateAcceptedForwardMeteredDataMessage(
-            externalId,
-            receiver,
-            start,
-            end);
+            externalId: externalId,
+            receiver: receiver,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId2);
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
@@ -106,17 +115,19 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
 
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
 
+        // Assert that the collection contains exactly one element, with the expected RelatedToMessageId
         Assert.Multiple(
             () => Assert.Single(outgoingMessages),
-            () => Assert.Equal(message1.RelatedToMessageId, outgoingMessages.First().RelatedToMessageId),
-            () => Assert.NotEqual(message2.RelatedToMessageId, outgoingMessages.First().RelatedToMessageId));
+            () => Assert.Equal(relatedToMessageId1, outgoingMessages.First().RelatedToMessageId),
+            () => Assert.NotEqual(relatedToMessageId2, outgoingMessages.First().RelatedToMessageId));
     }
 
     private AcceptedForwardMeteredDataMessageDto CreateAcceptedForwardMeteredDataMessage(
         ExternalId externalId,
         Actor receiver,
         Instant start,
-        Instant end)
+        Instant end,
+        MessageId relatedToMessageId)
     {
         var resolution = Resolution.QuarterHourly;
 
@@ -125,7 +136,7 @@ public class WhenEnqueueingForwardMeteredDataTests : OutgoingMessagesTestBase
             externalId: externalId,
             receiver: receiver,
             businessReason: BusinessReason.PeriodicMetering,
-            relatedToMessageId: MessageId.New(),
+            relatedToMessageId: relatedToMessageId,
             series: new ForwardMeteredDataMessageSeriesDto(
                 TransactionId.New(),
                 "1234567890123",
