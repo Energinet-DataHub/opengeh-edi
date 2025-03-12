@@ -90,25 +90,6 @@ public class RegistrationTests
             .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
     }
 
-    // public static IEnumerable<object[]> GetRequestHandlerRequirements()
-    // {
-    //     return ResolveTypes(
-    //             typeof(IRequestHandler<,>),
-    //             new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(PeekMessage).Assembly });
-    // }
-    //
-    // public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
-    // {
-    //     return ResolveTypes(
-    //             typeof(INotificationHandler<>),
-    //             new[]
-    //             {
-    //             typeof(ExecuteDataRetentionJobs).Assembly,
-    //             typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
-    //             typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
-    //             });
-    // }
-
     public static IEnumerable<object[]> GetDocumentWritersRequirements()
     {
         return ResolveTypesThatImplementType(

@@ -45,6 +45,9 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_02
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 {
+    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
+    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
+
     public EnqueueMessagesOrchestrationTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
@@ -151,7 +154,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                if (msg.Subject != "NotifyOrchestration")
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
                 {
                     return false;
                 }
@@ -251,7 +254,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                if (msg.Subject != "NotifyOrchestration")
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
                 {
                     return false;
                 }
