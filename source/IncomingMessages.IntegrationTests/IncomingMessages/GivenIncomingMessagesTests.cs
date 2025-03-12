@@ -465,8 +465,9 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var messageStream = ReadFile(@"IncomingMessages\EbixMeteredDataForMeteringPoint.xml");
 
+        var sut = GetService<IIncomingMessageClient>();
         // Act
-        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+        await sut.ReceiveIncomingMarketMessageAsync(
             messageStream,
             DocumentFormat.Ebix,
             IncomingDocumentType.NotifyValidatedMeasureData,
