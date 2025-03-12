@@ -24,9 +24,9 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
-public class WhenEnqueueingOutgoingMessageIdempotencyTests : OutgoingMessagesTestBase
+public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMessagesTestBase
 {
-    public WhenEnqueueingOutgoingMessageIdempotencyTests(
+    public WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests(
         OutgoingMessagesTestFixture outgoingMessagesTestFixture,
         ITestOutputHelper testOutputHelper)
         : base(outgoingMessagesTestFixture, testOutputHelper)
