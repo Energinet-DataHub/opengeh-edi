@@ -65,13 +65,14 @@ public static class HttpRequestExtensions
 
     public static Task<HttpRequestMessage> CreatePeekHttpRequestAsync(
         this B2BApiAppFixture fixture,
-        Actor actor)
+        Actor actor,
+        string category = "Aggregations")
     {
         return CreateHttpRequestAsync(
             fixture,
             actor,
             HttpMethod.Get,
-            $"api/peek/Aggregations",
+            $"api/peek/{category}",
             new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
     }
 

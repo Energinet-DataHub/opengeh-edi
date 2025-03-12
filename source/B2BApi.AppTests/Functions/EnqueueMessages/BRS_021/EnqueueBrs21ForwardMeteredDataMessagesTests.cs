@@ -17,8 +17,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -45,6 +47,9 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_02
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 {
+    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
+    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
+
     private readonly B2BApiAppFixture _fixture;
 
     public EnqueueBrs21ForwardMeteredDataMessagesTests(
@@ -68,7 +73,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_Then_RejectedMessagesIsEnqueued()
+    public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued_AndThen_RejectedMessageCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(usePeekTimeSeriesMessages: true);
 
@@ -87,6 +92,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
                     ErrorCode: "X01"),
             ]);
 
+        var orchestrationInstanceId = Guid.NewGuid().ToString();
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_021_ForwardedMeteredData.Name,
@@ -99,7 +105,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             Data = JsonSerializer.Serialize(enqueueMessagesData),
             DataType = nameof(ForwardMeteredDataRejectedV1),
             DataFormat = EnqueueActorMessagesDataFormatV1.Json,
-            OrchestrationInstanceId = Guid.NewGuid().ToString(),
+            OrchestrationInstanceId = orchestrationInstanceId,
         };
 
         // Act
@@ -135,26 +141,50 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             .ToListAsync();
         enqueuedOutgoingMessages.Should().HaveCount(1);
 
-        var actorClientId = Guid.NewGuid().ToString();
-        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create(actorNumber), actorClientId);
+        // Verify that the enqueued message can be peeked
+        var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
+            actor: new Actor(ActorNumber.Create(actorNumber), actorRole),
+            category: "TimeSeries");
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/TimeSeries");
-
-        var b2bToken = new JwtBuilder()
-            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
-            .CreateToken();
-
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
-
-        request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(request);
+        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
         await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
-        peekResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        (await peekResponse.Content.ReadAsStringAsync()).Should().NotBeNullOrEmpty().And.Contain("Acknowledgement");
+
+        var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
+        peekResponseContent.Should().NotBeNullOrEmpty()
+            .And.Contain("Acknowledgement");
 
         hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
         hostLog.Should().ContainMatch("*Executing 'Functions.PeekRequestListener'*");
         hostLog.Should().ContainMatch("*Executed 'Functions.PeekRequestListener' (Succeeded,*");
+
+        // Verify that the expected notify message was sent on the ServiceBus
+        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
+            orchestrationInstanceId,
+            ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName);
+        notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
+    }
+
+    private async Task<bool> ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
+        string orchestrationInstanceId,
+        string eventName)
+    {
+        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != NotifyOrchestrationInstanceSubject)
+                    return false;
+
+                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
+                    msg.Body.ToString());
+
+                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
+                var matchingEvent = parsedNotification.EventName == eventName;
+
+                return matchingOrchestrationId && matchingEvent;
+            })
+            .VerifyCountAsync(1);
+
+        var wasSent = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        return wasSent;
     }
 }
