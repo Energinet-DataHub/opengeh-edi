@@ -62,11 +62,10 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
                 new ForwardMeteredDataCommandV1(
                     operatingIdentity: actorIdentityDto,
                     new ForwardMeteredDataInputV1(
-                        MessageId: initializeProcessDto.MessageId,
-                        AuthenticatedActorId: Guid.Empty, // TODO: This is not used and should be removed from the contract
+                        ActorMessageId: initializeProcessDto.MessageId,
+                        TransactionId: transaction.TransactionId,
                         ActorNumber: actorIdentityDto.ActorNumber.Value,
                         ActorRole: actorIdentityDto.ActorRole.Name,
-                        TransactionId: transaction.TransactionId,
                         MeteringPointId: transaction.MeteringPointLocationId,
                         MeteringPointType: meteringPointType,
                         ProductNumber: transaction.ProductNumber,

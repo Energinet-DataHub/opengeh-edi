@@ -76,7 +76,7 @@ public static class MeteredDataForMeteringPointEventBuilder
         };
 
         var acceptRequest = new ForwardMeteredDataAcceptedV1(
-            OriginalActorMessageId: requestMeteredDataForMeteringPointMessageInputV1.MessageId,
+            OriginalActorMessageId: requestMeteredDataForMeteringPointMessageInputV1.ActorMessageId,
             MeteringPointId: requestMeteredDataForMeteringPointMessageInputV1.MeteringPointId,
             MeteringPointType: meteringPointType,
             OriginalTransactionId: requestMeteredDataForMeteringPointMessageInputV1.TransactionId,
