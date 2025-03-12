@@ -82,7 +82,6 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         // Verify the function was executed
         var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
             functionName: nameof(EnqueueTrigger_Brs_028));
-
         functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
 
         // Verify that outgoing messages were enqueued

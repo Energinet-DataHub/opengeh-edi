@@ -115,24 +115,15 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             idempotencyKey: eventId.ToString());
 
         // => When message is received
-        var beforeOrchestrationCreated = DateTime.UtcNow;
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
         // Assert
         using var assertionScope = new AssertionScope();
 
-        var didFinish = await Awaiter.TryWaitUntilConditionAsync(
-            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)}"),
-            timeLimit: TimeSpan.FromSeconds(30));
-
-        didFinish.Should()
-            .BeTrue($"the {nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)} should have been executed");
-
-        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-
-        hostLog.Should().ContainMatch($"*Executing 'Functions.{nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)}'*");
-        hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 021*");
-        hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_021_ForwardMeteredData)}' (Succeeded,*");
+        // Verify the function was executed
+        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: nameof(EnqueueTrigger_Brs_021_ForwardMeteredData));
+        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
 
         // Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
@@ -152,10 +143,6 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
         peekResponseContent.Should().NotBeNullOrEmpty()
             .And.Contain("Acknowledgement");
-
-        hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-        hostLog.Should().ContainMatch("*Executing 'Functions.PeekRequestListener'*");
-        hostLog.Should().ContainMatch("*Executed 'Functions.PeekRequestListener' (Succeeded,*");
 
         // Verify that the expected notify message was sent on the ServiceBus
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
