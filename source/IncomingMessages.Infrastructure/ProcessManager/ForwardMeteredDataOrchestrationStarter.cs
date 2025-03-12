@@ -28,12 +28,12 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
     "StyleCop.CSharp.ReadabilityRules",
     "SA1118:Parameter should not span multiple lines",
     Justification = "Needed for inline ebix exception")]
-public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient processManagerMessageClient, AuthenticatedActor authenticatedActor)
+public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient processManagerMessageClient, AuthenticatedActor authenticatedActor)
 {
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
-    public async Task StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+    public async Task StartForwardMeteredDataOrchestrationAsync(
         InitializeMeteredDataForMeteringPointMessageProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {

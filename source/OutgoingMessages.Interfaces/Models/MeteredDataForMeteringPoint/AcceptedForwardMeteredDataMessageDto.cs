@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed class ForwardMeteredDataMessageDto(
+public sealed class AcceptedForwardMeteredDataMessageDto(
     EventId eventId,
     ExternalId externalId,
     Actor receiver,

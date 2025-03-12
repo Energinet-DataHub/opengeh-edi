@@ -380,7 +380,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        ForwardMeteredDataMessageDto message,
+        AcceptedForwardMeteredDataMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {
@@ -405,7 +405,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        MeteredDataForMeteringPointRejectedDto message,
+        RejectedForwardMeteredDataMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {

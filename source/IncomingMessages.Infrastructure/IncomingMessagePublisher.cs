@@ -32,7 +32,7 @@ public class IncomingMessagePublisher
     private readonly ISerializer _serializer;
     private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
-    private readonly MeteredDataOrchestrationStarter _meteredDataOrchestrationStarter;
+    private readonly ForwardMeteredDataOrchestrationStarter _forwardMeteredDataOrchestrationStarter;
     private readonly ServiceBusSender _sender;
 
     public IncomingMessagePublisher(
@@ -42,7 +42,7 @@ public class IncomingMessagePublisher
         ISerializer serializer,
         IFeatureFlagManager featureFlagManager,
         IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter,
-        MeteredDataOrchestrationStarter meteredDataOrchestrationStarter)
+        ForwardMeteredDataOrchestrationStarter forwardMeteredDataOrchestrationStarter)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
@@ -50,7 +50,7 @@ public class IncomingMessagePublisher
         _serializer = serializer;
         _featureFlagManager = featureFlagManager;
         _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
-        _meteredDataOrchestrationStarter = meteredDataOrchestrationStarter;
+        _forwardMeteredDataOrchestrationStarter = forwardMeteredDataOrchestrationStarter;
 
         _sender = senderFactory.CreateClient(options.Value.QueueName);
     }
@@ -130,7 +130,7 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+        await _forwardMeteredDataOrchestrationStarter.StartForwardMeteredDataOrchestrationAsync(
                 initializeMeteredDataForMeteringPointMessageProcessDto,
                 cancellationToken)
             .ConfigureAwait(false);

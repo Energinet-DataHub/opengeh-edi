@@ -55,8 +55,9 @@ public class InitializeMeteredDataForMeteringPointHandler(
         foreach (var series in marketMessage.Series)
         {
             await _outgoingMessagesClient.EnqueueAndCommitAsync(
-                    new ForwardMeteredDataMessageDto(
+                    new AcceptedForwardMeteredDataMessageDto(
                         EventId.From(Guid.NewGuid()),
+                        new ExternalId(Guid.NewGuid()),
                         marketMessage.MessageId.Contains("perf_test")
                             ? new Actor(ActorNumber.Create("5790000282425"), ActorRole.EnergySupplier)
                             : new Actor(ActorNumber.Create("8100000000115"), ActorRole.EnergySupplier),

@@ -48,7 +48,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
 
         foreach (var acceptedDataMarketActorRecipient in acceptedData.MarketActorRecipients)
         {
-            var forwardMeteredDataMessageDto = new ForwardMeteredDataMessageDto(
+            var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
                 eventId: EventId.From(serviceBusMessageId),
                 externalId: new ExternalId(orchestrationInstanceId),
                 receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorNumber), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
@@ -67,7 +67,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                     EndedDateTime: acceptedData.EndDateTime.ToInstant(),
                     EnergyObservations: series));
 
-            await _outgoingMessagesClient.EnqueueAndCommitAsync(forwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
         }
 
         var executionPolicy = Policy
@@ -92,7 +92,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             rejectedData);
 
         // TODO: Fix when we have the correct data from ForwardMeteredDataRejectedV1
-        var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
+        var rejectedForwardMeteredDataMessageDto = new RejectedForwardMeteredDataMessageDto(
             EventId: EventId.From(serviceBusMessageId),
             BusinessReason: BusinessReason.PeriodicMetering,
             ReceiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
@@ -121,7 +121,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                 OriginalMktActivityRecord: [],
                 RejectedTimeSeries: []));
 
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointRejectedDto, CancellationToken.None).ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)
