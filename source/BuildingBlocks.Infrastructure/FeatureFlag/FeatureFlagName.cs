@@ -54,4 +54,9 @@ public static class FeatureFlagName
     /// Whether to enqueue BRS-023/027 messages via the Process Manager.
     /// </summary>
     public const string UseProcessManagerToEnqueueBrs023027Messages = "UseProcessManagerToEnqueueBrs023027Messages";
+
+    /// <summary>
+    /// Whether to archive BRS-021 messages.
+    /// </summary>
+    public const string ArchiveBrs021Messages = "ArchiveBrs021Messages";
 }

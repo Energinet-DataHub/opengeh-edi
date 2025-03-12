@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificates;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
 
 public class ActorCertificateEntityConfiguration : IEntityTypeConfiguration<Domain.ActorCertificates.ActorCertificate>
 {
