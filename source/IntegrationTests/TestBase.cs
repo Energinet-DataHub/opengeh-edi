@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text;
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Dapper;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
@@ -23,10 +24,12 @@ using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
@@ -35,7 +38,9 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationTests.AppConfiguration;
 using Energinet.DataHub.EDI.IntegrationTests.DataRetention;
+using Energinet.DataHub.EDI.IntegrationTests.FeatureFlag;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
@@ -79,6 +84,8 @@ public class TestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, null, ActorId));
+
+        AppConfigurationClient = new AppConfigurationClient(Fixture.AppConfigEndpoint, Fixture.IntegrationTestConfiguration.Credential);
     }
 
     protected Guid ActorId => Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -91,6 +98,8 @@ public class TestBase : IDisposable
 
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
 
+    protected AppConfigurationClient AppConfigurationClient { get; private set; } = null!;
+    
     public void Dispose()
     {
         Dispose(true);
@@ -222,6 +231,15 @@ public class TestBase : IDisposable
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
+                .AddAzureAppConfiguration(options =>
+                {
+                    var appConfigEndpoint = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
+                    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
+                        .UseFeatureFlags(featureFlagOptions =>
+                        {
+                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(1));
+                        });
+                })
             .AddEnvironmentVariables()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
@@ -245,6 +263,8 @@ public class TestBase : IDisposable
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
+                    // => App Configuration
+                    [$"{nameof(BuildingBlocks.Infrastructure.Configuration.AppConfiguration.AppConfigEndpoint)}"] = Fixture.AppConfigEndpoint,
                 })
             .Build();
 
@@ -269,6 +289,9 @@ public class TestBase : IDisposable
             .AddOutboxContext(config)
             .AddOutboxClient<OutboxContext>()
             .AddOutboxProcessor<OutboxContext>();
+
+        // Azure App Configuration
+        _services.AddAzureAppConfiguration();
 
         // Replace the services with stub implementations.
         // - Building blocks

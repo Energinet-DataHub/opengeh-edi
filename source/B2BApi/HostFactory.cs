@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
@@ -30,6 +31,7 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyI
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OutboxContext = Energinet.DataHub.EDI.Outbox.Infrastructure.OutboxContext;
@@ -44,6 +46,7 @@ public static class HostFactory
     {
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
+        var defaultAzureCredential = new DefaultAzureCredential();
         return new HostBuilder()
             .ConfigureFunctionsWebApplication(
                 builder =>
@@ -63,17 +66,31 @@ public static class HostFactory
                             settings.Mode = DfmMode.ReadOnly;
                         });
                 })
+            .ConfigureAppConfiguration((context, configBuilder) =>
+            {
+                var settings = configBuilder.Build();
+                var appConfigEndpoint = settings[AppConfiguration.AppConfigEndpoint]!;
+                configBuilder.AddAzureAppConfiguration(options =>
+                {
+                    options.Connect(new Uri(appConfigEndpoint), defaultAzureCredential)
+                        .UseFeatureFlags(featureFlagOptions =>
+                        {
+                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(5));
+                        });
+                });
+            })
             .ConfigureServices(
                 (context, services) =>
                 {
-                    var azureCredential = new DefaultAzureCredential();
-
                     services
                         // Logging
                         .AddApplicationInsightsForIsolatedWorker(SubsystemName)
 
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
+
+                        // Azure App Configuration
+                        .AddAzureAppConfiguration()
 
                         // Data retention
                         .AddDataRetention()
@@ -109,7 +126,7 @@ public static class HostFactory
                         .AddOutboxRetention()
 
                         // Enqueue messages from PM (using Edi Topic)
-                        .AddEnqueueActorMessagesFromProcessManager(azureCredential);
+                        .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential);
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>

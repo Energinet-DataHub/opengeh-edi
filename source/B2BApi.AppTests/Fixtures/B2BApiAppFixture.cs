@@ -28,6 +28,7 @@ using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
@@ -125,6 +126,8 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(AuditLogMockServer));
 
         LogStopwatch(constructorStopwatch, "B2BApiAppFixture constructor");
+
+        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public AuditLogMockServer AuditLogMockServer { get; }
@@ -169,6 +172,8 @@ public class B2BApiAppFixture : IAsyncLifetime
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
+
+    private string AppConfigEndpoint { get; }
 
     public async Task InitializeAsync()
     {
@@ -313,15 +318,15 @@ public class B2BApiAppFixture : IAsyncLifetime
     public void EnsureAppHostUsesFeatureFlagValue(
         bool useRequestWholesaleServicesOrchestration = false,
         bool useRequestAggregatedMeasureDataOrchestration = false,
-        bool usePeekTimeSeriesMessages = false,
+        bool usePeekMeasureDataMessages = false,
         bool useProcessManagerToEnqueueBrs023027Messages = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
-            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UsePeekTimeSeriesMessages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.PM25Messages}", usePeekMeasureDataMessages.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }
 
@@ -479,19 +484,23 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UsePeekMessages.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.UsePeekMessages}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}",
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.ReceiveMeteredDataForMeasurementPoints.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25Ebix}",
+            true.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}",
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -507,6 +516,11 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.{nameof(OutboxPublisher)}.Disabled",
             "true");
+
+        // App Configuration settings
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(AppConfiguration.AppConfigEndpoint),
+            AppConfigEndpoint);
 
         return appHostSettings;
     }
