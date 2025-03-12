@@ -240,6 +240,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
     <None Remove="Scripts\Model\202409121115 Change Id length for ChargeType.sql" />
     <EmbeddedResource Include="Scripts\Model\202409121115 Change Id length for ChargeType.sql" />
+    <None Remove="Scripts\Model\202503111600 Delete Process tables.sql" />
+    <EmbeddedResource Include="Scripts\Model\202503111600 Delete Process tables.sql" />
   </ItemGroup>
 
   <ItemGroup>

@@ -46,7 +46,6 @@ public class GivenWholesaleServicesRequestV2WithDelegationTests : WholesaleServi
         : base(fixture, testOutputHelper)
     {
         _fixture = fixture;
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, true);
         _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 

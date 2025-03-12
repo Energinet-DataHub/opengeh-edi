@@ -19,15 +19,13 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
 internal sealed class NotifyWholesaleServicesDsl
 {
-    private readonly WholesaleDriver _wholesaleDriver;
     private readonly EdiDriver _ediDriver;
 
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal NotifyWholesaleServicesDsl(EdiDriver ediDriverDriver, WholesaleDriver wholesaleDriverDriver)
+    internal NotifyWholesaleServicesDsl(EdiDriver ediDriverDriver)
     {
         _ediDriver = ediDriverDriver;
-        _wholesaleDriver = wholesaleDriverDriver;
     }
 
     internal async Task<string> ConfirmResultIsAvailable()

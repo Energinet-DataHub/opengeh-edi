@@ -24,6 +24,7 @@ limitations under the License.
     <ItemGroup>
         <PackageReference Include="CsvHelper" Version="33.0.1" />
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.2.1"/>
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Abstractions" Version="2.1.0" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
             <PrivateAssets>all</PrivateAssets>
@@ -75,9 +76,6 @@ limitations under the License.
         <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
         <ProjectReference Include="..\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj" />
         <ProjectReference Include="..\OutgoingMessages.UnitTests\OutgoingMessages.UnitTests.csproj" />
-        <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
-        <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
-        <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
         <ProjectReference Include="..\Tests\Tests.csproj" />
     </ItemGroup>
 
@@ -179,10 +177,6 @@ limitations under the License.
         <None Update="Behaviours\TestData\balance_fixing_01-11-2022_01-12-2022_ga_542_and_543_per_brp_ga_v1.csv">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Application\Process\" />
     </ItemGroup>
 
     <ItemDefinitionGroup>

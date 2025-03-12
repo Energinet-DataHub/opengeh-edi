@@ -41,21 +41,6 @@ public static class FeatureFlagName
     public const string PM25Messages = "PM25-MESSAGES";
 
     /// <summary>
-    /// Whether to use orchestration for handling RequestWholesaleServices processes.
-    /// </summary>
-    public const string UseRequestWholesaleServicesProcessOrchestration = "UseRequestWholesaleServicesProcessOrchestration";
-
-    /// <summary>
-    /// Whether to use orchestration for handling RequestAggregatedMeasureData processes.
-    /// </summary>
-    public const string UseRequestAggregatedMeasureDataProcessOrchestration = "UseRequestAggregatedMeasureDataProcessOrchestration";
-
-    /// <summary>
-    /// Whether to enqueue BRS-023/027 messages via the Process Manager.
-    /// </summary>
-    public const string UseProcessManagerToEnqueueBrs023027Messages = "UseProcessManagerToEnqueueBrs023027Messages";
-
-    /// <summary>
     /// Whether to archive BRS-021 messages.
     /// </summary>
     public const string ArchiveBrs021Messages = "ArchiveBrs021Messages";

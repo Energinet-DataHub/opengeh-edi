@@ -44,7 +44,6 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
         : base(integrationTestFixture, testOutputHelper)
     {
         _fixture = integrationTestFixture;
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, true);
         _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 

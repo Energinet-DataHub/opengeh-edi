@@ -21,8 +21,8 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.ProcessManager.Abstractions.Client;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -57,9 +57,6 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
         : base(integrationTestFixture, testOutputHelper)
     {
         _fixture = integrationTestFixture;
-        FeatureFlagManagerStub.SetFeatureFlag(
-            FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration,
-            true);
         _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 
@@ -956,16 +953,6 @@ public class GivenAggregatedMeasureDataV2RequestWithDelegationTests
     public Task DisposeAsync()
     {
         return Task.CompletedTask;
-    }
-
-    private Task GivenAggregatedMeasureDataRequestRejectedIsReceived(
-        Guid processId,
-        AggregatedTimeSeriesRequestRejected rejectedMessage)
-    {
-        return HavingReceivedInboxEventAsync(
-            eventType: nameof(AggregatedTimeSeriesRequestRejected),
-            eventPayload: rejectedMessage,
-            processId: processId);
     }
 }
 

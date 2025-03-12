@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
@@ -84,11 +83,6 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
         response.MessageBody.Should().BeEmpty();
 
         return response;
-    }
-
-    protected async Task WhenMeteredDataForMeteringPointProcessIsInitialized(ServiceBusMessage serviceBusMessage)
-    {
-        await InitializeProcess(serviceBusMessage, nameof(InitializeMeteredDataForMeteringPointMessageProcessDto));
     }
 
     protected async Task ThenNotifyValidatedMeasureDataDocumentIsCorrect(

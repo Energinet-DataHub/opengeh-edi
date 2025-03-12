@@ -17,16 +17,12 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
-using FluentAssertions;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
 public sealed class AggregatedMeasureDataRequestDsl
 {
     private readonly EdiDriver _ediDriver;
-    private readonly EdiDatabaseDriver _ediDatabaseDriver;
-    private readonly WholesaleDriver _wholesaleDriver;
     private readonly ProcessManagerDriver _processManagerDriver;
     private readonly B2CEdiDriver _b2cEdiDriver;
 
@@ -35,14 +31,10 @@ public sealed class AggregatedMeasureDataRequestDsl
     internal AggregatedMeasureDataRequestDsl(
         EdiDriver ediDriver,
         B2CEdiDriver b2cEdiDriver,
-        EdiDatabaseDriver ediDatabaseDriver,
-        WholesaleDriver wholesaleDriver,
         ProcessManagerDriver processManagerDriver)
     {
         _ediDriver = ediDriver;
         _b2cEdiDriver = b2cEdiDriver;
-        _ediDatabaseDriver = ediDatabaseDriver;
-        _wholesaleDriver = wholesaleDriver;
         _processManagerDriver = processManagerDriver;
     }
 
@@ -76,60 +68,6 @@ public sealed class AggregatedMeasureDataRequestDsl
         };
 
         await Assert.ThrowsAsync<BadAggregatedMeasureDataRequestException>(act).ConfigureAwait(false);
-    }
-
-    internal async Task ConfirmRequestIsInitialized(
-        Guid requestMessageId,
-        CancellationToken cancellationToken)
-    {
-        var processId = await _ediDatabaseDriver
-            .GetAggregatedMeasureDataProcessIdAsync(requestMessageId, cancellationToken)
-            .ConfigureAwait(false);
-
-        processId.Should().NotBeNull("because the aggregated measure data process should be initialized");
-    }
-
-    internal async Task ConfirmRequestIsInitialized(
-        Instant createdAfter,
-        string requestedByActorNumber)
-    {
-        var processId = await _ediDatabaseDriver
-            .GetAggregatedMeasureDataProcessIdAsync(createdAfter, requestedByActorNumber, CancellationToken.None)
-            .ConfigureAwait(false);
-
-        processId.Should().NotBeNull("because the aggregated measure data process should be initialized");
-    }
-
-    internal async Task PublishAggregatedMeasureDataRequestAcceptedResponse(
-        string gridAreaCode,
-        string actorNumber,
-        CancellationToken cancellationToken)
-    {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-
-        var processId = await _ediDatabaseDriver
-            .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
-            .ConfigureAwait(false);
-
-        await _wholesaleDriver.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
-            processId,
-            gridAreaCode,
-            cancellationToken).ConfigureAwait(false);
-    }
-
-    internal async Task PublishAggregatedMeasureDataRequestRejectedResponse(
-        string gridAreaCode,
-        string actorNumber,
-        CancellationToken cancellationToken)
-    {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-
-        var processId = await _ediDatabaseDriver
-            .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
-            .ConfigureAwait(false);
-
-        await _wholesaleDriver.PublishAggregatedMeasureDataRequestRejectedResponseAsync(processId, cancellationToken)
-            .ConfigureAwait(false);
     }
 
     internal async Task PublishAcceptedBrs026RequestAsync(

@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -44,7 +43,6 @@ public static class IntegrationEventExtensions
             .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsRemovedEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
-            .AddTransient<IIntegrationEventProcessor, CalculationCompletedV1Processor>()
             .AddTransient<IReadOnlyDictionary<string, IIntegrationEventProcessor>>(
                 sp => sp.GetServices<IIntegrationEventProcessor>()
                     .ToDictionary(m => m.EventTypeToHandle, m => m));
@@ -56,7 +54,6 @@ public static class IntegrationEventExtensions
             ActorCertificateCredentialsRemoved.Descriptor,
             ActorCertificateCredentialsAssigned.Descriptor,
             ProcessDelegationConfigured.Descriptor,
-            CalculationCompletedV1.Descriptor,
         ]);
         // Dead-letter logging
         services.AddDeadLetterHandlerForIsolatedWorker(configuration);

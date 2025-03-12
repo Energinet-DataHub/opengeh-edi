@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Google.Protobuf.Collections;
 using NodaTime;
-using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
@@ -25,17 +24,6 @@ public record TimeSeriesPointAssertionInput(
     decimal Quantity,
     CalculatedQuantityQuality Quality)
 {
-    public static implicit operator TimeSeriesPointAssertionInput(TimeSeriesPoint tsp) => From(tsp);
-
-    public static List<TimeSeriesPointAssertionInput> From(RepeatedField<TimeSeriesPoint> timeSeriesPoints) => timeSeriesPoints
-        .Select(From)
-        .ToList();
-
-    public static TimeSeriesPointAssertionInput From(TimeSeriesPoint timeSeriesPoint) => new(
-        timeSeriesPoint.Time.ToDateTimeOffset().ToInstant(),
-        timeSeriesPoint.Quantity.ToDecimal(),
-        ConvertQuality(timeSeriesPoint.QuantityQualities));
-
     private static CalculatedQuantityQuality ConvertQuality(RepeatedField<QuantityQuality> qualities)
     {
         var expectedQuantityQuality = qualities.Single() switch
