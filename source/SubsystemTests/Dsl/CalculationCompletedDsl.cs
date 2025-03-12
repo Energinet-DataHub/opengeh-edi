@@ -22,8 +22,6 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using NodaTime;
 using Xunit.Abstractions;
 
-using CalculationType = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.CalculationCompletedV1.Types.CalculationType;
-
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
 [SuppressMessage(
