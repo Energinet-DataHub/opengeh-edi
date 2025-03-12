@@ -53,7 +53,6 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
             new AggregatedMeasureDataRequestDsl(
                 ediDriver,
                 new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
-                new EdiDatabaseDriver(fixture.ConnectionString),
                 new ProcessManagerDriver(fixture.EdiTopicClient));
     }
 

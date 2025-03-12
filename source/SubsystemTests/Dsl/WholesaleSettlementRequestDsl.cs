@@ -70,24 +70,6 @@ public sealed class WholesaleSettlementRequestDsl
         await Assert.ThrowsAsync<BadWholesaleSettlementRequestException>(act).ConfigureAwait(false);
     }
 
-    internal async Task ConfirmRequestIsInitialized(Guid requestMessageId)
-    {
-        var processId = await _ediDatabaseDriver
-            .GetWholesaleServiceProcessIdAsync(requestMessageId, CancellationToken.None)
-            .ConfigureAwait(false);
-
-        processId.Should().NotBeNull("because the wholesale settlement process should be initialized");
-    }
-
-    internal async Task ConfirmRequestIsInitialized(Instant createdAfter, string requestedByActorNumber)
-    {
-        var processId = await _ediDatabaseDriver
-            .GetWholesaleServiceProcessIdAsync(createdAfter, requestedByActorNumber, CancellationToken.None)
-            .ConfigureAwait(false);
-
-        processId.Should().NotBeNull("because the wholesale settlement process should be initialized");
-    }
-
     internal async Task PublishAcceptedBrs028RequestAsync(
         string gridArea,
         Actor actor)

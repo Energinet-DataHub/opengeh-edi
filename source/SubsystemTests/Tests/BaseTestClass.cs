@@ -50,7 +50,6 @@ public class BaseTestClass
                 _fixture.ApiManagementUri,
                 _fixture.EdiB2CWebApiUri,
                 Output),
-            new EdiDatabaseDriver(_fixture.ConnectionString),
             new ProcessManagerDriver(_fixture.EdiTopicClient));
     }
 }
