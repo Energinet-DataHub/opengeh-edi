@@ -140,6 +140,9 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
         await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
 
+        // Ensure status code is 200 OK, since EnsureSuccessStatusCode() also allows 204 No Content
+        peekResponse.StatusCode.Should().Be(HttpStatusCode.OK, "because the peek request should return OK status code (with content)");
+
         var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
         peekResponseContent.Should().NotBeNullOrEmpty()
             .And.Contain("Acknowledgement");
