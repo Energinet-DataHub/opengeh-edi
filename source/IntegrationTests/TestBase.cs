@@ -99,7 +99,7 @@ public class TestBase : IDisposable
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
 
     protected AppConfigurationClient AppConfigurationClient { get; private set; } = null!;
-    
+
     public void Dispose()
     {
         Dispose(true);
