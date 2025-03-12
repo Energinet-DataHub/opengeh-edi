@@ -45,7 +45,7 @@ public class MicrosoftFeatureFlagManager(
 
     public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => IsEnabledAsync(FeatureFlagName.PM25Ebix);
 
-    public Task<bool> UsePeekMeasureDataMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25Messages);
+    public Task<bool> UsePeekMeteredDataMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25Messages);
 
     protected async Task<bool> IsEnabledAsync(string featureFlagName)
     {

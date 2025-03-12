@@ -32,7 +32,7 @@ public interface IFeatureFlagManager
     /// <summary>
     /// Whether to disallow actors to peek time series messages.
     /// </summary>
-    Task<bool> UsePeekMeasureDataMessagesAsync();
+    Task<bool> UsePeekMeteredDataMessagesAsync();
 
     /// <summary>
     /// Whether to allow receiving metered data for metering points in CIM.

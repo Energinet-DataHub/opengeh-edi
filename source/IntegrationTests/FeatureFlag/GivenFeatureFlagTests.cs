@@ -51,7 +51,8 @@ public class GivenFeatureFlagTests : TestBase, IAsyncDisposable
     {
         // Arrange
         await AppConfigurationClient.SetFeatureFlagAsync(_disabledFeatureFlag, false);
-        await _refresherProvider.Refreshers.First().TryRefreshAsync();
+        // The feature flag is updated every second.
+        await Task.Delay(1020);
 
         // Act
         var resultBefore = await _sut.IsEnabledSpyAsync(_disabledFeatureFlag);
