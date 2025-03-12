@@ -64,6 +64,18 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         _fixture.AppHostManager.ClearHostLog();
+
+        // Dequeue existing messages
+        await using var context = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+
+        var bundles = await context.Bundles.ToListAsync();
+        foreach (var bundle in bundles)
+        {
+            bundle.TryDequeue();
+        }
+
+        await context.SaveChangesAsync();
+
         await Task.CompletedTask;
     }
 
