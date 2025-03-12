@@ -30,9 +30,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.PM25CIM, true },
         { FeatureFlagName.PM25Ebix, true },
         { FeatureFlagName.PM25Messages, true },
-        { FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, false },
-        { FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, false },
-        { FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages, false },
         { FeatureFlagName.ArchiveBrs021Messages, false },
     };
 
@@ -48,12 +45,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25CIM]);
 
     public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Ebix]);
-
-    public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration]);
-
-    public Task<bool> UseRequestAggregatedMeasureDataProcessOrchestrationAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration]);
-
-    public Task<bool> UseProcessManagerToEnqueueBrs023027MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages]);
 
     public Task<bool> ArchiveBrs021MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ArchiveBrs021Messages]);
 }

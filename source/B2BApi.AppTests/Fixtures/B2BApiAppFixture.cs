@@ -323,10 +323,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
-            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
             { $"FeatureManagement__{FeatureFlagName.PM25Messages}", usePeekMeasureDataMessages.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
         });
     }
 
@@ -488,20 +485,12 @@ public class B2BApiAppFixture : IAsyncLifetime
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration}",
-            false.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"FeatureManagement__{FeatureFlagName.PM25Ebix}",
             true.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages}",
-            false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",

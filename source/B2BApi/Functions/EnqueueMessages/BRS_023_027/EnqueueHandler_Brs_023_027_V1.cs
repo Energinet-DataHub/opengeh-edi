@@ -44,19 +44,6 @@ public class EnqueueHandler_Brs_023_027_V1(
         EnqueueActorMessagesV1 enqueueActorMessages,
         CancellationToken cancellationToken)
     {
-        var featureIsDisabled =
-            !await _featureFlagManager.UseProcessManagerToEnqueueBrs023027MessagesAsync().ConfigureAwait(false);
-
-        _logger.LogInformation(
-            "Received enqueue actor messages for BRS 023/027. Feature is {Status}. Data: {Data}",
-            featureIsDisabled ? "disabled" : "enabled",
-            enqueueActorMessages.Data);
-
-        if (featureIsDisabled)
-        {
-            return;
-        }
-
         switch (enqueueActorMessages.DataType)
         {
             case nameof(CalculationEnqueueActorMessagesV1):
