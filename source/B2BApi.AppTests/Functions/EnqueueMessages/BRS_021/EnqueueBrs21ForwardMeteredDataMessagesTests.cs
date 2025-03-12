@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
@@ -31,6 +32,8 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 using PMCoreValueTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
@@ -121,8 +124,14 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         hostLog.Should().ContainMatch("*Executing 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1'*");
         hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 021*");
-        hostLog.Should().ContainMatch("*INSERT INTO [dbo].[OutgoingMessages]*");
         hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
+
+        // Verify that outgoing messages were enqueued
+        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+            .Where(om => om.EventId == eventId)
+            .ToListAsync();
+        enqueuedOutgoingMessages.Should().HaveCount(1);
 
         var actorClientId = Guid.NewGuid().ToString();
         await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create(actorNumber), actorClientId);
