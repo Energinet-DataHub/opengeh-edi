@@ -24,14 +24,19 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using PMCoreValueTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
@@ -69,24 +74,18 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
+        const string actorNumber = "1234567890123";
+        var actorRole = ActorRole.GridAccessProvider;
         var enqueueMessagesData = new ForwardMeteredDataRejectedV1(
-            "EventId",
-            PMValueTypes.BusinessReason.PeriodicMetering,
-            new MarketActorRecipientV1(PMCoreValueTypes.ActorNumber.Create("1111111111111"), PMCoreValueTypes.ActorRole.GridAccessProvider),
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            new AcknowledgementV1(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                [],
-                [],
-                [],
-                [],
-                []));
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
+            actorRole.ToProcessManagerActorRole(),
+            [
+                new ValidationErrorDto(
+                    Message: "Invalid end date",
+                    ErrorCode: "X01"),
+            ]);
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
@@ -94,8 +93,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OrchestrationVersion = 1,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
-                ActorNumber = "1111111111111",
-                ActorRole = ActorRole.GridAccessProvider.ToProcessManagerActorRole().ToActorRoleV1(),
+                ActorNumber = actorNumber,
+                ActorRole = actorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
             Data = JsonSerializer.Serialize(enqueueMessagesData),
             DataType = nameof(ForwardMeteredDataRejectedV1),
@@ -104,9 +103,10 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         };
 
         // Act
+        var eventId = Guid.NewGuid();
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
-            idempotencyKey: Guid.NewGuid().ToString());
+            idempotencyKey: eventId.ToString());
 
         // => When message is received
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -126,16 +126,22 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         hostLog.Should().ContainMatch("*Executing 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1'*");
         hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 021*");
-        hostLog.Should().ContainMatch("*INSERT INTO [dbo].[OutgoingMessages]*");
         hostLog.Should().ContainMatch("*Executed 'Functions.EnqueueTrigger_Brs_021_Forward_Metered_Data_V1' (Succeeded,*");
 
+        // Verify that outgoing messages were enqueued
+        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+            .Where(om => om.EventId == EventId.From(eventId))
+            .ToListAsync();
+        enqueuedOutgoingMessages.Should().HaveCount(1);
+
         var actorClientId = Guid.NewGuid().ToString();
-        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create("1111111111111"), actorClientId);
+        await _fixture.DatabaseManager.AddActorAsync(ActorNumber.Create(actorNumber), actorClientId);
 
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/peek/TimeSeries");
 
         var b2bToken = new JwtBuilder()
-            .WithRole(ClaimsMap.RoleFrom(ActorRole.GridAccessProvider).Value)
+            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
             .WithClaim(ClaimsMap.ActorClientId, actorClientId)
             .CreateToken();
 

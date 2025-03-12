@@ -374,11 +374,10 @@ public class RequestProcessOrchestrationStarterTests
                 expectedActor.ActorNumber.ToProcessManagerActorNumber(),
                 expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new ForwardMeteredDataInputV1(
-                MessageId: messageId,
-                AuthenticatedActorId: Guid.Empty, // This is not used and should be removed from the contract
+                ActorMessageId: messageId,
+                TransactionId: transactionId,
                 ActorNumber: requestedByActor.ActorNumber.Value,
                 ActorRole: requestedByActor.ActorRole.Name,
-                TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,
                 ProductNumber: expectedProductNumber,

@@ -72,32 +72,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         if (disposing)
         {
             // Cleanup actual Azurite "database" files
-            if (Directory.Exists("__blobstorage__"))
-                Directory.Delete("__blobstorage__", true);
-
-            if (Directory.Exists("__queuestorage__"))
-                Directory.Delete("__queuestorage__", true);
-
-            if (Directory.Exists("__tablestorage__"))
-                Directory.Delete("__tablestorage__", true);
-
-            if (File.Exists("__azurite_db_blob__.json"))
-                File.Delete("__azurite_db_blob__.json");
-
-            if (File.Exists("__azurite_db_blob_extent__.json"))
-                File.Delete("__azurite_db_blob_extent__.json");
-
-            if (File.Exists("__azurite_db_queue__.json"))
-                File.Delete("__azurite_db_queue__.json");
-
-            if (File.Exists("__azurite_db_queue_extent__.json"))
-                File.Delete("__azurite_db_queue_extent__.json");
-
-            if (File.Exists("__azurite_db_table__.json"))
-                File.Delete("__azurite_db_table__.json");
-
-            if (File.Exists("__azurite_db_table_extent__.json"))
-                File.Delete("__azurite_db_table_extent__.json");
+            AzuriteManager.CleanupAzuriteStorage();
         }
         else
         {
