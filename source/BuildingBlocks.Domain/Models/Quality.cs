@@ -39,7 +39,7 @@ public class Quality : DataHubType<Quality>
             "36" => throw new ArgumentOutOfRangeException(
                 nameof(code),
                 code,
-                $"is not a valid {nameof(Quality)}, it is deprecated"),
+                $"Invalid ebIX {nameof(Quality)} code, it is deprecated"),
             "56" => Estimated.Name,
             "E01" => Measured.Name,
             "D01" => Calculated.Name,
