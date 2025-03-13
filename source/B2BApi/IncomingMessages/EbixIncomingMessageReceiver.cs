@@ -47,7 +47,7 @@ public sealed class EbixIncomingMessageReceiver(
 
         var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
 
-        if (!await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsInEbixAsync().ConfigureAwait(false))
+        if (!await _featureFlagManager.ReceiveForwardMeteredDataInEbixAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request

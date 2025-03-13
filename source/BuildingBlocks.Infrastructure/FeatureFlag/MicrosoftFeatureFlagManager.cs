@@ -35,11 +35,11 @@ public class MicrosoftFeatureFlagManager(
     public Task<bool> ArchiveBrs021MessagesAsync() => IsEnabledAsync(FeatureFlagName.ArchiveBrs021Messages);
 
     // Product Goals
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsInCimAsync() => IsEnabledAsync(FeatureFlagName.PM25CIM);
+    public Task<bool> ReceiveForwardMeteredDataInCimAsync() => IsEnabledAsync(FeatureFlagName.PM25CIM);
 
-    public Task<bool> ReceiveMeteredDataForMeasurementPointsInEbixAsync() => IsEnabledAsync(FeatureFlagName.PM25Ebix);
+    public Task<bool> ReceiveForwardMeteredDataInEbixAsync() => IsEnabledAsync(FeatureFlagName.PM25Ebix);
 
-    public Task<bool> UsePeekMeteredDataMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25Messages);
+    public Task<bool> UsePeekForwardMeteredDataMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25Messages);
 
     protected async Task<bool> IsEnabledAsync(string featureFlagName)
     {

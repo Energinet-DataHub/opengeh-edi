@@ -13,19 +13,13 @@
 // limitations under the License.
 
 using System.Net;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
-using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
-using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
@@ -35,12 +29,9 @@ using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
-using PMCoreValueTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
@@ -86,14 +77,20 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueAcceptedBrs021Message_When_MessageIsReceived_Then_AcceptedMessageIsEnqueued_AndThen_RejectedMessageCanBePeeked()
+    public async Task Given_EnqueueAcceptedBrs021Message_When_MessageIsReceived_Then_AcceptedMessageIsEnqueued_AndThen_AcceptedMessageCanBePeeked()
     {
-        _fixture.EnsureAppHostUsesFeatureFlagValue(usePeekMeasureDataMessages: true);
+        _fixture.EnsureAppHostUsesFeatureFlagValue(
+        [
+            new(FeatureFlagName.PM25Messages, true),
+            new(FeatureFlagName.PM25CIM, true),
+        ]);
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
         const string actorNumber = "1234567890123";
-        var actorRole = ActorRole.GridAccessProvider;
+        var senderActorRole = ActorRole.GridAccessProvider;
+        var receiverActorRole = ActorRole.MeteredDataResponsible;
+
         var startDateTime = new DateTimeOffset(2025, 01, 31, 23, 00, 00, TimeSpan.Zero);
         var enqueueMessagesData = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
@@ -117,7 +114,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             [
                 new MarketActorRecipientV1(
                     ActorNumber: ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
-                    ActorRole: actorRole.ToProcessManagerActorRole()),
+                    ActorRole: senderActorRole.ToProcessManagerActorRole()),
             ]);
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();
@@ -128,7 +125,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
                 ActorNumber = actorNumber,
-                ActorRole = actorRole.ToProcessManagerActorRole().ToActorRoleV1(),
+                ActorRole = senderActorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId,
         };
@@ -154,14 +151,14 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId == eventId)
+            .Where(om => om.EventId == eventId && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
         enqueuedOutgoingMessages.Should().HaveCount(1);
 
         // Verify that the enqueued message can be peeked
         var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
-            actor: new Actor(ActorNumber.Create(actorNumber), actorRole),
-            category: MessageCategory.Aggregations);
+            actor: new Actor(ActorNumber.Create(actorNumber), senderActorRole),
+            category: MessageCategory.MeasureData);
 
         var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
         await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
@@ -171,7 +168,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
         peekResponseContent.Should().NotBeNullOrEmpty()
-            .And.Contain("Acknowledgement");
+            .And.Contain("NotifyValidatedMeasureData");
 
         // Verify that the expected notify message was sent on the ServiceBus
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
@@ -183,7 +180,11 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     [Fact]
     public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued_AndThen_RejectedMessageCanBePeeked()
     {
-        _fixture.EnsureAppHostUsesFeatureFlagValue(usePeekMeasureDataMessages: true);
+        _fixture.EnsureAppHostUsesFeatureFlagValue(
+        [
+            new(FeatureFlagName.PM25Messages, true),
+            new(FeatureFlagName.PM25CIM, true),
+        ]);
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
@@ -235,7 +236,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId == eventId)
+            .Where(om => om.EventId == eventId && om.DocumentType == DocumentType.Acknowledgement)
             .ToListAsync();
         enqueuedOutgoingMessages.Should().HaveCount(1);
 
