@@ -89,7 +89,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // => Given enqueue BRS-021 service bus message
         const string actorNumber = "1234567890123";
         var senderActorRole = ActorRole.GridAccessProvider;
-        var receiverActorRole = ActorRole.MeteredDataResponsible;
+        var receiverActorRole = ActorRole.EnergySupplier;
 
         var startDateTime = new DateTimeOffset(2025, 01, 31, 23, 00, 00, TimeSpan.Zero);
         var enqueueMessagesData = new ForwardMeteredDataAcceptedV1(
@@ -114,7 +114,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             [
                 new MarketActorRecipientV1(
                     ActorNumber: ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
-                    ActorRole: senderActorRole.ToProcessManagerActorRole()),
+                    ActorRole: receiverActorRole.ToProcessManagerActorRole()),
             ]);
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();
@@ -157,7 +157,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         // Verify that the enqueued message can be peeked
         var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
-            actor: new Actor(ActorNumber.Create(actorNumber), senderActorRole),
+            actor: new Actor(ActorNumber.Create(actorNumber), receiverActorRole),
             category: MessageCategory.MeasureData);
 
         var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
