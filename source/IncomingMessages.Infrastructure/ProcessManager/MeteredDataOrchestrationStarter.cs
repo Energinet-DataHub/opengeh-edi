@@ -97,6 +97,13 @@ public class MeteredDataOrchestrationStarter(IProcessManagerMessageClient proces
         var quantityQuality = energyObservation.QuantityQuality is not null
             ? Quality.TryGetNameFromCode(energyObservation.QuantityQuality, fallbackValue: energyObservation.QuantityQuality)
             : null;
+
+        // We could not translate the CIM code, trying ebix
+        if (quantityQuality == energyObservation.QuantityQuality)
+        {
+            quantityQuality = Quality.TryGetNameFromEbixCode(energyObservation.QuantityQuality, fallbackValue: energyObservation.QuantityQuality);
+        }
+
         return new ForwardMeteredDataInputV1.EnergyObservation(
             Position: energyObservation.Position,
             EnergyQuantity: energyObservation.EnergyQuantity,
