@@ -17,7 +17,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed record MeteredDataForMeteringPointRejectedDto(
+public sealed record RejectedForwardMeteredDataMessageDto(
     EventId EventId,
     BusinessReason BusinessReason,
     ActorNumber ReceiverId,

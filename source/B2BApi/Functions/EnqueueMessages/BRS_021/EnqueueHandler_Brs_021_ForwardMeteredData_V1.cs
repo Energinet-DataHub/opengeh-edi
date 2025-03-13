@@ -26,10 +26,10 @@ using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
-public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
+public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
-    ILogger<EnqueueHandler_Brs_021_Forward_Metered_Data_V1> logger)
+    ILogger<EnqueueHandler_Brs_021_ForwardMeteredData_V1> logger)
     : EnqueueActorMessagesValidatedHandlerBase<ForwardMeteredDataAcceptedV1, ForwardMeteredDataRejectedV1>(logger)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
@@ -48,12 +48,13 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
 
         foreach (var acceptedDataMarketActorRecipient in acceptedData.MarketActorRecipients)
         {
-            var meteredDataForMeteringPointMessageProcessDto = new MeteredDataForMeteringPointMessageProcessDto(
-                eventId: EventId.From(orchestrationInstanceId),
+            var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
+                eventId: EventId.From(serviceBusMessageId),
+                externalId: new ExternalId(orchestrationInstanceId),
                 receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorNumber), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
                 businessReason: BusinessReason.PeriodicMetering,
                 relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-                series: new MeteredDataForMeteringPointMessageSeriesDto(
+                series: new ForwardMeteredDataMessageSeriesDto(
                     TransactionId: TransactionId.New(),
                     MarketEvaluationPointNumber: acceptedData.MeteringPointId,
                     MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
@@ -66,7 +67,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
                     EndedDateTime: acceptedData.EndDateTime.ToInstant(),
                     EnergyObservations: series));
 
-            await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointMessageProcessDto, CancellationToken.None).ConfigureAwait(false);
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
         }
 
         var executionPolicy = Policy
@@ -91,7 +92,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
             rejectedData);
 
         // TODO: Fix when we have the correct data from ForwardMeteredDataRejectedV1
-        var meteredDataForMeteringPointRejectedDto = new MeteredDataForMeteringPointRejectedDto(
+        var rejectedForwardMeteredDataMessageDto = new RejectedForwardMeteredDataMessageDto(
             EventId: EventId.From(serviceBusMessageId),
             BusinessReason: BusinessReason.PeriodicMetering,
             ReceiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
@@ -120,7 +121,7 @@ public sealed class EnqueueHandler_Brs_021_Forward_Metered_Data_V1(
                 OriginalMktActivityRecord: [],
                 RejectedTimeSeries: []));
 
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(meteredDataForMeteringPointRejectedDto, CancellationToken.None).ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)

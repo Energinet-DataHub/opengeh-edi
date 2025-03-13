@@ -35,14 +35,15 @@ public interface IOutgoingMessageRepository
     Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Get message in the database for the designated receiver and the external id.
+    /// Get message in the database for the given receiver and the external id.
     /// </summary>
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Get message in the database for the designated receiver role and the external id and period started at.
+    /// Get message in the database for the given receiver number and role, external id and period started at.
+    /// <remarks>This is used as the idempotency check (coupled with a unique index in the database on the same 4 columns)</remarks>
     /// </summary>
-    Task<OutgoingMessage?> GetAsync(ActorRole receiverRole, ExternalId externalId, Instant? periodStartedAt);
+    Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt);
 
     /// <summary>
     /// Delete outgoing messages if they exists

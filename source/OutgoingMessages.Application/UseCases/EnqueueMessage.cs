@@ -59,7 +59,7 @@ public class EnqueueMessage
                 .ConfigureAwait(false);
 
         var existingMessage = await _outgoingMessageRepository.GetAsync(
-                messageToEnqueue.Receiver.ActorRole,
+                messageToEnqueue.Receiver,
                 messageToEnqueue.ExternalId,
                 messageToEnqueue.PeriodStartedAt)
             .ConfigureAwait(false);

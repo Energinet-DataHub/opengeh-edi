@@ -14,8 +14,6 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
@@ -30,20 +28,20 @@ public class IncomingMessagePublisher
 {
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
-    private readonly MeteredDataOrchestrationStarter _meteredDataOrchestrationStarter;
+    private readonly ForwardMeteredDataOrchestrationStarter _forwardMeteredDataOrchestrationStarter;
 
     public IncomingMessagePublisher(
         AuthenticatedActor authenticatedActor,
         IOptions<IncomingMessagesQueueOptions> options,
         IAzureClientFactory<ServiceBusSender> senderFactory,
         IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter,
-        MeteredDataOrchestrationStarter meteredDataOrchestrationStarter)
+        ForwardMeteredDataOrchestrationStarter forwardMeteredDataOrchestrationStarter)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
         _authenticatedActor = authenticatedActor;
         _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
-        _meteredDataOrchestrationStarter = meteredDataOrchestrationStarter;
+        _forwardMeteredDataOrchestrationStarter = forwardMeteredDataOrchestrationStarter;
     }
 
     public async Task PublishAsync(
@@ -91,7 +89,7 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+        await _forwardMeteredDataOrchestrationStarter.StartForwardMeteredDataOrchestrationAsync(
                 initializeMeteredDataForMeteringPointMessageProcessDto,
                 cancellationToken)
             .ConfigureAwait(false);

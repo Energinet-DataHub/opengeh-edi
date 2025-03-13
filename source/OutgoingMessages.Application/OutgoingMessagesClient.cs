@@ -212,11 +212,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAndCommitAsync(
-        MeteredDataForMeteringPointMessageProcessDto meteredDataForMeteringPointMessageProcessDto,
+        AcceptedForwardMeteredDataMessageDto acceptedForwardMeteredDataMessageDto,
         CancellationToken cancellationToken)
     {
         var message = OutgoingMessageFactory.CreateMessage(
-            meteredDataForMeteringPointMessageProcessDto,
+            acceptedForwardMeteredDataMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 
@@ -227,11 +227,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAndCommitAsync(
-        MeteredDataForMeteringPointRejectedDto meteredDataForMeteringPointRejected,
+        RejectedForwardMeteredDataMessageDto rejectedForwardMeteredDataMessageDto,
         CancellationToken cancellationToken)
     {
         var message = OutgoingMessageFactory.CreateMessage(
-            meteredDataForMeteringPointRejected,
+            rejectedForwardMeteredDataMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 

@@ -159,17 +159,10 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
         // => Then accepted message is enqueued
-        var didFinish = await Awaiter.TryWaitUntilConditionAsync(
-            () => _fixture.AppHostManager.CheckIfFunctionWasExecuted($"Functions.{nameof(EnqueueTrigger_Brs_026)}"),
-            timeLimit: TimeSpan.FromSeconds(30));
-        var hostLog = _fixture.AppHostManager.GetHostLogSnapshot();
-
-        using (new AssertionScope())
-        {
-            didFinish.Should().BeTrue($"because the {nameof(EnqueueTrigger_Brs_026)} should have been executed");
-            hostLog.Should().ContainMatch($"*Executed 'Functions.{nameof(EnqueueTrigger_Brs_026)}' (Succeeded,*");
-            hostLog.Should().ContainMatch("*Received enqueue rejected message(s) for BRS 026*");
-        }
+        // Verify the function was executed
+        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: nameof(EnqueueTrigger_Brs_026));
+        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
 
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var actualOutgoingMessage = await dbContext.OutgoingMessages

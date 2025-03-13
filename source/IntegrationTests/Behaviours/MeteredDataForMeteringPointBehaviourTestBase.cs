@@ -196,7 +196,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
             subject: message.Subject,
             body: message.Body,
             properties: message.ApplicationProperties);
-        var enqueueHandler = GetService<EnqueueHandler_Brs_021_Forward_Metered_Data_V1>();
+        var enqueueHandler = GetService<EnqueueHandler_Brs_021_ForwardMeteredData_V1>();
         await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
     }
 }

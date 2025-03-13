@@ -59,7 +59,6 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
     public async Task Given_RequestAggregatedMeasureData_When_RequestIsReceived_Then_ServiceBusMessageIsSentToProcessManagerTopic()
     {
         // Arrange
-        EnableRequestAggregatedMeasureDataOrchestrationFeature();
         // The following must match with the JSON/XML document content
         var energySupplier = new Actor(
             ActorNumber.Create("5790000701278"),
@@ -88,10 +87,5 @@ public class RequestAggregatedMeasureDataTests : IAsyncLifetime
 
         var messageReceived = verifyServiceBusMessage.Wait(TimeSpan.FromSeconds(30));
         messageReceived.Should().BeTrue("because a Brs_026 message should be sent to the Process Manager topic");
-    }
-
-    private void EnableRequestAggregatedMeasureDataOrchestrationFeature()
-    {
-        Fixture.EnsureAppHostUsesFeatureFlagValue(useRequestAggregatedMeasureDataOrchestration: true);
     }
 }

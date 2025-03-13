@@ -353,12 +353,12 @@ public class RequestProcessOrchestrationStarterTests
             null,
             Guid.NewGuid()));
 
-        var sut = new MeteredDataOrchestrationStarter(
+        var sut = new ForwardMeteredDataOrchestrationStarter(
             processManagerClient.Object,
             authenticatedActor);
 
         // Act
-        await sut.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+        await sut.StartForwardMeteredDataOrchestrationAsync(
             initializeProcessDto,
             CancellationToken.None);
 

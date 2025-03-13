@@ -65,13 +65,14 @@ public static class HttpRequestExtensions
 
     public static Task<HttpRequestMessage> CreatePeekHttpRequestAsync(
         this B2BApiAppFixture fixture,
-        Actor actor)
+        Actor actor,
+        MessageCategory category)
     {
         return CreateHttpRequestAsync(
             fixture,
             actor,
             HttpMethod.Get,
-            $"api/peek/Aggregations",
+            $"api/peek/{category.Name}",
             new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
     }
 
@@ -131,7 +132,8 @@ public static class HttpRequestExtensions
         string url,
         HttpContent? content = null)
     {
-        // The actor must exist in the database
+        // The actor must exist in the database. It doesn't matter if the actor number exists more than once in the
+        // database, as long as an actor with the client id from the b2b token exists.
         var actorClientId = Guid.NewGuid().ToString();
         await fixture.DatabaseManager.AddActorAsync(actor.ActorNumber, actorClientId);
 
