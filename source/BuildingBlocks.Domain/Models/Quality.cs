@@ -31,4 +31,16 @@ public class Quality : DataHubType<Quality>
         : base(name, code)
     {
     }
+
+    public static string? TryGetNameFromEbixCode(string? code, string? fallbackValue)
+    {
+        return code switch
+        {
+            "36" => "36", // 36 is deprecated
+            "56" => Estimated.Name,
+            "E01" => Measured.Name,
+            "D01" => Calculated.Name,
+            _ => fallbackValue,
+        };
+    }
 }
