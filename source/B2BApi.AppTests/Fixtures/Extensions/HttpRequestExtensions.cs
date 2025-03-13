@@ -66,10 +66,8 @@ public static class HttpRequestExtensions
     public static Task<HttpRequestMessage> CreatePeekHttpRequestAsync(
         this B2BApiAppFixture fixture,
         Actor actor,
-        MessageCategory? category)
+        MessageCategory category)
     {
-        category ??= MessageCategory.Aggregations;
-
         return CreateHttpRequestAsync(
             fixture,
             actor,
