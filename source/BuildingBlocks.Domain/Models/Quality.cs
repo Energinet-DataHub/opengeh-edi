@@ -36,7 +36,10 @@ public class Quality : DataHubType<Quality>
     {
         return code switch
         {
-            "36" => "36", // 36 is deprecated
+            "36" => throw new ArgumentOutOfRangeException(
+                nameof(code),
+                code,
+                $"is not a valid {nameof(Quality)}, it is deprecated"),
             "56" => Estimated.Name,
             "E01" => Measured.Name,
             "D01" => Calculated.Name,
