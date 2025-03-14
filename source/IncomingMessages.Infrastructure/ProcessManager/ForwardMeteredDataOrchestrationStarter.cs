@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -58,6 +57,8 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                 ? InstantPattern.General.Parse(transaction.RegisteredAt).Value.ToString()
                 : null;
 
+            var businessReason = BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason);
+
             var startCommand =
                 new ForwardMeteredDataCommandV1(
                     operatingIdentity: actorIdentityDto,
@@ -66,6 +67,7 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                         TransactionId: transaction.TransactionId,
                         ActorNumber: actorIdentityDto.ActorNumber.Value,
                         ActorRole: actorIdentityDto.ActorRole.Name,
+                        BusinessReason: businessReason,
                         MeteringPointId: transaction.MeteringPointLocationId,
                         MeteringPointType: meteringPointType,
                         ProductNumber: transaction.ProductNumber,

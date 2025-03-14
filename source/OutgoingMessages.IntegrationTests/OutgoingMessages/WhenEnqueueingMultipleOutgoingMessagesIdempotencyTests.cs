@@ -261,6 +261,43 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             ]);
     }
 
+    [Fact]
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueRejectedForwardMeteredDataMessage_Then_OneMessageIsEnqueued()
+    {
+        // Arrange
+        var orchestrationInstanceId = Guid.NewGuid();
+        var message = new RejectedForwardMeteredDataMessageDto(
+            EventId: EventId.From(Guid.NewGuid()),
+            BusinessReason: BusinessReason.PeriodicFlexMetering,
+            ReceiverId: ActorNumber.Create("1234567890123"),
+            ReceiverRole: ActorRole.GridAccessProvider,
+            ProcessId: orchestrationInstanceId,
+            ExternalId: orchestrationInstanceId,
+            AcknowledgementDto: new AcknowledgementDto(
+                ReceivedMarketDocumentTransactionId: Guid.NewGuid().ToString(),
+                ReceivedMarketDocumentProcessProcessType: BusinessReason.PeriodicFlexMetering.Name,
+                Series: [
+                    new SeriesDto(
+                        MRID: Guid.NewGuid().ToString(),
+                        Reason: [
+                            new ReasonDto(
+                                    Code: "E01",
+                                    Text: "An error has occurred")])
+                ]));
+
+        // Act
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+
+        // Assert
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+        Assert.Collection(outgoingMessages, om => Assert.Equal(orchestrationInstanceId, om.ExternalId.Value));
+    }
+
     private AcceptedForwardMeteredDataMessageDto CreateAcceptedForwardMeteredDataMessage(
         ExternalId externalId,
         Actor receiver,

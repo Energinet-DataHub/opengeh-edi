@@ -13,42 +13,38 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed record RejectedForwardMeteredDataMessageDto(
-    EventId EventId,
-    BusinessReason BusinessReason,
-    ActorNumber ReceiverId,
-    ActorRole ReceiverRole,
-    Guid ProcessId,
-    Guid ExternalId,
-    AcknowledgementDto AcknowledgementDto);
+public sealed class RejectedForwardMeteredDataMessageDto : OutgoingMessageDto
+{
+    public RejectedForwardMeteredDataMessageDto(
+        EventId eventId,
+        ExternalId externalId,
+        BusinessReason businessReason,
+        ActorNumber receiverId,
+        ActorRole receiverRole,
+        MessageId relatedToMessageId,
+        RejectedForwardMeteredDataSeries series)
+        : base(
+            DocumentType.Acknowledgement,
+            receiverId,
+            Guid.NewGuid(),
+            eventId,
+            businessReason.Name,
+            receiverRole,
+            externalId,
+            relatedToMessageId)
+    {
+        Series = series;
+    }
 
-public sealed record AcknowledgementDto(
-    DateTimeOffset? ReceivedMarketDocumentCreatedDateTime,
-    string? ReceivedMarketDocumentTransactionId,
-    string? ReceivedMarketDocumentProcessProcessType,
-    string? ReceivedMarketDocumentRevisionNumber,
-    string? ReceivedMarketDocumentTitle,
-    string? ReceivedMarketDocumentType,
-    IReadOnlyCollection<ReasonDto> Reason,
-    IReadOnlyCollection<TimePeriodDto> InErrorPeriod,
-    IReadOnlyCollection<SeriesDto> Series,
-    IReadOnlyCollection<MktActivityRecordDto> OriginalMktActivityRecord,
-    IReadOnlyCollection<TimeSeriesDto> RejectedTimeSeries);
+    public RejectedForwardMeteredDataSeries Series { get; }
+}
 
-public sealed record ReasonDto(string Code, string? Text);
+public record RejectedForwardMeteredDataSeries(
+    TransactionId TransactionId,
+    IReadOnlyCollection<RejectedRejectedForwardMeteredDataReason> RejectReasons,
+    TransactionId OriginalTransactionIdReference);
 
-public sealed record TimePeriodDto(Interval TimeInterval, IReadOnlyCollection<ReasonDto> Reason);
-
-public sealed record SeriesDto(string MRID, IReadOnlyCollection<ReasonDto> Reason);
-
-public sealed record MktActivityRecordDto(string MRID, IReadOnlyCollection<ReasonDto> Reason);
-
-public sealed record TimeSeriesDto(
-    string MRID,
-    string Version,
-    IReadOnlyCollection<TimePeriodDto> InErrorPeriod,
-    IReadOnlyCollection<ReasonDto> Reason);
+public record RejectedRejectedForwardMeteredDataReason(string ErrorCode, string ErrorMessage);
