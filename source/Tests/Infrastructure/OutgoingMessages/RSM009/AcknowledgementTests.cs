@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Factories;
@@ -71,10 +70,15 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
         //         new[] { records });
         // }
 
-        var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
-        return new AcknowledgementJsonDocumentWriter(
-                _parser,
-                serviceProvider.GetRequiredService<JavaScriptEncoder>())
-            .WriteAsync(documentHeader, new[] { records });
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
+            return new AcknowledgementJsonDocumentWriter(
+                    _parser,
+                    serviceProvider.GetRequiredService<JavaScriptEncoder>())
+                .WriteAsync(documentHeader, new[] { records });
+        }
+
+        throw new Exception("Unknown document format");
     }
 }
