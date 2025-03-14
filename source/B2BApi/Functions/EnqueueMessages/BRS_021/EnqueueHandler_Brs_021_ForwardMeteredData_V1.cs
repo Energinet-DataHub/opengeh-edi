@@ -103,7 +103,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                 OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
                 RejectReasons: rejectedData.ValidationErrors.Select(
                         validationError =>
-                            new RejectedRejectedForwardMeteredDataReason(
+                            new RejectReason(
                                 ErrorCode: validationError.ErrorCode,
                                 ErrorMessage: validationError.Message))
                     .ToList()));

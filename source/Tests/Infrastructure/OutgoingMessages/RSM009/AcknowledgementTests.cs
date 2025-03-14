@@ -1,0 +1,80 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Text.Encodings.Web;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
+using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.Tests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
+
+public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
+{
+    private readonly DocumentValidationFixture _documentValidation;
+    private readonly MessageRecordParser _parser;
+    private readonly RejectedForwardMeteredDataMessageBuilder _rejectedForwardMeteredDataMessageBuilder;
+
+    public AcknowledgementTests(DocumentValidationFixture documentValidation)
+    {
+        _documentValidation = documentValidation;
+        _parser = new MessageRecordParser(new Serializer());
+        _rejectedForwardMeteredDataMessageBuilder = new RejectedForwardMeteredDataMessageBuilder();
+    }
+
+    [Theory]
+    //[InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    //[InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Can_create_document(string documentFormat)
+    {
+        var marketDocumentStream = await CreateDocument(
+            _rejectedForwardMeteredDataMessageBuilder,
+            DocumentFormat.FromName(documentFormat));
+    }
+
+    private Task<MarketDocumentStream> CreateDocument(
+        RejectedForwardMeteredDataMessageBuilder resultBuilder,
+        DocumentFormat documentFormat)
+    {
+        var documentHeader = resultBuilder.BuildHeader();
+        var records = _parser.From(resultBuilder.GetSeries());
+        // if (documentFormat == DocumentFormat.Ebix)
+        // {
+        //     return new RejectRequestWholesaleSettlementEbixDocumentWriter(_parser).WriteAsync(
+        //         documentHeader,
+        //         new[] { records });
+        // }
+
+        // if (documentFormat == DocumentFormat.Xml)
+        // {
+        //     return new RejectRequestWholesaleSettlementCimXmlDocumentWriter(_parser).WriteAsync(
+        //         documentHeader,
+        //         new[] { records });
+        // }
+
+        var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
+        return new AcknowledgementJsonDocumentWriter(
+                _parser,
+                serviceProvider.GetRequiredService<JavaScriptEncoder>())
+            .WriteAsync(documentHeader, new[] { records });
+    }
+}
