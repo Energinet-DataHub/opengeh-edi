@@ -56,7 +56,6 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
         _calculationCompleted = new CalculationCompletedDsl(
             new EdiDriver(fixture.DurableClient, fixture.B2BClients.MeteredDataResponsible, output),
             new EdiDatabaseDriver(fixture.ConnectionString),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
             new ProcessManagerDriver(fixture.EdiTopicClient),
             output,
             fixture.BalanceFixingCalculationId,

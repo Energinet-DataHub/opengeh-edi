@@ -16,7 +16,7 @@ using System.Net;
 using System.Text;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
@@ -47,7 +47,7 @@ public sealed class EbixIncomingMessageReceiver(
 
         var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
 
-        if (!await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))
+        if (!await _featureFlagManager.ReceiveForwardMeteredDataInEbixAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request

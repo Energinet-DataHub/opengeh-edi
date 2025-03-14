@@ -21,8 +21,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
-using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -45,7 +44,6 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
         : base(integrationTestFixture, testOutputHelper)
     {
         _fixture = integrationTestFixture;
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration, true);
         _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 
@@ -105,7 +103,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
              ? testDataDescription.ExampleEnergySupplier
              : testDataDescription.ExampleBalanceResponsible;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
@@ -221,7 +219,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
             ? testDataDescription.ExampleEnergySupplier
             : testDataDescription.ExampleBalanceResponsible;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);
@@ -347,7 +345,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
                 ? GivenDatabricksResultDataForEnergyResultPerBalanceResponsible().ExampleBalanceResponsible
                 : GivenDatabricksResultDataForEnergyResultPerGridArea().ExampleEnergyResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierOrNull = actorRole == ActorRole.EnergySupplier
             ? testMessageData.ExampleMessageData.EnergySupplier
             : null;
@@ -477,7 +475,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
              ? testDataDescription.ExampleEnergySupplier
              : testDataDescription.ExampleBalanceResponsible;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = testMessageData.ExampleMessageData.EnergySupplier;
         var balanceResponsibleParty = testMessageData.ExampleMessageData.BalanceResponsible;
         var actor = (ActorNumber: testMessageData.ActorNumber, ActorRole: actorRole);

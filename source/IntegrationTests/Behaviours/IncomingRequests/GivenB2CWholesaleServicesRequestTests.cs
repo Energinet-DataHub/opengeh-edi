@@ -20,10 +20,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -31,8 +30,6 @@ using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
-using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -43,145 +40,50 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
     {
     }
 
-    public static object[][] DocumentFormatsWithActorRoleCombinations()
+    [Fact]
+    public async Task When_Received_Then_ProcessManagerIsCorrectlyInformed()
     {
-        // The actor roles who can perform WholesaleServicesRequest's
-        var actorRoles = new List<ActorRole>
-        {
-            ActorRole.EnergySupplier,
-            ActorRole.SystemOperator,
-            ActorRole.GridAccessProvider,
-        };
-
-        var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
-
-        return actorRoles
-                .SelectMany(actorRole => peekDocumentFormats
-                    .Select(peekDocumentFormat => new object[]
-                    {
-                        actorRole,
-                        peekDocumentFormat,
-                    }))
-            .ToArray();
-    }
-
-    [Theory]
-    [MemberData(nameof(DocumentFormatsWithActorRoleCombinations))]
-    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat peekDocumentFormat)
-    {
-        /*
-         *  --- PART 1: Receive request, create process and send message to Wholesale ---
-         */
-
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy();
-        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
-        var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
-            ? actor.ActorNumber
-            : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
-            ? actor.ActorNumber
-            : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
-            ? actor.ActorNumber
-            : ActorNumber.Create("4444444444444");
+        var testDataDescription = GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
+        var exampleWholesaleResultMessageForActor = testDataDescription.ExampleWholesaleResultMessageData;
+        var actorRole = ActorRole.EnergySupplier;
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var energySupplierNumber = ActorNumber.Create("5790001662233");
+        var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value) : ActorNumber.Create("8500000000502");
+        var gridOperatorNumber = ActorNumber.Create("4444444444444");
+        var actor = (ActorNumber: actorRole == ActorRole.EnergySupplier
+            ? energySupplierNumber
+            : actorRole == ActorRole.SystemOperator
+                ? chargeOwnerNumber
+                : gridOperatorNumber, ActorRole: actorRole);
+        var transactionId = TransactionId.From("12356478912356478912356478912356478");
+
+        var expectedGridArea = exampleWholesaleResultMessageForActor.GridArea;
+        var expectedChargeType = exampleWholesaleResultMessageForActor.ChargeType!;
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-
-        GivenAuthenticatedActorIs(actor.ActorNumber, actorRole);
-        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
-
-        var transactionId = await GivenReceivedB2CWholesaleServicesRequest(
-            senderActorNumber: actor.ActorNumber,
-            senderActorRole: actorRole,
-            energySupplier: energySupplierNumber,
-            gridArea: "512");
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
+        await GivenGridAreaOwnershipAsync(expectedGridArea, gridOperatorNumber);
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
+        await GivenReceivedB2CWholesaleServicesRequest(transactionId, actor.ActorNumber, actor.ActorRole, energySupplierNumber, expectedGridArea);
 
         // Assert
-        var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
+        ThenRequestCalculatedWholesaleServicesCommandV1ServiceBusMessageIsCorrect(
             senderSpy,
-            new WholesaleServicesMessageAssertionInput(
-                new List<string> { "512" },
+            new RequestCalculatedWholesaleServicesInputV1AssertionInput(
+                transactionId,
                 actor.ActorNumber.Value,
                 actor.ActorRole.Name,
+                BusinessReason.WholesaleFixing,
+                Resolution: Resolution.Monthly,
+                PeriodStart: CreateDateInstant(2023, 2, 1),
+                PeriodEnd: CreateDateInstant(2023, 3, 1),
                 energySupplierNumber.Value,
                 null,
-                Resolution.Monthly.Name,
-                BusinessReason.WholesaleFixing.Name,
-                ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
-                {
-                    (ChargeType.Tariff.Name, null),
-                },
-                new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-                null));
-
-        // TODO: Assert correct process is created?
-
-        /*
-         *  --- PART 2: Receive data from Wholesale and create RSM document ---
-         */
-
-        // Arrange
-
-        // Generate a mock WholesaleServicesRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
-        // It is very important that the generated data is correct,
-        // since (almost) all assertion after this point is based on this data
-        var acceptedResponse = WholesaleServicesResponseEventBuilder
-            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow(), chargeOwnerNumber.Value);
-
-        await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, acceptedResponse);
-
-        // Act
-        var peekResults = await WhenActorPeeksAllMessages(
-            actor.ActorNumber,
-            actor.ActorRole,
-            peekDocumentFormat);
-
-        // Assert
-        PeekResultDto peekResult;
-        using (new AssertionScope())
-        {
-            peekResult = peekResults
-                .Should()
-                .ContainSingle("because there should be one message when requesting for one grid area")
-                .Subject;
-        }
-
-        peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-
-        await ThenNotifyWholesaleServicesDocumentIsCorrect(
-            peekResult.Bundle,
-            peekDocumentFormat,
-            new NotifyWholesaleServicesDocumentAssertionInput(
-                Timestamp: "2024-07-01T14:57:09Z",
-                BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
-                    BusinessReason.WholesaleFixing,
-                    null),
-                ReceiverId: actor.ActorNumber.Value,
-                ReceiverRole: actor.ActorRole,
-                SenderId: "5790001330552",  // Sender is always DataHub
-                SenderRole: ActorRole.MeteredDataAdministrator,
-                ChargeTypeOwner: chargeOwnerNumber.Value,
-                ChargeCode: null,
-                ChargeType: ChargeType.Tariff,
-                Currency: Currency.DanishCrowns,
-                EnergySupplierNumber: energySupplierNumber.Value,
-                SettlementMethod: SettlementMethod.Flex,
-                MeteringPointType: MeteringPointType.Consumption,
-                GridArea: "512",
-                OriginalTransactionIdReference: TransactionId.From(transactionId),
-                PriceMeasurementUnit: MeasurementUnit.KilowattHour,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.KilowattHour,
-                CalculationVersion: GetNow().ToUnixTimeTicks(),
-                Resolution: Resolution.Monthly,
-                Period: new Period(
-                    CreateDateInstant(2024, 1, 1),
-                    CreateDateInstant(2024, 1, 31)),
-                Points: acceptedResponse.Series.Single().TimeSeriesPoints));
+                new List<string> { expectedGridArea },
+                null,
+                new List<ChargeTypeInput> { new(expectedChargeType.Name, null) }));
     }
 
     private static IncomingMarketMessageStream GenerateStreamFromString(string jsonString)
@@ -192,7 +94,8 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
         return new IncomingMarketMessageStream(memoryStream);
     }
 
-    private async Task<string> GivenReceivedB2CWholesaleServicesRequest(
+    private async Task GivenReceivedB2CWholesaleServicesRequest(
+        TransactionId transactionId,
         ActorNumber senderActorNumber,
         ActorRole senderActorRole,
         ActorNumber? energySupplier,
@@ -203,14 +106,15 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
 
         var b2CRequest = new RequestWholesaleSettlementMarketRequest(
             CalculationType.WholesaleFixing,
-            "2024-01-01T22:00:00Z",
-            "2024-01-31T22:00:00Z",
+            "2023-02-01T22:00:00Z",
+            "2023-03-01T22:00:00Z",
             gridArea,
             energySupplier?.Value,
             Resolution.Monthly.Name,
-            PriceType.MonthlyTariff);
+            PriceType.MonthlySubscription);
 
         var requestMessage = RequestWholesaleSettlementDtoFactory.Create(
+            transactionId,
             b2CRequest,
             senderActorNumber.Value,
             senderActorRole.Name,
@@ -233,7 +137,5 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().BeEmpty();
         }
-
-        return requestMessage.Series.First().Id;
     }
 }

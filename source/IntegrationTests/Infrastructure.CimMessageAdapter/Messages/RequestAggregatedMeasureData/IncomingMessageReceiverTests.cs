@@ -24,9 +24,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
@@ -37,7 +34,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
 public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 {
     private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
-    private readonly ProcessContext _processContext;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
 
     public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
@@ -46,8 +42,6 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         _messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
             parser => (parser.DocumentType, parser.DocumentFormat),
             parser => parser);
-
-        _processContext = GetService<ProcessContext>();
 
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDQ"), null, ActorId));
@@ -79,7 +73,6 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
     public Task DisposeAsync()
     {
-        _processContext.Dispose();
         return Task.CompletedTask;
     }
 
@@ -525,32 +518,6 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             CancellationToken.None);
 
         result.Errors.Should().ContainItemsAssignableTo<InvalidMessageIdSize>();
-    }
-
-    [Fact]
-    public async Task Multiple_activity_records_are_committed_as_processes()
-    {
-        var knownReceiverId = "5790001330552";
-        var knownReceiverRole = ActorRole.MeteredDataAdministrator.Code;
-        var knownSenderId = "5790001330554";
-        var knownSenderRole = ActorRole.EnergySupplier.Code;
-        await using var message = BusinessMessageBuilder
-            .RequestAggregatedMeasureData()
-            .DuplicateSeriesRecords()
-            .WithSeriesTransactionId(Guid.NewGuid().ToString())
-            .WithReceiverRole(knownReceiverRole)
-            .WithReceiverId(knownReceiverId)
-            .WithSenderId(knownSenderId)
-            .WithSenderRole(knownSenderRole)
-            .Message();
-
-        var messageParser = await ParseMessageAsync(message);
-        var marketMessage = CreateMarketMessageWithAuthentication(messageParser.IncomingMessage!, knownSenderId, knownSenderRole);
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
-
-        var processes = _processContext.AggregatedMeasureDataProcesses.ToList();
-        Assert.NotNull(processes);
-        Assert.Equal(2, processes.Count);
     }
 
     [Fact]

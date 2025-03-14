@@ -380,7 +380,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        MeteredDataForMeteringPointMessageProcessDto message,
+        AcceptedForwardMeteredDataMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {
@@ -405,7 +405,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        MeteredDataForMeteringPointRejectedDto message,
+        RejectedForwardMeteredDataMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {
@@ -417,7 +417,7 @@ public static class OutgoingMessageFactory
             : null;
 
         return new OutgoingMessage(
-            eventId: EventId.From(message.EventId),
+            eventId: message.EventId,
             documentType: DocumentType.Acknowledgement,
             receiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
             documentReceiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),

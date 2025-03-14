@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -40,40 +40,22 @@ internal static class TimeSeriesPointsFactory
         return points;
     }
 
-    public static IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> CreatePointsForPeriod(
+    public static IReadOnlyCollection<WholesaleServicesPoint> CreatePointsForPeriod(
         Period period,
         Resolution resolution,
         decimal? price,
         decimal? quantity,
         decimal amount,
-        QuantityQuality? calculatedQuality)
+        CalculatedQuantityQuality? calculatedQuality)
     {
-        var points = new List<WholesaleServicesRequestSeries.Types.Point>();
+        var points = new List<WholesaleServicesPoint>();
+        var posistion = 1;
 
         var currentTime = period.Start.ToDateTimeOffset();
         while (currentTime < period.End.ToDateTimeOffset())
         {
-            var point = new WholesaleServicesRequestSeries.Types.Point
-            {
-                Amount = DecimalValue.FromDecimal(amount),
-            };
-
-            if (price is not null)
-            {
-                point.Price = DecimalValue.FromDecimal(price.Value);
-            }
-
-            if (quantity is not null)
-            {
-                point.Quantity = DecimalValue.FromDecimal(quantity.Value);
-            }
-
-            if (calculatedQuality is not null)
-            {
-                point.QuantityQualities.Add(calculatedQuality.Value);
-            }
-
-            points.Add(point);
+            points.Add(new WholesaleServicesPoint(posistion, quantity, price, amount, calculatedQuality));
+            posistion++;
             currentTime = GetDateTimeWithResolutionOffset(resolution, currentTime);
         }
 

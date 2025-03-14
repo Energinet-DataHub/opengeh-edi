@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="7.2.1"/>
-    <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="11.0.2" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -42,7 +41,6 @@
     <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
-    <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

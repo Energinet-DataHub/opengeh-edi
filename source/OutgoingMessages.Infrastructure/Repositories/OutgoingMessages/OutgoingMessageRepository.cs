@@ -89,12 +89,15 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<OutgoingMessage?> GetAsync(ActorRole receiverRole, ExternalId externalId, Instant? periodStartedAt)
+    public async Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt)
     {
         return await _context.OutgoingMessages
-            .FirstOrDefaultAsync(x => x.Receiver.ActorRole == receiverRole &&
-                                                    x.ExternalId == externalId &&
-                                                    x.PeriodStartedAt == periodStartedAt).ConfigureAwait(false);
+            .FirstOrDefaultAsync(x =>
+                x.Receiver.Number == receiver.Number &&
+                x.Receiver.ActorRole == receiver.ActorRole &&
+                x.ExternalId == externalId &&
+                x.PeriodStartedAt == periodStartedAt)
+            .ConfigureAwait(false);
     }
 
     public async Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds, CancellationToken cancellationToken)

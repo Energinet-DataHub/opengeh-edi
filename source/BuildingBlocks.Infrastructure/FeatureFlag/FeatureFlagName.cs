@@ -18,35 +18,30 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 /// List of all Feature Flags that exists in the system. A Feature Flag name must
 /// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
 /// </summary>
-public enum FeatureFlagName
+public static class FeatureFlagName
 {
     /// <summary>
     /// Whether to disable peek messages
     /// </summary>
-    UsePeekMessages,
+    public const string UsePeekMessages = "UsePeekMessages";
 
     /// <summary>
-    /// Whether to disable peek time series messages
+    /// Whether to allow receiving metered data for metering points in CIM.
     /// </summary>
-    UsePeekTimeSeriesMessages,
+    public const string PM25CIM = "PM25-CIM";
 
     /// <summary>
-    /// Whether to allow receiving metered data for metering points.
+    /// Whether to allow receiving metered data for metering points in Ebix.
     /// </summary>
-    ReceiveMeteredDataForMeasurementPoints,
+    public const string PM25Ebix = "PM25-EBIX";
 
     /// <summary>
-    /// Whether to use orchestration for handling RequestWholesaleServices processes.
+    /// Whether to allow actors to peek metered data for metering points.
     /// </summary>
-    UseRequestWholesaleServicesProcessOrchestration,
+    public const string PM25Messages = "PM25-MESSAGES";
 
     /// <summary>
-    /// Whether to use orchestration for handling RequestAggregatedMeasureData processes.
+    /// Whether to archive BRS-021 messages.
     /// </summary>
-    UseRequestAggregatedMeasureDataProcessOrchestration,
-
-    /// <summary>
-    /// Whether to enqueue BRS-023/027 messages via the Process Manager.
-    /// </summary>
-    UseProcessManagerToEnqueueBrs023027Messages,
+    public const string ArchiveBrs021Messages = "ArchiveBrs021Messages";
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
@@ -26,7 +26,7 @@ public record ExampleWholesaleResultMessageForActor(
     SettlementMethod? SettlementMethod,
     Resolution Resolution,
     int Version,
-    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points,
+    IReadOnlyCollection<WholesaleServicesPoint> Points,
     string? ChargeCode = null,
     ChargeType? ChargeType = null,
     MeasurementUnit? MeasurementUnit = null);

@@ -16,7 +16,6 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.Encodings.Web;
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
@@ -25,7 +24,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholes
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
-using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -182,13 +180,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
             .HasQuantityMeasurementUnit(SampleData.MeasurementUnit)
             .PriceMeasurementUnitDoesNotExist()
             .HasResolution(Resolution.Monthly)
-            .HasSinglePointWithAmountAndQuality(
-                new DecimalValue()
-                    {
-                        Nanos = 0,
-                        Units = 100,
-                    },
-                null)
+            .HasSinglePointWithAmountAndQuality(100m, null)
             .HasProductCode(ProductType.Tariff.Code)
             .OriginalTransactionIdReferenceDoesNotExist()
             .SettlementVersionDoesNotExist()

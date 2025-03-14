@@ -255,6 +255,7 @@ public sealed class MessageParserTests
             PriceType.MonthlySubscription);
 
         var message = RequestWholesaleSettlementDtoFactory.Create(
+            TransactionId.New(),
             b2CRequest,
             "5799999933318",
             "EnergySupplier",

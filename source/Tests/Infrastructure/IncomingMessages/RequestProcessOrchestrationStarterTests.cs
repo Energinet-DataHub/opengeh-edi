@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
-using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
@@ -293,7 +293,7 @@ public class RequestProcessOrchestrationStarterTests
         const string expectedRegistrationDateFrom = "2023-04-30T22:00:00Z";
         const string expectedPosition = "1";
         const string expectedEnergyQuantity = "1001";
-        const string expectedQuantityQuality = "A03";
+        var expectedQuantityQuality = Quality.Estimated.Name;
 
         var meteringPointType = expectedMeteringPointType is not null
             ? MeteringPointType.FromCode(expectedMeteringPointType)
@@ -353,12 +353,12 @@ public class RequestProcessOrchestrationStarterTests
             null,
             Guid.NewGuid()));
 
-        var sut = new MeteredDataOrchestrationStarter(
+        var sut = new ForwardMeteredDataOrchestrationStarter(
             processManagerClient.Object,
             authenticatedActor);
 
         // Act
-        await sut.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
+        await sut.StartForwardMeteredDataOrchestrationAsync(
             initializeProcessDto,
             CancellationToken.None);
 
@@ -374,11 +374,10 @@ public class RequestProcessOrchestrationStarterTests
                 expectedActor.ActorNumber.ToProcessManagerActorNumber(),
                 expectedActor.ActorRole.ToProcessManagerActorRole()),
             inputParameter: new ForwardMeteredDataInputV1(
-                MessageId: messageId,
-                AuthenticatedActorId: Guid.Empty, // This is not used and should be removed from the contract
+                ActorMessageId: messageId,
+                TransactionId: transactionId,
                 ActorNumber: requestedByActor.ActorNumber.Value,
                 ActorRole: requestedByActor.ActorRole.Name,
-                TransactionId: transactionId,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,
                 ProductNumber: expectedProductNumber,

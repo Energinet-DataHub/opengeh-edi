@@ -31,4 +31,19 @@ public class Quality : DataHubType<Quality>
         : base(name, code)
     {
     }
+
+    public static string? TryGetNameFromEbixCode(string? code, string? fallbackValue)
+    {
+        return code switch
+        {
+            "36" => throw new ArgumentOutOfRangeException(
+                nameof(code),
+                code,
+                $"Invalid ebIX {nameof(Quality)} code, it is deprecated"),
+            "56" => Estimated.Name,
+            "E01" => Measured.Name,
+            "D01" => Calculated.Name,
+            _ => fallbackValue,
+        };
+    }
 }

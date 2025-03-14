@@ -14,13 +14,11 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
-using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 
@@ -29,30 +27,21 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 public class IncomingMessagePublisher
 {
     private readonly AuthenticatedActor _authenticatedActor;
-    private readonly ISerializer _serializer;
-    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IRequestProcessOrchestrationStarter _requestProcessOrchestrationStarter;
-    private readonly MeteredDataOrchestrationStarter _meteredDataOrchestrationStarter;
-    private readonly ServiceBusSender _sender;
+    private readonly ForwardMeteredDataOrchestrationStarter _forwardMeteredDataOrchestrationStarter;
 
     public IncomingMessagePublisher(
         AuthenticatedActor authenticatedActor,
         IOptions<IncomingMessagesQueueOptions> options,
         IAzureClientFactory<ServiceBusSender> senderFactory,
-        ISerializer serializer,
-        IFeatureFlagManager featureFlagManager,
         IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter,
-        MeteredDataOrchestrationStarter meteredDataOrchestrationStarter)
+        ForwardMeteredDataOrchestrationStarter forwardMeteredDataOrchestrationStarter)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
         _authenticatedActor = authenticatedActor;
-        _serializer = serializer;
-        _featureFlagManager = featureFlagManager;
         _requestProcessOrchestrationStarter = requestProcessOrchestrationStarter;
-        _meteredDataOrchestrationStarter = meteredDataOrchestrationStarter;
-
-        _sender = senderFactory.CreateClient(options.Value.QueueName);
+        _forwardMeteredDataOrchestrationStarter = forwardMeteredDataOrchestrationStarter;
     }
 
     public async Task PublishAsync(
@@ -80,59 +69,29 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeAggregatedMeasureDataProcessDto);
 
-        if (await _featureFlagManager.UseRequestAggregatedMeasureDataProcessOrchestrationAsync()
-                .ConfigureAwait(false))
-        {
-            await _requestProcessOrchestrationStarter.StartRequestAggregatedMeasureDataOrchestrationAsync(
+        await _requestProcessOrchestrationStarter.StartRequestAggregatedMeasureDataOrchestrationAsync(
                     initializeAggregatedMeasureDataProcessDto,
                     cancellationToken)
                 .ConfigureAwait(false);
-        }
-        else
-        {
-            var serviceBusMessage =
-                new ServiceBusMessage(
-                    new BinaryData(_serializer.Serialize(initializeAggregatedMeasureDataProcessDto)))
-                {
-                    Subject = nameof(InitializeAggregatedMeasureDataProcessDto),
-                };
-
-            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
-        }
     }
 
     private async Task SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(initializeWholesaleServicesProcessDto);
 
-        if (await _featureFlagManager.UseRequestWholesaleServicesProcessOrchestrationAsync()
-                .ConfigureAwait(false))
-        {
-            await _requestProcessOrchestrationStarter.StartRequestWholesaleServicesOrchestrationAsync(
+        await _requestProcessOrchestrationStarter.StartRequestWholesaleServicesOrchestrationAsync(
                     initializeWholesaleServicesProcessDto,
                     cancellationToken)
                 .ConfigureAwait(false);
-        }
-        else
-        {
-            var serviceBusMessage =
-                new ServiceBusMessage(
-                    _serializer.Serialize(initializeWholesaleServicesProcessDto))
-                {
-                    Subject = nameof(InitializeWholesaleServicesProcessDto),
-                };
-
-            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
-        }
     }
 
     private async Task SendInitializeMeteredDataForMeteringPointMessageProcessAsync(InitializeMeteredDataForMeteringPointMessageProcessDto initializeMeteredDataForMeteringPointMessageProcessDto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
 
-        await _meteredDataOrchestrationStarter.StartForwardMeteredDataForMeteringPointOrchestrationAsync(
-            initializeMeteredDataForMeteringPointMessageProcessDto,
-            cancellationToken)
-        .ConfigureAwait(false);
+        await _forwardMeteredDataOrchestrationStarter.StartForwardMeteredDataOrchestrationAsync(
+                initializeMeteredDataForMeteringPointMessageProcessDto,
+                cancellationToken)
+            .ConfigureAwait(false);
     }
 }

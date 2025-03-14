@@ -28,6 +28,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
     private const string Electricity = "23";
 
     public static RequestAggregatedMeasureDataDto Create(
+        TransactionId transactionId,
         RequestAggregatedMeasureDataMarketRequest request,
         string senderNumber,
         string senderRole,
@@ -39,7 +40,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
         var series = new RequestAggregatedMeasureDataSeries(
-            TransactionId.New().Value,
+            transactionId.Value,
             MapEvaluationPointType(request),
             MapSettlementMethod(request),
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
@@ -44,19 +44,6 @@ public class EnqueueHandler_Brs_023_027_V1(
         EnqueueActorMessagesV1 enqueueActorMessages,
         CancellationToken cancellationToken)
     {
-        var featureIsDisabled =
-            !await _featureFlagManager.UseProcessManagerToEnqueueBrs023027MessagesAsync().ConfigureAwait(false);
-
-        _logger.LogInformation(
-            "Received enqueue actor messages for BRS 023/027. Feature is {Status}. Data: {Data}",
-            featureIsDisabled ? "disabled" : "enabled",
-            enqueueActorMessages.Data);
-
-        if (featureIsDisabled)
-        {
-            return;
-        }
-
         switch (enqueueActorMessages.DataType)
         {
             case nameof(CalculationEnqueueActorMessagesV1):

@@ -36,7 +36,6 @@ public sealed class WhenCalculationCompletedIsPublishedTests : BaseTestClass
                 fixture.B2BClients.MeteredDataResponsible,
                 output),
             new EdiDatabaseDriver(fixture.ConnectionString),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
             new ProcessManagerDriver(fixture.EdiTopicClient),
             output,
             fixture.BalanceFixingCalculationId,

@@ -131,7 +131,17 @@ public static class IncomingMessagesExtensions
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.NotifyTopicName,
                 tokenCredentialFactory: _ => defaultAzureCredential,
-                name: "Process Manager Notify Topic");
+                name: "Process Manager Notify Topic")
+            .AddAzureServiceBusTopic(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.Brs021ForwardMeteredDataStartTopicName,
+                tokenCredentialFactory: _ => defaultAzureCredential,
+                name: "Process Manager BRS-021 Start Topic")
+            .AddAzureServiceBusTopic(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.Brs021ForwardMeteredDataNotifyTopicName,
+                tokenCredentialFactory: _ => defaultAzureCredential,
+                name: "Process Manager BRS-021 Notify Topic");
 
         /*
         // RegisterSchemaProviders
@@ -159,7 +169,7 @@ public static class IncomingMessagesExtensions
          * Process Manager
          */
         services.AddTransient<IRequestProcessOrchestrationStarter, RequestProcessOrchestrationStarter>();
-        services.AddTransient<MeteredDataOrchestrationStarter>();
+        services.AddTransient<ForwardMeteredDataOrchestrationStarter>();
         services.AddProcessManagerMessageClient();
 
         return services;

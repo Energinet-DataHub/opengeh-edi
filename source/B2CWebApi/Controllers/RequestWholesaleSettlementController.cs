@@ -76,6 +76,7 @@ public class RequestWholesaleSettlementController : ControllerBase
 
         var message =
             RequestWholesaleSettlementDtoFactory.Create(
+                TransactionId.New(),
                 request,
                 currentUser.ActorNumber,
                 currentUser.MarketRole,

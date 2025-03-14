@@ -24,7 +24,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -48,7 +48,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests;
 [Collection(nameof(IncomingMessagesIntegrationTestCollection))]
 public class IncomingMessagesTestBase : IDisposable
 {
-    private readonly IAzureClientFactory<ServiceBusSender> _serviceBusSenderFactoryStub;
+    private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private ServiceCollection? _services;
     private bool _disposed;
@@ -66,6 +66,8 @@ public class IncomingMessagesTestBase : IDisposable
         AuthenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.EnergySupplier, null, ActorId));
     }
+
+    public ServiceBusSenderSpy Spy { get; set; } = null!;
 
     protected Guid ActorId => Guid.Parse("00000000-0000-0000-0000-000000000001");
 
@@ -96,6 +98,14 @@ public class IncomingMessagesTestBase : IDisposable
         var stringContent = await streamReader.ReadToEndAsync();
 
         return stringContent;
+    }
+
+    protected ServiceBusSenderSpy CreateServiceBusSenderSpy(string queueOrTopicName)
+    {
+        var serviceBusSenderSpy = new ServiceBusSenderSpy(queueOrTopicName);
+        _serviceBusSenderFactoryStub.AddSenderSpy(serviceBusSenderSpy);
+
+        return serviceBusSenderSpy;
     }
 
     protected async Task<string> GetFileContentFromFileStorageAsync(
@@ -180,9 +190,12 @@ public class IncomingMessagesTestBase : IDisposable
                         "Fake",
                     [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}"] =
                         "Fake",
+                    [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataStartTopicName)}"] =
+                        "Fake",
+                    [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataNotifyTopicName)}"] =
+                        "Fake",
                 })
             .Build();
-
         _services = [];
         _services
             .AddScoped<IConfiguration>(_ => config)
@@ -203,9 +216,8 @@ public class IncomingMessagesTestBase : IDisposable
             .AddIncomingMessagesModule(config);
 
         // Replace the services with stub implementations.
-        _services.AddSingleton(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
-
+        _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
         _services.AddScoped<ExecutionContext>(
             _ =>
             {

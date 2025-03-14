@@ -48,6 +48,7 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
@@ -55,8 +56,6 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
-      <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
-      <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
     </ItemGroup>
 
@@ -86,6 +85,9 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeteringPoint\InvalidMeteredDataForMeteringPoint.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeteringPoint\InvalidMeteredDataForMeteringPointMissingRegistration.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeteringPoint\ValidMeteredDataForMeteringPointWithTwoTransactions.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -108,6 +110,9 @@ limitations under the License.
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeteringPoint\InvalidMeteredDataForMeteringPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeteringPoint\InvalidMeteredDataForMeteringPointMissingRegistration.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\MeteredDataForMeteringPoint\ValidMeteredDataForMeteringPoint.xml">

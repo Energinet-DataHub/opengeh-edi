@@ -17,8 +17,8 @@ using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
-using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Json.Schema;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -568,7 +568,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasPoints(
-        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points,
+        IReadOnlyCollection<WholesaleServicesPoint> points,
         Resolution resolution)
     {
         var pointsInDocument = FirstWholesaleSeriesElement()
@@ -583,21 +583,21 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         pointsInDocument.Should().HaveSameCount(points);
 
-        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+        var expectedPoints = points.OrderBy(p => p.Position).ToList();
 
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
-            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount.ToDecimal());
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount);
 
-            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity.ToDecimal());
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity);
 
             AssertPosition(pointsInDocument, i);
 
-            AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price);
 
             // QuantityQuality should not be present in the document if resolution is monthly
-            QuantityQuality? expectedQuantityQuality = resolution == Resolution.Monthly
-                ? null : expectedPoints[i].QuantityQualities.SingleOrDefault();
+            var expectedQuantityQuality = resolution == Resolution.Monthly
+                ? null : expectedPoints[i].QuantityQuality;
             AssertQuantityQuality(pointsInDocument, i, expectedQuantityQuality);
         }
 
@@ -638,7 +638,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
-        DecimalValue expectedAmount,
+        decimal expectedAmount,
         QuantityQuality? expectedQuantityQuality)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
@@ -657,7 +657,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetProperty("energySum_Quantity.quantity")
             .GetDecimal()
             .Should()
-            .Be(expectedAmount.ToDecimal());
+            .Be(expectedAmount);
 
         pointInDocument
             .GetProperty("position")

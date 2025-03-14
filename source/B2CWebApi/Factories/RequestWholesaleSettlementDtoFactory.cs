@@ -28,6 +28,7 @@ public static class RequestWholesaleSettlementDtoFactory
     private const string Electricity = "23";
 
     public static RequestWholesaleSettlementDto Create(
+        TransactionId transactionId,
         RequestWholesaleSettlementMarketRequest request,
         string senderNumber,
         string senderRole,
@@ -48,7 +49,7 @@ public static class RequestWholesaleSettlementDtoFactory
             : [];
 
         var series = new RequestWholesaleSettlementSeries(
-            TransactionId.New().Value,
+            transactionId.Value,
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
             string.IsNullOrWhiteSpace(request.EndDate) ? null : InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone, Duration.FromMilliseconds(1)).ToString(),
             request.GridArea,

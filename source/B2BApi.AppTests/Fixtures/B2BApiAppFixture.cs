@@ -28,13 +28,13 @@ using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
@@ -126,6 +126,8 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(AuditLogMockServer));
 
         LogStopwatch(constructorStopwatch, "B2BApiAppFixture constructor");
+
+        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public AuditLogMockServer AuditLogMockServer { get; }
@@ -171,6 +173,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
 
+    private string AppConfigEndpoint { get; }
+
     public async Task InitializeAsync()
     {
         var initializeStopwatch = Stopwatch.StartNew();
@@ -207,6 +211,8 @@ public class B2BApiAppFixture : IAsyncLifetime
             .BuildTopic("process-manager-start")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", topic.Name))
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables // TODO: Do we need a separate topic for tests as well?
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataStartTopicName)}", topic.Name))
             .AddSubscription("process-manager-subscription")
             .CreateAsync();
         LogStopwatch(stopwatch, nameof(ProcessManagerStartTopicResource));
@@ -218,26 +224,14 @@ public class B2BApiAppFixture : IAsyncLifetime
             .BuildTopic("process-manager-notify")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", topic.Name))
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables // TODO: Do we need a separate topic for tests as well?
+                .Add($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataNotifyTopicName)}", topic.Name))
             .AddSubscription("process-manager-subscription")
             .CreateAsync();
         LogStopwatch(stopwatch, nameof(ProcessManagerNotifyTopicResource));
         await ServiceBusListenerMock.AddTopicSubscriptionListenerAsync(
             topicName: ProcessManagerNotifyTopicResource.Name,
             subscriptionName: ProcessManagerNotifyTopicResource.Subscriptions.Single().SubscriptionName);
-
-        await ServiceBusResourceProvider
-            .BuildQueue("edi-inbox")
-            .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", queue.Name))
-            .CreateAsync();
-        LogStopwatch(stopwatch, "ServiceBusQueue (edi-inbox)");
-
-        var wholesaleInboxQueueResource = await ServiceBusResourceProvider
-            .BuildQueue("wholesale-inbox")
-            .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", queue.Name))
-            .CreateAsync();
-        LogStopwatch(stopwatch, "ServiceBusQueue (wholesale-inbox)");
 
         await ServiceBusResourceProvider
             .BuildQueue("incoming-messages")
@@ -268,8 +262,6 @@ public class B2BApiAppFixture : IAsyncLifetime
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_021_Forward_Metered_Data_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
 
-        // => Receive messages on Wholesale Inbox Queue
-        await ServiceBusListenerMock.AddQueueListenerAsync(wholesaleInboxQueueResource.Name);
         LogStopwatch(stopwatch, nameof(ServiceBusListenerMock.AddQueueListenerAsync));
 
         AuditLogMockServer.StartServer();
@@ -324,18 +316,12 @@ public class B2BApiAppFixture : IAsyncLifetime
     }
 
     public void EnsureAppHostUsesFeatureFlagValue(
-        bool useRequestWholesaleServicesOrchestration = false,
-        bool useRequestAggregatedMeasureDataOrchestration = false,
-        bool usePeekTimeSeriesMessages = false,
-        bool useProcessManagerToEnqueueBrs023027Messages = false)
+        List<KeyValuePair<string, bool>> featureFlags)
     {
-        AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
-        {
-            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseRequestAggregatedMeasureDataProcessOrchestration.ToString()}", useRequestAggregatedMeasureDataOrchestration.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UsePeekTimeSeriesMessages.ToString()}", usePeekTimeSeriesMessages.ToString().ToLower() },
-            { $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}", useProcessManagerToEnqueueBrs023027Messages.ToString().ToLower() },
-        });
+        AppHostManager.RestartHostIfChanges(
+            featureFlags.ToDictionary(
+                keySelector: (element) => $"FeatureManagement__{element.Key}",
+                elementSelector: (element) => element.Value.ToString().ToLower()));
     }
 
     private static void StartHost(FunctionAppHostManager hostManager)
@@ -415,6 +401,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "Logging__LogLevel__Default",
             "Information");
+        // => Disable extensive logging from EF Core
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "Logging__LogLevel__Microsoft.EntityFrameworkCore",
+            "Warning");
         // => Disable extensive logging when using Azure Storage
         appHostSettings.ProcessEnvironmentVariables.Add(
             "Logging__LogLevel__Azure.Core",
@@ -488,20 +478,16 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UsePeekMessages.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.UsePeekMessages}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}",
-            false.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.ReceiveMeteredDataForMeasurementPoints.ToString()}",
+            $"FeatureManagement__{FeatureFlagName.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UseProcessManagerToEnqueueBrs023027Messages.ToString()}",
-            false.ToString().ToLower());
+            $"FeatureManagement__{FeatureFlagName.PM25Ebix}",
+            true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",
@@ -516,6 +502,11 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.{nameof(OutboxPublisher)}.Disabled",
             "true");
+
+        // App Configuration settings
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(AppConfiguration.AppConfigEndpoint),
+            AppConfigEndpoint);
 
         return appHostSettings;
     }

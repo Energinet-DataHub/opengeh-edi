@@ -46,12 +46,12 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
         IReadOnlyCollection<WholesaleServicesPoint> points)
         : base(
             documentType: DocumentType.NotifyWholesaleServices,
-            null!,
-            null,
-            eventId,
-            businessReason,
+            receiverNumber: null!,
+            processId: null,
+            eventId: eventId,
+            businessReasonName: businessReason,
             receiverRole: null!,
-            new ExternalId(calculationResultId))
+            externalId: new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
         EnergySupplierReceiverId = energySupplierReceiverId;

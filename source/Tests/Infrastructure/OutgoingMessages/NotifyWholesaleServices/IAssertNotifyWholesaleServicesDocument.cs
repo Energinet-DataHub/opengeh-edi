@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.CalculationResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
-using Energinet.DataHub.Edi.Responses;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
@@ -275,7 +275,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the list of points exists exactly as given in the first series element
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasPoints(
-        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points,
+        IReadOnlyCollection<WholesaleServicesPoint> points,
         Resolution resolution);
 
     /// <summary>
@@ -289,6 +289,6 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the list of points only contains a single point with the given amount and calculated quality
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
-        DecimalValue expectedAmount,
+        decimal expectedAmount,
         QuantityQuality? expectedQuantityQuality);
 }

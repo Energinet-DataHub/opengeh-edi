@@ -46,18 +46,14 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.SystemOperator, output);
-        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
-        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
-            ediDriver,
-            wholesaleDriver);
+        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(ediDriver);
 
         _wholesaleSettlementRequest =
             new WholesaleSettlementRequestDsl(
                 new EdiDatabaseDriver(fixture.ConnectionString),
                 ediDriver,
                 new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
-                wholesaleDriver,
                 new ProcessManagerDriver(fixture.EdiTopicClient));
     }
 

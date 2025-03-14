@@ -91,7 +91,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
             else
             {
                 // QuantityQuality should not be present in any format if resolution is monthly
-                asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount, null);
+                asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount!.Value, null);
             }
         }
 

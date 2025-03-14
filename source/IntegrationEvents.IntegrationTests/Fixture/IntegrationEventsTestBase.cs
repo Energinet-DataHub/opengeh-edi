@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
@@ -38,14 +38,11 @@ public class IntegrationEventsTestBase : IAsyncLifetime
         _integrationEventsFixture = integrationEventsFixture;
         _testOutputHelper = testOutputHelper;
         FeatureFlagManagerStub = new();
-        DurableClientSpy = new();
     }
 
     protected ServiceProvider Services { get; private set; } = null!;
 
     protected FeatureFlagManagerStub FeatureFlagManagerStub { get; }
-
-    protected DurableClientSpy DurableClientSpy { get; }
 
     public void SetupServiceCollection()
     {
@@ -64,9 +61,7 @@ public class IntegrationEventsTestBase : IAsyncLifetime
             .AddNodaTimeForApplication()
             .AddMasterDataModule(configuration)
             .AddIntegrationEventModule(configuration)
-            .AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub)
-            .AddScoped<IDurableClient>(_ => DurableClientSpy)
-            .AddScoped<IDurableClientFactory, DurableClientFactoryStub>();
+            .AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
 
         services.AddScoped<IConfiguration>(_ => configuration);
 

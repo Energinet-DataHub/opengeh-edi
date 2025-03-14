@@ -17,14 +17,13 @@
     <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
     <ProjectReference Include="..\IncomingMessages.Domain\IncomingMessages.Domain.csproj" />
     <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
-    <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="AdaskoTheBeAsT.Dapper.NodaTime" Version="5.0.0" />
-    <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="2.0.0" />
-    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.5.0" />
+    <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="2.1.0" />
+    <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.10.0" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.10.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">

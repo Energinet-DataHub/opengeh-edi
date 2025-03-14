@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
@@ -61,7 +61,7 @@ public class IncomingMessageReceiver
 
         if (incomingDocumentTypeName != null &&
             incomingDocumentTypeName.Equals(IncomingDocumentType.NotifyValidatedMeasureData.Name, StringComparison.OrdinalIgnoreCase)
-            && !await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))
+            && !await _featureFlagManager.ReceiveForwardMeteredDataInCimAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request

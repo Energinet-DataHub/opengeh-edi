@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
-using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 

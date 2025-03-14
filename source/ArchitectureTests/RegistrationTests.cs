@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
@@ -29,19 +30,14 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -60,8 +56,6 @@ public class RegistrationTests
     public RegistrationTests()
     {
         Environment.SetEnvironmentVariable($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", "FakeQueueNameIncoming");
-        Environment.SetEnvironmentVariable($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", "FakeQueueNameWholesale");
-        Environment.SetEnvironmentVariable($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", "FakeQueueNameEdi");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
         // The following declaration slows down the test execution, since creating a new Uri is a heavy operation
         Environment.SetEnvironmentVariable(
@@ -78,10 +72,15 @@ public class RegistrationTests
 
         Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}", "FakeTopicName");
         Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", "FakeTopicName");
+        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataStartTopicName)}", "FakeBrs021TopicName");
+        Environment.SetEnvironmentVariable($"{ProcessManagerServiceBusClientOptions.SectionName}__{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataNotifyTopicName)}", "FakeBrs021TopicName");
 
         // Dead-letter logging
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}", TestEnvironment.CreateFakeStorageUrl());
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.ContainerName)}", "fake-container-name");
+
+        // App Configuration settings
+        Environment.SetEnvironmentVariable(nameof(AppConfiguration.AppConfigEndpoint), "https://appcs-intgra-t-we-002.azconfig.io");
 
         _host = HostFactory.CreateHost(Program.TokenValidationParameters);
     }
@@ -94,25 +93,6 @@ public class RegistrationTests
         return typeof(NotifyAggregatedMeasureDataCimXmlDocumentWriter).Assembly.GetTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(IDocumentWriter)) && !t.IsAbstract)
             .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
-    }
-
-    public static IEnumerable<object[]> GetRequestHandlerRequirements()
-    {
-        return ResolveTypes(
-                typeof(IRequestHandler<,>),
-                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(PeekMessage).Assembly });
-    }
-
-    public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
-    {
-        return ResolveTypes(
-                typeof(INotificationHandler<>),
-                new[]
-                {
-                typeof(ExecuteDataRetentionJobs).Assembly,
-                typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
-                typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
-                });
     }
 
     public static IEnumerable<object[]> GetDocumentWritersRequirements()
@@ -165,22 +145,6 @@ public class RegistrationTests
         using var scope = _host.Services.CreateScope();
         Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
         Assert.True(scope.ServiceProvider.RequirementIsPartOfCollection<IDocumentWriter>(requirement));
-    }
-
-    [Theory(DisplayName = nameof(All_request_handlers_are_registered))]
-    [MemberData(nameof(GetRequestHandlerRequirements))]
-    public void All_request_handlers_are_registered(Requirement requirement)
-    {
-        using var scope = _host.Services.CreateScope();
-        Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
-    }
-
-    [Theory(DisplayName = nameof(All_notification_handlers_are_registered))]
-    [MemberData(nameof(GetNotificationsHandlerRequirements))]
-    public void All_notification_handlers_are_registered(Requirement requirement)
-    {
-        using var scope = _host.Services.CreateScope();
-        Assert.True(scope.ServiceProvider.CanSatisfyRequirement(requirement));
     }
 
     [Theory(DisplayName = nameof(All_document_writers_are_registered))]
@@ -280,7 +244,6 @@ public class RegistrationTests
         [
             scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>(),
             scope.ServiceProvider.GetRequiredService<IncomingMessagesContext>(),
-            scope.ServiceProvider.GetRequiredService<ProcessContext>(),
             scope.ServiceProvider.GetRequiredService<MasterDataContext>(),
             scope.ServiceProvider.GetRequiredService<OutboxContext>(),
         ];

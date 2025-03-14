@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
@@ -58,7 +56,7 @@ public class MeteredDateForMeteringPointBuilder
             null,
             null,
             SampleData.QuantityMeasureUnit,
-            null,
+            SampleData.RegistrationDateTime,
             SampleData.Resolution,
             SampleData.StartedDateTime,
             SampleData.EndedDateTime,

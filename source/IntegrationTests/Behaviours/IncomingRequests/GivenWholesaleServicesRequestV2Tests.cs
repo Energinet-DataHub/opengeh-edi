@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -45,7 +45,6 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         : base(fixture, testOutput)
     {
         _fixture = fixture;
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration, true);
         _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 
@@ -114,7 +113,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescription.ExampleWholesaleResultMessageData;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value) : ActorNumber.Create("8500000000502");
         var gridOperatorNumber = ActorNumber.Create("4444444444444");
@@ -249,7 +248,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
             ? testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier
             : testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = actorRole == ActorRole.SystemOperator ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value) : ActorNumber.Create("8500000000502");
         var actor = (ActorNumber: actorRole == ActorRole.EnergySupplier
@@ -397,7 +396,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
         var exampleWholesaleResultMessageForActor = actorRole == ActorRole.SystemOperator
             ? testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator
             : testDataDescription.ExampleWholesaleResultMessageData;
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
 
         var energySupplierOrNull = actorRole == ActorRole.EnergySupplier
             ? ActorNumber.Create("5790001662233")
@@ -546,7 +545,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
 
         // Arrange
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
         var energySupplierNumber = ActorNumber.Create("3333333333333");
         var chargeOwnerNumber = ActorNumber.Create("5799999933444");
@@ -671,7 +670,7 @@ public class GivenWholesaleServicesRequestV2Tests : WholesaleServicesBehaviourTe
                 ? testDataDescriptionForTotalAmount.ExampleWholesaleResultMessageDataForEnergySupplier
                 : testDataDescriptionForTotalAmount.ExampleWholesaleResultMessageDataForChargeOwner;
 
-        var senderSpy = CreateServiceBusSenderSpy(ServiceBusSenderNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var energySupplierNumber = ActorNumber.Create("5790001662233");
         var chargeOwnerNumber = actorRole == ActorRole.SystemOperator
                                 ? ActorNumber.Create(DataHubDetails.SystemOperatorActorNumber.Value)

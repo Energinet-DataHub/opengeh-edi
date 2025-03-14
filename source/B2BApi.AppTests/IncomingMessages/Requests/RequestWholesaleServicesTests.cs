@@ -59,7 +59,6 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
     public async Task Given_RequestWholesaleServices_When_RequestIsReceived_Then_ServiceBusMessageIsSentToProcessManagerTopic()
     {
         // Arrange
-        EnableRequestWholesaleServicesOrchestrationFeature();
         // The following must match with the JSON/XML document content
         var energySupplier = new Actor(
             ActorNumber.Create("5790000701278"),
@@ -88,10 +87,5 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
 
         var messageReceived = verifyServiceBusMessage.Wait(TimeSpan.FromSeconds(30));
         messageReceived.Should().BeTrue("because a Brs_028 message should be sent to the Process Manager topic");
-    }
-
-    private void EnableRequestWholesaleServicesOrchestrationFeature()
-    {
-        Fixture.EnsureAppHostUsesFeatureFlagValue(useRequestWholesaleServicesOrchestration: true);
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text;
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Dapper;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
@@ -23,6 +24,7 @@ using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
@@ -31,17 +33,16 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
-using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationTests.AppConfiguration;
 using Energinet.DataHub.EDI.IntegrationTests.DataRetention;
+using Energinet.DataHub.EDI.IntegrationTests.FeatureFlag;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -50,15 +51,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Dependenc
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.Process.Interfaces;
-using Google.Protobuf;
-using MediatR;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
@@ -69,7 +61,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
 
 namespace Energinet.DataHub.EDI.IntegrationTests;
@@ -78,7 +69,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests;
 public class TestBase : IDisposable
 {
     private readonly IAzureClientFactory<ServiceBusSender> _serviceBusSenderFactoryStub;
-    private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private ServiceCollection? _services;
     private bool _disposed;
@@ -90,13 +80,12 @@ public class TestBase : IDisposable
         Fixture.DatabaseManager.CleanupDatabase();
         Fixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-        TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
-        InboxEventNotificationHandler = new TestNotificationHandlerSpy();
         BuildServices(testOutputHelper);
-        _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, null, ActorId));
+
+        AppConfigurationClient = new AppConfigurationClient(Fixture.AppConfigEndpoint, Fixture.IntegrationTestConfiguration.Credential);
     }
 
     protected Guid ActorId => Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -109,9 +98,7 @@ public class TestBase : IDisposable
 
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
 
-    private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
-
-    private TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
+    protected AppConfigurationClient AppConfigurationClient { get; private set; } = null!;
 
     public void Dispose()
     {
@@ -215,7 +202,6 @@ public class TestBase : IDisposable
             return;
         }
 
-        _processContext.Dispose();
         _incomingMessagesContext.Dispose();
         ServiceProvider.Dispose();
         _disposed = true;
@@ -231,49 +217,9 @@ public class TestBase : IDisposable
         return serviceCollectionClone;
     }
 
-    protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
-    {
-        return GetService<IMediator>().Send(command);
-    }
-
     protected Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
     {
         return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
-    }
-
-    protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId, string? eventId = null)
-    {
-        await GetService<IInboxEventReceiver>().
-            ReceiveAsync(
-                EventId.From(eventId ?? Guid.NewGuid().ToString()),
-                eventType,
-                processId,
-                eventPayload.ToByteArray())
-            .ConfigureAwait(false);
-
-        await ProcessReceivedInboxEventsAsync().ConfigureAwait(false);
-        await ProcessInternalCommandsAsync().ConfigureAwait(false);
-    }
-
-    protected async Task ProcessInternalCommandsAsync()
-    {
-        await ProcessBackgroundTasksAsync();
-
-        if (_processContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
-        {
-            await ProcessInternalCommandsAsync();
-        }
-    }
-
-    private Task ProcessReceivedInboxEventsAsync()
-    {
-        return ProcessBackgroundTasksAsync();
-    }
-
-    private Task ProcessBackgroundTasksAsync()
-    {
-        var clock = GetService<IClock>();
-        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
     }
 
     private void BuildServices(ITestOutputHelper testOutputHelper)
@@ -285,14 +231,21 @@ public class TestBase : IDisposable
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
+                .AddAzureAppConfiguration(options =>
+                {
+                    var appConfigEndpoint = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
+                    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
+                        .UseFeatureFlags(featureFlagOptions =>
+                        {
+                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(1));
+                        });
+                })
             .AddEnvironmentVariables()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
                     // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
-                    [$"{EdiInboxQueueOptions.SectionName}:{nameof(EdiInboxQueueOptions.QueueName)}"] = "Fake",
-                    [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] = "Fake",
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] = "NotEmpty",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] = "NotEmpty",
@@ -310,20 +263,15 @@ public class TestBase : IDisposable
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
+                    // => App Configuration
+                    [$"{nameof(BuildingBlocks.Infrastructure.Configuration.AppConfiguration.AppConfigEndpoint)}"] = Fixture.AppConfigEndpoint,
                 })
             .Build();
 
         _services = [];
         _services.AddScoped<IConfiguration>(_ => config);
 
-        _services.AddTransient<InboxEventsProcessor>()
-            .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(
-                _ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy)
-            .AddTransient<INotificationHandler<TestNotification>>(_ => InboxEventNotificationHandler)
-            .AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>()
-            .AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>,
-                TestCreateOutgoingCommandHandler>()
-            .AddScopedSqlDbContext<ProcessContext>(config)
+        _services
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddJavaScriptEncoder()
             .AddSerializer()
@@ -333,7 +281,6 @@ public class TestBase : IDisposable
         _services.AddTransient<ExecuteDataRetentionJobs>()
             .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)
-            .AddProcessModule(config)
             .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
@@ -342,6 +289,9 @@ public class TestBase : IDisposable
             .AddOutboxContext(config)
             .AddOutboxClient<OutboxContext>()
             .AddOutboxProcessor<OutboxContext>();
+
+        // Azure App Configuration
+        _services.AddAzureAppConfiguration();
 
         // Replace the services with stub implementations.
         // - Building blocks
