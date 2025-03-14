@@ -412,23 +412,19 @@ public static class OutgoingMessageFactory
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(message);
 
-        MessageId? relatedToMessageId = message.AcknowledgementDto.ReceivedMarketDocumentTransactionId is not null
-            ? MessageId.Create(message.AcknowledgementDto.ReceivedMarketDocumentTransactionId)
-            : null;
-
         return new OutgoingMessage(
             eventId: message.EventId,
             documentType: DocumentType.Acknowledgement,
-            receiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
-            documentReceiver: Receiver.Create(message.ReceiverId, message.ReceiverRole),
+            receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
             processId: message.ProcessId,
-            businessReason: message.BusinessReason.Name,
-            serializedContent: serializer.Serialize(message.AcknowledgementDto),
+            businessReason: message.BusinessReason,
+            serializedContent: serializer.Serialize(message.Series),
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
-            relatedToMessageId: relatedToMessageId,
+            relatedToMessageId: message.RelatedToMessageId,
             gridAreaCode: null,
-            externalId: new ExternalId(message.ExternalId),
+            externalId: message.ExternalId,
             calculationId: null,
             periodStartedAt: null);
     }

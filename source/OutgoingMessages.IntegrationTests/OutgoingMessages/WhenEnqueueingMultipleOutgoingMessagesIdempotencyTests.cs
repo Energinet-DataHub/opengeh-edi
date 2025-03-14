@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -265,25 +266,21 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueRejectedForwardMeteredDataMessage_Then_OneMessageIsEnqueued()
     {
         // Arrange
-        var orchestrationInstanceId = Guid.NewGuid();
+        var serviceBusMessageId = Guid.NewGuid();
         var message = new RejectedForwardMeteredDataMessageDto(
-            EventId: EventId.From(Guid.NewGuid()),
-            BusinessReason: BusinessReason.PeriodicFlexMetering,
-            ReceiverId: ActorNumber.Create("1234567890123"),
-            ReceiverRole: ActorRole.GridAccessProvider,
-            ProcessId: orchestrationInstanceId,
-            ExternalId: orchestrationInstanceId,
-            AcknowledgementDto: new AcknowledgementDto(
-                ReceivedMarketDocumentTransactionId: Guid.NewGuid().ToString(),
-                ReceivedMarketDocumentProcessProcessType: BusinessReason.PeriodicFlexMetering.Name,
-                Series: [
-                    new SeriesDto(
-                        MRID: Guid.NewGuid().ToString(),
-                        Reason: [
-                            new ReasonDto(
-                                    Code: "E01",
-                                    Text: "An error has occurred")])
-                ]));
+            eventId: EventId.From(serviceBusMessageId),
+            externalId: new ExternalId(serviceBusMessageId),
+            businessReason: BusinessReason.PeriodicFlexMetering,
+            receiverId: ActorNumber.Create("1234567890123"),
+            receiverRole: ActorRole.GridAccessProvider,
+            relatedToMessageId: MessageId.New(),
+            series: new RejectedForwardMeteredDataSeries(
+                TransactionId: TransactionId.New(),
+                OriginalTransactionIdReference: TransactionId.New(),
+                RejectReasons: [
+                    new RejectedRejectedForwardMeteredDataReason(
+                        ErrorCode: "E01",
+                        ErrorMessage: "An error has occurred")]));
 
         // Act
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
@@ -295,7 +292,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
 
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
-        Assert.Collection(outgoingMessages, om => Assert.Equal(orchestrationInstanceId, om.ExternalId.Value));
+        Assert.Collection(outgoingMessages, om => Assert.Equal(serviceBusMessageId, om.ExternalId.Value));
     }
 
     private AcceptedForwardMeteredDataMessageDto CreateAcceptedForwardMeteredDataMessage(
