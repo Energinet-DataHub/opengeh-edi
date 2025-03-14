@@ -29,6 +29,7 @@ using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.IncomingMessages;
 
+// TODO: If this lives when the process module is deleted, then move it to incoming messages
 public class RequestProcessOrchestrationStarterTests
 {
     [Theory]
@@ -378,6 +379,7 @@ public class RequestProcessOrchestrationStarterTests
                 TransactionId: transactionId,
                 ActorNumber: requestedByActor.ActorNumber.Value,
                 ActorRole: requestedByActor.ActorRole.Name,
+                BusinessReason: expectedBusinessReason.Name,
                 MeteringPointId: expectedMeteringPointId,
                 MeteringPointType: meteringPointType?.Name,
                 ProductNumber: expectedProductNumber,
