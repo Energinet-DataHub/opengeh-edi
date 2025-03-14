@@ -26,7 +26,7 @@ public sealed class AcknowledgementXmlDocumentWriter(IMessageRecordParser parser
               "urn:ediel.org:general:acknowledgement:0:1 ack.xsd",
               "urn:ediel.org:general:acknowledgement:0:1",
               "cim",
-              "E66"),
+              "ERR"),
           parser)
 {
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
