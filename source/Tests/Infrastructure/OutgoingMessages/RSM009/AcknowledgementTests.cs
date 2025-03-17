@@ -30,13 +30,11 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
-    private readonly RejectedForwardMeteredDataMessageBuilder _rejectedForwardMeteredDataMessageBuilder;
 
     public AcknowledgementTests(DocumentValidationFixture documentValidation)
     {
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
-        _rejectedForwardMeteredDataMessageBuilder = new RejectedForwardMeteredDataMessageBuilder();
     }
 
     [Theory]
@@ -45,12 +43,35 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
     //[InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_document(string documentFormat)
     {
+        var rejectMessageBuilder = new RejectedForwardMeteredDataMessageBuilder(
+            messageId: MessageId.New(),
+            senderId: ActorNumber.Create("5790001330552"),
+            senderRole: ActorRole.DanishEnergyAgency,
+            receiverId: ActorNumber.Create("1234567890123"),
+            receiverRole: ActorRole.EnergySupplier,
+            businessReason: BusinessReason.PeriodicFlexMetering,
+            relatedToMessageId: MessageId.New(),
+            transactionId: TransactionId.New(),
+            originalTransactionIdReference: TransactionId.New());
+
         var marketDocumentStream = await CreateDocument(
-            _rejectedForwardMeteredDataMessageBuilder,
+            rejectMessageBuilder,
             DocumentFormat.FromName(documentFormat));
 
         AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
             .DocumentIsValid();
+
+        AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
+            .HasMessageId(rejectMessageBuilder.MessageId)
+            .HasSenderId(rejectMessageBuilder.SenderId)
+            .HasSenderRole(rejectMessageBuilder.SenderRole)
+            .HasReceiverId(rejectMessageBuilder.ReceiverId)
+            .HasReceiverRole(rejectMessageBuilder.ReceiverRole)
+            //.HasReasonCode(rejectMessageBuilder.BusinessReason)
+
+            .HasTransactionId(rejectMessageBuilder.TransactionId)
+            //.HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)
+            ;
     }
 
     private Task<MarketDocumentStream> CreateDocument(

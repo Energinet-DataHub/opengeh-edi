@@ -83,7 +83,7 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         {
             writer.WriteStartObject();
             {
-                writer.WriteProperty("mRID", rejectedForwardMeteredDataRecord.OriginalTransactionIdReference.Value);
+                writer.WriteProperty("mRID", rejectedForwardMeteredDataRecord.TransactionId.Value);
                 WriteReasons(rejectedForwardMeteredDataRecord.RejectReasons, writer);
             }
 
