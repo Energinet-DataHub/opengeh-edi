@@ -82,6 +82,7 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IDocumentWriter, MeteredDateForMeteringPointCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, MeteredDateForMeteringPointCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, AcknowledgementJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, AcknowledgementXmlDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         // MessageEnqueueingConfiguration

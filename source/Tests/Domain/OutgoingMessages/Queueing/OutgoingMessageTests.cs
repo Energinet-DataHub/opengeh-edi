@@ -59,6 +59,7 @@ public class OutgoingMessageTests
         new MeteredDateForMeteringPointCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new AcknowledgementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
+        new AcknowledgementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     ];
 
     /// <summary>

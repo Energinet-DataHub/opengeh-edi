@@ -44,14 +44,7 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
-        if (documentType == DocumentType.Acknowledgement)
-        {
-            writer.Should().BeNull($"{documentType} does not support xml yet");
-        }
-        else
-        {
-            writer.Should().NotBeNull();
-        }
+        writer.Should().NotBeNull();
     }
 
     [Theory]
