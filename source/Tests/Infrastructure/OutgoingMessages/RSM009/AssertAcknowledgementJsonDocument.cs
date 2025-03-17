@@ -88,11 +88,9 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public async Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
+    public IAssertAcknowledgementDocument DocumentIsValid()
     {
-        var schema = await _schemas
-            .GetSchemaAsync<JsonSchema>(DocumentType.Acknowledgement.ToString(), "0", CancellationToken.None)
-            .ConfigureAwait(false);
+        var schema = JsonSchema.FromFile(@"Infrastructure\OutgoingMessages\RSM009\Acknowledgement-assembly-model.schema.json");
 
         schema.Should().NotBeNull("Cannot validate document without a schema");
 

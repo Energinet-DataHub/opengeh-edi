@@ -137,7 +137,7 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         WriteValueObjectIfNotNull(
             writer,
             "received_MarketDocument.process.processType",
-            messageHeader.BusinessReason);
+            BusinessReason.FromName(messageHeader.BusinessReason).Code);
 
         WritePropertyIfNotNull(
             writer,
