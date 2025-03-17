@@ -58,8 +58,8 @@ public class OutgoingMessageTests
         new MeteredDateForMeteringPointCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new MeteredDateForMeteringPointCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
-        // TODO add missing xml document writers for acknowledgement
         new AcknowledgementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
+        new AcknowledgementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     ];
 
     /// <summary>
