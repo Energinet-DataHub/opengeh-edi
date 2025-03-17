@@ -31,15 +31,17 @@ public sealed class AcknowledgementXmlDocumentWriter(IMessageRecordParser parser
 {
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
-        // Parse the acknowledgement record (assumes a single payload) - is this right?
-        var acknowledgement = ParseFrom<Acknowledgement>(marketActivityPayloads.Single());
+        var acknowledgements = ParseFrom<Acknowledgement>(marketActivityPayloads);
 
-        await WriteReceivedMarketDocumentElementsAsync(acknowledgement, writer).ConfigureAwait(false);
-        await WriteReasonElementsAsync(acknowledgement.Reason, writer).ConfigureAwait(false);
-        await WriteInErrorPeriodsAsync(acknowledgement.InErrorPeriod, writer).ConfigureAwait(false);
-        await WriteSeriesElementsAsync(acknowledgement.Series, writer).ConfigureAwait(false);
-        await WriteOriginalMktActivityRecordsAsync(acknowledgement.OriginalMktActivityRecord, writer).ConfigureAwait(false);
-        await WriteRejectedTimeSeriesAsync(acknowledgement.RejectedTimeSeries, writer).ConfigureAwait(false);
+        foreach (var acknowledgement in acknowledgements)
+        {
+            await WriteReceivedMarketDocumentElementsAsync(acknowledgement, writer).ConfigureAwait(false);
+            await WriteReasonElementsAsync(acknowledgement.Reason, writer).ConfigureAwait(false);
+            await WriteInErrorPeriodsAsync(acknowledgement.InErrorPeriod, writer).ConfigureAwait(false);
+            await WriteSeriesElementsAsync(acknowledgement.Series, writer).ConfigureAwait(false);
+            await WriteOriginalMktActivityRecordsAsync(acknowledgement.OriginalMktActivityRecord, writer).ConfigureAwait(false);
+            await WriteRejectedTimeSeriesAsync(acknowledgement.RejectedTimeSeries, writer).ConfigureAwait(false);
+        }
     }
 
     private async Task WriteReceivedMarketDocumentElementsAsync(Acknowledgement acknowledgement, XmlWriter writer)

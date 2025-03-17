@@ -79,13 +79,6 @@ public abstract class CimXmlDocumentWriter : IDocumentWriter
         return marketActivityRecords;
     }
 
-    protected TMarketActivityRecord ParseFrom<TMarketActivityRecord>(string payload)
-    {
-        ArgumentNullException.ThrowIfNull(payload);
-
-        return _parser.From<TMarketActivityRecord>(payload);
-    }
-
     protected Task WriteElementAsync(string name, string value, XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(writer);
