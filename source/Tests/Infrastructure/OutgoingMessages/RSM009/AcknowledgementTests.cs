@@ -48,6 +48,9 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
         var marketDocumentStream = await CreateDocument(
             _rejectedForwardMeteredDataMessageBuilder,
             DocumentFormat.FromName(documentFormat));
+
+        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
+            .DocumentIsValidAsync();
     }
 
     private Task<MarketDocumentStream> CreateDocument(
@@ -77,6 +80,31 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
                     _parser,
                     serviceProvider.GetRequiredService<JavaScriptEncoder>())
                 .WriteAsync(documentHeader, new[] { records });
+        }
+
+        throw new Exception("Unknown document format");
+    }
+
+    private IAssertAcknowledgementDocument AssertDocument(
+        Stream document,
+        DocumentFormat documentFormat)
+    {
+        /*
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
+            return new AssertRejectRequestWholesaleSettlementEbixDocument(assertEbixDocument);
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
+            return new AssertRejectRequestWholesaleSettlementXmlDocument(assertXmlDocument);
+        }
+*/
+        if (documentFormat == DocumentFormat.Json)
+        {
+            return new AssertAcknowledgementJsonDocument(document);
         }
 
         throw new Exception("Unknown document format");
