@@ -83,7 +83,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             .HasReceiverId(rejectMessageBuilder.ReceiverId)
             .HasReceiverRole(rejectMessageBuilder.ReceiverRole)
             .HasCreationDate(rejectMessageBuilder.Timestamp)
-            .HasOriginalMessageId(rejectMessageBuilder.RelatedToMessageId)
+            .HasRelatedToMessageId(rejectMessageBuilder.RelatedToMessageId)
             .HasReceivedBusinessReasonCode(rejectMessageBuilder.BusinessReason)
 
             .HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)

@@ -90,12 +90,12 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasOriginalMessageId(MessageId originalMessageId)
+    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId relatedTOriginalMessageId)
     {
         _root.GetProperty("received_MarketDocument.mRID")
             .GetString()
             .Should()
-            .Be(originalMessageId.Value);
+            .Be(relatedTOriginalMessageId.Value);
         return this;
     }
 

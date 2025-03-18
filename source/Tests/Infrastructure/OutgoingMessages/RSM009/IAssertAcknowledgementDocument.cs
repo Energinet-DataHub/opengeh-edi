@@ -32,7 +32,7 @@ public interface IAssertAcknowledgementDocument
 
     IAssertAcknowledgementDocument HasReceivedBusinessReasonCode(BusinessReason businessReason);
 
-    IAssertAcknowledgementDocument HasOriginalMessageId(MessageId originalMessageId);
+    IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId relatedTOriginalMessageId);
 
     IAssertAcknowledgementDocument HasCreationDate(Instant creationDate);
 

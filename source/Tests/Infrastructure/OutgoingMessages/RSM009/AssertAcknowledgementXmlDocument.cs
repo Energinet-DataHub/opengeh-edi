@@ -67,9 +67,9 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasOriginalMessageId(MessageId originalMessageId)
+    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId relatedTOriginalMessageId)
     {
-        _documentAsserter.HasValue("received_MarketDocument.mRID", originalMessageId.Value);
+        _documentAsserter.HasValue("received_MarketDocument.mRID", relatedTOriginalMessageId.Value);
         return this;
     }
 
