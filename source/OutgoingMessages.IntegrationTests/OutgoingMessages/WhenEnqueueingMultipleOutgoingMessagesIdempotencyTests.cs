@@ -278,7 +278,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
                 OriginalTransactionIdReference: TransactionId.New(),
                 RejectReasons: [
                     new RejectReason(
-                        ErrorCode: "E01",
+                        ErrorCode: "E0I",
                         ErrorMessage: "An error has occurred")]));
 
         // Act
@@ -291,7 +291,9 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
 
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
-        Assert.Collection(outgoingMessages, om => Assert.Equal(serviceBusMessageId, om.ExternalId.Value));
+
+        var outgoingMessage = Assert.Single(outgoingMessages);
+        Assert.Equal(serviceBusMessageId, outgoingMessage.ExternalId.Value);
     }
 
     private AcceptedForwardMeteredDataMessageDto CreateAcceptedForwardMeteredDataMessage(

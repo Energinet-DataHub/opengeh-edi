@@ -200,7 +200,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             ValidationErrors: [
                 new ValidationErrorDto(
                     Message: "Invalid end date",
-                    ErrorCode: "X01"),
+                    ErrorCode: "999"),
             ]);
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();

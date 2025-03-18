@@ -16,23 +16,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using NodaTime;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class RejectedForwardMeteredDataMessageBuilder
 {
-#pragma warning disable SA1401
-    public readonly BusinessReason BusinessReason;
-    public readonly ActorNumber SenderId;
-    public readonly ActorRole SenderRole;
-    public readonly ActorNumber ReceiverId;
-    public readonly ActorRole ReceiverRole;
-    public readonly MessageId MessageId;
-    public readonly MessageId RelatedToMessageId;
-    public readonly TransactionId OriginalTransactionIdReference;
-    public readonly Instant Timestamp;
-#pragma warning restore SA1401
     private readonly List<RejectReason> _rejectReasons;
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly ExternalId _externalId = new ExternalId(Guid.NewGuid());
@@ -59,6 +47,24 @@ public class RejectedForwardMeteredDataMessageBuilder
         OriginalTransactionIdReference = originalTransactionIdReference;
         Timestamp = timestamp;
     }
+
+    public BusinessReason BusinessReason { get; }
+
+    public ActorNumber SenderId { get; }
+
+    public ActorRole SenderRole { get; }
+
+    public ActorNumber ReceiverId { get; }
+
+    public ActorRole ReceiverRole { get; }
+
+    public MessageId MessageId { get; }
+
+    public MessageId RelatedToMessageId { get; }
+
+    public TransactionId OriginalTransactionIdReference { get; }
+
+    public Instant Timestamp { get; }
 
     public RejectedForwardMeteredDataMessageDto BuildDto()
     {

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
@@ -28,11 +30,15 @@ public interface IAssertAcknowledgementDocument
 
     IAssertAcknowledgementDocument HasReceiverRole(ActorRole receiverRole);
 
-    IAssertAcknowledgementDocument HasReasonCode(ReasonCode reasonCode);
+    IAssertAcknowledgementDocument HasReceivedBusinessReasonCode(BusinessReason businessReason);
 
     IAssertAcknowledgementDocument HasOriginalMessageId(MessageId originalMessageId);
+
+    IAssertAcknowledgementDocument HasCreationDate(Instant creationDate);
 
     Task<IAssertAcknowledgementDocument> DocumentIsValidAsync();
 
     IAssertAcknowledgementDocument HasOriginalTransactionId(TransactionId originalTransactionId);
+
+    IAssertAcknowledgementDocument SeriesHasReasons(params RejectReason[] rejectReasons);
 }

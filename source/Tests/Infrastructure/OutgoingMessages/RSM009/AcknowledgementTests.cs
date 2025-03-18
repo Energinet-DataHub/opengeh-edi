@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Text;
 using Xunit;
+using RejectReason = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint.RejectReason;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
@@ -59,6 +60,15 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             originalTransactionIdReference: TransactionId.New(),
             timestamp: InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value);
 
+        rejectMessageBuilder.AddReasonToSeries(
+            new RejectReason(
+                ErrorCode: "999",
+                ErrorMessage: "Error message 1"));
+        rejectMessageBuilder.AddReasonToSeries(
+            new RejectReason(
+                ErrorCode: "A01",
+                ErrorMessage: "Error message 2"));
+
         var marketDocumentStream = await CreateDocument(
             rejectMessageBuilder,
             DocumentFormat.FromName(documentFormat));
@@ -72,11 +82,12 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             .HasSenderRole(rejectMessageBuilder.SenderRole)
             .HasReceiverId(rejectMessageBuilder.ReceiverId)
             .HasReceiverRole(rejectMessageBuilder.ReceiverRole)
+            .HasCreationDate(rejectMessageBuilder.Timestamp)
             .HasOriginalMessageId(rejectMessageBuilder.RelatedToMessageId)
-            //.HasReasonCode(rejectMessageBuilder.BusinessReason)
+            .HasReceivedBusinessReasonCode(rejectMessageBuilder.BusinessReason)
 
             .HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)
-            ;
+            .SeriesHasReasons(rejectMessageBuilder.GetSeries().RejectReasons.ToArray());
     }
 
     private Task<MarketDocumentStream> CreateDocument(

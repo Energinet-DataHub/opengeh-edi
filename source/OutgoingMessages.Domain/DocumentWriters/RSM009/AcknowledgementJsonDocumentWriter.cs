@@ -61,15 +61,13 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
             writer.WriteStartObject();
             {
                 WriteHeader(messageHeader, writer);
+                writer.WriteStartArray("Series");
                 foreach (var acknowledgement in acknowledgements)
                 {
-                    writer.WriteStartArray("Series");
-                    {
-                        WriteSerie(acknowledgement, writer);
-                    }
-
-                    writer.WriteEndArray();
+                    WriteSeries(acknowledgement, writer);
                 }
+
+                writer.WriteEndArray();
             }
 
             writer.WriteEndObject();
@@ -83,7 +81,7 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         return new MarketDocumentStream(stream);
     }
 
-    private void WriteSerie(
+    private void WriteSeries(
         RejectedForwardMeteredDataRecord rejectedForwardMeteredDataRecord,
         Utf8JsonWriter writer)
     {
@@ -128,7 +126,7 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
 
         writer.WriteObject(
             "received_MarketDocument.process.processType",
-            new KeyValuePair<string, string>("value", messageHeader.BusinessReason));
+            new KeyValuePair<string, string>("value", BusinessReason.FromName(messageHeader.BusinessReason).Code));
 
         writer.WriteObject(
             "sender_MarketParticipant.mRID",

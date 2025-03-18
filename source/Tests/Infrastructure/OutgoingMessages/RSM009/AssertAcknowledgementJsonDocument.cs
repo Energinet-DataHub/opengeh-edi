@@ -15,8 +15,10 @@
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using FluentAssertions;
 using Json.Schema;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
@@ -78,13 +80,13 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasReasonCode(ReasonCode reasonCode)
+    public IAssertAcknowledgementDocument HasReceivedBusinessReasonCode(BusinessReason businessReason)
     {
-        _root.GetProperty("reason.code")
+        _root.GetProperty("received_MarketDocument.process.processType")
             .GetProperty("value")
             .GetString()
             .Should()
-            .Be(reasonCode.Code);
+            .Be(businessReason.Code);
         return this;
     }
 
@@ -94,6 +96,15 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
             .GetString()
             .Should()
             .Be(originalMessageId.Value);
+        return this;
+    }
+
+    public IAssertAcknowledgementDocument HasCreationDate(Instant creationDate)
+    {
+        _root.GetProperty("createdDateTime")
+            .GetString()
+            .Should()
+            .Be(creationDate.ToString());
         return this;
     }
 
@@ -123,6 +134,18 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
             .GetString()
             .Should()
             .Be(originalTransactionId.Value);
+        return this;
+    }
+
+    public IAssertAcknowledgementDocument SeriesHasReasons(params RejectReason[] rejectReasons)
+    {
+        FirstSeriesElement()
+            .GetProperty("Reason")
+            .EnumerateArray()
+            .Select(x => new RejectReason(x.GetProperty("code").GetProperty("value").GetString()!, x.GetProperty("text").GetString()!))
+            .Should()
+            .BeEquivalentTo(rejectReasons);
+
         return this;
     }
 

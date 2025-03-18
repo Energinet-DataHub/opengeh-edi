@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
@@ -59,15 +61,21 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasReasonCode(ReasonCode reasonCode)
+    public IAssertAcknowledgementDocument HasReceivedBusinessReasonCode(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("reason.code", reasonCode.Code);
+        _documentAsserter.HasValue("received_MarketDocument.process.processType", businessReason.Code);
         return this;
     }
 
     public IAssertAcknowledgementDocument HasOriginalMessageId(MessageId originalMessageId)
     {
         _documentAsserter.HasValue("received_MarketDocument.mRID", originalMessageId.Value);
+        return this;
+    }
+
+    public IAssertAcknowledgementDocument HasCreationDate(Instant creationDate)
+    {
+        _documentAsserter.HasValue("createdDateTime", creationDate.ToString());
         return this;
     }
 
@@ -84,6 +92,24 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         _documentAsserter.HasValue(
             "Series[1]/mRID",
             originalTransactionId.Value);
+        return this;
+    }
+
+    public IAssertAcknowledgementDocument SeriesHasReasons(params RejectReason[] rejectReasons)
+    {
+        // If this failed, then the document has to many reasons compared to the expected
+        _documentAsserter.HasValue($"Series[1]/Reason[{rejectReasons.Length + 1}]", null!);
+
+        for (var i = 0; i < rejectReasons.Length;  i++)
+        {
+            _documentAsserter.HasValue(
+                $"Series[1]/Reason[{i + 1}]/code",
+                rejectReasons[i].ErrorCode);
+            _documentAsserter.HasValue(
+                $"Series[1]/Reason[{i + 1}]/text",
+                rejectReasons[i].ErrorMessage);
+        }
+
         return this;
     }
 }
