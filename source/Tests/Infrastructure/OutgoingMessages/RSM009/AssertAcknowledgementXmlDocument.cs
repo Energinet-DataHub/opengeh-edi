@@ -24,7 +24,7 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
     public AssertAcknowledgementXmlDocument(AssertXmlDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
-        _documentAsserter.HasValue("type", "ERR");
+        _documentAsserter.HasValue("type", null!);
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)
@@ -65,6 +65,12 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         return this;
     }
 
+    public IAssertAcknowledgementDocument HasOriginalMessageId(MessageId originalMessageId)
+    {
+        _documentAsserter.HasValue("received_MarketDocument.mRID", originalMessageId.Value);
+        return this;
+    }
+
     public async Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.Acknowledgement)
@@ -72,18 +78,11 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
-    {
-        ArgumentNullException.ThrowIfNull(transactionId);
-        _documentAsserter.HasValue("Series[1]/mRID", transactionId.Value);
-        return this;
-    }
-
     public IAssertAcknowledgementDocument HasOriginalTransactionId(TransactionId originalTransactionId)
     {
         ArgumentNullException.ThrowIfNull(originalTransactionId);
         _documentAsserter.HasValue(
-            "Series[1]/originalTransactionIDReference_Series.mRID",
+            "Series[1]/mRID",
             originalTransactionId.Value);
         return this;
     }

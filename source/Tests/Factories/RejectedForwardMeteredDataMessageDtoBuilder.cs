@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using NodaTime;
 using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
@@ -30,6 +31,7 @@ public class RejectedForwardMeteredDataMessageBuilder
     public readonly MessageId MessageId;
     public readonly MessageId RelatedToMessageId;
     public readonly TransactionId OriginalTransactionIdReference;
+    public readonly Instant Timestamp;
 #pragma warning restore SA1401
     private readonly List<RejectReason> _rejectReasons;
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
@@ -43,8 +45,8 @@ public class RejectedForwardMeteredDataMessageBuilder
         ActorRole senderRole,
         BusinessReason businessReason,
         MessageId relatedToMessageId,
-        TransactionId transactionId,
-        TransactionId originalTransactionIdReference)
+        TransactionId originalTransactionIdReference,
+        Instant timestamp)
     {
         _rejectReasons = new List<RejectReason>();
         ReceiverRole = receiverRole;
@@ -55,6 +57,7 @@ public class RejectedForwardMeteredDataMessageBuilder
         MessageId = messageId;
         ReceiverId = receiverId;
         OriginalTransactionIdReference = originalTransactionIdReference;
+        Timestamp = timestamp;
     }
 
     public RejectedForwardMeteredDataMessageDto BuildDto()
@@ -79,7 +82,7 @@ public class RejectedForwardMeteredDataMessageBuilder
             ReceiverRole.Code,
             MessageId: MessageId.Value,
             RelatedToMessageId: RelatedToMessageId.Value,
-            InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value);
+            Timestamp);
     }
 
     public RejectedForwardMeteredDataSeries GetSeries()
