@@ -63,7 +63,7 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
                 WriteHeader(messageHeader, writer);
                 foreach (var acknowledgement in acknowledgements)
                 {
-                    WriteSeries(acknowledgement, writer);
+                    WriteReasons(acknowledgement, writer);
                 }
             }
 
@@ -78,36 +78,22 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         return new MarketDocumentStream(stream);
     }
 
-    private void WriteSeries(
+    private void WriteReasons(
         RejectedForwardMeteredDataRecord rejectedForwardMeteredDataRecord,
         Utf8JsonWriter writer)
     {
-        writer.WriteStartArray("Series");
-        {
-            writer.WriteStartObject();
-            {
-                writer.WriteProperty("mRID", rejectedForwardMeteredDataRecord.OriginalTransactionIdReference.Value);
-                WriteReasons(rejectedForwardMeteredDataRecord.RejectReasons, writer);
-            }
-
-            writer.WriteEndObject();
-        }
-
-        writer.WriteEndArray();
-    }
-
-    private void WriteReasons(IReadOnlyCollection<RejectReason> rejectReasons, Utf8JsonWriter writer)
-    {
         writer.WriteStartArray("Reason");
-        foreach (var rejectReason in rejectReasons)
         {
-            writer.WriteStartObject();
+            foreach (var rejectReason in rejectedForwardMeteredDataRecord.RejectReasons)
             {
-                writer.WriteObject("code", new KeyValuePair<string, string>("value", rejectReason.ErrorCode));
-                WritePropertyIfNotNull(writer, "text", rejectReason.ErrorMessage);
-            }
+                writer.WriteStartObject();
+                {
+                    writer.WriteObject("code", new KeyValuePair<string, string>("value", rejectReason.ErrorCode));
+                    WritePropertyIfNotNull(writer, "text", rejectReason.ErrorMessage);
+                }
 
-            writer.WriteEndObject();
+                writer.WriteEndObject();
+            }
         }
 
         writer.WriteEndArray();
@@ -121,6 +107,12 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         writer.WriteObject(
             "businessSector.type",
             new KeyValuePair<string, string>("value", GeneralValues.SectorTypeCode));
+
+        writer.WriteProperty("createdDateTime", messageHeader.TimeStamp.ToString());
+
+        writer.WriteProperty("received_MarketDocument.mRID", messageHeader.RelatedToMessageId!);
+
+        writer.WriteProperty("Received_MarketDocument.Process.processType", messageHeader.BusinessReason);
 
         writer.WriteObject(
             "sender_MarketParticipant.mRID",
@@ -143,38 +135,6 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         writer.WriteObject(
             "receiver_MarketParticipant.marketRole.type",
             new KeyValuePair<string, string>("value", messageHeader.ReceiverRole));
-
-        writer.WriteProperty("createdDateTime", messageHeader.TimeStamp.ToString());
-
-        // WritePropertyIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.createdDateTime",
-        //     );
-        //
-        // WritePropertyIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.mRID",
-        //     );
-        //
-        // WriteValueObjectIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.process.processType",
-        //     messageHeader.BusinessReason);
-        //
-        // WritePropertyIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.revisionNumber",
-        //     null);
-        //
-        // WritePropertyIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.title",
-        //     messageHeader.Title);
-        //
-        // WriteValueObjectIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.type",
-        //     null);
     }
 
     private void WritePropertyIfNotNull(Utf8JsonWriter writer, string property, string? value)
@@ -182,14 +142,6 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         if (value is not null)
         {
             writer.WriteProperty(property, value);
-        }
-    }
-
-    private void WriteValueObjectIfNotNull(Utf8JsonWriter writer, string @object, string? value)
-    {
-        if (value is not null)
-        {
-            writer.WriteObject(@object, new KeyValuePair<string, string>("value", value));
         }
     }
 
