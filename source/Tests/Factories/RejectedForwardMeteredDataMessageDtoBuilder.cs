@@ -21,56 +21,88 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class RejectedForwardMeteredDataMessageBuilder
 {
-    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
-    private static readonly ExternalId _externalId = new ExternalId(Guid.NewGuid());
-    private static readonly BusinessReason _businessReason = BusinessReason.PeriodicFlexMetering;
-    private static readonly ActorNumber _receiverId = ActorNumber.Create("1234567890123");
-    private static readonly ActorRole _receiverRole = ActorRole.EnergySupplier;
-    private static readonly MessageId _relatedToMessageId = MessageId.New();
-    private static readonly TransactionId _transactionId = TransactionId.New();
-    private static readonly TransactionId _originalTransactionIdReference = TransactionId.New();
-    private static readonly List<RejectReason> _rejectReasons = new List<RejectReason>();
+#pragma warning disable SA1401
+    public readonly BusinessReason BusinessReason;
+    public readonly ActorNumber SenderId;
+    public readonly ActorRole SenderRole;
+    public readonly ActorNumber ReceiverId;
+    public readonly ActorRole ReceiverRole;
+    public readonly MessageId MessageId;
+    public readonly MessageId RelatedToMessageId;
+    public readonly TransactionId TransactionId;
+    public readonly TransactionId OriginalTransactionIdReference;
+#pragma warning restore SA1401
+    private readonly List<RejectReason> _rejectReasons;
+    private readonly EventId _eventId = EventId.From(Guid.NewGuid());
+    private readonly ExternalId _externalId = new ExternalId(Guid.NewGuid());
 
-    private static readonly RejectedForwardMeteredDataSeries _series = new RejectedForwardMeteredDataSeries(
-        TransactionId: _transactionId,
-        OriginalTransactionIdReference: _originalTransactionIdReference,
-#pragma warning disable SA1118
-        RejectReasons: _rejectReasons.Count != 0
-            ? _rejectReasons
-            : new List<RejectReason>
-            {
-                new RejectReason(
-                    ErrorCode: "999",
-                    ErrorMessage: "An error has occurred"),
-            });
-#pragma warning restore SA1118
+    public RejectedForwardMeteredDataMessageBuilder(
+        MessageId messageId,
+        ActorNumber receiverId,
+        ActorRole receiverRole,
+        ActorNumber senderId,
+        ActorRole senderRole,
+        BusinessReason businessReason,
+        MessageId relatedToMessageId,
+        TransactionId transactionId,
+        TransactionId originalTransactionIdReference)
+    {
+        _rejectReasons = new List<RejectReason>();
+        ReceiverRole = receiverRole;
+        SenderId = senderId;
+        SenderRole = senderRole;
+        BusinessReason = businessReason;
+        RelatedToMessageId = relatedToMessageId;
+        MessageId = messageId;
+        ReceiverId = receiverId;
+        TransactionId = transactionId;
+        OriginalTransactionIdReference = originalTransactionIdReference;
+    }
 
-    public static RejectedForwardMeteredDataMessageDto BuildDto()
+    public RejectedForwardMeteredDataMessageDto BuildDto()
     {
         return new RejectedForwardMeteredDataMessageDto(
             eventId: _eventId,
             externalId: _externalId,
-            businessReason: _businessReason,
-            receiverId: _receiverId,
-            receiverRole: _receiverRole,
-            relatedToMessageId: _relatedToMessageId,
-            series: _series);
+            businessReason: BusinessReason,
+            receiverId: ReceiverId,
+            receiverRole: ReceiverRole,
+            relatedToMessageId: RelatedToMessageId,
+            series: GetSeries());
     }
 
     public OutgoingMessageHeader BuildHeader()
     {
         return new OutgoingMessageHeader(
-            _businessReason.Name,
-            "5790001330552",
-            ActorRole.DanishEnergyAgency.Code,
-            _receiverId.Value,
-            _receiverRole.Code,
-            MessageId: MessageId.New().Value,
+            BusinessReason.Name,
+            SenderId.Value,
+            SenderRole.Code,
+            ReceiverId.Value,
+            ReceiverRole.Code,
+            MessageId: MessageId.Value,
             InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value);
     }
 
     public RejectedForwardMeteredDataSeries GetSeries()
     {
-        return _series;
+        var series = new RejectedForwardMeteredDataSeries(
+            TransactionId: TransactionId,
+            OriginalTransactionIdReference: OriginalTransactionIdReference,
+#pragma warning disable SA1118
+            RejectReasons: _rejectReasons.Count != 0
+                ? _rejectReasons
+                : new List<RejectReason>
+                {
+                    new RejectReason(
+                        ErrorCode: "999",
+                        ErrorMessage: "An error has occurred"),
+                });
+
+        return series;
+    }
+
+    public void AddReasonToSeries(RejectReason rejectReason)
+    {
+        _rejectReasons.Add(rejectReason);
     }
 }
