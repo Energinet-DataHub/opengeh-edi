@@ -76,6 +76,39 @@ limitations under the License.
       <None Update="Infrastructure\OutgoingMessages\Schemas\Json\Acknowledgement-assembly-model.schema.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\RSM009\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\RSM009\ebIX_BusinessDataType_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\RSM009\ebIX_DK_Acknowledgement_0p9pC.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000019_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000023_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000028_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000029_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000041_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000075_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000077_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000080_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -189,6 +222,11 @@ limitations under the License.
         <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Xml\urn-ediel-org-general-acknowledgement-0-1.xsd">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Infrastructure\OutgoingMessages\Schemas\Ebix\Documents\" />
+      <Folder Include="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\" />
     </ItemGroup>
 
     <ItemDefinitionGroup>
