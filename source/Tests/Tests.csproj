@@ -85,9 +85,6 @@ limitations under the License.
       <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\RSM009\ebIX_DK_Acknowledgement_0p9pC.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000019_0p1pA.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000023_0p1pA.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
@@ -107,6 +104,57 @@ limitations under the License.
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000080_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\Documents\RSM009\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\Documents\RSM009\ebIX_BusinessDataType_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\Documents\RSM009\ebIX_DK_Acknowledgement_0p9pC.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000006_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000019_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000020_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000012_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000001_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000030_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000010_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_CH0002_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_NL0005_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000042_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000076_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000004_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000005_0p1pA.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000008_0p1pA.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
@@ -225,7 +273,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Infrastructure\OutgoingMessages\Schemas\Ebix\Documents\" />
+      <Folder Include="Infrastructure\OutgoingMessages\Schemas\Ebix\documents\" />
       <Folder Include="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\" />
     </ItemGroup>
 

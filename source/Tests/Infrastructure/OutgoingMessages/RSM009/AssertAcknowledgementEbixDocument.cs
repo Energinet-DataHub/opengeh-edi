@@ -29,7 +29,7 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
     {
         _documentAsserter = documentAsserter;
         _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
-        _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", null!);
+        _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "294");
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)

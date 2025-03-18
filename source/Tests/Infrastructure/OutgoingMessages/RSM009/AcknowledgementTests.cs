@@ -126,13 +126,19 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
         Stream document,
         DocumentFormat documentFormat)
     {
-        /*
         if (documentFormat == DocumentFormat.Ebix)
         {
-            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
-            return new AssertRejectRequestWholesaleSettlementEbixDocument(assertEbixDocument);
+            var assertEbixDocument = AssertEbixDocument.Document(
+                document,
+                "ns0",
+                new DocumentValidator(
+                    new[]
+                        {
+                            new EbixValidator(new EbixSchemaProvider()),
+                        }));
+            return new AssertAcknowledgementEbixDocument(assertEbixDocument);
         }
-*/
+
         if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(
