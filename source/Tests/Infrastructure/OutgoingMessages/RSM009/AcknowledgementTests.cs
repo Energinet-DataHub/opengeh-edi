@@ -49,8 +49,8 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             _rejectedForwardMeteredDataMessageBuilder,
             DocumentFormat.FromName(documentFormat));
 
-        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
-            .DocumentIsValidAsync();
+        AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
+            .DocumentIsValid();
     }
 
     private Task<MarketDocumentStream> CreateDocument(

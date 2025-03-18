@@ -40,7 +40,7 @@ public class RejectedForwardMeteredDataMessageBuilder
             : new List<RejectReason>
             {
                 new RejectReason(
-                    ErrorCode: "E01",
+                    ErrorCode: "999",
                     ErrorMessage: "An error has occurred"),
             });
 #pragma warning restore SA1118
