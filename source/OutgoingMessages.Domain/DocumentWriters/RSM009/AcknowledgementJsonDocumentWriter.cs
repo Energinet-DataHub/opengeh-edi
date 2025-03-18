@@ -150,31 +150,10 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         //     writer,
         //     "received_MarketDocument.createdDateTime",
         //     );
-        //
-        // WritePropertyIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.mRID",
-        //     );
-        //
-        // WriteValueObjectIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.process.processType",
-        //     messageHeader.BusinessReason);
-        //
-        // WritePropertyIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.revisionNumber",
-        //     null);
-        //
-        // WritePropertyIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.title",
-        //     messageHeader.Title);
-        //
-        // WriteValueObjectIfNotNull(
-        //     writer,
-        //     "received_MarketDocument.type",
-        //     null);
+        WritePropertyIfNotNull(
+            writer,
+            "received_MarketDocument.mRID",
+            messageHeader.RelatedToMessageId);
     }
 
     private void WritePropertyIfNotNull(Utf8JsonWriter writer, string property, string? value)

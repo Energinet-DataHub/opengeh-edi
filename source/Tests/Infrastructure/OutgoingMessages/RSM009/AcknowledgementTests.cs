@@ -25,12 +25,14 @@ using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime.Text;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
 public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
 {
+    // _documentValidation depends on incoming messages, which it should not
     private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
 
@@ -54,8 +56,8 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             receiverRole: ActorRole.EnergySupplier,
             businessReason: BusinessReason.PeriodicFlexMetering,
             relatedToMessageId: MessageId.New(),
-            transactionId: TransactionId.New(),
-            originalTransactionIdReference: TransactionId.New());
+            originalTransactionIdReference: TransactionId.New(),
+            timestamp: InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value);
 
         var marketDocumentStream = await CreateDocument(
             rejectMessageBuilder,
@@ -70,10 +72,10 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             .HasSenderRole(rejectMessageBuilder.SenderRole)
             .HasReceiverId(rejectMessageBuilder.ReceiverId)
             .HasReceiverRole(rejectMessageBuilder.ReceiverRole)
+            .HasOriginalMessageId(rejectMessageBuilder.RelatedToMessageId)
             //.HasReasonCode(rejectMessageBuilder.BusinessReason)
 
-            //.HasTransactionId(rejectMessageBuilder.TransactionId)
-            //.HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)
+            .HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)
             ;
     }
 

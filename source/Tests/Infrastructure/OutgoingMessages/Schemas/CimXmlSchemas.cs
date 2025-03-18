@@ -18,8 +18,6 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas;
 
 public sealed class CimXmlSchemas : SchemaBase, ISchema
 {
-    // C:\git\opengeh-edi\source\Tests\Infrastructure\OutgoingMessages\Schemas\Xml\urn-ediel-org-general-acknowledgement-0-1.xsd
-    //private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Cim{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
     private static readonly string _schemaPath = $"Infrastructure{Path.DirectorySeparatorChar}OutgoingMessages{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}";
 
     public CimXmlSchemas()

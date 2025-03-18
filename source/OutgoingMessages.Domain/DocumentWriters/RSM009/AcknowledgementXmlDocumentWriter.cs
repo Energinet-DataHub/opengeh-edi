@@ -28,7 +28,7 @@ public sealed class AcknowledgementXmlDocumentWriter(IMessageRecordParser parser
               "urn:ediel.org:general:acknowledgement:0:1 ack.xsd",
               "urn:ediel.org:general:acknowledgement:0:1",
               "cim",
-              "ERR"),
+              string.Empty),
           parser)
 {
     protected override async Task WriteHeaderAsync(OutgoingMessageHeader messageHeader, DocumentDetails documentDetails, XmlWriter writer)
@@ -84,11 +84,14 @@ public sealed class AcknowledgementXmlDocumentWriter(IMessageRecordParser parser
     {
         var rejectedForwardMeteredDataRecords = ParseFrom<RejectedForwardMeteredDataRecord>(marketActivityPayloads);
 
+        await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
         foreach (var rejectedForwardMeteredDataRecord in rejectedForwardMeteredDataRecords)
         {
             await WriteElementAsync("mRID", rejectedForwardMeteredDataRecord.OriginalTransactionIdReference.Value, writer).ConfigureAwait(false);
             await WriteReasonElementsAsync(rejectedForwardMeteredDataRecord.RejectReasons, writer).ConfigureAwait(false);
         }
+
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
     private async Task WriteReasonElementsAsync(IReadOnlyCollection<RejectReason>? reasons, XmlWriter writer)

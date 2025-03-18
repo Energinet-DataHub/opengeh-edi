@@ -88,6 +88,15 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
+    public IAssertAcknowledgementDocument HasOriginalMessageId(MessageId originalMessageId)
+    {
+        _root.GetProperty("received_MarketDocument.mRID")
+            .GetString()
+            .Should()
+            .Be(originalMessageId.Value);
+        return this;
+    }
+
     public Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
     {
         var schema = JsonSchema.FromFile(@"Infrastructure\OutgoingMessages\Schemas\Json\Acknowledgement-assembly-model.schema.json");
@@ -107,20 +116,10 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return Task.FromResult(this as IAssertAcknowledgementDocument);
     }
 
-    public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
-    {
-        FirstSeriesElement()
-            .GetProperty("mRID")
-            .GetString()
-            .Should()
-            .Be(transactionId.Value);
-        return this;
-    }
-
     public IAssertAcknowledgementDocument HasOriginalTransactionId(TransactionId originalTransactionId)
     {
         FirstSeriesElement()
-            .GetProperty("originalTransactionIDReference_Series.mRID")
+            .GetProperty("mRID")
             .GetString()
             .Should()
             .Be(originalTransactionId.Value);
