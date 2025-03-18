@@ -19,9 +19,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.IncomingMessages;
+namespace IncomingMessages.UnitTests;
 
 public class SenderAuthorizerTests
 {
