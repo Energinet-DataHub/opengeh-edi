@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.Tests.DocumentValidation;
-using CimXmlSchemas = Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas.CimXmlSchemas;
 
 namespace Energinet.DataHub.EDI.Tests.Fixtures;
 

@@ -30,7 +30,6 @@ using FluentAssertions.Execution;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
-using CimXmlSchemas = Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas.CimXmlSchemas;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.WholesaleSettlementMessageParsers;
 
