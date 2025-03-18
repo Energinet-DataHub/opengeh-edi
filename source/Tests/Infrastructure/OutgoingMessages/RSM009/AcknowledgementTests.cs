@@ -46,7 +46,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    //[InlineData(nameof(DocumentFormat.Ebix))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_document(string documentFormat)
     {
         var rejectMessageBuilder = new RejectedForwardMeteredDataMessageBuilder(
@@ -96,12 +96,12 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.GetSeries());
-        // if (documentFormat == DocumentFormat.Ebix)
-        // {
-        //     return new RejectRequestWholesaleSettlementEbixDocumentWriter(_parser).WriteAsync(
-        //         documentHeader,
-        //         new[] { records });
-        // }
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            return new AcknowledgementEbixDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records });
+        }
 
         if (documentFormat == DocumentFormat.Xml)
         {

@@ -177,16 +177,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return Task.CompletedTask;
     }
 
-    private static async Task WriteEndAsync(XmlWriter writer)
-    {
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
-
-        writer.Close();
-    }
-
-    private async Task WriteHeaderAsync(
+    protected virtual async Task WriteHeaderAsync(
         OutgoingMessageHeader header,
         DocumentDetails documentDetails,
         XmlWriter writer,
@@ -278,5 +269,14 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);
         // End ProcessEnergyContext
+    }
+
+    private static async Task WriteEndAsync(XmlWriter writer)
+    {
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+        writer.Close();
     }
 }
