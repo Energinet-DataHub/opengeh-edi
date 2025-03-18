@@ -188,7 +188,7 @@ limitations under the License.
         </EmbeddedResource>
         <None Remove="Infrastructure\OutgoingMessages\Schemas\Xml\urn-ediel-org-general-acknowledgement-0-1.xsd" />
         <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Xml\urn-ediel-org-general-acknowledgement-0-1.xsd">
-          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
 

@@ -19,8 +19,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
+using Energinet.DataHub.EDI.Tests.DocumentValidation;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -38,7 +41,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
     }
 
     [Theory]
-    //[InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     //[InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_document(string documentFormat)
@@ -58,8 +61,8 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             rejectMessageBuilder,
             DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
-            .DocumentIsValid();
+        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
+            .DocumentIsValidAsync();
 
         AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
             .HasMessageId(rejectMessageBuilder.MessageId)
@@ -87,12 +90,12 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
         //         new[] { records });
         // }
 
-        // if (documentFormat == DocumentFormat.Xml)
-        // {
-        //     return new RejectRequestWholesaleSettlementCimXmlDocumentWriter(_parser).WriteAsync(
-        //         documentHeader,
-        //         new[] { records });
-        // }
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            return new AcknowledgementXmlDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records });
+        }
 
         if (documentFormat == DocumentFormat.Json)
         {
@@ -103,7 +106,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
                 .WriteAsync(documentHeader, new[] { records });
         }
 
-        throw new Exception("Unknown document format");
+        throw new Exception("No writer for the given format");
     }
 
     private IAssertAcknowledgementDocument AssertDocument(
@@ -116,18 +119,26 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
             return new AssertRejectRequestWholesaleSettlementEbixDocument(assertEbixDocument);
         }
-
+*/
         if (documentFormat == DocumentFormat.Xml)
         {
-            var assertXmlDocument = AssertXmlDocument.Document(document, "cim", _documentValidation.Validator);
-            return new AssertRejectRequestWholesaleSettlementXmlDocument(assertXmlDocument);
+            var assertXmlDocument = AssertXmlDocument.Document(
+                document,
+                "cim",
+                new DocumentValidator(
+                    new[]
+                        {
+                            new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
+                        }));
+
+            return new AssertAcknowledgementXmlDocument(assertXmlDocument);
         }
-*/
+
         if (documentFormat == DocumentFormat.Json)
         {
             return new AssertAcknowledgementJsonDocument(document);
         }
 
-        throw new Exception("Unknown document format");
+        throw new Exception("No asserter for the given format");
     }
 }
