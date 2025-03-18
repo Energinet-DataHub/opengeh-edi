@@ -275,7 +275,6 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             receiverRole: ActorRole.GridAccessProvider,
             relatedToMessageId: MessageId.New(),
             series: new RejectedForwardMeteredDataSeries(
-                TransactionId: TransactionId.New(),
                 OriginalTransactionIdReference: TransactionId.New(),
                 RejectReasons: [
                     new RejectReason(

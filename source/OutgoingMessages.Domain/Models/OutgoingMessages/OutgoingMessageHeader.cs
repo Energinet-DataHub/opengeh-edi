@@ -23,4 +23,5 @@ public record OutgoingMessageHeader(
     string ReceiverId,
     string ReceiverRole,
     string MessageId,
+    string? RelatedToMessageId,
     Instant TimeStamp);

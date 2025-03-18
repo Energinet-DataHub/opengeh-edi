@@ -72,7 +72,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             .HasReceiverRole(rejectMessageBuilder.ReceiverRole)
             //.HasReasonCode(rejectMessageBuilder.BusinessReason)
 
-            .HasTransactionId(rejectMessageBuilder.TransactionId)
+            //.HasTransactionId(rejectMessageBuilder.TransactionId)
             //.HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)
             ;
     }

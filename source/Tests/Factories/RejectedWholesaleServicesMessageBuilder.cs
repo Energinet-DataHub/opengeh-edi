@@ -53,6 +53,7 @@ public class RejectedWholesaleServicesMessageBuilder
             _receiverNumber,
             _receiverRole.Code,
             _messageId,
+            null,
             _creationDate);
     }
 

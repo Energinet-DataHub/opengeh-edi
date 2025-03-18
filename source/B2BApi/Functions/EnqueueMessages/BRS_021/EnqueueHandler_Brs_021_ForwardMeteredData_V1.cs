@@ -99,7 +99,6 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             receiverRole: ActorRole.Create(rejectedData.ForwardedByActorRole),
             relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             series: new RejectedForwardMeteredDataSeries(
-                TransactionId: TransactionId.New(),
                 OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
                 RejectReasons: rejectedData.ValidationErrors.Select(
                         validationError =>

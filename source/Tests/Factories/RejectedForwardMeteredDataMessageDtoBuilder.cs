@@ -29,7 +29,6 @@ public class RejectedForwardMeteredDataMessageBuilder
     public readonly ActorRole ReceiverRole;
     public readonly MessageId MessageId;
     public readonly MessageId RelatedToMessageId;
-    public readonly TransactionId TransactionId;
     public readonly TransactionId OriginalTransactionIdReference;
 #pragma warning restore SA1401
     private readonly List<RejectReason> _rejectReasons;
@@ -55,7 +54,6 @@ public class RejectedForwardMeteredDataMessageBuilder
         RelatedToMessageId = relatedToMessageId;
         MessageId = messageId;
         ReceiverId = receiverId;
-        TransactionId = transactionId;
         OriginalTransactionIdReference = originalTransactionIdReference;
     }
 
@@ -80,13 +78,13 @@ public class RejectedForwardMeteredDataMessageBuilder
             ReceiverId.Value,
             ReceiverRole.Code,
             MessageId: MessageId.Value,
+            RelatedToMessageId: RelatedToMessageId.Value,
             InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value);
     }
 
     public RejectedForwardMeteredDataSeries GetSeries()
     {
         var series = new RejectedForwardMeteredDataSeries(
-            TransactionId: TransactionId,
             OriginalTransactionIdReference: OriginalTransactionIdReference,
 #pragma warning disable SA1118
             RejectReasons: _rejectReasons.Count != 0

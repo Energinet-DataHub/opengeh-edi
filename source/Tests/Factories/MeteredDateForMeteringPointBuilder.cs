@@ -29,6 +29,7 @@ public class MeteredDateForMeteringPointBuilder
             SampleData.ReceiverActorNumber,
             SampleData.ReceiverActorRole,
             SampleData.MessageId,
+            null,
             SampleData.TimeStamp);
     }
 

@@ -38,7 +38,6 @@ public sealed class RejectedForwardMeteredDataMessageDto(
 }
 
 public record RejectedForwardMeteredDataSeries(
-    TransactionId TransactionId,
     IReadOnlyCollection<RejectReason> RejectReasons,
     TransactionId OriginalTransactionIdReference);
 

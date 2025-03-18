@@ -95,26 +95,17 @@ public abstract class CimXmlDocumentWriter : IDocumentWriter
         return Task.CompletedTask;
     }
 
-    protected async Task WriteMridAsync(string localName, string id, string codingScheme, XmlWriter writer)
+    protected virtual Task WriteHeaderAsync(
+        OutgoingMessageHeader messageHeader,
+        DocumentDetails documentDetails,
+        XmlWriter writer)
     {
-        ArgumentNullException.ThrowIfNull(writer);
-        await writer.WriteStartElementAsync(DocumentDetails.Prefix, localName, null).ConfigureAwait(false);
-        await writer.WriteAttributeStringAsync(null, "codingScheme", null, codingScheme).ConfigureAwait(false);
-        writer.WriteValue(id);
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        return CimXmlHeaderWriter.WriteAsync(writer, messageHeader, documentDetails, _reasonCode);
     }
 
     private static async Task WriteEndAsync(XmlWriter writer)
     {
         await writer.WriteEndElementAsync().ConfigureAwait(false);
         writer.Close();
-    }
-
-    private Task WriteHeaderAsync(
-        OutgoingMessageHeader header,
-        DocumentDetails documentDetails,
-        XmlWriter writer)
-    {
-        return CimXmlHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
     }
 }

@@ -164,6 +164,7 @@ public class EnergyResultMessageTimeSeriesBuilder
             _receiverNumber,
             _receiverRole.Code,
             _messageId,
+            null,
             _timeStamp);
     }
 
