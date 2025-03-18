@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit.Abstractions;
+using RejectReason = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint.RejectReason;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
@@ -259,6 +260,40 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
                 om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
                 om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
             ]);
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueRejectedForwardMeteredDataMessage_Then_OneMessageIsEnqueued()
+    {
+        // Arrange
+        var serviceBusMessageId = Guid.NewGuid();
+        var message = new RejectedForwardMeteredDataMessageDto(
+            eventId: EventId.From(serviceBusMessageId),
+            externalId: new ExternalId(serviceBusMessageId),
+            businessReason: BusinessReason.PeriodicFlexMetering,
+            receiverId: ActorNumber.Create("1234567890123"),
+            receiverRole: ActorRole.GridAccessProvider,
+            relatedToMessageId: MessageId.New(),
+            series: new RejectedForwardMeteredDataSeries(
+                OriginalTransactionIdReference: TransactionId.New(),
+                RejectReasons: [
+                    new RejectReason(
+                        ErrorCode: "E0I",
+                        ErrorMessage: "An error has occurred")]));
+
+        // Act
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+
+        // Assert
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        var outgoingMessage = Assert.Single(outgoingMessages);
+        Assert.Equal(serviceBusMessageId, outgoingMessage.ExternalId.Value);
     }
 
     private AcceptedForwardMeteredDataMessageDto CreateAcceptedForwardMeteredDataMessage(

@@ -14,30 +14,9 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 
-public sealed class RejectedForwardMeteredDataMessageDto(
-    EventId eventId,
-    ExternalId externalId,
-    BusinessReason businessReason,
-    ActorNumber receiverId,
-    ActorRole receiverRole,
-    MessageId relatedToMessageId,
-    RejectedForwardMeteredDataSeries series)
-    : OutgoingMessageDto(
-        DocumentType.Acknowledgement,
-        receiverId,
-        Guid.NewGuid(),
-        eventId,
-        businessReason.Name,
-        receiverRole,
-        externalId,
-        relatedToMessageId)
-{
-    public RejectedForwardMeteredDataSeries Series { get; } = series;
-}
-
-public record RejectedForwardMeteredDataSeries(
+public record RejectedForwardMeteredDataRecord(
     IReadOnlyCollection<RejectReason> RejectReasons,
     TransactionId OriginalTransactionIdReference);
 

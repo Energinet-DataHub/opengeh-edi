@@ -315,6 +315,7 @@ public class OutgoingMessageTests
             "1234567812345",
             ActorRole.DanishEnergyAgency.Code,
             MessageId.New().ToString()!,
+            null,
             Instant.FromUtc(2022, 1, 1, 0, 0));
     }
 

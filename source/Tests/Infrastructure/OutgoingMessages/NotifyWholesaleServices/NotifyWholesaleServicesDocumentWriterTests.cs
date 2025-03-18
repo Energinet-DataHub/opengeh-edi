@@ -150,6 +150,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
             SampleData.ReceiverId.Value,
             ActorRole.EnergySupplier.Code,
             SampleData.MessageId,
+            null,
             InstantPattern.General.Parse(SampleData.Timestamp).Value);
 
         // Act

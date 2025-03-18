@@ -47,6 +47,7 @@ public class RejectedEnergyResultMessageSerieBuilder
             _receiverNumber,
             _receiverRole.Code,
             _messageId,
+            MessageId.New().Value,
             _creationDate);
     }
 

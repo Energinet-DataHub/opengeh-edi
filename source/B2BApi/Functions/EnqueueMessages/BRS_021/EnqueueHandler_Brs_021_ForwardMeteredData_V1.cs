@@ -91,36 +91,21 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        // TODO: Fix when we have the correct data from ForwardMeteredDataRejectedV1
         var rejectedForwardMeteredDataMessageDto = new RejectedForwardMeteredDataMessageDto(
-            EventId: EventId.From(serviceBusMessageId),
-            BusinessReason: BusinessReason.PeriodicMetering,
-            ReceiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
-            ReceiverRole: ActorRole.Create(rejectedData.ForwardedByActorRole),
-            ProcessId: orchestrationInstanceId,
-            ExternalId: Guid.NewGuid(),
-            AcknowledgementDto: new AcknowledgementDto(
-                ReceivedMarketDocumentCreatedDateTime: null,
-                ReceivedMarketDocumentTransactionId: null,
-                ReceivedMarketDocumentProcessProcessType: null,
-                ReceivedMarketDocumentRevisionNumber: null,
-                ReceivedMarketDocumentTitle: null,
-                ReceivedMarketDocumentType: null,
-                Reason: [],
-                InErrorPeriod: [],
-                Series: rejectedData.ValidationErrors.Select(
-                        validationError => new SeriesDto(
-                            MRID: Guid.NewGuid().ToString(),
-                            Reason:
-                            [
-                                new ReasonDto(
-                                    Code: validationError.ErrorCode,
-                                    Text: validationError.Message)
-                            ]))
-                    .ToList(),
-                OriginalMktActivityRecord: [],
-                RejectedTimeSeries: []));
-
+            eventId: EventId.From(serviceBusMessageId),
+            externalId: new ExternalId(serviceBusMessageId),
+            businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
+            receiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
+            receiverRole: ActorRole.Create(rejectedData.ForwardedByActorRole),
+            relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
+            series: new RejectedForwardMeteredDataSeries(
+                OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
+                RejectReasons: rejectedData.ValidationErrors.Select(
+                        validationError =>
+                            new RejectReason(
+                                ErrorCode: validationError.ErrorCode,
+                                ErrorMessage: validationError.Message))
+                    .ToList()));
         await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
 
         var executionPolicy = Policy
