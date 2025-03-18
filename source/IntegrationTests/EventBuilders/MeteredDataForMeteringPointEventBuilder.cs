@@ -108,4 +108,9 @@ public static class MeteredDataForMeteringPointEventBuilder
 
         return serviceBusMessage;
     }
+
+    public static ServiceBusMessage GenerateRejectedFrom(ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointInputV1, (ActorNumber ActorNumber, ActorRole ActorRole) receiverActor, Guid orchestrationInstanceId)
+    {
+        throw new NotImplementedException();
+    }
 }
