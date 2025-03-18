@@ -62,7 +62,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
 
         rejectMessageBuilder.AddReasonToSeries(
             new RejectReason(
-                ErrorCode: "999",
+                ErrorCode: "E0I",
                 ErrorMessage: "Error message 1"));
         rejectMessageBuilder.AddReasonToSeries(
             new RejectReason(

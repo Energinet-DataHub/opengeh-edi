@@ -24,7 +24,7 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
     : EbixDocumentWriter(new DocumentDetails(
         "DK_Acknowledgement",
         string.Empty,
-        "un:unece:260:data:EEM-DK_Acknowledgement:v3",
+        "un:unece:260:data:EEM-DK_Acknowledgement",
         "ns0",
         "294"), parser)
 {
