@@ -186,7 +186,6 @@ limitations under the License.
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeteringPoint\ValidMeteredDataForMeteringPoint.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="Infrastructure\OutgoingMessages\Schemas\Xml\urn-ediel-org-general-acknowledgement-0-1.xsd" />
         <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Xml\urn-ediel-org-general-acknowledgement-0-1.xsd">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
