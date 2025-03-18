@@ -19,8 +19,9 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using FluentAssertions;
+using Xunit;
 
-namespace IncomingMessages.UnitTests;
+namespace Energinet.DataHub.EDI.IncomingMessages.UnitTests;
 
 public class SenderAuthorizerTests
 {
@@ -32,8 +33,7 @@ public class SenderAuthorizerTests
     private readonly Guid _actorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
     [Fact]
-    public async Task
-        Given_UnauthorisedUser_When_ValidatingSenderForAggregatedMeasureData_Then_SenderRoleTypeIsNotAuthorizedError()
+    public async Task Given_UnauthorisedUser_When_ValidatingSenderForAggregatedMeasureData_Then_SenderRoleTypeIsNotAuthorizedError()
     {
         var authenticatedActor = CreateAuthenticatedActor(
             ActorNumber.Create("1213141516178"),
@@ -58,8 +58,7 @@ public class SenderAuthorizerTests
     }
 
     [Fact]
-    public async Task
-        Given_UnauthorisedUser_When_ValidatingSenderForWholesaleServices_Then_SenderRoleTypeIsNotAuthorizedError()
+    public async Task Given_UnauthorisedUser_When_ValidatingSenderForWholesaleServices_Then_SenderRoleTypeIsNotAuthorizedError()
     {
         var authenticatedActor = CreateAuthenticatedActor(
             ActorNumber.Create("1213141516178"),
@@ -84,8 +83,7 @@ public class SenderAuthorizerTests
     }
 
     [Fact]
-    public async Task
-        Given_ActorIsNotMeteredDataResponsible_When_MeteredDataForMeteringPoint_Then_SenderRoleTypeIsNotAuthorizedError()
+    public async Task Given_ActorIsNotMeteredDataResponsible_When_MeteredDataForMeteringPoint_Then_SenderRoleTypeIsNotAuthorizedError()
     {
         var senderRole = ActorRole.BalanceResponsibleParty;
         var authenticatedActor = CreateAuthenticatedActor(
@@ -111,8 +109,7 @@ public class SenderAuthorizerTests
     }
 
     [Fact]
-    public async Task
-        Given_ActorIsMeteredDataResponsible_When_MeteredDataForMeteringPoint_Then_SenderIsAuthorized()
+    public async Task Given_ActorIsMeteredDataResponsible_When_MeteredDataForMeteringPoint_Then_SenderIsAuthorized()
     {
         var senderRole = ActorRole.MeteredDataResponsible;
         var authenticatedActor = CreateAuthenticatedActor(
