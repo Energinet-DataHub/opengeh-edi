@@ -30,7 +30,7 @@ public interface IAssertAcknowledgementDocument
 
     IAssertAcknowledgementDocument HasReasonCode(ReasonCode reasonCode);
 
-    IAssertAcknowledgementDocument DocumentIsValid();
+    Task<IAssertAcknowledgementDocument> DocumentIsValidAsync();
 
     IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId);
 

@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
+using CimXmlSchemas = Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas.CimXmlSchemas;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeteringPointMessageParserTests;
 

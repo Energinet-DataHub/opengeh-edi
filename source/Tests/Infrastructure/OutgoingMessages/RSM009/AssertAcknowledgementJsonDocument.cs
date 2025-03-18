@@ -88,9 +88,9 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument DocumentIsValid()
+    public Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
     {
-        var schema = JsonSchema.FromFile(@"Infrastructure\OutgoingMessages\RSM009\Acknowledgement-assembly-model.schema.json");
+        var schema = JsonSchema.FromFile(@"Infrastructure\OutgoingMessages\Schemas\Json\Acknowledgement-assembly-model.schema.json");
 
         schema.Should().NotBeNull("Cannot validate document without a schema");
 
@@ -104,7 +104,7 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
 
         validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", errors));
 
-        return this;
+        return Task.FromResult(this as IAssertAcknowledgementDocument);
     }
 
     public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)

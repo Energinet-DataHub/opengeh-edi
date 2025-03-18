@@ -28,6 +28,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
+using CimXmlSchemas = Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas.CimXmlSchemas;
 using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models.RequestAggregatedMeasureDataDto;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
