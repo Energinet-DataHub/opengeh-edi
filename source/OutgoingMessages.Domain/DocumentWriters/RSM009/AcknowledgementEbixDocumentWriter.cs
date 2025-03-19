@@ -52,7 +52,7 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
                 null,
                 "MessageReference",
                 "urn:www:datahub:dk:b2b:v01",
-                $"ENDK_{Guid.NewGuid():N}")
+                $"ENDK_{Guid.NewGuid():N}") // TODO: THis is not a new guid?
             .ConfigureAwait(false);
 
         await writer.WriteElementStringAsync(
@@ -153,9 +153,11 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
             await writer.WriteStringAsync(rejectedForwardMeteredDataRecord.RejectReasons.First().ErrorCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(null, "ReasonText", null, rejectedForwardMeteredDataRecord.RejectReasons.First().ErrorMessage)
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ReasonText", null, rejectedForwardMeteredDataRecord.RejectReasons.First().ErrorMessage)
                 .ConfigureAwait(false);
 
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "OriginalBusinessDocument", null, rejectedForwardMeteredDataRecord.OriginalTransactionIdReference.Value) // TODO: What is this?
+                .ConfigureAwait(false);
             // End PayloadResponseEvent
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
