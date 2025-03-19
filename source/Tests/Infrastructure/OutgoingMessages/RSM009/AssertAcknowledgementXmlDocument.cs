@@ -27,6 +27,7 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("type", null!);
+        _documentAsserter.HasValue("businessSector.type", "23");
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)
