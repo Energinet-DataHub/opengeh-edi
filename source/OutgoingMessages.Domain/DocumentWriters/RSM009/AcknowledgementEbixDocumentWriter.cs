@@ -130,6 +130,9 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
                 throw new NotSupportedException("Unable to create reject message if no reason is supplied");
             }
 
+            // Ebix only support one reject reason, hence we only take the first one
+            var firstRejectReason = rejectedForwardMeteredDataRecord.RejectReasons.First();
+
             // Begin PayloadResponseEvent
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadResponseEvent", null)
                 .ConfigureAwait(false);
@@ -150,10 +153,10 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
                 .ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
-            await writer.WriteStringAsync(rejectedForwardMeteredDataRecord.RejectReasons.First().ErrorCode).ConfigureAwait(false);
+            await writer.WriteStringAsync(firstRejectReason.ErrorCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ReasonText", null, rejectedForwardMeteredDataRecord.RejectReasons.First().ErrorMessage)
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ReasonText", null, firstRejectReason.ErrorMessage)
                 .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "OriginalBusinessDocument", null, rejectedForwardMeteredDataRecord.OriginalTransactionIdReference.Value)

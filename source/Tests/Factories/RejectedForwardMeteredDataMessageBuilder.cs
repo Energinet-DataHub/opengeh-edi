@@ -70,18 +70,6 @@ public class RejectedForwardMeteredDataMessageBuilder
 
     public Instant Timestamp { get; }
 
-    public RejectedForwardMeteredDataMessageDto BuildDto()
-    {
-        return new RejectedForwardMeteredDataMessageDto(
-            eventId: _eventId,
-            externalId: _externalId,
-            businessReason: BusinessReason,
-            receiverId: ReceiverId,
-            receiverRole: ReceiverRole,
-            relatedToMessageId: RelatedToMessageId,
-            series: GetSeries());
-    }
-
     public OutgoingMessageHeader BuildHeader()
     {
         return new OutgoingMessageHeader(

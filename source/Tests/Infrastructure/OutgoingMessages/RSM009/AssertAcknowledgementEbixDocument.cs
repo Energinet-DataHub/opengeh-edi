@@ -70,9 +70,9 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId relatedTOriginalMessageId)
+    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId originalMessageId)
     {
-        _documentAsserter.HasValue("ProcessEnergyContext/OriginalBusinessMessage", relatedTOriginalMessageId.Value);
+        _documentAsserter.HasValue("ProcessEnergyContext/OriginalBusinessMessage", originalMessageId.Value);
         return this;
     }
 

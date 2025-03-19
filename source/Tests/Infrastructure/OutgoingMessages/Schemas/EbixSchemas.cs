@@ -47,7 +47,6 @@ public class EbixSchemas : SchemaBase, ISchema
             foreach (var schema in schemas)
             {
                 var filename = Path.GetFileNameWithoutExtension(schema);
-                filename = filename.Replace("-", "_", StringComparison.InvariantCulture);
                 var filenameSplit = filename.Split('_');
                 if (filenameSplit.Length >= 3 && filenameSplit[0] == "ebIX" && filenameSplit[1] == "DK")
                 {

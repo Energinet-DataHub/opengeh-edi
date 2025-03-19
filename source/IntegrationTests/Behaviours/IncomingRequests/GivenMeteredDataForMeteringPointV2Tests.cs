@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Globalization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -210,7 +211,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
 
     [Theory]
     [MemberData(nameof(SupportedRejectDocumentFormats))]
-    public async Task AndGiven_InvalidBusinessReason_When_ActorPeeksMessage_Then_ReceivesOneRejectDocumentWithCorrectContent(DocumentFormat documentFormat)
+    public async Task AndGiven_InvalidPeriod_When_ActorPeeksMessage_Then_ReceivesOneRejectDocumentWithCorrectContent(DocumentFormat documentFormat)
     {
         /*
          *  --- PART 1: Receive request and send message to Process Manager ---
@@ -226,7 +227,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         var messageId = MessageId.New();
 
         var registeredAt = Instant.FromUtc(2022, 12, 17, 9, 30, 00);
-        var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
+        var startDate = Instant.FromUtc(2024, 11, 28, 13, 15);
         var endDate = Instant.FromUtc(2024, 11, 29, 9, 15);
 
         var expectedEnergyObservations = new List<(int Position, string? QualityName, decimal? Quantity)>
@@ -237,7 +238,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             (4, "A03", 654.321m),
         };
 
-        var now = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
+        var now = Instant.FromUtc(2025, 7, 1, 14, 57, 09);
         GivenNowIs(now);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
 
@@ -315,7 +316,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         }
 
         await AssertAcknowledgementDocumentProvider.AssertDocument(peekResult.Bundle, documentFormat)
-            .HasSenderId(ActorNumber.Create("5790001330552"))
+            .HasSenderId(DataHubDetails.DataHubActorNumber)
             .HasSenderRole(ActorRole.MeteredDataAdministrator)
             .HasReceiverId(senderActor.ActorNumber)
             .HasReceiverRole(senderActor.ActorRole)
