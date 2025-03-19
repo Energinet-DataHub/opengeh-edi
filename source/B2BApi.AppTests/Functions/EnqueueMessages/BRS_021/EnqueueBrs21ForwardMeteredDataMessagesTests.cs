@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Net;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -29,6 +30,7 @@ using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
@@ -99,13 +101,13 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var receiver2ActorRole = ActorRole.EnergySupplier;
         const int receiver2Quantity = 22;
 
-        var startDateTime = new DateTimeOffset(2025, 01, 31, 23, 00, 00, TimeSpan.Zero);
+        var startDateTime = Instant.FromUtc(2025, 01, 31, 23, 00, 00);
 
         var receiver1Start = startDateTime;
-        var receiver1End = startDateTime.AddMinutes(15);
+        var receiver1End = startDateTime.Plus(Duration.FromMinutes(15));
 
         var receiver2Start = receiver1End;
-        var receiver2End = receiver2Start.AddMinutes(15);
+        var receiver2End = receiver2Start.Plus(Duration.FromMinutes(15));
 
         var endDateTime = receiver2End;
 
@@ -115,9 +117,9 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
-            RegistrationDateTime: startDateTime,
-            StartDateTime: startDateTime,
-            EndDateTime: endDateTime,
+            RegistrationDateTime: startDateTime.ToDateTimeOffset(),
+            StartDateTime: startDateTime.ToDateTimeOffset(),
+            EndDateTime: endDateTime.ToDateTimeOffset(),
             ReceiversWithMeteredData: [
                 new ReceiversWithMeteredDataV1(
                     Actors: [
@@ -127,8 +129,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
                     ],
                     Resolution: PMValueTypes.Resolution.QuarterHourly,
                     MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-                    StartDateTime: receiver1Start,
-                    EndDateTime: receiver1End,
+                    StartDateTime: receiver1Start.ToDateTimeOffset(),
+                    EndDateTime: receiver1End.ToDateTimeOffset(),
                     MeteredData:
                     [
                         new ReceiversWithMeteredDataV1.AcceptedMeteredData(
@@ -144,8 +146,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
                     ],
                     Resolution: PMValueTypes.Resolution.QuarterHourly,
                     MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-                    StartDateTime: receiver1Start,
-                    EndDateTime: receiver2End,
+                    StartDateTime: receiver1Start.ToDateTimeOffset(),
+                    EndDateTime: receiver2End.ToDateTimeOffset(),
                     MeteredData:
                     [
                         new ReceiversWithMeteredDataV1.AcceptedMeteredData(
@@ -194,10 +196,10 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         enqueuedOutgoingMessages.Should().HaveCount(2);
 
         // Verify that the enqueued message can be peeked
-        List<(Actor Actor, decimal EnergyQuantity)> expectedReceivers =
+        List<(Actor Actor, decimal EnergyQuantity, Instant Start, Instant End)> expectedReceivers =
         [
-            (new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole), receiver1Quantity),
-            (new Actor(ActorNumber.Create(receiver2ActorNumber), receiver2ActorRole), receiver2Quantity),
+            (new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole), receiver1Quantity, receiver1Start, receiver1End),
+            (new Actor(ActorNumber.Create(receiver2ActorNumber), receiver2ActorRole), receiver2Quantity, receiver2Start, receiver2End),
         ];
 
         foreach (var expectedReceiver in expectedReceivers)
@@ -215,7 +217,9 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
             peekResponseContent.Should().NotBeNullOrEmpty()
                 .And.Contain("NotifyValidatedMeasureData", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should be a notify validated measure data")
-                .And.Contain($"\"quantity\": {expectedReceiver.EnergyQuantity}", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected measure data");
+                .And.Contain($"\"quantity\": {expectedReceiver.EnergyQuantity}", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected measure data")
+                .And.Contain($"\"value\": \"{expectedReceiver.Start.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected start")
+                .And.Contain($"\"value\": \"{expectedReceiver.End.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected end");
         }
 
         // Verify that the expected notify message was sent on the ServiceBus
