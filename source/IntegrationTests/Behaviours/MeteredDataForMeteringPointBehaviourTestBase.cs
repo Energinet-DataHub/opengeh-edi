@@ -47,6 +47,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
     protected async Task<ResponseMessage> GivenReceivedMeteredDataForMeteringPoint(
         DocumentFormat documentFormat,
         ActorNumber senderActorNumber,
+        MessageId messageId,
         IReadOnlyCollection<(string TransactionId, Instant PeriodStart, Instant PeriodEnd, Resolution Resolution)>
             series,
         bool assertRequestWasSuccessful = true)
@@ -54,6 +55,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
         var incomingMessageStream = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
+            messageId: messageId.Value,
             format: documentFormat,
             senderActorNumber: senderActorNumber,
             series: series);
@@ -80,7 +82,11 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
                 "the response should not have an error. Actual response: {0}",
                 response.MessageBody + "\n\n\n" + await reader.ReadToEndAsync());
 
-        response.MessageBody.Should().BeEmpty();
+        if (documentFormat != DocumentFormat.Ebix)
+        {
+            // The response should be empty for CIM XML and CIM JSON
+            response.MessageBody.Should().BeEmpty();
+        }
 
         return response;
     }
@@ -103,18 +109,21 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
 
     protected StartOrchestrationInstanceV1 ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
+        DocumentFormat documentFormat,
         ForwardMeteredDataInputV1AssertionInput assertionInput)
     {
         var assertionResult = ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessagesAreCorrect(
             senderSpy,
-            [assertionInput]);
+            [assertionInput],
+            documentFormat);
 
         return assertionResult.Single();
     }
 
     protected IList<StartOrchestrationInstanceV1> ThenRequestStartForwardMeteredDataCommandV1ServiceBusMessagesAreCorrect(
         ServiceBusSenderSpy senderSpy,
-        IList<ForwardMeteredDataInputV1AssertionInput> assertionInputs)
+        IList<ForwardMeteredDataInputV1AssertionInput> assertionInputs,
+        DocumentFormat documentFormat)
     {
         var messages = AssertProcessManagerServiceBusMessages(
             senderSpy: senderSpy,
@@ -124,7 +133,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
         using var assertionScope = new AssertionScope();
 
         var assertionMethods = assertionInputs
-            .Select(GetAssertServiceBusMessage);
+            .Select(x => GetAssertServiceBusMessage(x, documentFormat));
 
         messages
             .Select(x => x.ParseInput<ForwardMeteredDataInputV1>())
@@ -135,6 +144,11 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
     }
 
     protected async Task GivenForwardMeteredDataRequestAcceptedIsReceived(ServiceBusMessage acceptedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(acceptedMessage);
+    }
+
+    protected async Task GivenForwardMeteredDataRequestRejectedIsReceived(ServiceBusMessage acceptedMessage)
     {
         await GivenProcessManagerResponseIsReceived(acceptedMessage);
     }
@@ -152,7 +166,8 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
     }
 
     private static Action<ForwardMeteredDataInputV1> GetAssertServiceBusMessage(
-        ForwardMeteredDataInputV1AssertionInput input)
+        ForwardMeteredDataInputV1AssertionInput input,
+        DocumentFormat documentFormat)
     {
         return (message) =>
         {
@@ -165,8 +180,20 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
             message.MeasureUnit.Should().BeEquivalentTo(input.MeasureUnit);
             message.RegistrationDateTime.Should().BeEquivalentTo(input.RegistrationDateTime.ToString());
             message.Resolution.Should().BeEquivalentTo(input.Resolution?.Name);
-            message.StartDateTime.Should().BeEquivalentTo(input.StartDateTime.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
-            message.EndDateTime.Should().BeEquivalentTo(input.EndDateTime?.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
+
+            if (documentFormat != DocumentFormat.Ebix)
+            {
+                message.StartDateTime.Should()
+                    .BeEquivalentTo(input.StartDateTime.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
+                message.EndDateTime.Should()
+                    .BeEquivalentTo(input.EndDateTime?.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                message.StartDateTime.Should().BeEquivalentTo(input.StartDateTime.ToString());
+                message.EndDateTime.Should().BeEquivalentTo(input.EndDateTime?.ToString());
+            }
+
             message.GridAccessProviderNumber.Should().BeEquivalentTo(input.GridAccessProviderNumber);
 
             if (input.DelegatedGridAreas == null)

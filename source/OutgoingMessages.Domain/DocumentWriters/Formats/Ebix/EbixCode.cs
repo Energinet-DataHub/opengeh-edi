@@ -41,6 +41,14 @@ public static class EbixCode
         if (businessReason == BusinessReason.Correction)
             return "D32";
 
+        // TODO: awaiting clarification on the correct code for this business reason
+        if (businessReason == BusinessReason.PeriodicMetering)
+            return "E23";
+
+        // TODO: awaiting clarification on the correct code for this business reason
+        if (businessReason == BusinessReason.PeriodicFlexMetering)
+            return "D42";
+
         throw NoCodeFoundFor(businessReason.Name);
     }
 

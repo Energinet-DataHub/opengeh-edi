@@ -16,13 +16,14 @@ using System.Globalization;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime.Text;
-using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataAcceptedV1;
 using PMActorNumber = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber;
 using PMActorRole = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorRole;
+using PMBusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 using PMMeasureUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
 using PMMeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
 using PMQuality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
@@ -88,10 +89,10 @@ public static class MeteredDataForMeteringPointEventBuilder
 
         var acceptRequest = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: requestMeteredDataForMeteringPointMessageInputV1.ActorMessageId,
-            MeteringPointId: requestMeteredDataForMeteringPointMessageInputV1.MeteringPointId,
+            MeteringPointId: meteringPointId,
             MeteringPointType: meteringPointType,
             OriginalTransactionId: requestMeteredDataForMeteringPointMessageInputV1.TransactionId,
-            ProductNumber: requestMeteredDataForMeteringPointMessageInputV1.ProductNumber,
+            ProductNumber: productNumber,
             RegistrationDateTime: InstantPattern.General.Parse(requestMeteredDataForMeteringPointMessageInputV1.RegistrationDateTime).Value.ToDateTimeOffset(),
             StartDateTime: startDateTime,
             EndDateTime: endDateTime,
@@ -109,6 +110,39 @@ public static class MeteredDataForMeteringPointEventBuilder
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
         enqueueActorMessages.SetData(acceptRequest);
+
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_021_ForwardedMeteredData.Name),
+            idempotencyKey: Guid.NewGuid().ToString());
+
+        return serviceBusMessage;
+    }
+
+    public static ServiceBusMessage GenerateRejectedFrom(ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointInputV1, Guid orchestrationInstanceId)
+    {
+        var rejectRequest = new ForwardMeteredDataRejectedV1(
+            requestMeteredDataForMeteringPointInputV1.ActorMessageId,
+            requestMeteredDataForMeteringPointInputV1.TransactionId,
+            PMActorNumber.Create(requestMeteredDataForMeteringPointInputV1.ActorNumber),
+            PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole),
+            PMBusinessReason.FromName(requestMeteredDataForMeteringPointInputV1.BusinessReason),
+            new List<ValidationErrorDto>()
+            {
+                new("Invalid Period", "E17"),
+            });
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_021_ForwardedMeteredData.Name,
+            OrchestrationVersion = Brs_021_ForwardedMeteredData.V1.Version,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = requestMeteredDataForMeteringPointInputV1.ActorNumber,
+                ActorRole = PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole).ToActorRoleV1(),
+            },
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
+        };
+
+        enqueueActorMessages.SetData(rejectRequest);
 
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_021_ForwardedMeteredData.Name),

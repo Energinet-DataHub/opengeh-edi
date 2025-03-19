@@ -332,6 +332,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             relatedToMessageId: MessageId.New(),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.New(),
+                TransactionId: TransactionId.New(),
                 RejectReasons: [
                     new RejectReason(
                         ErrorCode: "E0I",

@@ -13,110 +13,113 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
-public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
+public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
 {
-    private readonly AssertXmlDocument _documentAsserter;
+    private readonly AssertEbixDocument _documentAsserter;
+    private readonly bool _skipIdentificationLengthValidation;
 
-    public AssertAcknowledgementXmlDocument(AssertXmlDocument documentAsserter)
+    public AssertAcknowledgementEbixDocument(AssertEbixDocument documentAsserter, bool skipIdentificationLengthValidation = false)
     {
         _documentAsserter = documentAsserter;
-        _documentAsserter.HasValue("type", null!);
-        _documentAsserter.HasValue("businessSector.type", "23");
+        _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
+        _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "294");
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyIndustryClassification", "23");
+        _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", "41");
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)
     {
-        _documentAsserter.HasValue("mRID", messageId.Value);
+        _documentAsserter.HasValue("HeaderEnergyDocument/Identification", messageId.Value);
         return this;
     }
 
     public IAssertAcknowledgementDocument HasSenderId(ActorNumber senderId)
     {
-        _documentAsserter.HasValue("sender_MarketParticipant.mRID", senderId.Value);
+        _documentAsserter.HasValue("HeaderEnergyDocument/SenderEnergyParty/Identification", senderId.Value);
         return this;
     }
 
     public IAssertAcknowledgementDocument HasSenderRole(ActorRole senderRole)
     {
-        ArgumentNullException.ThrowIfNull(senderRole);
-        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", senderRole.Code);
+        // Ebix doesn't have a sender role?
         return this;
     }
 
     public IAssertAcknowledgementDocument HasReceiverId(ActorNumber receiverId)
     {
-        _documentAsserter.HasValue("receiver_MarketParticipant.mRID", receiverId.Value);
+        _documentAsserter.HasValue("HeaderEnergyDocument/RecipientEnergyParty/Identification", receiverId.Value);
         return this;
     }
 
     public IAssertAcknowledgementDocument HasReceiverRole(ActorRole receiverRole)
     {
-        ArgumentNullException.ThrowIfNull(receiverRole);
-        _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", receiverRole.Code);
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcessRole", EbixCode.Of(receiverRole));
         return this;
     }
 
     public IAssertAcknowledgementDocument HasReceivedBusinessReasonCode(BusinessReason businessReason)
     {
-        _documentAsserter.HasValue("received_MarketDocument.process.processType", businessReason.Code);
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
         return this;
     }
 
     public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId originalMessageId)
     {
-        _documentAsserter.HasValue("received_MarketDocument.mRID", originalMessageId.Value);
+        _documentAsserter.HasValue("ProcessEnergyContext/OriginalBusinessMessage", originalMessageId.Value);
         return this;
     }
 
     public IAssertAcknowledgementDocument HasCreationDate(Instant creationDate)
     {
-        _documentAsserter.HasValue("createdDateTime", creationDate.ToString());
+        _documentAsserter.HasValue("HeaderEnergyDocument/Creation", creationDate.ToString());
         return this;
     }
 
     public async Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.Acknowledgement)
+        await _documentAsserter.HasValidStructureAsync(DocumentType.Acknowledgement, "3", _skipIdentificationLengthValidation)
             .ConfigureAwait(false);
         return this;
     }
 
     public IAssertAcknowledgementDocument HasOriginalTransactionId(TransactionId originalTransactionId)
     {
-        ArgumentNullException.ThrowIfNull(originalTransactionId);
         _documentAsserter.HasValue(
-            "Series[1]/mRID",
+            "PayloadResponseEvent[1]/OriginalBusinessDocument",
             originalTransactionId.Value);
         return this;
     }
 
     public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
     {
-        // CIM xml doesn't have this property
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[1]/Identification",
+            transactionId.Value);
         return this;
     }
 
     public IAssertAcknowledgementDocument SeriesHasReasons(params RejectReason[] rejectReasons)
     {
-        // If this failed, then the document has to many reasons compared to the expected
-        _documentAsserter.HasValue($"Series[1]/Reason[{rejectReasons.Length + 1}]", null!);
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[1]/ResponseReasonType",
+            rejectReasons.First().ErrorCode);
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[1]/ReasonText",
+            rejectReasons.First().ErrorMessage);
 
-        for (var i = 0; i < rejectReasons.Length;  i++)
-        {
-            _documentAsserter.HasValue(
-                $"Series[1]/Reason[{i + 1}]/code",
-                rejectReasons[i].ErrorCode);
-            _documentAsserter.HasValue(
-                $"Series[1]/Reason[{i + 1}]/text",
-                rejectReasons[i].ErrorMessage);
-        }
-
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[2]/ResponseReasonType",
+            null!);
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[2]/ReasonText",
+            null!);
         return this;
     }
 }
