@@ -65,6 +65,7 @@ limitations under the License.
         <ProjectReference Include="..\IncomingMessages.Domain\IncomingMessages.Domain.csproj" />
         <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
         <ProjectReference Include="..\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj" />
+        <ProjectReference Include="..\IncomingMessages.UnitTests\IncomingMessages.UnitTests.csproj" />
         <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
         <ProjectReference Include="..\IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj" />
         <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
