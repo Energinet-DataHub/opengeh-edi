@@ -100,7 +100,7 @@ public static class MeteredDataForMeteringPointBuilder
     <ns0:HeaderEnergyDocument>
         <ns0:Identification>{messageId}</ns0:Identification>
         <ns0:DocumentType listAgencyIdentifier=""260"">{messageType}</ns0:DocumentType>
-        <ns0:Creation>2024-07-30T07:30:54Z</ns0:Creation>
+        <ns0:Creation>2022-12-17T09:30:00Z</ns0:Creation>
         <ns0:SenderEnergyParty>
             <ns0:Identification schemeAgencyIdentifier=""9"">{senderActorNumber.Value}</ns0:Identification>
         </ns0:SenderEnergyParty>
@@ -119,18 +119,18 @@ public static class MeteredDataForMeteringPointBuilder
             <ns0:Function listAgencyIdentifier=""6"">9</ns0:Function>
             <ns0:ObservationTimeSeriesPeriod>
                 <ns0:ResolutionDuration>{s.Resolution}</ns0:ResolutionDuration>
-                <ns0:Start>{s.PeriodStart}</ns0:Start>
-                <ns0:End>{s.PeriodEnd}</ns0:End>
+                <ns0:Start>{s.PeriodStart.ToString()}</ns0:Start>
+                <ns0:End>{s.PeriodEnd.ToString()}</ns0:End>
             </ns0:ObservationTimeSeriesPeriod>
             <ns0:IncludedProductCharacteristic>
                 <ns0:Identification listAgencyIdentifier=""9"">8716867000030</ns0:Identification>
                 <ns0:UnitType listAgencyIdentifier=""260"">KWH</ns0:UnitType>
             </ns0:IncludedProductCharacteristic>
             <ns0:DetailMeasurementMeteringPointCharacteristic>
-                <ns0:TypeOfMeteringPoint listAgencyIdentifier=""260"">E18</ns0:TypeOfMeteringPoint>
+                <ns0:TypeOfMeteringPoint listAgencyIdentifier=""260"">E17</ns0:TypeOfMeteringPoint>
             </ns0:DetailMeasurementMeteringPointCharacteristic>
             <ns0:MeteringPointDomainLocation>
-                <ns0:Identification schemeAgencyIdentifier=""9"">571313000000002000</ns0:Identification>
+                <ns0:Identification schemeAgencyIdentifier=""9"">579999993331812345</ns0:Identification>
             </ns0:MeteringPointDomainLocation>
         {EnergyObservationEbixBuilder(GetEnergyObservations())}
     </ns0:PayloadEnergyTimeSeries>
@@ -357,12 +357,23 @@ public static class MeteredDataForMeteringPointBuilder
                     if (e.Quality != null)
                     {
                         builder.AppendLine(
-                            "<ns0:QuantityQuality listAgencyIdentifier=\"260\">E01</ns0:QuantityQuality>");
+                            $"<ns0:QuantityQuality listAgencyIdentifier=\"260\">{GetEbixCode(Quality.FromCode(e.Quality))}</ns0:QuantityQuality>");
                     }
 
                     builder.AppendLine("</ns0:IntervalEnergyObservation>");
 
                     return builder.ToString();
                 }));
+    }
+
+    private static string? GetEbixCode(Quality quality)
+    {
+        return quality switch
+        {
+            var q when q == Quality.Estimated => "56",
+            var q when q == Quality.Measured => "E01",
+            var q when q == Quality.Calculated => "D01",
+            _ => "D01",
+        };
     }
 }
