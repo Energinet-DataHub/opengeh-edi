@@ -146,7 +146,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
                     ],
                     Resolution: PMValueTypes.Resolution.QuarterHourly,
                     MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-                    StartDateTime: receiver1Start.ToDateTimeOffset(),
+                    StartDateTime: receiver2Start.ToDateTimeOffset(),
                     EndDateTime: receiver2End.ToDateTimeOffset(),
                     MeteredData:
                     [
