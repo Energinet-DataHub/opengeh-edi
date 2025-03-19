@@ -59,23 +59,34 @@ public static class MeteredDataForMeteringPointEventBuilder
             ? PMResolution.FromName(requestMeteredDataForMeteringPointMessageInputV1.Resolution)
             : throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1.Resolution), "Resolution must be set");
 
+        var startDateTime = invariantPattern.Parse(requestMeteredDataForMeteringPointMessageInputV1.StartDateTime).Value.ToDateTimeOffset();
+
         var endDateTime = requestMeteredDataForMeteringPointMessageInputV1.EndDateTime != null
             ? invariantPattern.Parse(requestMeteredDataForMeteringPointMessageInputV1.EndDateTime).Value.ToDateTimeOffset()
             : throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1), "EndDateTime must be set");
 
-        var acceptedEnergyObservations = requestMeteredDataForMeteringPointMessageInputV1.EnergyObservations
-            .Select(eo => new AcceptedEnergyObservation(
-                int.Parse(eo.Position!),
-                eo.EnergyQuantity != null ? decimal.Parse(eo.EnergyQuantity.TrimEnd('M'), CultureInfo.InvariantCulture) : null,
-                eo.QuantityQuality != null ? PMQuality.FromName(eo.QuantityQuality) : null))
+        var acceptedEnergyObservations = requestMeteredDataForMeteringPointMessageInputV1.MeteredDataList
+            .Select(eo => new ReceiversWithMeteredDataV1.AcceptedMeteredData(
+                Position: int.Parse(eo.Position!),
+                EnergyQuantity: eo.EnergyQuantity != null ? decimal.Parse(eo.EnergyQuantity.TrimEnd('M'), CultureInfo.InvariantCulture) : null,
+                QuantityQuality: eo.QuantityQuality != null ? PMQuality.FromName(eo.QuantityQuality) : null))
             .ToList();
 
-        var marketActorRecipients = new List<MarketActorRecipientV1>
-        {
-            new(
-                PMActorNumber.Create(receiverActor.ActorNumber.Value),
-                PMActorRole.FromName(receiverActor.ActorRole.Name)),
-        };
+        List<ReceiversWithMeteredDataV1> receiversWithMeteredData =
+        [
+            new ReceiversWithMeteredDataV1(
+                Actors:
+                [
+                    new MarketActorRecipientV1(
+                        PMActorNumber.Create(receiverActor.ActorNumber.Value),
+                        PMActorRole.FromName(receiverActor.ActorRole.Name)),
+                ],
+                Resolution: resolution,
+                MeasureUnit: measureUnit,
+                StartDateTime: startDateTime,
+                EndDateTime: endDateTime,
+                acceptedEnergyObservations),
+        ];
 
         var acceptRequest = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: requestMeteredDataForMeteringPointMessageInputV1.ActorMessageId,
@@ -83,13 +94,10 @@ public static class MeteredDataForMeteringPointEventBuilder
             MeteringPointType: meteringPointType,
             OriginalTransactionId: requestMeteredDataForMeteringPointMessageInputV1.TransactionId,
             ProductNumber: productNumber,
-            MeasureUnit: measureUnit,
             RegistrationDateTime: InstantPattern.General.Parse(requestMeteredDataForMeteringPointMessageInputV1.RegistrationDateTime).Value.ToDateTimeOffset(),
-            Resolution: resolution,
-            StartDateTime: invariantPattern.Parse(requestMeteredDataForMeteringPointMessageInputV1.StartDateTime).Value.ToDateTimeOffset(),
+            StartDateTime: startDateTime,
             EndDateTime: endDateTime,
-            AcceptedEnergyObservations: acceptedEnergyObservations,
-            MarketActorRecipients: marketActorRecipients);
+            ReceiversWithMeteredData: receiversWithMeteredData);
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
