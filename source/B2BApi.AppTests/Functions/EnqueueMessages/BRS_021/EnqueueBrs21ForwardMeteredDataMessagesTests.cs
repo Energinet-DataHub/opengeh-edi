@@ -78,7 +78,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueAcceptedBrs021Message_When_MessageIsReceived_Then_AcceptedMessagesAreEnqueued_AndThen_AcceptedMessagesCanBePeeked()
+    public async Task Given_EnqueueAcceptedBrs021MessageWithMultipleReceivers_When_MessageIsReceived_Then_AcceptedMessagesAreEnqueued_AndThen_AcceptedMessagesCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
@@ -93,11 +93,11 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         const string receiver1ActorNumber = "1111111111111";
         var receiver1ActorRole = ActorRole.EnergySupplier;
-        var receiver1Quantity = 11;
+        const int receiver1Quantity = 11;
 
         const string receiver2ActorNumber = "2222222222222";
         var receiver2ActorRole = ActorRole.EnergySupplier;
-        var receiver2Quantity = 22;
+        const int receiver2Quantity = 22;
 
         var startDateTime = new DateTimeOffset(2025, 01, 31, 23, 00, 00, TimeSpan.Zero);
 
@@ -215,7 +215,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
             peekResponseContent.Should().NotBeNullOrEmpty()
                 .And.Contain("NotifyValidatedMeasureData", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should be a notify validated measure data")
-                .And.Contain($"EnergyQuantity={expectedReceiver.EnergyQuantity}", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected measure data");
+                .And.Contain($"\"quantity\": {expectedReceiver.EnergyQuantity}", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected measure data");
         }
 
         // Verify that the expected notify message was sent on the ServiceBus
