@@ -84,6 +84,7 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
 
         if (documentFormat != DocumentFormat.Ebix)
         {
+            // The response should be empty for CIM XML and CIM JSON
             response.MessageBody.Should().BeEmpty();
         }
 

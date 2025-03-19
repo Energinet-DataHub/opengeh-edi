@@ -249,11 +249,11 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             senderActorNumber: senderActor.ActorNumber,
             messageId,
             [
-                (transactionId.Value,
+                (TransactionId: transactionId.Value,
                     // Invalid Period
-                    endDate,
-                    startDate,
-                    resolution),
+                    PeriodStart: endDate,
+                    PeriodEnd: startDate,
+                    Resolution: resolution),
             ]);
 
         // Assert
@@ -314,7 +314,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 .Subject;
         }
 
-        await AssertDocument(peekResult.Bundle, documentFormat)
+        await AssertAcknowledgementDocumentProvider.AssertDocument(peekResult.Bundle, documentFormat)
             .HasSenderId(ActorNumber.Create("5790001330552"))
             .HasSenderRole(ActorRole.MeteredDataAdministrator)
             .HasReceiverId(senderActor.ActorNumber)
@@ -329,44 +329,5 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 new("E17", "Invalid Period"),
             }.ToArray())
             .DocumentIsValidAsync();
-    }
-
-    private IAssertAcknowledgementDocument AssertDocument(
-        Stream document,
-        DocumentFormat documentFormat)
-    {
-        if (documentFormat == DocumentFormat.Ebix)
-        {
-            var assertEbixDocument = AssertEbixDocument.Document(
-                document,
-                "ns0",
-                new DocumentValidator(
-                    new[]
-                    {
-                        new EbixValidator(new EbixSchemaProvider()),
-                    }));
-            return new AssertAcknowledgementEbixDocument(assertEbixDocument);
-        }
-
-        if (documentFormat == DocumentFormat.Xml)
-        {
-            var assertXmlDocument = AssertXmlDocument.Document(
-                document,
-                "cim",
-                new DocumentValidator(
-                    new[]
-                    {
-                        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
-                    }));
-
-            return new AssertAcknowledgementXmlDocument(assertXmlDocument);
-        }
-
-        if (documentFormat == DocumentFormat.Json)
-        {
-            return new AssertAcknowledgementJsonDocument(document);
-        }
-
-        throw new Exception("No asserter for the given format");
     }
 }
