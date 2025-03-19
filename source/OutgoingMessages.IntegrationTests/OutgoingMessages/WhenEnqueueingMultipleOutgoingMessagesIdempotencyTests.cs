@@ -68,8 +68,8 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
 
         // Then only one message is enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -110,8 +110,8 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -154,8 +154,8 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -198,8 +198,8 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -244,8 +244,8 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();

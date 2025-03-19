@@ -32,4 +32,4 @@ public record ForwardMeteredDataInputV1AssertionInput(
     Instant? EndDateTime,
     string? GridAccessProviderNumber,
     IReadOnlyCollection<string>? DelegatedGridAreas,
-    IReadOnlyCollection<ForwardMeteredDataInputV1.EnergyObservation> EnergyObservations);
+    IReadOnlyCollection<ForwardMeteredDataInputV1.MeteredDataWithTimestamp> EnergyObservations);

@@ -104,8 +104,9 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 GridAccessProviderNumber: senderActor.ActorNumber.Value,
                 DelegatedGridAreas: null,
                 EnergyObservations: expectedEnergyObservations
-                    .Select(eo => new EnergyObservation(
+                    .Select(eo => new MeteredDataWithTimestamp(
                         eo.Position.ToString(),
+                        Timestamp: null,
                         eo.Quantity.HasValue ? eo.Quantity.Value.ToString(CultureInfo.InvariantCulture) : null,
                         eo.QualityName != null ? Quality.TryGetNameFromCode(eo.QualityName!, fallbackValue: eo.QualityName) : null))
                     .ToList()));

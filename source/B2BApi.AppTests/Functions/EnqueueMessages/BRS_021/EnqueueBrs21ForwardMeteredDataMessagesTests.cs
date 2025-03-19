@@ -93,29 +93,36 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var receiverActorRole = ActorRole.EnergySupplier;
 
         var startDateTime = new DateTimeOffset(2025, 01, 31, 23, 00, 00, TimeSpan.Zero);
+        var endDateTime = startDateTime.AddMinutes(15);
         var enqueueMessagesData = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
-            MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
+            // MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
             RegistrationDateTime: startDateTime,
-            Resolution: PMValueTypes.Resolution.QuarterHourly,
+            // Resolution: PMValueTypes.Resolution.QuarterHourly,
             StartDateTime: startDateTime,
-            EndDateTime: startDateTime.AddMinutes(15),
-            AcceptedEnergyObservations:
+            EndDateTime: endDateTime,
+            MeteredData:
             [
-                new ForwardMeteredDataAcceptedV1.AcceptedEnergyObservation(
+                new ForwardMeteredDataAcceptedV1.AcceptedMeteredData(
                     Position: 1,
                     EnergyQuantity: 1337,
                     QuantityQuality: PMValueTypes.Quality.Calculated),
             ],
-            MarketActorRecipients:
-            [
-                new MarketActorRecipientV1(
-                    ActorNumber: ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
-                    ActorRole: receiverActorRole.ToProcessManagerActorRole()),
+            Receivers: [
+                new MeteredDataReceiverV1(
+                    Actors: [
+                        new MarketActorRecipientV1(
+                            ActorNumber: ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
+                            ActorRole: receiverActorRole.ToProcessManagerActorRole()),
+                    ],
+                    PMValueTypes.Resolution.QuarterHourly,
+                    PMValueTypes.MeasurementUnit.KilowattHour,
+                    startDateTime,
+                    endDateTime),
             ]);
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();
