@@ -34,6 +34,7 @@ public class RejectedForwardMeteredDataMessageBuilder
         BusinessReason businessReason,
         MessageId relatedToMessageId,
         TransactionId originalTransactionIdReference,
+        TransactionId transactionId,
         Instant timestamp)
     {
         _rejectReasons = new List<RejectReason>();
@@ -45,6 +46,7 @@ public class RejectedForwardMeteredDataMessageBuilder
         MessageId = messageId;
         ReceiverId = receiverId;
         OriginalTransactionIdReference = originalTransactionIdReference;
+        TransactionId = transactionId;
         Timestamp = timestamp;
     }
 
@@ -63,6 +65,8 @@ public class RejectedForwardMeteredDataMessageBuilder
     public MessageId RelatedToMessageId { get; }
 
     public TransactionId OriginalTransactionIdReference { get; }
+
+    public TransactionId TransactionId { get; }
 
     public Instant Timestamp { get; }
 
@@ -95,6 +99,7 @@ public class RejectedForwardMeteredDataMessageBuilder
     {
         var series = new RejectedForwardMeteredDataSeries(
             OriginalTransactionIdReference: OriginalTransactionIdReference,
+            TransactionId: TransactionId,
 #pragma warning disable SA1118
             RejectReasons: _rejectReasons.Count != 0
                 ? _rejectReasons

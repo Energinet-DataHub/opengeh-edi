@@ -58,6 +58,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             businessReason: BusinessReason.PeriodicFlexMetering,
             relatedToMessageId: MessageId.New(),
             originalTransactionIdReference: TransactionId.New(),
+            transactionId: TransactionId.New(),
             timestamp: InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value);
 
         rejectMessageBuilder.AddReasonToSeries(
@@ -87,6 +88,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             .HasReceivedBusinessReasonCode(rejectMessageBuilder.BusinessReason)
 
             .HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)
+            .HasTransactionId(rejectMessageBuilder.TransactionId) // Only ebix has this property
             .SeriesHasReasons(rejectMessageBuilder.GetSeries().RejectReasons.ToArray());
     }
 

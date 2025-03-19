@@ -40,5 +40,7 @@ public interface IAssertAcknowledgementDocument
 
     IAssertAcknowledgementDocument HasOriginalTransactionId(TransactionId originalTransactionId);
 
+    IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId);
+
     IAssertAcknowledgementDocument SeriesHasReasons(params RejectReason[] rejectReasons);
 }

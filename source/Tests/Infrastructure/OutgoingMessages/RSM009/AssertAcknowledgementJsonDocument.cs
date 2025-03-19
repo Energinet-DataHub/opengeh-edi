@@ -137,6 +137,12 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
+    public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
+    {
+        // CIM json doesn't have this property
+        return this;
+    }
+
     public IAssertAcknowledgementDocument SeriesHasReasons(params RejectReason[] rejectReasons)
     {
         FirstSeriesElement()

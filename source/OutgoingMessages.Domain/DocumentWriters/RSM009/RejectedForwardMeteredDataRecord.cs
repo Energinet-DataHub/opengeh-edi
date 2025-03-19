@@ -18,6 +18,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 
 public record RejectedForwardMeteredDataRecord(
     IReadOnlyCollection<RejectReason> RejectReasons,
+    TransactionId TransactionId,
     TransactionId OriginalTransactionIdReference);
 
 public record RejectReason(string ErrorCode, string ErrorMessage);

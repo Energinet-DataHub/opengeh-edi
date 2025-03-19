@@ -95,6 +95,12 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         return this;
     }
 
+    public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
+    {
+        // CIM xml doesn't have this property
+        return this;
+    }
+
     public IAssertAcknowledgementDocument SeriesHasReasons(params RejectReason[] rejectReasons)
     {
         // If this failed, then the document has to many reasons compared to the expected

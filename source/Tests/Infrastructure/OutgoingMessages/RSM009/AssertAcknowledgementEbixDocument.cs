@@ -30,6 +30,8 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
         _documentAsserter = documentAsserter;
         _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "294");
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyIndustryClassification", "23");
+        _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", "41");
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)
@@ -90,8 +92,16 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
     public IAssertAcknowledgementDocument HasOriginalTransactionId(TransactionId originalTransactionId)
     {
         _documentAsserter.HasValue(
-            "PayloadResponseEvent[1]/Identification",
+            "PayloadResponseEvent[1]/OriginalBusinessDocument",
             originalTransactionId.Value);
+        return this;
+    }
+
+    public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
+    {
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[1]/Identification",
+            transactionId.Value);
         return this;
     }
 
@@ -100,6 +110,16 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
         _documentAsserter.HasValue(
             "PayloadResponseEvent[1]/ResponseReasonType",
             rejectReasons.First().ErrorCode);
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[1]/ReasonText",
+            rejectReasons.First().ErrorMessage);
+
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[2]/ResponseReasonType",
+            null!);
+        _documentAsserter.HasValue(
+            "PayloadResponseEvent[2]/ReasonText",
+            null!);
         return this;
     }
 }
