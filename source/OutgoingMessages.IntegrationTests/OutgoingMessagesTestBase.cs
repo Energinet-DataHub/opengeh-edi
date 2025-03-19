@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyI
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
+using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
@@ -223,7 +224,8 @@ public class OutgoingMessagesTestBase : IDisposable
             .AddScoped<IClock>(_ => new ClockStub())
             .AddOutgoingMessagesModule(config)
             .AddArchivedMessagesModule(config)
-            .AddMasterDataModule(config);
+            .AddMasterDataModule(config)
+            .AddDataAccessUnitOfWorkModule();
 
         // Replace the services with stub implementations.
         _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
