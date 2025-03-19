@@ -81,7 +81,7 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                         EndDateTime: transaction.EndDateTime,
                         GridAccessProviderNumber: transaction.RequestedByActor.ActorNumber.Value,
                         DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
-                        MeteredData:
+                        MeteredDataList:
                                 transaction.EnergyObservations
                                     .Select(MapToMeteredData)
                                     .ToList()),
@@ -94,7 +94,7 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    private static ForwardMeteredDataInputV1.MeteredDataWithTimestamp MapToMeteredData(InitializeEnergyObservation energyObservation)
+    private static ForwardMeteredDataInputV1.MeteredData MapToMeteredData(InitializeEnergyObservation energyObservation)
     {
         var quantityQuality = energyObservation.QuantityQuality is not null
             ? Quality.TryGetNameFromCode(energyObservation.QuantityQuality, fallbackValue: energyObservation.QuantityQuality)
@@ -106,9 +106,8 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
             quantityQuality = Quality.TryGetNameFromEbixCode(energyObservation.QuantityQuality, fallbackValue: energyObservation.QuantityQuality);
         }
 
-        return new ForwardMeteredDataInputV1.MeteredDataWithTimestamp(
+        return new ForwardMeteredDataInputV1.MeteredData(
             Position: energyObservation.Position,
-            Timestamp: null,
             EnergyQuantity: energyObservation.EnergyQuantity,
             QuantityQuality: quantityQuality);
     }

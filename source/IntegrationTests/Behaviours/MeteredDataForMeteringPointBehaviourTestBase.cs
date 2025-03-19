@@ -180,11 +180,10 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
                         input.DelegatedGridAreas.Select(delegatedGridArea => delegatedGridArea));
             }
 
-            message.MeteredData.Should()
+            message.MeteredDataList.Should()
                 .BeEquivalentTo(
-                    input.EnergyObservations.Select(eo => new MeteredDataWithTimestamp(
+                    input.EnergyObservations.Select(eo => new MeteredData(
                         eo.Position,
-                        null,
                         eo.EnergyQuantity,
                         eo.QuantityQuality)));
         };

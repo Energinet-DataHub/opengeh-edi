@@ -45,10 +45,9 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
         ForwardMeteredDataAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
     {
-        foreach (var receivers in acceptedData.Receivers)
+        foreach (var receivers in acceptedData.ReceiversWithMeteredData)
         {
-            // TODO: Get metered data from receivers
-            var energyObservations = acceptedData.MeteredData
+            var energyObservations = receivers.MeteredData
                 .Select(x =>
                     new EnergyObservationDto(
                         Position: x.Position,
@@ -73,8 +72,8 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                         QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
                         RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
                         Resolution: Resolution.FromName(receivers.Resolution.Name),
-                        StartedDateTime: acceptedData.StartDateTime.ToInstant(),
-                        EndedDateTime: acceptedData.EndDateTime.ToInstant(),
+                        StartedDateTime: receivers.StartDateTime.ToInstant(),
+                        EndedDateTime: receivers.EndDateTime.ToInstant(),
                         EnergyObservations: energyObservations));
 
                 await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);

@@ -63,16 +63,16 @@ public static class MeteredDataForMeteringPointEventBuilder
             ? invariantPattern.Parse(requestMeteredDataForMeteringPointMessageInputV1.EndDateTime).Value.ToDateTimeOffset()
             : throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1), "EndDateTime must be set");
 
-        var acceptedEnergyObservations = requestMeteredDataForMeteringPointMessageInputV1.MeteredData
-            .Select(eo => new AcceptedMeteredData(
+        var acceptedEnergyObservations = requestMeteredDataForMeteringPointMessageInputV1.MeteredDataList
+            .Select(eo => new ReceiversWithMeteredDataV1.AcceptedMeteredData(
                 Position: int.Parse(eo.Position!),
                 EnergyQuantity: eo.EnergyQuantity != null ? decimal.Parse(eo.EnergyQuantity.TrimEnd('M'), CultureInfo.InvariantCulture) : null,
                 QuantityQuality: eo.QuantityQuality != null ? PMQuality.FromName(eo.QuantityQuality) : null))
             .ToList();
 
-        List<MeteredDataReceiverV1> receiversWithMeteredData =
+        List<ReceiversWithMeteredDataV1> receiversWithMeteredData =
         [
-            new MeteredDataReceiverV1(
+            new ReceiversWithMeteredDataV1(
                 Actors:
                 [
                     new MarketActorRecipientV1(
@@ -82,7 +82,8 @@ public static class MeteredDataForMeteringPointEventBuilder
                 Resolution: resolution,
                 MeasureUnit: measureUnit,
                 StartDateTime: startDateTime,
-                EndDateTime: endDateTime),
+                EndDateTime: endDateTime,
+                acceptedEnergyObservations),
         ];
 
         var acceptRequest = new ForwardMeteredDataAcceptedV1(
@@ -94,8 +95,7 @@ public static class MeteredDataForMeteringPointEventBuilder
             RegistrationDateTime: InstantPattern.General.Parse(requestMeteredDataForMeteringPointMessageInputV1.RegistrationDateTime).Value.ToDateTimeOffset(),
             StartDateTime: startDateTime,
             EndDateTime: endDateTime,
-            MeteredData: acceptedEnergyObservations,
-            Receivers: receiversWithMeteredData);
+            ReceiversWithMeteredData: receiversWithMeteredData);
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
