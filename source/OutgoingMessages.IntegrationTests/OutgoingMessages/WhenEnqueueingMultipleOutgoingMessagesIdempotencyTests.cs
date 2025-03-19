@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using FluentAssertions;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -42,7 +45,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     }
 
     [Fact]
-    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredData_Then_OnlyOneMessageIsEnqueued()
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataSeparately_Then_OnlyOneMessageIsEnqueued()
     {
         // Given multiple messages with the same idempotency data
         var externalId = new ExternalId(Guid.NewGuid());
@@ -68,8 +71,13 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        var unitOfWork = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await unitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        await unitOfWork.SaveChangesAsync(CancellationToken.None);
 
         // Then only one message is enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -82,6 +90,46 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             () => Assert.Single(outgoingMessages),
             () => Assert.Equal(relatedToMessageId1, outgoingMessages.First().RelatedToMessageId),
             () => Assert.NotEqual(relatedToMessageId2, outgoingMessages.First().RelatedToMessageId));
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataAtTheSameTime_Then_UniqueDatabaseIndexThrowsException()
+    {
+        // Given multiple messages with the same idempotency data
+        var externalId = new ExternalId(Guid.NewGuid());
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
+        var start = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var end = Instant.FromUtc(2025, 01, 31, 23, 00);
+
+        var relatedToMessageId1 = MessageId.New();
+        var message1 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: externalId,
+            receiver: receiver,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId1);
+
+        var relatedToMessageId2 = MessageId.New();
+        var message2 = CreateAcceptedForwardMeteredDataMessage(
+            externalId: externalId,
+            receiver: receiver,
+            start: start,
+            end: end,
+            relatedToMessageId: relatedToMessageId2);
+
+        // When enqueueing the messages
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        var unitOfWork = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var act = () => unitOfWork.SaveChangesAsync(CancellationToken.None);
+
+        await act.Should()
+            .ThrowExactlyAsync<DbUpdateException>()
+            .WithInnerException(typeof(SqlException))
+            .WithMessage(
+                "Cannot insert duplicate key row in object 'dbo.OutgoingMessages' with unique index 'UQ_OutgoingMessages_ExternalId_ReceiverNumber_ReceiverRole_PeriodStartedAt'*");
     }
 
     [Fact]
@@ -110,8 +158,10 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -121,7 +171,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
         Assert.Collection(
-            outgoingMessages,
+            outgoingMessages.OrderBy(om => om.CreatedAt),
             [
                 om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
                 om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
@@ -154,8 +204,10 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -165,7 +217,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
         Assert.Collection(
-            outgoingMessages,
+            outgoingMessages.OrderBy(om => om.CreatedAt),
             [
                 om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
                 om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
@@ -198,8 +250,10 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -209,7 +263,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
         Assert.Collection(
-            outgoingMessages,
+            outgoingMessages.OrderBy(om => om.CreatedAt),
             [
                 om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
                 om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
@@ -244,8 +298,10 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message2, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
         using var queryScope = ServiceProvider.CreateScope();
@@ -255,7 +311,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
         Assert.Collection(
-            outgoingMessages,
+            outgoingMessages.OrderBy(om => om.CreatedAt),
             [
                 om => Assert.Equal(relatedToMessageId1, om.RelatedToMessageId),
                 om => Assert.Equal(relatedToMessageId2, om.RelatedToMessageId),
@@ -285,6 +341,8 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
         await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Assert
         using var queryScope = ServiceProvider.CreateScope();

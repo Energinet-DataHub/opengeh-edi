@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Net;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -29,6 +30,7 @@ using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
@@ -78,7 +80,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueAcceptedBrs021Message_When_MessageIsReceived_Then_AcceptedMessageIsEnqueued_AndThen_AcceptedMessageCanBePeeked()
+    public async Task Given_EnqueueAcceptedBrs021MessageWithMultipleReceivers_When_MessageIsReceived_Then_AcceptedMessagesAreEnqueued_AndThen_AcceptedMessagesCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
@@ -88,34 +90,71 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-021 service bus message
-        const string actorNumber = "1234567890123";
+        const string senderActorNumber = "1234567890123";
         var senderActorRole = ActorRole.GridAccessProvider;
-        var receiverActorRole = ActorRole.EnergySupplier;
 
-        var startDateTime = new DateTimeOffset(2025, 01, 31, 23, 00, 00, TimeSpan.Zero);
+        const string receiver1ActorNumber = "1111111111111";
+        var receiver1ActorRole = ActorRole.EnergySupplier;
+        const int receiver1Quantity = 11;
+
+        const string receiver2ActorNumber = "2222222222222";
+        var receiver2ActorRole = ActorRole.EnergySupplier;
+        const int receiver2Quantity = 22;
+
+        var startDateTime = Instant.FromUtc(2025, 01, 31, 23, 00, 00);
+
+        var receiver1Start = startDateTime;
+        var receiver1End = startDateTime.Plus(Duration.FromMinutes(15));
+
+        var receiver2Start = receiver1End;
+        var receiver2End = receiver2Start.Plus(Duration.FromMinutes(15));
+
+        var endDateTime = receiver2End;
+
         var enqueueMessagesData = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
-            MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-            RegistrationDateTime: startDateTime,
-            Resolution: PMValueTypes.Resolution.QuarterHourly,
-            StartDateTime: startDateTime,
-            EndDateTime: startDateTime.AddMinutes(15),
-            AcceptedEnergyObservations:
-            [
-                new ForwardMeteredDataAcceptedV1.AcceptedEnergyObservation(
-                    Position: 1,
-                    EnergyQuantity: 1337,
-                    QuantityQuality: PMValueTypes.Quality.Calculated),
-            ],
-            MarketActorRecipients:
-            [
-                new MarketActorRecipientV1(
-                    ActorNumber: ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
-                    ActorRole: receiverActorRole.ToProcessManagerActorRole()),
+            RegistrationDateTime: startDateTime.ToDateTimeOffset(),
+            StartDateTime: startDateTime.ToDateTimeOffset(),
+            EndDateTime: endDateTime.ToDateTimeOffset(),
+            ReceiversWithMeteredData: [
+                new ReceiversWithMeteredDataV1(
+                    Actors: [
+                        new MarketActorRecipientV1(
+                            ActorNumber: ActorNumber.Create(receiver1ActorNumber).ToProcessManagerActorNumber(),
+                            ActorRole: receiver1ActorRole.ToProcessManagerActorRole()),
+                    ],
+                    Resolution: PMValueTypes.Resolution.QuarterHourly,
+                    MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
+                    StartDateTime: receiver1Start.ToDateTimeOffset(),
+                    EndDateTime: receiver1End.ToDateTimeOffset(),
+                    MeteredData:
+                    [
+                        new ReceiversWithMeteredDataV1.AcceptedMeteredData(
+                            Position: 1,
+                            EnergyQuantity: receiver1Quantity,
+                            QuantityQuality: PMValueTypes.Quality.AsProvided),
+                    ]),
+                new ReceiversWithMeteredDataV1(
+                    Actors: [
+                        new MarketActorRecipientV1(
+                            ActorNumber: ActorNumber.Create(receiver2ActorNumber).ToProcessManagerActorNumber(),
+                            ActorRole: receiver2ActorRole.ToProcessManagerActorRole()),
+                    ],
+                    Resolution: PMValueTypes.Resolution.QuarterHourly,
+                    MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
+                    StartDateTime: receiver2Start.ToDateTimeOffset(),
+                    EndDateTime: receiver2End.ToDateTimeOffset(),
+                    MeteredData:
+                    [
+                        new ReceiversWithMeteredDataV1.AcceptedMeteredData(
+                                Position: 1,
+                                EnergyQuantity: receiver2Quantity,
+                                QuantityQuality: PMValueTypes.Quality.AsProvided),
+                    ]),
             ]);
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();
@@ -125,7 +164,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OrchestrationVersion = 1,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
-                ActorNumber = actorNumber,
+                ActorNumber = senderActorNumber,
                 ActorRole = senderActorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId,
@@ -154,22 +193,34 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
             .Where(om => om.EventId == eventId && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
-        enqueuedOutgoingMessages.Should().HaveCount(1);
+        enqueuedOutgoingMessages.Should().HaveCount(2);
 
         // Verify that the enqueued message can be peeked
-        var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
-            actor: new Actor(ActorNumber.Create(actorNumber), receiverActorRole),
-            category: MessageCategory.MeasureData);
+        List<(Actor Actor, decimal EnergyQuantity, Instant Start, Instant End)> expectedReceivers =
+        [
+            (new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole), receiver1Quantity, receiver1Start, receiver1End),
+            (new Actor(ActorNumber.Create(receiver2ActorNumber), receiver2ActorRole), receiver2Quantity, receiver2Start, receiver2End),
+        ];
 
-        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
-        await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+        foreach (var expectedReceiver in expectedReceivers)
+        {
+            var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
+                actor: expectedReceiver.Actor,
+                category: MessageCategory.MeasureData);
 
-        // Ensure status code is 200 OK, since EnsureSuccessStatusCode() also allows 204 No Content
-        peekResponse.StatusCode.Should().Be(HttpStatusCode.OK, "because the peek request should return OK status code (with content)");
+            var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
+            await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
 
-        var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
-        peekResponseContent.Should().NotBeNullOrEmpty()
-            .And.Contain("NotifyValidatedMeasureData");
+            // Ensure status code is 200 OK, since EnsureSuccessStatusCode() also allows 204 No Content
+            peekResponse.StatusCode.Should().Be(HttpStatusCode.OK, $"because the peek request for receiver {expectedReceiver.Actor.ActorNumber} should return OK status code (with content)");
+
+            var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
+            peekResponseContent.Should().NotBeNullOrEmpty()
+                .And.Contain("NotifyValidatedMeasureData", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should be a notify validated measure data")
+                .And.Contain($"\"quantity\": {expectedReceiver.EnergyQuantity}", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected measure data")
+                .And.Contain($"\"value\": \"{expectedReceiver.Start.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected start")
+                .And.Contain($"\"value\": \"{expectedReceiver.End.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected end");
+        }
 
         // Verify that the expected notify message was sent on the ServiceBus
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
