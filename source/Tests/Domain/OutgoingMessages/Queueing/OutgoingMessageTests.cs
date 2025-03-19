@@ -60,6 +60,7 @@ public class OutgoingMessageTests
 
         new AcknowledgementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new AcknowledgementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new AcknowledgementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
     ];
 
     /// <summary>

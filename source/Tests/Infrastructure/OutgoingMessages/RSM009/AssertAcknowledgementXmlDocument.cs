@@ -27,6 +27,7 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("type", null!);
+        _documentAsserter.HasValue("businessSector.type", "23");
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)
@@ -67,9 +68,9 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId relatedTOriginalMessageId)
+    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId originalMessageId)
     {
-        _documentAsserter.HasValue("received_MarketDocument.mRID", relatedTOriginalMessageId.Value);
+        _documentAsserter.HasValue("received_MarketDocument.mRID", originalMessageId.Value);
         return this;
     }
 
@@ -92,6 +93,12 @@ public class AssertAcknowledgementXmlDocument : IAssertAcknowledgementDocument
         _documentAsserter.HasValue(
             "Series[1]/mRID",
             originalTransactionId.Value);
+        return this;
+    }
+
+    public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
+    {
+        // CIM xml doesn't have this property
         return this;
     }
 

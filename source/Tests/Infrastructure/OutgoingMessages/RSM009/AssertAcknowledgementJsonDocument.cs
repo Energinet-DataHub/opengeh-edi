@@ -24,7 +24,6 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
 public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
 {
-    private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
     private readonly JsonElement _root;
 
@@ -32,6 +31,9 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
     {
         _document = JsonDocument.Parse(stream);
         _root = _document.RootElement.GetProperty("Acknowledgement_MarketDocument");
+        _root.TryGetProperty("type", out _).Should().BeFalse();
+        _root.GetProperty("businessSector.type")
+            .GetProperty("value").GetString().Should().Be("23");
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)
@@ -90,12 +92,12 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId relatedTOriginalMessageId)
+    public IAssertAcknowledgementDocument HasRelatedToMessageId(MessageId originalMessageId)
     {
         _root.GetProperty("received_MarketDocument.mRID")
             .GetString()
             .Should()
-            .Be(relatedTOriginalMessageId.Value);
+            .Be(originalMessageId.Value);
         return this;
     }
 
@@ -134,6 +136,12 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
             .GetString()
             .Should()
             .Be(originalTransactionId.Value);
+        return this;
+    }
+
+    public IAssertAcknowledgementDocument HasTransactionId(TransactionId transactionId)
+    {
+        // CIM json doesn't have this property
         return this;
     }
 

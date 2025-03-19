@@ -19,11 +19,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
-using Energinet.DataHub.EDI.Tests.DocumentValidation;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Text;
 using Xunit;
@@ -46,7 +43,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    //[InlineData(nameof(DocumentFormat.Ebix))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_document(string documentFormat)
     {
         var rejectMessageBuilder = new RejectedForwardMeteredDataMessageBuilder(
@@ -58,11 +55,12 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             businessReason: BusinessReason.PeriodicFlexMetering,
             relatedToMessageId: MessageId.New(),
             originalTransactionIdReference: TransactionId.New(),
+            transactionId: TransactionId.New(),
             timestamp: InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value);
 
         rejectMessageBuilder.AddReasonToSeries(
             new RejectReason(
-                ErrorCode: "999",
+                ErrorCode: "E0I",
                 ErrorMessage: "Error message 1"));
         rejectMessageBuilder.AddReasonToSeries(
             new RejectReason(
@@ -73,10 +71,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             rejectMessageBuilder,
             DocumentFormat.FromName(documentFormat));
 
-        await AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
-            .DocumentIsValidAsync();
-
-        AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
+        await AssertAcknowledgementDocumentProvider.AssertDocument(marketDocumentStream.Stream, DocumentFormat.FromName(documentFormat))
             .HasMessageId(rejectMessageBuilder.MessageId)
             .HasSenderId(rejectMessageBuilder.SenderId)
             .HasSenderRole(rejectMessageBuilder.SenderRole)
@@ -87,7 +82,9 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
             .HasReceivedBusinessReasonCode(rejectMessageBuilder.BusinessReason)
 
             .HasOriginalTransactionId(rejectMessageBuilder.OriginalTransactionIdReference)
-            .SeriesHasReasons(rejectMessageBuilder.GetSeries().RejectReasons.ToArray());
+            .HasTransactionId(rejectMessageBuilder.TransactionId) // Only ebix has this property
+            .SeriesHasReasons(rejectMessageBuilder.GetSeries().RejectReasons.ToArray())
+            .DocumentIsValidAsync();
     }
 
     private Task<MarketDocumentStream> CreateDocument(
@@ -96,12 +93,12 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
     {
         var documentHeader = resultBuilder.BuildHeader();
         var records = _parser.From(resultBuilder.GetSeries());
-        // if (documentFormat == DocumentFormat.Ebix)
-        // {
-        //     return new RejectRequestWholesaleSettlementEbixDocumentWriter(_parser).WriteAsync(
-        //         documentHeader,
-        //         new[] { records });
-        // }
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            return new AcknowledgementEbixDocumentWriter(_parser).WriteAsync(
+                documentHeader,
+                new[] { records });
+        }
 
         if (documentFormat == DocumentFormat.Xml)
         {
@@ -120,38 +117,5 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
         }
 
         throw new Exception("No writer for the given format");
-    }
-
-    private IAssertAcknowledgementDocument AssertDocument(
-        Stream document,
-        DocumentFormat documentFormat)
-    {
-        /*
-        if (documentFormat == DocumentFormat.Ebix)
-        {
-            var assertEbixDocument = AssertEbixDocument.Document(document, "ns0", _documentValidation.Validator);
-            return new AssertRejectRequestWholesaleSettlementEbixDocument(assertEbixDocument);
-        }
-*/
-        if (documentFormat == DocumentFormat.Xml)
-        {
-            var assertXmlDocument = AssertXmlDocument.Document(
-                document,
-                "cim",
-                new DocumentValidator(
-                    new[]
-                        {
-                            new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
-                        }));
-
-            return new AssertAcknowledgementXmlDocument(assertXmlDocument);
-        }
-
-        if (documentFormat == DocumentFormat.Json)
-        {
-            return new AssertAcknowledgementJsonDocument(document);
-        }
-
-        throw new Exception("No asserter for the given format");
     }
 }

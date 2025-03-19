@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
@@ -29,11 +30,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
+    IUnitOfWork unitOfWork,
     ILogger<EnqueueHandler_Brs_021_ForwardMeteredData_V1> logger)
     : EnqueueActorMessagesValidatedHandlerBase<ForwardMeteredDataAcceptedV1, ForwardMeteredDataRejectedV1>(logger)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ILogger _logger = logger;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
@@ -42,33 +45,42 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
         ForwardMeteredDataAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
     {
-        var series = acceptedData.AcceptedEnergyObservations.Select(x =>
-            new EnergyObservationDto(x.Position, x.EnergyQuantity, x.QuantityQuality != null ? Quality.FromName(x.QuantityQuality.Name) : null))
-            .ToList();
-
-        foreach (var acceptedDataMarketActorRecipient in acceptedData.MarketActorRecipients)
+        foreach (var receivers in acceptedData.ReceiversWithMeteredData)
         {
-            var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
-                eventId: EventId.From(serviceBusMessageId),
-                externalId: new ExternalId(orchestrationInstanceId),
-                receiver: new Actor(ActorNumber.Create(acceptedDataMarketActorRecipient.ActorNumber), ActorRole.FromName(acceptedDataMarketActorRecipient.ActorRole.Name)),
-                businessReason: BusinessReason.PeriodicMetering,
-                relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-                series: new ForwardMeteredDataMessageSeriesDto(
-                    TransactionId: TransactionId.New(),
-                    MarketEvaluationPointNumber: acceptedData.MeteringPointId,
-                    MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                    OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
-                    Product: acceptedData.ProductNumber,
-                    QuantityMeasureUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
-                    RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
-                    Resolution: Resolution.FromName(acceptedData.Resolution.Name),
-                    StartedDateTime: acceptedData.StartDateTime.ToInstant(),
-                    EndedDateTime: acceptedData.EndDateTime.ToInstant(),
-                    EnergyObservations: series));
+            var energyObservations = receivers.MeteredData
+                .Select(x =>
+                    new EnergyObservationDto(
+                        Position: x.Position,
+                        Quantity: x.EnergyQuantity,
+                        Quality: x.QuantityQuality != null ? Quality.FromName(x.QuantityQuality.Name) : null))
+                .ToList();
 
-            await _outgoingMessagesClient.EnqueueAndCommitAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+            foreach (var actor in receivers.Actors)
+            {
+                var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
+                    eventId: EventId.From(serviceBusMessageId),
+                    externalId: new ExternalId(orchestrationInstanceId),
+                    receiver: new Actor(ActorNumber.Create(actor.ActorNumber), ActorRole.FromName(actor.ActorRole.Name)),
+                    businessReason: BusinessReason.PeriodicMetering,
+                    relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
+                    series: new ForwardMeteredDataMessageSeriesDto(
+                        TransactionId: TransactionId.New(),
+                        MarketEvaluationPointNumber: acceptedData.MeteringPointId,
+                        MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
+                        OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
+                        Product: acceptedData.ProductNumber,
+                        QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
+                        RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
+                        Resolution: Resolution.FromName(receivers.Resolution.Name),
+                        StartedDateTime: receivers.StartDateTime.ToInstant(),
+                        EndedDateTime: receivers.EndDateTime.ToInstant(),
+                        EnergyObservations: energyObservations));
+
+                await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+            }
         }
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)
@@ -100,6 +112,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
+                TransactionId: TransactionId.New(),
                 RejectReasons: rejectedData.ValidationErrors.Select(
                         validationError =>
                             new RejectReason(
