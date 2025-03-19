@@ -195,6 +195,7 @@ public class WholesaleServicesSeriesBuilder
             _receiverActorNumber.Value,
             _receiverActorRole.Code,
             _messageId,
+            null,
             _timeStamp);
     }
 

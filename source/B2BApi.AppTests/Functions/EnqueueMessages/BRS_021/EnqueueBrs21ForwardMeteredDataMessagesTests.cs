@@ -31,6 +31,7 @@ using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Abstractions;
+using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
@@ -195,11 +196,11 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OriginalTransactionId: Guid.NewGuid().ToString(),
             ForwardedByActorNumber: ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
             ForwardedByActorRole: actorRole.ToProcessManagerActorRole(),
-            ValidationErrors:
-            [
+            BusinessReason: BusinessReason.PeriodicFlexMetering,
+            ValidationErrors: [
                 new ValidationErrorDto(
                     Message: "Invalid end date",
-                    ErrorCode: "X01"),
+                    ErrorCode: "999"),
             ]);
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();

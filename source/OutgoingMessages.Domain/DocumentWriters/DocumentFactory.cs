@@ -53,6 +53,7 @@ public class DocumentFactory
                 bundle.Receiver.Number.Value,
                 bundle.DocumentReceiver.ActorRole.Code,
                 bundle.MessageId.Value,
+                bundle.RelatedToMessageId?.Value,
                 timestamp),
             bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList(),
             cancellationToken);
