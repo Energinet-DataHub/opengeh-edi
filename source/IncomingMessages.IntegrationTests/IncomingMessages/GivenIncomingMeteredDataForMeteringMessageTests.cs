@@ -293,6 +293,29 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
     }
 
     [Fact]
+    public async Task When_SenderRoleIsGridAccessProvider_When_Parsing_Then_HasValidationError()
+    {
+        var documentFormat = DocumentFormat.Xml;
+        var validSenderRoleInMessage = ActorRole.GridAccessProvider;
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
+            documentFormat,
+            _actorIdentity.ActorNumber,
+            [
+                ("555555555", Instant.FromUtc(2024, 1, 1, 0, 0), Instant.FromUtc(2024, 1, 31, 0, 0), Resolution.QuarterHourly),
+            ],
+            senderRole: validSenderRoleInMessage.Code);
+
+        var (incomingMessage, _) = await ParseMessageAsync(message.Stream, documentFormat);
+        var result = await _validateIncomingMessage.ValidateAsync(
+            incomingMessage!,
+            documentFormat,
+            CancellationToken.None);
+
+        result.Success.Should().BeFalse();
+        result.Errors.Should().ContainSingle().And.Contain(error => error is SenderRoleTypeIsNotAuthorized);
+    }
+
+    [Fact]
     public async Task When_AuthenticatedSenderRoleIsIncorrect_Then_ResultContainExceptedValidationError()
     {
         var documentFormat = DocumentFormat.Xml;

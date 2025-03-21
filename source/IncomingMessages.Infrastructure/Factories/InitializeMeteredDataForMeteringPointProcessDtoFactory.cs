@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
@@ -42,7 +43,7 @@ public static class InitializeMeteredDataForMeteringPointProcessDtoFactory
                         DelegatedGridAreaCodes: series.DelegatedGridAreas,
                         RequestedByActor: RequestedByActor.From(
                             authenticatedActor.CurrentActorIdentity.ActorNumber,
-                            series.RequestedByActorRole ?? authenticatedActor.CurrentActorIdentity.ActorRole),
+                            series.RequestedByActorRole ?? ActorRole.FromCode(meteredDataForMeteringPointMessageBase.SenderRoleCode)),
                         EnergyObservations: series.EnergyObservations
                             .Select(
                                 energyObservation => new InitializeEnergyObservation(

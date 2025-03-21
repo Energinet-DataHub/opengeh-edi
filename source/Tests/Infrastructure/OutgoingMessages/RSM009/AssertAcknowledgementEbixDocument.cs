@@ -66,6 +66,10 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
 
     public IAssertAcknowledgementDocument HasReceivedBusinessReasonCode(BusinessReason businessReason)
     {
+        _documentAsserter.HasValueWithAttributes(
+            "ProcessEnergyContext/EnergyBusinessProcess",
+            
+            )
         _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
         return this;
     }
