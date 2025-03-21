@@ -293,7 +293,7 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
     }
 
     [Fact]
-    public async Task When_SenderRoleIsGridAccessProvider_When_Parsing_Then_HasValidationError()
+    public async Task AndGiven_SenderRoleIsGridAccessProvider_When_Parsing_Then_HasValidationError()
     {
         var documentFormat = DocumentFormat.Xml;
         var validSenderRoleInMessage = ActorRole.GridAccessProvider;
