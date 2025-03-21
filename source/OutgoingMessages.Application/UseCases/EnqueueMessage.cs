@@ -26,6 +26,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 /// </summary>
 public class EnqueueMessage
 {
+    private const int MaxBundleSizeForMeasureData = 2000; // TODO: Get from config
+
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IBundleRepository _bundleRepository;
@@ -63,16 +65,17 @@ public class EnqueueMessage
                 messageToEnqueue.ExternalId,
                 messageToEnqueue.PeriodStartedAt)
             .ConfigureAwait(false);
+
         if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
             return existingMessage.Id;
 
         var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
                 messageToEnqueue.GetActorMessageQueueMetadata(),
                 cancellationToken)
-                .ConfigureAwait(false);
+            .ConfigureAwait(false);
 
-        var newBundle = CreateBundle(messageToEnqueue, actorMessageQueueId);
-        newBundle.Add(messageToEnqueue);
+        await BundleMessageAsync(messageToEnqueue, actorMessageQueueId, cancellationToken)
+            .ConfigureAwait(false);
 
         // Add to outgoing message repository (and upload to file storage) after adding actor message queue and bundle,
         // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
@@ -88,14 +91,47 @@ public class EnqueueMessage
         return messageToEnqueue.Id;
     }
 
+    /// <summary>
+    /// Bundle message for the receiver. Only NotifyValidatedMeasureData messages has bundles with more than one
+    /// message in each, the rest of the messages has a bundle size of 1 (effectively not bundled).
+    /// </summary>
+    private async Task BundleMessageAsync(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
+    {
+        Bundle? bundle = null;
+        if (messageToEnqueue.DocumentType == DocumentType.NotifyValidatedMeasureData)
+        {
+            // - Get existing bundle.
+            //     - Create bundle if not exists.
+            bundle = await _bundleRepository.GetOpenBundleAsync(
+                    messageToEnqueue.DocumentType,
+                    actorMessageQueueId,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        if (bundle == null)
+            bundle = CreateBundle(messageToEnqueue, actorMessageQueueId);
+
+        // - Add message to bundle and increment counter by 1.
+        //    - Close bundle if it is full (already handled in the .Add() method).
+        // - This will fail because of RowVersion if the bundle is incremented concurrently.
+        bundle.Add(messageToEnqueue);
+    }
+
     private Bundle CreateBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId)
     {
-        var newBundle = CreateBundle(
-            actorMessageQueueId,
-            BusinessReason.FromName(messageToEnqueue.BusinessReason),
-            messageToEnqueue.DocumentType,
-            _clock.GetCurrentInstant(),
-            messageToEnqueue.RelatedToMessageId);
+        var maxBundleSize = messageToEnqueue.DocumentType == DocumentType.NotifyValidatedMeasureData
+            ? MaxBundleSizeForMeasureData
+            : 1;
+
+        var newBundle = new Bundle(
+            actorMessageQueueId: actorMessageQueueId,
+            businessReason: BusinessReason.FromName(messageToEnqueue.BusinessReason),
+            documentTypeInBundle: messageToEnqueue.DocumentType,
+            maxNumberOfMessagesInABundle: maxBundleSize,
+            created: _clock.GetCurrentInstant(),
+            relatedToMessageId: messageToEnqueue.RelatedToMessageId);
+
         _bundleRepository.Add(newBundle);
 
         return newBundle;
@@ -117,10 +153,5 @@ public class EnqueueMessage
         }
 
         return actorMessageQueueId;
-    }
-
-    private Bundle CreateBundle(ActorMessageQueueId actorMessageQueueId, BusinessReason businessReason, DocumentType messageType, Instant created, MessageId? relatedToMessageId = null)
-    {
-        return new Bundle(actorMessageQueueId, businessReason, messageType, 1, created, relatedToMessageId);
     }
 }

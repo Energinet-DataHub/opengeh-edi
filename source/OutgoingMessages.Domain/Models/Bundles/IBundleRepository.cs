@@ -50,10 +50,15 @@ public interface IBundleRepository
     Task<Bundle?> GetBundleAsync(MessageId messageId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Get open bundle for a given document type and actor message queue.
+    /// </summary>
+    Task<Bundle?> GetOpenBundleAsync(DocumentType documentType, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets the oldest bundle for a ActorMessageQueue.
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="actorMessageQueueId"></param>
     /// <param name="messageCategory"></param>
     /// <param name="cancellationToken"></param>
-    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory messageCategory, CancellationToken cancellationToken);
+    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId actorMessageQueueId, MessageCategory messageCategory, CancellationToken cancellationToken);
 }

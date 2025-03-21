@@ -52,13 +52,16 @@ public class BundleEntityConfiguration : IEntityTypeConfiguration<Bundle>
         builder.Property<BusinessReason>(b => b.BusinessReason)
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
 
-        builder.Property<int>("_messageCount").HasColumnName("MessageCount");
-        builder.Property<int>("_maxNumberOfMessagesInABundle").HasColumnName("MaxMessageCount");
+        builder.Property<int>(Bundle.MessageCountPropertyName).HasColumnName("MessageCount");
+        builder.Property<int>(Bundle.MaxNumberOfMessagesInABundlePropertyName).HasColumnName("MaxMessageCount");
 
         builder.Property(b => b.RelatedToMessageId)
             .HasConversion(
                 toDbValue => toDbValue != null ? toDbValue.Value.Value : null,
                 fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
+
+        builder.Property(b => b.RowVersion)
+            .IsRowVersion();
 
         builder.HasMany<OutgoingMessage>().WithOne().HasForeignKey(o => o.AssignedBundleId);
     }

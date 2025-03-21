@@ -208,6 +208,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202409231616 Ensure all tables has a clustered index on RecordId.sql" />
     <EmbeddedResource Include="Scripts\Model\202503121445 Add ReceiverNumber to OutgoingMessages idempotency index.sql" />
     <EmbeddedResource Include="Scripts\Model\202503121446 Drop old idempotency index from OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202503211553 Add RowVersion to Bundles table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

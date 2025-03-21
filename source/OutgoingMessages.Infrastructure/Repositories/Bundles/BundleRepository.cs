@@ -49,22 +49,38 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
             .ConfigureAwait(false);
     }
 
+    public Task<Bundle?> GetOpenBundleAsync(
+        DocumentType documentType,
+        ActorMessageQueueId actorMessageQueueId,
+        CancellationToken cancellationToken)
+    {
+        // TODO: Can we assume there will always only be one bundle (.Single() instead of .First())?
+        return _dbContext.Bundles
+            .Where(
+                b =>
+                    b.ActorMessageQueueId == actorMessageQueueId &&
+                    b.DocumentTypeInBundle == documentType &&
+                    b.ClosedAt == null)
+            .OrderByDescending(b => b.Created)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<Bundle?> GetOldestBundleAsync(
-        ActorMessageQueueId id,
+        ActorMessageQueueId actorMessageQueueId,
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
         if (messageCategory == MessageCategory.None)
         {
             return await _dbContext.Bundles.Where(b =>
-                b.ActorMessageQueueId == id &&
+                b.ActorMessageQueueId == actorMessageQueueId &&
                 b.DequeuedAt == null)
                 .OrderBy(b => b.Created)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
         }
 
         return await _dbContext.Bundles.Where(b =>
-                                                   b.ActorMessageQueueId == id &&
+                                                   b.ActorMessageQueueId == actorMessageQueueId &&
                                                    b.DequeuedAt == null &&
                                                    b.MessageCategory == messageCategory)
                                                    .OrderBy(b => b.Created)
