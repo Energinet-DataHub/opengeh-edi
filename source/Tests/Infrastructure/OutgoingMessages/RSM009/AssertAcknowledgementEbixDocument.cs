@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
@@ -30,8 +31,12 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
         _documentAsserter = documentAsserter;
         _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "294");
-        _documentAsserter.HasValue("ProcessEnergyContext/EnergyIndustryClassification", "23");
         _documentAsserter.HasValue("PayloadResponseEvent[1]/StatusType", "41");
+
+        _documentAsserter.HasValueWithAttributes(
+            "ProcessEnergyContext/EnergyIndustryClassification",
+            "23",
+            CreateRequiredListAttributes(CodeListType.UnitedNations));
     }
 
     public IAssertAcknowledgementDocument HasMessageId(MessageId messageId)
@@ -60,7 +65,10 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
 
     public IAssertAcknowledgementDocument HasReceiverRole(ActorRole receiverRole)
     {
-        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcessRole", EbixCode.Of(receiverRole));
+        _documentAsserter.HasValueWithAttributes(
+            "ProcessEnergyContext/EnergyBusinessProcessRole",
+            EbixCode.Of(receiverRole),
+            CreateRequiredListAttributes(CodeListType.Ebix));
         return this;
     }
 
@@ -68,9 +76,8 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
     {
         _documentAsserter.HasValueWithAttributes(
             "ProcessEnergyContext/EnergyBusinessProcess",
-            
-            )
-        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcess", EbixCode.Of(businessReason));
+            EbixCode.Of(businessReason),
+            CreateRequiredListAttributes(businessReason.Code.StartsWith('D') ? CodeListType.EbixDenmark : CodeListType.Ebix));
         return this;
     }
 
@@ -126,4 +133,25 @@ public class AssertAcknowledgementEbixDocument : IAssertAcknowledgementDocument
             null!);
         return this;
     }
+
+    private static AttributeNameAndValue[] CreateRequiredListAttributes(CodeListType codeListType)
+    {
+        var (codeList, countryCode) = GetCodeListConstant(codeListType);
+
+        var requiredAttributes = new List<AttributeNameAndValue> { new("listAgencyIdentifier", codeList), };
+
+        if (!string.IsNullOrEmpty(countryCode))
+            requiredAttributes.Add(new("listIdentifier", countryCode));
+
+        return requiredAttributes.ToArray();
+    }
+
+    private static (string CodeList, string? CountryCode) GetCodeListConstant(CodeListType codeListType) =>
+        codeListType switch
+        {
+            CodeListType.UnitedNations => (EbixDocumentWriter.UnitedNationsCodeList, null),
+            CodeListType.Ebix => (EbixDocumentWriter.EbixCodeList, null),
+            CodeListType.EbixDenmark => (EbixDocumentWriter.EbixCodeList, EbixDocumentWriter.CountryCodeDenmark),
+            _ => throw new ArgumentOutOfRangeException(nameof(codeListType), codeListType, "Invalid CodeListType"),
+        };
 }
