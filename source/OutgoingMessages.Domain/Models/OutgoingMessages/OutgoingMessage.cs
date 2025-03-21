@@ -187,9 +187,7 @@ public class OutgoingMessage
 
         if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
         {
-            // AggregatedMeasureData messages (notify & reject) to the MDR role should always be added to the GridOperator queue
-            if (DocumentIsAggregatedMeasureData(DocumentType))
-                actorMessageQueueReceiverRole = actorMessageQueueReceiverRole.ForActorMessageQueue();
+            actorMessageQueueReceiverRole = actorMessageQueueReceiverRole.ForActorMessageQueue();
         }
 
         return Receiver.Create(Receiver.Number, actorMessageQueueReceiverRole);

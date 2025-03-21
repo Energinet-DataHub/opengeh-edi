@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
@@ -285,6 +286,7 @@ public class RequestProcessOrchestrationStarterTests
         // Arrange
         // => Setup input
         var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+        var receiver = RequestedByActor.From(ActorNumber.Create("2221111111111"), ActorRole.MeteredDataAdministrator);
         var transactionId = TransactionId.From("9b6184bf-2f05-40b9-d783-08dc814df95a").Value;
         const string messageId = "62EA5019-57FB-41B8-BD34-4F0885E77DAE";
 
@@ -306,29 +308,32 @@ public class RequestProcessOrchestrationStarterTests
             ? Resolution.FromCode(expectedResolution)
             : null;
 
-        var initializeProcessDto = new InitializeMeteredDataForMeteringPointMessageProcessDto(
-            MessageId: messageId,
-            MessageType: "E66",
-            CreatedAt: expectedRegistrationDateFrom,
-            BusinessReason: expectedBusinessReason.Code,
-            BusinessType: "23",
-            Series:
+        var meteredDataForMeteringPointMessage = new MeteredDataForMeteringPointMessageBase(
+            messageId: messageId,
+            messageType: "E66",
+            createdAt: expectedRegistrationDateFrom,
+            senderNumber: requestedByActor.ActorNumber.Value,
+            senderRoleCode: requestedByActor.ActorRole.Code,
+            receiverNumber: receiver.ActorNumber.Value,
+            receiverRoleCode: receiver.ActorRole.Code,
+            businessReason: expectedBusinessReason.Code,
+            businessType: "23",
+            series:
             [
-                new InitializeMeteredDataForMeteringPointMessageSeries(
+                new MeteredDataForMeteringPointSeries(
                     TransactionId: transactionId,
                     Resolution: resolution?.Code,
                     StartDateTime: expectedStart,
                     EndDateTime: expectedEndDate,
                     ProductNumber: expectedProductNumber,
+                    RegisteredAt: expectedRegistrationDateFrom,
                     ProductUnitType: productUnitType?.Code,
                     MeteringPointType: meteringPointType?.Code,
                     MeteringPointLocationId: expectedMeteringPointId,
-                    RegisteredAt: expectedRegistrationDateFrom,
-                    DelegatedGridAreaCodes: null,
-                    RequestedByActor: requestedByActor,
+                    SenderNumber: requestedByActor.ActorNumber.Value,
                     EnergyObservations:
                     [
-                        new InitializeEnergyObservation(
+                        new EnergyObservation(
                             Position: expectedPosition,
                             EnergyQuantity: expectedEnergyQuantity,
                             QuantityQuality: expectedQuantityQuality)
@@ -360,7 +365,7 @@ public class RequestProcessOrchestrationStarterTests
 
         // Act
         await sut.StartForwardMeteredDataOrchestrationAsync(
-            initializeProcessDto,
+            meteredDataForMeteringPointMessage,
             CancellationToken.None);
 
         // Assert
@@ -389,7 +394,7 @@ public class RequestProcessOrchestrationStarterTests
                 StartDateTime: expectedStart,
                 EndDateTime: expectedEndDate,
                 GridAccessProviderNumber: requestedByActor.ActorNumber.Value,
-                DelegatedGridAreaCodes: null,
+                DelegatedGridAreaCodes: Array.Empty<string>(),
                 MeteredDataList:
                 [
                     new ForwardMeteredDataInputV1.MeteredData(
