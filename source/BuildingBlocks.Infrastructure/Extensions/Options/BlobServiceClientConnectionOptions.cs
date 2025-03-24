@@ -14,7 +14,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.Options;
 
 public class BlobServiceClientConnectionOptions
 {

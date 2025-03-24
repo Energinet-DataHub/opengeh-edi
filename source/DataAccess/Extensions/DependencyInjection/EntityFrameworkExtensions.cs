@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

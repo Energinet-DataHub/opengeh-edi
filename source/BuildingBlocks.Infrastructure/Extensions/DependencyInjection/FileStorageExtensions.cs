@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
