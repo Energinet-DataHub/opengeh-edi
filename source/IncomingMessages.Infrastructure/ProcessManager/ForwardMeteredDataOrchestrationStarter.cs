@@ -15,7 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
@@ -33,13 +33,14 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
     public async Task StartForwardMeteredDataOrchestrationAsync(
-        InitializeMeteredDataForMeteringPointMessageProcessDto initializeProcessDto,
+        MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessageBase,
         CancellationToken cancellationToken)
     {
-        var actorIdentityDto = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
+        var actorIdentityDto = GetAuthenticatedActorIdentityDto(meteredDataForMeteringPointMessageBase.MessageId);
 
         var startProcessTasks = new List<Task>();
-        foreach (var transaction in initializeProcessDto.Series)
+        foreach (var transaction in meteredDataForMeteringPointMessageBase.Series
+                     .Cast<MeteredDataForMeteringPointSeries>())
         {
             var meteringPointType = transaction.MeteringPointType is not null
                 ? MeteringPointType.TryGetNameFromCode(transaction.MeteringPointType, fallbackValue: transaction.MeteringPointType)
@@ -53,20 +54,25 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                 ? Resolution.TryGetNameFromCode(transaction.Resolution, fallbackValue: transaction.Resolution)
                 : null;
 
-            var registeredAt = transaction.RegisteredAt is not null
-                ? InstantPattern.General.Parse(transaction.RegisteredAt).Value.ToString()
-                : null;
+            var registeredAt = InstantPattern.General.Parse(transaction.RegisteredAt).Value.ToString();
 
-            var businessReason = BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason);
+            var businessReason = BusinessReason
+                .TryGetNameFromCode(
+                    meteredDataForMeteringPointMessageBase.BusinessReason,
+                    fallbackValue: meteredDataForMeteringPointMessageBase.BusinessReason);
+
+            var senderActorRole = ActorRole.TryGetNameFromCode(
+                meteredDataForMeteringPointMessageBase.SenderRoleCode,
+                meteredDataForMeteringPointMessageBase.SenderRoleCode);
 
             var startCommand =
                 new ForwardMeteredDataCommandV1(
                     operatingIdentity: actorIdentityDto,
                     new ForwardMeteredDataInputV1(
-                        ActorMessageId: initializeProcessDto.MessageId,
+                        ActorMessageId: meteredDataForMeteringPointMessageBase.MessageId,
                         TransactionId: transaction.TransactionId,
-                        ActorNumber: actorIdentityDto.ActorNumber.Value,
-                        ActorRole: actorIdentityDto.ActorRole.Name,
+                        ActorNumber: meteredDataForMeteringPointMessageBase.SenderNumber,
+                        ActorRole: senderActorRole,
                         BusinessReason: businessReason,
                         MeteringPointId: transaction.MeteringPointLocationId,
                         MeteringPointType: meteringPointType,
@@ -79,13 +85,13 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                         Resolution: resolution,
                         StartDateTime: transaction.StartDateTime,
                         EndDateTime: transaction.EndDateTime,
-                        GridAccessProviderNumber: transaction.RequestedByActor.ActorNumber.Value,
-                        DelegatedGridAreaCodes: transaction.DelegatedGridAreaCodes,
+                        GridAccessProviderNumber: meteredDataForMeteringPointMessageBase.SenderNumber,
+                        DelegatedGridAreaCodes: transaction.DelegatedGridAreas,
                         MeteredDataList:
                                 transaction.EnergyObservations
                                     .Select(MapToMeteredData)
                                     .ToList()),
-                    $"{transaction.RequestedByActor.ActorNumber.Value}-{transaction.TransactionId}");
+                    $"{transaction.SenderNumber}-{transaction.TransactionId}");
 
             var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, CancellationToken.None);
             startProcessTasks.Add(startProcessTask);
@@ -94,7 +100,7 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    private static ForwardMeteredDataInputV1.MeteredData MapToMeteredData(InitializeEnergyObservation energyObservation)
+    private static ForwardMeteredDataInputV1.MeteredData MapToMeteredData(EnergyObservation energyObservation)
     {
         var quantityQuality = energyObservation.QuantityQuality is not null
             ? Quality.TryGetNameFromCode(energyObservation.QuantityQuality, fallbackValue: energyObservation.QuantityQuality)

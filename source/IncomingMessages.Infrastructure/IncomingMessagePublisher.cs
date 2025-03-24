@@ -58,7 +58,7 @@ public class IncomingMessagePublisher
                 await SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
                 break;
             case MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessage:
-                await SendInitializeMeteredDataForMeteringPointMessageProcessAsync(InitializeMeteredDataForMeteringPointProcessDtoFactory.Create(meteredDataForMeteringPointMessage, _authenticatedActor), cancellationToken).ConfigureAwait(false);
+                await SendInitializeMeteredDataForMeteringPointMessageProcessAsync(meteredDataForMeteringPointMessage, cancellationToken).ConfigureAwait(false);
                 break;
             default:
                 throw new InvalidOperationException($"Unknown message type {incomingMessage.GetType().Name}");
@@ -85,12 +85,12 @@ public class IncomingMessagePublisher
                 .ConfigureAwait(false);
     }
 
-    private async Task SendInitializeMeteredDataForMeteringPointMessageProcessAsync(InitializeMeteredDataForMeteringPointMessageProcessDto initializeMeteredDataForMeteringPointMessageProcessDto, CancellationToken cancellationToken)
+    private async Task SendInitializeMeteredDataForMeteringPointMessageProcessAsync(MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessageBase, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeteringPointMessageProcessDto);
+        ArgumentNullException.ThrowIfNull(meteredDataForMeteringPointMessageBase);
 
         await _forwardMeteredDataOrchestrationStarter.StartForwardMeteredDataOrchestrationAsync(
-                initializeMeteredDataForMeteringPointMessageProcessDto,
+                meteredDataForMeteringPointMessageBase,
                 cancellationToken)
             .ConfigureAwait(false);
     }

@@ -96,20 +96,11 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
         // Begin ProcessEnergyContext
         await writer.WriteStartElementAsync(documentDetails.Prefix, "ProcessEnergyContext", null).ConfigureAwait(false);
 
-        await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyBusinessProcess", null)
-            .ConfigureAwait(false);
-        await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-        await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
-        writer.WriteValue(EbixCode.Of(BusinessReason.FromName(header.BusinessReason)));
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await WriteCodeWithCodeListReferenceAttributesAsync("EnergyBusinessProcess", EbixCode.Of(BusinessReason.FromName(header.BusinessReason)), writer).ConfigureAwait(false);
 
         await WriteCodeWithCodeListReferenceAttributesAsync("EnergyBusinessProcessRole", EbixCode.Of(ActorRole.FromCode(header.ReceiverRole)), writer).ConfigureAwait(false);
 
-        await writer.WriteStartElementAsync(documentDetails.Prefix, "EnergyIndustryClassification", null)
-            .ConfigureAwait(false);
-        await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
-        writer.WriteValue(GeneralValues.SectorTypeCode);
-        await writer.WriteEndElementAsync().ConfigureAwait(false);
+        await WriteCodeWithCodeListReferenceAttributesAsync("EnergyIndustryClassification", GeneralValues.SectorTypeCode, writer).ConfigureAwait(false);
 
         await writer.WriteElementStringAsync(documentDetails.Prefix, "OriginalBusinessMessage", null, header.RelatedToMessageId!)
             .ConfigureAwait(false);

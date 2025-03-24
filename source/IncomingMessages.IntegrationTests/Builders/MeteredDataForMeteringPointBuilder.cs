@@ -31,8 +31,8 @@ public static class MeteredDataForMeteringPointBuilder
         string processType = "E23",
         string businessType = "23",
         string messageId = "111131835",
-        string senderRole = "MDR",
         string receiverNumber = "5790001330552",
+        string senderRole = "MDR",
         string? schema = null)
     {
         string content;
