@@ -106,7 +106,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             documentFormat,
             new ForwardMeteredDataInputV1AssertionInput(
                 ActorNumber: senderActor.ActorNumber.Value,
-                ActorRole: senderActor.ActorRole.Name,
+                ActorRole: ActorRole.MeteredDataResponsible.Name,
                 TransactionId: TransactionId.From(transactionId),
                 MeteringPointId: "579999993331812345",
                 MeteringPointType: MeteringPointType.Consumption.Name,
@@ -263,7 +263,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             documentFormat,
             new ForwardMeteredDataInputV1AssertionInput(
                 ActorNumber: senderActor.ActorNumber.Value,
-                ActorRole: senderActor.ActorRole.Name,
+                ActorRole: ActorRole.MeteredDataResponsible.Name,
                 TransactionId: transactionId,
                 MeteringPointId: "579999993331812345",
                 MeteringPointType: MeteringPointType.Consumption.Name,
@@ -319,7 +319,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             .HasSenderId(DataHubDetails.DataHubActorNumber)
             .HasSenderRole(ActorRole.MeteredDataAdministrator)
             .HasReceiverId(senderActor.ActorNumber)
-            .HasReceiverRole(senderActor.ActorRole)
+            .HasReceiverRole(ActorRole.MeteredDataResponsible)
             .HasCreationDate(now)
             .HasRelatedToMessageId(messageId)
             .HasReceivedBusinessReasonCode(BusinessReason.PeriodicMetering)
