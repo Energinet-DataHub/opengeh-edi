@@ -57,14 +57,13 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 
         // Ensure that only backslashes are used in paths
         location = location.Replace("/", "\\", StringComparison.InvariantCulture);
-        XmlSchema? cached;
-        if (_schemaCache.TryGetValue(location, out cached))
+        if (_schemaCache.TryGetValue(location, out var cached))
             return (T)(object)cached;
 
         using var reader = new XmlTextReader(location);
         var xmlSchema = XmlSchema.Read(reader, null) ?? throw new XmlSchemaException($"Could not read schema at {location}");
 
-        _schemaCache.Add(location, xmlSchema);
+        _schemaCache.TryAdd(location, xmlSchema);
 
         // Extract path of the current XSD as includes are relative to this
         var pathElements = location.Split('\\').ToList();
