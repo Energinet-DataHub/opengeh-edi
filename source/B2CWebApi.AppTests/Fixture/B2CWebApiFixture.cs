@@ -22,7 +22,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
