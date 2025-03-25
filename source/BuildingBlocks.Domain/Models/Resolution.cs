@@ -32,6 +32,11 @@ public class Resolution : DataHubType<Resolution>
     {
     }
 
+    public ProcessManager.Components.Abstractions.ValueObjects.Resolution ToProcessManagerResolution()
+    {
+        return ProcessManager.Components.Abstractions.ValueObjects.Resolution.FromName(Name);
+    }
+
     public Duration ToDuration()
     {
         var resolutionDuration = this switch

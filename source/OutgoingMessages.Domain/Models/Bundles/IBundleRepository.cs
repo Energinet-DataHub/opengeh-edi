@@ -52,7 +52,12 @@ public interface IBundleRepository
     /// <summary>
     /// Get open bundle for a given document type and actor message queue.
     /// </summary>
-    Task<Bundle?> GetOpenBundleAsync(DocumentType documentType, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken);
+    Task<Bundle?> GetOpenBundleAsync(
+        DocumentType documentType,
+        BusinessReason businessReason,
+        ActorMessageQueueId actorMessageQueueId,
+        MessageId? relatedToMessageId,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the oldest bundle for a ActorMessageQueue.

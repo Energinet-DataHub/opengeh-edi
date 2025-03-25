@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
@@ -49,6 +50,22 @@ internal class ProcessManagerDriver(
     internal async Task PublishEnqueueBrs023_027RequestAsync(Guid calculationId)
     {
         var message = EnqueueBrs023_027MessageFactory.CreateEnqueue(calculationId);
+        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+    }
+
+    internal async Task PublishEnqueueBrs021AcceptedForwardMeteredDataRequestAsync(
+        Actor actor,
+        Instant start,
+        Instant end,
+        string originalActorMessageId,
+        Guid eventId)
+    {
+        var message = EnqueueBrs021ForwardMeteredDataFactory.CreateAcceptedV1(
+            actor,
+            start,
+            end,
+            originalActorMessageId,
+            eventId);
         await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 }

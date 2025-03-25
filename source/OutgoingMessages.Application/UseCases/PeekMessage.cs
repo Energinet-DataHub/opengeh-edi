@@ -70,6 +70,13 @@ public class PeekMessage
         _telemetryClient = telemetryClient;
     }
 
+    private enum CloseBundleResult
+    {
+        NoBundleExists,
+        BundleClosed,
+        BundleWasAlreadyClosed,
+    }
+
     public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -87,16 +94,14 @@ public class PeekMessage
             return null;
         }
 
-        await CloseBundleAndCommitAsync(request, actorMessageQueue.Id, cancellationToken).ConfigureAwait(false);
-
-        var bundle = await _bundleRepository.GetOldestBundleAsync(actorMessageQueue.Id, request.MessageCategory, cancellationToken).ConfigureAwait(false);
+        var bundle = await CloseBundleAndCommitAsync(request, actorMessageQueue.Id, cancellationToken).ConfigureAwait(false);
 
         if (bundle is null)
         {
             return null;
         }
 
-        bundle.PeekBundle();
+        bundle.Peek();
 
         var peekResult = new PeekResult(bundle.Id, bundle.MessageId);
 
@@ -120,19 +125,19 @@ public class PeekMessage
 
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         var archivedMessageToCreate = new ArchivedMessageDto(
-            outgoingMessageBundle.MessageId.Value,
-            outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
-            outgoingMessageBundle.DocumentType.ToString(),
-            outgoingMessageBundle.SenderId,
-            outgoingMessageBundle.SenderRole,
+            messageId: outgoingMessageBundle.MessageId.Value,
+            eventIds: outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
+            documentType: outgoingMessageBundle.DocumentType.ToString(),
+            senderNumber: outgoingMessageBundle.SenderId,
+            senderRole: outgoingMessageBundle.SenderRole,
             // The receiver is always the authenticated actor
-            authenticatedActor.ActorNumber,
-            authenticatedActor.ActorRole,
-            timestamp,
-            BusinessReason.FromName(outgoingMessageBundle.BusinessReason).Code,
-            ArchivedMessageTypeDto.OutgoingMessage,
-            marketDocumentStream,
-            outgoingMessageBundle.RelatedToMessageId);
+            receiverNumber: authenticatedActor.ActorNumber,
+            receiverRole: authenticatedActor.ActorRole,
+            createdAt: timestamp,
+            businessReason: BusinessReason.FromName(outgoingMessageBundle.BusinessReason).Code,
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
+            marketDocumentStream: marketDocumentStream,
+            relatedToMessageId: outgoingMessageBundle.RelatedToMessageId);
 
         var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
 
@@ -151,17 +156,23 @@ public class PeekMessage
         return marketDocument;
     }
 
-    private async Task CloseBundleAndCommitAsync(PeekRequestDto request, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
+    private async Task<Bundle?> CloseBundleAndCommitAsync(PeekRequestDto request, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
     {
         // Right after we call Close(), we close the bundle. This is to ensure that the bundle wont be added more messages, after we have peeked.
         // And before we are able to update the bundle to closed in the database.
         var bundle = await _bundleRepository
             .GetOldestBundleAsync(actorMessageQueueId, request.MessageCategory, cancellationToken)
             .ConfigureAwait(false);
-        if (bundle != null)
-        {
-            bundle.Close();
-            await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        }
+
+        if (bundle == null)
+            return null;
+
+        if (bundle.IsClosed)
+            return bundle;
+
+        bundle.Close(SystemClock.Instance.GetCurrentInstant());
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return bundle;
     }
 }

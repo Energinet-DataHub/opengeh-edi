@@ -106,7 +106,9 @@ public class EnqueueMessage
             // Get existing bundle.
             bundle = await _bundleRepository.GetOpenBundleAsync(
                     messageToEnqueue.DocumentType,
+                    BusinessReason.FromName(messageToEnqueue.BusinessReason),
                     actorMessageQueueId,
+                    GetRelatedToMessageIdForBundling(messageToEnqueue),
                     cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -130,7 +132,7 @@ public class EnqueueMessage
             documentTypeInBundle: messageToEnqueue.DocumentType,
             maxNumberOfMessagesInABundle: maxBundleSize,
             created: _clock.GetCurrentInstant(),
-            relatedToMessageId: messageToEnqueue.RelatedToMessageId);
+            relatedToMessageId: GetRelatedToMessageIdForBundling(messageToEnqueue));
 
         _bundleRepository.Add(newBundle);
 
@@ -160,5 +162,14 @@ public class EnqueueMessage
         return documentType == DocumentType.NotifyValidatedMeasureData
             ? MaxBundleSizeForMeasureData
             : 1;
+    }
+
+    private MessageId? GetRelatedToMessageIdForBundling(OutgoingMessage messageToEnqueue)
+    {
+        // RSM-012 NotifyValidatedMeasureData messages can be bundled with different related to message id's,
+        // so the bundle should not contain a related to message id for that document type.
+        return messageToEnqueue.DocumentType == DocumentType.NotifyValidatedMeasureData
+            ? null
+            : messageToEnqueue.RelatedToMessageId;
     }
 }

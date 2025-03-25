@@ -80,6 +80,8 @@ public sealed class Bundle
 
     public Instant? ClosedAt { get; private set; }
 
+    public bool IsClosed => ClosedAt is not null;
+
     public MessageCategory MessageCategory { get; set; }
 
     public int MessageCount => _messageCount;
@@ -95,26 +97,27 @@ public sealed class Bundle
     /// </remarks>
     public byte[]? RowVersion { get; }
 
-    public void PeekBundle()
+    public void Peek()
     {
-        // If the bundle is closed, because it was full. Then we should not update it at the peeked time.
-        ClosedAt ??= SystemClock.Instance.GetCurrentInstant();
+        if (!IsClosed)
+            throw new InvalidOperationException($"Trying to peek bundle that was not closed (Id={Id}).");
+
         PeekedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
     public void Add(OutgoingMessage outgoingMessage)
     {
-        if (ClosedAt is not null)
+        if (IsClosed)
             throw new InvalidOperationException($"Cannot add message to a closed bundle (bundle id: {Id.Id}, message id: {outgoingMessage.Id}, external id: {outgoingMessage.ExternalId})");
 
         outgoingMessage.AssignToBundle(Id);
         _messageCount++;
-        CloseBundleIfFull(outgoingMessage.CreatedAt);
+        CloseIfFull(outgoingMessage.CreatedAt);
     }
 
     public bool TryDequeue()
     {
-        if (ClosedAt is not null && PeekedAt is not null)
+        if (IsClosed && PeekedAt is not null)
         {
             DequeuedAt = SystemClock.Instance.GetCurrentInstant();
             return true;
@@ -123,14 +126,17 @@ public sealed class Bundle
         return false;
     }
 
-    public void Close()
+    public void Close(Instant closedAt)
     {
-        ClosedAt = SystemClock.Instance.GetCurrentInstant();
+        if (IsClosed)
+            throw new InvalidOperationException($"Cannot close a already closed bundle (bundle id: {Id.Id}).");
+
+        ClosedAt = closedAt;
     }
 
-    private void CloseBundleIfFull(Instant messageCreatedAt)
+    private void CloseIfFull(Instant closedAt)
     {
         if (_maxNumberOfMessagesInABundle == _messageCount)
-           ClosedAt = messageCreatedAt;
+           Close(closedAt);
     }
 }

@@ -51,7 +51,9 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
 
     public Task<Bundle?> GetOpenBundleAsync(
         DocumentType documentType,
+        BusinessReason businessReason,
         ActorMessageQueueId actorMessageQueueId,
+        MessageId? relatedToMessageId,
         CancellationToken cancellationToken)
     {
         // TODO: Can we assume there will always only be one bundle (.Single() instead of .First())?
@@ -60,6 +62,8 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
                 b =>
                     b.ActorMessageQueueId == actorMessageQueueId &&
                     b.DocumentTypeInBundle == documentType &&
+                    b.BusinessReason == businessReason &&
+                    b.RelatedToMessageId == relatedToMessageId &&
                     b.ClosedAt == null)
             .OrderByDescending(b => b.Created)
             .FirstOrDefaultAsync(cancellationToken);
@@ -70,21 +74,28 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
+        // 1. Get oldest bundle that is closed and not dequeued
+        // 2. Get oldest bundle that is closed is not closed and older than 5 minutes
         if (messageCategory == MessageCategory.None)
         {
-            return await _dbContext.Bundles.Where(b =>
-                b.ActorMessageQueueId == actorMessageQueueId &&
-                b.DequeuedAt == null)
+            return await _dbContext.Bundles
+                .Where(
+                    b =>
+                        b.ActorMessageQueueId == actorMessageQueueId &&
+                        b.DequeuedAt == null)
                 .OrderBy(b => b.Created)
-                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+                .FirstOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
         }
 
-        return await _dbContext.Bundles.Where(b =>
-                                                   b.ActorMessageQueueId == actorMessageQueueId &&
-                                                   b.DequeuedAt == null &&
-                                                   b.MessageCategory == messageCategory)
-                                                   .OrderBy(b => b.Created)
-                                                   .FirstOrDefaultAsync(cancellationToken)
-                                                   .ConfigureAwait(false);
+        return await _dbContext.Bundles
+            .Where(
+                b =>
+                    b.ActorMessageQueueId == actorMessageQueueId &&
+                    b.DequeuedAt == null &&
+                    b.MessageCategory == messageCategory)
+            .OrderBy(b => b.Created)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 }

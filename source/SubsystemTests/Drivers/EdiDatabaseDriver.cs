@@ -14,6 +14,7 @@
 
 using System.Diagnostics;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
 using NodaTime;
 
@@ -184,6 +185,61 @@ internal sealed class EdiDatabaseDriver
         return enqueuedMessagesCount;
     }
 
+    internal async Task<List<BundleDto>> GetNotifyValidatedMeasureDataBundlesAsync(
+        HashSet<Guid> ids)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var enqueuedBundles = await connection.QueryAsync<BundleDto>(
+            sql: """
+                 SELECT
+                    [Id],
+                    [ActorMessageQueueId],
+                    [MessageCount],
+                    [RelatedToMessageId],
+                    [ClosedAt]
+                 FROM [Bundles]
+                    WHERE ([DocumentTypeInBundle] = @DocumentTypeInBundle)
+                        AND [Id] IN @Ids 
+                        AND [DequeuedAt] IS NULL
+                 """,
+            param: new
+            {
+                DocumentTypeInBundle = DocumentType.NotifyValidatedMeasureData.Name,
+                Ids = ids,
+            });
+
+        return enqueuedBundles.ToList();
+    }
+
+    internal async Task<List<OutgoingMessageDto>> GetNotifyValidatedMeasureDataMessagesFromLoadTestAsync(
+        Guid eventId)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var enqueuedMessages = await connection.QueryAsync<OutgoingMessageDto>(
+            sql: """
+                 SELECT
+                    [CreatedAt],
+                    [AssignedBundleId],
+                    [RelatedToMessageId]
+                 FROM [OutgoingMessages]
+                    WHERE ([DocumentType] = @DocumentTypeInBundle)
+                        AND [EventId] = @EventId 
+                 """,
+            param: new
+            {
+                DocumentType = DocumentType.NotifyValidatedMeasureData.Name,
+                @EventId = eventId,
+            });
+
+        return enqueuedMessages.ToList();
+    }
+
     private async Task<Guid?> GetProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
@@ -223,4 +279,16 @@ internal sealed class EdiDatabaseDriver
 
         return null;
     }
+
+    public record BundleDto(
+        Guid Id,
+        Guid ActorMessageQueueId,
+        int MessageCount,
+        string RelatedToMessageId,
+        DateTimeOffset? ClosedAt);
+
+    public record OutgoingMessageDto(
+        DateTimeOffset CreatedAt,
+        Guid AssignedBundleId,
+        string RelatedToMessageId);
 }
