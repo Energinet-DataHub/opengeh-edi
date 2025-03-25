@@ -3,3 +3,9 @@ ALTER TABLE [dbo].[Bundles]
     -- https://learn.microsoft.com/en-us/ef/core/saving/concurrency?tabs=fluent-api
     ADD [RowVersion] ROWVERSION NOT NULL
 GO
+
+CREATE UNIQUE INDEX UQ_Bundles_ActorMessageQueueId_DocumentTypeInBundle
+    ON [dbo].Bundles ([ActorMessageQueueId], [DocumentTypeInBundle])
+    WHERE [ClosedAt] IS NULL;
+
+GO;

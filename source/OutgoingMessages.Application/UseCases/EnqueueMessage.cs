@@ -98,10 +98,12 @@ public class EnqueueMessage
     private async Task BundleMessageAsync(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
     {
         Bundle? bundle = null;
-        if (messageToEnqueue.DocumentType == DocumentType.NotifyValidatedMeasureData)
+        var maxBundleSize = GetMaxBundleSize(messageToEnqueue.DocumentType);
+
+        // No need to find existing bundle if max bundle size is 1
+        if (maxBundleSize > 1)
         {
-            // - Get existing bundle.
-            //     - Create bundle if not exists.
+            // Get existing bundle.
             bundle = await _bundleRepository.GetOpenBundleAsync(
                     messageToEnqueue.DocumentType,
                     actorMessageQueueId,
@@ -109,21 +111,19 @@ public class EnqueueMessage
                 .ConfigureAwait(false);
         }
 
+        // Create bundle if not exists.
         if (bundle == null)
-            bundle = CreateBundle(messageToEnqueue, actorMessageQueueId);
+            bundle = CreateBundle(messageToEnqueue, actorMessageQueueId, maxBundleSize);
 
-        // - Add message to bundle and increment counter by 1.
-        //    - Close bundle if it is full (already handled in the .Add() method).
-        // - This will fail because of RowVersion if the bundle is incremented concurrently.
+        // Add message to bundle and increment counter by 1.
+        //   - Close bundle if it is full (already handled in the .Add() method).
+        //   - This will fail on commit changes (intentionally) because of RowVersion, if the bundle is incremented or
+        //     closed concurrently.
         bundle.Add(messageToEnqueue);
     }
 
-    private Bundle CreateBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId)
+    private Bundle CreateBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId, int maxBundleSize)
     {
-        var maxBundleSize = messageToEnqueue.DocumentType == DocumentType.NotifyValidatedMeasureData
-            ? MaxBundleSizeForMeasureData
-            : 1;
-
         var newBundle = new Bundle(
             actorMessageQueueId: actorMessageQueueId,
             businessReason: BusinessReason.FromName(messageToEnqueue.BusinessReason),
@@ -153,5 +153,12 @@ public class EnqueueMessage
         }
 
         return actorMessageQueueId;
+    }
+
+    private int GetMaxBundleSize(DocumentType documentType)
+    {
+        return documentType == DocumentType.NotifyValidatedMeasureData
+            ? MaxBundleSizeForMeasureData
+            : 1;
     }
 }
