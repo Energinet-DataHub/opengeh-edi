@@ -158,8 +158,8 @@ public class PeekMessage
 
     private async Task<Bundle?> CloseBundleAndCommitAsync(PeekRequestDto request, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
     {
-        // Right after we call Close(), we close the bundle. This is to ensure that the bundle wont be added more messages, after we have peeked.
-        // And before we are able to update the bundle to closed in the database.
+        // Right after we call Close(), we close the bundle. This is to ensure that messages won't be added to
+        // the bundle after we have peeked and before we are able to update the bundle to closed in the database.
         var bundle = await _bundleRepository
             .GetOldestBundleAsync(actorMessageQueueId, request.MessageCategory, cancellationToken)
             .ConfigureAwait(false);
@@ -171,6 +171,10 @@ public class PeekMessage
             return bundle;
 
         bundle.Close(SystemClock.Instance.GetCurrentInstant());
+
+        // TODO: This can now fail, if messages have been added to the bundle after it was read, but before we closed
+        // it in the database. How do we handle this? Do we need to keep trying retrieving the oldest bundle until
+        // it is closed successfully?
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return bundle;

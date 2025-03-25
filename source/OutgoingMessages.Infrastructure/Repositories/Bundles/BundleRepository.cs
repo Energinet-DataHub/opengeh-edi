@@ -23,6 +23,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bun
 
 public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepository
 {
+    public const int CloseBundlesAfterMinutes = 5; // TODO: Move to configuration
+
     private readonly ActorMessageQueueContext _dbContext = dbContext;
 
     public void Add(Bundle bundle)
@@ -74,28 +76,28 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
-        // 1. Get oldest bundle that is closed and not dequeued
-        // 2. Get oldest bundle that is closed is not closed and older than 5 minutes
-        if (messageCategory == MessageCategory.None)
-        {
-            return await _dbContext.Bundles
-                .Where(
-                    b =>
-                        b.ActorMessageQueueId == actorMessageQueueId &&
-                        b.DequeuedAt == null)
-                .OrderBy(b => b.Created)
-                .FirstOrDefaultAsync(cancellationToken)
-                .ConfigureAwait(false);
-        }
+        // Get oldest bundle that is:
+        // - In the given actor message queue
+        // - Not dequeued
+        // - Already closed or is created more than 5 minutes ago
+        var closeBundlesCreatedBefore = SystemClock.Instance
+            .GetCurrentInstant()
+            .Minus(Duration.FromMinutes(CloseBundlesAfterMinutes));
 
-        return await _dbContext.Bundles
-            .Where(
-                b =>
-                    b.ActorMessageQueueId == actorMessageQueueId &&
-                    b.DequeuedAt == null &&
-                    b.MessageCategory == messageCategory)
+        var query = _dbContext.Bundles.Where(
+            b =>
+                b.ActorMessageQueueId == actorMessageQueueId &&
+                b.DequeuedAt == null &&
+                (b.ClosedAt != null || b.Created < closeBundlesCreatedBefore));
+
+        if (messageCategory != MessageCategory.None)
+            query = query.Where(b => b.MessageCategory == messageCategory);
+
+        var oldestBundle = await query
             .OrderBy(b => b.Created)
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
+
+        return oldestBundle;
     }
 }
