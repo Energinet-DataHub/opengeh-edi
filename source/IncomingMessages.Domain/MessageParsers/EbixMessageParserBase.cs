@@ -69,7 +69,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider, I
         catch (XmlSchemaValidationException e)
         {
             var streamContent = await new StreamReader(marketMessage.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-            _logger.LogError(e, "Error validating incoming message: {StreamContent}", streamContent);
+            _logger.LogError(e, "Error validating incoming message: {StreamContent}", streamContent.Substring(0, 5000));
             throw;
         }
     }
