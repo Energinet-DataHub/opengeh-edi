@@ -25,10 +25,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bun
 
 public class BundleRepository(
     ActorMessageQueueContext dbContext,
+    IClock clock,
     IOptions<BundlingOptions> options)
         : IBundleRepository
 {
     private readonly ActorMessageQueueContext _dbContext = dbContext;
+    private readonly IClock _clock = clock;
     private readonly BundlingOptions _options = options.Value;
 
     public void Add(Bundle bundle)
@@ -84,7 +86,7 @@ public class BundleRepository(
         // - In the given actor message queue
         // - Not dequeued
         // - Already closed or is created more than "ForwardMeteredDataBundleDurationInMinutes" minutes ago
-        var closeBundlesCreatedBefore = SystemClock.Instance
+        var closeBundlesCreatedBefore = _clock
             .GetCurrentInstant()
             .Minus(Duration.FromMinutes(_options.ForwardMeteredDataBundleDurationInMinutes));
 
@@ -92,7 +94,7 @@ public class BundleRepository(
             b =>
                 b.ActorMessageQueueId == actorMessageQueueId &&
                 b.DequeuedAt == null &&
-                (b.ClosedAt != null || b.Created < closeBundlesCreatedBefore));
+                (b.ClosedAt != null || b.Created <= closeBundlesCreatedBefore));
 
         if (messageCategory != MessageCategory.None)
             query = query.Where(b => b.MessageCategory == messageCategory);
