@@ -15,7 +15,10 @@
 using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -23,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMet
 using Energinet.DataHub.EDI.Tests.Factories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit.Abstractions;
 
@@ -31,6 +35,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessag
 public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
 {
     private readonly ITestOutputHelper _testOutputHelper;
+    private readonly ClockStub _clockStub;
 
     public WhenEnqueuingMeasureDataWithBundlingTests(
         OutgoingMessagesTestFixture outgoingMessagesTestFixture,
@@ -38,6 +43,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         : base(outgoingMessagesTestFixture, testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
+        _clockStub = (ClockStub)GetService<IClock>();
     }
 
     public static TheoryData<Func<Actor, OutgoingMessageDto>> MessageBuildersForBundledMessageTypes()
@@ -52,19 +58,32 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
     [Theory]
     [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
-    public async Task Given_ExistingBundleForMessage_When_EnqueuingNewMessage_Then_BothMessageAreInTheSameBundle_AndThen_BundleHasCorrectCount(
+    public async Task Given_EnqueuedTwoMessageForSameBundle_When_BundlingMessages_Then_BothMessageAreInTheSameBundle_AndThen_BundleHasCorrectCount(
         Func<Actor, OutgoingMessageDto> messageBuilder)
     {
         // Given existing bundle
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
 
-        // - Create existing message & bundle
-        var existingMessage = messageBuilder(receiver);
-        await EnqueueAndCommitMessageInNewScope(existingMessage);
+        // - Create two message for same bundle
+        var message1 = messageBuilder(receiver);
+        var message2 = messageBuilder(receiver);
 
-        // When enqueuing new message
-        var newMessage = messageBuilder(receiver);
-        await EnqueueAndCommitMessageInNewScope(newMessage);
+        // - Enqueue messages "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        await EnqueueAndCommitMessageInNewScope(message1);
+        await EnqueueAndCommitMessageInNewScope(message2);
+
+        // When creating bundles
+
+        // - Move clock to when bundles should be created
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Create bundles
+        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
+        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
 
         // Then message is added to existing bundle & bundle has correct count
         await using var scope = ServiceProvider.CreateAsyncScope();

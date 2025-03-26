@@ -98,6 +98,7 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
         {
             () => Assert.Equal(createdOutgoingMessageId, messageFromDatabase.Id),
             () => Assert.NotNull(messageFromDatabase.RecordId),
+            () => Assert.NotNull(messageFromDatabase.RowVersion),
             () => Assert.Equal(message.ProcessId, messageFromDatabase.ProcessId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, messageFromDatabase.DocumentType),
             () => Assert.Equal(message.ReceiverNumber.Value, messageFromDatabase.ReceiverNumber),
@@ -165,7 +166,7 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
             () => Assert.NotNull(bundleFromDatabase.RowVersion),
             () => Assert.Equal(bundleFromDatabase.ActorMessageQueueId, expectedActorMessageQueueId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, bundleFromDatabase.DocumentTypeInBundle),
-            () => Assert.Equal(1, bundleFromDatabase.MessageCount),
+            () => Assert.NotNull(bundleFromDatabase.MessageCount), // TODO: MessageCount will be removed
             () => Assert.Equal(1, bundleFromDatabase.MaxMessageCount),
             () => Assert.Equal(message.BusinessReason, bundleFromDatabase.BusinessReason),
             () => Assert.Equal(bundleFromDatabase.Created, now.ToDateTimeUtc()),

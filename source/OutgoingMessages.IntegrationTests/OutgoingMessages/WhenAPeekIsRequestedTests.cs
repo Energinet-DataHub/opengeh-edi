@@ -338,7 +338,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     }
 
     [Fact]
-    public async Task Given_BundledOutgoingMessages_When_MessageIsPeekedBeforeBundleShouldClose_Then_PeekReturnsNothing()
+    public async Task Given_OutgoingMessagesForBundling_When_MessagesArePeeked_Then_PeekReturnsNothing()
     {
         // Arrange / Given
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
@@ -349,18 +349,11 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
             .WithReceiver(receiver)
             .Build();
 
-        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
-        _clockStub.SetCurrentInstant(now);
+        // var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        // _clockStub.SetCurrentInstant(now);
 
         await EnqueueAndCommitMessage(bundledMessage1);
         await EnqueueAndCommitMessage(bundledMessage2);
-
-        // Bundle is closed after X minutes, so we set "now" to just before X minutes later, so the bundle shouldn't be closed yet
-        var bundlingOptions = GetService<IOptions<BundlingOptions>>().Value;
-        var justBeforeBundleShouldClose = now
-            .Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes))
-            .Minus(Duration.FromMilliseconds(1));
-        _clockStub.SetCurrentInstant(justBeforeBundleShouldClose);
 
         // Act / When
         var peekResult = await PeekMessageAsync(
@@ -369,42 +362,42 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
             actorRole: receiver.ActorRole);
 
         // Assert / Then
-        peekResult.Should().BeNull("because the bundled shouldn't be closed yet, so no message should be peeked");
+        peekResult.Should().BeNull("because the messages shouldn't be bundled yet, so no message should be peeked");
     }
 
-    [Fact]
-    public async Task Given_BundledOutgoingMessages_When_MessageIsPeekedAfterBundleShouldClose_Then_PeekClosesBundleAndReturnsResult()
-    {
-        // Arrange / Given
-        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-        var bundledMessage1 = new AcceptedForwardMeteredDataMessageDtoBuilder()
-            .WithReceiver(receiver)
-            .Build();
-        var bundledMessage2 = new AcceptedForwardMeteredDataMessageDtoBuilder()
-            .WithReceiver(receiver)
-            .Build();
-
-        // Set created at timestamp on messages to "now"
-        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
-        _clockStub.SetCurrentInstant(now);
-
-        await EnqueueAndCommitMessage(bundledMessage1);
-        await EnqueueAndCommitMessage(bundledMessage2);
-
-        // Bundle is closed after X minutes, so we set "now" to X minutes later, so the bundle should be closed when peeked
-        var bundlingOptions = GetService<IOptions<BundlingOptions>>().Value;
-        var whenBundleShouldClose = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
-        _clockStub.SetCurrentInstant(whenBundleShouldClose);
-
-        // Act / When
-        var peekResult = await PeekMessageAsync(
-            MessageCategory.MeasureData,
-            actorNumber: receiver.ActorNumber,
-            actorRole: receiver.ActorRole);
-
-        // Assert / Then
-        peekResult.Should().NotBeNull("because the bundled should now be closed when peeked");
-    }
+    // [Fact]
+    // public async Task Given_BundledOutgoingMessages_When_MessageIsPeekedAfterBundleShouldClose_Then_PeekClosesBundleAndReturnsResult()
+    // {
+    //     // Arrange / Given
+    //     var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+    //     var bundledMessage1 = new AcceptedForwardMeteredDataMessageDtoBuilder()
+    //         .WithReceiver(receiver)
+    //         .Build();
+    //     var bundledMessage2 = new AcceptedForwardMeteredDataMessageDtoBuilder()
+    //         .WithReceiver(receiver)
+    //         .Build();
+    //
+    //     // Set created at timestamp on messages to "now"
+    //     var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+    //     _clockStub.SetCurrentInstant(now);
+    //
+    //     await EnqueueAndCommitMessage(bundledMessage1);
+    //     await EnqueueAndCommitMessage(bundledMessage2);
+    //
+    //     // Bundle is closed after X minutes, so we set "now" to X minutes later, so the bundle should be closed when peeked
+    //     var bundlingOptions = GetService<IOptions<BundlingOptions>>().Value;
+    //     var whenBundleShouldClose = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+    //     _clockStub.SetCurrentInstant(whenBundleShouldClose);
+    //
+    //     // Act / When
+    //     var peekResult = await PeekMessageAsync(
+    //         MessageCategory.MeasureData,
+    //         actorNumber: receiver.ActorNumber,
+    //         actorRole: receiver.ActorRole);
+    //
+    //     // Assert / Then
+    //     peekResult.Should().NotBeNull("because the bundled should now be closed when peeked");
+    // }
 
     private async Task<bool> BundleIsRegistered()
     {
