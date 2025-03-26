@@ -16,16 +16,20 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 
-public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepository
+public class BundleRepository(
+    ActorMessageQueueContext dbContext,
+    IOptions<BundlingOptions> options)
+        : IBundleRepository
 {
-    public const int CloseBundlesAfterMinutes = 5; // TODO: Move to configuration
-
     private readonly ActorMessageQueueContext _dbContext = dbContext;
+    private readonly BundlingOptions _options = options.Value;
 
     public void Add(Bundle bundle)
     {
@@ -79,10 +83,10 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         // Get oldest bundle that is:
         // - In the given actor message queue
         // - Not dequeued
-        // - Already closed or is created more than 5 minutes ago
+        // - Already closed or is created more than "ForwardMeteredDataBundleDurationInMinutes" minutes ago
         var closeBundlesCreatedBefore = SystemClock.Instance
             .GetCurrentInstant()
-            .Minus(Duration.FromMinutes(CloseBundlesAfterMinutes));
+            .Minus(Duration.FromMinutes(_options.ForwardMeteredDataBundleDurationInMinutes));
 
         var query = _dbContext.Bundles.Where(
             b =>

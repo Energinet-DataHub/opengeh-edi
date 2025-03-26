@@ -503,6 +503,11 @@ public class B2BApiAppFixture : IAsyncLifetime
             $"AzureWebJobs.{nameof(OutboxPublisher)}.Disabled",
             "true");
 
+        // Bundling
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{BundlingOptions.SectionName}__{nameof(BundlingOptions.ForwardMeteredDataBundleDurationInMinutes)}",
+            "0"); // Setting the bundle duration to 0 ensures that bundles will be closed as soon as they are peeked.
+
         // App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(AppConfiguration.AppConfigEndpoint),
