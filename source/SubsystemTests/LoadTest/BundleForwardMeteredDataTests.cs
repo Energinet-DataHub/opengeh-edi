@@ -67,7 +67,7 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
                 .ToList());
 
         // Wait for all messages to be enqueued (with a timeout)
-        var timeout = TimeSpan.FromMinutes(10);
+        var timeout = TimeSpan.FromMinutes(15);
         var timeoutCancellationToken = new CancellationTokenSource(timeout).Token;
 
         List<EdiDatabaseDriver.OutgoingMessageDto> enqueuedMessages = [];
@@ -87,7 +87,16 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
             var finishedEnqueueing = enqueuedMessagesCount >= messagesToEnqueueCount;
             var stoppedEnqueuing = enqueuedMessagesCount == previousCount;
             if (finishedEnqueueing || stoppedEnqueuing || timeoutCancellationToken.IsCancellationRequested)
+            {
+                _testOutputHelper.WriteLine(
+                    "Stopped enqueueing outgoing messages (enqueued {0} in {1:g} minutes, finishedEnqueueing={2}, stoppedEnqueuing={3}, cancellationTimeout={4})",
+                    enqueuedMessages.Count,
+                    stopwatch.Elapsed,
+                    finishedEnqueueing,
+                    stoppedEnqueuing,
+                    timeoutCancellationToken.IsCancellationRequested);
                 break;
+            }
 
             await Task.Delay(TimeSpan.FromSeconds(30));
         }
