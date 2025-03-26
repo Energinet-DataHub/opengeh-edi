@@ -52,20 +52,19 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
     [Theory]
     [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
-    public async Task Given_ExistingBundleForMessage_When_EnqueuingNewMessage_Then_MessageAddedToExistingBundle_AndThen_ExistingBundleHasCorrectCount(
+    public async Task Given_ExistingBundleForMessage_When_EnqueuingNewMessage_Then_BothMessageAreInTheSameBundle_AndThen_BundleHasCorrectCount(
         Func<Actor, OutgoingMessageDto> messageBuilder)
     {
         // Given existing bundle
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
 
-        // Create existing message & bundle
+        // - Create existing message & bundle
         var existingMessage = messageBuilder(receiver);
         await EnqueueAndCommitMessageInNewScope(existingMessage);
 
-        var messageToEnqueue = messageBuilder(receiver);
-
         // When enqueuing new message
-        await EnqueueAndCommitMessageInNewScope(messageToEnqueue);
+        var newMessage = messageBuilder(receiver);
+        await EnqueueAndCommitMessageInNewScope(newMessage);
 
         // Then message is added to existing bundle & bundle has correct count
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -76,13 +75,16 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var bundles = await dbContext.Bundles
             .ToListAsync();
 
+        // - Bundle has correct count
         Assert.Multiple(
-            () => Assert.Equal(2, outgoingMessages.Count),
             () => Assert.Single(bundles),
             () => Assert.Collection(bundles, b => Assert.Equal(2, b.MessageCount)));
 
+        // - Both outgoing messages are in the same bundle (have the correct bundle id)
         var bundle = bundles.Single();
-        Assert.All(outgoingMessages, om => Assert.Equal(bundle.Id, om.AssignedBundleId));
+        Assert.Multiple(
+            () => Assert.Equal(2, outgoingMessages.Count),
+            () => Assert.All(outgoingMessages, om => Assert.Equal(bundle.Id, om.AssignedBundleId)));
     }
 
     [Fact]
