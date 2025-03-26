@@ -20,10 +20,12 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 
-public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) : MessageParserBase<XmlSchema>()
+public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider, ILogger<EbixMessageParserBase> logger)
+    : MessageParserBase<XmlSchema>()
 {
     private const string HeaderElementName = "HeaderEnergyDocument";
     private const string EnergyContextElementName = "ProcessEnergyContext";
@@ -36,6 +38,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     private const string EnergyBusinessProcessRoleElementName = "EnergyBusinessProcessRole";
     private const string EnergyIndustryClassificationElementName = "EnergyIndustryClassification";
     private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
+    private readonly ILogger<EbixMessageParserBase> _logger = logger;
 
     protected abstract string RootPayloadElementName { get; }
 
@@ -46,20 +49,29 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         XmlSchema schemaResult,
         CancellationToken cancellationToken)
     {
-        using var reader = XmlReader.Create(marketMessage.Stream, CreateXmlReaderSettings(schemaResult));
-        var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
-        if (ValidationErrors.Count > 0)
+        try
         {
-            return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
+            using var reader = XmlReader.Create(marketMessage.Stream, CreateXmlReaderSettings(schemaResult));
+
+            var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
+            if (ValidationErrors.Count > 0)
+            {
+                return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
+            }
+
+            var @namespace = GetNamespace(marketMessage);
+            var ns = XNamespace.Get(@namespace);
+
+            var header = ParseHeader(document, ns);
+            var transactions = ParseTransactions(document, ns, header.SenderId, header.CreatedAt);
+            return CreateResult(header, transactions);
         }
-
-        var @namespace = GetNamespace(marketMessage);
-        var ns = XNamespace.Get(@namespace);
-
-        var header = ParseHeader(document, ns);
-        var transactions = ParseTransactions(document, ns, header.SenderId, header.CreatedAt);
-
-        return CreateResult(header, transactions);
+        catch (XmlSchemaValidationException e)
+        {
+            var streamContent = await new StreamReader(marketMessage.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogError(e, "Error validating incoming message: {StreamContent}", streamContent.Substring(0, 5000));
+            throw;
+        }
     }
 
     protected override async Task<(XmlSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
@@ -207,7 +219,16 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
                               XmlSchemaValidationFlags.ReportValidationWarnings,
         };
 
-        settings.Schemas.Add(xmlSchema);
+        try
+        {
+            settings.Schemas.Add(xmlSchema);
+        }
+        catch (XmlSchemaException e)
+        {
+            _logger.LogError(e, "Error adding schema {XmlSchema} to XmlReaderSettings", xmlSchema);
+            throw;
+        }
+
         settings.ValidationEventHandler += OnValidationError;
         return settings;
     }
