@@ -344,11 +344,9 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage1 = new AcceptedForwardMeteredDataMessageDtoBuilder()
             .WithReceiver(receiver)
-            .WithExternalId(ExternalId.New()) // Must use different external id to avoid idempotency check
             .Build();
         var bundledMessage2 = new AcceptedForwardMeteredDataMessageDtoBuilder()
             .WithReceiver(receiver)
-            .WithExternalId(ExternalId.New()) // Must use different external id to avoid idempotency check
             .Build();
 
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
@@ -360,7 +358,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         // Bundle is closed after X minutes, so we set "now" to just before X minutes later, so the bundle shouldn't be closed yet
         var bundlingOptions = GetService<IOptions<BundlingOptions>>().Value;
         var justBeforeBundleShouldClose = now
-            .Plus(Duration.FromMinutes(bundlingOptions.ForwardMeteredDataBundleDurationInMinutes))
+            .Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes))
             .Minus(Duration.FromMilliseconds(1));
         _clockStub.SetCurrentInstant(justBeforeBundleShouldClose);
 
@@ -381,24 +379,22 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage1 = new AcceptedForwardMeteredDataMessageDtoBuilder()
             .WithReceiver(receiver)
-            .WithExternalId(ExternalId.New()) // Must use different external id to avoid idempotency check
             .Build();
         var bundledMessage2 = new AcceptedForwardMeteredDataMessageDtoBuilder()
             .WithReceiver(receiver)
-            .WithExternalId(ExternalId.New()) // Must use different external id to avoid idempotency check
             .Build();
 
+        // Set created at timestamp on messages to "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
         _clockStub.SetCurrentInstant(now);
 
         await EnqueueAndCommitMessage(bundledMessage1);
         await EnqueueAndCommitMessage(bundledMessage2);
 
-        // Bundle is closed after X minutes, so we set "now" to just before X minutes later, so the bundle shouldn't be closed yet
+        // Bundle is closed after X minutes, so we set "now" to X minutes later, so the bundle should be closed when peeked
         var bundlingOptions = GetService<IOptions<BundlingOptions>>().Value;
-        var justAfterBundleShouldClose = now
-            .Plus(Duration.FromMinutes(bundlingOptions.ForwardMeteredDataBundleDurationInMinutes));
-        _clockStub.SetCurrentInstant(justAfterBundleShouldClose);
+        var whenBundleShouldClose = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+        _clockStub.SetCurrentInstant(whenBundleShouldClose);
 
         // Act / When
         var peekResult = await PeekMessageAsync(

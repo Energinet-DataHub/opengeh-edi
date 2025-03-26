@@ -505,7 +505,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Bundling
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{BundlingOptions.SectionName}__{nameof(BundlingOptions.ForwardMeteredDataBundleDurationInMinutes)}",
+            $"{BundlingOptions.SectionName}__{nameof(BundlingOptions.BundleDurationInMinutes)}",
             "0"); // Setting the bundle duration to 0 ensures that bundles will be closed as soon as they are peeked.
 
         // App Configuration settings

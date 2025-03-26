@@ -21,8 +21,8 @@ public class BundlingOptions
     public const string SectionName = "Bundling";
 
     /// <summary>
-    /// How old a RSM-012 (ForwardMeteredData) bundle can be before it should be closed.
+    /// How old a bundle can be before it should be closed when peeked.
     /// </summary>
     [Required]
-    public double ForwardMeteredDataBundleDurationInMinutes { get; set; } = 5;
+    public double BundleDurationInMinutes { get; set; } = 5;
 }

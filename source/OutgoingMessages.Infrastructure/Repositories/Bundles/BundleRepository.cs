@@ -85,10 +85,10 @@ public class BundleRepository(
         // Get oldest bundle that is:
         // - In the given actor message queue
         // - Not dequeued
-        // - Already closed or is created more than "ForwardMeteredDataBundleDurationInMinutes" minutes ago
+        // - Already closed or is created more than "BundleDurationInMinutes" minutes ago
         var closeBundlesCreatedBefore = _clock
             .GetCurrentInstant()
-            .Minus(Duration.FromMinutes(_options.ForwardMeteredDataBundleDurationInMinutes));
+            .Minus(Duration.FromMinutes(_options.BundleDurationInMinutes));
 
         var query = _dbContext.Bundles.Where(
             b =>
