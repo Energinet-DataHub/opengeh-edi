@@ -41,7 +41,6 @@ public sealed record AssertSeriesDocumentFieldsInput(
     OptionalSeriesFields OptionalSeriesFields);
 
 public sealed record RequiredSeriesFields(
-    TransactionId TransactionId,
     string MeteringPointNumber,
     string MeteringPointScheme,
     MeteringPointType MeteringPointType,
