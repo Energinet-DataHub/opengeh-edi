@@ -76,6 +76,15 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
     }
 
     [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
+    public async Task B2C_actor_can_request_wholesale_settlement_v2()
+    {
+        var act = async () => await _wholesaleSettlementRequest.B2CRequestV2(CancellationToken.None);
+
+        await act.Should().NotThrowAsync("because the request should be valid");
+    }
+
+    [Fact]
     public async Task Actor_get_sync_rejected_response_when_wholesale_settlement_request_is_invalid()
     {
         await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text;
+using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
@@ -82,6 +83,59 @@ public class RequestWholesaleSettlementController : ControllerBase
                 currentUser.MarketRole,
                 _dateTimeZone,
                 _clock.GetCurrentInstant());
+
+        var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
+                GenerateStreamFromString(_serializer.Serialize(message)),
+                DocumentFormat.Json,
+                IncomingDocumentType.B2CRequestWholesaleSettlement,
+                DocumentFormat.Json,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        if (responseMessage.IsErrorResponse)
+        {
+            return BadRequest(responseMessage.MessageBody);
+        }
+
+        return Ok(responseMessage.MessageBody);
+    }
+
+    [ApiVersion("2.0")]
+    [HttpPost]
+    [Authorize(Roles = "request-wholesale-settlement:view")]
+    public async Task<ActionResult> RequestAsync(
+        RequestWholesaleServicesMarketDocumentV2 request,
+        CancellationToken cancellationToken)
+    {
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.RequestWholesaleResults,
+                activityOrigin: HttpContext.Request.GetDisplayUrl(),
+                activityPayload: request,
+                affectedEntityType: AuditLogEntityType.RequestWholesaleServices,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
+
+        var message = new RequestWholesaleSettlementDto(
+            request.SenderNumber,
+            request.SenderRoleCode,
+            request.ReceiverNumber,
+            request.ReceiverRoleCode,
+            request.BusinessReason,
+            request.MessageType,
+            request.MessageId,
+            request.CreatedAt,
+            request.BusinessType,
+            request.Series.Select(s => new RequestWholesaleSettlementSeries(
+                s.Id,
+                s.StartDateAndOrTimeDateTime,
+                s.EndDateAndOrTimeDateTime,
+                s.MeteringGridAreaDomainId,
+                s.EnergySupplierMarketParticipantId,
+                s.SettlementVersion,
+                s.Resolution,
+                s.ChargeOwner,
+                s.ChargeTypes.Select(ct => new RequestWholesaleSettlementChargeType(ct.Id, ct.Type)).ToList().AsReadOnly())).ToList().AsReadOnly());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),

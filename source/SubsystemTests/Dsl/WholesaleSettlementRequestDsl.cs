@@ -56,6 +56,12 @@ public sealed class WholesaleSettlementRequestDsl
             .RequestWholesaleSettlementAsync(cancellationToken);
     }
 
+    internal Task B2CRequestV2(CancellationToken cancellationToken)
+    {
+        return _b2cEdiDriver
+            .RequestWholesaleSettlementV2Async(cancellationToken);
+    }
+
     internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);

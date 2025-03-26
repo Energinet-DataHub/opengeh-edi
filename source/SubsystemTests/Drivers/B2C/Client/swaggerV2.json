@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.4",
   "info": {
     "title": "EDI B2C Web API",
     "version": "2.0"
@@ -72,6 +72,60 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/RequestWholesaleSettlement": {
+      "post": {
+        "tags": [
+          "RequestWholesaleSettlement"
+        ],
+        "operationId": "RequestWholesaleSettlement",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestWholesaleServicesMarketDocumentV2"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestWholesaleServicesMarketDocumentV2"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestWholesaleServicesMarketDocumentV2"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -172,6 +226,102 @@
           "end": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "RequestWholesaleServicesMarketDocumentV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "senderNumber": {
+            "type": "string"
+          },
+          "senderRoleCode": {
+            "type": "string"
+          },
+          "receiverNumber": {
+            "type": "string"
+          },
+          "receiverRoleCode": {
+            "type": "string"
+          },
+          "businessReason": {
+            "type": "string"
+          },
+          "messageType": {
+            "type": "string"
+          },
+          "messageId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "businessType": {
+            "type": "string",
+            "nullable": true
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestWholesaleSettlementSeriesV2"
+            }
+          }
+        }
+      },
+      "RequestWholesaleSettlementChargeTypeV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RequestWholesaleSettlementSeriesV2": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "startDateAndOrTimeDateTime": {
+            "type": "string"
+          },
+          "endDateAndOrTimeDateTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "meteringGridAreaDomainId": {
+            "type": "string",
+            "nullable": true
+          },
+          "energySupplierMarketParticipantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "settlementVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "resolution": {
+            "type": "string",
+            "nullable": true
+          },
+          "chargeOwner": {
+            "type": "string",
+            "nullable": true
+          },
+          "chargeTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestWholesaleSettlementChargeTypeV2"
+            }
           }
         }
       },

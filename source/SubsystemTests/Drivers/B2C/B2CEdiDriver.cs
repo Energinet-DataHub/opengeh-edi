@@ -94,6 +94,52 @@ public sealed class B2CEdiDriver : IDisposable
             .ConfigureAwait(false);
     }
 
+    public async Task RequestWholesaleSettlementV2Async(CancellationToken cancellationToken)
+    {
+        var webApiClient = await CreateWebApiClientV2Async();
+
+        var start = Instant.FromUtc(2024, 09, 01, 00, 00);
+        var requestWholesaleServicesMarketDocumentV2 = new RequestWholesaleServicesMarketDocumentV2
+        {
+            BusinessReason = "D05",
+            BusinessType = "A02",
+            MessageId = Guid.NewGuid().ToString(),
+            CreatedAt = start.ToString(),
+            MessageType = "D21",
+            SenderNumber = "5790001330552",
+            ReceiverNumber = "5790001330801",
+            SenderRoleCode = "DGL",
+            ReceiverRoleCode = "DDQ",
+            Series = new List<RequestWholesaleSettlementSeriesV2>
+            {
+                new RequestWholesaleSettlementSeriesV2
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    StartDateAndOrTimeDateTime = start.ToString(),
+                    EndDateAndOrTimeDateTime = start.Plus(Duration.FromDays(30)).ToString(),
+                    MeteringGridAreaDomainId = "804",
+                    EnergySupplierMarketParticipantId = "5790001330552",
+                    SettlementVersion = "D01",
+                    Resolution = "D01",
+                    ChargeOwner = null,
+                    ChargeTypes = new List<RequestWholesaleSettlementChargeTypeV2>
+                    {
+                        new RequestWholesaleSettlementChargeTypeV2
+                        {
+                            Id = null,
+                            Type = "23",
+                        },
+                    },
+                },
+            },
+        };
+        await webApiClient.RequestWholesaleSettlementAsync(
+                api_version: "2.0",
+                body: requestWholesaleServicesMarketDocumentV2,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     private async Task<B2CEdiClient> CreateWebApiClientAsync()
     {
         var httpClient = await _httpClient;
