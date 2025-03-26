@@ -225,7 +225,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider, I
         }
         catch (XmlSchemaException e)
         {
-            _logger.LogError(e, "Error adding schema {XmlSchema} to XmlReaderSettings", xmlSchema);
+            _logger.LogError(e, "Error adding schema with target namespace '{TargetNamespace}' and source URI '{SourceUri}' to XmlReaderSettings", xmlSchema.TargetNamespace, xmlSchema.SourceUri);
             throw;
         }
 
