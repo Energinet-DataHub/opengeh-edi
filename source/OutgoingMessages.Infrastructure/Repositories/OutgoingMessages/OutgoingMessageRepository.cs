@@ -126,9 +126,10 @@ public class OutgoingMessageRepository(
     {
         var query = _context.OutgoingMessages
             .Where(om => om.AssignedBundleId == null
+                && om.Receiver.Number == receiver.Number
+                && om.Receiver.ActorRole == receiver.ActorRole
                 && om.DocumentType == documentType
-                && om.BusinessReason == businessReason
-                && om.Receiver == receiver);
+                && om.BusinessReason == businessReason);
 
         if (relatedToMessageId != null)
             query = query.Where(om => om.RelatedToMessageId == relatedToMessageId);

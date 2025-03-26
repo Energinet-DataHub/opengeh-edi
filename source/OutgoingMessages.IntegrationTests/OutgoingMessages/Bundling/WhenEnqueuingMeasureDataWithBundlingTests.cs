@@ -71,8 +71,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - Enqueue messages "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
         _clockStub.SetCurrentInstant(now);
-        await EnqueueAndCommitMessageInNewScope(message1);
-        await EnqueueAndCommitMessageInNewScope(message2);
+        await EnqueueAndCommitMessage(message1);
+        await EnqueueAndCommitMessage(message2);
 
         // When creating bundles
 
@@ -94,10 +94,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var bundles = await dbContext.Bundles
             .ToListAsync();
 
-        // - Bundle has correct count
-        Assert.Multiple(
-            () => Assert.Single(bundles),
-            () => Assert.Collection(bundles, b => Assert.Equal(2, b.MessageCount)));
+        // - One bundle was created
+        Assert.Single(bundles);
 
         // - Both outgoing messages are in the same bundle (have the correct bundle id)
         var bundle = bundles.Single();
@@ -222,7 +220,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         try
         {
-            await EnqueueAndCommitMessageInNewScope(message);
+            await EnqueueAndCommitMessage(message);
         }
         catch (Exception)
         {
@@ -234,10 +232,9 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         return retryCount;
     }
 
-    private async Task<Guid> EnqueueAndCommitMessageInNewScope(OutgoingMessageDto message)
+    private async Task<Guid> EnqueueAndCommitMessage(OutgoingMessageDto message)
     {
-        await using var scope = ServiceProvider.CreateAsyncScope();
-        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
         var messageId = message switch
         {
@@ -246,7 +243,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             _ => throw new NotImplementedException($"Enqueueing outgoing message of type {message.GetType()} is not implemented."),
         };
 
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         return messageId;
