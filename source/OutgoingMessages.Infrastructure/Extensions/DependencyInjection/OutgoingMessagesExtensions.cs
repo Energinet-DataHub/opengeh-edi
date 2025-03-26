@@ -101,6 +101,13 @@ public static class OutgoingMessagesExtensions
         // DequeConfiguration
         services.AddTransient<DequeueMessage>();
 
+        // CloseBundles configuration
+        services.AddTransient<BundleMessages>();
+        services
+            .AddOptions<BundlingOptions>()
+            .BindConfiguration(BundlingOptions.SectionName)
+            .ValidateDataAnnotations();
+
         // DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
 
@@ -146,12 +153,6 @@ public static class OutgoingMessagesExtensions
             .AddDatabricksSqlStatementExecution(configuration)
             .AddHealthChecks()
                 .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
-
-        // Bundling
-        services
-            .AddOptions<BundlingOptions>()
-            .BindConfiguration(BundlingOptions.SectionName)
-            .ValidateDataAnnotations();
 
         return services;
     }

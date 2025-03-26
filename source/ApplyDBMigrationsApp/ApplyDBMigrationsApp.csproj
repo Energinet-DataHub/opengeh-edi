@@ -213,6 +213,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202503261452 Drop IX_OldestBundle index from Bundles table.sql" />
     <EmbeddedResource Include="Scripts\Model\202503261453 Create index IX_Bundles_OldestBundle on Bundles table.sql" />
     <EmbeddedResource Include="Scripts\Model\202503261454 Create index IX_Bundles_OpenBundle on Bundles table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202503261904 Add RowVersion to OutgoingMessages table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

@@ -157,19 +157,6 @@ public class PeekMessage
             .GetOldestBundleAsync(actorMessageQueueId, request.MessageCategory, cancellationToken)
             .ConfigureAwait(false);
 
-        if (bundle == null)
-            return null;
-
-        if (bundle.IsClosed)
-            return bundle;
-
-        bundle.Close(SystemClock.Instance.GetCurrentInstant());
-
-        // TODO: This can now fail, if messages have been added to the bundle after it was read, but before we closed
-        // it in the database. How do we handle this? Do we need to keep trying retrieving the oldest bundle until
-        // it is closed successfully?
-        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
         return bundle;
     }
 }

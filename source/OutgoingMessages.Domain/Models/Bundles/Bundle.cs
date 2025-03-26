@@ -28,7 +28,7 @@ public sealed class Bundle
     public const string MessageCountPropertyName = nameof(_messageCount);
 
     private readonly int _maxNumberOfMessagesInABundle;
-    private int _messageCount;
+    private readonly int _messageCount; // TODO: Remove _messageCount
 
     /// <summary>
     /// Create new bundle in the given actor message queue
@@ -50,6 +50,8 @@ public sealed class Bundle
         Created = created;
         RelatedToMessageId = relatedToMessageId;
         MessageCategory = DocumentTypeInBundle.Category;
+
+        _messageCount = 0;
     }
 
     private Bundle()
@@ -111,8 +113,6 @@ public sealed class Bundle
             throw new InvalidOperationException($"Cannot add message to a closed bundle (bundle id: {Id.Id}, message id: {outgoingMessage.Id}, external id: {outgoingMessage.ExternalId})");
 
         outgoingMessage.AssignToBundle(Id);
-        _messageCount++;
-        CloseIfFull(outgoingMessage.CreatedAt);
     }
 
     public bool TryDequeue()
@@ -132,11 +132,5 @@ public sealed class Bundle
             throw new InvalidOperationException($"Cannot close a already closed bundle (bundle id: {Id.Id}).");
 
         ClosedAt = closedAt;
-    }
-
-    private void CloseIfFull(Instant closedAt)
-    {
-        if (_maxNumberOfMessagesInABundle == _messageCount)
-           Close(closedAt);
     }
 }

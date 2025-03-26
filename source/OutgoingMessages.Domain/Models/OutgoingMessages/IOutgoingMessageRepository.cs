@@ -45,6 +45,15 @@ public interface IOutgoingMessageRepository
     /// </summary>
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt);
 
+    public Task<IReadOnlyCollection<OutgoingMessage>> GetMessagesReadyToBeBundledAsync(CancellationToken cancellationToken);
+
+    public Task<IReadOnlyCollection<OutgoingMessage>> GetMessagesForBundleAsync(
+        Receiver receiver,
+        string businessReason,
+        DocumentType documentType,
+        MessageId? relatedToMessageId,
+        CancellationToken cancellationToken);
+
     /// <summary>
     /// Delete outgoing messages if they exists
     /// </summary>

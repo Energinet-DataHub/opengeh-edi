@@ -74,8 +74,9 @@ public class EnqueueMessage
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await BundleMessageAsync(messageToEnqueue, actorMessageQueueId, cancellationToken)
-            .ConfigureAwait(false);
+        var maxBundleSize = GetMaxBundleSize(messageToEnqueue.DocumentType);
+        if (maxBundleSize == 1) // If max bundle size is 1, the bundle can be created & closed immediately
+            CreateAndCloseBundle(messageToEnqueue, actorMessageQueueId);
 
         // Add to outgoing message repository (and upload to file storage) after adding actor message queue and bundle,
         // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
@@ -92,36 +93,17 @@ public class EnqueueMessage
     }
 
     /// <summary>
-    /// Bundle message for the receiver. Only NotifyValidatedMeasureData messages has bundles with more than one
-    /// message in each, the rest of the messages has a bundle size of 1 (effectively not bundled).
+    /// Create bundle, add message to it, and close it immediately. This can be done if the max bundle size is 1.
     /// </summary>
-    private async Task BundleMessageAsync(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
+    private void CreateAndCloseBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId)
     {
-        Bundle? bundle = null;
-        var maxBundleSize = GetMaxBundleSize(messageToEnqueue.DocumentType);
+        var bundle = CreateBundle(messageToEnqueue, actorMessageQueueId, maxBundleSize: 1);
 
-        // No need to find existing bundle if max bundle size is 1
-        if (maxBundleSize > 1)
-        {
-            // Get existing bundle.
-            bundle = await _bundleRepository.GetOpenBundleAsync(
-                    messageToEnqueue.DocumentType,
-                    BusinessReason.FromName(messageToEnqueue.BusinessReason),
-                    actorMessageQueueId,
-                    GetRelatedToMessageIdForBundling(messageToEnqueue),
-                    cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        // Create bundle if not exists.
-        if (bundle == null)
-            bundle = CreateBundle(messageToEnqueue, actorMessageQueueId, maxBundleSize);
-
-        // Add message to bundle and increment counter by 1.
-        //   - Close bundle if it is full (already handled in the .Add() method).
-        //   - This will fail on commit changes (intentionally) because of RowVersion, if the bundle is incremented or
-        //     closed concurrently.
+        // Add message to bundle.
         bundle.Add(messageToEnqueue);
+
+        // Close bundle immediately, since max bundle size is 1.
+        bundle.Close(_clock.GetCurrentInstant());
     }
 
     private Bundle CreateBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId, int maxBundleSize)

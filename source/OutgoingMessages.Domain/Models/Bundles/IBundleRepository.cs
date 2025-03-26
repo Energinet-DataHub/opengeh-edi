@@ -28,6 +28,8 @@ public interface IBundleRepository
     /// </summary>
     void Add(Bundle bundle);
 
+    void Add(IList<Bundle> bundles);
+
     /// <summary>
     ///  Get dequeued bundles older than a specific time.
     /// </summary>
@@ -66,4 +68,6 @@ public interface IBundleRepository
     /// <param name="messageCategory"></param>
     /// <param name="cancellationToken"></param>
     Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId actorMessageQueueId, MessageCategory messageCategory, CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<Bundle>> GetBundlesToCloseAsync(CancellationToken cancellationToken);
 }

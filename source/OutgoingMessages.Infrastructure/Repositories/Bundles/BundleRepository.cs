@@ -38,6 +38,11 @@ public class BundleRepository(
         _dbContext.Bundles.Add(bundle);
     }
 
+    public void Add(IList<Bundle> bundles)
+    {
+        _dbContext.Bundles.AddRange(bundles);
+    }
+
     public void Delete(IReadOnlyCollection<Bundle> bundles)
     {
         _dbContext.Bundles.RemoveRange(bundles);
@@ -73,7 +78,7 @@ public class BundleRepository(
                     b.BusinessReason == businessReason &&
                     b.RelatedToMessageId == relatedToMessageId &&
                     b.ClosedAt == null)
-            .OrderByDescending(b => b.Created)
+            .OrderBy(b => b.Created)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -87,16 +92,12 @@ public class BundleRepository(
         // Get oldest bundle that is:
         // - In the given actor message queue
         // - Not dequeued
-        // - Already closed or is created more than "BundleDurationInMinutes" minutes ago
-        var closeBundlesCreatedBefore = _clock
-            .GetCurrentInstant()
-            .Minus(Duration.FromMinutes(_options.BundleDurationInMinutes));
-
+        // - Closed
         var query = _dbContext.Bundles.Where(
             b =>
                 b.ActorMessageQueueId == actorMessageQueueId &&
                 b.DequeuedAt == null &&
-                (b.ClosedAt != null || b.Created <= closeBundlesCreatedBefore));
+                b.ClosedAt != null);
 
         if (messageCategory != MessageCategory.None)
             query = query.Where(b => b.MessageCategory == messageCategory);
@@ -107,5 +108,22 @@ public class BundleRepository(
             .ConfigureAwait(false);
 
         return oldestBundle;
+    }
+
+    public async Task<IReadOnlyCollection<Bundle>> GetBundlesToCloseAsync(CancellationToken cancellationToken)
+    {
+        var closeBundlesCreatedBefore = _clock
+            .GetCurrentInstant()
+            .Minus(Duration.FromMinutes(_options.BundleDurationInMinutes));
+
+        var bundlesToClose = await _dbContext.Bundles
+            .Where(
+                b =>
+                    b.ClosedAt == null &&
+                    b.Created <= closeBundlesCreatedBefore)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return bundlesToClose;
     }
 }
