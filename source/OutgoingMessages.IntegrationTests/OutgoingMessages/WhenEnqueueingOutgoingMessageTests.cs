@@ -162,6 +162,7 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
         {
             () => Assert.NotNull(bundleFromDatabase.RecordId),
             () => Assert.NotNull(bundleFromDatabase.Id),
+            () => Assert.NotNull(bundleFromDatabase.RowVersion),
             () => Assert.Equal(bundleFromDatabase.ActorMessageQueueId, expectedActorMessageQueueId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, bundleFromDatabase.DocumentTypeInBundle),
             () => Assert.Equal(1, bundleFromDatabase.MessageCount),
