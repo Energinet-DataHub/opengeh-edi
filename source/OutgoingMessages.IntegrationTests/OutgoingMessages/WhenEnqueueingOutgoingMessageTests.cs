@@ -325,11 +325,8 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
     {
         // TODO: Should this test be deleted?
         // Arrange
-        var actorMessageQueueId = Guid.NewGuid();
-        var existingBundleId = Guid.NewGuid();
         var receiverId = ActorNumber.Create("1234567891912");
         var receiverRole = ActorRole.MeteredDataAdministrator;
-        var maxMessageCount = 3;
         var message1RelatedTo = MessageId.New();
         var message2RelatedTo = MessageId.New();
         var message3RelatedTo = MessageId.New();
@@ -350,18 +347,6 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
             .WithRelationTo(message3RelatedTo)
             .Build();
 
-        // We have to manually create the queue and bundle to ensure that the bundle has a maxMessageCount
-        // such that we do not close the bundle when we enqueue the first message
-        await CreateActorMessageQueueInDatabase(actorMessageQueueId, receiverId, receiverRole);
-        await CreateBundleInDatabase(
-            existingBundleId,
-            actorMessageQueueId,
-            message1.DocumentType,
-            MessageCategory.Aggregations,
-            message1.BusinessReason,
-            maxMessageCount,
-            message1RelatedTo);
-
         // Act
         var createdIdMessage1 = await EnqueueAndCommitAsync(message1);
         var createdIdMessage2 = await EnqueueAndCommitAsync(message2);
@@ -372,11 +357,7 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
         var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
         var bundleIdForMessage3 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage3);
 
-        Assert.Equal(existingBundleId, bundleIdForMessage1); // This is not correct as long as bundling is disabled
-        Assert.NotEqual(existingBundleId, bundleIdForMessage2);
-        Assert.NotEqual(existingBundleId, bundleIdForMessage3);
-
-        Assert.NotEqual(bundleIdForMessage2, bundleIdForMessage3);
+        Assert.Distinct([bundleIdForMessage1, bundleIdForMessage2, bundleIdForMessage3]);
     }
 
     /// <summary>
