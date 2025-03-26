@@ -228,13 +228,13 @@ internal sealed class EdiDatabaseDriver
                     [AssignedBundleId],
                     [RelatedToMessageId]
                  FROM [OutgoingMessages]
-                    WHERE ([DocumentType] = @DocumentTypeInBundle)
+                    WHERE ([DocumentType] = @DocumentType)
                         AND [EventId] = @EventId 
                  """,
             param: new
             {
                 DocumentType = DocumentType.NotifyValidatedMeasureData.Name,
-                @EventId = eventId,
+                EventId = eventId,
             });
 
         return enqueuedMessages.ToList();
