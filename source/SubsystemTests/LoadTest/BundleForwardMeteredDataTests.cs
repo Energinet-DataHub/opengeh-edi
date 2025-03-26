@@ -23,6 +23,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
 {
     private const string AverageBundleTimeMetric = "AverageBundleTime";
+    private const string OriginalActorMessageIdPrefix = "bundle_perf_test_"; // Used to clean up previous test messages before running new test
 
     private readonly LoadTestFixture _fixture;
     private readonly ITestOutputHelper _testOutputHelper;
@@ -44,7 +45,6 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
 
         const int messagesToEnqueueCount = 10000;
 
-        const string originalActorMessageIdPrefix = "bundle_perf_test_"; // Used to clean up previous test messages before running new test
         var eventId = Guid.NewGuid(); // Used to find the enqueued outgoing messages in the databse
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
@@ -60,7 +60,7 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
                         actor: receiver,
                         start: start,
                         end: end,
-                        originalActorMessageId: originalActorMessageIdPrefix + i,
+                        originalActorMessageId: OriginalActorMessageIdPrefix + i,
                         eventId: eventId);
                     return task;
                 })
@@ -129,6 +129,6 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
 
     private async Task CleanUp()
     {
-        await _ediDatabaseDriver.MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync(CancellationToken.None);
+        await _ediDatabaseDriver.MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync(OriginalActorMessageIdPrefix, CancellationToken.None);
     }
 }
