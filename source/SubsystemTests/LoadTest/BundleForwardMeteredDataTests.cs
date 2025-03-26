@@ -45,38 +45,35 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
 
         const int messagesToEnqueueCount = 10000;
 
-        var eventId = Guid.NewGuid(); // Used to find the enqueued outgoing messages in the databse
+        var eventId = Guid.NewGuid(); // Used to find the enqueued outgoing messages in the database
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var start = Instant.FromUtc(2024, 12, 31, 23, 00, 00);
         var end = start.Plus(Duration.FromDays(7));
 
-        // Add enqueue messages to EDI service bus topic
-        var tasks = Enumerable.Range(0, messagesToEnqueueCount)
-            .Select(
-                i =>
-                {
-                    var task = _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataRequestAsync(
-                        actor: receiver,
-                        start: start,
-                        end: end,
-                        originalActorMessageId: OriginalActorMessageIdPrefix + i,
-                        eventId: eventId);
-                    return task;
-                })
-            .ToList();
+        // Add all enqueue messages to EDI service bus topic
 
-        // Wait for all enqueue messages to be added to the service bus
-        await Task.WhenAll(tasks);
+        // Start stopwatch here, since as soon as the first service bus message is sent, EDI starts enqueueing messages.
+        var stopwatch = Stopwatch.StartNew();
 
-        // Wait for all messages to be enqueued
-        var timeout = TimeSpan.FromMinutes(5);
+        await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataRequestsAsync(
+            Enumerable.Range(0, messagesToEnqueueCount)
+                .Select(i => (
+                    Actor: receiver,
+                    Start: start,
+                    End: end,
+                    OriginalActorMessageId: OriginalActorMessageIdPrefix + i,
+                    EventId: eventId))
+                .ToList());
+
+        // Wait for all messages to be enqueued (with a timeout)
+        var timeout = TimeSpan.FromMinutes(10);
         var timeoutCancellationToken = new CancellationTokenSource(timeout).Token;
 
-        var stopwatch = Stopwatch.StartNew();
         List<EdiDatabaseDriver.OutgoingMessageDto> enqueuedMessages = [];
         while (!timeoutCancellationToken.IsCancellationRequested)
         {
+            var previousCount = enqueuedMessages.Count;
             // Get outgoing messages & bundles from database
             enqueuedMessages = await _ediDatabaseDriver.GetNotifyValidatedMeasureDataMessagesFromLoadTestAsync(eventId);
 
@@ -86,7 +83,10 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
                 messagesToEnqueueCount,
                 stopwatch.Elapsed);
 
-            if (enqueuedMessages.Count >= messagesToEnqueueCount || timeoutCancellationToken.IsCancellationRequested)
+            var enqueuedMessagesCount = enqueuedMessages.Count;
+            var finishedEnqueueing = enqueuedMessagesCount >= messagesToEnqueueCount;
+            var stoppedEnqueuing = enqueuedMessagesCount == previousCount;
+            if (finishedEnqueueing || stoppedEnqueuing || timeoutCancellationToken.IsCancellationRequested)
                 break;
 
             await Task.Delay(TimeSpan.FromSeconds(30));
@@ -125,6 +125,8 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
             () => Assert.Equal(messagesToEnqueueCount, enqueuedMessages.Count),
             () => Assert.True(bundles.Count is 5 or 6, $"Messages should be enqueued in 5 or 6 bundles, but was {bundles.Count}"),
             () => Assert.True(enqueueTime < TimeSpan.FromMinutes(5), $"Enqueue time should be less than 5 minutes, but was {enqueueTime:g}"));
+
+        await CleanUp();
     }
 
     private async Task CleanUp()

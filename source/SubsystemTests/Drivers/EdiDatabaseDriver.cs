@@ -288,10 +288,10 @@ internal sealed class EdiDatabaseDriver
         Guid ActorMessageQueueId,
         int MessageCount,
         string RelatedToMessageId,
-        DateTimeOffset? ClosedAt);
+        DateTime? ClosedAt);
 
     public record OutgoingMessageDto(
-        DateTimeOffset CreatedAt,
+        DateTime CreatedAt,
         Guid AssignedBundleId,
         string RelatedToMessageId);
 }

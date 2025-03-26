@@ -64,7 +64,7 @@ public class BundleRepository(
         MessageId? relatedToMessageId,
         CancellationToken cancellationToken)
     {
-        // TODO: Can we assume there will always only be one bundle (.Single() instead of .First())?
+        // This query should be covered by the "IX_Bundles_OpenBundle" index
         return _dbContext.Bundles
             .Where(
                 b =>
@@ -82,6 +82,8 @@ public class BundleRepository(
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
+        // This query should be covered by the "IX_Bundles_OldestBundle" index
+
         // Get oldest bundle that is:
         // - In the given actor message queue
         // - Not dequeued

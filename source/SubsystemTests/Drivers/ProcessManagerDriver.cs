@@ -53,19 +53,22 @@ internal class ProcessManagerDriver(
         await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
     }
 
-    internal async Task PublishEnqueueBrs021AcceptedForwardMeteredDataRequestAsync(
-        Actor actor,
-        Instant start,
-        Instant end,
-        string originalActorMessageId,
-        Guid eventId)
+    internal async Task PublishEnqueueBrs021AcceptedForwardMeteredDataRequestsAsync(
+        List<(
+            Actor Actor,
+            Instant Start,
+            Instant End,
+            string OriginalActorMessageId,
+            Guid EventId)> messages)
     {
-        var message = EnqueueBrs021ForwardMeteredDataFactory.CreateAcceptedV1(
-            actor,
-            start,
-            end,
-            originalActorMessageId,
-            eventId);
-        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        var serviceBusMessages = messages
+            .Select(m => EnqueueBrs021ForwardMeteredDataFactory.CreateAcceptedV1(
+                m.Actor,
+                m.Start,
+                m.End,
+                m.OriginalActorMessageId,
+                m.EventId))
+            .ToList();
+        await _client.SendAsync(serviceBusMessages, CancellationToken.None).ConfigureAwait(false);
     }
 }
