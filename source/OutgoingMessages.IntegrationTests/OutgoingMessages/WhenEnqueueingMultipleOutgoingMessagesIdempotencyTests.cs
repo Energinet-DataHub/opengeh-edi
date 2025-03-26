@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -117,13 +118,32 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             end: end,
             relatedToMessageId: relatedToMessageId2);
 
+        // Need to create a bundle up front, else an exception will be thrown when trying to create the same bundle for both messages.
+        // The easiest way to do that, is just to enqueue another message, to the same receiver, before running the tests
+        using (var setupScope = ServiceProvider.CreateScope())
+        {
+            var existingMessage = CreateAcceptedForwardMeteredDataMessage(
+                externalId: new ExternalId(Guid.NewGuid()), // Using a new external id, so the messages are not the same (idempotency check)
+                receiver: receiver,
+                start: start,
+                end: end,
+                relatedToMessageId: MessageId.New());
+
+            var setupOutgoingMessagesClient = setupScope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+            var setupDbContext = setupScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+            await setupOutgoingMessagesClient.EnqueueAsync(existingMessage, CancellationToken.None);
+            await setupDbContext.SaveChangesAsync(CancellationToken.None);
+        }
+
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var dbContext = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
-        var unitOfWork = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
 
-        var act = () => unitOfWork.SaveChangesAsync(CancellationToken.None);
+        var act = () => dbContext.SaveChangesAsync(CancellationToken.None);
 
         await act.Should()
             .ThrowExactlyAsync<DbUpdateException>()
@@ -157,10 +177,15 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             relatedToMessageId: relatedToMessageId2);
 
         // When enqueueing the messages
+
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // We need to save changes between enqueues to not fail on unique index for bundling
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
@@ -204,9 +229,13 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // We need to save changes between enqueues to not fail on unique index for bundling
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
@@ -250,9 +279,13 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // We need to save changes between enqueues to not fail on unique index for bundling
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
@@ -298,9 +331,13 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // We need to save changes between enqueues to not fail on unique index for bundling
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Then both messages are enqueued
@@ -340,9 +377,13 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         // Act
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // We need to save changes between enqueues to not fail on unique index for bundling
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Assert

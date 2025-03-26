@@ -70,13 +70,6 @@ public class PeekMessage
         _telemetryClient = telemetryClient;
     }
 
-    private enum CloseBundleResult
-    {
-        NoBundleExists,
-        BundleClosed,
-        BundleWasAlreadyClosed,
-    }
-
     public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
