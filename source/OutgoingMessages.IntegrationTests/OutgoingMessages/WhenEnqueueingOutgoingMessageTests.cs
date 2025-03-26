@@ -322,6 +322,7 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
     [Fact]
     public async Task Rejected_energy_result_outgoing_messages_with_different_relatedTo_ids_are_assigned_to_different_bundles()
     {
+        // TODO: Should this test be deleted?
         // Arrange
         var actorMessageQueueId = Guid.NewGuid();
         var existingBundleId = Guid.NewGuid();

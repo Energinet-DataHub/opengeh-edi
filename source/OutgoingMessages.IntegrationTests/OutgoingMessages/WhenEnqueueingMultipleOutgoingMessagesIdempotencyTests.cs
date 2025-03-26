@@ -177,7 +177,6 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             relatedToMessageId: relatedToMessageId2);
 
         // When enqueueing the messages
-
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
