@@ -43,4 +43,9 @@ public class Receiver : ValueObject
     {
         return new Receiver(actor.ActorNumber, actor.ActorRole);
     }
+
+    public Actor ToActor()
+    {
+        return new Actor(Number, ActorRole);
+    }
 }

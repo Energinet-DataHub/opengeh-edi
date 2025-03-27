@@ -121,7 +121,7 @@ public class OutgoingMessageRepository(
 
     public async Task<IReadOnlyCollection<OutgoingMessage>> GetMessagesForBundleAsync(
         Receiver receiver,
-        string businessReason,
+        BusinessReason businessReason,
         DocumentType documentType,
         MessageId? relatedToMessageId,
         CancellationToken cancellationToken)
@@ -131,7 +131,7 @@ public class OutgoingMessageRepository(
                 && om.Receiver.Number == receiver.Number
                 && om.Receiver.ActorRole == receiver.ActorRole
                 && om.DocumentType == documentType
-                && om.BusinessReason == businessReason);
+                && om.BusinessReason == businessReason.Name);
 
         if (relatedToMessageId != null)
             query = query.Where(om => om.RelatedToMessageId == relatedToMessageId);

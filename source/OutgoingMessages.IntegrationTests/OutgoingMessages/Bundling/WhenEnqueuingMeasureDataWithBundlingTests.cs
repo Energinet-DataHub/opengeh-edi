@@ -61,7 +61,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
     [Theory]
     [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
-    public async Task Given_EnqueuedTwoMessageForSameBundle_When_BundlingMessages_Then_BothMessageAreInTheSameBundle_AndThen_BundleHasCorrectCount(
+    public async Task Given_EnqueuedTwoMessageForSameBundle_When_BundleMessages_Then_BothMessageAreInTheSameBundle_AndThen_BundleHasCorrectCount(
         Func<Actor, OutgoingMessageDto> messageBuilder)
     {
         // Given existing bundle
@@ -107,27 +107,74 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.All(outgoingMessages, om => Assert.Equal(bundle.Id, om.AssignedBundleId)));
     }
 
-    [Fact]
-    public async Task Given_EnqueuedMultipleMessagesToDifferentReceivers_When_BundleMessages_Then_AllMessagesAreBundlesInCorrectBundles()
+    [Theory]
+    [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
+    public async Task Given_EnqueuedTwoMessageForDifferentBundles_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage(
+        Func<Actor, OutgoingMessageDto> messageBuilder)
     {
+        // Given existing bundle
         var receiver1 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var receiver2 = new Actor(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
 
-        // Create actor message queue for actor
+        // - Create two message for same bundle
+        var message1 = messageBuilder(receiver1);
+        var message2 = messageBuilder(receiver2);
+
+        // - Enqueue messages "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        await EnqueueAndCommitMessage(message1, useNewScope: false);
+        await EnqueueAndCommitMessage(message2, useNewScope: false);
+
+        // When creating bundles
+        // - Move clock to when bundles should be created
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Create bundles
+        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
+        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+
+        // Then a bundle is created for each message
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var outgoingMessages = await dbContext.OutgoingMessages
+            .ToListAsync();
+
+        var bundles = await dbContext.Bundles
+            .ToListAsync();
+
+        // - Two bundles are created, each having 1 message.
+        Assert.Multiple(
+            () => Assert.Equal(2, bundles.Count),
+            () => Assert.NotEqual(outgoingMessages[0].AssignedBundleId, outgoingMessages[1].AssignedBundleId),
+            () => Assert.All(bundles, b => Assert.Single(outgoingMessages, om => om.AssignedBundleId == b.Id)));
+    }
+
+    [Fact]
+    public async Task Given_MessagesEnqueuedForTwoDifferentReceivers_When_BundleMessages_Then_AllMessagesAreInCorrectBundles()
+    {
+        // Given messages enqueued for two different receivers
+        var receiver1 = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
+        var receiver2 = Receiver.Create(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
+
+        // - Create actor message queue for receivers
         using (var setupScope = ServiceProvider.CreateScope())
         {
             var amqContext = setupScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
-            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(Receiver.Create(receiver1)));
-            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(Receiver.Create(receiver2)));
+            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(receiver1));
+            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(receiver2));
             await amqContext.SaveChangesAsync();
         }
 
+        // - Create messages for receivers
         var eventId = EventId.From(Guid.NewGuid());
         var startTime = Instant.FromUtc(2024, 03, 21, 23, 00, 00);
         const int bundleSize = 2000;
         const int receiver1MessageCount = 7234; // 4 bundles for receiver 1
         var receiver1BundleCount = (int)Math.Ceiling((double)receiver1MessageCount / bundleSize);
-        const int receiver2MessageCount = 1689; // 1 bundle for receiver 2
+        const int receiver2MessageCount = 1111; // 1 bundle for receiver 2
         var receiver2BundleCount = (int)Math.Ceiling((double)receiver2MessageCount / bundleSize);
         const int totalMessageCount = receiver1MessageCount + receiver2MessageCount;
         var totalBundleCount = receiver1BundleCount + receiver2BundleCount;
@@ -142,7 +189,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     return new AcceptedForwardMeteredDataMessageDto(
                         eventId: eventId,
                         externalId: new ExternalId(Guid.NewGuid()),
-                        receiver: receiver,
+                        receiver: receiver.ToActor(),
                         businessReason: BusinessReason.PeriodicMetering,
                         relatedToMessageId: MessageId.New(),
                         series: new ForwardMeteredDataMessageSeriesDto(
@@ -163,10 +210,11 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                 })
             .ToList();
 
-        // When enqueueing the messages concurrently
+        // - Set messages created at to "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
         _clockStub.SetCurrentInstant(now);
 
+        // - Enqueue messages for receivers
         var enqueueStopwatch = Stopwatch.StartNew();
         var enqueuedMessagesCount = await EnqueueMessages(
             messagesToEnqueue: messagesToEnqueue);
@@ -187,7 +235,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         await bundleMessages.BundleMessagesAsync(CancellationToken.None);
         bundleStopwatch.Stop();
 
-        // Then all messages are enqueued & 3 bundles created
+        // Then all messages are in correct bundles
         await using var scope = ServiceProvider.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
 
@@ -210,31 +258,55 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             bundleStopwatch.Elapsed.Minutes,
             bundleStopwatch.Elapsed.Seconds,
             bundleStopwatch.Elapsed.Milliseconds);
+
         Assert.Multiple(
-            () => Assert.Equal(totalMessageCount, outgoingMessages.SelectMany(om => om.Value).Count()),
-            () => Assert.DoesNotContain(outgoingMessages, om => om.Key == nullBundleKey),
-            () => Assert.Equal(totalBundleCount, bundles.Count),
+            () => Assert.Equal(totalMessageCount, outgoingMessages.SelectMany(om => om.Value).Count()), // All messages are enqueued
+            () => Assert.DoesNotContain(outgoingMessages, om => om.Key == nullBundleKey), // All messages are assigned a bundle
+            () => Assert.Equal(totalBundleCount, bundles.Count), // The created bundle count is as expected
             () => Assert.Collection(
                 bundles.OrderByDescending(b => outgoingMessages[b.Id].Count),
+                // The outgoing messages are in the correct bundles
                 b =>
                 {
-                    Assert.True(outgoingMessages[b.Id].Count == bundleSize, $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                    // 2000 messages for receiver 1
+                    Assert.Multiple(
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
+                        () => Assert.True(
+                            outgoingMessages[b.Id].Count == bundleSize,
+                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"));
                 },
                 b =>
                 {
-                    Assert.True(outgoingMessages[b.Id].Count == bundleSize, $"2nd bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                    // 2000 messages for receiver 1
+                    Assert.Multiple(
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
+                        () => Assert.True(
+                            outgoingMessages[b.Id].Count == bundleSize,
+                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"));
                 },
                 b =>
                 {
-                    Assert.True(outgoingMessages[b.Id].Count == bundleSize, $"3rd bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                    // 2000 messages for receiver 1
+                    Assert.Multiple(
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
+                        () => Assert.True(
+                            outgoingMessages[b.Id].Count == bundleSize,
+                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"));
                 },
                 b =>
                 {
-                    Assert.True(outgoingMessages[b.Id].Count == receiver2MessageCount % bundleSize, $"4th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                    // 1234 messages for receiver 1
+                    Assert.Multiple(
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
+                        () => Assert.True(
+                            outgoingMessages[b.Id].Count == receiver1MessageCount % bundleSize,
+                            $"4th bundle count should be {receiver1MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}"));
                 },
                 b =>
                 {
-                    Assert.True(outgoingMessages[b.Id].Count == receiver1MessageCount % bundleSize, $"5th bundle count should be {receiver1MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                    // 1111 messages for receiver 2
+                    Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver));
+                    Assert.True(outgoingMessages[b.Id].Count == receiver1MessageCount % bundleSize, $"5th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
                 }));
     }
 

@@ -48,64 +48,16 @@ public class BundleMessages(
 
         foreach (var bundleGrouping in bundlesToCreateWithoutRelatedToMessageId)
         {
-            // TODO: This could add a message to a service bus, and handle this async separately in a service bus trigger.
-            // This would increase scaling, instead of creating all bundles in a single transaction.
+            // TODO: This loop could instead add a message to a service bus, and create bundles async separately in
+            // a service bus trigger. This would increase scaling, instead of creating all bundles in a single transaction.
             using var scope = _serviceScopeFactory.CreateScope();
-
-            var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
-            var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(actorMessageQueueRepository, bundleGrouping.Key.Receiver, _logger, cancellationToken)
-                    .ConfigureAwait(false);
-
-            var outgoingMessageRepository = scope.ServiceProvider.GetRequiredService<IOutgoingMessageRepository>();
-            var outgoingMessages = await outgoingMessageRepository
-                .GetMessagesForBundleAsync(
-                    receiver: bundleGrouping.Key.Receiver,
-                    businessReason: bundleGrouping.Key.BusinessReason,
-                    documentType: bundleGrouping.Key.DocumentType,
-                    relatedToMessageId: null,
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            _logger.LogInformation(
-                "Creating bundles for {OutgoingMessagesCount} messages for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
-                outgoingMessages.Count,
-                bundleGrouping.Key.Receiver.Number.Value,
-                bundleGrouping.Key.Receiver.ActorRole.Name,
-                bundleGrouping.Key.DocumentType.Name);
-
-            var bundlesToCreate = new List<Bundle>();
-
-            var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
-            while (outgoingMessagesList.Count > 0)
-            {
-                const int bundleSize = 2000;
-                var outgoingMessagesForBundle = outgoingMessagesList
-                    .Take(bundleSize)
-                    .ToList();
-
-                var bundle = CreateBundle(
-                    actorMessageQueueId,
+            var bundlesToCreate = await BundleMessagesForAsync(
+                    scope,
+                    bundleGrouping.Key.Receiver,
                     BusinessReason.FromName(bundleGrouping.Key.BusinessReason),
                     bundleGrouping.Key.DocumentType,
-                    relatedToMessageId: null);
-                bundlesToCreate.Add(bundle);
-
-                foreach (var outgoingMessage in outgoingMessagesForBundle)
-                {
-                    outgoingMessage.AssignToBundle(bundle.Id);
-                }
-
-                bundle.Close(_clock.GetCurrentInstant());
-
-                outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count());
-            }
-
-            _logger.LogInformation(
-                "Creating {BundleCount} bundles for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
-                bundlesToCreate.Count,
-                bundleGrouping.Key.Receiver.Number.Value,
-                bundleGrouping.Key.Receiver.ActorRole.Name,
-                bundleGrouping.Key.DocumentType.Name);
+                    cancellationToken)
+                .ConfigureAwait(false);
 
             var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
             bundleRepository.Add(bundlesToCreate);
@@ -117,7 +69,76 @@ public class BundleMessages(
         return messagesReadyToBeBundled.Count;
     }
 
-    private static async Task<ActorMessageQueueId> GetMessageQueueIdForReceiverAsync(
+    private async Task<List<Bundle>> BundleMessagesForAsync(
+        IServiceScope scope,
+        Receiver receiver,
+        BusinessReason businessReason,
+        DocumentType documentType,
+        CancellationToken cancellationToken)
+    {
+        var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
+        var actorMessageQueueId = await GetActorMessageQueueIdForReceiverAsync(
+                actorMessageQueueRepository,
+                receiver,
+                _logger,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        var outgoingMessageRepository = scope.ServiceProvider.GetRequiredService<IOutgoingMessageRepository>();
+        var outgoingMessages = await outgoingMessageRepository
+            .GetMessagesForBundleAsync(
+                receiver: receiver,
+                businessReason: businessReason,
+                documentType: documentType,
+                relatedToMessageId: null,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        _logger.LogInformation(
+            "Creating bundles for {OutgoingMessagesCount} messages for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
+            outgoingMessages.Count,
+            receiver.Number.Value,
+            receiver.ActorRole.Name,
+            documentType.Name);
+
+        var bundlesToCreate = new List<Bundle>();
+
+        var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
+        while (outgoingMessagesList.Count > 0)
+        {
+            const int bundleSize = 2000;
+            var outgoingMessagesForBundle = outgoingMessagesList
+                .Take(bundleSize)
+                .ToList();
+
+            var bundle = CreateBundle(
+                actorMessageQueueId,
+                businessReason,
+                documentType,
+                relatedToMessageId: null);
+            bundlesToCreate.Add(bundle);
+
+            foreach (var outgoingMessage in outgoingMessagesForBundle)
+            {
+                outgoingMessage.AssignToBundle(bundle.Id);
+            }
+
+            bundle.Close(_clock.GetCurrentInstant());
+
+            outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count());
+        }
+
+        _logger.LogInformation(
+            "Creating {BundleCount} bundles for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
+            bundlesToCreate.Count,
+            receiver.Number.Value,
+            receiver.ActorRole.Name,
+            documentType.Name);
+
+        return bundlesToCreate;
+    }
+
+    private async Task<ActorMessageQueueId> GetActorMessageQueueIdForReceiverAsync(
         IActorMessageQueueRepository actorMessageQueueRepository,
         Receiver receiver,
         ILogger logger,

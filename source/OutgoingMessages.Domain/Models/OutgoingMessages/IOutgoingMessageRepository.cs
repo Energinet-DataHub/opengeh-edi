@@ -49,7 +49,7 @@ public interface IOutgoingMessageRepository
 
     public Task<IReadOnlyCollection<OutgoingMessage>> GetMessagesForBundleAsync(
         Receiver receiver,
-        string businessReason,
+        BusinessReason businessReason,
         DocumentType documentType,
         MessageId? relatedToMessageId,
         CancellationToken cancellationToken);

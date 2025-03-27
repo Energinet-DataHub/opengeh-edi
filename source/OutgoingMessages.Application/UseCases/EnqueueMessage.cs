@@ -69,14 +69,17 @@ public class EnqueueMessage
         if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
             return existingMessage.Id;
 
-        var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
-                messageToEnqueue.GetActorMessageQueueMetadata(),
-                cancellationToken)
-            .ConfigureAwait(false);
-
         var maxBundleSize = GetMaxBundleSize(messageToEnqueue.DocumentType);
-        if (maxBundleSize == 1) // If max bundle size is 1, the bundle can be created & closed immediately
+        if (maxBundleSize == 1)
+        {
+            // If max bundle size is 1, then a bundle can be created & closed immediately
+            var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
+                    messageToEnqueue.GetActorMessageQueueMetadata(),
+                    cancellationToken)
+                .ConfigureAwait(false);
+
             CreateAndCloseBundle(messageToEnqueue, actorMessageQueueId);
+        }
 
         // Add to outgoing message repository (and upload to file storage) after adding actor message queue and bundle,
         // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
