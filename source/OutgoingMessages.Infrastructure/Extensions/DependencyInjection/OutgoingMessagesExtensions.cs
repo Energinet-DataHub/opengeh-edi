@@ -147,6 +147,12 @@ public static class OutgoingMessagesExtensions
             .AddHealthChecks()
                 .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
 
+        // Bundling
+        services
+            .AddOptions<BundlingOptions>()
+            .BindConfiguration(BundlingOptions.SectionName)
+            .ValidateDataAnnotations();
+
         return services;
     }
 }

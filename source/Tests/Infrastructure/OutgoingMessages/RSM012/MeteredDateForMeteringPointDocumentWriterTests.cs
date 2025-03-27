@@ -48,7 +48,7 @@ public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFi
         // Act
         var document = await WriteDocument(
             messageBuilder.BuildHeader(),
-            messageBuilder.BuildMeteredDataForMeteringPoint(),
+            [messageBuilder.BuildMeteredDataForMeteringPoint()],
             DocumentFormat.FromName(documentFormat));
 
         // Assert
@@ -96,7 +96,7 @@ public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFi
         // Act
         var document = await WriteDocument(
             messageBuilder.BuildHeader(),
-            messageBuilder.BuildMinimalMeteredDataForMeteringPoint(),
+            [messageBuilder.BuildMinimalMeteredDataForMeteringPoint()],
             DocumentFormat.FromName(documentFormat));
 
         // Assert
@@ -149,7 +149,7 @@ public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFi
         // Act
         var document = await WriteDocument(
             messageBuilder.BuildHeader(),
-            null,
+            [],
             DocumentFormat.FromName(documentFormat));
 
         // Assert
@@ -165,26 +165,98 @@ public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFi
             .DocumentIsValidAsync();
     }
 
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    public async Task Can_create_multiple_series_notifyValidatedMeasureData_document(string documentFormat)
+    {
+        // Arrange
+        var messageBuilder = _meteredDateForMeteringPointBuilder;
+
+        var expectedSeriesValues = new List<(TransactionId TransactionId, IReadOnlyList<PointActivityRecord> Points)>
+        {
+            (TransactionId.New(), SampleData.Points),
+            (TransactionId.New(), [new PointActivityRecord(1, Quality.NotAvailable, null)]),
+            (TransactionId.New(), [
+                new PointActivityRecord(1, null, 1.04m),
+                new PointActivityRecord(2, null, 1.07m),
+            ]),
+        };
+
+        // Act
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            expectedSeriesValues.Select(
+                    v => messageBuilder.BuildMeteredDataForMeteringPoint(
+                        v.TransactionId,
+                        v.Points))
+                .ToList(),
+            DocumentFormat.FromName(documentFormat));
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+
+        var asserter = AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .MessageIdExists()
+            .HasBusinessReason(SampleData.BusinessReason.Code)
+            .HasSenderId(SampleData.SenderActorNumber, "A10")
+            .HasSenderRole(SampleData.SenderActorRole)
+            .HasReceiverId(SampleData.ReceiverActorNumber, "A10")
+            .HasReceiverRole(SampleData.ReceiverActorRole)
+            .HasTimestamp(SampleData.TimeStamp.ToString());
+
+        for (var i = 0; i < expectedSeriesValues.Count; i++)
+        {
+            var seriesIndex = i + 1;
+            var expectedSeriesValue = expectedSeriesValues[i];
+            asserter = asserter
+                .HasTransactionId(seriesIndex, expectedSeriesValue.TransactionId)
+                .HasMeteringPointNumber(seriesIndex, SampleData.MeteringPointNumber, "A10")
+                .HasMeteringPointType(seriesIndex, SampleData.MeteringPointType)
+                .HasOriginalTransactionIdReferenceId(seriesIndex, SampleData.OriginalTransactionIdReferenceId?.Value)
+                .HasProduct(seriesIndex, SampleData.Product)
+                .HasQuantityMeasureUnit(seriesIndex, SampleData.QuantityMeasureUnit.Code)
+                .HasRegistrationDateTime(seriesIndex, SampleData.RegistrationDateTime.ToString())
+                .HasResolution(seriesIndex, SampleData.Resolution.Code)
+                .HasStartedDateTime(
+                    seriesIndex,
+                    SampleData.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+                .HasEndedDateTime(
+                    seriesIndex,
+                    SampleData.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+                .HasPoints(
+                    seriesIndex,
+                    expectedSeriesValue.Points
+                        .Select(
+                            p => new AssertPointDocumentFieldsInput(
+                                new RequiredPointDocumentFields(p.Position),
+                                new OptionalPointDocumentFields(p.Quality, p.Quantity)))
+                        .ToList());
+        }
+
+        await asserter.DocumentIsValidAsync();
+    }
+
     private Task<MarketDocumentStream> WriteDocument(
         OutgoingMessageHeader header,
-        MeteredDateForMeteringPointMarketActivityRecord? meteredDateForMeteringPointMarketActivityRecord,
+        List<MeteredDateForMeteringPointMarketActivityRecord> meteredDateForMeteringPointMarketActivityRecord,
         DocumentFormat documentFormat)
     {
-        var records = meteredDateForMeteringPointMarketActivityRecord is null
-            ? null
-            : _parser.From(meteredDateForMeteringPointMarketActivityRecord);
+        var records = meteredDateForMeteringPointMarketActivityRecord
+            .Select(_parser.From)
+            .ToList();
 
         if (documentFormat == DocumentFormat.Xml)
         {
             return new MeteredDateForMeteringPointCimXmlDocumentWriter(_parser)
-                .WriteAsync(header, records is null ? [] : [records]);
+                .WriteAsync(header, records);
         }
 
         var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
         return new MeteredDateForMeteringPointCimJsonDocumentWriter(
                 _parser,
                 serviceProvider.GetRequiredService<JavaScriptEncoder>())
-            .WriteAsync(header, records is null ? [] : [records], CancellationToken.None);
+            .WriteAsync(header, records, CancellationToken.None);
     }
 
     private IAssertMeteredDateForMeteringPointDocumentDocument AssertDocument(

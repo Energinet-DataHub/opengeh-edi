@@ -16,14 +16,22 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 
-public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepository
+public class BundleRepository(
+    ActorMessageQueueContext dbContext,
+    IClock clock,
+    IOptions<BundlingOptions> options)
+        : IBundleRepository
 {
     private readonly ActorMessageQueueContext _dbContext = dbContext;
+    private readonly IClock _clock = clock;
+    private readonly BundlingOptions _options = options.Value;
 
     public void Add(Bundle bundle)
     {
@@ -49,26 +57,55 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
             .ConfigureAwait(false);
     }
 
+    public Task<Bundle?> GetOpenBundleAsync(
+        DocumentType documentType,
+        BusinessReason businessReason,
+        ActorMessageQueueId actorMessageQueueId,
+        MessageId? relatedToMessageId,
+        CancellationToken cancellationToken)
+    {
+        // This query should be covered by the "IX_Bundles_OpenBundle" index
+        return _dbContext.Bundles
+            .Where(
+                b =>
+                    b.ActorMessageQueueId == actorMessageQueueId &&
+                    b.DocumentTypeInBundle == documentType &&
+                    b.BusinessReason == businessReason &&
+                    b.RelatedToMessageId == relatedToMessageId &&
+                    b.ClosedAt == null)
+            .OrderByDescending(b => b.Created)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<Bundle?> GetOldestBundleAsync(
-        ActorMessageQueueId id,
+        ActorMessageQueueId actorMessageQueueId,
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
-        if (messageCategory == MessageCategory.None)
-        {
-            return await _dbContext.Bundles.Where(b =>
-                b.ActorMessageQueueId == id &&
-                b.DequeuedAt == null)
-                .OrderBy(b => b.Created)
-                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
-        }
+        // This query should be covered by the "IX_Bundles_OldestBundle" index
 
-        return await _dbContext.Bundles.Where(b =>
-                                                   b.ActorMessageQueueId == id &&
-                                                   b.DequeuedAt == null &&
-                                                   b.MessageCategory == messageCategory)
-                                                   .OrderBy(b => b.Created)
-                                                   .FirstOrDefaultAsync(cancellationToken)
-                                                   .ConfigureAwait(false);
+        // Get oldest bundle that is:
+        // - In the given actor message queue
+        // - Not dequeued
+        // - Already closed or is created more than "BundleDurationInMinutes" minutes ago
+        var closeBundlesCreatedBefore = _clock
+            .GetCurrentInstant()
+            .Minus(Duration.FromMinutes(_options.BundleDurationInMinutes));
+
+        var query = _dbContext.Bundles.Where(
+            b =>
+                b.ActorMessageQueueId == actorMessageQueueId &&
+                b.DequeuedAt == null &&
+                (b.ClosedAt != null || b.Created <= closeBundlesCreatedBefore));
+
+        if (messageCategory != MessageCategory.None)
+            query = query.Where(b => b.MessageCategory == messageCategory);
+
+        var oldestBundle = await query
+            .OrderBy(b => b.Created)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return oldestBundle;
     }
 }

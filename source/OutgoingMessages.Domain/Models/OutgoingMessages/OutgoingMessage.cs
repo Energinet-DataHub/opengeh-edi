@@ -33,7 +33,7 @@ public class OutgoingMessage
         Receiver receiver,
         Receiver documentReceiver,
         Guid? processId,
-        string businessReason,
+        string businessReason, // TODO: Make typed
         string serializedContent,
         Instant createdAt,
         ProcessType messageCreatedFromProcess,

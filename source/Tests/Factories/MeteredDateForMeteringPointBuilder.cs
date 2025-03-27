@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
@@ -33,10 +34,12 @@ public class MeteredDateForMeteringPointBuilder
             SampleData.TimeStamp);
     }
 
-    public MeteredDateForMeteringPointMarketActivityRecord BuildMeteredDataForMeteringPoint()
+    public MeteredDateForMeteringPointMarketActivityRecord BuildMeteredDataForMeteringPoint(
+        TransactionId? transactionId = null,
+        IReadOnlyList<PointActivityRecord>? points = null)
     {
         return new MeteredDateForMeteringPointMarketActivityRecord(
-            SampleData.TransactionId,
+            transactionId ?? SampleData.TransactionId,
             SampleData.MeteringPointNumber,
             SampleData.MeteringPointType,
             SampleData.OriginalTransactionIdReferenceId,
@@ -46,7 +49,7 @@ public class MeteredDateForMeteringPointBuilder
             SampleData.Resolution,
             SampleData.StartedDateTime,
             SampleData.EndedDateTime,
-            SampleData.Points);
+            points ?? SampleData.Points);
     }
 
     public MeteredDateForMeteringPointMarketActivityRecord BuildMinimalMeteredDataForMeteringPoint() =>

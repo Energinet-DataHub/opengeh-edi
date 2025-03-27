@@ -32,4 +32,6 @@ public record ExternalId
     }
 
     public Guid Value { get; }
+
+    public static ExternalId New() => new ExternalId(Guid.NewGuid());
 }
