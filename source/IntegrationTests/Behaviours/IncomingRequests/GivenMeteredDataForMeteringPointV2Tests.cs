@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
@@ -26,6 +27,7 @@ using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -142,8 +144,10 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 notifyEventName));
 
         // Act
-        var whenPeekShouldCloseBundle = whenMessageIsEnqueued.Plus(Duration.FromMinutes(BundlingOptions.BundleDurationInMinutes));
-        GivenNowIs(whenPeekShouldCloseBundle);
+        var whenBundleShouldBeClosed = whenMessageIsEnqueued.Plus(Duration.FromMinutes(BundlingOptions.BundleDurationInMinutes));
+        GivenNowIs(whenBundleShouldBeClosed);
+        await GivenBundleMessagesHasBeenTriggered();
+
         var peekResults = await WhenActorPeeksAllMessages(
             receiverActor.ActorNumber,
             receiverActor.ActorRole,
@@ -171,7 +175,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                         SenderScheme: "A10",
                         SenderRole: "DGL",
                         ReceiverRole: "DDQ",
-                        Timestamp: InstantPattern.General.Format(whenPeekShouldCloseBundle)),
+                        Timestamp: InstantPattern.General.Format(whenBundleShouldBeClosed)),
                     OptionalHeaderDocumentFields: new OptionalHeaderDocumentFields(
                         BusinessSectorType: "23",
                         AssertSeriesDocumentFieldsInput: [
@@ -419,8 +423,10 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         }
 
         // Act
-        var whenPeekShouldCloseBundle = whenMessagesAreEnqueued.Plus(Duration.FromMinutes(BundlingOptions.BundleDurationInMinutes));
-        GivenNowIs(whenPeekShouldCloseBundle);
+        var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(Duration.FromMinutes(BundlingOptions.BundleDurationInMinutes));
+        GivenNowIs(whenBundleShouldBeClosed);
+        await GivenBundleMessagesHasBeenTriggered();
+
         var peekResults = await WhenActorPeeksAllMessages(
             receiverActor.ActorNumber,
             receiverActor.ActorRole,
@@ -448,7 +454,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                     SenderScheme: "A10",
                     SenderRole: "DGL",
                     ReceiverRole: "DDQ",
-                    Timestamp: InstantPattern.General.Format(whenPeekShouldCloseBundle)),
+                    Timestamp: InstantPattern.General.Format(whenBundleShouldBeClosed)),
                 OptionalHeaderDocumentFields: new OptionalHeaderDocumentFields(
                     BusinessSectorType: "23",
                     AssertSeriesDocumentFieldsInput: forwardMeteredDataMessages
