@@ -39,23 +39,18 @@ public class BundleMessages(
     public async Task<int> BundleMessagesAsync(CancellationToken cancellationToken)
     {
         var messagesReadyToBeBundled = await _outgoingMessageRepository
-            .GetMessagesReadyToBeBundledAsync(cancellationToken)
+            .GetBundleMetadataForMessagesReadyToBeBundledAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        var bundlesToCreateWithoutRelatedToMessageId = messagesReadyToBeBundled
-            .Where(b => b.DocumentType != DocumentType.Acknowledgement)
-            .GroupBy(om => (om.Receiver, om.BusinessReason, om.DocumentType));
-
-        foreach (var bundleGrouping in bundlesToCreateWithoutRelatedToMessageId)
+        // TODO: Handle RSM-009 and related to message id bundling
+        foreach (var bundleMetadata in messagesReadyToBeBundled)
         {
             // TODO: This loop could instead add a message to a service bus, and create bundles async separately in
             // a service bus trigger. This would increase scaling, instead of creating all bundles in a single transaction.
             using var scope = _serviceScopeFactory.CreateScope();
             var bundlesToCreate = await BundleMessagesForAsync(
                     scope,
-                    bundleGrouping.Key.Receiver,
-                    BusinessReason.FromName(bundleGrouping.Key.BusinessReason),
-                    bundleGrouping.Key.DocumentType,
+                    bundleMetadata,
                     cancellationToken)
                 .ConfigureAwait(false);
 
@@ -71,12 +66,14 @@ public class BundleMessages(
 
     private async Task<List<Bundle>> BundleMessagesForAsync(
         IServiceScope scope,
-        Receiver receiver,
-        BusinessReason businessReason,
-        DocumentType documentType,
+        BundleMetadata bundleMetadata,
         CancellationToken cancellationToken)
     {
+        var receiver = Receiver.Create(bundleMetadata.ReceiverNumber, bundleMetadata.ReceiverRole);
+        var businessReason = BusinessReason.FromName(bundleMetadata.BusinessReason);
+
         var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
+
         var actorMessageQueueId = await GetActorMessageQueueIdForReceiverAsync(
                 actorMessageQueueRepository,
                 receiver,
@@ -89,7 +86,7 @@ public class BundleMessages(
             .GetMessagesForBundleAsync(
                 receiver: receiver,
                 businessReason: businessReason,
-                documentType: documentType,
+                documentType: bundleMetadata.DocumentType,
                 relatedToMessageId: null,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -99,7 +96,7 @@ public class BundleMessages(
             outgoingMessages.Count,
             receiver.Number.Value,
             receiver.ActorRole.Name,
-            documentType.Name);
+            bundleMetadata.DocumentType.Name);
 
         var bundlesToCreate = new List<Bundle>();
 
@@ -114,7 +111,7 @@ public class BundleMessages(
             var bundle = CreateBundle(
                 actorMessageQueueId,
                 businessReason,
-                documentType,
+                bundleMetadata.DocumentType,
                 relatedToMessageId: null);
             bundlesToCreate.Add(bundle);
 
@@ -133,7 +130,7 @@ public class BundleMessages(
             bundlesToCreate.Count,
             receiver.Number.Value,
             receiver.ActorRole.Name,
-            documentType.Name);
+            bundleMetadata.DocumentType.Name);
 
         return bundlesToCreate;
     }
