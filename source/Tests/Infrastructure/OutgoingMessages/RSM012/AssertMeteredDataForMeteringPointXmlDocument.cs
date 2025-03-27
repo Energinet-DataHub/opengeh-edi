@@ -19,41 +19,41 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
-public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateForMeteringPointDocumentDocument
+public class AssertMeteredDataForMeteringPointXmlDocument : IAssertMeteredDataForMeteringPointDocumentDocument
 {
     private readonly AssertXmlDocument _documentAsserter;
 
-    public AssertMeteredDateForMeteringPointXmlDocument(AssertXmlDocument documentAsserter)
+    public AssertMeteredDataForMeteringPointXmlDocument(AssertXmlDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("type", "E66");
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument MessageIdExists()
+    public IAssertMeteredDataForMeteringPointDocumentDocument MessageIdExists()
     {
         _documentAsserter.ElementExists("mRID");
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode)
     {
         _documentAsserter.HasValue("process.processType", expectedBusinessReasonCode);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasSenderId(string expectedSenderId, string expectedSchemeCode)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasSenderId(string expectedSenderId, string expectedSchemeCode)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasSenderRole(string expectedSenderRole)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasSenderRole(string expectedSenderRole)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", expectedSenderRole);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasReceiverId(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasReceiverId(
         string expectedReceiverId,
         string expectedSchemeCode)
     {
@@ -61,19 +61,19 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasReceiverRole(string expectedReceiverRole)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasReceiverRole(string expectedReceiverRole)
     {
         _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", expectedReceiverRole);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasTimestamp(string expectedTimestamp)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasTimestamp(string expectedTimestamp)
     {
         _documentAsserter.HasValue("createdDateTime", expectedTimestamp);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasBusinessSectorType(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasBusinessSectorType(
         string? expectedBusinessSectorType)
     {
         if (expectedBusinessSectorType == null)
@@ -88,13 +88,13 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument TransactionIdExists(int seriesIndex)
+    public IAssertMeteredDataForMeteringPointDocumentDocument TransactionIdExists(int seriesIndex)
     {
         _documentAsserter.ElementExists($"Series[{seriesIndex}]/mRID");
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasTransactionId(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId)
     {
@@ -102,7 +102,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasMeteringPointNumber(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasMeteringPointNumber(
         int seriesIndex,
         string expectedMeteringPointNumber,
         string expectedSchemeCode)
@@ -111,7 +111,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasMeteringPointType(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasMeteringPointType(
         int seriesIndex,
         MeteringPointType expectedMeteringPointType)
     {
@@ -119,7 +119,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasOriginalTransactionIdReferenceId(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasOriginalTransactionIdReferenceId(
         int seriesIndex,
         string? expectedOriginalTransactionIdReferenceId)
     {
@@ -137,7 +137,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct)
     {
         if (expectedProduct is null)
         {
@@ -149,7 +149,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasQuantityMeasureUnit(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasQuantityMeasureUnit(
         int seriesIndex,
         string expectedQuantityMeasureUnit)
     {
@@ -157,7 +157,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasRegistrationDateTime(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasRegistrationDateTime(
         int seriesIndex,
         string? expectedRegistrationDateTime)
     {
@@ -173,7 +173,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasResolution(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasResolution(
         int seriesIndex,
         string expectedResolution)
     {
@@ -181,7 +181,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasStartedDateTime(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasStartedDateTime(
         int seriesIndex,
         string expectedStartedDateTime)
     {
@@ -190,7 +190,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasEndedDateTime(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasEndedDateTime(
         int seriesIndex,
         string expectedEndedDateTime)
     {
@@ -199,7 +199,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasInDomain(int seriesIndex, string? expectedInDomain)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasInDomain(int seriesIndex, string? expectedInDomain)
     {
         if (expectedInDomain is null)
         {
@@ -212,7 +212,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasOutDomain(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasOutDomain(
         int seriesIndex,
         string? expectedOutDomain)
     {
@@ -227,7 +227,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasPoints(
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasPoints(
         int seriesIndex,
         IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints)
     {
@@ -278,7 +278,7 @@ public class AssertMeteredDateForMeteringPointXmlDocument : IAssertMeteredDateFo
         }
     }
 
-    public async Task<IAssertMeteredDateForMeteringPointDocumentDocument> DocumentIsValidAsync()
+    public async Task<IAssertMeteredDataForMeteringPointDocumentDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyValidatedMeasureData).ConfigureAwait(false);
         return this;

@@ -24,7 +24,7 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
     : EbixDocumentWriter(new DocumentDetails(
             type: "DK_MeteredDataTimeSeries",
             schemaLocation: string.Empty,
-            xmlNamespace: "un:unece:260:data:EEM-DK_MeteredDataTimeSeries",
+            xmlNamespace: "un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3",
             prefix: "ns0",
             typeCode: "E66"),
         parser)
@@ -116,12 +116,6 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
             GeneralValues.SectorTypeCode,
             writer).ConfigureAwait(false);
 
-        await writer.WriteElementStringAsync(
-            documentDetails.Prefix,
-            "OriginalBusinessMessage",
-            null,
-            header.RelatedToMessageId ?? string.Empty).ConfigureAwait(false);
-
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
@@ -132,7 +126,7 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var forwardMeteredDataRecord in ParseFrom<MeteredDateForMeteringPointMarketActivityRecord>(marketActivityPayloads))
+        foreach (var forwardMeteredDataRecord in ParseFrom<MeteredDataForMeteringPointMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null)
                 .ConfigureAwait(false);
@@ -211,17 +205,36 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                     energyObservation.Position.ToString())
                 .ConfigureAwait(false);
 
-                await writer.WriteElementStringAsync(
-                    DocumentDetails.Prefix,
-                    "EnergyQuantity",
-                    null,
-                    energyObservation.Quantity != null ? energyObservation.Quantity.Value.ToString() : "0")
-                .ConfigureAwait(false);
-
-                if (energyObservation.Quality != null)
+                if (energyObservation.Quantity is not null)
                 {
-                    await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", energyObservation.Quality.Code, writer).ConfigureAwait(false);
+                    await writer.WriteElementStringAsync(
+                        DocumentDetails.Prefix,
+                        "EnergyQuantity",
+                        null,
+                        energyObservation.Quantity.Value.ToString())
+                    .ConfigureAwait(false);
+
+                    if (energyObservation.Quality is not null)
+                    {
+                        var quality = EbixCode.Of(energyObservation.Quality);
+                        if (quality is not null)
+                        {
+                            await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", quality, writer)
+                                .ConfigureAwait(false);
+                        }
+                    }
                 }
+                else if (energyObservation.Quality is not null)
+                {
+                    await writer.WriteElementStringAsync(
+                        DocumentDetails.Prefix,
+                        "QuantityMissing",
+                        null,
+                        "true")
+                    .ConfigureAwait(false);
+                }
+
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);

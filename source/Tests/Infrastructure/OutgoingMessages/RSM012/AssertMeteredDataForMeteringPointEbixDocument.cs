@@ -18,10 +18,12 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 using FluentAssertions;
+using NodaTime;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
-public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateForMeteringPointDocumentDocument
+public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDataForMeteringPointDocumentDocument
 {
     private readonly AssertEbixDocument _documentAsserter;
 
@@ -30,10 +32,10 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateF
         bool skipIdentificationLengthValdation = false)
     {
         _documentAsserter = documentAsserter;
-        _documentAsserter.HasValue("type", "E66");
+        _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "E66");
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasBusinessReason(string expectedBusinessReasonCode)
     {
         _documentAsserter.HasValueWithAttributes(
             "ProcessEnergyContext/EnergyBusinessProcess",
@@ -42,7 +44,7 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateF
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasBusinessSectorType(string? expectedBusinessSectorType)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasBusinessSectorType(string? expectedBusinessSectorType)
     {
         if (expectedBusinessSectorType is null)
         {
@@ -58,14 +60,21 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateF
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasEndedDateTime(int seriesIndex, string expectedEndedDateTime)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasEndedDateTime(int seriesIndex, string expectedEndedDateTime)
     {
-        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/ObservationTimeSeriesPeriod/End", expectedEndedDateTime);
+        if (expectedEndedDateTime.Count(c => c == ':') == 1)
+        {
+            expectedEndedDateTime = expectedEndedDateTime.Insert(expectedEndedDateTime.Length - 1, ":00");
+        }
+
+        _documentAsserter.HasValue(
+            $"PayloadEnergyTimeSeries[{seriesIndex}]/ObservationTimeSeriesPeriod/End",
+            InstantPattern.General.Parse(expectedEndedDateTime).Value.ToString("yyyy-MM-ddTHH:mm:ss'Z'", CultureInfo.InvariantCulture));
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasInDomain(int seriesIndex, string? expectedInDomain)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasInDomain(int seriesIndex, string? expectedInDomain)
     {
         if (expectedInDomain is null)
         {
@@ -77,33 +86,26 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateF
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasMeteringPointNumber(int seriesIndex, string expectedMeteringPointNumber, string expectedSchemeCode)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasMeteringPointNumber(int seriesIndex, string expectedMeteringPointNumber, string expectedSchemeCode)
     {
         _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/MeteringPointDomainLocation/Identification", expectedMeteringPointNumber);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasMeteringPointType(int seriesIndex, MeteringPointType expectedMeteringPointType)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasMeteringPointType(int seriesIndex, MeteringPointType expectedMeteringPointType)
     {
         _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
         return this;
     }
 
-    // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasOriginalTransactionIdReferenceId(int seriesIndex, string? expectedOriginalTransactionIdReferenceId)
+    // OriginalTransactionIdReferenceId not present in ebix.
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasOriginalTransactionIdReferenceId(int seriesIndex, string? expectedOriginalTransactionIdReferenceId)
     {
-        if (expectedOriginalTransactionIdReferenceId is null)
-        {
-            _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/OriginalTransactionId");
-            return this;
-        }
-
-        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/OriginalTransactionId", expectedOriginalTransactionIdReferenceId);
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasOutDomain(int seriesIndex, string? expectedOutDomain)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasOutDomain(int seriesIndex, string? expectedOutDomain)
     {
         if (expectedOutDomain is null)
         {
@@ -115,7 +117,7 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateF
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasPoints(int seriesIndex, IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasPoints(int seriesIndex, IReadOnlyList<AssertPointDocumentFieldsInput> expectedPoints)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation");
@@ -128,31 +130,36 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateF
 
             _documentAsserter
                 .HasValue(
-                    $"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/position",
+                    $"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/Position",
                     requiredPointDocumentFields.Position.ToString());
 
             if (optionalPointDocumentFields.Quantity.HasValue)
             {
                 _documentAsserter
                     .HasValue(
-                        $"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/quantity",
+                        $"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/EnergyQuantity",
                         optionalPointDocumentFields.Quantity.Value.ToString(CultureInfo.InvariantCulture));
             }
             else
             {
-                AssertElementNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/quantity");
+                AssertElementNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/EnergyQuantity");
             }
 
             if (optionalPointDocumentFields.Quality != null)
             {
-                _documentAsserter
+                var quality = EbixCode.Of(optionalPointDocumentFields.Quality);
+
+                if (quality is not null)
+                {
+                    _documentAsserter
                     .HasValue(
-                        $"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/quality",
-                        optionalPointDocumentFields.Quality.Code);
+                        $"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/QuantityQuality",
+                        quality);
+                }
             }
             else
             {
-                AssertElementNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/quality");
+                AssertElementNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/QuantityQuality");
             }
         }
 
@@ -165,105 +172,105 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDateF
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasProduct(int seriesIndex, string? expectedProduct)
     {
         if (expectedProduct is null)
         {
-            _documentAsserter.IsNotPresent($"Series[{seriesIndex}]/Product");
+            _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/IncludedProductCharacteristic/Identification");
             return this;
         }
 
-        _documentAsserter.HasValue($"Series[{seriesIndex}]/Product", expectedProduct);
+        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/IncludedProductCharacteristic/Identification", expectedProduct);
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasQuantityMeasureUnit(int seriesIndex, string expectedQuantityMeasureUnit)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasQuantityMeasureUnit(int seriesIndex, string expectedQuantityMeasureUnit)
     {
         _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/QuantityMeasureUnit");
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasReceiverId(string expectedReceiverId, string expectedSchemeCode)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasReceiverId(string expectedReceiverId, string expectedSchemeCode)
     {
         _documentAsserter.IsNotPresent($"Receiver");
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasReceiverRole(string expectedReceiverRole)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasReceiverRole(string expectedReceiverRole)
     {
         _documentAsserter.IsNotPresent($"ReceiverRole");
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasRegistrationDateTime(int seriesIndex, string? expectedRegistrationDateTime)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasRegistrationDateTime(int seriesIndex, string? expectedRegistrationDateTime)
     {
-        if (expectedRegistrationDateTime is null)
-        {
-            _documentAsserter.IsNotPresent($"Series[{seriesIndex}]/RegistrationDateTime");
-            return this;
-        }
-
-        _documentAsserter.HasValue($"Series[{seriesIndex}]/RegistrationDateTime", expectedRegistrationDateTime);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasResolution(int seriesIndex, string expectedResolution)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasResolution(int seriesIndex, string expectedResolution)
     {
         _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/ObservationTimeSeriesPeriod/ResolutionDuration", expectedResolution);
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasSenderId(string expectedSenderId, string expectedSchemeCode)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasSenderId(string expectedSenderId, string expectedSchemeCode)
     {
         _documentAsserter.IsNotPresent($"SenderId");
         return this;
     }
 
     // Not sure how this looks in ebix?
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasSenderRole(string expectedSenderRole)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasSenderRole(string expectedSenderRole)
     {
         _documentAsserter.IsNotPresent($"SenderRole");
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasStartedDateTime(int seriesIndex, string expectedStartedDateTime)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasStartedDateTime(int seriesIndex, string expectedStartedDateTime)
     {
-        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/ObservationTimeSeriesPeriod/Start", expectedStartedDateTime);
+        if (expectedStartedDateTime.Count(c => c == ':') == 1)
+        {
+            expectedStartedDateTime = expectedStartedDateTime.Insert(expectedStartedDateTime.Length - 1, ":00");
+        }
+
+        _documentAsserter.HasValue(
+            $"PayloadEnergyTimeSeries[{seriesIndex}]/ObservationTimeSeriesPeriod/Start",
+            InstantPattern.General.Parse(expectedStartedDateTime).Value.ToString("yyyy-MM-ddTHH:mm:ss'Z'", CultureInfo.InvariantCulture));
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasTimestamp(string expectedTimestamp)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasTimestamp(string expectedTimestamp)
     {
         _documentAsserter.HasValue($"HeaderEnergyDocument/Creation", expectedTimestamp);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
+    public IAssertMeteredDataForMeteringPointDocumentDocument HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
     {
         _documentAsserter.HasValue($"PayloadEnergyTimeSeries[{seriesIndex}]/Identification", expectedTransactionId.Value);
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument MessageIdExists()
+    public IAssertMeteredDataForMeteringPointDocumentDocument MessageIdExists()
     {
-        _documentAsserter.ElementExists("MessageReference");
+        _documentAsserter.ElementExists("HeaderEnergyDocument/Identification");
         return this;
     }
 
-    public IAssertMeteredDateForMeteringPointDocumentDocument TransactionIdExists(int seriesIndex)
+    public IAssertMeteredDataForMeteringPointDocumentDocument TransactionIdExists(int seriesIndex)
     {
         _documentAsserter.ElementExists($"PayloadEnergyTimeSeries[{seriesIndex}]/Identification");
         return this;
     }
 
-    public async Task<IAssertMeteredDateForMeteringPointDocumentDocument> DocumentIsValidAsync()
+    public async Task<IAssertMeteredDataForMeteringPointDocumentDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyValidatedMeasureData).ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyValidatedMeasureData, "3").ConfigureAwait(false);
         return this;
     }
 
