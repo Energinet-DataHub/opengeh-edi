@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
-using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
@@ -54,8 +53,6 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                 ? Resolution.TryGetNameFromCode(transaction.Resolution, fallbackValue: transaction.Resolution)
                 : null;
 
-            var registeredAt = InstantPattern.General.Parse(transaction.RegisteredAt).Value.ToString();
-
             var businessReason = BusinessReason
                 .TryGetNameFromCode(
                     meteredDataForMeteringPointMessageBase.BusinessReason,
@@ -78,10 +75,7 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                         MeteringPointType: meteringPointType,
                         ProductNumber: transaction.ProductNumber,
                         MeasureUnit: productUnitType,
-                        RegistrationDateTime: registeredAt
-                                              ?? throw new ArgumentNullException(
-                                                  nameof(transaction.RegisteredAt),
-                                                  "RegistrationDateTime is only allowed to be null in Ebix."),
+                        RegistrationDateTime: transaction.RegisteredAt,
                         Resolution: resolution,
                         StartDateTime: transaction.StartDateTime,
                         EndDateTime: transaction.EndDateTime,
