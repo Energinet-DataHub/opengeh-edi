@@ -24,14 +24,10 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 
 public class BundleRepository(
-    ActorMessageQueueContext dbContext,
-    IClock clock,
-    IOptions<BundlingOptions> options)
+    ActorMessageQueueContext dbContext)
         : IBundleRepository
 {
     private readonly ActorMessageQueueContext _dbContext = dbContext;
-    private readonly IClock _clock = clock;
-    private readonly BundlingOptions _options = options.Value;
 
     public void Add(Bundle bundle)
     {
@@ -81,11 +77,11 @@ public class BundleRepository(
         if (messageCategory != MessageCategory.None)
             query = query.Where(b => b.MessageCategory == messageCategory);
 
-        var oldestBundle = await query
+        var nextBundle = await query
             .OrderBy(b => b.Created)
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return oldestBundle;
+        return nextBundle;
     }
 }
