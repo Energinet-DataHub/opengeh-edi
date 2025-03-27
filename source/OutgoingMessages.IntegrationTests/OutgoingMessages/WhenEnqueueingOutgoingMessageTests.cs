@@ -166,7 +166,6 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
             () => Assert.NotNull(bundleFromDatabase.RowVersion),
             () => Assert.Equal(bundleFromDatabase.ActorMessageQueueId, expectedActorMessageQueueId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, bundleFromDatabase.DocumentTypeInBundle),
-            () => Assert.NotNull(bundleFromDatabase.MessageCount), // TODO: MessageCount will be removed
             () => Assert.Equal(1, bundleFromDatabase.MaxMessageCount),
             () => Assert.Equal(message.BusinessReason, bundleFromDatabase.BusinessReason),
             () => Assert.Equal(bundleFromDatabase.Created, now.ToDateTimeUtc()),
