@@ -16,7 +16,10 @@ using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
@@ -71,8 +74,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - Enqueue messages "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
         _clockStub.SetCurrentInstant(now);
-        await EnqueueAndCommitMessage(message1);
-        await EnqueueAndCommitMessage(message2);
+        await EnqueueAndCommitMessage(message1, useNewScope: false);
+        await EnqueueAndCommitMessage(message2, useNewScope: false);
 
         // When creating bundles
 
@@ -105,17 +108,35 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     }
 
     [Fact]
-    public async Task Given_MultipleMessagesWithSameReceiverAndType_When_EnqueueingMessagesUsingParallel_Then_AllMessagesAreEnqueuedIn3Bundles()
+    public async Task Given_EnqueuedMultipleMessagesToDifferentReceivers_When_BundleMessages_Then_AllMessagesAreBundlesInCorrectBundles()
     {
-        var receiver = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
+        var receiver1 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
+        var receiver2 = new Actor(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
+
+        // Create actor message queue for actor
+        using (var setupScope = ServiceProvider.CreateScope())
+        {
+            var amqContext = setupScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(Receiver.Create(receiver1)));
+            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(Receiver.Create(receiver2)));
+            await amqContext.SaveChangesAsync();
+        }
 
         var eventId = EventId.From(Guid.NewGuid());
         var startTime = Instant.FromUtc(2024, 03, 21, 23, 00, 00);
-        const int messageCount = 5000;
-        var messagesToEnqueue = Enumerable.Range(0, messageCount)
+        const int bundleSize = 2000;
+        const int receiver1MessageCount = 7234; // 4 bundles for receiver 1
+        var receiver1BundleCount = (int)Math.Ceiling((double)receiver1MessageCount / bundleSize);
+        const int receiver2MessageCount = 1689; // 1 bundle for receiver 2
+        var receiver2BundleCount = (int)Math.Ceiling((double)receiver2MessageCount / bundleSize);
+        const int totalMessageCount = receiver1MessageCount + receiver2MessageCount;
+        var totalBundleCount = receiver1BundleCount + receiver2BundleCount;
+        var messagesToEnqueue = Enumerable.Range(0, totalMessageCount)
             .Select(
                 i =>
                 {
+                    var receiver = i < receiver1MessageCount ? receiver1 : receiver2;
+
                     var resolutionDuration = Duration.FromMinutes(15);
                     var time = startTime.Plus(i * resolutionDuration); // Start every message 15 minutes later
                     return new AcceptedForwardMeteredDataMessageDto(
@@ -143,98 +164,106 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             .ToList();
 
         // When enqueueing the messages concurrently
-        var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2)).Token;
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
 
-        var stopwatch = Stopwatch.StartNew();
-        var counts = await EnqueueMessagesWithRecursiveRetries(
-            messagesToEnqueue: messagesToEnqueue,
-            cancellationToken: cancellationToken);
+        var enqueueStopwatch = Stopwatch.StartNew();
+        var enqueuedMessagesCount = await EnqueueMessages(
+            messagesToEnqueue: messagesToEnqueue);
+        enqueueStopwatch.Stop();
 
-        _testOutputHelper.WriteLine("Test finished after enqueueing {0} ({1} retried, {4} total retries) messages. Elapsed time: {2:D2}m{3:D2}s", counts.EnqueuedCount, counts.RetriedCount, stopwatch.Elapsed.Minutes, stopwatch.Elapsed.Seconds, counts.TotalRetries);
+        _testOutputHelper.WriteLine("Finished enqueueing {0} messages. Elapsed time: {1:D2}m{2:D2}s", enqueuedMessagesCount, enqueueStopwatch.Elapsed.Minutes, enqueueStopwatch.Elapsed.Seconds);
 
-        // Then all messages are enqueued
+        // When bundling the messages
+        // - Move clock to when bundles should be created
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Bundle messages
+        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
+
+        var bundleStopwatch = Stopwatch.StartNew();
+        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+        bundleStopwatch.Stop();
+
+        // Then all messages are enqueued & 3 bundles created
         await using var scope = ServiceProvider.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var nullBundleKey = BundleId.Create(Guid.Empty);
         var outgoingMessages = await dbContext.OutgoingMessages
             .Where(om => om.EventId == eventId)
-            .ToListAsync();
+            .GroupBy(om => om.AssignedBundleId)
+            .ToDictionaryAsync(
+                keySelector: om => om.Key ?? nullBundleKey,
+                elementSelector: om => om.ToList());
 
         var bundles = await dbContext.Bundles
             .Where(b => b.MessageCategory == MessageCategory.MeasureData)
             .ToListAsync();
 
+        _testOutputHelper.WriteLine(
+            "Created {0} bundles (for {1} messages). Elapsed time: {2:D2}m{3:D2}s{4:D2}ms",
+            bundles.Count,
+            enqueuedMessagesCount,
+            bundleStopwatch.Elapsed.Minutes,
+            bundleStopwatch.Elapsed.Seconds,
+            bundleStopwatch.Elapsed.Milliseconds);
         Assert.Multiple(
-            () => Assert.Equal(messageCount, outgoingMessages.Count),
-            () => Assert.Equal(3, bundles.Count),
-            () => Assert.All(
-                bundles,
+            () => Assert.Equal(totalMessageCount, outgoingMessages.SelectMany(om => om.Value).Count()),
+            () => Assert.DoesNotContain(outgoingMessages, om => om.Key == nullBundleKey),
+            () => Assert.Equal(totalBundleCount, bundles.Count),
+            () => Assert.Collection(
+                bundles.OrderByDescending(b => outgoingMessages[b.Id].Count),
                 b =>
                 {
-                    Assert.Multiple(
-                        () => Assert.True(b.MessageCount <= b.MaxMessageCount, "MessageCount should be less than or equal to MaxMessageCount"),
-                        // Message count matches the actual number of outgoing messages in the bundle
-                        () => Assert.Equal(b.MessageCount, outgoingMessages.Count(om => om.AssignedBundleId == b.Id)));
+                    Assert.True(outgoingMessages[b.Id].Count == bundleSize, $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                },
+                b =>
+                {
+                    Assert.True(outgoingMessages[b.Id].Count == bundleSize, $"2nd bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                },
+                b =>
+                {
+                    Assert.True(outgoingMessages[b.Id].Count == bundleSize, $"3rd bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                },
+                b =>
+                {
+                    Assert.True(outgoingMessages[b.Id].Count == receiver2MessageCount % bundleSize, $"4th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                },
+                b =>
+                {
+                    Assert.True(outgoingMessages[b.Id].Count == receiver1MessageCount % bundleSize, $"5th bundle count should be {receiver1MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
                 }));
     }
 
-    private async Task<(int EnqueuedCount, int RetriedCount, int TotalRetries)> EnqueueMessagesWithRecursiveRetries(List<AcceptedForwardMeteredDataMessageDto> messagesToEnqueue, CancellationToken cancellationToken)
+    private async Task<int> EnqueueMessages(List<AcceptedForwardMeteredDataMessageDto> messagesToEnqueue)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        var enqueueTasks = messagesToEnqueue
+            .Select(m => EnqueueAndCommitMessage(m, useNewScope: true))
+            .ToList();
+        await Task.WhenAll(enqueueTasks);
 
-        var enqueuedMessagesCount = 0;
-        var retriedMessagesCount = 0;
-        var totalRetries = 0;
-
-        try
-        {
-            var stopwatch = Stopwatch.StartNew();
-            await Parallel.ForEachAsync(
-                messagesToEnqueue,
-                cancellationToken,
-                async (m, _) =>
-                {
-                    var retryCount = await EnqueueAndCommitMessageWithRecursiveRetries(m, 0, cancellationToken);
-                    enqueuedMessagesCount++;
-                    if (retryCount > 0)
-                    {
-                        _testOutputHelper.WriteLine("Finished enqueueing message after {0} retries (enqueued {1} messages total, with {2} retries)", retryCount, enqueuedMessagesCount, retriedMessagesCount);
-                        retriedMessagesCount++;
-                        totalRetries += retryCount;
-                    }
-
-                    if (enqueuedMessagesCount % 500 == 0)
-                        _testOutputHelper.WriteLine("[{0:D2}m{1:D2}s] Finished enqueueing {2} messages", stopwatch.Elapsed.Minutes, stopwatch.Elapsed.Seconds, enqueuedMessagesCount);
-                });
-        }
-        catch (Exception e)
-        {
-            _testOutputHelper.WriteLine("Error enqueueing messages: {0}", e.InnerException?.Message ?? e.Message);
-        }
-
-        return (enqueuedMessagesCount, retriedMessagesCount, totalRetries);
+        return enqueueTasks.Count;
     }
 
-    private async Task<int> EnqueueAndCommitMessageWithRecursiveRetries(AcceptedForwardMeteredDataMessageDto message, int retryCount, CancellationToken cancellationToken)
+    private async Task<Guid> EnqueueAndCommitMessage(OutgoingMessageDto message, bool useNewScope)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        try
+        IOutgoingMessagesClient outgoingMessagesClient;
+        ActorMessageQueueContext dbContext;
+        IServiceScope? scope = null;
+        if (useNewScope)
         {
-            await EnqueueAndCommitMessage(message);
+            scope = ServiceProvider.CreateScope();
+            outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+            dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
         }
-        catch (Exception)
+        else
         {
-            retryCount++;
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            retryCount = await EnqueueAndCommitMessageWithRecursiveRetries(message, retryCount, cancellationToken);
+            outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+            dbContext = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
         }
-
-        return retryCount;
-    }
-
-    private async Task<Guid> EnqueueAndCommitMessage(OutgoingMessageDto message)
-    {
-        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
         var messageId = message switch
         {
@@ -243,8 +272,9 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             _ => throw new NotImplementedException($"Enqueueing outgoing message of type {message.GetType()} is not implemented."),
         };
 
-        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+        await dbContext.SaveChangesAsync();
+
+        scope?.Dispose();
 
         return messageId;
     }

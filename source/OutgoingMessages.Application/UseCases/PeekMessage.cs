@@ -39,7 +39,6 @@ public class PeekMessage
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly DocumentFactory _documentFactory;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
-    private readonly IActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
     private readonly IClock _clock;
     private readonly IBundleRepository _bundleRepository;
@@ -51,7 +50,6 @@ public class PeekMessage
         IMarketDocumentRepository marketDocumentRepository,
         DocumentFactory documentFactory,
         IOutgoingMessageRepository outgoingMessageRepository,
-        IActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessagesClient archivedMessageClient,
         IClock clock,
         IBundleRepository bundleRepository,
@@ -62,7 +60,6 @@ public class PeekMessage
         _marketDocumentRepository = marketDocumentRepository;
         _documentFactory = documentFactory;
         _outgoingMessageRepository = outgoingMessageRepository;
-        _actorMessageQueueContext = actorMessageQueueContext;
         _archivedMessageClient = archivedMessageClient;
         _clock = clock;
         _bundleRepository = bundleRepository;
@@ -87,7 +84,7 @@ public class PeekMessage
             return null;
         }
 
-        var bundle = await CloseBundleAndCommitAsync(request, actorMessageQueue.Id, cancellationToken).ConfigureAwait(false);
+        var bundle = await GetNextBundleToPeekAsync(request, actorMessageQueue.Id, cancellationToken).ConfigureAwait(false);
 
         if (bundle is null)
         {
@@ -149,12 +146,10 @@ public class PeekMessage
         return marketDocument;
     }
 
-    private async Task<Bundle?> CloseBundleAndCommitAsync(PeekRequestDto request, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
+    private async Task<Bundle?> GetNextBundleToPeekAsync(PeekRequestDto request, ActorMessageQueueId actorMessageQueueId, CancellationToken cancellationToken)
     {
-        // Right after we call Close(), we close the bundle. This is to ensure that messages won't be added to
-        // the bundle after we have peeked and before we are able to update the bundle to closed in the database.
         var bundle = await _bundleRepository
-            .GetOldestBundleAsync(actorMessageQueueId, request.MessageCategory, cancellationToken)
+            .GetNextBundleToPeekAsync(actorMessageQueueId, request.MessageCategory, cancellationToken)
             .ConfigureAwait(false);
 
         return bundle;

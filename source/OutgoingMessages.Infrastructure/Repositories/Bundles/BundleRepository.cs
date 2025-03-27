@@ -82,15 +82,14 @@ public class BundleRepository(
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Bundle?> GetOldestBundleAsync(
+    public async Task<Bundle?> GetNextBundleToPeekAsync(
         ActorMessageQueueId actorMessageQueueId,
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
-        // This query should be covered by the "IX_Bundles_OldestBundle" index
-
-        // Get oldest bundle that is:
-        // - In the given actor message queue
+        // This query should be covered by the "IX_Bundles_NextBundleToPeek" index
+        // Get the oldest bundle that is:
+        // - In the given actor message queue & category
         // - Not dequeued
         // - Closed
         var query = _dbContext.Bundles.Where(
@@ -108,22 +107,5 @@ public class BundleRepository(
             .ConfigureAwait(false);
 
         return oldestBundle;
-    }
-
-    public async Task<IReadOnlyCollection<Bundle>> GetBundlesToCloseAsync(CancellationToken cancellationToken)
-    {
-        var closeBundlesCreatedBefore = _clock
-            .GetCurrentInstant()
-            .Minus(Duration.FromMinutes(_options.BundleDurationInMinutes));
-
-        var bundlesToClose = await _dbContext.Bundles
-            .Where(
-                b =>
-                    b.ClosedAt == null &&
-                    b.Created <= closeBundlesCreatedBefore)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        return bundlesToClose;
     }
 }

@@ -109,6 +109,8 @@ public class OutgoingMessageRepository(
             .GetCurrentInstant()
             .Minus(Duration.FromMinutes(_bundlingOptions.BundleDurationInMinutes));
 
+        var messages = _context.OutgoingMessages.ToList();
+
         return await _context.OutgoingMessages
             .Where(
                 om => om.AssignedBundleId == null &&

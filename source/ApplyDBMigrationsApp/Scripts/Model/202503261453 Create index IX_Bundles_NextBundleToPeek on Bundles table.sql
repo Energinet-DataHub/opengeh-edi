@@ -1,4 +1,5 @@
-CREATE INDEX IX_Bundles_OldestBundle
+-- Should match the query in BundlesRepository.GetNextBundleToPeekAsync()
+CREATE INDEX IX_Bundles_NextBundleToPeek
     ON [dbo].[Bundles] (
         ActorMessageQueueId,
         DequeuedAt,

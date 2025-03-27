@@ -62,12 +62,8 @@ public interface IBundleRepository
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the oldest bundle for a ActorMessageQueue.
+    /// Gets the next bundle to peek for an ActorMessageQueue and a category.
     /// </summary>
-    /// <param name="actorMessageQueueId"></param>
-    /// <param name="messageCategory"></param>
-    /// <param name="cancellationToken"></param>
-    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId actorMessageQueueId, MessageCategory messageCategory, CancellationToken cancellationToken);
-
-    Task<IReadOnlyCollection<Bundle>> GetBundlesToCloseAsync(CancellationToken cancellationToken);
+    /// <returns>The oldest closed bundle that hasn't been dequeued yet for given inputs.</returns>
+    Task<Bundle?> GetNextBundleToPeekAsync(ActorMessageQueueId actorMessageQueueId, MessageCategory messageCategory, CancellationToken cancellationToken);
 }

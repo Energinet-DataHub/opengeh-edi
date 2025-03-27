@@ -38,4 +38,9 @@ public class Receiver : ValueObject
     {
         return new Receiver(actorNumber, actorRole);
     }
+
+    public static Receiver Create(Actor actor)
+    {
+        return new Receiver(actor.ActorNumber, actor.ActorRole);
+    }
 }

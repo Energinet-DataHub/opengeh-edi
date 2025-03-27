@@ -25,10 +25,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 public sealed class Bundle
 {
     public const string MaxNumberOfMessagesInABundlePropertyName = nameof(_maxNumberOfMessagesInABundle);
-    public const string MessageCountPropertyName = nameof(_messageCount);
 
     private readonly int _maxNumberOfMessagesInABundle;
-    private readonly int _messageCount; // TODO: Remove _messageCount
 
     /// <summary>
     /// Create new bundle in the given actor message queue
@@ -50,8 +48,6 @@ public sealed class Bundle
         Created = created;
         RelatedToMessageId = relatedToMessageId;
         MessageCategory = DocumentTypeInBundle.Category;
-
-        _messageCount = 0;
     }
 
     private Bundle()
@@ -85,8 +81,6 @@ public sealed class Bundle
     public bool IsClosed => ClosedAt is not null;
 
     public MessageCategory MessageCategory { get; set; }
-
-    public int MessageCount => _messageCount;
 
     public int MaxMessageCount => _maxNumberOfMessagesInABundle;
 

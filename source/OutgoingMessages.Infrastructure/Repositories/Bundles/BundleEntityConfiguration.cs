@@ -52,7 +52,6 @@ public class BundleEntityConfiguration : IEntityTypeConfiguration<Bundle>
         builder.Property<BusinessReason>(b => b.BusinessReason)
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
 
-        builder.Property<int>(Bundle.MessageCountPropertyName).HasColumnName("MessageCount");
         builder.Property<int>(Bundle.MaxNumberOfMessagesInABundlePropertyName).HasColumnName("MaxMessageCount");
 
         builder.Property(b => b.RelatedToMessageId)

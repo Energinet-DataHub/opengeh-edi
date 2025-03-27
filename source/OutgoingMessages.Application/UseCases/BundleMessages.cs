@@ -46,12 +46,10 @@ public class BundleMessages(
             .Where(b => b.DocumentType != DocumentType.Acknowledgement)
             .GroupBy(om => (om.Receiver, om.BusinessReason, om.DocumentType));
 
-        var bundlesToCreate = new List<Bundle>();
         foreach (var bundleGrouping in bundlesToCreateWithoutRelatedToMessageId)
         {
             // TODO: This could add a message to a service bus, and handle this async separately in a service bus trigger.
             // This would increase scaling, instead of creating all bundles in a single transaction.
-
             using var scope = _serviceScopeFactory.CreateScope();
 
             var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
@@ -74,6 +72,8 @@ public class BundleMessages(
                 bundleGrouping.Key.Receiver.Number.Value,
                 bundleGrouping.Key.Receiver.ActorRole.Name,
                 bundleGrouping.Key.DocumentType.Name);
+
+            var bundlesToCreate = new List<Bundle>();
 
             var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
             while (outgoingMessagesList.Count > 0)
