@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System.Text;
-using Energinet.DataHub.Core.App.Common.Users;
+using Asp.Versioning;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
-using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
-using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -25,41 +23,32 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class RequestWholesaleSettlementController : ControllerBase
+public class TempRequestWholesaleSettlementController : ControllerBase
 {
-    private readonly UserContext<FrontendUser> _userContext;
-    private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
-    private readonly IClock _clock;
     private readonly IAuditLogger _auditLogger;
 
-    public RequestWholesaleSettlementController(
-        UserContext<FrontendUser> userContext,
-        DateTimeZone dateTimeZone,
+    public TempRequestWholesaleSettlementController(
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
-        IClock clock,
         IAuditLogger auditLogger)
     {
-        _userContext = userContext;
-        _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
-        _clock = clock;
         _auditLogger = auditLogger;
     }
 
+    [ApiVersion("1.0")]
     [HttpPost]
     [Authorize(Roles = "request-wholesale-settlement:view")]
     public async Task<ActionResult> RequestAsync(
-        RequestWholesaleSettlementMarketRequest request,
+        RequestWholesaleServicesMarketDocumentV2 request,
         CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
@@ -71,16 +60,26 @@ public class RequestWholesaleSettlementController : ControllerBase
                 affectedEntityKey: null)
             .ConfigureAwait(false);
 
-        var currentUser = _userContext.CurrentUser;
-
-        var message =
-            RequestWholesaleSettlementDtoFactory.Create(
-                TransactionId.New(),
-                request,
-                currentUser.ActorNumber,
-                currentUser.MarketRole,
-                _dateTimeZone,
-                _clock.GetCurrentInstant());
+        var message = new RequestWholesaleSettlementDto(
+            request.SenderNumber,
+            request.SenderRoleCode,
+            request.ReceiverNumber,
+            request.ReceiverRoleCode,
+            request.BusinessReason,
+            request.MessageType,
+            request.MessageId,
+            request.CreatedAt,
+            request.BusinessType,
+            request.Series.Select(s => new RequestWholesaleSettlementSeries(
+                s.Id,
+                s.StartDateAndOrTimeDateTime,
+                s.EndDateAndOrTimeDateTime,
+                s.MeteringGridAreaDomainId,
+                s.EnergySupplierMarketParticipantId,
+                s.SettlementVersion,
+                s.Resolution,
+                s.ChargeOwner,
+                s.ChargeTypes.Select(ct => new RequestWholesaleSettlementChargeType(ct.Id, ct.Type)).ToList().AsReadOnly())).ToList().AsReadOnly());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),

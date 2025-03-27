@@ -19,6 +19,9 @@ using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
+using RequestWholesaleServicesMarketDocumentV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.RequestWholesaleServicesMarketDocumentV2;
+using RequestWholesaleSettlementChargeTypeV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.RequestWholesaleSettlementChargeTypeV2;
+using RequestWholesaleSettlementSeriesV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.RequestWholesaleSettlementSeriesV2;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
@@ -134,7 +137,7 @@ public sealed class B2CEdiDriver : IDisposable
             },
         };
         await webApiClient.RequestWholesaleSettlementAsync(
-                api_version: "2.0",
+                api_version: "1.0",
                 body: requestWholesaleServicesMarketDocumentV2,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
