@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
-public record BundleMetadata(
+public record BundleMetadataDto(
     ActorNumber ReceiverNumber,
     ActorRole ReceiverRole,
     string BusinessReason,

@@ -103,7 +103,7 @@ public class OutgoingMessageRepository(
             .ConfigureAwait(false);
     }
 
-    public async Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
+    public async Task<HashSet<BundleMetadataDto>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
     {
         var bundleMessagesCreatedBefore = _clock
             .GetCurrentInstant()
@@ -113,7 +113,7 @@ public class OutgoingMessageRepository(
             .Where(
                 om => om.AssignedBundleId == null &&
                       om.CreatedAt <= bundleMessagesCreatedBefore)
-            .Select(om => new BundleMetadata(om.Receiver.Number, om.Receiver.ActorRole, om.BusinessReason, om.DocumentType))
+            .Select(om => new BundleMetadataDto(om.Receiver.Number, om.Receiver.ActorRole, om.BusinessReason, om.DocumentType))
             .Distinct()
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);

@@ -66,11 +66,11 @@ public class BundleMessages(
 
     private async Task<List<Bundle>> BundleMessagesForAsync(
         IServiceScope scope,
-        BundleMetadata bundleMetadata,
+        BundleMetadataDto bundleMetadataDto,
         CancellationToken cancellationToken)
     {
-        var receiver = Receiver.Create(bundleMetadata.ReceiverNumber, bundleMetadata.ReceiverRole);
-        var businessReason = BusinessReason.FromName(bundleMetadata.BusinessReason);
+        var receiver = Receiver.Create(bundleMetadataDto.ReceiverNumber, bundleMetadataDto.ReceiverRole);
+        var businessReason = BusinessReason.FromName(bundleMetadataDto.BusinessReason);
 
         var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
 
@@ -86,7 +86,7 @@ public class BundleMessages(
             .GetMessagesForBundleAsync(
                 receiver: receiver,
                 businessReason: businessReason,
-                documentType: bundleMetadata.DocumentType,
+                documentType: bundleMetadataDto.DocumentType,
                 relatedToMessageId: null,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -96,7 +96,7 @@ public class BundleMessages(
             outgoingMessages.Count,
             receiver.Number.Value,
             receiver.ActorRole.Name,
-            bundleMetadata.DocumentType.Name);
+            bundleMetadataDto.DocumentType.Name);
 
         var bundlesToCreate = new List<Bundle>();
 
@@ -111,7 +111,7 @@ public class BundleMessages(
             var bundle = CreateBundle(
                 actorMessageQueueId,
                 businessReason,
-                bundleMetadata.DocumentType,
+                bundleMetadataDto.DocumentType,
                 relatedToMessageId: null);
             bundlesToCreate.Add(bundle);
 
@@ -130,7 +130,7 @@ public class BundleMessages(
             bundlesToCreate.Count,
             receiver.Number.Value,
             receiver.ActorRole.Name,
-            bundleMetadata.DocumentType.Name);
+            bundleMetadataDto.DocumentType.Name);
 
         return bundlesToCreate;
     }
