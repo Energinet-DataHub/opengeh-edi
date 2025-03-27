@@ -62,26 +62,6 @@ public class BundleRepository(
             .ConfigureAwait(false);
     }
 
-    public Task<Bundle?> GetOpenBundleAsync(
-        DocumentType documentType,
-        BusinessReason businessReason,
-        ActorMessageQueueId actorMessageQueueId,
-        MessageId? relatedToMessageId,
-        CancellationToken cancellationToken)
-    {
-        // This query should be covered by the "IX_Bundles_OpenBundle" index
-        return _dbContext.Bundles
-            .Where(
-                b =>
-                    b.ActorMessageQueueId == actorMessageQueueId &&
-                    b.DocumentTypeInBundle == documentType &&
-                    b.BusinessReason == businessReason &&
-                    b.RelatedToMessageId == relatedToMessageId &&
-                    b.ClosedAt == null)
-            .OrderBy(b => b.Created)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
-
     public async Task<Bundle?> GetNextBundleToPeekAsync(
         ActorMessageQueueId actorMessageQueueId,
         MessageCategory messageCategory,

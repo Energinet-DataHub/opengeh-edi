@@ -52,16 +52,6 @@ public interface IBundleRepository
     Task<Bundle?> GetBundleAsync(MessageId messageId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Get open bundle for a given document type and actor message queue.
-    /// </summary>
-    Task<Bundle?> GetOpenBundleAsync(
-        DocumentType documentType,
-        BusinessReason businessReason,
-        ActorMessageQueueId actorMessageQueueId,
-        MessageId? relatedToMessageId,
-        CancellationToken cancellationToken);
-
-    /// <summary>
     /// Gets the next bundle to peek for an ActorMessageQueue and a category.
     /// </summary>
     /// <returns>The oldest closed bundle that hasn't been dequeued yet for given inputs.</returns>
