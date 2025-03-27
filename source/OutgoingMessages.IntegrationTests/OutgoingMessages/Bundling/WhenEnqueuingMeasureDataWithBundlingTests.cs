@@ -270,43 +270,45 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                 {
                     // 2000 messages for receiver 1
                     Assert.Multiple(
-                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
                         () => Assert.True(
-                            outgoingMessages[b.Id].Count == bundleSize,
-                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"));
+                                outgoingMessages[b.Id].Count == bundleSize,
+                                $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"),
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)));
                 },
                 b =>
                 {
                     // 2000 messages for receiver 1
                     Assert.Multiple(
-                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
                         () => Assert.True(
                             outgoingMessages[b.Id].Count == bundleSize,
-                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"));
+                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"),
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)));
                 },
                 b =>
                 {
                     // 2000 messages for receiver 1
                     Assert.Multiple(
-                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
                         () => Assert.True(
                             outgoingMessages[b.Id].Count == bundleSize,
-                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"));
+                            $"1st bundle count should be {bundleSize}, but was {outgoingMessages[b.Id].Count}"),
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)));
                 },
                 b =>
                 {
                     // 1234 messages for receiver 1
                     Assert.Multiple(
-                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)),
                         () => Assert.True(
                             outgoingMessages[b.Id].Count == receiver1MessageCount % bundleSize,
-                            $"4th bundle count should be {receiver1MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}"));
+                            $"4th bundle count should be {receiver1MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}"),
+                        () => Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver)));
                 },
                 b =>
                 {
                     // 1111 messages for receiver 2
+                    Assert.True(
+                        outgoingMessages[b.Id].Count == receiver2MessageCount % bundleSize,
+                        $"5th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
                     Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver2, om.Receiver));
-                    Assert.True(outgoingMessages[b.Id].Count == receiver2MessageCount % bundleSize, $"5th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
                 }));
     }
 
