@@ -305,8 +305,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                 b =>
                 {
                     // 1111 messages for receiver 2
-                    Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver1, om.Receiver));
-                    Assert.True(outgoingMessages[b.Id].Count == receiver1MessageCount % bundleSize, $"5th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
+                    Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver2, om.Receiver));
+                    Assert.True(outgoingMessages[b.Id].Count == receiver2MessageCount % bundleSize, $"5th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
                 }));
     }
 
