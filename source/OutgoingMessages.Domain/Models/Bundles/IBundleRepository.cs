@@ -28,10 +28,10 @@ public interface IBundleRepository
     /// </summary>
     void Add(Bundle bundle);
 
-    void Add(IList<Bundle> bundles);
+    void Add(IReadOnlyCollection<Bundle> bundles);
 
     /// <summary>
-    ///  Get dequeued bundles older than a specific time.
+    /// Get dequeued bundles older than a specific time.
     /// </summary>
     /// <param name="olderThan"></param>
     /// <param name="take"></param>

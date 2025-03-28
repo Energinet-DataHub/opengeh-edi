@@ -74,7 +74,7 @@ public class BundleMessages(
     /// </summary>
     /// <param name="bundleMetadata"></param>
     /// <param name="cancellationToken"></param>
-    private async Task BundleMessagesAndCommitAsync(BundleMetadataDto bundleMetadata, CancellationToken cancellationToken)
+    private async Task BundleMessagesAndCommitAsync(BundleMetadata bundleMetadata, CancellationToken cancellationToken)
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var bundlingStopwatch = Stopwatch.StartNew();
@@ -113,11 +113,11 @@ public class BundleMessages(
 
     private async Task<List<(Bundle Bundle, int MessageCount)>> CreateBundlesAsync(
         IServiceScope scope,
-        BundleMetadataDto bundleMetadataDto,
+        BundleMetadata bundleMetadata,
         CancellationToken cancellationToken)
     {
-        var receiver = Receiver.Create(bundleMetadataDto.ReceiverNumber, bundleMetadataDto.ReceiverRole);
-        var businessReason = BusinessReason.FromName(bundleMetadataDto.BusinessReason);
+        var receiver = Receiver.Create(bundleMetadata.ReceiverNumber, bundleMetadata.ReceiverRole);
+        var businessReason = BusinessReason.FromName(bundleMetadata.BusinessReason);
 
         var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
 
@@ -133,7 +133,7 @@ public class BundleMessages(
             .GetMessagesForBundleAsync(
                 receiver: receiver,
                 businessReason: businessReason,
-                documentType: bundleMetadataDto.DocumentType,
+                documentType: bundleMetadata.DocumentType,
                 relatedToMessageId: null,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -143,7 +143,7 @@ public class BundleMessages(
             outgoingMessages.Count,
             receiver.Number.Value,
             receiver.ActorRole.Name,
-            bundleMetadataDto.DocumentType.Name);
+            bundleMetadata.DocumentType.Name);
 
         var bundlesToCreate = new List<(Bundle Bundle, int MessageCount)>();
 
@@ -168,7 +168,7 @@ public class BundleMessages(
 
             var bundle = CreateAndCloseBundleForMessages(
                 actorMessageQueueId,
-                bundleMetadataDto.DocumentType,
+                bundleMetadata.DocumentType,
                 businessReason,
                 outgoingMessagesForBundle);
 

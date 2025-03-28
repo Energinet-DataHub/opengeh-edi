@@ -93,12 +93,14 @@ public sealed class Bundle
     /// </remarks>
     public byte[]? RowVersion { get; }
 
-    public void Peek()
+    public PeekResult Peek()
     {
         if (!IsClosed)
             throw new InvalidOperationException($"Trying to peek bundle that was not closed (Id={Id}).");
 
         PeekedAt = SystemClock.Instance.GetCurrentInstant();
+
+        return new PeekResult(Id, MessageId);
     }
 
     public void Add(OutgoingMessage outgoingMessage)

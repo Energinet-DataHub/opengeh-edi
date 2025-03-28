@@ -91,9 +91,7 @@ public class PeekMessage
             return null;
         }
 
-        bundle.Peek();
-
-        var peekResult = new PeekResult(bundle.Id, bundle.MessageId);
+        var peekResult = bundle.Peek();
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId, cancellationToken).ConfigureAwait(false);
 

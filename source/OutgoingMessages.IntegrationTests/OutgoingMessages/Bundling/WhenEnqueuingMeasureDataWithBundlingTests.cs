@@ -106,7 +106,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
     [Theory]
     [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
-    public async Task Given_EnqueuedTwoMessageForDifferentBundles_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage(
+    public async Task Given_EnqueuedTwoMessageForDifferentReceivers_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage(
         Func<Actor, OutgoingMessageDto> messageBuilder)
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;

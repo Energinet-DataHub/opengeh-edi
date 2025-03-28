@@ -64,7 +64,7 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
                 .ToList());
 
         // Wait for all messages to be enqueued (with a timeout)
-        var timeout = TimeSpan.FromMinutes(15);
+        var timeout = TimeSpan.FromMinutes(10);
         var timeoutCancellationToken = new CancellationTokenSource(timeout).Token;
 
         List<EdiDatabaseDriver.OutgoingMessageDto> enqueuedMessages = [];

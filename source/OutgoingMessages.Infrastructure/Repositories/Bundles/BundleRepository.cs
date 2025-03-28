@@ -34,7 +34,7 @@ public class BundleRepository(
         _dbContext.Bundles.Add(bundle);
     }
 
-    public void Add(IList<Bundle> bundles)
+    public void Add(IReadOnlyCollection<Bundle> bundles)
     {
         _dbContext.Bundles.AddRange(bundles);
     }

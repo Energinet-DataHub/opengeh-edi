@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
-public record BundleMetadataDto(
+public record BundleMetadata(
     ActorNumber ReceiverNumber,
     ActorRole ReceiverRole,
     string BusinessReason,
