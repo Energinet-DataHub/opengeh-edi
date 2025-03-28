@@ -158,7 +158,7 @@ public class BundleMessages(
 
         foreach (var outgoingMessage in outgoingMessagesForBundle)
         {
-            outgoingMessage.AssignToBundle(bundle.Id);
+            bundle.Add(outgoingMessage);
         }
 
         bundle.Close(_clock.GetCurrentInstant());
