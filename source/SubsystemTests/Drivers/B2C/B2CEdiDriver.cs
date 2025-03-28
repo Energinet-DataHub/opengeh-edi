@@ -19,9 +19,9 @@ using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
-using RequestWholesaleServicesMarketDocumentV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.RequestWholesaleServicesMarketDocumentV2;
-using RequestWholesaleSettlementChargeTypeV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.RequestWholesaleSettlementChargeTypeV2;
-using RequestWholesaleSettlementSeriesV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.RequestWholesaleSettlementSeriesV2;
+using RequestWholesaleServicesMarketDocumentV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.RequestWholesaleServicesMarketDocumentV2;
+using RequestWholesaleSettlementChargeTypeV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.RequestWholesaleSettlementChargeTypeV2;
+using RequestWholesaleSettlementSeriesV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.RequestWholesaleSettlementSeriesV2;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
@@ -97,9 +97,9 @@ public sealed class B2CEdiDriver : IDisposable
             .ConfigureAwait(false);
     }
 
-    public async Task RequestWholesaleSettlementV2Async(CancellationToken cancellationToken)
+    public async Task RequestWholesaleSettlementTempAsync(CancellationToken cancellationToken)
     {
-        var webApiClient = await CreateWebApiClientV2Async();
+        var webApiClient = await CreateWebApiClientAsync();
 
         var start = Instant.FromUtc(2024, 09, 01, 00, 00);
         var requestWholesaleServicesMarketDocumentV2 = new RequestWholesaleServicesMarketDocumentV2
@@ -136,7 +136,7 @@ public sealed class B2CEdiDriver : IDisposable
                 },
             },
         };
-        await webApiClient.RequestWholesaleSettlementAsync(
+        await webApiClient.TempRequestWholesaleSettlementAsync(
                 api_version: "1.0",
                 body: requestWholesaleServicesMarketDocumentV2,
                 cancellationToken: cancellationToken)
