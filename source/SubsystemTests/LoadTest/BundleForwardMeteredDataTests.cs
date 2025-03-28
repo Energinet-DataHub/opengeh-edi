@@ -73,28 +73,32 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
         List<EdiDatabaseDriver.OutgoingMessageDto> enqueuedMessages = [];
         while (!timeoutCancellationToken.IsCancellationRequested)
         {
-            var previousCount = enqueuedMessages.Count;
+            var previousBundledCount = enqueuedMessages.Count(b => b.AssignedBundleId != null);
             // Get outgoing messages & bundles from database
             enqueuedMessages = await _ediDatabaseDriver.GetNotifyValidatedMeasureDataMessagesFromLoadTestAsync(eventId);
 
+            var enqueuedMessagesCount = enqueuedMessages.Count;
+            var bundledMessagesCount = enqueuedMessages.Count(m => m.AssignedBundleId != null);
+
             _testOutputHelper.WriteLine(
-                "Enqueued messages count: {0} of {1} (elapsed time: {2:g})",
+                "Bundled message count: {0}, enqueued messages count: {1} of {2} (elapsed time: {3:g})",
+                bundledMessagesCount,
                 enqueuedMessages.Count,
                 messagesToEnqueueCount,
                 stopwatch.Elapsed);
 
-            var enqueuedMessagesCount = enqueuedMessages.Count;
-            var finishedEnqueueing = enqueuedMessagesCount >= messagesToEnqueueCount;
-            var stoppedEnqueuing = enqueuedMessagesCount == previousCount;
-            if (finishedEnqueueing || stoppedEnqueuing || timeoutCancellationToken.IsCancellationRequested)
+            var finishedBundling = bundledMessagesCount >= messagesToEnqueueCount;
+            var stoppedBundling = bundledMessagesCount > 00 && bundledMessagesCount == previousBundledCount;
+            if (finishedBundling || stoppedBundling || timeoutCancellationToken.IsCancellationRequested)
             {
                 _testOutputHelper.WriteLine(
-                    "Stopped enqueueing outgoing messages (enqueued {0} in {1:g} minutes, finishedEnqueueing={2}, stoppedEnqueuing={3}, cancellationTimeout={4})",
-                    enqueuedMessages.Count,
+                    "Stopped enqueueing/bundling outgoing messages (enqueued {0}, bundled {5} in {1:g} minutes, finishedBundling={2}, stoppedEnqueuing={3}, cancellationTimeout={4})",
+                    enqueuedMessagesCount,
                     stopwatch.Elapsed,
-                    finishedEnqueueing,
-                    stoppedEnqueuing,
-                    timeoutCancellationToken.IsCancellationRequested);
+                    finishedBundling,
+                    stoppedBundling,
+                    timeoutCancellationToken.IsCancellationRequested,
+                    bundledMessagesCount);
                 break;
             }
 
@@ -102,6 +106,7 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
         }
 
         Assert.NotEmpty(enqueuedMessages);
+        Assert.All(enqueuedMessages, m => Assert.NotNull(m.AssignedBundleId));
 
         var startedAt = enqueuedMessages.First().CreatedAt;
         var finishedAt = enqueuedMessages.First().CreatedAt;
@@ -115,7 +120,7 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
                 finishedAt = outgoingMessage.CreatedAt;
 
             // HashSet does nothing if the bundle id is already added, so we do not need to check for duplicates.
-            bundleIds.Add(outgoingMessage.AssignedBundleId);
+            bundleIds.Add(outgoingMessage.AssignedBundleId!.Value);
         }
 
         var bundles = await _ediDatabaseDriver.GetNotifyValidatedMeasureDataBundlesAsync(bundleIds);

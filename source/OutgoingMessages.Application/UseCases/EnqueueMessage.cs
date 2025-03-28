@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -26,14 +28,13 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 /// </summary>
 public class EnqueueMessage
 {
-    private const int MaxBundleSizeForMeasureData = 2000; // TODO: Get from config
-
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IBundleRepository _bundleRepository;
     private readonly IClock _clock;
     private readonly ILogger<EnqueueMessage> _logger;
     private readonly DelegateMessage _delegateMessage;
+    private readonly BundlingOptions _bundlingOptions;
 
     public EnqueueMessage(
         IOutgoingMessageRepository outgoingMessageRepository,
@@ -41,7 +42,8 @@ public class EnqueueMessage
         IBundleRepository bundleRepository,
         IClock clock,
         ILogger<EnqueueMessage> logger,
-        DelegateMessage delegateMessage)
+        DelegateMessage delegateMessage,
+        IOptions<BundlingOptions> bundlingOptions)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
@@ -49,6 +51,7 @@ public class EnqueueMessage
         _clock = clock;
         _logger = logger;
         _delegateMessage = delegateMessage;
+        _bundlingOptions = bundlingOptions.Value;
     }
 
     public async Task<OutgoingMessageId> EnqueueAsync(
@@ -145,7 +148,7 @@ public class EnqueueMessage
     private int GetMaxBundleSize(DocumentType documentType)
     {
         return documentType == DocumentType.NotifyValidatedMeasureData
-            ? MaxBundleSizeForMeasureData
+            ? _bundlingOptions.MaxBundleSize
             : 1;
     }
 

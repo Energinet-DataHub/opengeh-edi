@@ -144,7 +144,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 notifyEventName));
 
         // Act
-        var whenBundleShouldBeClosed = whenMessageIsEnqueued.Plus(Duration.FromMinutes(BundlingOptions.BundleDurationInMinutes));
+        var whenBundleShouldBeClosed = whenMessageIsEnqueued.Plus(Duration.FromSeconds(BundlingOptions.BundleMessagesOlderThanSeconds));
         GivenNowIs(whenBundleShouldBeClosed);
         await GivenBundleMessagesHasBeenTriggered();
 
@@ -423,7 +423,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         }
 
         // Act
-        var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(Duration.FromMinutes(BundlingOptions.BundleDurationInMinutes));
+        var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(Duration.FromSeconds(BundlingOptions.BundleMessagesOlderThanSeconds));
         GivenNowIs(whenBundleShouldBeClosed);
         await GivenBundleMessagesHasBeenTriggered();
 

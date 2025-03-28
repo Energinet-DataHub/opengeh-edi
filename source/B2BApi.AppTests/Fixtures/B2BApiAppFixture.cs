@@ -34,6 +34,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
@@ -508,8 +509,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Bundling
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{BundlingOptions.SectionName}__{nameof(BundlingOptions.BundleDurationInMinutes)}",
-            "0"); // Setting the bundle duration to 0 ensures that bundles will be created for outgoing messages as soon as the function is triggered
+            $"{BundlingOptions.SectionName}__{nameof(BundlingOptions.BundleMessagesOlderThanSeconds)}",
+            "0"); // Setting the "bundle messages older than" to 0 ensures that bundles will be created for outgoing messages as soon as the function is triggered
 
         // App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(

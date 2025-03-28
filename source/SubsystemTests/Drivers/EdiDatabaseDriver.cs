@@ -200,7 +200,6 @@ internal sealed class EdiDatabaseDriver
                  SELECT
                     [Id],
                     [ActorMessageQueueId],
-                    [MessageCount],
                     [RelatedToMessageId],
                     [ClosedAt]
                  FROM [Bundles]
@@ -286,12 +285,11 @@ internal sealed class EdiDatabaseDriver
     public record BundleDto(
         Guid Id,
         Guid ActorMessageQueueId,
-        int MessageCount,
         string RelatedToMessageId,
         DateTime? ClosedAt);
 
     public record OutgoingMessageDto(
         DateTime CreatedAt,
-        Guid AssignedBundleId,
+        Guid? AssignedBundleId,
         string RelatedToMessageId);
 }

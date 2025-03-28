@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
@@ -107,7 +108,7 @@ public class OutgoingMessageRepository(
     {
         var bundleMessagesCreatedBefore = _clock
             .GetCurrentInstant()
-            .Minus(Duration.FromMinutes(_bundlingOptions.BundleDurationInMinutes));
+            .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
 
         var bundleMetadata = await _context.OutgoingMessages
             .Where(
@@ -138,7 +139,8 @@ public class OutgoingMessageRepository(
         if (relatedToMessageId != null)
             query = query.Where(om => om.RelatedToMessageId == relatedToMessageId);
 
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds, CancellationToken cancellationToken)

@@ -14,15 +14,21 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 
 public class BundlingOptions
 {
     public const string SectionName = "Bundling";
 
     /// <summary>
-    /// How old a bundle can be before it should be closed when peeked.
+    /// How old an outgoing messages can be before it should be bundled.
     /// </summary>
     [Required]
-    public double BundleDurationInMinutes { get; set; } = 5;
+    public double BundleMessagesOlderThanSeconds { get; set; } = 300; // 5 minutes
+
+    /// <summary>
+    /// The maximum amount of messages that should be added to a bundle.
+    /// </summary>
+    [Required]
+    public int MaxBundleSize { get; set; } = 2000;
 }

@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -26,12 +28,14 @@ public class BundleMessages(
     ILogger<BundleMessages> logger,
     IClock clock,
     IOutgoingMessageRepository outgoingMessageRepository,
-    IServiceScopeFactory serviceScopeFactory)
+    IServiceScopeFactory serviceScopeFactory,
+    IOptions<BundlingOptions> bundlingOptions)
 {
     private readonly ILogger<BundleMessages> _logger = logger;
     private readonly IClock _clock = clock;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository = outgoingMessageRepository;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly BundlingOptions _bundlingOptions = bundlingOptions.Value;
 
     /// <summary>
     /// Closes bundles that are ready to be closed in a single transaction, and returns the number of closed bundles.
@@ -47,8 +51,10 @@ public class BundleMessages(
         {
             // TODO: This loop could instead add a message to a service bus, and create bundles async separately in
             // a service bus trigger. This would increase scaling, instead of creating all bundles in a single transaction.
+            // Alternatively, it could be created as a DurableFunction, that first gets all bundle metadata, and then
+            // fans out to create bundles for each bundle metadata in parallel.
             using var scope = _serviceScopeFactory.CreateScope();
-            var bundlesToCreate = await BundleMessagesForAsync(
+            var bundlesToCreate = await CreateBundlesForAsync(
                     scope,
                     bundleMetadata,
                     cancellationToken)
@@ -64,7 +70,7 @@ public class BundleMessages(
         return messagesReadyToBeBundled.Count;
     }
 
-    private async Task<List<Bundle>> BundleMessagesForAsync(
+    private async Task<List<Bundle>> CreateBundlesForAsync(
         IServiceScope scope,
         BundleMetadataDto bundleMetadataDto,
         CancellationToken cancellationToken)
@@ -103,10 +109,26 @@ public class BundleMessages(
         var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
         while (outgoingMessagesList.Count > 0)
         {
-            const int bundleSize = 2000;
+            var bundleSize = _bundlingOptions.MaxBundleSize;
             var outgoingMessagesForBundle = outgoingMessagesList
                 .Take(bundleSize)
                 .ToList();
+
+            if (outgoingMessagesForBundle.Count < bundleSize)
+            {
+                // Only create partial bundles for the outgoing messages that are older than X minutes
+                var bundleMessagesCreatedBefore = _clock
+                    .GetCurrentInstant()
+                    .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
+
+                outgoingMessagesForBundle = outgoingMessagesForBundle
+                    .Where(om => om.CreatedAt <= bundleMessagesCreatedBefore)
+                    .ToList();
+            }
+
+            // If there are no messages to bundle, break the loop
+            if (outgoingMessagesForBundle.Count == 0)
+                break;
 
             var bundle = CreateBundle(
                 actorMessageQueueId,

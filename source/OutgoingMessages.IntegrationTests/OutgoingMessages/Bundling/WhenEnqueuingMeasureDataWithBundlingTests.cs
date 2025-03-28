@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
@@ -81,7 +82,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         // - Move clock to when bundles should be created
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
-        var whenBundlesShouldBeCreated = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
         _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
 
         // - Create bundles
@@ -112,6 +113,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     public async Task Given_EnqueuedTwoMessageForDifferentBundles_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage(
         Func<Actor, OutgoingMessageDto> messageBuilder)
     {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
         // Given existing bundle
         var receiver1 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var receiver2 = new Actor(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
@@ -128,8 +131,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         // When creating bundles
         // - Move clock to when bundles should be created
-        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
-        var whenBundlesShouldBeCreated = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
         _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
 
         // - Create bundles
@@ -155,6 +157,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     [Fact]
     public async Task Given_MessagesEnqueuedForTwoDifferentReceivers_When_BundleMessages_Then_AllMessagesAreInCorrectBundles()
     {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
         // Given messages enqueued for two different receivers
         var receiver1 = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var receiver2 = Receiver.Create(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
@@ -171,7 +175,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - Create messages for receivers
         var eventId = EventId.From(Guid.NewGuid());
         var startTime = Instant.FromUtc(2024, 03, 21, 23, 00, 00);
-        const int bundleSize = 2000;
+        var bundleSize = bundlingOptions.MaxBundleSize; // Max bundle size = 2000
         const int receiver1MessageCount = 7234; // 4 bundles for receiver 1
         var receiver1BundleCount = (int)Math.Ceiling((double)receiver1MessageCount / bundleSize);
         const int receiver2MessageCount = 1111; // 1 bundle for receiver 2
@@ -224,8 +228,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         // When bundling the messages
         // - Move clock to when bundles should be created
-        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
-        var whenBundlesShouldBeCreated = now.Plus(Duration.FromMinutes(bundlingOptions.BundleDurationInMinutes));
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
         _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
 
         // - Bundle messages
