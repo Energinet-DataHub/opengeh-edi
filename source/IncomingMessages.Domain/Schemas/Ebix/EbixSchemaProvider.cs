@@ -23,6 +23,13 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
     private readonly ISchema _schema = new EbixSchemas();
     private readonly Dictionary<string, XmlSchema> _schemaCache = new();
 
+    public EbixSchemaProvider()
+    {
+        var schemaName = _schema.GetSchemaLocation(ParseDocumentType(DocumentType.NotifyValidatedMeasureData), "3")
+            ?? throw new ArgumentException("Schema not found for DocumentType.NotifyValidatedMeasureData");
+        LoadSchemaWithDependentSchemas(schemaName, CancellationToken.None);
+    }
+
     public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
     {
         var schemaName = _schema.GetSchemaLocation(ParseDocumentType(type), version);
@@ -70,8 +77,9 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         pathElements.RemoveAt(pathElements.Count - 1);
         var relativeSchemaPath = string.Join("\\", pathElements) + "\\";
 
-        foreach (XmlSchemaExternal external in xmlSchema.Includes)
+        foreach (var o in xmlSchema.Includes)
         {
+            var external = (XmlSchemaExternal)o;
             if (external.SchemaLocation == null)
             {
                 continue;
@@ -86,6 +94,47 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         return (T)(object)xmlSchema;
     }
 
+    protected XmlSchema? LoadSchemaWithDependentSchemas(
+        string location, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(location);
+
+        // Ensure that only backslashes are used in paths
+        location = location.Replace("/", "\\", StringComparison.InvariantCulture);
+        if (_schemaCache.TryGetValue(location, out var cached))
+            return cached;
+
+        using var reader = new XmlTextReader(location);
+        var xmlSchema = XmlSchema.Read(reader, null) ?? throw new XmlSchemaException($"Could not read schema at {location}");
+
+        _schemaCache.TryAdd(location, xmlSchema);
+
+        // Extract path of the current XSD as includes are relative to this
+        var pathElements = location.Split('\\').ToList();
+        pathElements.RemoveAt(pathElements.Count - 1);
+        var relativeSchemaPath = string.Join("\\", pathElements) + "\\";
+
+        foreach (XmlSchemaExternal external in xmlSchema.Includes)
+        {
+            if (external.SchemaLocation == null)
+            {
+                continue;
+            }
+
+            if (_schemaCache.TryGetValue(relativeSchemaPath + external.SchemaLocation, out var cachedExternal))
+            {
+                external.Schema = cachedExternal;
+                continue;
+            }
+
+            external.Schema =
+                LoadSchemaWithDependentSchemas(
+                        relativeSchemaPath + external.SchemaLocation, cancellationToken);
+        }
+
+        return xmlSchema;
+    }
+
     private static string ParseDocumentType(DocumentType document)
     {
         if (document == DocumentType.NotifyAggregatedMeasureData)
@@ -96,6 +145,8 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             return "DK_NotifyAggregatedWholesaleServices";
         if (document == DocumentType.RejectRequestWholesaleSettlement)
             return "DK_RejectAggregatedBillingInformation";
+        if (document == DocumentType.NotifyValidatedMeasureData)
+            return "DK_MeteredDataTimeSeries";
 
         throw new InvalidOperationException("Unknown document type");
     }
