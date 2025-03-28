@@ -70,6 +70,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider, I
         {
             var streamContent = await new StreamReader(marketMessage.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
             _logger.LogError(e, "Error validating incoming message: {StreamContent}", streamContent.Substring(0, 5000));
+            _logger.LogError(e, "Schema with target namespace '{TargetNamespace}' and source URI '{SourceUri}' to XmlReaderSettings", schemaResult.TargetNamespace, schemaResult.SourceUri);
             throw;
         }
     }
@@ -225,7 +226,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider, I
         }
         catch (XmlSchemaException e)
         {
-            _logger.LogError(e, "Error adding schema {XmlSchema} to XmlReaderSettings", xmlSchema);
+            _logger.LogError(e, "Error adding schema with target namespace '{TargetNamespace}' and source URI '{SourceUri}' to XmlReaderSettings", xmlSchema.TargetNamespace, xmlSchema.SourceUri);
             throw;
         }
 
