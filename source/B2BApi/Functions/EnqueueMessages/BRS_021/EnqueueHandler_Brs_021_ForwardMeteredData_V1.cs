@@ -82,10 +82,12 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                         EnergyObservations: energyObservations));
 
                 await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+
+                // We must commit after every enqueue, else the same bundle will be created multiple times and
+                // fail because of a unique constraint.
+                await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
             }
         }
-
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)

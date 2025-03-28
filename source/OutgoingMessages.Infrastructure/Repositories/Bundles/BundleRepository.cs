@@ -16,18 +16,27 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 
-public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepository
+public class BundleRepository(
+    ActorMessageQueueContext dbContext)
+        : IBundleRepository
 {
     private readonly ActorMessageQueueContext _dbContext = dbContext;
 
     public void Add(Bundle bundle)
     {
         _dbContext.Bundles.Add(bundle);
+    }
+
+    public void Add(IReadOnlyCollection<Bundle> bundles)
+    {
+        _dbContext.Bundles.AddRange(bundles);
     }
 
     public void Delete(IReadOnlyCollection<Bundle> bundles)
@@ -49,26 +58,30 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
             .ConfigureAwait(false);
     }
 
-    public async Task<Bundle?> GetOldestBundleAsync(
-        ActorMessageQueueId id,
+    public async Task<Bundle?> GetNextBundleToPeekAsync(
+        ActorMessageQueueId actorMessageQueueId,
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
-        if (messageCategory == MessageCategory.None)
-        {
-            return await _dbContext.Bundles.Where(b =>
-                b.ActorMessageQueueId == id &&
-                b.DequeuedAt == null)
-                .OrderBy(b => b.Created)
-                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
-        }
+        // This query should be covered by the "IX_Bundles_NextBundleToPeek" index
+        // Get the oldest bundle that is:
+        // - In the given actor message queue & category
+        // - Not dequeued
+        // - Closed
+        var query = _dbContext.Bundles.Where(
+            b =>
+                b.ActorMessageQueueId == actorMessageQueueId &&
+                b.DequeuedAt == null &&
+                b.ClosedAt != null);
 
-        return await _dbContext.Bundles.Where(b =>
-                                                   b.ActorMessageQueueId == id &&
-                                                   b.DequeuedAt == null &&
-                                                   b.MessageCategory == messageCategory)
-                                                   .OrderBy(b => b.Created)
-                                                   .FirstOrDefaultAsync(cancellationToken)
-                                                   .ConfigureAwait(false);
+        if (messageCategory != MessageCategory.None)
+            query = query.Where(b => b.MessageCategory == messageCategory);
+
+        var nextBundle = await query
+            .OrderBy(b => b.Created)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return nextBundle;
     }
 }

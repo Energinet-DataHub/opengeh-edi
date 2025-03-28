@@ -37,4 +37,38 @@ internal sealed class ServiceBusSenderClient : IAsyncDisposable
     {
         await _sender.SendMessageAsync(message, cancellationToken).ConfigureAwait(false);
     }
+
+    internal async Task SendAsync(List<ServiceBusMessage> messages, CancellationToken cancellationToken)
+    {
+        List<ServiceBusMessageBatch> batches = [await _sender.CreateMessageBatchAsync(cancellationToken)];
+        var sendTasks = new List<Task>();
+        foreach (var message in messages)
+        {
+            var couldAddToBatch = batches.Last().TryAddMessage(message);
+
+            // If batch is full, send batch and create a new one.
+            if (!couldAddToBatch)
+            {
+                // Send batch and add task to list
+                var sendTask = _sender.SendMessagesAsync(batches.Last(), cancellationToken);
+                sendTasks.Add(sendTask);
+
+                // Create new batch
+                batches.Add(await _sender.CreateMessageBatchAsync(cancellationToken));
+
+                // The previous batch couldn't fit this message, so we need to add the message to the new batch.
+                if (!batches.Last().TryAddMessage(message))
+                    throw new InvalidOperationException("Batch couldn't fit a single message");
+            }
+        }
+
+        // Send the last batch
+        sendTasks.Add(_sender.SendMessagesAsync(batches.Last(), cancellationToken));
+
+        // Wait for all send tasks to be finished
+        await Task.WhenAll(sendTasks).ConfigureAwait(false);
+
+        // Dispose all batches
+        batches.ForEach(b => b.Dispose());
+    }
 }
