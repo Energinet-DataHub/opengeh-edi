@@ -22,12 +22,14 @@ using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
-using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit.Abstractions;
 using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataInputV1;
@@ -43,6 +45,8 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
         : base(integrationTestFixture, testOutputHelper)
     {
     }
+
+    protected BundlingOptions BundlingOptions => GetService<IOptions<BundlingOptions>>().Value;
 
     protected async Task<ResponseMessage> GivenReceivedMeteredDataForMeteringPoint(
         DocumentFormat documentFormat,

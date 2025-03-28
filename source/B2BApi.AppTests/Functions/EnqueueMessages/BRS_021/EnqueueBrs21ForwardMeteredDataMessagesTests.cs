@@ -14,9 +14,12 @@
 
 using System.Globalization;
 using System.Net;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
+using Energinet.DataHub.EDI.B2BApi.Functions;
+using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
@@ -80,7 +83,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueAcceptedBrs021MessageWithMultipleReceivers_When_MessageIsReceived_Then_AcceptedMessagesAreEnqueued_AndThen_AcceptedMessagesCanBePeeked()
+    public async Task Given_EnqueueAcceptedBrs021MessageWithMultipleReceivers_When_MessageIsReceived_AndWhen_MessageIsBundled_Then_AcceptedMessagesAreEnqueued_AndThen_AcceptedMessagesCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
@@ -180,22 +183,29 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
-        // Assert
+        // Verify the function was executed
+        var enqueueFunctionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: nameof(EnqueueTrigger_Brs_021_ForwardMeteredData));
+        enqueueFunctionResult.Succeeded.Should().BeTrue("because the enqueue function should have been completed with success. Host log:\n{0}", enqueueFunctionResult.HostLog);
+
+        // => And when message is bundled
+        await _fixture.AppHostManager.TriggerFunctionAsync(nameof(OutgoingMessagesBundler));
+
+        // Verify the bundling function was executed
+        var bundleFunctionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: nameof(OutgoingMessagesBundler));
+        bundleFunctionResult.Succeeded.Should().BeTrue("because the OutgoingMessagesBundler function should have been completed with success. Host log:\n{0}", enqueueFunctionResult.HostLog);
+
         using var assertionScope = new AssertionScope();
 
-        // Verify the function was executed
-        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
-            functionName: nameof(EnqueueTrigger_Brs_021_ForwardMeteredData));
-        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
-
-        // Verify that outgoing messages were enqueued
+        // => Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
             .Where(om => om.EventId == eventId && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
         enqueuedOutgoingMessages.Should().HaveCount(2);
 
-        // Verify that the enqueued message can be peeked
+        // => Verify that the enqueued message can be peeked
         List<(Actor Actor, decimal EnergyQuantity, Instant Start, Instant End)> expectedReceivers =
         [
             (new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole), receiver1Quantity, receiver1Start, receiver1End),
@@ -222,7 +232,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
                 .And.Contain($"\"value\": \"{expectedReceiver.End.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"", $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected end");
         }
 
-        // Verify that the expected notify message was sent on the ServiceBus
+        // => Verify that the expected notify message was sent on the ServiceBus
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
             orchestrationInstanceId,
             ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName);

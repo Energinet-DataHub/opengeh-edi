@@ -20,16 +20,14 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.Tests.DocumentValidation;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas;
 using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
 using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model.ForwardMeteredDataInputV1;
@@ -56,7 +54,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
 
     [Theory]
     [MemberData(nameof(SupportedDocumentFormats))]
-    public async Task When_ActorPeeksMessage_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
+    public async Task When_ActorPeeksMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
     {
         /*
          *  --- PART 1: Receive request and send message to Process Manager ---
@@ -69,7 +67,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         var receiverActor = (ActorNumber: ActorNumber.Create("8100000000115"), ActorRole: ActorRole.EnergySupplier);
         var orchestrationInstanceId = Guid.NewGuid();
         var resolution = Resolution.Hourly;
-        var notifyEventName = ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName;
+        const string notifyEventName = ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName;
 
         var registeredAt = Instant.FromUtc(2022, 12, 17, 9, 30, 00);
         var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
@@ -83,7 +81,8 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             (4, "A03", 654.321m),
         };
 
-        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        var whenMessageIsEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
+        GivenNowIs(whenMessageIsEnqueued);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
 
         var transactionId = Guid.NewGuid().ToString("N");
@@ -143,6 +142,10 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 notifyEventName));
 
         // Act
+        var whenBundleShouldBeClosed = whenMessageIsEnqueued.Plus(Duration.FromSeconds(BundlingOptions.BundleMessagesOlderThanSeconds));
+        GivenNowIs(whenBundleShouldBeClosed);
+        await GivenBundleMessagesHasBeenTriggered();
+
         var peekResults = await WhenActorPeeksAllMessages(
             receiverActor.ActorNumber,
             receiverActor.ActorRole,
@@ -170,14 +173,13 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                         SenderScheme: "A10",
                         SenderRole: "DGL",
                         ReceiverRole: "DDQ",
-                        Timestamp: "2024-07-01T14:57:09Z"),
+                        Timestamp: InstantPattern.General.Format(whenBundleShouldBeClosed)),
                     OptionalHeaderDocumentFields: new OptionalHeaderDocumentFields(
                         BusinessSectorType: "23",
                         AssertSeriesDocumentFieldsInput: [
                             new AssertSeriesDocumentFieldsInput(
                                 1,
                                 RequiredSeriesFields: new RequiredSeriesFields(
-                                    TransactionId: TransactionId.From(Guid.NewGuid().ToString()),
                                     MeteringPointNumber: "579999993331812345",
                                     MeteringPointScheme: "A10",
                                     MeteringPointType: MeteringPointType.FromCode("E17"),
@@ -211,7 +213,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
 
     [Theory]
     [MemberData(nameof(SupportedRejectDocumentFormats))]
-    public async Task AndGiven_InvalidPeriod_When_ActorPeeksMessage_Then_ReceivesOneRejectDocumentWithCorrectContent(DocumentFormat documentFormat)
+    public async Task AndGiven_InvalidPeriod_When_ActorPeeksMessages_Then_ReceivesOneRejectDocumentWithCorrectContent(DocumentFormat documentFormat)
     {
         /*
          *  --- PART 1: Receive request and send message to Process Manager ---
@@ -330,5 +332,153 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 new("E17", "Invalid Period"),
             }.ToArray())
             .DocumentIsValidAsync();
+    }
+
+    [Theory]
+    [MemberData(nameof(SupportedDocumentFormats))]
+    public async Task AndGiven_TwoForwardMeteredDataThatShouldBeBundled_When_ActorPeeksMessages_Then_ReceivesOneDocumentWithCorrectContentFromBothMessages(DocumentFormat documentFormat)
+    {
+        // Arrange
+        var senderSpyNotify = CreateServiceBusSenderSpy(NotifySenderClientNames.Brs021ForwardMeteredDataNotifySender);
+        var senderActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.GridAccessProvider);
+        var receiverActor = (ActorNumber: ActorNumber.Create("8100000000115"), ActorRole: ActorRole.EnergySupplier);
+        var resolution = Resolution.Hourly;
+
+        var whenMessagesAreEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
+        GivenNowIs(whenMessagesAreEnqueued);
+        GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
+
+        const string meteringPointId = "1234567890123";
+
+        // Arrange
+        var message1 = new ForwardMeteredDataInputV1(
+            ActorMessageId: Guid.NewGuid().ToString(),
+            TransactionId: Guid.NewGuid().ToString(),
+            ActorNumber: senderActor.ActorNumber.Value,
+            ActorRole: senderActor.ActorRole.Name,
+            BusinessReason: BusinessReason.PeriodicMetering.Name,
+            MeteringPointId: meteringPointId,
+            MeteringPointType: MeteringPointType.Consumption.Name,
+            ProductNumber: "8716867000030",
+            MeasureUnit: MeasurementUnit.KilowattHour.Name,
+            RegistrationDateTime: "2024-12-31T23:00:00Z",
+            Resolution: resolution.Name,
+            StartDateTime: "2024-12-31T23:00Z",
+            EndDateTime: "2025-01-01T02:00Z",
+            GridAccessProviderNumber: senderActor.ActorNumber.Value,
+            DelegatedGridAreaCodes: [],
+            MeteredDataList: [ // Start -> End = 3 hours = 3 points (with hourly resolution)
+                new("1", "1.01", Quality.Measured.Name),
+                new("2", "1.02", Quality.Calculated.Name),
+                new("3", "1.03", Quality.Estimated.Name),
+            ]);
+
+        var message2 = new ForwardMeteredDataInputV1(
+            ActorMessageId: Guid.NewGuid().ToString(),
+            TransactionId: Guid.NewGuid().ToString(),
+            ActorNumber: senderActor.ActorNumber.Value,
+            ActorRole: senderActor.ActorRole.Name,
+            BusinessReason: BusinessReason.PeriodicMetering.Name,
+            MeteringPointId: meteringPointId,
+            MeteringPointType: MeteringPointType.Consumption.Name,
+            ProductNumber: "8716867000030",
+            MeasureUnit: MeasurementUnit.KilowattHour.Name,
+            RegistrationDateTime: "2024-12-31T23:01:00Z",
+            Resolution: Resolution.Hourly.Name,
+            StartDateTime: "2024-12-31T23:00Z",
+            EndDateTime: "2025-01-01T04:00Z",
+            GridAccessProviderNumber: senderActor.ActorNumber.Value,
+            DelegatedGridAreaCodes: [],
+            MeteredDataList: [ // Start -> End = 5 hours = 5 points (with hourly resolution)
+                new("1", "2.01", Quality.Measured.Name),
+                new("2", "2.02", Quality.Measured.Name),
+                new("3", "2.03", Quality.Measured.Name),
+                new("4", "2.04", Quality.Calculated.Name),
+                new("5", "2.05", Quality.Estimated.Name),
+            ]);
+
+        var forwardMeteredDataMessages = new List<(Guid OrchestrationInstanceId, ForwardMeteredDataInputV1 Input)>()
+        {
+            (OrchestrationInstanceId: Guid.NewGuid(), Input: message1),
+            (OrchestrationInstanceId: Guid.NewGuid(), Input: message2),
+        };
+
+        foreach (var forwardMeteredDataMessage in forwardMeteredDataMessages)
+        {
+            var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
+                .GenerateAcceptedFrom(
+                    requestMeteredDataForMeteringPointMessageInputV1: forwardMeteredDataMessage.Input,
+                    receiverActor: receiverActor,
+                    orchestrationInstanceId: forwardMeteredDataMessage.OrchestrationInstanceId);
+
+            await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
+
+            AssertCorrectProcessManagerNotification(
+                serviceBusMessage: senderSpyNotify.LatestMessage!,
+                assertionInput: new NotifyOrchestrationInstanceEventV1AssertionInput(
+                    InstanceId: forwardMeteredDataMessage.OrchestrationInstanceId,
+                    EventName: ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName));
+        }
+
+        // Act
+        var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(Duration.FromSeconds(BundlingOptions.BundleMessagesOlderThanSeconds));
+        GivenNowIs(whenBundleShouldBeClosed);
+        await GivenBundleMessagesHasBeenTriggered();
+
+        var peekResults = await WhenActorPeeksAllMessages(
+            receiverActor.ActorNumber,
+            receiverActor.ActorRole,
+            documentFormat);
+
+        // Assert
+        PeekResultDto peekResult;
+        using (new AssertionScope())
+        {
+            peekResult = peekResults
+                .Should()
+                .ContainSingle()
+                .Subject;
+        }
+
+        await ThenNotifyValidatedMeasureDataDocumentIsCorrect(
+            peekResultDocumentStream: peekResult.Bundle,
+            documentFormat: documentFormat,
+            assertionInput: new NotifyValidatedMeasureDataDocumentAssertionInput(
+                RequiredHeaderDocumentFields: new RequiredHeaderDocumentFields(
+                    BusinessReasonCode: "E23",
+                    ReceiverId: "8100000000115",
+                    ReceiverScheme: "A10",
+                    SenderId: "5790001330552",
+                    SenderScheme: "A10",
+                    SenderRole: "DGL",
+                    ReceiverRole: "DDQ",
+                    Timestamp: InstantPattern.General.Format(whenBundleShouldBeClosed)),
+                OptionalHeaderDocumentFields: new OptionalHeaderDocumentFields(
+                    BusinessSectorType: "23",
+                    AssertSeriesDocumentFieldsInput: forwardMeteredDataMessages
+                        .Select(
+                            (m, index) => new AssertSeriesDocumentFieldsInput(
+                                index + 1, // Series number is 1-indexed
+                                RequiredSeriesFields: new RequiredSeriesFields(
+                                    MeteringPointNumber: meteringPointId,
+                                    MeteringPointScheme: "A10",
+                                    MeteringPointType: MeteringPointType.Consumption,
+                                    QuantityMeasureUnit: "KWH",
+                                    RequiredPeriodDocumentFields: new RequiredPeriodDocumentFields(
+                                        Resolution: "PT1H",
+                                        StartedDateTime: m.Input.StartDateTime,
+                                        EndedDateTime: m.Input.EndDateTime!,
+                                        Points: m.Input.MeteredDataList
+                                            .Select(md => new AssertPointDocumentFieldsInput(
+                                                new RequiredPointDocumentFields(int.Parse(md.Position!)),
+                                                new OptionalPointDocumentFields(Quality.FromName(md.QuantityQuality!), decimal.Parse(md.EnergyQuantity!, CultureInfo.InvariantCulture))))
+                                            .ToList())),
+                                OptionalSeriesFields: new OptionalSeriesFields(
+                                    OriginalTransactionIdReferenceId: m.Input.TransactionId,
+                                    RegistrationDateTime: m.Input.RegistrationDateTime,
+                                    InDomain: null,
+                                    OutDomain: null,
+                                    Product: "8716867000030")))
+                        .ToList())));
     }
 }

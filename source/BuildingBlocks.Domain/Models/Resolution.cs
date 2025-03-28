@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json.Serialization;
+using NodaTime;
 using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -29,5 +30,24 @@ public class Resolution : DataHubType<Resolution>
     private Resolution(string name, string code)
         : base(name, code)
     {
+    }
+
+    public ProcessManager.Components.Abstractions.ValueObjects.Resolution ToProcessManagerResolution()
+    {
+        return ProcessManager.Components.Abstractions.ValueObjects.Resolution.FromName(Name);
+    }
+
+    public Duration ToDuration()
+    {
+        var resolutionDuration = this switch
+        {
+            var r when r == QuarterHourly => Duration.FromMinutes(15),
+            var r when r == Hourly => Duration.FromHours(1),
+            var r when r == Daily => Duration.FromDays(1),
+            var r when r == Monthly => throw new InvalidOperationException("Monthly resolution to duration is not supported, since a month is not a fixed duration."),
+            _ => throw new ArgumentOutOfRangeException(nameof(Name), Name, "Unknown resolution."),
+        };
+
+        return resolutionDuration;
     }
 }
