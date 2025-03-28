@@ -82,7 +82,4 @@ limitations under the License.
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functions\BundleMessages\" />
-  </ItemGroup>
 </Project>

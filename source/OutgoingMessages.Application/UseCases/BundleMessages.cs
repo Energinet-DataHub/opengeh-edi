@@ -54,7 +54,7 @@ public class BundleMessages(
             // Alternatively, it could be created as a DurableFunction, that first gets all bundle metadata, and then
             // fans out to create bundles for each bundle metadata in parallel.
             using var scope = _serviceScopeFactory.CreateScope();
-            var bundlesToCreate = await CreateBundlesForAsync(
+            var bundlesToCreate = await CreateBundlesAsync(
                     scope,
                     bundleMetadata,
                     cancellationToken)
@@ -77,7 +77,7 @@ public class BundleMessages(
         return messagesReadyToBeBundled.Count;
     }
 
-    private async Task<List<Bundle>> CreateBundlesForAsync(
+    private async Task<List<Bundle>> CreateBundlesAsync(
         IServiceScope scope,
         BundleMetadataDto bundleMetadataDto,
         CancellationToken cancellationToken)
