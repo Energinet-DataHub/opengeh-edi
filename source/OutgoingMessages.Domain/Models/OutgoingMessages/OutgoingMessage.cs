@@ -168,6 +168,9 @@ public class OutgoingMessage
 
     public void AssignToBundle(BundleId bundleId)
     {
+        if (AssignedBundleId != null)
+            throw new InvalidOperationException($"Cannot assign a message to a bundle when it is already assigned to another bundle (MessageId={Id.Value}, CurrentBundleId={AssignedBundleId.Id}, NewBundleId={bundleId.Id})");
+
         AssignedBundleId = bundleId;
     }
 

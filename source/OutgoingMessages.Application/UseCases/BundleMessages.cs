@@ -60,6 +60,13 @@ public class BundleMessages(
                     cancellationToken)
                 .ConfigureAwait(false);
 
+            _logger.LogInformation(
+                "Creating {BundleCount} bundles for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
+                bundlesToCreate.Count,
+                bundleMetadata.ReceiverNumber.Value,
+                bundleMetadata.ReceiverRole.Name,
+                bundleMetadata.DocumentType.Name);
+
             var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
             bundleRepository.Add(bundlesToCreate);
 
@@ -133,13 +140,6 @@ public class BundleMessages(
 
             outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count);
         }
-
-        _logger.LogInformation(
-            "Creating {BundleCount} bundles for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
-            bundlesToCreate.Count,
-            receiver.Number.Value,
-            receiver.ActorRole.Name,
-            bundleMetadataDto.DocumentType.Name);
 
         return bundlesToCreate;
     }
