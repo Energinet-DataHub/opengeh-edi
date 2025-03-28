@@ -61,7 +61,7 @@
       <None Update="Drivers\Ebix\DH3-test-mosaik-energysupplier-private-and-public.pfx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="subsystemtests.dev002.settings.json">
+      <None Update="subsystemtests.dev001.settings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Drivers\Ebix\DH3-test-Mosaic-GridAccessProvider.pfx">

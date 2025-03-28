@@ -78,7 +78,7 @@ public class TempRequestWholesaleSettlementController : ControllerBase
 
         var message = new RequestWholesaleSettlementDto(
             currentUser.ActorNumber,
-            currentUser.ActorNumber,
+            MapRoleNameToCode(currentUser.MarketRole),
             DataHubDetails.DataHubActorNumber.Value,
             ActorRole.MeteredDataAdministrator.Code,
             request.BusinessReason,
@@ -119,5 +119,20 @@ public class TempRequestWholesaleSettlementController : ControllerBase
         var byteArray = encoding.GetBytes(jsonString);
         var memoryStream = new MemoryStream(byteArray);
         return new IncomingMarketMessageStream(memoryStream);
+    }
+
+    private static string MapRoleNameToCode(string roleName)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(roleName);
+        var actorRole = ActorRole.FromName(roleName);
+
+        if (actorRole == ActorRole.SystemOperator
+            || actorRole == ActorRole.EnergySupplier
+            || actorRole == ActorRole.GridAccessProvider)
+        {
+            return actorRole.Code;
+        }
+
+        throw new ArgumentException($"Market Role: {actorRole}, is not allowed to request wholesale settlement.");
     }
 }
