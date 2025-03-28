@@ -105,14 +105,6 @@ public sealed class B2CEdiDriver : IDisposable
         var requestWholesaleServicesMarketDocumentV2 = new RequestWholesaleServicesMarketDocumentV2
         {
             BusinessReason = "D05",
-            BusinessType = "A02",
-            MessageId = Guid.NewGuid().ToString(),
-            CreatedAt = start.ToString(),
-            MessageType = "D21",
-            SenderNumber = "5790001330552",
-            ReceiverNumber = "5790001330801",
-            SenderRoleCode = "DGL",
-            ReceiverRoleCode = "DDQ",
             Series = new List<RequestWholesaleSettlementSeriesV2>
             {
                 new RequestWholesaleSettlementSeriesV2

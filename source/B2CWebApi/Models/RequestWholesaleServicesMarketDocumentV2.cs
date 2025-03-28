@@ -15,15 +15,7 @@
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 public record RequestWholesaleServicesMarketDocumentV2(
-    string SenderNumber,
-    string SenderRoleCode,
-    string ReceiverNumber,
-    string ReceiverRoleCode,
     string BusinessReason,
-    string MessageType,
-    string MessageId,
-    string CreatedAt,
-    string? BusinessType,
     IReadOnlyCollection<RequestWholesaleSettlementSeriesV2> Series);
 
 public record RequestWholesaleSettlementSeriesV2(

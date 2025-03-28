@@ -563,33 +563,8 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "senderNumber": {
-            "type": "string"
-          },
-          "senderRoleCode": {
-            "type": "string"
-          },
-          "receiverNumber": {
-            "type": "string"
-          },
-          "receiverRoleCode": {
-            "type": "string"
-          },
           "businessReason": {
             "type": "string"
-          },
-          "messageType": {
-            "type": "string"
-          },
-          "messageId": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "businessType": {
-            "type": "string",
-            "nullable": true
           },
           "series": {
             "type": "array",
