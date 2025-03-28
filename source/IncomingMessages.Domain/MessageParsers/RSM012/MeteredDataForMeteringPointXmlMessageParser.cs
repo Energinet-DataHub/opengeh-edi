@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDateForMeteringPointXmlMessageParser(CimXmlSchemaProvider schemaProvider)
+public class MeteredDataForMeteringPointXmlMessageParser(CimXmlSchemaProvider schemaProvider)
     : XmlMessageParserBase(schemaProvider)
 {
     private const string SeriesElementName = "Series";

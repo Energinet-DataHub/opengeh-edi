@@ -17,7 +17,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
-public sealed record MeteredDateForMeteringPointMarketActivityRecord(
+public sealed record MeteredDataForMeteringPointMarketActivityRecord(
     TransactionId TransactionId,
     string MarketEvaluationPointNumber,
     MeteringPointType MarketEvaluationPointType,

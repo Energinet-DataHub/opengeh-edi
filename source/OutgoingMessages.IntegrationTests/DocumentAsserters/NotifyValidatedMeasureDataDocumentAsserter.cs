@@ -44,11 +44,11 @@ public class NotifyValidatedMeasureDataDocumentAsserter
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(assertionInput);
 
-        IAssertMeteredDateForMeteringPointDocumentDocument asserter = documentFormat.Name switch
+        IAssertMeteredDataForMeteringPointDocumentDocument asserter = documentFormat.Name switch
         {
-            nameof(DocumentFormat.Xml) => new AssertMeteredDateForMeteringPointXmlDocument(
+            nameof(DocumentFormat.Xml) => new AssertMeteredDataForMeteringPointXmlDocument(
                 CreateCimXmlAsserter(document)),
-            nameof(DocumentFormat.Json) => new AssertMeteredDateForMeteringPointJsonDocument(document),
+            nameof(DocumentFormat.Json) => new AssertMeteredDataForMeteringPointJsonDocument(document),
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 

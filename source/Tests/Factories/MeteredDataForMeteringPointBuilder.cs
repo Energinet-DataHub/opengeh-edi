@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public class MeteredDateForMeteringPointBuilder
+public class MeteredDataForMeteringPointBuilder
 {
     public OutgoingMessageHeader BuildHeader()
     {
@@ -33,9 +33,9 @@ public class MeteredDateForMeteringPointBuilder
             SampleData.TimeStamp);
     }
 
-    public MeteredDateForMeteringPointMarketActivityRecord BuildMeteredDataForMeteringPoint()
+    public MeteredDataForMeteringPointMarketActivityRecord BuildMeteredDataForMeteringPoint()
     {
-        return new MeteredDateForMeteringPointMarketActivityRecord(
+        return new MeteredDataForMeteringPointMarketActivityRecord(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,
             SampleData.MeteringPointType,
@@ -49,7 +49,7 @@ public class MeteredDateForMeteringPointBuilder
             SampleData.Points);
     }
 
-    public MeteredDateForMeteringPointMarketActivityRecord BuildMinimalMeteredDataForMeteringPoint() =>
+    public MeteredDataForMeteringPointMarketActivityRecord BuildMinimalMeteredDataForMeteringPoint() =>
         new(
             SampleData.TransactionId,
             SampleData.MeteringPointNumber,

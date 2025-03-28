@@ -39,9 +39,9 @@ public sealed class MessageParserTests
 
     private readonly Dictionary<DocumentFormat, IMessageParser> _marketMessageParser = new()
     {
-        { DocumentFormat.Ebix, new MeteredDateForMeteringPointEbixMessageParser(new EbixSchemaProvider(), new Logger<MeteredDateForMeteringPointEbixMessageParser>(new LoggerFactory())) },
-        { DocumentFormat.Xml, new MeteredDateForMeteringPointXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
-        { DocumentFormat.Json, new MeteredDateForMeteringPointJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
+        { DocumentFormat.Ebix, new MeteredDataForMeteringPointEbixMessageParser(new EbixSchemaProvider(), new Logger<MeteredDataForMeteringPointEbixMessageParser>(new LoggerFactory())) },
+        { DocumentFormat.Xml, new MeteredDataForMeteringPointXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
+        { DocumentFormat.Json, new MeteredDataForMeteringPointJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
     };
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()

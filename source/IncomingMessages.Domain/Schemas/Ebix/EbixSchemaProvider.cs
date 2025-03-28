@@ -96,6 +96,8 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             return "DK_NotifyAggregatedWholesaleServices";
         if (document == DocumentType.RejectRequestWholesaleSettlement)
             return "DK_RejectAggregatedBillingInformation";
+        if (document == DocumentType.NotifyValidatedMeasureData)
+            return "DK_MeteredDataTimeSeries";
 
         throw new InvalidOperationException("Unknown document type");
     }
