@@ -86,8 +86,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
 
         // - Create bundles
-        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
-        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
 
         // Then message is added to existing bundle & bundle has correct count
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -135,8 +135,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
 
         // - Create bundles
-        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
-        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
 
         // Then a bundle is created for each message
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -187,8 +187,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         _clockStub.SetCurrentInstant(whenBundle1ShouldBeCreated);
 
         // - Create bundles
-        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
-        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
 
         // Then message is added to existing bundle & bundle has correct count
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -252,8 +252,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         _clockStub.SetCurrentInstant(whenBundle1ShouldBeCreated);
 
         // - Create bundles
-        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
-        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
 
         // Then message is added to existing bundle & bundle has correct count
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -367,10 +367,10 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
 
         // - Bundle messages
-        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
 
         var bundleStopwatch = Stopwatch.StartNew();
-        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
         bundleStopwatch.Stop();
 
         // Then all messages are in correct bundles

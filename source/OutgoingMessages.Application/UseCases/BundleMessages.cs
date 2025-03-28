@@ -40,41 +40,54 @@ public class BundleMessages(
     /// <summary>
     /// Closes bundles that are ready to be closed in a single transaction, and returns the number of closed bundles.
     /// </summary>
-    public async Task<int> BundleMessagesAsync(CancellationToken cancellationToken)
+    public async Task BundleMessagesAndCommitAsync(CancellationToken cancellationToken)
     {
         var messagesReadyToBeBundled = await _outgoingMessageRepository
             .GetBundleMetadataForMessagesReadyToBeBundledAsync(cancellationToken)
             .ConfigureAwait(false);
 
         // TODO: Handle RSM-009 and related to message id bundling
+        var bundleTasks = new List<Task>();
         foreach (var bundleMetadata in messagesReadyToBeBundled)
         {
             // TODO: This loop could instead add a message to a service bus, and create bundles async separately in
             // a service bus trigger. This would increase scaling, instead of creating all bundles in a single transaction.
             // Alternatively, it could be created as a DurableFunction, that first gets all bundle metadata, and then
             // fans out to create bundles for each bundle metadata in parallel.
-            using var scope = _serviceScopeFactory.CreateScope();
-            var bundlesToCreate = await CreateBundlesAsync(
-                    scope,
-                    bundleMetadata,
-                    cancellationToken)
-                .ConfigureAwait(false);
-
-            _logger.LogInformation(
-                "Creating {BundleCount} bundles for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
-                bundlesToCreate.Count,
-                bundleMetadata.ReceiverNumber.Value,
-                bundleMetadata.ReceiverRole.Name,
-                bundleMetadata.DocumentType.Name);
-
-            var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
-            bundleRepository.Add(bundlesToCreate);
-
-            var actorMessageQueueContext = scope.ServiceProvider.GetRequiredService<IActorMessageQueueContext>();
-            await actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            var bundleTask = BundleMessagesAndCommitAsync(bundleMetadata, cancellationToken);
+            bundleTasks.Add(bundleTask);
         }
 
-        return messagesReadyToBeBundled.Count;
+        await Task.WhenAll(bundleTasks).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Bundle messages for a single receiver, and commit the bundles to the database.
+    /// <remarks>This is done in a separate scope, to enable parallel bundling for different receivers.</remarks>
+    /// </summary>
+    /// <param name="bundleMetadata"></param>
+    /// <param name="cancellationToken"></param>
+    private async Task BundleMessagesAndCommitAsync(BundleMetadataDto bundleMetadata, CancellationToken cancellationToken)
+    {
+        using var scope = _serviceScopeFactory.CreateScope();
+        var bundlesToCreate = await CreateBundlesAsync(
+                scope,
+                bundleMetadata,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        _logger.LogInformation(
+            "Creating {BundleCount} bundles for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
+            bundlesToCreate.Count,
+            bundleMetadata.ReceiverNumber.Value,
+            bundleMetadata.ReceiverRole.Name,
+            bundleMetadata.DocumentType.Name);
+
+        var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
+        bundleRepository.Add(bundlesToCreate);
+
+        var actorMessageQueueContext = scope.ServiceProvider.GetRequiredService<IActorMessageQueueContext>();
+        await actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<List<Bundle>> CreateBundlesAsync(
@@ -117,6 +130,8 @@ public class BundleMessages(
         var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
         while (outgoingMessagesList.Count > 0)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var outgoingMessagesForBundle = outgoingMessagesList
                 .Take(bundleSize)
                 .ToList();

@@ -102,8 +102,10 @@ public static class OutgoingMessagesExtensions
         // DequeConfiguration
         services.AddTransient<DequeueMessage>();
 
-        // CloseBundles configuration
-        services.AddTransient<BundleMessages>();
+        // BundleMessages configuration
+        services
+            .AddTransient<BundleMessages>()
+            .AddTransient<IOutgoingMessagesBundleClient, OutgoingMessagesBundleClient>();
         services
             .AddOptions<BundlingOptions>()
             .BindConfiguration(BundlingOptions.SectionName)

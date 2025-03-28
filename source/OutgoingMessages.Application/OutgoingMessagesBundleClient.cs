@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Microsoft.Azure.Functions.Worker;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
-public class OutgoingMessagesBundler(
-    IOutgoingMessagesBundleClient bundleClient)
+public class OutgoingMessagesBundleClient(
+    BundleMessages bundleMessages)
+        : IOutgoingMessagesBundleClient
 {
-    private readonly IOutgoingMessagesBundleClient _bundleClient = bundleClient;
+    private readonly BundleMessages _bundleMessages = bundleMessages;
 
-    [Function(nameof(OutgoingMessagesBundler))]
-    public Task BundleMessagesAsync(
-        [TimerTrigger("*/30 * * * * *")] TimerInfo timerTimerInfo,
-        FunctionContext context,
-        CancellationToken cancellationToken)
+    public Task BundleMessagesAndCommitAsync(CancellationToken cancellationToken)
     {
-        return _bundleClient.BundleMessagesAndCommitAsync(cancellationToken);
+        return _bundleMessages.BundleMessagesAndCommitAsync(cancellationToken);
     }
 }
