@@ -25,9 +25,9 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 
     public EbixSchemaProvider()
     {
-        var schemaName = _schema.GetSchemaLocation(ParseDocumentType(DocumentType.NotifyValidatedMeasureData), "3")
+        var notfyValidatedMeasureDataSchema = _schema.GetSchemaLocation(ParseDocumentType(DocumentType.NotifyValidatedMeasureData), "3")
             ?? throw new ArgumentException("Schema not found for DocumentType.NotifyValidatedMeasureData");
-        LoadSchemaWithDependentSchemas(schemaName, CancellationToken.None);
+        LoadSchemaWithDependentSchemas(notfyValidatedMeasureDataSchema, CancellationToken.None);
     }
 
     public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
@@ -77,9 +77,8 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         pathElements.RemoveAt(pathElements.Count - 1);
         var relativeSchemaPath = string.Join("\\", pathElements) + "\\";
 
-        foreach (var o in xmlSchema.Includes)
+        foreach (XmlSchemaExternal external in xmlSchema.Includes)
         {
-            var external = (XmlSchemaExternal)o;
             if (external.SchemaLocation == null)
             {
                 continue;
