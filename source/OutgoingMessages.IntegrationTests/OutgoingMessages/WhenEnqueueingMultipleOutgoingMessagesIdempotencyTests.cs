@@ -374,7 +374,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
                 TransactionId: TransactionId.New(),
                 MarketEvaluationPointNumber: "1234567890123",
                 MarketEvaluationPointType: MeteringPointType.Consumption,
-                OriginalTransactionIdReferenceId: TransactionId.New(),
+                OriginalTransactionIdReferenceId: null,
                 Product: "test-product",
                 QuantityMeasureUnit: MeasurementUnit.KilowattHour,
                 RegistrationDateTime: start,
