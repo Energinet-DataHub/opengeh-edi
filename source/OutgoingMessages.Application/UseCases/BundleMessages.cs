@@ -34,9 +34,6 @@ public class BundleMessages(
     IOptions<BundlingOptions> bundlingOptions,
     IOutgoingMessageRepository outgoingMessageRepository)
 {
-    private const string BundleSizeMetricPrefix = "BundleSize";
-    private const string AverageBundlingDurationMetricPrefix = "AverageBundlingDuration";
-
     private readonly ILogger<BundleMessages> _logger = logger;
     private readonly TelemetryClient _telemetryClient = telemetryClient;
     private readonly IClock _clock = clock;
@@ -100,18 +97,21 @@ public class BundleMessages(
         await actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         bundlingStopwatch.Stop();
 
-        // Log bundle size metric for document type
-        var bundleSizeMetricName = $"{BundleSizeMetricPrefix}{bundleMetadata.DocumentType.Name}";
-        var bundleSizeMetric = _telemetryClient.GetMetric(bundleSizeMetricName);
-        bundlesToCreate.ForEach(b => bundleSizeMetric.TrackValue(b.MessageCount));
+        // Log bundle size & timespan metrics for document type
+        var bundleSizeMetric = BundleSizeMetric(bundleMetadata.DocumentType);
+        var bundleTimespanSecondsMetric = BundleTimespanSecondsMetric(bundleMetadata.DocumentType);
+        bundlesToCreate.ForEach(b =>
+        {
+            bundleSizeMetric.TrackValue(b.MessageCount);
+            bundleTimespanSecondsMetric.TrackValue(b.Timespan.TotalSeconds);
+        });
 
         // Log average bundling duration for document type
-        var averageBundlingDurationMetricName = $"{AverageBundlingDurationMetricPrefix}{bundleMetadata.DocumentType.Name}";
-        var averageBundlingDurationMetric = _telemetryClient.GetMetric(averageBundlingDurationMetricName);
+        var averageBundlingDurationMetric = AverageMillisecondsBundlingDurationMetric(bundleMetadata.DocumentType);
         averageBundlingDurationMetric.TrackValue((double)bundlingStopwatch.ElapsedMilliseconds / createdBundlesCount);
     }
 
-    private async Task<List<(Bundle Bundle, int MessageCount)>> CreateBundlesAsync(
+    private async Task<List<(Bundle Bundle, int MessageCount, Duration Timespan)>> CreateBundlesAsync(
         IServiceScope scope,
         BundleMetadata bundleMetadata,
         CancellationToken cancellationToken)
@@ -145,7 +145,7 @@ public class BundleMessages(
             receiver.ActorRole.Name,
             bundleMetadata.DocumentType.Name);
 
-        var bundlesToCreate = new List<(Bundle Bundle, int MessageCount)>();
+        var bundlesToCreate = new List<(Bundle Bundle, int MessageCount, Duration Timespan)>();
 
         var bundleSize = _bundlingOptions.MaxBundleSize;
         var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
@@ -172,7 +172,10 @@ public class BundleMessages(
                 businessReason,
                 outgoingMessagesForBundle);
 
-            bundlesToCreate.Add((bundle, outgoingMessagesForBundle.Count));
+            var bundleTimespan =
+                outgoingMessagesForBundle.Last().CreatedAt - outgoingMessagesForBundle.First().CreatedAt;
+
+            bundlesToCreate.Add((bundle, outgoingMessagesForBundle.Count, bundleTimespan));
 
             outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count);
         }
@@ -259,4 +262,10 @@ public class BundleMessages(
 
         return newBundle;
     }
+
+    private Metric BundleSizeMetric(DocumentType documentType) => _telemetryClient.GetMetric($"BundleSize{documentType.Name}");
+
+    private Metric BundleTimespanSecondsMetric(DocumentType documentType) => _telemetryClient.GetMetric($"BundleTimespanSeconds{documentType.Name}");
+
+    private Metric AverageMillisecondsBundlingDurationMetric(DocumentType documentType) => _telemetryClient.GetMetric($"AverageMsBundlingDuration{documentType.Name}");
 }
