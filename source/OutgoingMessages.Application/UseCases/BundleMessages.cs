@@ -106,45 +106,32 @@ public class BundleMessages(
 
         var bundlesToCreate = new List<Bundle>();
 
+        var bundleSize = _bundlingOptions.MaxBundleSize;
         var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
         while (outgoingMessagesList.Count > 0)
         {
-            var bundleSize = _bundlingOptions.MaxBundleSize;
             var outgoingMessagesForBundle = outgoingMessagesList
                 .Take(bundleSize)
                 .ToList();
 
-            if (outgoingMessagesForBundle.Count < bundleSize)
+            // If the bundle isn't full, and no messages are older than the bundle duration, then do not create the bundle (yet).
+            var isPartialBundle = outgoingMessagesForBundle.Count < bundleSize;
+            if (isPartialBundle)
             {
-                // Only create partial bundles for the outgoing messages that are older than X minutes
-                var bundleMessagesCreatedBefore = _clock
-                    .GetCurrentInstant()
-                    .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
-
-                outgoingMessagesForBundle = outgoingMessagesForBundle
-                    .Where(om => om.CreatedAt <= bundleMessagesCreatedBefore)
-                    .ToList();
+                var anyMessageIsReadyToBeBundled = IsAnyMessageReadyToBeBundledYet(outgoingMessagesForBundle);
+                if (!anyMessageIsReadyToBeBundled)
+                    break;
             }
 
-            // If there are no messages to bundle, break the loop
-            if (outgoingMessagesForBundle.Count == 0)
-                break;
-
-            var bundle = CreateBundle(
+            var bundle = CreateAndCloseBundleForMessages(
                 actorMessageQueueId,
-                businessReason,
                 bundleMetadataDto.DocumentType,
-                relatedToMessageId: null);
+                businessReason,
+                outgoingMessagesForBundle);
+
             bundlesToCreate.Add(bundle);
 
-            foreach (var outgoingMessage in outgoingMessagesForBundle)
-            {
-                outgoingMessage.AssignToBundle(bundle.Id);
-            }
-
-            bundle.Close(_clock.GetCurrentInstant());
-
-            outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count());
+            outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count);
         }
 
         _logger.LogInformation(
@@ -155,6 +142,40 @@ public class BundleMessages(
             bundleMetadataDto.DocumentType.Name);
 
         return bundlesToCreate;
+    }
+
+    private Bundle CreateAndCloseBundleForMessages(
+        ActorMessageQueueId actorMessageQueueId,
+        DocumentType documentType,
+        BusinessReason businessReason,
+        List<OutgoingMessage> outgoingMessagesForBundle)
+    {
+        var bundle = CreateBundle(
+            actorMessageQueueId,
+            businessReason,
+            documentType,
+            relatedToMessageId: null);
+
+        foreach (var outgoingMessage in outgoingMessagesForBundle)
+        {
+            outgoingMessage.AssignToBundle(bundle.Id);
+        }
+
+        bundle.Close(_clock.GetCurrentInstant());
+        return bundle;
+    }
+
+    /// <summary>
+    /// Check if any of the messages in the bundle is older enough to be bundled (yet).
+    /// </summary>
+    private bool IsAnyMessageReadyToBeBundledYet(List<OutgoingMessage> outgoingMessagesForBundle)
+    {
+        var bundleMessagesCreatedBefore = _clock
+            .GetCurrentInstant()
+            .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
+
+        var anyMessageShouldBeBundledYet = outgoingMessagesForBundle.Any(om => om.CreatedAt <= bundleMessagesCreatedBefore);
+        return anyMessageShouldBeBundledYet;
     }
 
     private async Task<ActorMessageQueueId> GetActorMessageQueueIdForReceiverAsync(

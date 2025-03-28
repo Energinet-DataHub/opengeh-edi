@@ -154,6 +154,140 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.All(bundles, b => Assert.Single(outgoingMessages, om => om.AssignedBundleId == b.Id)));
     }
 
+    [Theory]
+    [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
+    public async Task Given_EnqueuedMessagesForTwoBundles_AndGiven_PartialBundleDoesNotHaveMessageOldEnoughToBeBundled_When_BundleMessages_Then_OnlyOneBundleIsCreatedWithCorrectCount(
+        Func<Actor, OutgoingMessageDto> messageBuilder)
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        // Given existing bundle
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+
+        // - Create messages for two bundles
+        var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
+            .Select(_ => messageBuilder(receiver))
+            .ToList();
+        var messageForPartialBundle = messageBuilder(receiver);
+
+        // - Enqueue messages for bundle 1 "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        await EnqueueAndCommitMessages(messagesForBundle1);
+
+        var whenBundle1ShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+
+        // - Enqueue message for partial bundle later, so it shouldn't be bundled yet
+        _clockStub.SetCurrentInstant(whenBundle1ShouldBeCreated.Minus(Duration.FromMilliseconds(1)));
+        await EnqueueAndCommitMessage(messageForPartialBundle, useNewScope: false);
+
+        // When creating bundles
+
+        // - Move clock to when bundle 1 should be created
+        _clockStub.SetCurrentInstant(whenBundle1ShouldBeCreated);
+
+        // - Create bundles
+        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
+        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+
+        // Then message is added to existing bundle & bundle has correct count
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var outgoingMessages = await dbContext.OutgoingMessages
+            .ToListAsync();
+
+        var bundles = await dbContext.Bundles
+            .ToListAsync();
+
+        // - Only one bundle was created
+        // - All outgoing messages are enqueued
+        // - Only one message is not assigned a bundle
+        // - The bundle has a count of MaxBundleSize
+        Assert.Multiple(
+            () => Assert.Single(bundles),
+            () => Assert.Equal(bundlingOptions.MaxBundleSize + 1, outgoingMessages.Count),
+            () => Assert.Single(outgoingMessages, om => om.AssignedBundleId == null),
+            () => Assert.Collection(
+                collection: bundles,
+                elementInspectors: b => Assert.Equal(
+                    expected: bundlingOptions.MaxBundleSize,
+                    actual: outgoingMessages.Count(om => om.AssignedBundleId == b.Id))));
+    }
+
+    [Theory]
+    [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
+    public async Task Given_EnqueuedMessagesForTwoBundles_AndGiven_PartialBundleHasMessageOldEnoughToBeBundled_When_BundleMessages_Then_TwoBundlesAreCreatedWithCorrectCount(
+        Func<Actor, OutgoingMessageDto> messageBuilder)
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        // Given existing bundle
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+
+        // - Create messages for two bundles
+        var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
+            .Select(_ => messageBuilder(receiver))
+            .ToList();
+        var message1ForPartialBundle = messageBuilder(receiver);
+        var message2ForPartialBundle = messageBuilder(receiver);
+
+        // - Enqueue messages for bundle 1 "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        await EnqueueAndCommitMessages(messagesForBundle1);
+
+        // - Enqueue message for partial bundle "now", so it is old enough to be bundled
+        await EnqueueAndCommitMessage(message1ForPartialBundle, useNewScope: false);
+
+        var whenBundle1ShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+
+        // - Enqueue message for partial bundle later, so it shouldn't be bundled yet. This should still be bundled
+        // because message1ForPartialBundle is old enough to be bundled.
+        _clockStub.SetCurrentInstant(whenBundle1ShouldBeCreated.Minus(Duration.FromMilliseconds(1)));
+        await EnqueueAndCommitMessage(message2ForPartialBundle, useNewScope: false);
+
+        // When creating bundles
+
+        // - Move clock to when bundle 1 should be created
+        _clockStub.SetCurrentInstant(whenBundle1ShouldBeCreated);
+
+        // - Create bundles
+        var bundleMessages = ServiceProvider.GetRequiredService<BundleMessages>();
+        await bundleMessages.BundleMessagesAsync(CancellationToken.None);
+
+        // Then message is added to existing bundle & bundle has correct count
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var outgoingMessages = await dbContext.OutgoingMessages
+            .ToListAsync();
+
+        var bundles = await dbContext.Bundles
+            .ToListAsync();
+
+        // - Two bundles was created
+        // - All outgoing messages are enqueued
+        // - All outgoing messages are bundled
+        // - MaxBundleSize messages are assigned bundle 1
+        // - 2 messages are assigned bundle 2
+        Assert.Multiple(
+            () => Assert.Equal(2, bundles.Count),
+            () => Assert.Equal(bundlingOptions.MaxBundleSize + 2, outgoingMessages.Count),
+            () => Assert.All(outgoingMessages, om => Assert.NotNull(om.AssignedBundleId)),
+            () => Assert.Collection(
+                collection: bundles.OrderByDescending(b => outgoingMessages.Count(om => om.AssignedBundleId == b.Id)),
+                elementInspectors:
+                [
+                    // First bundle has MaxBundleSize messages
+                    b => Assert.Equal(
+                        expected: bundlingOptions.MaxBundleSize,
+                        actual: outgoingMessages.Count(om => om.AssignedBundleId == b.Id)),
+                    // Second bundle has 2 messages
+                    b => Assert.Equal(
+                        expected: 2,
+                        actual: outgoingMessages.Count(om => om.AssignedBundleId == b.Id)),
+                ]));
+    }
+
     [Fact]
     public async Task Given_MessagesEnqueuedForTwoDifferentReceivers_When_BundleMessages_Then_AllMessagesAreInCorrectBundles()
     {
@@ -212,6 +346,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                                 new EnergyObservationDto(1, 1, Quality.Calculated),
                             ]));
                 })
+            .Cast<OutgoingMessageDto>()
             .ToList();
 
         // - Set messages created at to "now"
@@ -220,7 +355,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         // - Enqueue messages for receivers
         var enqueueStopwatch = Stopwatch.StartNew();
-        var enqueuedMessagesCount = await EnqueueMessages(
+        var enqueuedMessagesCount = await EnqueueAndCommitMessages(
             messagesToEnqueue: messagesToEnqueue);
         enqueueStopwatch.Stop();
 
@@ -315,7 +450,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                 }));
     }
 
-    private async Task<int> EnqueueMessages(List<AcceptedForwardMeteredDataMessageDto> messagesToEnqueue)
+    private async Task<int> EnqueueAndCommitMessages(List<OutgoingMessageDto> messagesToEnqueue)
     {
         var enqueueTasks = messagesToEnqueue
             .Select(m => EnqueueAndCommitMessage(m, useNewScope: true))
