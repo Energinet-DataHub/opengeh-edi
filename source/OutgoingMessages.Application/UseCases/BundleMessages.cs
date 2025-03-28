@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -26,16 +28,21 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 
 public class BundleMessages(
     ILogger<BundleMessages> logger,
+    TelemetryClient telemetryClient,
     IClock clock,
-    IOutgoingMessageRepository outgoingMessageRepository,
     IServiceScopeFactory serviceScopeFactory,
-    IOptions<BundlingOptions> bundlingOptions)
+    IOptions<BundlingOptions> bundlingOptions,
+    IOutgoingMessageRepository outgoingMessageRepository)
 {
+    private const string BundleSizeMetricPrefix = "BundleSize";
+    private const string AverageBundlingDurationMetricPrefix = "AverageBundlingDuration";
+
     private readonly ILogger<BundleMessages> _logger = logger;
+    private readonly TelemetryClient _telemetryClient = telemetryClient;
     private readonly IClock _clock = clock;
-    private readonly IOutgoingMessageRepository _outgoingMessageRepository = outgoingMessageRepository;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly BundlingOptions _bundlingOptions = bundlingOptions.Value;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository = outgoingMessageRepository;
 
     /// <summary>
     /// Closes bundles that are ready to be closed in a single transaction, and returns the number of closed bundles.
@@ -70,27 +77,41 @@ public class BundleMessages(
     private async Task BundleMessagesAndCommitAsync(BundleMetadataDto bundleMetadata, CancellationToken cancellationToken)
     {
         using var scope = _serviceScopeFactory.CreateScope();
+        var bundlingStopwatch = Stopwatch.StartNew();
         var bundlesToCreate = await CreateBundlesAsync(
                 scope,
                 bundleMetadata,
                 cancellationToken)
             .ConfigureAwait(false);
 
+        var createdBundlesCount = bundlesToCreate.Count;
         _logger.LogInformation(
-            "Creating {BundleCount} bundles for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
-            bundlesToCreate.Count,
+            "Creating {BundleCount} bundles (with {TotalMessageCount} messages) for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}.",
+            createdBundlesCount,
+            bundlesToCreate.Sum(b => b.MessageCount),
             bundleMetadata.ReceiverNumber.Value,
             bundleMetadata.ReceiverRole.Name,
             bundleMetadata.DocumentType.Name);
 
         var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
-        bundleRepository.Add(bundlesToCreate);
+        bundleRepository.Add(bundlesToCreate.Select(b => b.Bundle).ToList());
 
         var actorMessageQueueContext = scope.ServiceProvider.GetRequiredService<IActorMessageQueueContext>();
         await actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        bundlingStopwatch.Stop();
+
+        // Log bundle size metric for document type
+        var bundleSizeMetricName = $"{BundleSizeMetricPrefix}{bundleMetadata.DocumentType.Name}";
+        var bundleSizeMetric = _telemetryClient.GetMetric(bundleSizeMetricName);
+        bundlesToCreate.ForEach(b => bundleSizeMetric.TrackValue(b.MessageCount));
+
+        // Log average bundling duration for document type
+        var averageBundlingDurationMetricName = $"{AverageBundlingDurationMetricPrefix}{bundleMetadata.DocumentType.Name}";
+        var averageBundlingDurationMetric = _telemetryClient.GetMetric(averageBundlingDurationMetricName);
+        averageBundlingDurationMetric.TrackValue((double)bundlingStopwatch.ElapsedMilliseconds / createdBundlesCount);
     }
 
-    private async Task<List<Bundle>> CreateBundlesAsync(
+    private async Task<List<(Bundle Bundle, int MessageCount)>> CreateBundlesAsync(
         IServiceScope scope,
         BundleMetadataDto bundleMetadataDto,
         CancellationToken cancellationToken)
@@ -124,7 +145,7 @@ public class BundleMessages(
             receiver.ActorRole.Name,
             bundleMetadataDto.DocumentType.Name);
 
-        var bundlesToCreate = new List<Bundle>();
+        var bundlesToCreate = new List<(Bundle Bundle, int MessageCount)>();
 
         var bundleSize = _bundlingOptions.MaxBundleSize;
         var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
@@ -151,7 +172,7 @@ public class BundleMessages(
                 businessReason,
                 outgoingMessagesForBundle);
 
-            bundlesToCreate.Add(bundle);
+            bundlesToCreate.Add((bundle, outgoingMessagesForBundle.Count));
 
             outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count);
         }
@@ -223,8 +244,8 @@ public class BundleMessages(
     {
         var maxBundleSize = documentType switch
         {
-            var dt when dt == DocumentType.NotifyValidatedMeasureData => 2000, // TODO: Get from config
-            var dt when dt == DocumentType.Acknowledgement => 2000, // TODO: Get from config
+            var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleSize,
+            // var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleSize, // TODO: Support bundling RSM-009
             _ => throw new ArgumentOutOfRangeException(nameof(documentType), documentType, "Document type doesn't support bundling."),
         };
 

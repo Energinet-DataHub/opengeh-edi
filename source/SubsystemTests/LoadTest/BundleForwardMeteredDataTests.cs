@@ -22,19 +22,16 @@ namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 
 public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
 {
-    private const string AverageBundleTimeMetric = "AverageBundleTime";
     private const string OriginalActorMessageIdPrefix = "bundle_perf_test_"; // Used to clean up previous test messages before running new test
 
-    private readonly LoadTestFixture _fixture;
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly ProcessManagerDriver _processManagerDriver;
 
     public BundleForwardMeteredDataTests(LoadTestFixture fixture, ITestOutputHelper testOutputHelper)
     {
-        _fixture = fixture;
         _testOutputHelper = testOutputHelper;
-        _ediDatabaseDriver = new EdiDatabaseDriver(_fixture.DatabaseConnectionString);
+        _ediDatabaseDriver = new EdiDatabaseDriver(fixture.DatabaseConnectionString);
         _processManagerDriver = new ProcessManagerDriver(fixture.EdiTopicClient);
     }
 
@@ -132,8 +129,6 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
             enqueuedMessages.Count,
             bundles.Count,
             enqueueTime.TotalMinutes);
-
-        _fixture.TelemetryClient.GetMetric(AverageBundleTimeMetric).TrackValue(enqueueTime.TotalMilliseconds / (double)enqueuedMessages.Count);
 
         Assert.Multiple(
             () => Assert.Equal(messagesToEnqueueCount, enqueuedMessages.Count),

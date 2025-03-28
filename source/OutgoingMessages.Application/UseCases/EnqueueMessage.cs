@@ -148,7 +148,7 @@ public class EnqueueMessage
     private int GetMaxBundleSize(DocumentType documentType)
     {
         return documentType == DocumentType.NotifyValidatedMeasureData
-            ? _bundlingOptions.MaxBundleSize
+            ? _bundlingOptions.MaxBundleSize // TODO: Support bundling RSM-009
             : 1;
     }
 
