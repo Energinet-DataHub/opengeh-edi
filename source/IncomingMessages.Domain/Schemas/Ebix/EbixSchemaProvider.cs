@@ -25,9 +25,9 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 
     public EbixSchemaProvider()
     {
-        var notfyValidatedMeasureDataSchema = _schema.GetSchemaLocation(ParseDocumentType(DocumentType.NotifyValidatedMeasureData), "3")
+        var notifyValidatedMeasureDataSchema = _schema.GetSchemaLocation(ParseDocumentType(DocumentType.NotifyValidatedMeasureData), "3")
             ?? throw new ArgumentException("Schema not found for DocumentType.NotifyValidatedMeasureData");
-        LoadSchemaWithDependentSchemas(notfyValidatedMeasureDataSchema, CancellationToken.None);
+        LoadSchemaWithDependentSchemas(notifyValidatedMeasureDataSchema);
     }
 
     public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
@@ -56,45 +56,32 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName, cancellationToken);
     }
 
-    protected override async Task<T?> LoadSchemaWithDependentSchemasAsync<T>(
+    protected override Task<T?> LoadSchemaWithDependentSchemasAsync<T>(
         string location, CancellationToken cancellationToken)
         where T : default
     {
         ArgumentNullException.ThrowIfNull(location);
-
-        // Ensure that only backslashes are used in paths
-        location = location.Replace("/", "\\", StringComparison.InvariantCulture);
-        if (_schemaCache.TryGetValue(location, out var cached))
-            return (T)(object)cached;
-
-        using var reader = new XmlTextReader(location);
-        var xmlSchema = XmlSchema.Read(reader, null) ?? throw new XmlSchemaException($"Could not read schema at {location}");
-
-        _schemaCache.TryAdd(location, xmlSchema);
-
-        // Extract path of the current XSD as includes are relative to this
-        var pathElements = location.Split('\\').ToList();
-        pathElements.RemoveAt(pathElements.Count - 1);
-        var relativeSchemaPath = string.Join("\\", pathElements) + "\\";
-
-        foreach (XmlSchemaExternal external in xmlSchema.Includes)
-        {
-            if (external.SchemaLocation == null)
-            {
-                continue;
-            }
-
-            external.Schema =
-                await LoadSchemaWithDependentSchemasAsync<XmlSchema>(
-                        relativeSchemaPath + external.SchemaLocation, cancellationToken)
-                    .ConfigureAwait(false);
-        }
-
-        return (T)(object)xmlSchema;
+        var loadSchemaWithDependentSchemas = LoadSchemaWithDependentSchemas(location);
+        return Task.FromResult((T?)(object)loadSchemaWithDependentSchemas);
     }
 
-    protected XmlSchema? LoadSchemaWithDependentSchemas(
-        string location, CancellationToken cancellationToken)
+    private static string ParseDocumentType(DocumentType document)
+    {
+        if (document == DocumentType.NotifyAggregatedMeasureData)
+            return "DK_AggregatedMeteredDataTimeSeries";
+        if (document == DocumentType.RejectRequestAggregatedMeasureData)
+            return "DK_RejectRequestMeteredDataAggregated";
+        if (document == DocumentType.NotifyWholesaleServices)
+            return "DK_NotifyAggregatedWholesaleServices";
+        if (document == DocumentType.RejectRequestWholesaleSettlement)
+            return "DK_RejectAggregatedBillingInformation";
+        if (document == DocumentType.NotifyValidatedMeasureData)
+            return "DK_MeteredDataTimeSeries";
+
+        throw new InvalidOperationException("Unknown document type");
+    }
+
+    private XmlSchema LoadSchemaWithDependentSchemas(string location)
     {
         ArgumentNullException.ThrowIfNull(location);
 
@@ -127,26 +114,9 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             }
 
             external.Schema =
-                LoadSchemaWithDependentSchemas(
-                        relativeSchemaPath + external.SchemaLocation, cancellationToken);
+                LoadSchemaWithDependentSchemas(relativeSchemaPath + external.SchemaLocation);
         }
 
         return xmlSchema;
-    }
-
-    private static string ParseDocumentType(DocumentType document)
-    {
-        if (document == DocumentType.NotifyAggregatedMeasureData)
-            return "DK_AggregatedMeteredDataTimeSeries";
-        if (document == DocumentType.RejectRequestAggregatedMeasureData)
-            return "DK_RejectRequestMeteredDataAggregated";
-        if (document == DocumentType.NotifyWholesaleServices)
-            return "DK_NotifyAggregatedWholesaleServices";
-        if (document == DocumentType.RejectRequestWholesaleSettlement)
-            return "DK_RejectAggregatedBillingInformation";
-        if (document == DocumentType.NotifyValidatedMeasureData)
-            return "DK_MeteredDataTimeSeries";
-
-        throw new InvalidOperationException("Unknown document type");
     }
 }
