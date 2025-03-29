@@ -12,10 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
+using Energinet.DataHub.Core.Messaging.Communication;
 
-public enum AddReceivedIntegrationEventResult
+namespace Energinet.DataHub.EDI.IntegrationEvents.Application;
+
+/// <summary>
+/// Process specific type(s) of integration events
+/// </summary>
+public interface IIntegrationEventProcessor
 {
-    EventRegistered,
-    EventIsAlreadyRegistered,
+    /// <summary>
+    /// Event type the processor handles
+    /// </summary>
+    public string EventTypeToHandle { get; }
+
+    /// <summary>
+    /// Process a single integration event
+    /// </summary>
+    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
 }
