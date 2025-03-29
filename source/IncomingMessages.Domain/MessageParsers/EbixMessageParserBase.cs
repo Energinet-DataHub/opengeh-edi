@@ -216,8 +216,14 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider, I
         {
             Async = true,
             ValidationType = ValidationType.Schema,
-            ValidationFlags = XmlSchemaValidationFlags.ProcessInlineSchema |
-                              XmlSchemaValidationFlags.ReportValidationWarnings,
+            ValidationFlags =
+                // When this flag is set, the XML validator will process any inline schema definitions found within the
+                // XML document being validated. This allows the validator to use schema definitions that are embedded
+                // directly within the XML document itself, rather than relying solely on external schema files.
+                XmlSchemaValidationFlags.ProcessInlineSchema |
+                // When this flag is set, the validator will raise events for both warnings and errors during
+                // the validation process, allowing you to handle and log them accordingly
+                XmlSchemaValidationFlags.ReportValidationWarnings,
         };
 
         try

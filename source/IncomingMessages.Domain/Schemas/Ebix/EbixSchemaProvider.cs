@@ -23,6 +23,13 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
     private readonly ISchema _schema = new EbixSchemas();
     private readonly Dictionary<string, XmlSchema> _schemaCache = new();
 
+    public EbixSchemaProvider()
+    {
+        var notifyValidatedMeasureDataSchema = _schema.GetSchemaLocation(ParseDocumentType(DocumentType.NotifyValidatedMeasureData), "3")
+            ?? throw new ArgumentException("Schema not found for DocumentType.NotifyValidatedMeasureData");
+        LoadSchemaWithDependentSchemas(notifyValidatedMeasureDataSchema);
+    }
+
     public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
     {
         var schemaName = _schema.GetSchemaLocation(ParseDocumentType(type), version);
@@ -49,16 +56,39 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         return (Task<T?>)(object)LoadSchemaWithDependentSchemasAsync<XmlSchema>(schemaName, cancellationToken);
     }
 
-    protected override async Task<T?> LoadSchemaWithDependentSchemasAsync<T>(
+    protected override Task<T?> LoadSchemaWithDependentSchemasAsync<T>(
         string location, CancellationToken cancellationToken)
         where T : default
+    {
+        ArgumentNullException.ThrowIfNull(location);
+        var loadSchemaWithDependentSchemas = LoadSchemaWithDependentSchemas(location);
+        return Task.FromResult((T?)(object)loadSchemaWithDependentSchemas);
+    }
+
+    private static string ParseDocumentType(DocumentType document)
+    {
+        if (document == DocumentType.NotifyAggregatedMeasureData)
+            return "DK_AggregatedMeteredDataTimeSeries";
+        if (document == DocumentType.RejectRequestAggregatedMeasureData)
+            return "DK_RejectRequestMeteredDataAggregated";
+        if (document == DocumentType.NotifyWholesaleServices)
+            return "DK_NotifyAggregatedWholesaleServices";
+        if (document == DocumentType.RejectRequestWholesaleSettlement)
+            return "DK_RejectAggregatedBillingInformation";
+        if (document == DocumentType.NotifyValidatedMeasureData)
+            return "DK_MeteredDataTimeSeries";
+
+        throw new InvalidOperationException("Unknown document type");
+    }
+
+    private XmlSchema LoadSchemaWithDependentSchemas(string location)
     {
         ArgumentNullException.ThrowIfNull(location);
 
         // Ensure that only backslashes are used in paths
         location = location.Replace("/", "\\", StringComparison.InvariantCulture);
         if (_schemaCache.TryGetValue(location, out var cached))
-            return (T)(object)cached;
+            return cached;
 
         using var reader = new XmlTextReader(location);
         var xmlSchema = XmlSchema.Read(reader, null) ?? throw new XmlSchemaException($"Could not read schema at {location}");
@@ -77,26 +107,16 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
                 continue;
             }
 
+            if (_schemaCache.TryGetValue(relativeSchemaPath + external.SchemaLocation, out var cachedExternal))
+            {
+                external.Schema = cachedExternal;
+                continue;
+            }
+
             external.Schema =
-                await LoadSchemaWithDependentSchemasAsync<XmlSchema>(
-                        relativeSchemaPath + external.SchemaLocation, cancellationToken)
-                    .ConfigureAwait(false);
+                LoadSchemaWithDependentSchemas(relativeSchemaPath + external.SchemaLocation);
         }
 
-        return (T)(object)xmlSchema;
-    }
-
-    private static string ParseDocumentType(DocumentType document)
-    {
-        if (document == DocumentType.NotifyAggregatedMeasureData)
-            return "DK_AggregatedMeteredDataTimeSeries";
-        if (document == DocumentType.RejectRequestAggregatedMeasureData)
-            return "DK_RejectRequestMeteredDataAggregated";
-        if (document == DocumentType.NotifyWholesaleServices)
-            return "DK_NotifyAggregatedWholesaleServices";
-        if (document == DocumentType.RejectRequestWholesaleSettlement)
-            return "DK_RejectAggregatedBillingInformation";
-
-        throw new InvalidOperationException("Unknown document type");
+        return xmlSchema;
     }
 }
