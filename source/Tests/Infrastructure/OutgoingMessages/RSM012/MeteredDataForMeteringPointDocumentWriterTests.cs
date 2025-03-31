@@ -240,7 +240,7 @@ public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFi
 
     private Task<MarketDocumentStream> WriteDocument(
         OutgoingMessageHeader header,
-        List<MeteredDateForMeteringPointMarketActivityRecord> meteredDateForMeteringPointMarketActivityRecord,
+        List<MeteredDataForMeteringPointMarketActivityRecord> meteredDateForMeteringPointMarketActivityRecord,
         DocumentFormat documentFormat)
     {
         var records = meteredDateForMeteringPointMarketActivityRecord
@@ -256,7 +256,7 @@ public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFi
         if (documentFormat == DocumentFormat.Ebix)
         {
             return new MeteredDataForMeteringPointEbixDocumentWriter(_parser)
-                .WriteAsync(header, records is null ? [] : [records]);
+                .WriteAsync(header, records);
         }
 
         var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();

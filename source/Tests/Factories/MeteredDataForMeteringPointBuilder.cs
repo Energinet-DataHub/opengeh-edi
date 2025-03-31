@@ -34,7 +34,7 @@ public class MeteredDataForMeteringPointBuilder
             SampleData.TimeStamp);
     }
 
-    public MeteredDateForMeteringPointMarketActivityRecord BuildMeteredDataForMeteringPoint(
+    public MeteredDataForMeteringPointMarketActivityRecord BuildMeteredDataForMeteringPoint(
         TransactionId? transactionId = null,
         IReadOnlyList<PointActivityRecord>? points = null)
     {

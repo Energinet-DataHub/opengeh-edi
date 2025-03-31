@@ -119,20 +119,4 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 
         return xmlSchema;
     }
-
-    private static string ParseDocumentType(DocumentType document)
-    {
-        if (document == DocumentType.NotifyAggregatedMeasureData)
-            return "DK_AggregatedMeteredDataTimeSeries";
-        if (document == DocumentType.RejectRequestAggregatedMeasureData)
-            return "DK_RejectRequestMeteredDataAggregated";
-        if (document == DocumentType.NotifyWholesaleServices)
-            return "DK_NotifyAggregatedWholesaleServices";
-        if (document == DocumentType.RejectRequestWholesaleSettlement)
-            return "DK_RejectAggregatedBillingInformation";
-        if (document == DocumentType.NotifyValidatedMeasureData)
-            return "DK_MeteredDataTimeSeries";
-
-        throw new InvalidOperationException("Unknown document type");
-    }
 }
