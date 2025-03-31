@@ -114,7 +114,12 @@ public class OutgoingMessageRepository(
             .Where(
                 om => om.AssignedBundleId == null &&
                       om.CreatedAt <= bundleMessagesCreatedBefore)
-            .Select(om => new BundleMetadata(om.Receiver.Number, om.Receiver.ActorRole, om.BusinessReason, om.DocumentType))
+            .Select(om => new BundleMetadata(
+                om.Receiver.Number,
+                om.Receiver.ActorRole,
+                om.BusinessReason,
+                om.DocumentType,
+                om.DocumentType == DocumentType.Acknowledgement ? om.RelatedToMessageId : null)) // Acknowledgement bundles has same related to message id.
             .Distinct()
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);

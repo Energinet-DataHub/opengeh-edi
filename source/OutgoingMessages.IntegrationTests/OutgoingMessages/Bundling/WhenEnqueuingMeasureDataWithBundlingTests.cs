@@ -48,7 +48,6 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
     public static TheoryData<DocumentType> MessageBuildersForBundledMessageTypes()
     {
-        // TODO: Add rejected bundling as well.
         return new([
                 DocumentType.NotifyValidatedMeasureData,
                 DocumentType.Acknowledgement,
@@ -458,6 +457,9 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var relatedToMessageId1 = MessageId.New();
         var relatedToMessageId2 = MessageId.New();
 
+        // - Create actor message queue to avoid race condition that creates two actor message queues for the same receiver
+        await CreateActorMessageQueueAndCommit(receiver);
+
         // - Create two message for same bundle
         var message1 = CreateMessage(documentType, receiver, relatedToMessageId1);
         var message2 = CreateMessage(documentType, receiver, relatedToMessageId2);
@@ -491,6 +493,15 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.Equal(2, bundles.Count),
             () => Assert.NotEqual(outgoingMessages[0].AssignedBundleId, outgoingMessages[1].AssignedBundleId),
             () => Assert.All(bundles, b => Assert.Single(outgoingMessages, om => om.AssignedBundleId == b.Id)));
+    }
+
+    private async Task CreateActorMessageQueueAndCommit(Actor actor)
+    {
+        var dbContext = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var actorMessageQueue = ActorMessageQueue.CreateFor(Receiver.Create(actor));
+        dbContext.ActorMessageQueues.Add(actorMessageQueue);
+        await dbContext.SaveChangesAsync();
     }
 
     private OutgoingMessageDto CreateMessage(DocumentType documentType, Actor receiver, MessageId? relatedToMessageId)

@@ -194,7 +194,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // Verify the bundling function was executed
         var bundleFunctionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
             functionName: nameof(OutgoingMessagesBundler));
-        bundleFunctionResult.Succeeded.Should().BeTrue("because the OutgoingMessagesBundler function should have been completed with success. Host log:\n{0}", enqueueFunctionResult.HostLog);
+        bundleFunctionResult.Succeeded.Should().BeTrue("because the OutgoingMessagesBundler function should have been completed with success. Host log:\n{0}", bundleFunctionResult.HostLog);
 
         using var assertionScope = new AssertionScope();
 
@@ -240,7 +240,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued_AndThen_RejectedMessageCanBePeeked()
+    public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_AndWhen_MessageIsBundled__Then_RejectedMessageIsEnqueued_AndThen_RejectedMessageCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
@@ -287,13 +287,21 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
         // => When message is received
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
 
+        // Verify the function was executed
+        var enqueueFunctionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: nameof(EnqueueTrigger_Brs_021_ForwardMeteredData));
+        enqueueFunctionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", enqueueFunctionResult.HostLog);
+
+        // => And when message is bundled
+        await _fixture.AppHostManager.TriggerFunctionAsync(nameof(OutgoingMessagesBundler));
+
+        // Verify the bundling function was executed
+        var bundleFunctionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: nameof(OutgoingMessagesBundler));
+        bundleFunctionResult.Succeeded.Should().BeTrue("because the OutgoingMessagesBundler function should have been completed with success. Host log:\n{0}", bundleFunctionResult.HostLog);
+
         // Assert
         using var assertionScope = new AssertionScope();
-
-        // Verify the function was executed
-        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
-            functionName: nameof(EnqueueTrigger_Brs_021_ForwardMeteredData));
-        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
 
         // Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();

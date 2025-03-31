@@ -20,4 +20,5 @@ public record BundleMetadata(
     ActorNumber ReceiverNumber,
     ActorRole ReceiverRole,
     string BusinessReason,
-    DocumentType DocumentType);
+    DocumentType DocumentType,
+    MessageId? RelatedToMessageId);
