@@ -132,7 +132,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
         var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
-            .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor, orchestrationInstanceId);
+            .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor, orchestrationInstanceId, documentFormat);
 
         await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
 
@@ -410,7 +410,8 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 .GenerateAcceptedFrom(
                     requestMeteredDataForMeteringPointMessageInputV1: forwardMeteredDataMessage.Input,
                     receiverActor: receiverActor,
-                    orchestrationInstanceId: forwardMeteredDataMessage.OrchestrationInstanceId);
+                    orchestrationInstanceId: forwardMeteredDataMessage.OrchestrationInstanceId,
+                    documentFormat: documentFormat);
 
             await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
 

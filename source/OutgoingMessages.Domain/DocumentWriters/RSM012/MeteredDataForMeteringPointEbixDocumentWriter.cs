@@ -138,7 +138,7 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                         }
                     }
                 }
-                else if (energyObservation.Quality is not null)
+                else
                 {
                     await writer.WriteElementStringAsync(
                         DocumentDetails.Prefix,

@@ -139,7 +139,7 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDataF
                 AssertElementNotPresent($"PayloadEnergyTimeSeries[{seriesIndex}]/IntervalEnergyObservation[{i + 1}]/EnergyQuantity");
             }
 
-            if (optionalPointDocumentFields.Quality is not null)
+            if (optionalPointDocumentFields.Quality is not null && optionalPointDocumentFields.Quantity is not null)
             {
                 var quality = EbixCode.Of(optionalPointDocumentFields.Quality);
 
@@ -183,9 +183,9 @@ public class AssertMeteredDataForMeteringPointEbixDocument : IAssertMeteredDataF
         return this;
     }
 
-    // Not present in ebix.
     public IAssertMeteredDataForMeteringPointDocumentDocument HasReceiverRole(string expectedReceiverRole)
     {
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcessRole", expectedReceiverRole);
         return this;
     }
 
