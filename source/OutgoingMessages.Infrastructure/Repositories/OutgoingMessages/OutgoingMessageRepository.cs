@@ -14,26 +14,30 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 
-public class OutgoingMessageRepository : IOutgoingMessageRepository
+public class OutgoingMessageRepository(
+    IClock clock,
+    IOptions<BundlingOptions> bundlingOptions,
+    ActorMessageQueueContext context,
+    IFileStorageClient fileStorageClient)
+        : IOutgoingMessageRepository
 {
-    private readonly ActorMessageQueueContext _context;
-    private readonly IFileStorageClient _fileStorageClient;
-
-    public OutgoingMessageRepository(ActorMessageQueueContext context, IFileStorageClient fileStorageClient)
-    {
-        _context = context;
-        _fileStorageClient = fileStorageClient;
-    }
+    private readonly IClock _clock = clock;
+    private readonly BundlingOptions _bundlingOptions = bundlingOptions.Value;
+    private readonly ActorMessageQueueContext _context = context;
+    private readonly IFileStorageClient _fileStorageClient = fileStorageClient;
 
     public async Task AddAsync(OutgoingMessage message)
     {
@@ -98,6 +102,45 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
                 x.ExternalId == externalId &&
                 x.PeriodStartedAt == periodStartedAt)
             .ConfigureAwait(false);
+    }
+
+    public async Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
+    {
+        var bundleMessagesCreatedBefore = _clock
+            .GetCurrentInstant()
+            .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
+
+        var bundleMetadata = await _context.OutgoingMessages
+            .Where(
+                om => om.AssignedBundleId == null &&
+                      om.CreatedAt <= bundleMessagesCreatedBefore)
+            .Select(om => new BundleMetadata(om.Receiver.Number, om.Receiver.ActorRole, om.BusinessReason, om.DocumentType))
+            .Distinct()
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return bundleMetadata.ToHashSet();
+    }
+
+    public async Task<IReadOnlyCollection<OutgoingMessage>> GetMessagesForBundleAsync(
+        Receiver receiver,
+        BusinessReason businessReason,
+        DocumentType documentType,
+        MessageId? relatedToMessageId,
+        CancellationToken cancellationToken)
+    {
+        var query = _context.OutgoingMessages
+            .Where(om => om.AssignedBundleId == null
+                && om.Receiver.Number == receiver.Number
+                && om.Receiver.ActorRole == receiver.ActorRole
+                && om.DocumentType == documentType
+                && om.BusinessReason == businessReason.Name);
+
+        if (relatedToMessageId != null)
+            query = query.Where(om => om.RelatedToMessageId == relatedToMessageId);
+
+        return await query
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds, CancellationToken cancellationToken)

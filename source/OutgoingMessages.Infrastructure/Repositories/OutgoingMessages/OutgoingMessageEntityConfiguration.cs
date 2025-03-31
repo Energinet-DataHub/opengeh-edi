@@ -124,6 +124,9 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
         builder.Property(x => x.PeriodStartedAt);
         builder.Property(x => x.CreatedAt);
 
+        builder.Property(b => b.RowVersion)
+            .IsRowVersion();
+
         builder.Property<string>("CreatedBy");
         builder.Property<string?>("ModifiedBy");
         builder.Property<Instant?>("ModifiedAt");

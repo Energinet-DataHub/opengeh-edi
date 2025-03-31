@@ -28,8 +28,10 @@ public interface IBundleRepository
     /// </summary>
     void Add(Bundle bundle);
 
+    void Add(IReadOnlyCollection<Bundle> bundles);
+
     /// <summary>
-    ///  Get dequeued bundles older than a specific time.
+    /// Get dequeued bundles older than a specific time.
     /// </summary>
     /// <param name="olderThan"></param>
     /// <param name="take"></param>
@@ -50,10 +52,8 @@ public interface IBundleRepository
     Task<Bundle?> GetBundleAsync(MessageId messageId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the oldest bundle for a ActorMessageQueue.
+    /// Gets the next bundle to peek for an ActorMessageQueue and a category.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="messageCategory"></param>
-    /// <param name="cancellationToken"></param>
-    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory messageCategory, CancellationToken cancellationToken);
+    /// <returns>The oldest closed bundle that hasn't been dequeued yet for given inputs.</returns>
+    Task<Bundle?> GetNextBundleToPeekAsync(ActorMessageQueueId actorMessageQueueId, MessageCategory messageCategory, CancellationToken cancellationToken);
 }
