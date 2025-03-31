@@ -101,7 +101,7 @@ public sealed class B2CEdiDriver : IDisposable
     {
         var webApiClient = await CreateWebApiClientAsync();
 
-        var start = Instant.FromUtc(2024, 09, 01, 00, 00);
+        var start = Instant.FromUtc(2024, 08, 31, 00, 00);
         var requestWholesaleServicesMarketDocumentV2 = new RequestWholesaleServicesMarketDocumentV2
         {
             BusinessReason = "D05",
@@ -115,7 +115,7 @@ public sealed class B2CEdiDriver : IDisposable
                     MeteringGridAreaDomainId = "804",
                     EnergySupplierMarketParticipantId = "5790001330552",
                     SettlementVersion = "D01",
-                    Resolution = "D01",
+                    Resolution = "P15M",
                     ChargeOwner = null,
                     ChargeTypes = new List<RequestWholesaleSettlementChargeTypeV2>
                     {
