@@ -46,27 +46,27 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         _clockStub = (ClockStub)GetService<IClock>();
     }
 
-    public static TheoryData<Func<Actor, OutgoingMessageDto>> MessageBuildersForBundledMessageTypes()
+    public static TheoryData<DocumentType> MessageBuildersForBundledMessageTypes()
     {
         // TODO: Add rejected bundling as well.
         return new([
-                receiver => new AcceptedForwardMeteredDataMessageDtoBuilder()
-                    .WithReceiver(receiver)
-                    .Build(),
+                DocumentType.NotifyValidatedMeasureData,
+                DocumentType.Acknowledgement,
             ]);
     }
 
     [Theory]
     [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
     public async Task Given_EnqueuedTwoMessageForSameBundle_When_BundleMessages_Then_BothMessageAreInTheSameBundle_AndThen_BundleHasCorrectCount(
-        Func<Actor, OutgoingMessageDto> messageBuilder)
+        DocumentType documentType)
     {
         // Given existing bundle
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
 
         // - Create two message for same bundle
-        var message1 = messageBuilder(receiver);
-        var message2 = messageBuilder(receiver);
+        var message1 = CreateMessage(documentType, receiver, relatedToMessageId);
+        var message2 = CreateMessage(documentType, receiver, relatedToMessageId);
 
         // - Enqueue messages "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
@@ -107,17 +107,18 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     [Theory]
     [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
     public async Task Given_EnqueuedTwoMessageForDifferentReceivers_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage(
-        Func<Actor, OutgoingMessageDto> messageBuilder)
+        DocumentType documentType)
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
 
         // Given existing bundle
         var receiver1 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var receiver2 = new Actor(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
+        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
 
         // - Create two message for same bundle
-        var message1 = messageBuilder(receiver1);
-        var message2 = messageBuilder(receiver2);
+        var message1 = CreateMessage(documentType, receiver1, relatedToMessageId);
+        var message2 = CreateMessage(documentType, receiver2, relatedToMessageId);
 
         // - Enqueue messages "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
@@ -150,21 +151,21 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.All(bundles, b => Assert.Single(outgoingMessages, om => om.AssignedBundleId == b.Id)));
     }
 
-    [Theory]
-    [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
-    public async Task Given_EnqueuedMessagesForTwoBundles_AndGiven_PartialBundleDoesNotHaveMessageOldEnoughToBeBundled_When_BundleMessages_Then_OnlyOneBundleIsCreatedWithCorrectCount(
-        Func<Actor, OutgoingMessageDto> messageBuilder)
+    [Fact]
+    public async Task Given_EnqueuedMessagesForTwoBundles_AndGiven_PartialBundleDoesNotHaveMessageOldEnoughToBeBundled_When_BundleMessages_Then_OnlyOneBundleIsCreatedWithCorrectCount()
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
 
         // Given existing bundle
+        var documentType = DocumentType.NotifyValidatedMeasureData;
+        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
 
         // - Create messages for two bundles
         var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
-            .Select(_ => messageBuilder(receiver))
+            .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId))
             .ToList();
-        var messageForPartialBundle = messageBuilder(receiver);
+        var messageForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId);
 
         // - Enqueue messages for bundle 1 "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
@@ -210,22 +211,22 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     actual: outgoingMessages.Count(om => om.AssignedBundleId == b.Id))));
     }
 
-    [Theory]
-    [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
-    public async Task Given_EnqueuedMessagesForTwoBundles_AndGiven_PartialBundleHasMessageOldEnoughToBeBundled_When_BundleMessages_Then_TwoBundlesAreCreatedWithCorrectCount(
-        Func<Actor, OutgoingMessageDto> messageBuilder)
+    [Fact]
+    public async Task Given_EnqueuedMessagesForTwoBundles_AndGiven_PartialBundleHasMessageOldEnoughToBeBundled_When_BundleMessages_Then_TwoBundlesAreCreatedWithCorrectCount()
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
 
         // Given existing bundle
+        var documentType = DocumentType.NotifyValidatedMeasureData;
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
 
         // - Create messages for two bundles
         var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
-            .Select(_ => messageBuilder(receiver))
+            .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId))
             .ToList();
-        var message1ForPartialBundle = messageBuilder(receiver);
-        var message2ForPartialBundle = messageBuilder(receiver);
+        var message1ForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId);
+        var message2ForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId);
 
         // - Enqueue messages for bundle 1 "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
@@ -444,6 +445,76 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                         $"5th bundle count should be {receiver2MessageCount % bundleSize}, but was {outgoingMessages[b.Id].Count}");
                     Assert.All(outgoingMessages[b.Id], om => Assert.Equal(receiver2, om.Receiver));
                 }));
+    }
+
+    [Fact]
+    public async Task Given_EnqueuedTwoAcknowledgementMessagesWithDifferentRelatedToMessageIds_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage()
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        // Given existing bundle
+        var documentType = DocumentType.Acknowledgement;
+        var receiver = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
+        var relatedToMessageId1 = MessageId.New();
+        var relatedToMessageId2 = MessageId.New();
+
+        // - Create two message for same bundle
+        var message1 = CreateMessage(documentType, receiver, relatedToMessageId1);
+        var message2 = CreateMessage(documentType, receiver, relatedToMessageId2);
+
+        // - Enqueue messages "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        await EnqueueAndCommitMessage(message1, useNewScope: false);
+        await EnqueueAndCommitMessage(message2, useNewScope: false);
+
+        // When creating bundles
+        // - Move clock to when bundles should be created
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Create bundles
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+
+        // Then a bundle is created for each message
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var outgoingMessages = await dbContext.OutgoingMessages
+            .ToListAsync();
+
+        var bundles = await dbContext.Bundles
+            .ToListAsync();
+
+        // - Two bundles are created, each having 1 message.
+        Assert.Multiple(
+            () => Assert.Equal(2, bundles.Count),
+            () => Assert.NotEqual(outgoingMessages[0].AssignedBundleId, outgoingMessages[1].AssignedBundleId),
+            () => Assert.All(bundles, b => Assert.Single(outgoingMessages, om => om.AssignedBundleId == b.Id)));
+    }
+
+    private OutgoingMessageDto CreateMessage(DocumentType documentType, Actor receiver, MessageId? relatedToMessageId)
+    {
+        return documentType switch
+        {
+            var dt when dt == DocumentType.NotifyValidatedMeasureData =>
+                new AcceptedForwardMeteredDataMessageDtoBuilder()
+                    .WithReceiver(receiver)
+                    .Build(),
+
+            var dt when dt == DocumentType.Acknowledgement => new RejectedForwardMeteredDataMessageDtoBuilder()
+                .WithReceiver(receiver)
+                .WithRelatedToMessageId(relatedToMessageId
+                                        ?? throw new ArgumentNullException(
+                                            paramName: nameof(relatedToMessageId),
+                                            message: "RelatedToMessageId must be provided for Acknowledgement"))
+                .Build(),
+
+            _ => throw new ArgumentOutOfRangeException(
+                paramName: nameof(documentType),
+                actualValue: documentType.Name,
+                message: "Document type not supported."),
+        };
     }
 
     private async Task<int> EnqueueAndCommitMessages(List<OutgoingMessageDto> messagesToEnqueue)

@@ -245,7 +245,7 @@ public class BundleMessages(
         var maxBundleSize = documentType switch
         {
             var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleSize,
-            // var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleSize, // TODO: Support bundling RSM-009
+            var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleSize,
             _ => throw new ArgumentOutOfRangeException(nameof(documentType), documentType, "Document type doesn't support bundling."),
         };
 

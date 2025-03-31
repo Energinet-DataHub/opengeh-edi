@@ -72,8 +72,7 @@ public class EnqueueMessage
         if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
             return existingMessage.Id;
 
-        var maxBundleSize = GetMaxBundleSize(messageToEnqueue.DocumentType);
-        if (maxBundleSize == 1)
+        if (!IsBundlingEnabled(messageToEnqueue.DocumentType))
         {
             // If max bundle size is 1, then a bundle can be created & closed immediately
             var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
@@ -145,11 +144,17 @@ public class EnqueueMessage
         return actorMessageQueueId;
     }
 
-    private int GetMaxBundleSize(DocumentType documentType)
+    private bool IsBundlingEnabled(DocumentType documentType)
     {
-        return documentType == DocumentType.NotifyValidatedMeasureData
-            ? _bundlingOptions.MaxBundleSize // TODO: Support bundling RSM-009
-            : 1;
+        // Using max bundle size > 1 because we want to support disabling bundling by setting it to 1.
+        var maxBundleSize = documentType switch
+        {
+            var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleSize,
+            var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleSize,
+            _ => 1,
+        };
+
+        return maxBundleSize > 1;
     }
 
     private MessageId? GetRelatedToMessageIdForBundling(OutgoingMessage messageToEnqueue)
