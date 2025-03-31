@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
-using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using NodaTime.Extensions;
 using Polly;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
+[SuppressMessage(
+    "StyleCop.CSharp.ReadabilityRules",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "Readability")]
 public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
@@ -67,7 +70,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: acceptedData.MeteringPointId,
                         MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                        OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
+                        OriginalTransactionIdReferenceId: null,
                         Product: acceptedData.ProductNumber,
                         QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
                         RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
@@ -77,10 +80,12 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                         EnergyObservations: energyObservations));
 
                 await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+
+                // We must commit after every enqueue, else the same bundle will be created multiple times and
+                // fail because of a unique constraint.
+                await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
             }
         }
-
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)

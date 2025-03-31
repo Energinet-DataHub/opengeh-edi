@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.CalculationResults;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
@@ -101,6 +102,15 @@ public static class OutgoingMessagesExtensions
 
         // DequeConfiguration
         services.AddTransient<DequeueMessage>();
+
+        // BundleMessages configuration
+        services
+            .AddTransient<BundleMessages>()
+            .AddTransient<IOutgoingMessagesBundleClient, OutgoingMessagesBundleClient>();
+        services
+            .AddOptions<BundlingOptions>()
+            .BindConfiguration(BundlingOptions.SectionName)
+            .ValidateDataAnnotations();
 
         // DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
