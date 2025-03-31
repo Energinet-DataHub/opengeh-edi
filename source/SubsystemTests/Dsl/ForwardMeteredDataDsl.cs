@@ -77,7 +77,8 @@ internal sealed class ForwardMeteredDataDsl(
     {
         var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
         var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
-            messageCategory: MessageCategory.MeasureData);
+            messageCategory: MessageCategory.MeasureData,
+            timeout: timeout);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync();
 
