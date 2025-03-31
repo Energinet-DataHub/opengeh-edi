@@ -28,6 +28,8 @@ internal sealed class ForwardMeteredDataDsl(
     EdiDatabaseDriver ediDatabaseDriver,
     ProcessManagerDriver processManagerDriver)
 {
+    private const string SubsystemTestValidationError = "Subsystem test validation error.";
+
     private readonly EbixDriver _ebix = ebix;
     private readonly EdiDriver _ediDriver = ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver = ediDatabaseDriver;
@@ -85,6 +87,34 @@ internal sealed class ForwardMeteredDataDsl(
         messageId.Should().NotBeNull();
         contentString.Should().NotBeNull();
         contentString.Should().Contain("NotifyValidatedMeasureData_MarketDocument");
+
+        return messageId!;
+    }
+
+    public async Task PublishEnqueueBrs021ForwardMeteredDataRejected(Actor actor)
+    {
+        await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
+        await _processManagerDriver.PublishBrs021ForwardMeteredDataRejectedAsync(
+            actor: actor,
+            originalActorMessageId: Guid.NewGuid().ToString(),
+            eventId: Guid.NewGuid(),
+            validationError: SubsystemTestValidationError);
+    }
+
+    public async Task<string> ConfirmRejectedResponseIsAvailable()
+    {
+        var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
+            messageCategory: MessageCategory.MeasureData,
+            timeout: timeout);
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
+        var contentString = await peekResponse.Content.ReadAsStringAsync();
+
+        messageId.Should().NotBeNull();
+        contentString.Should().NotBeNull();
+        contentString.Should()
+            .Contain("Acknowledgement_MarketDocument")
+            .And.Contain(SubsystemTestValidationError);
 
         return messageId!;
     }

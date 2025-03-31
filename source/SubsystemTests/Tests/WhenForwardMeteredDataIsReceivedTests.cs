@@ -102,4 +102,15 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
 
         await _forwardMeteredDataEnergySupplier.ConfirmResponseIsAvailable();
     }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_forward_metered_data_rejected()
+    {
+        await _forwardMeteredDataEnergySupplier.PublishEnqueueBrs021ForwardMeteredDataRejected(
+            actor: new Actor(
+                actorNumber: ActorNumber.Create(actorNumber: SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
+                actorRole: ActorRole.EnergySupplier));
+
+        await _forwardMeteredDataEnergySupplier.ConfirmRejectedResponseIsAvailable();
+    }
 }

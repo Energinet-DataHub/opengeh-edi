@@ -88,4 +88,19 @@ internal class ProcessManagerDriver(
 
         await _client.SendAsync(serviceBusMessage, CancellationToken.None);
     }
+
+    internal async Task PublishBrs021ForwardMeteredDataRejectedAsync(
+        Actor actor,
+        string originalActorMessageId,
+        Guid eventId,
+        string validationError)
+    {
+        var serviceBusMessage = EnqueueBrs021ForwardMeteredDataFactory.CreateRejectedV1(
+            actor,
+            originalActorMessageId,
+            eventId,
+            validationError);
+
+        await _client.SendAsync(serviceBusMessage, CancellationToken.None);
+    }
 }
