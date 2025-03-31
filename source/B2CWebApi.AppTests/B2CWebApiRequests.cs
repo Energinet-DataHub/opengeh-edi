@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
 
@@ -111,6 +112,34 @@ public static class B2CWebApiRequests
                     EnergySupplierId: null,
                     Resolution: null,
                     PriceType: null)),
+        };
+        return request;
+    }
+
+    public static HttpRequestMessage CreateRequestWholesaleSettlementTempRequest()
+    {
+        var requestWholesaleSettlementChargeTypeV2 = new RequestWholesaleSettlementChargeTypeV2(null, "23");
+        var requestWholesaleSettlementChargeTypeV2s = new List<RequestWholesaleSettlementChargeTypeV2> { requestWholesaleSettlementChargeTypeV2 };
+        var currentInstant = SystemClock.Instance.GetCurrentInstant();
+        var requestWholesaleSettlementSeriesV2 = new EDI.B2CWebApi.Models.RequestWholesaleSettlementSeriesV2(
+            Guid.NewGuid().ToString(),
+            currentInstant.ToString(),
+            currentInstant.Plus(Duration.FromDays(30)).ToString(),
+            "804",
+            null,
+            "D01",
+            "PT15M",
+            null,
+            requestWholesaleSettlementChargeTypeV2s);
+
+        var requestWholesaleServicesMarketDocumentV2 =
+            new EDI.B2CWebApi.Models.RequestWholesaleServicesMarketDocumentV2(
+                "D05",
+                new List<RequestWholesaleSettlementSeriesV2> { requestWholesaleSettlementSeriesV2, });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/TempRequestWholesaleSettlement")
+        {
+            Content = CreateJsonContent(requestWholesaleServicesMarketDocumentV2),
         };
         return request;
     }
