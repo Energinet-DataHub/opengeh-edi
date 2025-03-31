@@ -61,11 +61,14 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     {
         // Given existing bundle
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
+        var relatedToMessageId1 = MessageId.New();
+        var relatedToMessageId2 = documentType == DocumentType.Acknowledgement
+            ? relatedToMessageId1 // If Acknowledgement then related to message id must be the same to enable bundling.
+            : MessageId.New();
 
         // - Create two message for same bundle
-        var message1 = CreateMessage(documentType, receiver, relatedToMessageId);
-        var message2 = CreateMessage(documentType, receiver, relatedToMessageId);
+        var message1 = CreateMessage(documentType, receiver, relatedToMessageId1);
+        var message2 = CreateMessage(documentType, receiver, relatedToMessageId2);
 
         // - Enqueue messages "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
@@ -113,7 +116,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // Given existing bundle
         var receiver1 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var receiver2 = new Actor(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
-        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
+        var relatedToMessageId = MessageId.New(); // If Acknowledgement then related to message id must be the same to enable bundling.
 
         // - Create two message for same bundle
         var message1 = CreateMessage(documentType, receiver1, relatedToMessageId);
@@ -157,14 +160,13 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         // Given existing bundle
         var documentType = DocumentType.NotifyValidatedMeasureData;
-        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
 
         // - Create messages for two bundles
         var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
-            .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId))
+            .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId: null))
             .ToList();
-        var messageForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId);
+        var messageForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId: null);
 
         // - Enqueue messages for bundle 1 "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
@@ -218,14 +220,13 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // Given existing bundle
         var documentType = DocumentType.NotifyValidatedMeasureData;
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-        var relatedToMessageId = MessageId.New(); // If Acknowledgement, related to message id must be the same to enable bundling.
 
         // - Create messages for two bundles
         var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
-            .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId))
+            .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId: null))
             .ToList();
-        var message1ForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId);
-        var message2ForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId);
+        var message1ForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId: null);
+        var message2ForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId: null);
 
         // - Enqueue messages for bundle 1 "now"
         var now = Instant.FromUtc(2025, 03, 26, 13, 37);
