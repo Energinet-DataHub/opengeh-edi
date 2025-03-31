@@ -12,18 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Xml;
+using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using FluentAssertions;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
-internal sealed class MeteredDataForMeteringPointRequestDsl(EbixDriver ebix, EdiDriver ediDriver, EdiDatabaseDriver ediDatabaseDriver)
+[SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Dsl shouldn't contain technical terms")]
+internal sealed class ForwardMeteredDataDsl(
+    EbixDriver ebix,
+    EdiDriver ediDriver,
+    EdiDatabaseDriver ediDatabaseDriver,
+    ProcessManagerDriver processManagerDriver)
 {
     private readonly EbixDriver _ebix = ebix;
     private readonly EdiDriver _ediDriver = ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver = ediDatabaseDriver;
+    private readonly ProcessManagerDriver _processManagerDriver = processManagerDriver;
 
     public async Task<string> SendMeteredDataForMeteringPointInEbixAsync(CancellationToken cancellationToken)
     {
@@ -54,5 +62,31 @@ internal sealed class MeteredDataForMeteringPointRequestDsl(EbixDriver ebix, Edi
     public async Task<string> SendMeteredDataForMeteringPointInCimAsync(CancellationToken cancellationToken)
     {
         return await _ediDriver.SendMeteredDataForMeteringPointAsync(cancellationToken);
+    }
+
+    public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor)
+    {
+        await _ediDriver.EmptyQueueAsync();
+        await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
+            actor: actor,
+            start: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
+            end: Instant.FromUtc(2025, 01, 31, 23, 00, 00),
+            originalActorMessageId: Guid.NewGuid().ToString(),
+            eventId: Guid.NewGuid());
+    }
+
+    public async Task<string> ConfirmResponseIsAvailable()
+    {
+        // TODO: Maybe we should decrease bundling duration on
+        var timeout = TimeSpan.FromMinutes(6); // Timeout must be above 5 minutes, since bundling is set to 5 minutes
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(timeout: timeout).ConfigureAwait(false);
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
+        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        messageId.Should().NotBeNull();
+        contentString.Should().NotBeNull();
+        contentString.Should().Contain("NotifyValidatedMeasureData_MarketDocument");
+
+        return messageId!;
     }
 }

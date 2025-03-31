@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
@@ -22,14 +23,15 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
+public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
 {
-    private readonly MeteredDataForMeteringPointRequestDsl _meteredDataForMeteringPointGridAccessProvider;
+    private readonly ForwardMeteredDataDsl _forwardMeteredData;
+    private readonly ForwardMeteredDataDsl _forwardMeteredDataEnergySupplier;
 
-    public WhenMeteredDataForMeteringPointIsReceivedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
+    public WhenForwardMeteredDataIsReceivedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
     {
-        _meteredDataForMeteringPointGridAccessProvider = new MeteredDataForMeteringPointRequestDsl(
+        _forwardMeteredData = new ForwardMeteredDataDsl(
             new EbixDriver(
                 fixture.EbixUri,
                 fixture.EbixGridAccessProviderCredentials,
@@ -38,42 +40,66 @@ public class WhenMeteredDataForMeteringPointIsReceivedTests : BaseTestClass
                 fixture.DurableClient,
                 fixture.B2BClients.GridAccessProvider,
                 output),
-            new EdiDatabaseDriver(fixture.ConnectionString));
+            new EdiDatabaseDriver(fixture.ConnectionString),
+            new ProcessManagerDriver(fixture.EdiTopicClient));
+
+        _forwardMeteredDataEnergySupplier = new ForwardMeteredDataDsl(
+            new EbixDriver(
+                fixture.EbixUri,
+                fixture.EbixEnergySupplierCredentials,
+                output),
+            new EdiDriver(
+                fixture.DurableClient,
+                fixture.B2BClients.EnergySupplier,
+                output),
+            new EdiDatabaseDriver(fixture.ConnectionString),
+            new ProcessManagerDriver(fixture.EdiTopicClient));
     }
 
     [Fact]
     public async Task Actor_can_send_metered_data_for_metering_point_in_cim_to_datahub()
     {
-        var messageId = await _meteredDataForMeteringPointGridAccessProvider
+        var messageId = await _forwardMeteredData
             .SendMeteredDataForMeteringPointInCimAsync(CancellationToken.None);
 
-        await _meteredDataForMeteringPointGridAccessProvider.ConfirmRequestIsReceivedAsync(
+        await _forwardMeteredData.ConfirmRequestIsReceivedAsync(
             messageId,
             CancellationToken.None);
     }
 
-    [Fact(Skip = "Ebix is not supported.")]
+    [Fact]
     public async Task Actor_can_send_metered_data_for_metering_point_in_ebix_to_datahub()
     {
-        var messageId = await _meteredDataForMeteringPointGridAccessProvider
+        var messageId = await _forwardMeteredData
             .SendMeteredDataForMeteringPointInEbixAsync(CancellationToken.None);
 
-        await _meteredDataForMeteringPointGridAccessProvider.ConfirmRequestIsReceivedAsync(
+        await _forwardMeteredData.ConfirmRequestIsReceivedAsync(
             messageId,
             CancellationToken.None);
     }
 
-    [Fact(Skip = "Ebix is not supported.")]
+    [Fact]
     public async Task Actor_sends_metered_data_for_metering_point_in_ebix_with_already_used_message_id_to_datahub()
     {
-        var faultMessage = await _meteredDataForMeteringPointGridAccessProvider
+        var faultMessage = await _forwardMeteredData
             .SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);
 
         var expectedErrorMessage = "B2B-003:The provided Ids are not unique and have been used before";
 
-        _meteredDataForMeteringPointGridAccessProvider.ConfirmResponseContainsValidationError(
+        _forwardMeteredData.ConfirmResponseContainsValidationError(
             faultMessage,
             expectedErrorMessage,
             CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_forward_metered_data_response()
+    {
+        await _forwardMeteredDataEnergySupplier.PublishEnqueueBrs021ForwardMeteredData(
+            actor: new Actor(
+                actorNumber: ActorNumber.Create(actorNumber: SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
+                actorRole: ActorRole.EnergySupplier));
+
+        await _forwardMeteredDataEnergySupplier.ConfirmResponseIsAvailable();
     }
 }

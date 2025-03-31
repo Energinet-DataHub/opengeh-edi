@@ -42,12 +42,13 @@ internal sealed class EdiDriver
     }
 
     internal async Task<(HttpResponseMessage PeekResponse, HttpResponseMessage DequeueResponse)> PeekMessageAsync(
-        DocumentFormat? documentFormat = null)
+        DocumentFormat? documentFormat = null,
+        TimeSpan? timeout = null)
     {
         var stopWatch = Stopwatch.StartNew();
 
         // Set timeout to above 20 seconds since internal commands must be handled (twice) before accepted/rejected messages are available
-        var timeoutAfter = TimeSpan.FromMinutes(1);
+        var timeoutAfter = timeout ?? TimeSpan.FromMinutes(1);
         while (stopWatch.ElapsedMilliseconds < timeoutAfter.TotalMilliseconds)
         {
             var peekResponse = await PeekAsync(documentFormat).ConfigureAwait(false);
