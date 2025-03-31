@@ -75,7 +75,7 @@ internal sealed class ForwardMeteredDataDsl(
 
     public async Task<string> ConfirmResponseIsAvailable()
     {
-        var timeout = TimeSpan.FromMinutes(3); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
+        var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
         var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
             messageCategory: MessageCategory.MeasureData);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
