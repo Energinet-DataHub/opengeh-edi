@@ -474,7 +474,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                                                 new OptionalPointDocumentFields(Quality.FromName(md.QuantityQuality!), decimal.Parse(md.EnergyQuantity!, CultureInfo.InvariantCulture))))
                                             .ToList())),
                                 OptionalSeriesFields: new OptionalSeriesFields(
-                                    OriginalTransactionIdReferenceId: m.Input.TransactionId,
+                                    OriginalTransactionIdReferenceId: null,
                                     RegistrationDateTime: m.Input.RegistrationDateTime,
                                     InDomain: null,
                                     OutDomain: null,
