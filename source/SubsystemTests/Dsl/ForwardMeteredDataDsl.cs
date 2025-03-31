@@ -33,18 +33,18 @@ internal sealed class ForwardMeteredDataDsl(
     private readonly EdiDatabaseDriver _ediDatabaseDriver = ediDatabaseDriver;
     private readonly ProcessManagerDriver _processManagerDriver = processManagerDriver;
 
-    public async Task<string> SendMeteredDataForMeteringPointInEbixAsync(CancellationToken cancellationToken)
+    public async Task<string> SendForwardMeteredDataInEbixAsync(CancellationToken cancellationToken)
     {
         return await _ebix.SendMeteredDataForMeteringPointAsync(cancellationToken);
     }
 
     public async Task ConfirmRequestIsReceivedAsync(string messageId, CancellationToken cancellationToken)
     {
-        var processId = await _ediDatabaseDriver
-            .GetMeteredDataForMeteringPointProcessIdAsync(messageId, cancellationToken)
+        var messageIdFromRegistry = await _ediDatabaseDriver
+            .GetMessageIdFromMessageRegistryAsync(messageId, cancellationToken)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull("because the metered data for metering point process should be initialized");
+        messageIdFromRegistry.Should().NotBeNull("because the forward metering data process should be initialized");
     }
 
     public async Task<string> SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
@@ -59,14 +59,14 @@ internal sealed class ForwardMeteredDataDsl(
         response.Should().BeEquivalentTo(errorMessage);
     }
 
-    public async Task<string> SendMeteredDataForMeteringPointInCimAsync(CancellationToken cancellationToken)
+    public async Task<string> SendForwardMeteredDataInCimAsync(CancellationToken cancellationToken)
     {
-        return await _ediDriver.SendMeteredDataForMeteringPointAsync(cancellationToken);
+        return await _ediDriver.SendForwardMeteredDataAsync(cancellationToken);
     }
 
     public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor)
     {
-        await _ediDriver.EmptyQueueAsync();
+        await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
         await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
             actor: actor,
             start: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
@@ -77,9 +77,10 @@ internal sealed class ForwardMeteredDataDsl(
 
     public async Task<string> ConfirmResponseIsAvailable()
     {
-        // TODO: Maybe we should decrease bundling duration on
-        var timeout = TimeSpan.FromMinutes(6); // Timeout must be above 5 minutes, since bundling is set to 5 minutes
-        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(timeout: timeout).ConfigureAwait(false);
+        var timeout = TimeSpan.FromMinutes(3); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
+            messageCategory: MessageCategory.MeasureData,
+            timeout: timeout).ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 

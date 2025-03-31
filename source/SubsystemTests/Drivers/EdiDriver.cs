@@ -43,15 +43,15 @@ internal sealed class EdiDriver
 
     internal async Task<(HttpResponseMessage PeekResponse, HttpResponseMessage DequeueResponse)> PeekMessageAsync(
         DocumentFormat? documentFormat = null,
+        MessageCategory? messageCategory = null,
         TimeSpan? timeout = null)
     {
         var stopWatch = Stopwatch.StartNew();
 
-        // Set timeout to above 20 seconds since internal commands must be handled (twice) before accepted/rejected messages are available
         var timeoutAfter = timeout ?? TimeSpan.FromMinutes(1);
         while (stopWatch.ElapsedMilliseconds < timeoutAfter.TotalMilliseconds)
         {
-            var peekResponse = await PeekAsync(documentFormat).ConfigureAwait(false);
+            var peekResponse = await PeekAsync(documentFormat, messageCategory).ConfigureAwait(false);
 
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -93,9 +93,10 @@ internal sealed class EdiDriver
         return results;
     }
 
-    internal async Task EmptyQueueAsync()
+    internal async Task EmptyQueueAsync(MessageCategory? messageCategory = null)
     {
-        var peekResponse = await PeekAsync()
+        _logger.WriteLine("Emptying actor message queue.");
+        var peekResponse = await PeekAsync(messageCategory: messageCategory)
                 .ConfigureAwait(false);
         if (peekResponse.StatusCode == HttpStatusCode.OK)
         {
@@ -141,7 +142,7 @@ internal sealed class EdiDriver
         return requestContent.MessageId;
     }
 
-    internal async Task<string> SendMeteredDataForMeteringPointAsync(CancellationToken cancellationToken)
+    internal async Task<string> SendForwardMeteredDataAsync(CancellationToken cancellationToken)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/notifyvalidatedmeasuredata");
@@ -193,38 +194,6 @@ internal sealed class EdiDriver
     internal async Task WaitForOrchestrationCompletedAsync(string orchestrationInstanceId)
     {
         await _durableClient.WaitForOrchestrationCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
-    }
-
-    internal async Task SendMeteredDataForMeteringPointAsync(Guid calculationId, Instant createdAfter)
-    {
-        var runningOrchestrationsResult = await _durableClient.ListInstancesAsync(
-            new OrchestrationStatusQueryCondition
-            {
-                RuntimeStatus = [
-                    OrchestrationRuntimeStatus.Pending,
-                    OrchestrationRuntimeStatus.Running,
-                ],
-                ShowInput = true,
-                CreatedTimeFrom = createdAfter.ToDateTimeUtc(),
-            },
-            CancellationToken.None);
-
-        var orchestrationsForCalculation = runningOrchestrationsResult
-            .DurableOrchestrationState
-            .Where(o => o.Input.ToString().Contains(calculationId.ToString()))
-            .ToList();
-
-        if (!orchestrationsForCalculation.Any())
-        {
-            _logger.WriteLine($"Found no orchestrations to stop for calculation (CalculationId={calculationId}, CreatedAfter={createdAfter.ToDateTimeUtc()})");
-            return;
-        }
-
-        foreach (var orchestration in orchestrationsForCalculation)
-        {
-            _logger.WriteLine($"Stopping orchestration for calculation (CalculationId={calculationId}, OrchestrationInstanceId={orchestration.InstanceId})");
-            await _durableClient.TerminateAsync(orchestration.InstanceId, "Stopped after load test");
-        }
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
@@ -283,10 +252,18 @@ internal sealed class EdiDriver
         return peekResponse.Headers.GetValues("MessageId").First();
     }
 
-    private async Task<HttpResponseMessage> PeekAsync(DocumentFormat? documentFormat = null)
+    private async Task<HttpResponseMessage> PeekAsync(DocumentFormat? documentFormat = null, MessageCategory? messageCategory = null)
     {
         var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/aggregations");
+
+        var messageCategoryString = messageCategory switch
+        {
+            null => MessageCategory.Aggregations.Name,
+            var mc when mc == MessageCategory.None => throw new InvalidOperationException("Message category must be specified."),
+            var mc => mc.Name,
+        };
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v1.0/cim/{messageCategoryString.ToLower()}");
         var contentType = documentFormat == null || DocumentFormat.Json == documentFormat ? "application/json" : "application/xml";
         request.Content = new StringContent(string.Empty, Encoding.UTF8, contentType);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);

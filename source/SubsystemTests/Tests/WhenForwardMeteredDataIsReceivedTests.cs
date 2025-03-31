@@ -57,10 +57,10 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_can_send_metered_data_for_metering_point_in_cim_to_datahub()
+    public async Task Actor_can_send_forward_metered_data_in_cim_to_datahub()
     {
         var messageId = await _forwardMeteredData
-            .SendMeteredDataForMeteringPointInCimAsync(CancellationToken.None);
+            .SendForwardMeteredDataInCimAsync(CancellationToken.None);
 
         await _forwardMeteredData.ConfirmRequestIsReceivedAsync(
             messageId,
@@ -68,10 +68,10 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_can_send_metered_data_for_metering_point_in_ebix_to_datahub()
+    public async Task Actor_can_send_forward_metered_data_in_ebix_to_datahub()
     {
         var messageId = await _forwardMeteredData
-            .SendMeteredDataForMeteringPointInEbixAsync(CancellationToken.None);
+            .SendForwardMeteredDataInEbixAsync(CancellationToken.None);
 
         await _forwardMeteredData.ConfirmRequestIsReceivedAsync(
             messageId,
@@ -79,7 +79,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_sends_metered_data_for_metering_point_in_ebix_with_already_used_message_id_to_datahub()
+    public async Task Actor_sends_forward_metered_data_in_ebix_with_already_used_message_id_to_datahub()
     {
         var faultMessage = await _forwardMeteredData
             .SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);
