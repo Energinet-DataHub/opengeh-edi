@@ -20,11 +20,8 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.Tests.DocumentValidation;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Schemas;
 using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
@@ -45,6 +42,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
     [
         DocumentFormat.Json,
         DocumentFormat.Xml,
+        DocumentFormat.Ebix
     ];
 
     public static TheoryData<DocumentFormat> SupportedRejectDocumentFormats =>

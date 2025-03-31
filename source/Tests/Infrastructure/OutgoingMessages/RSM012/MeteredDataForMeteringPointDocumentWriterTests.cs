@@ -206,7 +206,7 @@ public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFi
 
         if (documentFormat == DocumentFormat.Ebix)
         {
-            var assertXmlDocument = AssertEbixDocument.Document(document.Stream, "cim", _documentValidation.Validator);
+            var assertXmlDocument = AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator);
             return new AssertMeteredDataForMeteringPointEbixDocument(assertXmlDocument);
         }
 
