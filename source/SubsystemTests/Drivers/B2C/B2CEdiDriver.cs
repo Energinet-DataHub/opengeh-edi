@@ -102,6 +102,7 @@ public sealed class B2CEdiDriver : IDisposable
         var webApiClient = await CreateWebApiClientAsync();
 
         var start = Instant.FromUtc(2024, 08, 31, 00, 00);
+        var end = Instant.FromUtc(2024, 09, 30, 00, 00);
         var requestWholesaleServicesMarketDocumentV2 = new RequestWholesaleServicesMarketDocumentV2
         {
             BusinessReason = "D05",
@@ -111,7 +112,7 @@ public sealed class B2CEdiDriver : IDisposable
                 {
                     Id = Guid.NewGuid().ToString(),
                     StartDateAndOrTimeDateTime = start.ToString(),
-                    EndDateAndOrTimeDateTime = start.Plus(Duration.FromDays(30)).ToString(),
+                    EndDateAndOrTimeDateTime = end.ToString(),
                     MeteringGridAreaDomainId = "804",
                     EnergySupplierMarketParticipantId = "5790001330552",
                     SettlementVersion = "D01",
