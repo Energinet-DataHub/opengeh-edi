@@ -101,8 +101,8 @@ public sealed class B2CEdiDriver : IDisposable
     {
         var webApiClient = await CreateWebApiClientAsync();
 
-        var start = Instant.FromUtc(2024, 08, 31, 00, 00);
-        var end = Instant.FromUtc(2024, 09, 30, 00, 00);
+        var start = Instant.FromUtc(2024, 08, 31, 22, 00);
+        var end = Instant.FromUtc(2024, 09, 30, 22, 00);
         var requestWholesaleServicesMarketDocumentV2 = new RequestWholesaleServicesMarketDocumentV2
         {
             BusinessReason = "D05",
