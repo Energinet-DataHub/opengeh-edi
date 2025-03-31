@@ -82,7 +82,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     public async Task Actor_sends_forward_metered_data_in_ebix_with_already_used_message_id_to_datahub()
     {
         var faultMessage = await _forwardMeteredData
-            .SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);
+            .SendForwardMeteredDataInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);
 
         var expectedErrorMessage = "B2B-003:The provided Ids are not unique and have been used before";
 

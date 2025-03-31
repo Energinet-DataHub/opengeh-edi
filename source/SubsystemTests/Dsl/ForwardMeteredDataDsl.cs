@@ -35,23 +35,21 @@ internal sealed class ForwardMeteredDataDsl(
 
     public async Task<string> SendForwardMeteredDataInEbixAsync(CancellationToken cancellationToken)
     {
-        return await _ebix.SendMeteredDataForMeteringPointAsync(cancellationToken);
+        return await _ebix.SendForwardMeteredDataAsync(cancellationToken);
     }
 
     public async Task ConfirmRequestIsReceivedAsync(string messageId, CancellationToken cancellationToken)
     {
         var messageIdFromRegistry = await _ediDatabaseDriver
-            .GetMessageIdFromMessageRegistryAsync(messageId, cancellationToken)
-            .ConfigureAwait(false);
+            .GetMessageIdFromMessageRegistryAsync(messageId, cancellationToken);
 
         messageIdFromRegistry.Should().NotBeNull("because the forward metering data process should be initialized");
     }
 
-    public async Task<string> SendMeteredDataForMeteringPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
+    public async Task<string> SendForwardMeteredDataInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
     {
         return await _ebix
-            .SendMeteredDataForMeteringPointWithAlreadyUsedMessageIdAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .SendForwardMeteredDataWithAlreadyUsedMessageIdAsync(cancellationToken);
     }
 
     public void ConfirmResponseContainsValidationError(string response, string errorMessage, CancellationToken none)
@@ -79,10 +77,9 @@ internal sealed class ForwardMeteredDataDsl(
     {
         var timeout = TimeSpan.FromMinutes(3); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
         var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
-            messageCategory: MessageCategory.MeasureData,
-            timeout: timeout).ConfigureAwait(false);
+            messageCategory: MessageCategory.MeasureData);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
-        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var contentString = await peekResponse.Content.ReadAsStringAsync();
 
         messageId.Should().NotBeNull();
         contentString.Should().NotBeNull();
