@@ -36,7 +36,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 public class TempRequestWholesaleSettlementController : ControllerBase
 {
     private const string WholesaleSettlementMessageType = "D21";
-    private const string WholesaleSettlementBusinessType = "23";
+    private const string Electricity = "23";
 
     private readonly IClock _clock;
     private readonly UserContext<FrontendUser> _userContext;
@@ -85,7 +85,7 @@ public class TempRequestWholesaleSettlementController : ControllerBase
             WholesaleSettlementMessageType,
             Guid.NewGuid().ToString(),
             _clock.GetCurrentInstant().ToString(),
-            WholesaleSettlementBusinessType,
+            Electricity,
             request.Series.Select(s => new RequestWholesaleSettlementSeries(
                 s.Id,
                 s.StartDateAndOrTimeDateTime,
