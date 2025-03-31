@@ -203,7 +203,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                                                 new OptionalPointDocumentFields(Quality.FromCode("A03"), 654.321M)),
                                         ])),
                                 OptionalSeriesFields: new OptionalSeriesFields(
-                                    OriginalTransactionIdReferenceId: transactionId,
+                                    OriginalTransactionIdReferenceId: null,
                                     RegistrationDateTime: "2022-12-17T09:30:00Z",
                                     InDomain: null,
                                     OutDomain: null,
@@ -474,7 +474,7 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                                                 new OptionalPointDocumentFields(Quality.FromName(md.QuantityQuality!), decimal.Parse(md.EnergyQuantity!, CultureInfo.InvariantCulture))))
                                             .ToList())),
                                 OptionalSeriesFields: new OptionalSeriesFields(
-                                    OriginalTransactionIdReferenceId: m.Input.TransactionId,
+                                    OriginalTransactionIdReferenceId: null,
                                     RegistrationDateTime: m.Input.RegistrationDateTime,
                                     InDomain: null,
                                     OutDomain: null,

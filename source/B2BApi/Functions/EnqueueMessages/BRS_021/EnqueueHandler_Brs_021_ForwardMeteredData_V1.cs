@@ -70,9 +70,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: acceptedData.MeteringPointId,
                         MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                        OriginalTransactionIdReferenceId: acceptedData.OriginalTransactionId is not null
-                            ? TransactionId.From(acceptedData.OriginalTransactionId)
-                            : null,
+                        OriginalTransactionIdReferenceId: null,
                         Product: acceptedData.ProductNumber,
                         QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
                         RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
