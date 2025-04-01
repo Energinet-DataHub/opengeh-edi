@@ -96,7 +96,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     public async Task Actor_can_peek_and_dequeue_forward_metered_data_response()
     {
         await _forwardMeteredDataAsEnergySupplier.PublishEnqueueBrs021ForwardMeteredData(
-            actor: new Actor(
+            new Actor(
                 actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
                 actorRole: ActorRole.EnergySupplier));
 
@@ -107,7 +107,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     public async Task Actor_can_peek_and_dequeue_forward_metered_data_rejected()
     {
         await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredDataRejected(
-            actor: new Actor(
+            new Actor(
                 actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimGridAccessProviderNumber),
                 actorRole: ActorRole.GridAccessProvider));
 
