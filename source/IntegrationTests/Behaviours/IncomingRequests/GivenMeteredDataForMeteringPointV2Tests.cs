@@ -364,8 +364,8 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             MeasureUnit: MeasurementUnit.KilowattHour.Name,
             RegistrationDateTime: "2024-12-31T23:00:00Z",
             Resolution: resolution.Name,
-            StartDateTime: "2024-12-31T23:00Z",
-            EndDateTime: "2025-01-01T02:00Z",
+            StartDateTime: documentFormat == DocumentFormat.Ebix ? "2024-12-31T23:00:00Z" : "2024-12-31T23:00Z",
+            EndDateTime: documentFormat == DocumentFormat.Ebix ? "2025-01-01T02:00:00Z" : "2025-01-01T02:00Z",
             GridAccessProviderNumber: senderActor.ActorNumber.Value,
             DelegatedGridAreaCodes: [],
             MeteredDataList: [ // Start -> End = 3 hours = 3 points (with hourly resolution)
@@ -386,8 +386,8 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             MeasureUnit: MeasurementUnit.KilowattHour.Name,
             RegistrationDateTime: "2024-12-31T23:01:00Z",
             Resolution: Resolution.Hourly.Name,
-            StartDateTime: "2024-12-31T23:00Z",
-            EndDateTime: "2025-01-01T04:00Z",
+            StartDateTime: documentFormat == DocumentFormat.Ebix ? "2024-12-31T23:00:00Z" : "2024-12-31T23:00Z",
+            EndDateTime: documentFormat == DocumentFormat.Ebix ? "2025-01-01T04:00:00Z" : "2025-01-01T04:00Z",
             GridAccessProviderNumber: senderActor.ActorNumber.Value,
             DelegatedGridAreaCodes: [],
             MeteredDataList: [ // Start -> End = 5 hours = 5 points (with hourly resolution)
