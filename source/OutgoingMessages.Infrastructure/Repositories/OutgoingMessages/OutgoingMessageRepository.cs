@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
@@ -124,6 +125,13 @@ public class OutgoingMessageRepository(
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+        {
+            bundleMetadata = bundleMetadata
+                .Select(b => b with { ReceiverRole = b.ReceiverRole.ForActorMessageQueue() })
+                .ToList();
+        }
+
         return bundleMetadata.ToHashSet();
     }
 
@@ -137,9 +145,23 @@ public class OutgoingMessageRepository(
         var query = _context.OutgoingMessages
             .Where(om => om.AssignedBundleId == null
                 && om.Receiver.Number == receiver.Number
-                && om.Receiver.ActorRole == receiver.ActorRole
                 && om.DocumentType == documentType
                 && om.BusinessReason == businessReason.Name);
+
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
+            && receiver.ActorRole == ActorRole.GridAccessProvider)
+        {
+            // Bundles for GridAccessProvider needs to contain messages for MeteredDataResponsible as well,
+            // because of the MDR -> DDM hack, and the fact that the outgoing messages still has "MDR" as the receiver.
+            // even though they should be in the DDM actor message queue / bundles.
+            query = query.Where(om =>
+                om.Receiver.ActorRole == ActorRole.GridAccessProvider
+                || om.Receiver.ActorRole == ActorRole.MeteredDataResponsible);
+        }
+        else
+        {
+            query = query.Where(om => om.Receiver.Number == receiver.Number);
+        }
 
         if (relatedToMessageId != null)
             query = query.Where(om => om.RelatedToMessageId == relatedToMessageId);

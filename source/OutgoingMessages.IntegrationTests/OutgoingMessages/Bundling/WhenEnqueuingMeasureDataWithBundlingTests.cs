@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
@@ -46,7 +47,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         _clockStub = (ClockStub)GetService<IClock>();
     }
 
-    public static TheoryData<DocumentType> MessageBuildersForBundledMessageTypes()
+    public static TheoryData<DocumentType> DocumentTypesForBundledMessageTypes()
     {
         return new([
                 DocumentType.NotifyValidatedMeasureData,
@@ -54,8 +55,25 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             ]);
     }
 
+    public static TheoryData<ActorRole> ReceiverActorRolesForNotifyValidatedMeasureData()
+    {
+        return new([
+            ActorRole.EnergySupplier,
+            ActorRole.GridAccessProvider,
+            ActorRole.DanishEnergyAgency,
+            ActorRole.SystemOperator,
+        ]);
+    }
+
+    public static TheoryData<ActorRole> ReceiverActorRolesForAcknowledgement()
+    {
+        return new([
+            ActorRole.MeteredDataResponsible, // RSM-009 messages are sent to the sender role of the incoming RSM-012, which is MDR.
+        ]);
+    }
+
     [Theory]
-    [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
+    [MemberData(nameof(DocumentTypesForBundledMessageTypes))]
     public async Task Given_EnqueuedTwoMessageForSameBundle_When_BundleMessages_Then_BothMessageAreInTheSameBundle_AndThen_BundleHasCorrectCount(
         DocumentType documentType)
     {
@@ -107,7 +125,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     }
 
     [Theory]
-    [MemberData(nameof(MessageBuildersForBundledMessageTypes))]
+    [MemberData(nameof(DocumentTypesForBundledMessageTypes))]
     public async Task Given_EnqueuedTwoMessageForDifferentReceivers_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage(
         DocumentType documentType)
     {
@@ -151,6 +169,134 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.Equal(2, bundles.Count),
             () => Assert.NotEqual(outgoingMessages[0].AssignedBundleId, outgoingMessages[1].AssignedBundleId),
             () => Assert.All(bundles, b => Assert.Single(outgoingMessages, om => om.AssignedBundleId == b.Id)));
+    }
+
+    [Theory]
+    [MemberData(nameof(ReceiverActorRolesForNotifyValidatedMeasureData))]
+    public async Task Given_EnqueuedNotifyValidatedMeasureDataForReceiver_When_BundlingMessages_ThenBundleIsCreatedWithCorrectValues(
+        ActorRole receiverRole)
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        // Given existing bundle
+        var receiver = new Actor(ActorNumber.Create("1111111111111"), receiverRole);
+
+        // - Create two message for same bundle
+        var message = CreateMessage(DocumentType.NotifyValidatedMeasureData, receiver, relatedToMessageId: null);
+
+        // - Enqueue messages "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        await EnqueueAndCommitMessage(message, useNewScope: false);
+
+        // When creating bundles
+        // - Move clock to when bundles should be created
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Create bundles
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+
+        // Then a bundle is created with correct values
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var outgoingMessages = await dbContext.OutgoingMessages.ToListAsync();
+        var bundles = await dbContext.Bundles.ToListAsync();
+        var actorMessageQueues = await dbContext.ActorMessageQueues.ToListAsync();
+
+        // - One outgoing messages was enqueued
+        // - One bundle was created
+        Assert.Multiple(
+            () => Assert.Single(outgoingMessages),
+            () => Assert.Single(bundles));
+
+        var bundle = bundles.Single();
+        var outgoingMessage = outgoingMessages.Single();
+
+        // - The outgoing message is assigned to the bundle
+        // - The bundle is in the correct actor message queue (correct receiver)
+        // - The bundle has correct values
+        Assert.Multiple(
+            () => Assert.Equal(outgoingMessage.AssignedBundleId, bundle.Id),
+            () => Assert.Equal(Receiver.Create(receiver), actorMessageQueues.SingleOrDefault(amq => amq.Id == bundle.ActorMessageQueueId)?.Receiver),
+            () => Assert.NotNull(bundle.RowVersion),
+            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.Created),
+            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.ClosedAt),
+            () => Assert.True(bundle.IsClosed),
+            () => Assert.Null(bundle.PeekedAt),
+            () => Assert.Null(bundle.DequeuedAt),
+            () => Assert.Equal(DocumentType.NotifyValidatedMeasureData, bundle.DocumentTypeInBundle),
+            () => Assert.Equal(MessageCategory.MeasureData, bundle.MessageCategory),
+            () => Assert.Equal(BusinessReason.PeriodicMetering, bundle.BusinessReason),
+            () => Assert.Equal(bundlingOptions.MaxBundleSize, bundle.MaxMessageCount),
+            () => Assert.Null(bundle.RelatedToMessageId));
+    }
+
+    [Theory]
+    [MemberData(nameof(ReceiverActorRolesForAcknowledgement))]
+    public async Task Given_EnqueuedAcknowledgementForReceiver_When_BundlingMessages_ThenBundleIsCreatedWithCorrectValues(
+        ActorRole receiverRole)
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        var receiver = new Actor(ActorNumber.Create("1111111111111"), receiverRole);
+        var relatedToMessageId = MessageId.New();
+
+        var message = CreateMessage(DocumentType.Acknowledgement, receiver, relatedToMessageId);
+
+        // - Enqueue message "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        await EnqueueAndCommitMessage(message, useNewScope: false);
+
+        // When creating bundles
+        // - Move clock to when bundles should be created
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Create bundles
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+
+        // Then a bundle is created with correct values
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var outgoingMessages = await dbContext.OutgoingMessages.ToListAsync();
+        var bundles = await dbContext.Bundles.ToListAsync();
+        var actorMessageQueues = await dbContext.ActorMessageQueues.ToListAsync();
+
+        // - One outgoing messages was enqueued
+        // - One bundle was created
+        Assert.Multiple(
+            () => Assert.Single(outgoingMessages),
+            () => Assert.Single(bundles));
+
+        var bundle = bundles.Single();
+        var outgoingMessage = outgoingMessages.Single();
+
+        // If MDR -> DDM hack is enabled, then the outgoing message is enqueued as MDR but should be bundled to DDM.
+        var expectedReceiver = WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && receiver.ActorRole == ActorRole.MeteredDataResponsible
+            ? Receiver.Create(receiver.ActorNumber, ActorRole.GridAccessProvider)
+            : Receiver.Create(receiver);
+
+        // - The outgoing message is assigned to the bundle
+        // - The bundle is in the correct actor message queue (correct receiver)
+        // - The bundle has correct values
+        Assert.Multiple(
+            () => Assert.Equal(outgoingMessage.AssignedBundleId, bundle.Id),
+            () => Assert.Equal(expectedReceiver, actorMessageQueues.SingleOrDefault(amq => amq.Id == bundle.ActorMessageQueueId)?.Receiver),
+            () => Assert.NotNull(bundle.RowVersion),
+            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.Created),
+            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.ClosedAt),
+            () => Assert.True(bundle.IsClosed),
+            () => Assert.Null(bundle.PeekedAt),
+            () => Assert.Null(bundle.DequeuedAt),
+            () => Assert.Equal(DocumentType.Acknowledgement, bundle.DocumentTypeInBundle),
+            () => Assert.Equal(MessageCategory.MeasureData, bundle.MessageCategory),
+            () => Assert.Equal(BusinessReason.PeriodicMetering, bundle.BusinessReason),
+            () => Assert.Equal(bundlingOptions.MaxBundleSize, bundle.MaxMessageCount),
+            () => Assert.Equal(outgoingMessage.RelatedToMessageId, bundle.RelatedToMessageId));
     }
 
     [Fact]
