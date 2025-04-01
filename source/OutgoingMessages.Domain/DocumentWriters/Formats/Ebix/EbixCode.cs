@@ -159,6 +159,24 @@ public static class EbixCode
         };
     }
 
+    public static string? Of(Quality quality)
+    {
+        ArgumentNullException.ThrowIfNull(quality);
+
+        if (quality == Quality.Estimated)
+            return "56";
+        if (quality == Quality.Measured)
+            return "E01";
+        if (quality == Quality.Calculated)
+            return "D01";
+        if (quality == Quality.Incomplete)
+            return null;
+        if (quality == Quality.NotAvailable)
+            return null;
+
+        throw NoCodeFoundFor(quality.Name);
+    }
+
     public static string Of(ReasonCode reasonCode)
     {
         ArgumentNullException.ThrowIfNull(reasonCode);

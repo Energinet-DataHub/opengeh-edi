@@ -30,16 +30,17 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
 
-public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFixture documentValidation)
+public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFixture documentValidation)
     : IClassFixture<DocumentValidationFixture>
 {
     private readonly MessageRecordParser _parser = new(new Serializer());
-    private readonly MeteredDateForMeteringPointBuilder _meteredDateForMeteringPointBuilder = new();
+    private readonly MeteredDataForMeteringPointBuilder _meteredDateForMeteringPointBuilder = new();
     private readonly DocumentValidationFixture _documentValidation = documentValidation;
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_maximal_notifyValidatedMeasureData_document(string documentFormat)
     {
         // Arrange
@@ -239,7 +240,7 @@ public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFi
 
     private Task<MarketDocumentStream> WriteDocument(
         OutgoingMessageHeader header,
-        List<MeteredDateForMeteringPointMarketActivityRecord> meteredDateForMeteringPointMarketActivityRecord,
+        List<MeteredDataForMeteringPointMarketActivityRecord> meteredDateForMeteringPointMarketActivityRecord,
         DocumentFormat documentFormat)
     {
         var records = meteredDateForMeteringPointMarketActivityRecord
@@ -248,27 +249,39 @@ public class MeteredDateForMeteringPointDocumentWriterTests(DocumentValidationFi
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new MeteredDateForMeteringPointCimXmlDocumentWriter(_parser)
+            return new MeteredDataForMeteringPointCimXmlDocumentWriter(_parser)
+                .WriteAsync(header, records);
+        }
+
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            return new MeteredDataForMeteringPointEbixDocumentWriter(_parser)
                 .WriteAsync(header, records);
         }
 
         var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
-        return new MeteredDateForMeteringPointCimJsonDocumentWriter(
+        return new MeteredDataForMeteringPointCimJsonDocumentWriter(
                 _parser,
                 serviceProvider.GetRequiredService<JavaScriptEncoder>())
             .WriteAsync(header, records, CancellationToken.None);
     }
 
-    private IAssertMeteredDateForMeteringPointDocumentDocument AssertDocument(
+    private IAssertMeteredDataForMeteringPointDocumentDocument AssertDocument(
         MarketDocumentStream document,
         DocumentFormat documentFormat)
     {
         if (documentFormat == DocumentFormat.Xml)
         {
             var assertXmlDocument = AssertXmlDocument.Document(document.Stream, "cim", _documentValidation.Validator);
-            return new AssertMeteredDateForMeteringPointXmlDocument(assertXmlDocument);
+            return new AssertMeteredDataForMeteringPointXmlDocument(assertXmlDocument);
         }
 
-        return new AssertMeteredDateForMeteringPointJsonDocument(document.Stream);
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var assertXmlDocument = AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator);
+            return new AssertMeteredDataForMeteringPointEbixDocument(assertXmlDocument);
+        }
+
+        return new AssertMeteredDataForMeteringPointJsonDocument(document.Stream);
     }
 }
