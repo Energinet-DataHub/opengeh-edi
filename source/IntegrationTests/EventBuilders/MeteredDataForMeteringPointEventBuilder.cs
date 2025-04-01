@@ -36,9 +36,15 @@ public static class MeteredDataForMeteringPointEventBuilder
     public static ServiceBusMessage GenerateAcceptedFrom(
         ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointMessageInputV1,
         (ActorNumber ActorNumber, ActorRole ActorRole) receiverActor,
-        Guid orchestrationInstanceId)
+        Guid orchestrationInstanceId,
+        DocumentFormat documentFormat)
     {
         var invariantPattern = InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd'T'HH':'mm'Z'");
+
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            invariantPattern = InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd'T'HH':'mm':'ss'Z'");
+        }
 
         var meteringPointId = requestMeteredDataForMeteringPointMessageInputV1.MeteringPointId
             ?? throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1.MeteringPointId), "MeteringPointId must be set");
