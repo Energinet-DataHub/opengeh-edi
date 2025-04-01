@@ -15,12 +15,14 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime;
 using NodaTime.Text;
+using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
 using MeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
 using Quality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
@@ -78,6 +80,26 @@ public class EnqueueBrs021ForwardMeteredDataFactory
             ReceiversWithMeteredData: [receiversWithMeteredData]);
 
         return CreateServiceBusMessage(accepted, actor, eventId);
+    }
+
+    public static ServiceBusMessage CreateRejectedV1(
+        Actor actor,
+        string originalActorMessageId,
+        Guid eventId,
+        string validationError)
+    {
+        var rejected = new ForwardMeteredDataRejectedV1(
+            OriginalActorMessageId: originalActorMessageId,
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            ForwardedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
+            ForwardedByActorRole: actor.ActorRole.ToProcessManagerActorRole(),
+            BusinessReason: BusinessReason.PeriodicMetering,
+            ValidationErrors:
+            [
+                new ValidationErrorDto(validationError, "XYZ"),
+            ]);
+
+        return CreateServiceBusMessage(rejected, actor, eventId);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage<TData>(

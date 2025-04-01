@@ -29,11 +29,10 @@ internal sealed class EdiDatabaseDriver
         _connectionString = connectionString;
     }
 
-    internal async Task<string?> GetMeteredDataForMeteringPointProcessIdAsync(string initiatedByMessageId, CancellationToken cancellationToken)
+    internal async Task<string?> GetMessageIdFromMessageRegistryAsync(string initiatedByMessageId, CancellationToken cancellationToken)
     {
         await using var command = new SqlCommand();
 
-        // TODO: This is a workaround to see if we have handled the request, since we currently don't create a process for the request.
         command.CommandText = @"
             SELECT [MessageId] FROM [MessageRegistry] WHERE [MessageId] = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId);
