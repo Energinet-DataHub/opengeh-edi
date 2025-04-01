@@ -178,10 +178,9 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
 
-        // Given existing bundle
         var receiver = new Actor(ActorNumber.Create("1111111111111"), receiverRole);
 
-        // - Create two message for same bundle
+        // - Create message for bundle
         var message = CreateMessage(DocumentType.NotifyValidatedMeasureData, receiver, relatedToMessageId: null);
 
         // - Enqueue messages "now"
@@ -243,6 +242,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var receiver = new Actor(ActorNumber.Create("1111111111111"), receiverRole);
         var relatedToMessageId = MessageId.New();
 
+        // - Create message for bundle
         var message = CreateMessage(DocumentType.Acknowledgement, receiver, relatedToMessageId);
 
         // - Enqueue message "now"
@@ -276,7 +276,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var outgoingMessage = outgoingMessages.Single();
 
         // If MDR -> DDM hack is enabled, then the outgoing message is enqueued as MDR but should be bundled to DDM.
-        var expectedReceiver = WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && receiver.ActorRole == ActorRole.MeteredDataResponsible
+        var expectedReceiver = WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
+                               && receiver.ActorRole == ActorRole.MeteredDataResponsible
             ? Receiver.Create(receiver.ActorNumber, ActorRole.GridAccessProvider)
             : Receiver.Create(receiver);
 
