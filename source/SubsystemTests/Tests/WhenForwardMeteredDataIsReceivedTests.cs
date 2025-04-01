@@ -97,7 +97,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     {
         await _forwardMeteredDataAsEnergySupplier.PublishEnqueueBrs021ForwardMeteredData(
             actor: new Actor(
-                actorNumber: ActorNumber.Create(actorNumber: SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
+                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
                 actorRole: ActorRole.EnergySupplier));
 
         await _forwardMeteredDataAsEnergySupplier.ConfirmResponseIsAvailable();
@@ -108,7 +108,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     {
         await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredDataRejected(
             actor: new Actor(
-                actorNumber: ActorNumber.Create(actorNumber: SubsystemTestFixture.EdiSubsystemTestCimGridAccessProviderNumber),
+                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimGridAccessProviderNumber),
                 actorRole: ActorRole.GridAccessProvider));
 
         await _forwardMeteredDataAsGridAccessProvider.ConfirmRejectedResponseIsAvailable();
