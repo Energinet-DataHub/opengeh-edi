@@ -132,6 +132,7 @@ public class OutgoingMessageRepository(
                 .ToList();
         }
 
+        // HashSet<BundleMetadata> ensures that the collection (bundle metadata) is unique
         return bundleMetadata.ToHashSet();
     }
 
