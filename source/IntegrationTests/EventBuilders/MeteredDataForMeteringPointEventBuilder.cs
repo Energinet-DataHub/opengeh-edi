@@ -97,7 +97,6 @@ public static class MeteredDataForMeteringPointEventBuilder
             OriginalActorMessageId: requestMeteredDataForMeteringPointMessageInputV1.ActorMessageId,
             MeteringPointId: meteringPointId,
             MeteringPointType: meteringPointType,
-            OriginalTransactionId: requestMeteredDataForMeteringPointMessageInputV1.TransactionId,
             ProductNumber: productNumber,
             RegistrationDateTime: InstantPattern.General.Parse(requestMeteredDataForMeteringPointMessageInputV1.RegistrationDateTime).Value.ToDateTimeOffset(),
             StartDateTime: startDateTime,

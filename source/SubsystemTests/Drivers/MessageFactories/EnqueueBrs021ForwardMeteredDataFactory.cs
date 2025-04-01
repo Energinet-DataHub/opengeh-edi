@@ -69,7 +69,6 @@ public class EnqueueBrs021ForwardMeteredDataFactory
 
         var accepted = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: originalActorMessageId,
-            OriginalTransactionId: Guid.NewGuid().ToString(),
             MeteringPointId: "1234567890123",
             MeteringPointType: MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
