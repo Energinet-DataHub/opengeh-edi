@@ -99,6 +99,24 @@ public static class B2CWebApiRequests
         return request;
     }
 
+    public static HttpRequestMessage CreateRequestAggregatedMeasureDataRequestTemp()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/TempRequestAggregatedMeasureData?api-version=1")
+        {
+            Content = CreateJsonContent(
+                new RequestAggregatedMeasureDataMarketDocumentV1("D04", new RequestAggregatedMeasureDataSeriesV1(
+                    MarketEvaluationPointType: "E18",
+                    MarketEvaluationSettlementMethod: null,
+                    StartDateAndOrTimeDateTime: "2024-08-27T00:00:00Z",
+                    EndDateAndOrTimeDateTime: "2024-08-28T00:00:00Z",
+                    MeteringGridAreaDomainId: null,
+                    EnergySupplierMarketParticipantId: null,
+                    BalanceResponsiblePartyMarketParticipantId: null,
+                    SettlementVersion: null))),
+        };
+        return request;
+    }
+
     public static HttpRequestMessage CreateRequestWholesaleSettlementRequest()
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/RequestWholesaleSettlement")

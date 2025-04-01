@@ -15,13 +15,10 @@
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 public record RequestAggregatedMeasureDataMarketDocumentV1(
-    string ReceiverNumber,
-    string ReceiverRoleCode,
     string BusinessReason,
     RequestAggregatedMeasureDataSeriesV1 Series);
 
 public record RequestAggregatedMeasureDataSeriesV1(
-    string Id,
     string? MarketEvaluationPointType,
     string? MarketEvaluationSettlementMethod,
     string StartDateAndOrTimeDateTime,

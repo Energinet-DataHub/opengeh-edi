@@ -77,8 +77,8 @@ public class TempRequestAggregatedMeasureDataController : ControllerBase
         var message = new RequestAggregatedMeasureDataDto(
             SenderNumber: currentUser.ActorNumber,
             SenderRoleCode: MapRoleNameToCode(currentUser.MarketRole),
-            ReceiverNumber: request.ReceiverNumber,
-            ReceiverRoleCode: request.ReceiverRoleCode,
+            ReceiverNumber: DataHubDetails.DataHubActorNumber.Value,
+            ReceiverRoleCode: ActorRole.MeteredDataAdministrator.Code,
             BusinessReason: request.BusinessReason,
             MessageType: AggregatedMeasureDataMessageType,
             MessageId: MessageId.New().Value,
