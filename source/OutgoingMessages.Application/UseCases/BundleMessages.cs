@@ -146,14 +146,6 @@ public class BundleMessages(
                 cancellationToken)
             .ConfigureAwait(false);
 
-        _logger.LogInformation(
-            "Creating bundles for {OutgoingMessagesCount} messages for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}, RelatedToMessageId: {RelatedToMessageId}.",
-            outgoingMessages.Count,
-            receiver.Number.Value,
-            receiver.ActorRole.Name,
-            bundleMetadata.DocumentType.Name,
-            bundleMetadata.RelatedToMessageId?.Value);
-
         var bundlesToCreate = new List<(Bundle Bundle, int MessageCount, Duration Timespan)>();
 
         var bundleSize = _bundlingOptions.MaxBundleSize;
