@@ -28,6 +28,7 @@ public static class ClaimsMap
         { "systemoperator", ActorRole.SystemOperator },
         { "gridoperator", ActorRole.GridAccessProvider },
         { "delegated", ActorRole.Delegated },
+        { "danishenergyagency", ActorRole.DanishEnergyAgency },
     };
 
     public static string ActorClientId => "azp";

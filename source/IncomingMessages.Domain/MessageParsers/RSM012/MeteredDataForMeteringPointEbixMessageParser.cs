@@ -20,9 +20,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDateForMeteringPointEbixMessageParser(
+public class MeteredDataForMeteringPointEbixMessageParser(
     EbixSchemaProvider schemaProvider,
-    ILogger<MeteredDateForMeteringPointEbixMessageParser> logger)
+    ILogger<MeteredDataForMeteringPointEbixMessageParser> logger)
     : EbixMessageParserBase(schemaProvider, logger)
 {
     private const string SeriesElementName = "PayloadEnergyTimeSeries";

@@ -43,6 +43,7 @@ public sealed class GivenForwardMeteredDataV2Tests(
     [
         DocumentFormat.Json,
         DocumentFormat.Xml,
+        DocumentFormat.Ebix
     ];
 
     public static TheoryData<DocumentFormat> SupportedRejectDocumentFormats =>
@@ -131,7 +132,7 @@ public sealed class GivenForwardMeteredDataV2Tests(
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
         var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
-            .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor, orchestrationInstanceId);
+            .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor, orchestrationInstanceId, documentFormat);
 
         await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
 
@@ -366,8 +367,8 @@ public sealed class GivenForwardMeteredDataV2Tests(
             MeasureUnit: MeasurementUnit.KilowattHour.Name,
             RegistrationDateTime: "2024-12-31T23:00:00Z",
             Resolution: resolution.Name,
-            StartDateTime: "2024-12-31T23:00Z",
-            EndDateTime: "2025-01-01T02:00Z",
+            StartDateTime: documentFormat == DocumentFormat.Ebix ? "2024-12-31T23:00:00Z" : "2024-12-31T23:00Z",
+            EndDateTime: documentFormat == DocumentFormat.Ebix ? "2025-01-01T02:00:00Z" : "2025-01-01T02:00Z",
             GridAccessProviderNumber: senderActor.ActorNumber.Value,
             DelegatedGridAreaCodes: [],
             MeteredDataList: [ // Start -> End = 3 hours = 3 points (with hourly resolution)
@@ -388,8 +389,8 @@ public sealed class GivenForwardMeteredDataV2Tests(
             MeasureUnit: MeasurementUnit.KilowattHour.Name,
             RegistrationDateTime: "2024-12-31T23:01:00Z",
             Resolution: Resolution.Hourly.Name,
-            StartDateTime: "2024-12-31T23:00Z",
-            EndDateTime: "2025-01-01T04:00Z",
+            StartDateTime: documentFormat == DocumentFormat.Ebix ? "2024-12-31T23:00:00Z" : "2024-12-31T23:00Z",
+            EndDateTime: documentFormat == DocumentFormat.Ebix ? "2025-01-01T04:00:00Z" : "2025-01-01T04:00Z",
             GridAccessProviderNumber: senderActor.ActorNumber.Value,
             DelegatedGridAreaCodes: [],
             MeteredDataList: [ // Start -> End = 5 hours = 5 points (with hourly resolution)
@@ -412,7 +413,8 @@ public sealed class GivenForwardMeteredDataV2Tests(
                 .GenerateAcceptedFrom(
                     requestMeteredDataForMeteringPointMessageInputV1: forwardMeteredDataMessage.Input,
                     receiverActor: receiverActor,
-                    orchestrationInstanceId: forwardMeteredDataMessage.OrchestrationInstanceId);
+                    orchestrationInstanceId: forwardMeteredDataMessage.OrchestrationInstanceId,
+                    documentFormat: documentFormat);
 
             await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
 
