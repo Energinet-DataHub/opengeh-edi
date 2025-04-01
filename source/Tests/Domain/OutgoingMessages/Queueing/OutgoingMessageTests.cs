@@ -55,8 +55,9 @@ public class OutgoingMessageTests
         new RejectRequestWholesaleSettlementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestWholesaleSettlementCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
-        new MeteredDateForMeteringPointCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
-        new MeteredDateForMeteringPointCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new MeteredDataForMeteringPointCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
+        new MeteredDataForMeteringPointCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new MeteredDataForMeteringPointEbixDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new AcknowledgementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new AcknowledgementXmlDocumentWriter(new MessageRecordParser(new Serializer())),

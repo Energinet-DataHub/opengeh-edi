@@ -35,6 +35,12 @@ public class NotifyValidatedMeasureDataDocumentAsserter
             "cim_",
             _xmlDocumentValidator);
 
+    public static AssertEbixDocument CreateEbixAsserter(Stream document) =>
+        AssertEbixDocument.Document(
+            document,
+            "ns0",
+            _xmlDocumentValidator);
+
     public static async Task AssertCorrectDocumentAsync(
         DocumentFormat documentFormat,
         Stream document,
@@ -44,11 +50,13 @@ public class NotifyValidatedMeasureDataDocumentAsserter
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(assertionInput);
 
-        IAssertMeteredDateForMeteringPointDocumentDocument asserter = documentFormat.Name switch
+        IAssertMeteredDataForMeteringPointDocumentDocument asserter = documentFormat.Name switch
         {
-            nameof(DocumentFormat.Xml) => new AssertMeteredDateForMeteringPointXmlDocument(
+            nameof(DocumentFormat.Xml) => new AssertMeteredDataForMeteringPointXmlDocument(
                 CreateCimXmlAsserter(document)),
-            nameof(DocumentFormat.Json) => new AssertMeteredDateForMeteringPointJsonDocument(document),
+            nameof(DocumentFormat.Json) => new AssertMeteredDataForMeteringPointJsonDocument(document),
+            nameof(DocumentFormat.Ebix) => new AssertMeteredDataForMeteringPointEbixDocument(
+                CreateEbixAsserter(document)),
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 
