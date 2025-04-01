@@ -45,7 +45,7 @@ public class MeteringPointType : DataHubType<MeteringPointType>
     public static readonly MeteringPointType ExchangeReactiveEnergy = new(PMTypes.MeteringPointType.ExchangeReactiveEnergy.Name, "D20");
     public static readonly MeteringPointType CollectiveNetProduction = new(PMTypes.MeteringPointType.CollectiveNetProduction.Name, "D21");
     public static readonly MeteringPointType CollectiveNetConsumption = new(PMTypes.MeteringPointType.CollectiveNetConsumption.Name, "D22");
-    // public static readonly MeteringPointType InternalUse = new(PMTypes.MeteringPointType.InternalUse.Name, "D99");
+    public static readonly MeteringPointType InternalUse = new(PMTypes.MeteringPointType.InternalUse.Name, "D99");
 
     [JsonConstructor]
     private MeteringPointType(string name, string code)

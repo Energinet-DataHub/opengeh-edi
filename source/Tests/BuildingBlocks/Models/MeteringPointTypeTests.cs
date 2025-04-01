@@ -41,8 +41,8 @@ public class MeteringPointTypeTests
 
             // Child metering point types
             (MeteringPointType.VeProduction, "VeProduction", "D01"),
-            (MeteringPointType.VeProduction, "Analysis", "D02"),
-            (MeteringPointType.VeProduction, "SurplusProductionGroup6", "D04"),
+            (MeteringPointType.Analysis, "Analysis", "D02"),
+            (MeteringPointType.SurplusProductionGroup6, "SurplusProductionGroup6", "D04"),
             (MeteringPointType.NetProduction, "NetProduction", "D05"),
             (MeteringPointType.SupplyToGrid, "SupplyToGrid", "D06"),
             (MeteringPointType.ConsumptionFromGrid, "ConsumptionFromGrid", "D07"),
@@ -53,13 +53,13 @@ public class MeteringPointTypeTests
             (MeteringPointType.TotalConsumption, "TotalConsumption", "D12"),
             (MeteringPointType.ElectricalHeating, "ElectricalHeating", "D14"),
             (MeteringPointType.NetConsumption, "NetConsumption", "D15"),
-            (MeteringPointType.CapacitySettlement, "OtherConsumption", "D17"),
-            (MeteringPointType.CapacitySettlement, "OtherProduction", "D18"),
+            (MeteringPointType.OtherConsumption, "OtherConsumption", "D17"),
+            (MeteringPointType.OtherProduction, "OtherProduction", "D18"),
             (MeteringPointType.CapacitySettlement, "CapacitySettlement", "D19"),
-            (MeteringPointType.CapacitySettlement, "ExchangeReactiveEnergy", "D20"),
-            (MeteringPointType.CapacitySettlement, "CollectiveNetProduction", "D21"),
-            (MeteringPointType.CapacitySettlement, "CollectiveNetConsumption", "D22"),
-            (MeteringPointType.CapacitySettlement, "InternalUse", "D99"),
+            (MeteringPointType.ExchangeReactiveEnergy, "ExchangeReactiveEnergy", "D20"),
+            (MeteringPointType.CollectiveNetProduction, "CollectiveNetProduction", "D21"),
+            (MeteringPointType.CollectiveNetConsumption, "CollectiveNetConsumption", "D22"),
+            (MeteringPointType.InternalUse, "InternalUse", "D99"),
         };
 
         using var scope = new AssertionScope();
