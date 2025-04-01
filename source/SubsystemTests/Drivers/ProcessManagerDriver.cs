@@ -26,34 +26,34 @@ internal class ProcessManagerDriver(
     internal async Task PublishAcceptedBrs026RequestAsync(string gridArea, Actor actor)
     {
         var message = EnqueueBrs026MessageFactory.CreateAccept(actor, gridArea);
-        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None);
     }
 
     internal async Task PublishRejectedBrs026RequestAsync(Actor actor)
     {
         var message = EnqueueBrs026MessageFactory.CreateReject(actor);
-        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None);
     }
 
     internal async Task PublishAcceptedBrs028RequestAsync(string gridArea, Actor actor)
     {
         var message = EnqueueBrs028MessageFactory.CreateAccept(actor, gridArea);
-        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None);
     }
 
     internal async Task PublishRejectedBrs028RequestAsync(Actor actor)
     {
         var message = EnqueueBrs028MessageFactory.CreateReject(actor);
-        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None);
     }
 
     internal async Task PublishEnqueueBrs023_027RequestAsync(Guid calculationId)
     {
         var message = EnqueueBrs023_027MessageFactory.CreateEnqueue(calculationId);
-        await _client.SendAsync(message, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(message, CancellationToken.None);
     }
 
-    internal async Task PublishEnqueueBrs021AcceptedForwardMeteredDataRequestsAsync(
+    internal async Task PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
         List<(
             Actor Actor,
             Instant Start,
@@ -69,6 +69,38 @@ internal class ProcessManagerDriver(
                 m.OriginalActorMessageId,
                 m.EventId))
             .ToList();
-        await _client.SendAsync(serviceBusMessages, CancellationToken.None).ConfigureAwait(false);
+        await _client.SendAsync(serviceBusMessages, CancellationToken.None);
+    }
+
+    internal async Task PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
+        Actor actor,
+        Instant start,
+        Instant end,
+        string originalActorMessageId,
+        Guid eventId)
+    {
+        var serviceBusMessage = EnqueueBrs021ForwardMeteredDataFactory.CreateAcceptedV1(
+            actor,
+            start,
+            end,
+            originalActorMessageId,
+            eventId);
+
+        await _client.SendAsync(serviceBusMessage, CancellationToken.None);
+    }
+
+    internal async Task PublishBrs021ForwardMeteredDataRejectedAsync(
+        Actor actor,
+        string originalActorMessageId,
+        Guid eventId,
+        string validationError)
+    {
+        var serviceBusMessage = EnqueueBrs021ForwardMeteredDataFactory.CreateRejectedV1(
+            actor,
+            originalActorMessageId,
+            eventId,
+            validationError);
+
+        await _client.SendAsync(serviceBusMessage, CancellationToken.None);
     }
 }
