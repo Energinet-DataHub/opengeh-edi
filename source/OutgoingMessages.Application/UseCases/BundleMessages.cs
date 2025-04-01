@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Metrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -125,17 +124,17 @@ public class BundleMessages(
         BundleMetadata bundleMetadata,
         CancellationToken cancellationToken)
     {
-        var receiver = Receiver.Create(actorNumber: bundleMetadata.ReceiverNumber, actorRole: bundleMetadata.ReceiverRole);
-        var businessReason = BusinessReason.FromName(name: bundleMetadata.BusinessReason);
+        var receiver = Receiver.Create(bundleMetadata.ReceiverNumber, bundleMetadata.ReceiverRole);
+        var businessReason = BusinessReason.FromName(bundleMetadata.BusinessReason);
 
         var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
 
         var actorMessageQueueId = await GetActorMessageQueueIdForReceiverAsync(
-                actorMessageQueueRepository: actorMessageQueueRepository,
-                receiver: receiver,
-                logger: _logger,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(continueOnCapturedContext: false);
+                actorMessageQueueRepository,
+                receiver,
+                _logger,
+                cancellationToken)
+            .ConfigureAwait(false);
 
         var outgoingMessageRepository = scope.ServiceProvider.GetRequiredService<IOutgoingMessageRepository>();
         var outgoingMessages = await outgoingMessageRepository
@@ -144,17 +143,21 @@ public class BundleMessages(
                 businessReason,
                 bundleMetadata.DocumentType,
                 bundleMetadata.RelatedToMessageId,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(continueOnCapturedContext: false);
+                cancellationToken)
+            .ConfigureAwait(false);
 
         _logger.LogInformation(
-            message: "Creating bundles for {OutgoingMessagesCount} messages for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}, RelatedToMessageId: {RelatedToMessageId}.",
-            args: [outgoingMessages.Count, receiver.Number.Value, receiver.ActorRole.Name, bundleMetadata.DocumentType.Name, bundleMetadata.RelatedToMessageId?.Value]);
+            "Creating bundles for {OutgoingMessagesCount} messages for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}, RelatedToMessageId: {RelatedToMessageId}.",
+            outgoingMessages.Count,
+            receiver.Number.Value,
+            receiver.ActorRole.Name,
+            bundleMetadata.DocumentType.Name,
+            bundleMetadata.RelatedToMessageId?.Value);
 
         var bundlesToCreate = new List<(Bundle Bundle, int MessageCount, Duration Timespan)>();
 
         var bundleSize = _bundlingOptions.MaxBundleSize;
-        var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(keySelector: om => om.CreatedAt));
+        var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
         while (outgoingMessagesList.Count > 0)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -167,7 +170,7 @@ public class BundleMessages(
             var isPartialBundle = outgoingMessagesForBundle.Count < bundleSize;
             if (isPartialBundle)
             {
-                var anyMessageIsReadyToBeBundled = IsAnyMessageReadyToBeBundledYet(outgoingMessagesForBundle: outgoingMessagesForBundle);
+                var anyMessageIsReadyToBeBundled = IsAnyMessageReadyToBeBundledYet(outgoingMessagesForBundle);
                 if (!anyMessageIsReadyToBeBundled)
                     break;
             }
@@ -184,7 +187,7 @@ public class BundleMessages(
 
             bundlesToCreate.Add((bundle, outgoingMessagesForBundle.Count, bundleTimespan));
 
-            outgoingMessagesList.RemoveRange(index: 0, count: outgoingMessagesForBundle.Count);
+            outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count);
         }
 
         return bundlesToCreate;
