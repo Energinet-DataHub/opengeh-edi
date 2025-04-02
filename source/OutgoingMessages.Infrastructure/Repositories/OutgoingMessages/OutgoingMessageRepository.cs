@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
@@ -106,19 +107,18 @@ public class OutgoingMessageRepository(
 
     public async Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
     {
-        var bundleMessagesCreatedBefore = _clock
-            .GetCurrentInstant()
-            .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
-
-        var bundleMetadata = await _context.OutgoingMessages
-            .Where(
-                om => om.AssignedBundleId == null &&
-                      om.CreatedAt <= bundleMessagesCreatedBefore)
-            .Select(om => new BundleMetadata(om.Receiver.Number, om.Receiver.ActorRole, om.BusinessReason, om.DocumentType))
+        var bundleMetadata = await GetMessagesReadyToBeBundledQuery()
+            .Select(om => new BundleMetadata(
+                om.Receiver.Number,
+                om.Receiver.ActorRole,
+                om.BusinessReason,
+                om.DocumentType,
+                om.DocumentType == DocumentType.Acknowledgement ? om.RelatedToMessageId : null)) // Acknowledgement bundles has same related to message id.
             .Distinct()
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
+        // HashSet<BundleMetadata> ensures that the collection (bundle metadata) is unique
         return bundleMetadata.ToHashSet();
     }
 
@@ -157,6 +157,12 @@ public class OutgoingMessageRepository(
         await _fileStorageClient.DeleteIfExistsAsync(fileStorageReferences, FileStorageCategory.OutgoingMessage(), cancellationToken).ConfigureAwait(false);
     }
 
+    public Task<int> CountMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
+    {
+        return GetMessagesReadyToBeBundledQuery()
+            .CountAsync(cancellationToken);
+    }
+
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage, CancellationToken cancellationToken)
     {
         var fileStorageFile = await _fileStorageClient
@@ -166,5 +172,17 @@ public class OutgoingMessageRepository(
         var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
 
         outgoingMessage.SetSerializedContent(messageRecord);
+    }
+
+    private IQueryable<OutgoingMessage> GetMessagesReadyToBeBundledQuery()
+    {
+        var bundleMessagesCreatedBefore = _clock
+            .GetCurrentInstant()
+            .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
+
+        return _context.OutgoingMessages
+            .Where(
+                om => om.AssignedBundleId == null &&
+                      om.CreatedAt <= bundleMessagesCreatedBefore);
     }
 }

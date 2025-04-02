@@ -34,7 +34,7 @@ using static Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Proces
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
-public sealed class GivenMeteredDataForMeteringPointV2Tests(
+public sealed class GivenForwardMeteredDataV2Tests(
     IntegrationTestFixture integrationTestFixture,
     ITestOutputHelper testOutputHelper)
     : MeteredDataForMeteringPointBehaviourTestBase(integrationTestFixture, testOutputHelper)
@@ -241,8 +241,8 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             (4, "A03", 654.321m),
         };
 
-        var now = Instant.FromUtc(2025, 7, 1, 14, 57, 09);
-        GivenNowIs(now);
+        var whenMessagesAreEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
+        GivenNowIs(whenMessagesAreEnqueued);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
 
         var transactionId = TransactionId.New();
@@ -302,6 +302,10 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
                 orchestrationInstanceId,
                 notifyEventName));
 
+        var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(Duration.FromSeconds(BundlingOptions.BundleMessagesOlderThanSeconds));
+        GivenNowIs(whenBundleShouldBeClosed);
+        await GivenBundleMessagesHasBeenTriggered();
+
         // Act
         var peekResults = await WhenActorPeeksAllMessages(
             senderActor.ActorNumber,
@@ -323,10 +327,9 @@ public sealed class GivenMeteredDataForMeteringPointV2Tests(
             .HasSenderRole(ActorRole.MeteredDataAdministrator)
             .HasReceiverId(senderActor.ActorNumber)
             .HasReceiverRole(ActorRole.MeteredDataResponsible)
-            .HasCreationDate(now)
+            .HasCreationDate(whenBundleShouldBeClosed)
             .HasRelatedToMessageId(messageId)
             .HasReceivedBusinessReasonCode(BusinessReason.PeriodicMetering)
-
             .HasOriginalTransactionId(transactionId)
             .SeriesHasReasons(new List<RejectReason>()
             {
