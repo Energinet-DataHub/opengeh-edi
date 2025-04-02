@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Microsoft.Extensions.Logging;
@@ -99,6 +100,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
     protected override async Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
+        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
         ForwardMeteredDataRejectedV1 rejectedData,
         CancellationToken cancellationToken)
     {
@@ -110,8 +112,9 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
-            receiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
-            receiverRole: ActorRole.Create(rejectedData.ForwardedByActorRole),
+            receiverNumber: ActorNumber.Create(orchestrationStartedByActor.ActorNumber),
+            receiverRole: ActorRole.FromName(orchestrationStartedByActor.ActorRole.ToString()),
+            documentReceiverRole: ActorRole.FromName(rejectedData.ForwardedByActorRole.Name), // TODO: Change to ForwardedForActorRole
             relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),

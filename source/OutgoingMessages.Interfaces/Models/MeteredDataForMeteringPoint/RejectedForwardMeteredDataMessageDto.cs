@@ -20,13 +20,14 @@ public sealed class RejectedForwardMeteredDataMessageDto(
     EventId eventId,
     ExternalId externalId,
     BusinessReason businessReason,
-    ActorNumber receiverId,
+    ActorNumber receiverNumber,
     ActorRole receiverRole,
     MessageId relatedToMessageId,
-    RejectedForwardMeteredDataSeries series)
+    RejectedForwardMeteredDataSeries series,
+    ActorRole documentReceiverRole)
     : OutgoingMessageDto(
         DocumentType.Acknowledgement,
-        receiverId,
+        receiverNumber,
         Guid.NewGuid(),
         eventId,
         businessReason.Name,
@@ -35,6 +36,8 @@ public sealed class RejectedForwardMeteredDataMessageDto(
         relatedToMessageId)
 {
     public RejectedForwardMeteredDataSeries Series { get; } = series;
+
+    public ActorRole DocumentReceiverRole { get; } = documentReceiverRole;
 }
 
 public record RejectedForwardMeteredDataSeries(

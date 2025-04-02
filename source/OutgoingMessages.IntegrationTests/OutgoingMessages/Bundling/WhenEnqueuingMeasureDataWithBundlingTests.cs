@@ -611,13 +611,15 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     .WithReceiver(receiver)
                     .Build(),
 
-            var dt when dt == DocumentType.Acknowledgement => new RejectedForwardMeteredDataMessageDtoBuilder()
-                .WithReceiver(receiver)
-                .WithRelatedToMessageId(relatedToMessageId
-                                        ?? throw new ArgumentNullException(
-                                            paramName: nameof(relatedToMessageId),
-                                            message: "RelatedToMessageId must be provided for Acknowledgement"))
-                .Build(),
+            var dt when dt == DocumentType.Acknowledgement =>
+                new RejectedForwardMeteredDataMessageDtoBuilder()
+                    .WithReceiver(receiver)
+                    .WithDocumentReceiverRole(receiver.ActorRole)
+                    .WithRelatedToMessageId(relatedToMessageId
+                                            ?? throw new ArgumentNullException(
+                                                paramName: nameof(relatedToMessageId),
+                                                message: "RelatedToMessageId must be provided for Acknowledgement"))
+                    .Build(),
 
             _ => throw new ArgumentOutOfRangeException(
                 paramName: nameof(documentType),

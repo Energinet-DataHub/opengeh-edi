@@ -363,8 +363,9 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(serviceBusMessageId),
             businessReason: BusinessReason.PeriodicFlexMetering,
-            receiverId: ActorNumber.Create("1234567890123"),
-            receiverRole: ActorRole.GridAccessProvider,
+            receiverNumber: ActorNumber.Create("1234567890123"),
+            receiverRole: ActorRole.MeteredDataResponsible,
+            documentReceiverRole: ActorRole.MeteredDataResponsible,
             relatedToMessageId: MessageId.New(),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.New(),

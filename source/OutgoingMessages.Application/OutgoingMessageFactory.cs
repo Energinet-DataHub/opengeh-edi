@@ -416,7 +416,7 @@ public static class OutgoingMessageFactory
             eventId: message.EventId,
             documentType: DocumentType.Acknowledgement,
             receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
-            documentReceiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverNumber, message.DocumentReceiverRole),
             processId: message.ProcessId,
             businessReason: message.BusinessReason,
             serializedContent: serializer.Serialize(message.Series),
