@@ -116,7 +116,6 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
 
         var enqueueMessagesData = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
-            OriginalTransactionId: Guid.NewGuid().ToString(),
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
