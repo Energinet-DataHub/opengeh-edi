@@ -114,7 +114,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
             receiverNumber: ActorNumber.Create(orchestrationStartedByActor.ActorNumber),
             receiverRole: ActorRole.FromName(orchestrationStartedByActor.ActorRole.ToString()),
-            documentReceiverRole: ActorRole.FromName(rejectedData.ForwardedByActorRole.Name), // TODO: Change to ForwardedForActorRole
+            documentReceiverRole: ActorRole.FromName(rejectedData.ForwardedForActorRole.Name),
             relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
