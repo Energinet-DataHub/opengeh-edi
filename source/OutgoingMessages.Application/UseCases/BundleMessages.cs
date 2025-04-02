@@ -37,6 +37,8 @@ public class BundleMessages(
     private const string BundleSizeMetricName = "Bundle Size";
     private const string BundleTimespanSecondsMetricName = "Bundle Timespan (seconds)";
     private const string AverageMillisecondsBundlingDurationMetricName = "Average Bundling Duration (ms)";
+    private const string TotalSecondsBundlingDurationMetricName = "Total Bundling Duration (s)";
+    private const string UnbundledMessagesCountMetricName = "Unbundled Messages Count";
 
     private readonly ILogger<BundleMessages> _logger = logger;
     private readonly TelemetryClient _telemetryClient = telemetryClient;
@@ -50,6 +52,10 @@ public class BundleMessages(
     /// </summary>
     public async Task BundleMessagesAndCommitAsync(CancellationToken cancellationToken)
     {
+        var bundlingStopwatch = Stopwatch.StartNew();
+
+        await LogUnbundledMessagesMetricAsync(cancellationToken).ConfigureAwait(false);
+
         var messagesReadyToBeBundled = await _outgoingMessageRepository
             .GetBundleMetadataForMessagesReadyToBeBundledAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -66,6 +72,9 @@ public class BundleMessages(
         }
 
         await Task.WhenAll(bundleTasks).ConfigureAwait(false);
+        bundlingStopwatch.Stop();
+
+        LogTotalBundlingDurationMetric(bundlingStopwatch);
     }
 
     /// <summary>
@@ -77,17 +86,16 @@ public class BundleMessages(
     private async Task BundleMessagesAndCommitAsync(BundleMetadata bundleMetadata, CancellationToken cancellationToken)
     {
         using var scope = _serviceScopeFactory.CreateScope();
-        var bundlingStopwatch = Stopwatch.StartNew();
+        var createBundlesStopwatch = Stopwatch.StartNew();
         var bundlesToCreate = await CreateBundlesAsync(
                 scope,
                 bundleMetadata,
                 cancellationToken)
             .ConfigureAwait(false);
 
-        var createdBundlesCount = bundlesToCreate.Count;
         _logger.LogInformation(
             "Creating {BundleCount} bundles (with {TotalMessageCount} messages) for Actor: {ActorNumber}, ActorRole: {ActorRole}, DocumentType: {DocumentType}, RelatedToMessageId: {RelatedToMessageId}.",
-            createdBundlesCount,
+            bundlesToCreate.Count,
             bundlesToCreate.Sum(b => b.MessageCount),
             bundleMetadata.ReceiverNumber.Value,
             bundleMetadata.ReceiverRole.Name,
@@ -99,24 +107,20 @@ public class BundleMessages(
 
         var actorMessageQueueContext = scope.ServiceProvider.GetRequiredService<IActorMessageQueueContext>();
         await actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        bundlingStopwatch.Stop();
+        createBundlesStopwatch.Stop();
 
-        // Log bundle size & timespan metrics for document type
-        var bundleSizeMetric = _telemetryClient.GetMetric(metricId: BundleSizeMetricName, dimension1Name: "DocumentType");
-        var bundleTimespanSecondsMetric = _telemetryClient.GetMetric(metricId: BundleTimespanSecondsMetricName, dimension1Name: "DocumentType");
-        bundlesToCreate.ForEach(b =>
-        {
-            bundleSizeMetric.TrackValue(metricValue: b.MessageCount, dimension1Value: bundleMetadata.DocumentType.Name);
-            bundleTimespanSecondsMetric.TrackValue(metricValue: b.Timespan.TotalSeconds, dimension1Value: bundleMetadata.DocumentType.Name);
-        });
+        LogBundlingMetrics(bundleMetadata, bundlesToCreate, createBundlesStopwatch);
+    }
 
-        // Log average bundling duration for document type
-        var averageBundlingDurationMetric = _telemetryClient.GetMetric(
-            metricId: AverageMillisecondsBundlingDurationMetricName,
-            dimension1Name: "DocumentType");
-        averageBundlingDurationMetric.TrackValue(
-            metricValue: (double)bundlingStopwatch.ElapsedMilliseconds / createdBundlesCount,
-            dimension1Value: bundleMetadata.DocumentType.Name);
+    private async Task LogUnbundledMessagesMetricAsync(CancellationToken cancellationToken)
+    {
+        var unbundledOutgoingMessagesCount = await _outgoingMessageRepository
+            .CountUnbundledMessagesAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Log unbundled messages count metric
+        var unbundledMessagesCountMetric = _telemetryClient.GetMetric(UnbundledMessagesCountMetricName);
+        unbundledMessagesCountMetric.TrackValue(unbundledOutgoingMessagesCount);
     }
 
     private async Task<List<(Bundle Bundle, int MessageCount, Duration Timespan)>> CreateBundlesAsync(
@@ -264,5 +268,37 @@ public class BundleMessages(
             relatedToMessageId: relatedToMessageId);
 
         return newBundle;
+    }
+
+    private void LogBundlingMetrics(
+        BundleMetadata bundleMetadata,
+        List<(Bundle Bundle, int MessageCount, Duration Timespan)> bundlesToCreate,
+        Stopwatch createBundlesStopwatch)
+    {
+        // Log bundle size & timespan metrics for document type
+        var bundleSizeMetric = _telemetryClient.GetMetric(metricId: BundleSizeMetricName, dimension1Name: "DocumentType");
+        var bundleTimespanSecondsMetric = _telemetryClient.GetMetric(metricId: BundleTimespanSecondsMetricName, dimension1Name: "DocumentType");
+
+        bundlesToCreate.ForEach(b =>
+        {
+            bundleSizeMetric.TrackValue(metricValue: b.MessageCount, dimension1Value: bundleMetadata.DocumentType.Name);
+            bundleTimespanSecondsMetric.TrackValue(metricValue: b.Timespan.TotalSeconds, dimension1Value: bundleMetadata.DocumentType.Name);
+        });
+
+        // Log average bundling duration for document type
+        var averageBundlingDurationMetric = _telemetryClient.GetMetric(
+            metricId: AverageMillisecondsBundlingDurationMetricName,
+            dimension1Name: "DocumentType");
+
+        averageBundlingDurationMetric.TrackValue(
+            metricValue: (double)createBundlesStopwatch.ElapsedMilliseconds / bundlesToCreate.Count,
+            dimension1Value: bundleMetadata.DocumentType.Name);
+    }
+
+    private void LogTotalBundlingDurationMetric(Stopwatch bundlingStopwatch)
+    {
+        // Log total bundling duration metric
+        var totalBundlingDurationMetric = _telemetryClient.GetMetric(TotalSecondsBundlingDurationMetricName);
+        totalBundlingDurationMetric.TrackValue(bundlingStopwatch.Elapsed.TotalSeconds);
     }
 }

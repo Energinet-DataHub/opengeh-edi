@@ -185,6 +185,13 @@ public class OutgoingMessageRepository(
         await _fileStorageClient.DeleteIfExistsAsync(fileStorageReferences, FileStorageCategory.OutgoingMessage(), cancellationToken).ConfigureAwait(false);
     }
 
+    public Task<int> CountUnbundledMessagesAsync(CancellationToken cancellationToken)
+    {
+        return _context.OutgoingMessages
+            .Where(om => om.AssignedBundleId == null)
+            .CountAsync(cancellationToken);
+    }
+
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage, CancellationToken cancellationToken)
     {
         var fileStorageFile = await _fileStorageClient
