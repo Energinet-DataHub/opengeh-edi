@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDateForMeteringPointJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
+public class MeteredDataForMeteringPointJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
 {
     private const string ValueElementName = "value";
     private const string MridElementName = "mRID";

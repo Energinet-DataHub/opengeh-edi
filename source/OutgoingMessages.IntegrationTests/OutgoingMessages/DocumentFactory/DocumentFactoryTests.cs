@@ -64,13 +64,6 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
 
-        if (documentType == DocumentType.NotifyValidatedMeasureData)
-        {
-            writer.Should().BeNull($"{documentType} does not support ebix");
-        }
-        else
-        {
-            writer.Should().NotBeNull();
-        }
+        writer.Should().NotBeNull();
     }
 }

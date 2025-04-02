@@ -53,7 +53,7 @@ public class BundleForwardMeteredDataTests : IClassFixture<LoadTestFixture>
         // Start stopwatch here, since as soon as the first service bus message is sent, EDI starts enqueueing messages.
         var stopwatch = Stopwatch.StartNew();
 
-        await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataRequestsAsync(
+        await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
             Enumerable.Range(0, messagesToEnqueueCount)
                 .Select(i => (
                     Actor: receiver,
