@@ -291,27 +291,30 @@
           "content": {
             "application/json": {
               "schema": {
+                "description": "Start a request for aggregated measure data.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketDocumentV1"
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataV1"
                   }
                 ]
               }
             },
             "text/json": {
               "schema": {
+                "description": "Start a request for aggregated measure data.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketDocumentV1"
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataV1"
                   }
                 ]
               }
             },
             "application/*+json": {
               "schema": {
+                "description": "Start a request for aggregated measure data.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketDocumentV1"
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataV1"
                   }
                 ]
               }
@@ -564,22 +567,6 @@
           7
         ]
       },
-      "RequestAggregatedMeasureDataMarketDocumentV1": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "businessReason": {
-            "type": "string"
-          },
-          "series": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RequestAggregatedMeasureDataSeriesV1"
-              }
-            ]
-          }
-        }
-      },
       "RequestAggregatedMeasureDataMarketRequest": {
         "type": "object",
         "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
@@ -628,11 +615,15 @@
           }
         }
       },
-      "RequestAggregatedMeasureDataSeriesV1": {
+      "RequestAggregatedMeasureDataV1": {
         "type": "object",
+        "description": "Start a request for aggregated measure data.",
         "additionalProperties": false,
         "properties": {
-          "marketEvaluationPointType": {
+          "businessReason": {
+            "type": "string"
+          },
+          "meteringPointType": {
             "type": "string",
             "nullable": true
           },
@@ -644,8 +635,7 @@
             "type": "string"
           },
           "endDateAndOrTimeDateTime": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "meteringGridAreaDomainId": {
             "type": "string",

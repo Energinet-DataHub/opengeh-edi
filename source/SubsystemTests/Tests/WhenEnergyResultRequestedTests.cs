@@ -78,7 +78,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task Temp_B2C_actor_can_request_aggregated_measure_data()
     {
-        var act = async () => await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
+        var act = async () => await _aggregatedMeasureDataRequest.B2CRequestTemp(CancellationToken.None);
 
         await act.Should().NotThrowAsync("because the request should be valid");
     }

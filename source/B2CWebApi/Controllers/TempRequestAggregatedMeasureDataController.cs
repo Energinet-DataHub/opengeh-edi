@@ -61,7 +61,7 @@ public class TempRequestAggregatedMeasureDataController : ControllerBase
     [ApiVersion("1.0")]
     [HttpPost]
     [Authorize(Roles = "request-aggregated-measured-data:view")]
-    public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketDocumentV1 request, CancellationToken cancellationToken)
+    public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataV1 request, CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
@@ -88,14 +88,14 @@ public class TempRequestAggregatedMeasureDataController : ControllerBase
             [
                 new RequestAggregatedMeasureDataSeries(
                     Id: TransactionId.New().Value,
-                    MarketEvaluationPointType: request.Series.MarketEvaluationPointType,
-                    MarketEvaluationSettlementMethod: request.Series.MarketEvaluationSettlementMethod,
-                    StartDateAndOrTimeDateTime: request.Series.StartDateAndOrTimeDateTime,
-                    EndDateAndOrTimeDateTime: request.Series.EndDateAndOrTimeDateTime,
-                    MeteringGridAreaDomainId: request.Series.MeteringGridAreaDomainId,
-                    EnergySupplierMarketParticipantId: request.Series.EnergySupplierMarketParticipantId,
-                    BalanceResponsiblePartyMarketParticipantId: request.Series.BalanceResponsiblePartyMarketParticipantId,
-                    SettlementVersion: request.Series.SettlementVersion),
+                    MarketEvaluationPointType: request.MeteringPointType,
+                    MarketEvaluationSettlementMethod: request.MarketEvaluationSettlementMethod,
+                    StartDateAndOrTimeDateTime: request.StartDateAndOrTimeDateTime,
+                    EndDateAndOrTimeDateTime: request.EndDateAndOrTimeDateTime,
+                    MeteringGridAreaDomainId: request.MeteringGridAreaDomainId,
+                    EnergySupplierMarketParticipantId: request.EnergySupplierMarketParticipantId,
+                    BalanceResponsiblePartyMarketParticipantId: request.BalanceResponsiblePartyMarketParticipantId,
+                    SettlementVersion: request.SettlementVersion),
             ]);
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(

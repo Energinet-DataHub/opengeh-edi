@@ -14,15 +14,15 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-public record RequestAggregatedMeasureDataMarketDocumentV1(
+/// <summary>
+/// Start a request for aggregated measure data.
+/// </summary>
+public record RequestAggregatedMeasureDataV1(
     string BusinessReason,
-    RequestAggregatedMeasureDataSeriesV1 Series);
-
-public record RequestAggregatedMeasureDataSeriesV1(
-    string? MarketEvaluationPointType,
+    string? MeteringPointType,
     string? MarketEvaluationSettlementMethod,
     string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
+    string EndDateAndOrTimeDateTime,
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
