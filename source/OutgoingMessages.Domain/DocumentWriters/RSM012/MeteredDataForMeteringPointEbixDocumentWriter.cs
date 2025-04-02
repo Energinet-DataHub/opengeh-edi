@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats;
@@ -125,7 +126,7 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                         DocumentDetails.Prefix,
                         "EnergyQuantity",
                         null,
-                        energyObservation.Quantity.Value.ToString())
+                        energyObservation.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo))
                     .ConfigureAwait(false);
 
                     if (energyObservation.Quality is not null)
