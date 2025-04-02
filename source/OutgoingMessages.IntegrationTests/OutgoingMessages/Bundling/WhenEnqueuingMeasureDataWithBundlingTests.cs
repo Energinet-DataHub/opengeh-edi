@@ -88,24 +88,10 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var message1 = CreateMessage(documentType, receiver, relatedToMessageId1);
         var message2 = CreateMessage(documentType, receiver, relatedToMessageId2);
 
-        // - Enqueue messages "now"
-        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
-        _clockStub.SetCurrentInstant(now);
-        await EnqueueAndCommitMessage(message1, useNewScope: false);
-        await EnqueueAndCommitMessage(message2, useNewScope: false);
+        // - Enqueue and bundle messages
+        await EnqueueAndBundleMessages([message1, message2]);
 
-        // When creating bundles
-
-        // - Move clock to when bundles should be created
-        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
-        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
-        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
-
-        // - Create bundles
-        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
-        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
-
-        // Then message is added to existing bundle & bundle has correct count
+        // Then message is added to the same bundle & bundle has correct count
         await using var scope = ServiceProvider.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
         var outgoingMessages = await dbContext.OutgoingMessages
@@ -129,8 +115,6 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     public async Task Given_EnqueuedTwoMessageForDifferentReceivers_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage(
         DocumentType documentType)
     {
-        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
-
         // Given existing bundle
         var receiver1 = new Actor(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var receiver2 = new Actor(ActorNumber.Create("2222222222222"), ActorRole.EnergySupplier);
@@ -140,20 +124,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var message1 = CreateMessage(documentType, receiver1, relatedToMessageId);
         var message2 = CreateMessage(documentType, receiver2, relatedToMessageId);
 
-        // - Enqueue messages "now"
-        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
-        _clockStub.SetCurrentInstant(now);
-        await EnqueueAndCommitMessage(message1, useNewScope: false);
-        await EnqueueAndCommitMessage(message2, useNewScope: false);
-
-        // When creating bundles
-        // - Move clock to when bundles should be created
-        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
-        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
-
-        // - Create bundles
-        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
-        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+        // - Enqueue and bundle messages
+        await EnqueueAndBundleMessages([message1, message2]);
 
         // Then a bundle is created for each message
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -183,19 +155,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - Create message for bundle
         var message = CreateMessage(DocumentType.NotifyValidatedMeasureData, receiver, relatedToMessageId: null);
 
-        // - Enqueue messages "now"
-        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
-        _clockStub.SetCurrentInstant(now);
-        await EnqueueAndCommitMessage(message, useNewScope: false);
-
-        // When creating bundles
-        // - Move clock to when bundles should be created
-        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
-        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
-
-        // - Create bundles
-        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
-        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+        var bundleResult = await EnqueueAndBundleMessages([message]);
 
         // Then a bundle is created with correct values
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -220,8 +180,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.Equal(outgoingMessage.AssignedBundleId, bundle.Id),
             () => Assert.Equal(Receiver.Create(receiver), actorMessageQueues.SingleOrDefault(amq => amq.Id == bundle.ActorMessageQueueId)?.Receiver),
             () => Assert.NotNull(bundle.RowVersion),
-            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.Created),
-            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.ClosedAt),
+            () => Assert.Equal(bundleResult.BundlesCreatedAt, bundle.Created),
+            () => Assert.Equal(bundleResult.BundlesCreatedAt, bundle.ClosedAt),
             () => Assert.True(bundle.IsClosed),
             () => Assert.Null(bundle.PeekedAt),
             () => Assert.Null(bundle.DequeuedAt),
@@ -246,18 +206,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var message = CreateMessage(DocumentType.Acknowledgement, receiver, relatedToMessageId);
 
         // - Enqueue message "now"
-        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
-        _clockStub.SetCurrentInstant(now);
-        await EnqueueAndCommitMessage(message, useNewScope: false);
-
-        // When creating bundles
-        // - Move clock to when bundles should be created
-        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
-        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
-
-        // - Create bundles
-        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
-        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+        var (_, bundlesCreatedAt) = await EnqueueAndBundleMessages([message]);
 
         // Then a bundle is created with correct values
         await using var scope = ServiceProvider.CreateAsyncScope();
@@ -289,8 +238,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.Equal(outgoingMessage.AssignedBundleId, bundle.Id),
             () => Assert.Equal(expectedActorMessageQueueReceiver, actorMessageQueues.SingleOrDefault(amq => amq.Id == bundle.ActorMessageQueueId)?.Receiver),
             () => Assert.NotNull(bundle.RowVersion),
-            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.Created),
-            () => Assert.Equal(whenBundlesShouldBeCreated, bundle.ClosedAt),
+            () => Assert.Equal(bundlesCreatedAt, bundle.Created),
+            () => Assert.Equal(bundlesCreatedAt, bundle.ClosedAt),
             () => Assert.True(bundle.IsClosed),
             () => Assert.Null(bundle.PeekedAt),
             () => Assert.Null(bundle.DequeuedAt),
@@ -675,6 +624,29 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                 actualValue: documentType.Name,
                 message: "Document type not supported."),
         };
+    }
+
+    private async Task<(Instant Now, Instant BundlesCreatedAt)> EnqueueAndBundleMessages(List<OutgoingMessageDto> messages)
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        // - Enqueue messages "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+        foreach (var message in messages)
+        {
+            await EnqueueAndCommitMessage(message, useNewScope: false);
+        }
+
+        // When creating bundles
+        // - Move clock to when bundles should be created
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Create bundles
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+        return (now, whenBundlesShouldBeCreated);
     }
 
     private async Task<int> EnqueueAndCommitMessages(List<OutgoingMessageDto> messagesToEnqueue)
