@@ -88,6 +88,11 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task TempRequestAggregatedMeasureDataAsync(string api_version = null, RequestAggregatedMeasureDataMarketDocumentV1 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task TempRequestWholesaleSettlementAsync(string api_version = null, RequestWholesaleServicesMarketDocumentV2 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
@@ -628,6 +633,81 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task TempRequestAggregatedMeasureDataAsync(string api_version = null, RequestAggregatedMeasureDataMarketDocumentV1 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = Newtonsoft.Json.JsonConvert.SerializeObject(body, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.StringContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "TempRequestAggregatedMeasureData"
+                    urlBuilder_.Append("TempRequestAggregatedMeasureData");
+                    urlBuilder_.Append('?');
+                    if (api_version != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("api-version")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task TempRequestWholesaleSettlementAsync(string api_version = null, RequestWholesaleServicesMarketDocumentV2 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
@@ -945,6 +1025,17 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RequestAggregatedMeasureDataMarketDocumentV1
+    {
+        [Newtonsoft.Json.JsonProperty("businessReason", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string BusinessReason { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("series", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public RequestAggregatedMeasureDataSeriesV1 Series { get; set; }
+
+    }
+
     /// <summary>
     /// Responsible for carrying the market message data from the incoming message before any data validation.
     /// </summary>
@@ -971,6 +1062,35 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
         [Newtonsoft.Json.JsonProperty("balanceResponsibleId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string BalanceResponsibleId { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RequestAggregatedMeasureDataSeriesV1
+    {
+        [Newtonsoft.Json.JsonProperty("marketEvaluationPointType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string MarketEvaluationPointType { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("marketEvaluationSettlementMethod", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string MarketEvaluationSettlementMethod { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("startDateAndOrTimeDateTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string StartDateAndOrTimeDateTime { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("endDateAndOrTimeDateTime", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EndDateAndOrTimeDateTime { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("meteringGridAreaDomainId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string MeteringGridAreaDomainId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("energySupplierMarketParticipantId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EnergySupplierMarketParticipantId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("balanceResponsiblePartyMarketParticipantId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string BalanceResponsiblePartyMarketParticipantId { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("settlementVersion", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SettlementVersion { get; set; }
 
     }
 

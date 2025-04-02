@@ -272,6 +272,59 @@
         }
       }
     },
+    "/TempRequestAggregatedMeasureData": {
+      "post": {
+        "tags": [
+          "TempRequestAggregatedMeasureData"
+        ],
+        "operationId": "TempRequestAggregatedMeasureData",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketDocumentV1"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketDocumentV1"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketDocumentV1"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/TempRequestWholesaleSettlement": {
       "post": {
         "tags": [
@@ -511,6 +564,22 @@
           7
         ]
       },
+      "RequestAggregatedMeasureDataMarketDocumentV1": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "businessReason": {
+            "type": "string"
+          },
+          "series": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RequestAggregatedMeasureDataSeriesV1"
+              }
+            ]
+          }
+        }
+      },
       "RequestAggregatedMeasureDataMarketRequest": {
         "type": "object",
         "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
@@ -554,6 +623,43 @@
             "nullable": true
           },
           "balanceResponsibleId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RequestAggregatedMeasureDataSeriesV1": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "marketEvaluationPointType": {
+            "type": "string",
+            "nullable": true
+          },
+          "marketEvaluationSettlementMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDateAndOrTimeDateTime": {
+            "type": "string"
+          },
+          "endDateAndOrTimeDateTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "meteringGridAreaDomainId": {
+            "type": "string",
+            "nullable": true
+          },
+          "energySupplierMarketParticipantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "balanceResponsiblePartyMarketParticipantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "settlementVersion": {
             "type": "string",
             "nullable": true
           }

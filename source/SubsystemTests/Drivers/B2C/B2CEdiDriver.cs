@@ -80,6 +80,32 @@ public sealed class B2CEdiDriver : IDisposable
             .ConfigureAwait(false);
     }
 
+    public async Task TempRequestAggregatedMeasureDataAsync(CancellationToken cancellationToken)
+    {
+        var webApiClient = await CreateWebApiClientAsync();
+
+        var requestAggregatedMeasureDataSeriesV1 = new RequestAggregatedMeasureDataSeriesV1
+        {
+            MarketEvaluationPointType = "E18",
+            MarketEvaluationSettlementMethod = null,
+            StartDateAndOrTimeDateTime = "2024-08-27T00:00:00Z",
+            EndDateAndOrTimeDateTime = "2024-08-28T00:00:00Z",
+            MeteringGridAreaDomainId = null,
+            EnergySupplierMarketParticipantId = null,
+            BalanceResponsiblePartyMarketParticipantId = null,
+            SettlementVersion = null,
+        };
+        var body = new RequestAggregatedMeasureDataMarketDocumentV1
+        {
+            BusinessReason = "D04",
+            Series = requestAggregatedMeasureDataSeriesV1,
+        };
+
+        await webApiClient.TempRequestAggregatedMeasureDataAsync(
+                body: body,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task RequestWholesaleSettlementAsync(CancellationToken cancellationToken)
     {
         var webApiClient = await CreateWebApiClientAsync();
