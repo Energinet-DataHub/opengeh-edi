@@ -74,7 +74,7 @@ public class EnqueueMessage
 
         if (!IsBundlingEnabled(messageToEnqueue.DocumentType))
         {
-            // If max bundle size is 1, then a bundle can be created & closed immediately
+            // If bundling is disabled, then a bundle can be created & closed immediately
             var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
                     messageToEnqueue.GetActorMessageQueueMetadata(),
                     cancellationToken)

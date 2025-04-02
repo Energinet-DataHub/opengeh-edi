@@ -161,7 +161,7 @@ public class OutgoingMessageRepository(
         }
         else
         {
-            query = query.Where(om => om.Receiver.Number == receiver.Number);
+            query = query.Where(om => om.Receiver.ActorRole == receiver.ActorRole);
         }
 
         if (relatedToMessageId != null)

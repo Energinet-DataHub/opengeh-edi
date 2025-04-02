@@ -240,7 +240,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_AndWhen_MessageIsBundled__Then_RejectedMessageIsEnqueued_AndThen_RejectedMessageCanBePeeked()
+    public async Task Given_EnqueueRejectedBrs021Message_When_MessageIsReceived_AndWhen_MessageIsBundled_Then_RejectedMessageIsEnqueued_AndThen_RejectedMessageCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [

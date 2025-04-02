@@ -173,7 +173,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
     [Theory]
     [MemberData(nameof(ReceiverActorRolesForNotifyValidatedMeasureData))]
-    public async Task Given_EnqueuedNotifyValidatedMeasureDataForReceiver_When_BundlingMessages_ThenBundleIsCreatedWithCorrectValues(
+    public async Task Given_EnqueuedNotifyValidatedMeasureDataForReceiver_When_BundlingMessages_Then_BundleIsCreatedWithCorrectValues(
         ActorRole receiverRole)
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
