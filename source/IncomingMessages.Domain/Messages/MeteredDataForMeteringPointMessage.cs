@@ -76,10 +76,25 @@ public record MeteredDataForMeteringPointSeries(
     string? MeteringPointType,
     string? MeteringPointLocationId,
     string SenderNumber,
-    IReadOnlyCollection<EnergyObservation> EnergyObservations) : BaseDelegatedSeries, IIncomingMessageSeries
+    IReadOnlyCollection<EnergyObservation> EnergyObservations) : IIncomingMessageSeries
 {
-    // TODO: when refactor incoming message module not all incomingMessageSeries has a gridArea.
     public string? GridArea => null;
+
+    public bool IsDelegated => false;
+
+    public ActorNumber? OriginalActorNumber => null;
+
+    public ActorRole? RequestedByActorRole => null;
+
+    public IReadOnlyCollection<string> DelegatedGridAreas { get; } = Array.Empty<string>();
+
+    public void DelegateSeries(
+        ActorNumber? originalActorNumber,
+        ActorRole requestedByActorRole,
+        IReadOnlyCollection<string> delegatedGridAreas)
+    {
+        // Delegation is not handled in EDI.
+    }
 
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
