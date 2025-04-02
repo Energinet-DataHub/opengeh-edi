@@ -38,7 +38,7 @@ public class BundleMessages(
     private const string BundleTimespanSecondsMetricName = "Bundle Timespan (seconds)";
     private const string AverageMillisecondsBundlingDurationMetricName = "Average Bundling Duration (ms)";
     private const string TotalSecondsBundlingDurationMetricName = "Total Bundling Duration (s)";
-    private const string UnbundledMessagesCountMetricName = "Unbundled Messages Count";
+    private const string MessagesReadyToBeBundledCountMetricName = "Unbundled Messages Count";
 
     private readonly ILogger<BundleMessages> _logger = logger;
     private readonly TelemetryClient _telemetryClient = telemetryClient;
@@ -54,11 +54,14 @@ public class BundleMessages(
     {
         var bundlingStopwatch = Stopwatch.StartNew();
 
-        await LogUnbundledMessagesMetricAsync(cancellationToken).ConfigureAwait(false);
+        await LogMessagesReadyToBeBundledMetricAsync(cancellationToken).ConfigureAwait(false);
 
         var messagesReadyToBeBundled = await _outgoingMessageRepository
             .GetBundleMetadataForMessagesReadyToBeBundledAsync(cancellationToken)
             .ConfigureAwait(false);
+
+        if (messagesReadyToBeBundled.Count == 0)
+            return;
 
         var bundleTasks = new List<Task>();
         foreach (var bundleMetadata in messagesReadyToBeBundled)
@@ -102,6 +105,9 @@ public class BundleMessages(
             bundleMetadata.DocumentType.Name,
             bundleMetadata.RelatedToMessageId?.Value);
 
+        if (bundlesToCreate.Count == 0)
+            return;
+
         var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
         bundleRepository.Add(bundlesToCreate.Select(b => b.Bundle).ToList());
 
@@ -112,15 +118,15 @@ public class BundleMessages(
         LogBundlingMetrics(bundleMetadata, bundlesToCreate, createBundlesStopwatch);
     }
 
-    private async Task LogUnbundledMessagesMetricAsync(CancellationToken cancellationToken)
+    private async Task LogMessagesReadyToBeBundledMetricAsync(CancellationToken cancellationToken)
     {
-        var unbundledOutgoingMessagesCount = await _outgoingMessageRepository
-            .CountUnbundledMessagesAsync(cancellationToken)
+        var messagesReadyToBeBundledCount = await _outgoingMessageRepository
+            .CountMessagesReadyToBeBundledAsync(cancellationToken)
             .ConfigureAwait(false);
 
         // Log unbundled messages count metric
-        var unbundledMessagesCountMetric = _telemetryClient.GetMetric(UnbundledMessagesCountMetricName);
-        unbundledMessagesCountMetric.TrackValue(unbundledOutgoingMessagesCount);
+        var messagesReadyToBeBundledMetric = _telemetryClient.GetMetric(MessagesReadyToBeBundledCountMetricName);
+        messagesReadyToBeBundledMetric.TrackValue(messagesReadyToBeBundledCount);
     }
 
     private async Task<List<(Bundle Bundle, int MessageCount, Duration Timespan)>> CreateBundlesAsync(

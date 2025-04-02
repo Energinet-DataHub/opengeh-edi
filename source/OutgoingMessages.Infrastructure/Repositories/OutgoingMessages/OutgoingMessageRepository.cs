@@ -107,14 +107,7 @@ public class OutgoingMessageRepository(
 
     public async Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
     {
-        var bundleMessagesCreatedBefore = _clock
-            .GetCurrentInstant()
-            .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
-
-        var bundleMetadata = await _context.OutgoingMessages
-            .Where(
-                om => om.AssignedBundleId == null &&
-                      om.CreatedAt <= bundleMessagesCreatedBefore)
+        var bundleMetadata = await GetMessagesReadyToBeBundledQuery()
             .Select(om => new BundleMetadata(
                 om.Receiver.Number,
                 om.Receiver.ActorRole,
@@ -164,10 +157,9 @@ public class OutgoingMessageRepository(
         await _fileStorageClient.DeleteIfExistsAsync(fileStorageReferences, FileStorageCategory.OutgoingMessage(), cancellationToken).ConfigureAwait(false);
     }
 
-    public Task<int> CountUnbundledMessagesAsync(CancellationToken cancellationToken)
+    public Task<int> CountMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
     {
-        return _context.OutgoingMessages
-            .Where(om => om.AssignedBundleId == null)
+        return GetMessagesReadyToBeBundledQuery()
             .CountAsync(cancellationToken);
     }
 
@@ -180,5 +172,17 @@ public class OutgoingMessageRepository(
         var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
 
         outgoingMessage.SetSerializedContent(messageRecord);
+    }
+
+    private IQueryable<OutgoingMessage> GetMessagesReadyToBeBundledQuery()
+    {
+        var bundleMessagesCreatedBefore = _clock
+            .GetCurrentInstant()
+            .Minus(Duration.FromSeconds(_bundlingOptions.BundleMessagesOlderThanSeconds));
+
+        return _context.OutgoingMessages
+            .Where(
+                om => om.AssignedBundleId == null &&
+                      om.CreatedAt <= bundleMessagesCreatedBefore);
     }
 }

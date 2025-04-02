@@ -59,5 +59,5 @@ public interface IOutgoingMessageRepository
     /// </summary>
     Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds, CancellationToken cancellationToken);
 
-    Task<int> CountUnbundledMessagesAsync(CancellationToken cancellationToken);
+    Task<int> CountMessagesReadyToBeBundledAsync(CancellationToken cancellationToken);
 }
