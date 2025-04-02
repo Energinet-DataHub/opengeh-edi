@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
@@ -21,4 +23,27 @@ public record BundleMetadata(
     ActorRole ReceiverRole,
     string BusinessReason,
     DocumentType DocumentType,
-    MessageId? RelatedToMessageId);
+    MessageId? RelatedToMessageId)
+{
+    /// <summary>
+    /// The ActorMessageQueue receiver (which ActorMessageQueue the bundle should be saved in).
+    /// This is implemented to support the "hack" where a message for a MeteredDataResponsible
+    /// should be added to the GridOperator queue
+    /// </summary>
+    public Receiver GetActorMessageQueueReceiver()
+    {
+        var actorMessageQueueReceiverRole = ReceiverRole;
+
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+        {
+            actorMessageQueueReceiverRole = actorMessageQueueReceiverRole.ForActorMessageQueue();
+        }
+
+        return Receiver.Create(ReceiverNumber, actorMessageQueueReceiverRole);
+    }
+
+    public Receiver GetReceiver()
+    {
+        return Receiver.Create(ReceiverNumber, ReceiverRole);
+    }
+}

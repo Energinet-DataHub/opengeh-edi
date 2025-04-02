@@ -128,14 +128,13 @@ public class BundleMessages(
         BundleMetadata bundleMetadata,
         CancellationToken cancellationToken)
     {
-        var receiver = Receiver.Create(bundleMetadata.ReceiverNumber, bundleMetadata.ReceiverRole);
         var businessReason = BusinessReason.FromName(bundleMetadata.BusinessReason);
 
         var actorMessageQueueRepository = scope.ServiceProvider.GetRequiredService<IActorMessageQueueRepository>();
 
         var actorMessageQueueId = await GetActorMessageQueueIdForReceiverAsync(
                 actorMessageQueueRepository,
-                receiver,
+                bundleMetadata.GetActorMessageQueueReceiver(),
                 _logger,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -143,7 +142,7 @@ public class BundleMessages(
         var outgoingMessageRepository = scope.ServiceProvider.GetRequiredService<IOutgoingMessageRepository>();
         var outgoingMessages = await outgoingMessageRepository
             .GetMessagesForBundleAsync(
-                receiver,
+                bundleMetadata.GetReceiver(),
                 businessReason,
                 bundleMetadata.DocumentType,
                 bundleMetadata.RelatedToMessageId,

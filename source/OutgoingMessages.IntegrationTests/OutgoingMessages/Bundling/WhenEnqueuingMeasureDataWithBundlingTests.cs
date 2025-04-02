@@ -275,8 +275,9 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var bundle = bundles.Single();
         var outgoingMessage = outgoingMessages.Single();
 
-        // If MDR -> DDM hack is enabled, then the outgoing message is enqueued as MDR but should be bundled to DDM.
-        var expectedReceiver = WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
+        // If MDR -> DDM hack is enabled, then the outgoing message is enqueued as MDR but should be added to the
+        // DDM actor message queue.
+        var expectedActorMessageQueueReceiver = WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
                                && receiver.ActorRole == ActorRole.MeteredDataResponsible
             ? Receiver.Create(receiver.ActorNumber, ActorRole.GridAccessProvider)
             : Receiver.Create(receiver);
@@ -286,7 +287,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - The bundle has correct values
         Assert.Multiple(
             () => Assert.Equal(outgoingMessage.AssignedBundleId, bundle.Id),
-            () => Assert.Equal(expectedReceiver, actorMessageQueues.SingleOrDefault(amq => amq.Id == bundle.ActorMessageQueueId)?.Receiver),
+            () => Assert.Equal(expectedActorMessageQueueReceiver, actorMessageQueues.SingleOrDefault(amq => amq.Id == bundle.ActorMessageQueueId)?.Receiver),
             () => Assert.NotNull(bundle.RowVersion),
             () => Assert.Equal(whenBundlesShouldBeCreated, bundle.Created),
             () => Assert.Equal(whenBundlesShouldBeCreated, bundle.ClosedAt),
