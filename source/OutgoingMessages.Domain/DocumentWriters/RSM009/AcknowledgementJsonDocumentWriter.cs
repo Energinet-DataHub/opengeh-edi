@@ -40,8 +40,6 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
 
     public bool HandlesType(DocumentType documentType) => documentType == DocumentType.Acknowledgement;
 
-    public bool HandlesMultipleRecords() => false;
-
     public async Task<MarketDocumentStream> WriteAsync(
         OutgoingMessageHeader messageHeader,
         IReadOnlyCollection<string> rawAcknowledgement,
