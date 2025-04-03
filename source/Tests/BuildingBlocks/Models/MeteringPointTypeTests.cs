@@ -52,7 +52,7 @@ public class MeteringPointTypeTests
             (MeteringPointType.NetFromGrid, "NetFromGrid", "D10"),
             (MeteringPointType.NetToGrid, "NetToGrid", "D11"),
             (MeteringPointType.TotalConsumption, "TotalConsumption", "D12"),
-            (MeteringPointType.NetLossCorrection, "TotalConsumption", "D13"),
+            (MeteringPointType.NetLossCorrection, "NetLossCorrection", "D13"),
             (MeteringPointType.ElectricalHeating, "ElectricalHeating", "D14"),
             (MeteringPointType.NetConsumption, "NetConsumption", "D15"),
             (MeteringPointType.OtherConsumption, "OtherConsumption", "D17"),
