@@ -15,6 +15,7 @@
 using System.Text;
 using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
@@ -32,7 +33,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class TempRequestWholesaleSettlementController : ControllerBase
+public class TempRequestAggregatedMeasureDataController : ControllerBase
 {
     private readonly UserContext<FrontendUser> _userContext;
     private readonly DateTimeZone _dateTimeZone;
@@ -41,7 +42,7 @@ public class TempRequestWholesaleSettlementController : ControllerBase
     private readonly IClock _clock;
     private readonly IAuditLogger _auditLogger;
 
-    public TempRequestWholesaleSettlementController(
+    public TempRequestAggregatedMeasureDataController(
         UserContext<FrontendUser> userContext,
         DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
@@ -59,24 +60,22 @@ public class TempRequestWholesaleSettlementController : ControllerBase
 
     [ApiVersion("1.0")]
     [HttpPost]
-    [Authorize(Roles = "request-wholesale-settlement:view")]
-    public async Task<ActionResult> RequestAsync(
-        RequestWholesaleSettlementMarketRequest request,
-        CancellationToken cancellationToken)
+    [Authorize(Roles = "request-aggregated-measured-data:view")]
+    public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.RequestWholesaleResults,
+                activity: AuditLogActivity.RequestEnergyResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
-                affectedEntityType: AuditLogEntityType.RequestWholesaleServices,
+                affectedEntityType: AuditLogEntityType.RequestAggregatedMeasureData,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
 
         var currentUser = _userContext.CurrentUser;
 
         var message =
-            RequestWholesaleSettlementDtoFactory.Create(
+            RequestAggregatedMeasureDataDtoFactory.Create(
                 TransactionId.New(),
                 request,
                 currentUser.ActorNumber,
@@ -87,7 +86,7 @@ public class TempRequestWholesaleSettlementController : ControllerBase
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),
                 DocumentFormat.Json,
-                IncomingDocumentType.B2CRequestWholesaleSettlement,
+                IncomingDocumentType.B2CRequestAggregatedMeasureData,
                 DocumentFormat.Json,
                 cancellationToken)
             .ConfigureAwait(false);

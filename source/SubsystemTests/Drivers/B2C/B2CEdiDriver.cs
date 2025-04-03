@@ -19,9 +19,6 @@ using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
-using RequestWholesaleServicesMarketDocumentV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.RequestWholesaleServicesMarketDocumentV2;
-using RequestWholesaleSettlementChargeTypeV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.RequestWholesaleSettlementChargeTypeV2;
-using RequestWholesaleSettlementSeriesV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.RequestWholesaleSettlementSeriesV2;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
@@ -80,6 +77,24 @@ public sealed class B2CEdiDriver : IDisposable
             .ConfigureAwait(false);
     }
 
+    public async Task RequestAggregatedMeasureDataTempAsync(CancellationToken cancellationToken)
+    {
+        var webApiClient = await CreateWebApiClientAsync();
+
+        var start = Instant.FromUtc(2024, 09, 24, 00, 00);
+        await webApiClient.TempRequestAggregatedMeasureDataAsync(
+                api_version: "1.0",
+                body: new RequestAggregatedMeasureDataMarketRequest
+                {
+                    CalculationType = CalculationType.BalanceFixing,
+                    StartDate = InstantPattern.General.Format(start),
+                    EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(1))),
+                    GridArea = "804",
+                    EnergySupplierId = "5790001330552",
+                },
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task RequestWholesaleSettlementAsync(CancellationToken cancellationToken)
     {
         var webApiClient = await CreateWebApiClientAsync();
@@ -103,35 +118,16 @@ public sealed class B2CEdiDriver : IDisposable
 
         var start = Instant.FromUtc(2024, 08, 31, 22, 00);
         var end = Instant.FromUtc(2024, 09, 30, 22, 00);
-        var requestWholesaleServicesMarketDocumentV2 = new RequestWholesaleServicesMarketDocumentV2
-        {
-            BusinessReason = "D05",
-            Series = new List<RequestWholesaleSettlementSeriesV2>
-            {
-                new RequestWholesaleSettlementSeriesV2
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    StartDateAndOrTimeDateTime = start.ToString(),
-                    EndDateAndOrTimeDateTime = end.ToString(),
-                    MeteringGridAreaDomainId = "804",
-                    EnergySupplierMarketParticipantId = "5790001330552",
-                    SettlementVersion = "D01",
-                    Resolution = "P15M",
-                    ChargeOwner = null,
-                    ChargeTypes = new List<RequestWholesaleSettlementChargeTypeV2>
-                    {
-                        new RequestWholesaleSettlementChargeTypeV2
-                        {
-                            Id = null,
-                            Type = "23",
-                        },
-                    },
-                },
-            },
-        };
+
         await webApiClient.TempRequestWholesaleSettlementAsync(
                 api_version: "1.0",
-                body: requestWholesaleServicesMarketDocumentV2,
+                body: new RequestWholesaleSettlementMarketRequest
+                {
+                    CalculationType = CalculationType.WholesaleFixing,
+                    StartDate = InstantPattern.General.Format(start),
+                    EndDate = InstantPattern.General.Format(end),
+                    GridArea = "804",
+                },
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }
