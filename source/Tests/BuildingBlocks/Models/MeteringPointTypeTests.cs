@@ -42,6 +42,7 @@ public class MeteringPointTypeTests
             // Child metering point types
             (MeteringPointType.VeProduction, "VeProduction", "D01"),
             (MeteringPointType.Analysis, "Analysis", "D02"),
+            (MeteringPointType.NotUsed, "NotUsed", "D03"),
             (MeteringPointType.SurplusProductionGroup6, "SurplusProductionGroup6", "D04"),
             (MeteringPointType.NetProduction, "NetProduction", "D05"),
             (MeteringPointType.SupplyToGrid, "SupplyToGrid", "D06"),
@@ -51,6 +52,7 @@ public class MeteringPointTypeTests
             (MeteringPointType.NetFromGrid, "NetFromGrid", "D10"),
             (MeteringPointType.NetToGrid, "NetToGrid", "D11"),
             (MeteringPointType.TotalConsumption, "TotalConsumption", "D12"),
+            (MeteringPointType.NetLossCorrection, "TotalConsumption", "D13"),
             (MeteringPointType.ElectricalHeating, "ElectricalHeating", "D14"),
             (MeteringPointType.NetConsumption, "NetConsumption", "D15"),
             (MeteringPointType.OtherConsumption, "OtherConsumption", "D17"),
