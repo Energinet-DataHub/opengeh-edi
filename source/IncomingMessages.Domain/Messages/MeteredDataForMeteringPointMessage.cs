@@ -93,7 +93,7 @@ public record MeteredDataForMeteringPointSeries(
         ActorRole requestedByActorRole,
         IReadOnlyCollection<string> delegatedGridAreas)
     {
-        // Delegation is not handled in EDI.
+        throw new NotImplementedException($"Delegation for {typeof(MeteredDataForMeteringPointSeries)} is not handled in EDI.");
     }
 
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
