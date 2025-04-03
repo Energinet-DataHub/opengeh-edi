@@ -104,16 +104,14 @@ public static class B2CWebApiRequests
         var request = new HttpRequestMessage(HttpMethod.Post, "/TempRequestAggregatedMeasureData?api-version=1")
         {
             Content = CreateJsonContent(
-                new RequestAggregatedMeasureDataV1(
-                    BusinessReason: "D04",
-                    MeteringPointType: "E18",
-                    MarketEvaluationSettlementMethod: null,
-                    StartDateAndOrTimeDateTime: "2024-08-27T22:00:00Z",
-                    EndDateAndOrTimeDateTime: "2024-08-28T22:00:00Z",
-                    MeteringGridAreaDomainId: null,
-                    EnergySupplierMarketParticipantId: null,
-                    BalanceResponsiblePartyMarketParticipantId: null,
-                    SettlementVersion: null)),
+                new RequestWholesaleSettlementMarketRequest(
+                    CalculationType: CalculationType.WholesaleFixing,
+                    StartDate: "2024-08-27T00:00:00Z",
+                    EndDate: "2024-08-28T00:00:00Z",
+                    GridArea: null,
+                    EnergySupplierId: null,
+                    Resolution: null,
+                    PriceType: null)),
         };
         return request;
     }
@@ -137,28 +135,17 @@ public static class B2CWebApiRequests
 
     public static HttpRequestMessage CreateRequestWholesaleSettlementTempRequest()
     {
-        var requestWholesaleSettlementChargeTypeV2 = new RequestWholesaleSettlementChargeTypeV2(null, "23");
-        var requestWholesaleSettlementChargeTypeV2s = new List<RequestWholesaleSettlementChargeTypeV2> { requestWholesaleSettlementChargeTypeV2 };
-        var currentInstant = SystemClock.Instance.GetCurrentInstant();
-        var requestWholesaleSettlementSeriesV2 = new EDI.B2CWebApi.Models.RequestWholesaleSettlementSeriesV2(
-            Guid.NewGuid().ToString(),
-            currentInstant.ToString(),
-            currentInstant.Plus(Duration.FromDays(30)).ToString(),
-            "804",
-            null,
-            "D01",
-            "PT15M",
-            null,
-            requestWholesaleSettlementChargeTypeV2s);
-
-        var requestWholesaleServicesMarketDocumentV2 =
-            new EDI.B2CWebApi.Models.RequestWholesaleServicesMarketDocumentV2(
-                "D05",
-                new List<RequestWholesaleSettlementSeriesV2> { requestWholesaleSettlementSeriesV2, });
-
         var request = new HttpRequestMessage(HttpMethod.Post, "/TempRequestWholesaleSettlement")
         {
-            Content = CreateJsonContent(requestWholesaleServicesMarketDocumentV2),
+            Content = CreateJsonContent(
+                new RequestWholesaleSettlementMarketRequest(
+                    CalculationType: CalculationType.WholesaleFixing,
+                    StartDate: "2024-08-27T00:00:00Z",
+                    EndDate: "2024-08-28T00:00:00Z",
+                    GridArea: null,
+                    EnergySupplierId: null,
+                    Resolution: null,
+                    PriceType: null)),
         };
         return request;
     }

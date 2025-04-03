@@ -291,30 +291,30 @@
           "content": {
             "application/json": {
               "schema": {
-                "description": "Start a request for aggregated measure data.",
+                "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataV1"
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
                   }
                 ]
               }
             },
             "text/json": {
               "schema": {
-                "description": "Start a request for aggregated measure data.",
+                "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataV1"
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
                   }
                 ]
               }
             },
             "application/*+json": {
               "schema": {
-                "description": "Start a request for aggregated measure data.",
+                "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataV1"
+                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
                   }
                 ]
               }
@@ -347,27 +347,30 @@
           "content": {
             "application/json": {
               "schema": {
+                "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleServicesMarketDocumentV2"
+                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
             },
             "text/json": {
               "schema": {
+                "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleServicesMarketDocumentV2"
+                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
             },
             "application/*+json": {
               "schema": {
+                "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleServicesMarketDocumentV2"
+                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
@@ -615,75 +618,6 @@
           }
         }
       },
-      "RequestAggregatedMeasureDataV1": {
-        "type": "object",
-        "description": "Start a request for aggregated measure data.",
-        "additionalProperties": false,
-        "properties": {
-          "businessReason": {
-            "type": "string"
-          },
-          "meteringPointType": {
-            "type": "string",
-            "nullable": true
-          },
-          "marketEvaluationSettlementMethod": {
-            "type": "string",
-            "nullable": true
-          },
-          "startDateAndOrTimeDateTime": {
-            "type": "string"
-          },
-          "endDateAndOrTimeDateTime": {
-            "type": "string"
-          },
-          "meteringGridAreaDomainId": {
-            "type": "string",
-            "nullable": true
-          },
-          "energySupplierMarketParticipantId": {
-            "type": "string",
-            "nullable": true
-          },
-          "balanceResponsiblePartyMarketParticipantId": {
-            "type": "string",
-            "nullable": true
-          },
-          "settlementVersion": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "RequestWholesaleServicesMarketDocumentV2": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "businessReason": {
-            "type": "string"
-          },
-          "series": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequestWholesaleSettlementSeriesV2"
-            }
-          }
-        }
-      },
-      "RequestWholesaleSettlementChargeTypeV2": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "nullable": true
-          },
-          "type": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "RequestWholesaleSettlementMarketRequest": {
         "type": "object",
         "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
@@ -730,48 +664,6 @@
                 "$ref": "#/components/schemas/PriceType"
               }
             ]
-          }
-        }
-      },
-      "RequestWholesaleSettlementSeriesV2": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "startDateAndOrTimeDateTime": {
-            "type": "string"
-          },
-          "endDateAndOrTimeDateTime": {
-            "type": "string",
-            "nullable": true
-          },
-          "meteringGridAreaDomainId": {
-            "type": "string",
-            "nullable": true
-          },
-          "energySupplierMarketParticipantId": {
-            "type": "string",
-            "nullable": true
-          },
-          "settlementVersion": {
-            "type": "string",
-            "nullable": true
-          },
-          "resolution": {
-            "type": "string",
-            "nullable": true
-          },
-          "chargeOwner": {
-            "type": "string",
-            "nullable": true
-          },
-          "chargeTypes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequestWholesaleSettlementChargeTypeV2"
-            }
           }
         }
       }
