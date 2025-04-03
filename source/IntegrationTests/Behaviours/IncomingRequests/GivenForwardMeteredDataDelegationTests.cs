@@ -122,7 +122,10 @@ public class GivenForwardMeteredDataDelegationTests(
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
         var forwardMeteredDataRejectedServiceBusMessage = ForwardMeteredDataResponseBuilder
-            .GenerateRejectedFrom(requestMeteredDataForMeteringPointInputV1, orchestrationInstanceId);
+            .GenerateRejectedFrom(
+                requestMeteredDataForMeteringPointInputV1,
+                orchestrationInstanceId,
+                senderActor);
 
         await GivenForwardMeteredDataRequestRejectedIsReceived(forwardMeteredDataRejectedServiceBusMessage);
 

@@ -123,7 +123,10 @@ public static class ForwardMeteredDataResponseBuilder
         return serviceBusMessage;
     }
 
-    public static ServiceBusMessage GenerateRejectedFrom(ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointInputV1, Guid orchestrationInstanceId)
+    public static ServiceBusMessage GenerateRejectedFrom(
+        ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointInputV1,
+        Guid orchestrationInstanceId,
+        (ActorNumber ActorNumber, ActorRole ActorRole) senderActor)
     {
         var rejectRequest = new ForwardMeteredDataRejectedV1(
             requestMeteredDataForMeteringPointInputV1.ActorMessageId,
@@ -142,8 +145,8 @@ public static class ForwardMeteredDataResponseBuilder
             OrchestrationVersion = Brs_021_ForwardedMeteredData.V1.Version,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
-                ActorNumber = requestMeteredDataForMeteringPointInputV1.ActorNumber,
-                ActorRole = PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole).ToActorRoleV1(),
+                ActorNumber = senderActor.ActorNumber.Value,
+                ActorRole = senderActor.ActorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
