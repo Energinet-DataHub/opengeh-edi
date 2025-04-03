@@ -82,4 +82,7 @@ limitations under the License.
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Energinet.DataHub.EDI.Tests"/>
+  </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021.Mappers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -108,23 +109,11 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        var rejectedForwardMeteredDataMessageDto = new RejectedForwardMeteredDataMessageDto(
-            eventId: EventId.From(serviceBusMessageId),
-            externalId: new ExternalId(serviceBusMessageId),
-            businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
-            receiverNumber: ActorNumber.Create(orchestrationStartedByActor.ActorNumber),
-            receiverRole: ActorRole.FromName(orchestrationStartedByActor.ActorRole.ToString()),
-            documentReceiverRole: ActorRole.FromName(rejectedData.ForwardedForActorRole.Name),
-            relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
-            series: new RejectedForwardMeteredDataSeries(
-                OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
-                TransactionId: TransactionId.New(),
-                RejectReasons: rejectedData.ValidationErrors.Select(
-                        validationError =>
-                            new RejectReason(
-                                ErrorCode: validationError.ErrorCode,
-                                ErrorMessage: validationError.Message))
-                    .ToList()));
+        var rejectedForwardMeteredDataMessageDto = RejectedForwardMeteredDataMessageDtoMapper.Map(
+            serviceBusMessageId: serviceBusMessageId,
+            orchestrationStartedByActor: orchestrationStartedByActor,
+            rejectedData: rejectedData);
+
         await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
 
         var executionPolicy = Policy
