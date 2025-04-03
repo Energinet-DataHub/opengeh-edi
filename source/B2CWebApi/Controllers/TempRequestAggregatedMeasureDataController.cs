@@ -15,10 +15,11 @@
 using System.Text;
 using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -27,7 +28,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
-using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
@@ -35,10 +35,8 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [Route("[controller]")]
 public class TempRequestAggregatedMeasureDataController : ControllerBase
 {
-    private const string AggregatedMeasureDataMessageType = "E74";
-    private const string Electricity = "23";
-
     private readonly UserContext<FrontendUser> _userContext;
+    private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
     private readonly IClock _clock;
@@ -46,12 +44,14 @@ public class TempRequestAggregatedMeasureDataController : ControllerBase
 
     public TempRequestAggregatedMeasureDataController(
         UserContext<FrontendUser> userContext,
+        DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
         IClock clock,
         IAuditLogger auditLogger)
     {
         _userContext = userContext;
+        _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
         _clock = clock;
@@ -61,7 +61,7 @@ public class TempRequestAggregatedMeasureDataController : ControllerBase
     [ApiVersion("1.0")]
     [HttpPost]
     [Authorize(Roles = "request-aggregated-measured-data:view")]
-    public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataV1 request, CancellationToken cancellationToken)
+    public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
@@ -74,29 +74,14 @@ public class TempRequestAggregatedMeasureDataController : ControllerBase
 
         var currentUser = _userContext.CurrentUser;
 
-        var message = new RequestAggregatedMeasureDataDto(
-            SenderNumber: currentUser.ActorNumber,
-            SenderRoleCode: MapRoleNameToCode(currentUser.MarketRole),
-            ReceiverNumber: DataHubDetails.DataHubActorNumber.Value,
-            ReceiverRoleCode: ActorRole.MeteredDataAdministrator.Code,
-            BusinessReason: request.BusinessReason,
-            MessageType: AggregatedMeasureDataMessageType,
-            MessageId: MessageId.New().Value,
-            CreatedAt: _clock.GetCurrentInstant().ToString(),
-            BusinessType: Electricity,
-            Serie:
-            [
-                new RequestAggregatedMeasureDataSeries(
-                    Id: TransactionId.New().Value,
-                    MarketEvaluationPointType: request.MeteringPointType,
-                    MarketEvaluationSettlementMethod: request.MarketEvaluationSettlementMethod,
-                    StartDateAndOrTimeDateTime: request.StartDateAndOrTimeDateTime,
-                    EndDateAndOrTimeDateTime: request.EndDateAndOrTimeDateTime,
-                    MeteringGridAreaDomainId: request.MeteringGridAreaDomainId,
-                    EnergySupplierMarketParticipantId: request.EnergySupplierMarketParticipantId,
-                    BalanceResponsiblePartyMarketParticipantId: request.BalanceResponsiblePartyMarketParticipantId,
-                    SettlementVersion: request.SettlementVersion),
-            ]);
+        var message =
+            RequestAggregatedMeasureDataDtoFactory.Create(
+                TransactionId.New(),
+                request,
+                currentUser.ActorNumber,
+                currentUser.MarketRole,
+                _dateTimeZone,
+                _clock.GetCurrentInstant());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),
@@ -120,25 +105,5 @@ public class TempRequestAggregatedMeasureDataController : ControllerBase
         var byteArray = encoding.GetBytes(jsonString);
         var memoryStream = new MemoryStream(byteArray);
         return new IncomingMarketMessageStream(memoryStream);
-    }
-
-    private static string MapRoleNameToCode(string roleName)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(roleName);
-        var actorRole = ActorRole.FromName(roleName);
-
-        if (actorRole == ActorRole.MeteredDataResponsible
-            || actorRole == ActorRole.EnergySupplier
-            || actorRole == ActorRole.BalanceResponsibleParty)
-        {
-            return actorRole.Code;
-        }
-
-        if (WorkaroundFlags.GridOperatorToMeteredDataResponsibleHack && actorRole == ActorRole.GridAccessProvider)
-        {
-            return ActorRole.MeteredDataResponsible.Code;
-        }
-
-        throw new ArgumentException($"Market Role: {actorRole}, is not allowed to request aggregated measure data.");
     }
 }
