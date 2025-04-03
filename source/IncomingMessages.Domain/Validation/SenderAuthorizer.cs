@@ -32,7 +32,7 @@ public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAu
 
         EnsureSenderIdMatches(message.SenderNumber);
         EnsureSenderRoleCode(message, allSeriesAreDelegated);
-        EnsureCurrentUserHasRequiredRole(message.SenderRoleCode, allSeriesAreDelegated);
+        EnsureCurrentUserHasRequiredRole(message, allSeriesAreDelegated);
 
         return Task.FromResult(
             _validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
@@ -44,17 +44,28 @@ public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAu
             !senderRoleCode.Equals(ActorRole.GridAccessProvider.Code, StringComparison.OrdinalIgnoreCase);
     }
 
-    private void EnsureCurrentUserHasRequiredRole(string senderRole, bool allSeriesAreDelegated)
+    private void EnsureCurrentUserHasRequiredRole(IIncomingMessage message, bool allSeriesAreDelegated)
     {
-        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && HackThatAllowDdmToActAsMdr(senderRole)) return;
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && HackThatAllowDdmToActAsMdr(message.SenderRoleCode)) return;
 
         if (AllSeriesAreDelegatedToSender(allSeriesAreDelegated))
             return;
 
-        if (!actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(senderRole)))
+        if (AllowDelegatedAuthorizedActorForMeteredDataForMeteringPointMessage(message))
+        {
+            return;
+        }
+
+        if (!actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(message.SenderRoleCode)))
         {
             _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
         }
+    }
+
+    private bool AllowDelegatedAuthorizedActorForMeteredDataForMeteringPointMessage(IIncomingMessage message)
+    {
+        return message is MeteredDataForMeteringPointMessageBase
+               && actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.Delegated);
     }
 
     private void EnsureSenderRoleCode(IIncomingMessage message, bool allSeriesAreDelegated)
