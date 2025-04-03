@@ -131,7 +131,7 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
-        var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
+        var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = ForwardMeteredDataResponseBuilder
             .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor, orchestrationInstanceId, documentFormat);
 
         await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
@@ -291,7 +291,7 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
-        var requestMeteredDataForMeteringPointRejectedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
+        var requestMeteredDataForMeteringPointRejectedServiceBusMessage = ForwardMeteredDataResponseBuilder
             .GenerateRejectedFrom(requestMeteredDataForMeteringPointInputV1, orchestrationInstanceId);
 
         await GivenForwardMeteredDataRequestRejectedIsReceived(requestMeteredDataForMeteringPointRejectedServiceBusMessage);
@@ -409,9 +409,9 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         foreach (var forwardMeteredDataMessage in forwardMeteredDataMessages)
         {
-            var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = MeteredDataForMeteringPointEventBuilder
+            var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = ForwardMeteredDataResponseBuilder
                 .GenerateAcceptedFrom(
-                    requestMeteredDataForMeteringPointMessageInputV1: forwardMeteredDataMessage.Input,
+                    forwardMeteredDataInput: forwardMeteredDataMessage.Input,
                     receiverActor: receiverActor,
                     orchestrationInstanceId: forwardMeteredDataMessage.OrchestrationInstanceId,
                     documentFormat: documentFormat);
