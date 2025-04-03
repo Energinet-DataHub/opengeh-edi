@@ -57,6 +57,12 @@ public sealed class AggregatedMeasureDataRequestDsl
             .RequestAggregatedMeasureDataAsync(cancellationToken);
     }
 
+    internal Task B2CRequestTemp(CancellationToken cancellationToken)
+    {
+        return _b2cEdiDriver
+            .RequestAggregatedMeasureDataTempAsync(cancellationToken);
+    }
+
     internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken = default)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
