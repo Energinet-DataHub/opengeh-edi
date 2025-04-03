@@ -58,6 +58,7 @@ public class GivenForwardMeteredDataDelegationTests(
         var resolution = Resolution.Hourly;
         var notifyEventName = ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName;
         var messageId = MessageId.New();
+        var transactionId = TransactionId.New();
 
         var registeredAt = Instant.FromUtc(2022, 12, 17, 9, 30, 00);
         var startDate = Instant.FromUtc(2024, 11, 28, 13, 15);
@@ -74,8 +75,6 @@ public class GivenForwardMeteredDataDelegationTests(
         var whenMessagesAreEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
         GivenNowIs(whenMessagesAreEnqueued);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
-
-        var transactionId = TransactionId.New();
 
         // Act
         await GivenReceivedMeteredDataForMeteringPoint(
@@ -120,10 +119,10 @@ public class GivenForwardMeteredDataDelegationTests(
          */
 
         // Arrange
-        var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
+        var forwardMeteredDataInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
         var forwardMeteredDataRejectedServiceBusMessage = ForwardMeteredDataResponseBuilder
             .GenerateRejectedFrom(
-                requestMeteredDataForMeteringPointInputV1,
+                forwardMeteredDataInputV1,
                 orchestrationInstanceId,
                 senderActor);
 
