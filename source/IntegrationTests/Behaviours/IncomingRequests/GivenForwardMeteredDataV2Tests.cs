@@ -131,10 +131,10 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
-        var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = ForwardMeteredDataResponseBuilder
+        var forwardMeteredDataAcceptedServiceBusMessage = ForwardMeteredDataResponseBuilder
             .GenerateAcceptedFrom(requestMeteredDataForMeteringPointInputV1, receiverActor, orchestrationInstanceId, documentFormat);
 
-        await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
+        await GivenForwardMeteredDataRequestAcceptedIsReceived(forwardMeteredDataAcceptedServiceBusMessage);
 
         AssertCorrectProcessManagerNotification(
             senderSpyNotify.LatestMessage!,
@@ -291,10 +291,10 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         // Arrange
         var requestMeteredDataForMeteringPointInputV1 = message.ParseInput<ForwardMeteredDataInputV1>();
-        var requestMeteredDataForMeteringPointRejectedServiceBusMessage = ForwardMeteredDataResponseBuilder
+        var forwardMeteredDataRejectedServiceBusMessage = ForwardMeteredDataResponseBuilder
             .GenerateRejectedFrom(requestMeteredDataForMeteringPointInputV1, orchestrationInstanceId);
 
-        await GivenForwardMeteredDataRequestRejectedIsReceived(requestMeteredDataForMeteringPointRejectedServiceBusMessage);
+        await GivenForwardMeteredDataRequestRejectedIsReceived(forwardMeteredDataRejectedServiceBusMessage);
 
         AssertCorrectProcessManagerNotification(
             senderSpyNotify.LatestMessage!,
@@ -409,14 +409,14 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         foreach (var forwardMeteredDataMessage in forwardMeteredDataMessages)
         {
-            var requestMeteredDataForMeteringPointAcceptedServiceBusMessage = ForwardMeteredDataResponseBuilder
+            var forwardMeteredDataAcceptedServiceBusMessage = ForwardMeteredDataResponseBuilder
                 .GenerateAcceptedFrom(
                     forwardMeteredDataInput: forwardMeteredDataMessage.Input,
                     receiverActor: receiverActor,
                     orchestrationInstanceId: forwardMeteredDataMessage.OrchestrationInstanceId,
                     documentFormat: documentFormat);
 
-            await GivenForwardMeteredDataRequestAcceptedIsReceived(requestMeteredDataForMeteringPointAcceptedServiceBusMessage);
+            await GivenForwardMeteredDataRequestAcceptedIsReceived(forwardMeteredDataAcceptedServiceBusMessage);
 
             AssertCorrectProcessManagerNotification(
                 serviceBusMessage: senderSpyNotify.LatestMessage!,
