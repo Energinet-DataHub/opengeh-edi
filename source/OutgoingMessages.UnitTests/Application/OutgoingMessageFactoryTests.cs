@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Application;
 public class OutgoingMessageFactoryTests
 {
     [Fact]
-    public void Test213()
+    public void Given_RejectedForwardMeteredData_When_MappingToOutgoingMessage_Then_OutgoingMessageHasExpectedValues()
     {
         // Arrange
         var currentInstant = Instant.FromUtc(2024, 04, 02, 0, 0);
