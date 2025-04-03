@@ -40,8 +40,7 @@ public class DocumentFactory
         var documentWriter =
             _documentWriters.FirstOrDefault(
                 writer => writer.HandlesType(bundle.DocumentType)
-                          && writer.HandlesFormat(documentFormat)
-                          && (bundle.OutgoingMessages.Count <= 1 || writer.HandlesMultipleRecords()))
+                          && writer.HandlesFormat(documentFormat))
             ?? throw new OutgoingMessageException(
                 $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
 
