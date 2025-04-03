@@ -16,9 +16,9 @@ using System.Text;
 using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -27,7 +27,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
-using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
@@ -35,26 +34,26 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [Route("[controller]")]
 public class TempRequestWholesaleSettlementController : ControllerBase
 {
-    private const string WholesaleSettlementMessageType = "D21";
-    private const string Electricity = "23";
-
-    private readonly IClock _clock;
     private readonly UserContext<FrontendUser> _userContext;
+    private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
+    private readonly IClock _clock;
     private readonly IAuditLogger _auditLogger;
 
     public TempRequestWholesaleSettlementController(
-        IClock clock,
         UserContext<FrontendUser> userContext,
+        DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
+        IClock clock,
         IAuditLogger auditLogger)
     {
-        _clock = clock;
         _userContext = userContext;
+        _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
+        _clock = clock;
         _auditLogger = auditLogger;
     }
 
@@ -62,7 +61,7 @@ public class TempRequestWholesaleSettlementController : ControllerBase
     [HttpPost]
     [Authorize(Roles = "request-wholesale-settlement:view")]
     public async Task<ActionResult> RequestAsync(
-        RequestWholesaleServicesMarketDocumentV2 request,
+        RequestWholesaleSettlementMarketRequest request,
         CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
@@ -76,26 +75,14 @@ public class TempRequestWholesaleSettlementController : ControllerBase
 
         var currentUser = _userContext.CurrentUser;
 
-        var message = new RequestWholesaleSettlementDto(
-            currentUser.ActorNumber,
-            MapRoleNameToCode(currentUser.MarketRole),
-            DataHubDetails.DataHubActorNumber.Value,
-            ActorRole.MeteredDataAdministrator.Code,
-            request.BusinessReason,
-            WholesaleSettlementMessageType,
-            Guid.NewGuid().ToString(),
-            _clock.GetCurrentInstant().ToString(),
-            Electricity,
-            request.Series.Select(s => new RequestWholesaleSettlementSeries(
-                s.Id,
-                s.StartDateAndOrTimeDateTime,
-                s.EndDateAndOrTimeDateTime,
-                s.MeteringGridAreaDomainId,
-                s.EnergySupplierMarketParticipantId,
-                s.SettlementVersion,
-                s.Resolution,
-                s.ChargeOwner,
-                s.ChargeTypes.Select(ct => new RequestWholesaleSettlementChargeType(ct.Id, ct.Type)).ToList().AsReadOnly())).ToList().AsReadOnly());
+        var message =
+            RequestWholesaleSettlementDtoFactory.Create(
+                TransactionId.New(),
+                request,
+                currentUser.ActorNumber,
+                currentUser.MarketRole,
+                _dateTimeZone,
+                _clock.GetCurrentInstant());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),
@@ -119,20 +106,5 @@ public class TempRequestWholesaleSettlementController : ControllerBase
         var byteArray = encoding.GetBytes(jsonString);
         var memoryStream = new MemoryStream(byteArray);
         return new IncomingMarketMessageStream(memoryStream);
-    }
-
-    private static string MapRoleNameToCode(string roleName)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(roleName);
-        var actorRole = ActorRole.FromName(roleName);
-
-        if (actorRole == ActorRole.SystemOperator
-            || actorRole == ActorRole.EnergySupplier
-            || actorRole == ActorRole.GridAccessProvider)
-        {
-            return actorRole.Code;
-        }
-
-        throw new ArgumentException($"Market Role: {actorRole}, is not allowed to request wholesale settlement.");
     }
 }
