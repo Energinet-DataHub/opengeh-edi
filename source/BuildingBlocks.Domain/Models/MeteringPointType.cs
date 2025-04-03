@@ -28,6 +28,7 @@ public class MeteringPointType : DataHubType<MeteringPointType>
     // Child metering point types
     public static readonly MeteringPointType VeProduction = new(PMTypes.MeteringPointType.VeProduction.Name, "D01");
     public static readonly MeteringPointType Analysis = new(PMTypes.MeteringPointType.Analysis.Name, "D02");
+    public static readonly MeteringPointType NotUsed = new(PMTypes.MeteringPointType.NotUsed.Name, "D03");
     public static readonly MeteringPointType SurplusProductionGroup6 = new(PMTypes.MeteringPointType.SurplusProductionGroup6.Name, "D04");
     public static readonly MeteringPointType NetProduction = new(PMTypes.MeteringPointType.NetProduction.Name, "D05");
     public static readonly MeteringPointType SupplyToGrid = new(PMTypes.MeteringPointType.SupplyToGrid.Name, "D06");
@@ -37,6 +38,7 @@ public class MeteringPointType : DataHubType<MeteringPointType>
     public static readonly MeteringPointType NetFromGrid = new(PMTypes.MeteringPointType.NetFromGrid.Name, "D10");
     public static readonly MeteringPointType NetToGrid = new(PMTypes.MeteringPointType.NetToGrid.Name, "D11");
     public static readonly MeteringPointType TotalConsumption = new(PMTypes.MeteringPointType.TotalConsumption.Name, "D12");
+    public static readonly MeteringPointType NetLossCorrection = new(PMTypes.MeteringPointType.NetLossCorrection.Name, "D13");
     public static readonly MeteringPointType ElectricalHeating = new(PMTypes.MeteringPointType.ElectricalHeating.Name, "D14");
     public static readonly MeteringPointType NetConsumption = new(PMTypes.MeteringPointType.NetConsumption.Name, "D15");
     public static readonly MeteringPointType OtherConsumption = new(PMTypes.MeteringPointType.OtherConsumption.Name, "D17");
