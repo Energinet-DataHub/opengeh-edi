@@ -80,14 +80,16 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                         StartDateTime: transaction.StartDateTime,
                         EndDateTime: transaction.EndDateTime,
                         GridAccessProviderNumber: meteredDataForMeteringPointMessageBase.SenderNumber,
-                        DelegatedGridAreaCodes: transaction.DelegatedGridAreas,
+                        // DelegatedGridAreaCodes is going to be removed.
+                        DelegatedGridAreaCodes: null,
                         MeteredDataList:
                                 transaction.EnergyObservations
                                     .Select(MapToMeteredData)
                                     .ToList()),
                     $"{transaction.SenderNumber}-{transaction.TransactionId}");
 
-            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, CancellationToken.None);
+            var startProcessTask =
+                _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
             startProcessTasks.Add(startProcessTask);
         }
 
