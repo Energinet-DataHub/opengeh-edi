@@ -14,6 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
@@ -104,7 +105,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         TData data,
         Actor actor,
         Guid eventId)
-        where TData : class
+        where TData : IEnqueueDataDto
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {

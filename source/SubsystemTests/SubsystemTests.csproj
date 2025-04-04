@@ -85,8 +85,8 @@
         <PackageReference Include="Dapper" Version="2.1.66"/>
         <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="7.2.1"/>
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.2.1"/>
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="3.0.0" />
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.17.1" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="4.0.0" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.18.1" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
           <PrivateAssets>all</PrivateAssets>

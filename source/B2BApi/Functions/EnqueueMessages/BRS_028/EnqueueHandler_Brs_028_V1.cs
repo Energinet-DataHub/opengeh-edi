@@ -149,7 +149,7 @@ public class EnqueueHandler_Brs_028_V1(
             OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId));
 
         var rejectedMessageDto = new RejectedWholesaleServicesMessageDto(
-            relatedToMessageId: MessageId.Create(rejectedData.OriginalMessageId),
+            relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             receiverNumber: ActorNumber.Create(rejectedData.RequestedByActorNumber.Value),
             receiverRole: BuildingBlocks.Domain.Models.ActorRole.FromName(rejectedData.RequestedByActorRole.Name),
             documentReceiverNumber: ActorNumber.Create(rejectedData.RequestedForActorNumber.Value),

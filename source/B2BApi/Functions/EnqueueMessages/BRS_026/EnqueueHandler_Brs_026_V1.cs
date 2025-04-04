@@ -130,7 +130,7 @@ public class EnqueueHandler_Brs_026_V1(
             OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId));
 
         var enqueueRejectedMessageDto = new RejectedEnergyResultMessageDto(
-            relatedToMessageId: MessageId.Create(rejectedData.OriginalMessageId),
+            relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             receiverNumber: ActorNumber.Create(rejectedData.RequestedByActorNumber.Value),
             receiverRole: ActorRole.FromName(rejectedData.RequestedByActorRole.Name),
             documentReceiverNumber: ActorNumber.Create(rejectedData.RequestedForActorNumber.Value),
