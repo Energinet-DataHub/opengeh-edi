@@ -110,6 +110,7 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         };
         var rejectRequest = new RequestCalculatedEnergyTimeSeriesRejectedV1(
             OriginalMessageId: requestCalculatedEnergyTimeSeriesInput.ActorMessageId,
+            OriginalActorMessageId: requestCalculatedEnergyTimeSeriesInput.ActorMessageId,
             OriginalTransactionId: requestCalculatedEnergyTimeSeriesInput.TransactionId,
             RequestedForActorNumber: PMActorNumber.Create(requestCalculatedEnergyTimeSeriesInput.RequestedForActorNumber),
             RequestedForActorRole: PMActorRole.FromName(requestCalculatedEnergyTimeSeriesInput.RequestedForActorRole),
