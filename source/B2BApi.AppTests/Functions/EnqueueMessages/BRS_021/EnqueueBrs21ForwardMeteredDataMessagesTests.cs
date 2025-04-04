@@ -256,6 +256,7 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
             OriginalTransactionId: Guid.NewGuid().ToString(),
             ForwardedByActorNumber: ActorNumber.Create(actorNumber).ToProcessManagerActorNumber(),
             ForwardedByActorRole: actorRole.ToProcessManagerActorRole(),
+            ForwardedForActorRole: actorRole.ToProcessManagerActorRole(),
             BusinessReason: BusinessReason.PeriodicFlexMetering,
             ValidationErrors: [
                 new ValidationErrorDto(

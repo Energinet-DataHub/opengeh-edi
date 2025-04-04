@@ -14,6 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
@@ -32,7 +33,7 @@ public static class EnqueueBrs023_027MessageFactory
 
     private static ServiceBusMessage CreateServiceBusMessage<TData>(
         TData data)
-            where TData : class
+            where TData : INotifyEnqueueDataDto
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {

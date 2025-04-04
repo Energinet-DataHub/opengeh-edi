@@ -124,6 +124,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var orchestrationInstanceId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesRejectedV1(
             OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: businessReason.ToProcessManagerBusinessReason(),
             RequestedForActorNumber: requestedForActorNumber.ToProcessManagerActorNumber(),
@@ -174,7 +175,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         actualOutgoingMessage!.DocumentType.Should().Be(DocumentType.RejectRequestAggregatedMeasureData);
         actualOutgoingMessage.BusinessReason.Should().Be(businessReason.Name);
         actualOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
-        actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalMessageId);
+        actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
         actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
         actualOutgoingMessage.Receiver.ActorRole.Name.Should().Be(requestedForActorRole.Name);
 

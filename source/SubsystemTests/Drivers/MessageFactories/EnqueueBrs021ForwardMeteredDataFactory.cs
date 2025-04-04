@@ -14,6 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
@@ -93,6 +94,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
             OriginalTransactionId: Guid.NewGuid().ToString(),
             ForwardedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             ForwardedByActorRole: actor.ActorRole.ToProcessManagerActorRole(),
+            ForwardedForActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             BusinessReason: BusinessReason.PeriodicMetering,
             ValidationErrors:
             [
@@ -106,7 +108,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         TData data,
         Actor actor,
         Guid eventId)
-        where TData : class
+        where TData : INotifyEnqueueDataDto
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
