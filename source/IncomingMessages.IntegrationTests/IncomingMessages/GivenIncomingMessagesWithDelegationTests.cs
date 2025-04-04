@@ -391,12 +391,25 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             response.IsErrorResponse.Should().BeFalse();
             senderSpy.LatestMessage.Should().NotBeNull();
 
-            var requestInput = GetForwardMeteredDataInputV1(senderSpy);
-            requestInput.ActorNumber.Should().Be(_delegatedTo.ActorNumber.Value);
+            var startOrchestrationInstance = GetStartOrchestrationInstanceV1(senderSpy);
+            var serializer = new Serializer();
+            var requestInput = serializer.Deserialize<ForwardMeteredDataInputV1>(startOrchestrationInstance.Input);
+            startOrchestrationInstance.StartedByActor.ActorRole.Should().Be(ConvertToActorRoleV1(delegatedToAsDelegated.ActorRole));
+            startOrchestrationInstance.StartedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber.Value);
+            requestInput.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber.Value);
             requestInput.ActorRole.Should().Be(ActorRole.MeteredDataResponsible.Name);
             requestInput.TransactionId.Should().Be(transactionId);
             requestInput.Resolution.Should().Be(resolution.Name);
         }
+    }
+
+    private static ActorRoleV1 ConvertToActorRoleV1(ActorRole actorRole)
+    {
+        return actorRole.Name switch
+        {
+            "Delegated" => ActorRoleV1.Delegated,
+            _ => throw new ArgumentException($"Unknown actor role: {actorRole.Name}"),
+        };
     }
 
     private static RequestCalculatedEnergyTimeSeriesInputV1 GetRequestCalculatedEnergyTimeSeriesInputV1(
@@ -409,14 +422,12 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         return input;
     }
 
-    private static ForwardMeteredDataInputV1 GetForwardMeteredDataInputV1(
+    private static StartOrchestrationInstanceV1 GetStartOrchestrationInstanceV1(
         ServiceBusSenderSpy senderSpy)
     {
-        var serializer = new Serializer();
         var parser = new MessageParser<StartOrchestrationInstanceV1>(() => new StartOrchestrationInstanceV1());
         var message = parser.ParseJson(senderSpy.LatestMessage!.Body.ToString());
-        var input = serializer.Deserialize<ForwardMeteredDataInputV1>(message.Input);
-        return input;
+        return message;
     }
 
     private async Task AddDelegationAsync(
