@@ -396,7 +396,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             var requestInput = serializer.Deserialize<ForwardMeteredDataInputV1>(startOrchestrationInstance.Input);
             startOrchestrationInstance.StartedByActor.ActorRole.Should().Be(ConvertToActorRoleV1(delegatedToAsDelegated.ActorRole));
             startOrchestrationInstance.StartedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber.Value);
-            requestInput.ActorNumber.Should().Be(_delegatedTo.ActorNumber.Value);
+            requestInput.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber.Value);
             requestInput.ActorRole.Should().Be(ActorRole.MeteredDataResponsible.Name);
             requestInput.TransactionId.Should().Be(transactionId);
             requestInput.Resolution.Should().Be(resolution.Name);
