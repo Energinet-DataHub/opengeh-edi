@@ -78,7 +78,7 @@ public static class EnqueueBrs026MessageFactory
     private static ServiceBusMessage CreateServiceBusMessage<TData>(
         TData data,
         Actor actor)
-            where TData : INotifyEnqueueDataDto
+            where TData : IEnqueueDataDto
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {

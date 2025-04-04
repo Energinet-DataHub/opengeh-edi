@@ -108,7 +108,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         TData data,
         Actor actor,
         Guid eventId)
-        where TData : INotifyEnqueueDataDto
+        where TData : IEnqueueDataDto
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {

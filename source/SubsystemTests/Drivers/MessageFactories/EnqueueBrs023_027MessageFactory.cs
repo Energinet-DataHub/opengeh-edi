@@ -33,7 +33,7 @@ public static class EnqueueBrs023_027MessageFactory
 
     private static ServiceBusMessage CreateServiceBusMessage<TData>(
         TData data)
-            where TData : INotifyEnqueueDataDto
+            where TData : IEnqueueDataDto
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
