@@ -44,6 +44,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
             return EnqueueRejectedMessagesAsync(
                 serviceBusMessageId,
                 orchestrationInstanceId,
+                enqueueActorMessages.OrchestrationStartedByActor,
                 rejectedData,
                 cancellationToken);
         }
@@ -63,6 +64,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
     protected abstract Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
+        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
         TRejectedData rejectedData,
         CancellationToken cancellationToken);
 }
