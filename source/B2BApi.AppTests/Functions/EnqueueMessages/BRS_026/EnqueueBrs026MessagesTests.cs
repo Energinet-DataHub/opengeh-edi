@@ -122,9 +122,10 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var requestedForActorRole = ActorRole.EnergySupplier;
         var businessReason = BusinessReason.BalanceFixing;
         var orchestrationInstanceId = Guid.NewGuid().ToString();
+        var originalActorMessageId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesRejectedV1(
-            OriginalMessageId: Guid.NewGuid().ToString(),
-            OriginalActorMessageId: Guid.NewGuid().ToString(),
+            OriginalMessageId: originalActorMessageId,
+            OriginalActorMessageId: originalActorMessageId,
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: businessReason.ToProcessManagerBusinessReason(),
             RequestedForActorNumber: requestedForActorNumber.ToProcessManagerActorNumber(),
