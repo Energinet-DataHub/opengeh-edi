@@ -130,6 +130,7 @@ public static class MeteredDataForMeteringPointEventBuilder
             requestMeteredDataForMeteringPointInputV1.TransactionId,
             PMActorNumber.Create(requestMeteredDataForMeteringPointInputV1.ActorNumber),
             PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole),
+            PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole),
             PMBusinessReason.FromName(requestMeteredDataForMeteringPointInputV1.BusinessReason),
             new List<ValidationErrorDto>()
             {

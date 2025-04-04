@@ -110,8 +110,10 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
+#pragma warning disable CS0618 // Type or member is obsolete
             receiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
             receiverRole: ActorRole.Create(rejectedData.ForwardedByActorRole),
+#pragma warning restore CS0618 // Type or member is obsolete
             relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
