@@ -16,11 +16,16 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
+using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
+[TestCaseOrderer(
+    ordererTypeName: "Energinet.DataHub.EDI.SubsystemTests.TestOrdering.TestOrderer",
+    ordererAssemblyName: "Energinet.DataHub.EDI.SubsystemTests")]
+[IntegrationTest]
 [IntegrationTest]
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
@@ -57,6 +62,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     }
 
     [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task Actor_can_send_forward_metered_data_in_cim_to_datahub()
     {
         var messageId = await _forwardMeteredDataAsGridAccessProvider
@@ -68,6 +74,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     }
 
     [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task Actor_can_send_forward_metered_data_in_ebix_to_datahub()
     {
         var messageId = await _forwardMeteredDataAsGridAccessProvider
@@ -79,6 +86,7 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     }
 
     [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task Actor_sends_forward_metered_data_in_ebix_with_already_used_message_id_to_datahub()
     {
         var faultMessage = await _forwardMeteredDataAsGridAccessProvider
