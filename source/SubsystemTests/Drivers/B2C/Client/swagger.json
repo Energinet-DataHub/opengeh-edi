@@ -73,7 +73,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrchestrationStatusQueryResult"
+                  "$ref": "#/components/schemas/Microsoft.Azure.WebJobs.Extensions.DurableTask.OrchestrationStatusQueryResult"
                 }
               }
             }
@@ -112,7 +112,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DurableOrchestrationStatus"
+                  "$ref": "#/components/schemas/Microsoft.Azure.WebJobs.Extensions.DurableTask.DurableOrchestrationStatus"
                 }
               }
             }
@@ -182,7 +182,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequestV1"
                   }
                 ]
               }
@@ -192,7 +192,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequestV1"
                   }
                 ]
               }
@@ -202,7 +202,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequestV1"
                   }
                 ]
               }
@@ -238,7 +238,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
@@ -248,7 +248,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
@@ -258,7 +258,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
@@ -294,7 +294,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequest"
                   }
                 ]
               }
@@ -304,7 +304,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequest"
                   }
                 ]
               }
@@ -314,7 +314,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestAggregatedMeasureDataMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequest"
                   }
                 ]
               }
@@ -350,7 +350,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
@@ -360,7 +360,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
@@ -370,7 +370,7 @@
                 "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/RequestWholesaleSettlementMarketRequest"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementMarketRequest"
                   }
                 ]
               }
@@ -387,7 +387,7 @@
   },
   "components": {
     "schemas": {
-      "CalculationType": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.CalculationType": {
         "type": "integer",
         "format": "int32",
         "x-enumNames": [
@@ -407,84 +407,7 @@
           5
         ]
       },
-      "DurableOrchestrationStatus": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "instanceId": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastUpdatedTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "input": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/JToken"
-              }
-            ]
-          },
-          "output": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/JToken"
-              }
-            ]
-          },
-          "runtimeStatus": {
-            "x-enumNames": [
-              "Running",
-              "Completed",
-              "ContinuedAsNew",
-              "Failed",
-              "Canceled",
-              "Terminated",
-              "Pending",
-              "Suspended",
-              "Unknown"
-            ],
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OrchestrationRuntimeStatus"
-              }
-            ]
-          },
-          "customStatus": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/JToken"
-              }
-            ]
-          },
-          "history": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/JToken"
-            }
-          }
-        }
-      },
-      "JToken": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/JToken"
-        }
-      },
-      "MeteringPointType": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType": {
         "type": "integer",
         "format": "int32",
         "x-enumNames": [
@@ -502,50 +425,7 @@
           4
         ]
       },
-      "OrchestrationRuntimeStatus": {
-        "type": "integer",
-        "format": "int32",
-        "x-enumNames": [
-          "Running",
-          "Completed",
-          "ContinuedAsNew",
-          "Failed",
-          "Canceled",
-          "Terminated",
-          "Pending",
-          "Suspended",
-          "Unknown"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          -1
-        ]
-      },
-      "OrchestrationStatusQueryResult": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "durableOrchestrationState": {
-            "type": "array",
-            "nullable": true,
-            "items": {
-              "$ref": "#/components/schemas/DurableOrchestrationStatus"
-            }
-          },
-          "continuationToken": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "PriceType": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.PriceType": {
         "type": "integer",
         "description": "The price type enum is used to make B2C Wholesale Settlement requests from the UI, and describes a combination of\r\nthe resolution and charge type fields in the RequestWholesaleSettlement document",
         "format": "int32",
@@ -570,7 +450,7 @@
           7
         ]
       },
-      "RequestAggregatedMeasureDataMarketRequest": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequest": {
         "type": "object",
         "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
         "additionalProperties": false,
@@ -586,7 +466,7 @@
             ],
             "allOf": [
               {
-                "$ref": "#/components/schemas/CalculationType"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.CalculationType"
               }
             ]
           },
@@ -594,7 +474,7 @@
             "nullable": true,
             "allOf": [
               {
-                "$ref": "#/components/schemas/MeteringPointType"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType"
               }
             ]
           },
@@ -618,7 +498,78 @@
           }
         }
       },
-      "RequestWholesaleSettlementMarketRequest": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.RequestAggregatedMeasureDataMarketRequestV1": {
+        "type": "object",
+        "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
+        "additionalProperties": false,
+        "properties": {
+          "businessReason": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason"
+              }
+            ]
+          },
+          "settlementVersion": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion"
+              }
+            ]
+          },
+          "settlementMethod": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod"
+              }
+            ]
+          },
+          "meteringPointType": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType"
+              }
+            ]
+          },
+          "startDate": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NodaTime.Instant"
+              }
+            ]
+          },
+          "endDate": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NodaTime.Instant"
+              }
+            ]
+          },
+          "gridAreaCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "energySupplierId": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber"
+              }
+            ]
+          },
+          "balanceResponsibleId": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber"
+              }
+            ]
+          }
+        }
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementMarketRequest": {
         "type": "object",
         "description": "Responsible for carrying the market message data from the incoming message before any data validation.",
         "additionalProperties": false,
@@ -634,7 +585,7 @@
             ],
             "allOf": [
               {
-                "$ref": "#/components/schemas/CalculationType"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.CalculationType"
               }
             ]
           },
@@ -661,11 +612,185 @@
             "nullable": true,
             "allOf": [
               {
-                "$ref": "#/components/schemas/PriceType"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.PriceType"
               }
             ]
           }
         }
+      },
+      "Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask.DurableOrchestrationStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "instanceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUpdatedTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "input": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Newtonsoft.Json.Linq.JToken"
+              }
+            ]
+          },
+          "output": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Newtonsoft.Json.Linq.JToken"
+              }
+            ]
+          },
+          "runtimeStatus": {
+            "x-enumNames": [
+              "Running",
+              "Completed",
+              "ContinuedAsNew",
+              "Failed",
+              "Canceled",
+              "Terminated",
+              "Pending",
+              "Suspended",
+              "Unknown"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Microsoft.Azure.WebJobs.Extensions.DurableTask.OrchestrationRuntimeStatus"
+              }
+            ]
+          },
+          "customStatus": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Newtonsoft.Json.Linq.JToken"
+              }
+            ]
+          },
+          "history": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Newtonsoft.Json.Linq.JToken"
+            }
+          }
+        }
+      },
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask.OrchestrationRuntimeStatus": {
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "Running",
+          "Completed",
+          "ContinuedAsNew",
+          "Failed",
+          "Canceled",
+          "Terminated",
+          "Pending",
+          "Suspended",
+          "Unknown"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          -1
+        ]
+      },
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask.OrchestrationStatusQueryResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "durableOrchestrationState": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Microsoft.Azure.WebJobs.Extensions.DurableTask.DurableOrchestrationStatus"
+            }
+          },
+          "continuationToken": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Newtonsoft.Json.Linq.JToken": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Newtonsoft.Json.Linq.JToken"
+        }
+      },
+      "NodaTime.Instant": {
+        "type": "object",
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
