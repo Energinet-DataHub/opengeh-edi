@@ -29,6 +29,8 @@ public class RejectedForwardMeteredDataMessageDtoBuilder
         TransactionId: TransactionId.New(),
         OriginalTransactionIdReference: TransactionId.New());
 
+    private ActorRole _documentReceiverRole = ActorRole.MeteredDataResponsible;
+
     public RejectedForwardMeteredDataMessageDto Build()
     {
         return new RejectedForwardMeteredDataMessageDto(
@@ -38,7 +40,8 @@ public class RejectedForwardMeteredDataMessageDtoBuilder
             _receiver.ActorNumber,
             _receiver.ActorRole,
             _relatedToMessageId,
-            _series);
+            _series,
+            _documentReceiverRole);
     }
 
     public RejectedForwardMeteredDataMessageDtoBuilder WithEventId(EventId eventId)
@@ -74,6 +77,12 @@ public class RejectedForwardMeteredDataMessageDtoBuilder
     public RejectedForwardMeteredDataMessageDtoBuilder WithSeries(RejectedForwardMeteredDataSeries series)
     {
         _series = series;
+        return this;
+    }
+
+    public RejectedForwardMeteredDataMessageDtoBuilder WithDocumentReceiverRole(ActorRole documentReceiverRole)
+    {
+        _documentReceiverRole = documentReceiverRole;
         return this;
     }
 }

@@ -13,14 +13,15 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.EnqueueActorMessages;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
 public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TRejectedData>(ILogger logger)
     : EnqueueActorMessagesHandlerBase(logger)
-        where TAcceptedData : class
-        where TRejectedData : class
+        where TAcceptedData : IEnqueueAcceptedDataDto
+        where TRejectedData : IEnqueueRejectedDataDto
 {
     protected override Task EnqueueActorMessagesV1Async(
         Guid serviceBusMessageId,
@@ -43,6 +44,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
             return EnqueueRejectedMessagesAsync(
                 serviceBusMessageId,
                 orchestrationInstanceId,
+                enqueueActorMessages.OrchestrationStartedByActor,
                 rejectedData,
                 cancellationToken);
         }
@@ -62,6 +64,7 @@ public abstract class EnqueueActorMessagesValidatedHandlerBase<TAcceptedData, TR
     protected abstract Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
+        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
         TRejectedData rejectedData,
         CancellationToken cancellationToken);
 }

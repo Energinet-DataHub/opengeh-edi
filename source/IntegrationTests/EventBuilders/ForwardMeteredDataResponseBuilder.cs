@@ -31,10 +31,10 @@ using PMResolution = Energinet.DataHub.ProcessManager.Components.Abstractions.Va
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
-public static class MeteredDataForMeteringPointEventBuilder
+public static class ForwardMeteredDataResponseBuilder
 {
     public static ServiceBusMessage GenerateAcceptedFrom(
-        ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointMessageInputV1,
+        ForwardMeteredDataInputV1 forwardMeteredDataInput,
         (ActorNumber ActorNumber, ActorRole ActorRole) receiverActor,
         Guid orchestrationInstanceId,
         DocumentFormat documentFormat)
@@ -46,31 +46,31 @@ public static class MeteredDataForMeteringPointEventBuilder
             invariantPattern = InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd'T'HH':'mm':'ss'Z'");
         }
 
-        var meteringPointId = requestMeteredDataForMeteringPointMessageInputV1.MeteringPointId
-            ?? throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1.MeteringPointId), "MeteringPointId must be set");
+        var meteringPointId = forwardMeteredDataInput.MeteringPointId
+            ?? throw new ArgumentNullException(nameof(forwardMeteredDataInput.MeteringPointId), "MeteringPointId must be set");
 
-        var meteringPointType = requestMeteredDataForMeteringPointMessageInputV1.MeteringPointType != null
-            ? PMMeteringPointType.FromName(requestMeteredDataForMeteringPointMessageInputV1.MeteringPointType)
-            : throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1.MeteringPointType), "MeteringPointType must be set");
+        var meteringPointType = forwardMeteredDataInput.MeteringPointType != null
+            ? PMMeteringPointType.FromName(forwardMeteredDataInput.MeteringPointType)
+            : throw new ArgumentNullException(nameof(forwardMeteredDataInput.MeteringPointType), "MeteringPointType must be set");
 
-        var productNumber = requestMeteredDataForMeteringPointMessageInputV1.ProductNumber
-            ?? throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1.ProductNumber), "ProductNumber must be set");
+        var productNumber = forwardMeteredDataInput.ProductNumber
+            ?? throw new ArgumentNullException(nameof(forwardMeteredDataInput.ProductNumber), "ProductNumber must be set");
 
-        var measureUnit = requestMeteredDataForMeteringPointMessageInputV1.MeasureUnit != null
-            ? PMMeasureUnit.FromName(requestMeteredDataForMeteringPointMessageInputV1.MeasureUnit)
-            : throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1.MeasureUnit), "MeasureUnit must be set");
+        var measureUnit = forwardMeteredDataInput.MeasureUnit != null
+            ? PMMeasureUnit.FromName(forwardMeteredDataInput.MeasureUnit)
+            : throw new ArgumentNullException(nameof(forwardMeteredDataInput.MeasureUnit), "MeasureUnit must be set");
 
-        var resolution = requestMeteredDataForMeteringPointMessageInputV1.Resolution != null
-            ? PMResolution.FromName(requestMeteredDataForMeteringPointMessageInputV1.Resolution)
-            : throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1.Resolution), "Resolution must be set");
+        var resolution = forwardMeteredDataInput.Resolution != null
+            ? PMResolution.FromName(forwardMeteredDataInput.Resolution)
+            : throw new ArgumentNullException(nameof(forwardMeteredDataInput.Resolution), "Resolution must be set");
 
-        var startDateTime = invariantPattern.Parse(requestMeteredDataForMeteringPointMessageInputV1.StartDateTime).Value.ToDateTimeOffset();
+        var startDateTime = invariantPattern.Parse(forwardMeteredDataInput.StartDateTime).Value.ToDateTimeOffset();
 
-        var endDateTime = requestMeteredDataForMeteringPointMessageInputV1.EndDateTime != null
-            ? invariantPattern.Parse(requestMeteredDataForMeteringPointMessageInputV1.EndDateTime).Value.ToDateTimeOffset()
-            : throw new ArgumentNullException(nameof(requestMeteredDataForMeteringPointMessageInputV1), "EndDateTime must be set");
+        var endDateTime = forwardMeteredDataInput.EndDateTime != null
+            ? invariantPattern.Parse(forwardMeteredDataInput.EndDateTime).Value.ToDateTimeOffset()
+            : throw new ArgumentNullException(nameof(forwardMeteredDataInput), "EndDateTime must be set");
 
-        var acceptedEnergyObservations = requestMeteredDataForMeteringPointMessageInputV1.MeteredDataList
+        var acceptedEnergyObservations = forwardMeteredDataInput.MeteredDataList
             .Select(eo => new ReceiversWithMeteredDataV1.AcceptedMeteredData(
                 Position: int.Parse(eo.Position!),
                 EnergyQuantity: eo.EnergyQuantity != null ? decimal.Parse(eo.EnergyQuantity.TrimEnd('M'), CultureInfo.InvariantCulture) : null,
@@ -94,11 +94,11 @@ public static class MeteredDataForMeteringPointEventBuilder
         ];
 
         var acceptRequest = new ForwardMeteredDataAcceptedV1(
-            OriginalActorMessageId: requestMeteredDataForMeteringPointMessageInputV1.ActorMessageId,
+            OriginalActorMessageId: forwardMeteredDataInput.ActorMessageId,
             MeteringPointId: meteringPointId,
             MeteringPointType: meteringPointType,
             ProductNumber: productNumber,
-            RegistrationDateTime: InstantPattern.General.Parse(requestMeteredDataForMeteringPointMessageInputV1.RegistrationDateTime).Value.ToDateTimeOffset(),
+            RegistrationDateTime: InstantPattern.General.Parse(forwardMeteredDataInput.RegistrationDateTime).Value.ToDateTimeOffset(),
             StartDateTime: startDateTime,
             EndDateTime: endDateTime,
             ReceiversWithMeteredData: receiversWithMeteredData);
@@ -109,8 +109,8 @@ public static class MeteredDataForMeteringPointEventBuilder
             OrchestrationVersion = Brs_021_ForwardedMeteredData.V1.Version,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
-                ActorNumber = requestMeteredDataForMeteringPointMessageInputV1.ActorNumber,
-                ActorRole = PMActorRole.FromName(requestMeteredDataForMeteringPointMessageInputV1.ActorRole).ToActorRoleV1(),
+                ActorNumber = forwardMeteredDataInput.ActorNumber,
+                ActorRole = PMActorRole.FromName(forwardMeteredDataInput.ActorRole).ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
@@ -123,12 +123,16 @@ public static class MeteredDataForMeteringPointEventBuilder
         return serviceBusMessage;
     }
 
-    public static ServiceBusMessage GenerateRejectedFrom(ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointInputV1, Guid orchestrationInstanceId)
+    public static ServiceBusMessage GenerateRejectedFrom(
+        ForwardMeteredDataInputV1 requestMeteredDataForMeteringPointInputV1,
+        Guid orchestrationInstanceId,
+        (ActorNumber ActorNumber, ActorRole ActorRole) senderActor)
     {
         var rejectRequest = new ForwardMeteredDataRejectedV1(
             requestMeteredDataForMeteringPointInputV1.ActorMessageId,
             requestMeteredDataForMeteringPointInputV1.TransactionId,
             PMActorNumber.Create(requestMeteredDataForMeteringPointInputV1.ActorNumber),
+            PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole),
             PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole),
             PMBusinessReason.FromName(requestMeteredDataForMeteringPointInputV1.BusinessReason),
             new List<ValidationErrorDto>()
@@ -141,8 +145,8 @@ public static class MeteredDataForMeteringPointEventBuilder
             OrchestrationVersion = Brs_021_ForwardedMeteredData.V1.Version,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
-                ActorNumber = requestMeteredDataForMeteringPointInputV1.ActorNumber,
-                ActorRole = PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole).ToActorRoleV1(),
+                ActorNumber = senderActor.ActorNumber.Value,
+                ActorRole = senderActor.ActorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
