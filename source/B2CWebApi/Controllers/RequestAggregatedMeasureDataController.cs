@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Text;
+using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
-using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
@@ -35,7 +35,6 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 public class RequestAggregatedMeasureDataController : ControllerBase
 {
     private readonly UserContext<FrontendUser> _userContext;
-    private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
     private readonly IClock _clock;
@@ -43,23 +42,22 @@ public class RequestAggregatedMeasureDataController : ControllerBase
 
     public RequestAggregatedMeasureDataController(
         UserContext<FrontendUser> userContext,
-        DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
         IClock clock,
         IAuditLogger auditLogger)
     {
         _userContext = userContext;
-        _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
         _clock = clock;
         _auditLogger = auditLogger;
     }
 
+    [ApiVersion("1.0")]
     [HttpPost]
     [Authorize(Roles = "request-aggregated-measured-data:view")]
-    public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequestV1 request, CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
@@ -73,12 +71,11 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         var currentUser = _userContext.CurrentUser;
 
         var message =
-            RequestAggregatedMeasureDataDtoFactory.Create(
+            RequestAggregatedMeasureDataDtoFactoryV1.Create(
                 TransactionId.New(),
                 request,
                 currentUser.ActorNumber,
                 currentUser.MarketRole,
-                _dateTimeZone,
                 _clock.GetCurrentInstant());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(

@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
@@ -87,12 +88,14 @@ public static class B2CWebApiRequests
         var request = new HttpRequestMessage(HttpMethod.Post, "/RequestAggregatedMeasureData")
         {
             Content = CreateJsonContent(
-                new RequestAggregatedMeasureDataMarketRequest(
-                    CalculationType: CalculationType.BalanceFixing,
+                new RequestAggregatedMeasureDataMarketRequestV1(
+                    BusinessReason: BusinessReason.BalanceFixing,
+                    SettlementMethod: SettlementMethod.NonProfiled,
+                    SettlementVersion: null,
                     MeteringPointType: null,
-                    StartDate: "2024-08-27T00:00:00Z",
-                    EndDate: "2024-08-28T00:00:00Z",
-                    GridArea: null,
+                    StartDate: Instant.FromUtc(2024, 08, 27, 22, 00),
+                    EndDate: Instant.FromUtc(2024, 08, 28, 22, 00),
+                    GridAreaCode: null,
                     EnergySupplierId: null,
                     BalanceResponsibleId: null)),
         };
