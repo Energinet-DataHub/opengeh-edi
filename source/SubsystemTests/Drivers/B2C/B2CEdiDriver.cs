@@ -108,11 +108,11 @@ public sealed class B2CEdiDriver : IDisposable
 
         var start = Instant.FromUtc(2024, 09, 01, 00, 00);
         await webApiClient.RequestWholesaleSettlementAsync(
-                body: new RequestWholesaleSettlementMarketRequest
+                body: new RequestWholesaleSettlementMarketRequestV1
                 {
-                    CalculationType = CalculationType.WholesaleFixing,
-                    StartDate = InstantPattern.General.Format(start),
-                    EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(30))),
+                    BusinessReason = BusinessReason.BalanceFixing,
+                    StartDate = start.ToDateTimeOffset(),
+                    EndDate = start.Plus(Duration.FromDays(30)).ToDateTimeOffset(),
                     GridArea = "804",
                 },
                 cancellationToken: cancellationToken)

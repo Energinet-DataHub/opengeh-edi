@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text;
+using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
@@ -56,10 +57,11 @@ public class RequestWholesaleSettlementController : ControllerBase
         _auditLogger = auditLogger;
     }
 
+    [ApiVersion("1.0")]
     [HttpPost]
     [Authorize(Roles = "request-wholesale-settlement:view")]
     public async Task<ActionResult> RequestAsync(
-        RequestWholesaleSettlementMarketRequest request,
+        RequestWholesaleSettlementMarketRequestV1 request,
         CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
@@ -74,12 +76,11 @@ public class RequestWholesaleSettlementController : ControllerBase
         var currentUser = _userContext.CurrentUser;
 
         var message =
-            RequestWholesaleSettlementDtoFactory.Create(
+            RequestWholesaleSettlementDtoFactoryV1.Create(
                 TransactionId.New(),
                 request,
                 currentUser.ActorNumber,
                 currentUser.MarketRole,
-                _dateTimeZone,
                 _clock.GetCurrentInstant());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
