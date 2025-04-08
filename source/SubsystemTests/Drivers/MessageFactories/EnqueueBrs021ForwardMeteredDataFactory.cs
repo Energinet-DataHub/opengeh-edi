@@ -89,8 +89,6 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         var rejected = new ForwardMeteredDataRejectedV1(
             OriginalActorMessageId: originalActorMessageId,
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            ForwardedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
-            ForwardedByActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             ForwardedForActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             BusinessReason: BusinessReason.PeriodicMetering,
             ValidationErrors:
