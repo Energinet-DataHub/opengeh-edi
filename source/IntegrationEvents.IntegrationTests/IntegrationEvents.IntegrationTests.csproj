@@ -28,7 +28,7 @@
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
         <ProjectReference Include="..\Contracts\Contracts.csproj" />
-        <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
+        <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
         <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
     </ItemGroup>
 

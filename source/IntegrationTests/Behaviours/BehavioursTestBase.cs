@@ -31,7 +31,7 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
