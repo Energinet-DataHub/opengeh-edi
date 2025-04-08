@@ -126,14 +126,15 @@ public static class B2CWebApiRequests
         var request = new HttpRequestMessage(HttpMethod.Post, "/RequestWholesaleSettlement")
         {
             Content = CreateJsonContent(
-                new RequestWholesaleSettlementMarketRequest(
-                    CalculationType: CalculationType.WholesaleFixing,
-                    StartDate: "2024-08-27T00:00:00Z",
-                    EndDate: "2024-08-28T00:00:00Z",
+                new RequestWholesaleSettlementMarketRequestV1(
+                    SettlementVersion: null,
+                    BusinessReason: BusinessReason.WholesaleFixing,
+                    StartDate: Instant.FromUtc(2024, 08, 27, 22, 00).ToDateTimeOffset(),
+                    EndDate: Instant.FromUtc(2024, 08, 28, 22, 00).ToDateTimeOffset(),
                     GridArea: null,
                     EnergySupplierId: null,
                     Resolution: null,
-                    PriceType: null)),
+                    ChargeType: null)),
         };
         return request;
     }
