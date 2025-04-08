@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
-using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
-using NodaTime;
-
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 /// <summary>
 /// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
-public record RequestAggregatedMeasureDataMarketRequestV1(
-    BusinessReason BusinessReason,
-    SettlementVersion? SettlementVersion,
-    SettlementMethod SettlementMethod,
-    Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType? MeteringPointType,
-    Instant StartDate,
-    Instant EndDate,
-    string? GridAreaCode,
-    ActorNumber? EnergySupplierId,
-    ActorNumber? BalanceResponsibleId);
+public record RequestAggregatedMeasureDataMarketRequest(
+    CalculationType CalculationType,
+    MeteringPointType? MeteringPointType,
+    string StartDate,
+    string EndDate,
+    string? GridArea,
+    string? EnergySupplierId,
+    string? BalanceResponsibleId);

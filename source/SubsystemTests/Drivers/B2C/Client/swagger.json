@@ -387,6 +387,22 @@
   },
   "components": {
     "schemas": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.BusinessReason": {
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "BalanceFixing",
+          "PreliminaryAggregation",
+          "WholesaleFixing",
+          "Correction"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
       "Energinet.DataHub.EDI.B2CWebApi.Models.CalculationType": {
         "type": "integer",
         "format": "int32",
@@ -504,9 +520,15 @@
         "additionalProperties": false,
         "properties": {
           "businessReason": {
+            "x-enumNames": [
+              "BalanceFixing",
+              "PreliminaryAggregation",
+              "WholesaleFixing",
+              "Correction"
+            ],
             "allOf": [
               {
-                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.BusinessReason"
               }
             ]
           },
@@ -514,14 +536,18 @@
             "nullable": true,
             "allOf": [
               {
-                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.SettlementVersion"
               }
             ]
           },
           "settlementMethod": {
+            "x-enumNames": [
+              "NonProfiled",
+              "Flex"
+            ],
             "allOf": [
               {
-                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.SettlementMethod"
               }
             ]
           },
@@ -529,43 +555,29 @@
             "nullable": true,
             "allOf": [
               {
-                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType"
               }
             ]
           },
           "startDate": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/NodaTime.Instant"
-              }
-            ]
+            "type": "string",
+            "format": "date-time"
           },
           "endDate": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/NodaTime.Instant"
-              }
-            ]
+            "type": "string",
+            "format": "date-time"
           },
           "gridAreaCode": {
             "type": "string",
             "nullable": true
           },
           "energySupplierId": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           },
           "balanceResponsibleId": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -618,55 +630,31 @@
           }
         }
       },
-      "Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects.ActorNumber": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "value": {
-            "type": "string",
-            "readOnly": true
-          }
-        }
+      "Energinet.DataHub.EDI.B2CWebApi.Models.SettlementMethod": {
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "NonProfiled",
+          "Flex"
+        ],
+        "enum": [
+          0,
+          1
+        ]
       },
-      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "readOnly": true
-          }
-        }
-      },
-      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "readOnly": true
-          }
-        }
-      },
-      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementMethod": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "readOnly": true
-          }
-        }
-      },
-      "Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.SettlementVersion": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "readOnly": true
-          }
-        }
+      "Energinet.DataHub.EDI.B2CWebApi.Models.SettlementVersion": {
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "FirstCorrection",
+          "SecondCorrection",
+          "ThirdCorrection"
+        ],
+        "enum": [
+          0,
+          1,
+          2
+        ]
       },
       "Microsoft.Azure.WebJobs.Extensions.DurableTask.DurableOrchestrationStatus": {
         "type": "object",
@@ -787,10 +775,6 @@
         "items": {
           "$ref": "#/components/schemas/Newtonsoft.Json.Linq.JToken"
         }
-      },
-      "NodaTime.Instant": {
-        "type": "object",
-        "additionalProperties": false
       }
     },
     "securitySchemes": {
