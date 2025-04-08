@@ -26,4 +26,5 @@ public enum DocumentType
     RequestWholesaleSettlement = 6,
     B2CRequestWholesaleSettlement = 7,
     Acknowledgement = 8,
+    NotifyValidatedMeasureData = 9,
 }
