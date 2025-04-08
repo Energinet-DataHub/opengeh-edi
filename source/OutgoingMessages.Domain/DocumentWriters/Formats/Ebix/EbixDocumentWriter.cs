@@ -86,6 +86,11 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return marketActivityRecords;
     }
 
+    protected TMarketActivityRecord ParseFrom<TMarketActivityRecord>(string payload)
+    {
+        return _parser.From<TMarketActivityRecord>(payload);
+    }
+
     protected Task WriteElementAsync(string name, string value, XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(writer);

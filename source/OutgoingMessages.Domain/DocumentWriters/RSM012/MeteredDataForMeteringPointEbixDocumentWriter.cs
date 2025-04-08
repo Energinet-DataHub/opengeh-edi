@@ -41,8 +41,10 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var forwardMeteredDataRecord in ParseFrom<MeteredDataForMeteringPointMarketActivityRecord>(marketActivityPayloads))
+        foreach (var forwardMeteredDataRecordPayload in marketActivityPayloads)
         {
+            var forwardMeteredDataRecord = ParseFrom<MeteredDataForMeteringPointMarketActivityRecord>(forwardMeteredDataRecordPayload);
+
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null)
                 .ConfigureAwait(false);
 
