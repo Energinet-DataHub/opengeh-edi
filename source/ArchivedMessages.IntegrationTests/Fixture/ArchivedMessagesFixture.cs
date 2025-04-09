@@ -159,7 +159,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         ActorRole? receiverRole = null,
         Instant? timestamp = null,
         MessageId? relatedToMessageId = null,
-        bool storeMessage = true)
+        bool storeMessage = true,
+        IReadOnlyCollection<string>? meteringPointIds = null)
     {
         var documentStream = new MemoryStream();
 
@@ -182,7 +183,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             businessReasons ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageTypeDto.IncomingMessage,
             new ArchivedMessageStreamDto(documentStream),
-            relatedToMessageId ?? null);
+            relatedToMessageId ?? null,
+            meteringPointIds ?? []);
 
         if (storeMessage)
             await ArchivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);

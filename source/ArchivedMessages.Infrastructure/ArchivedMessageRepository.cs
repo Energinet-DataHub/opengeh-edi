@@ -129,4 +129,26 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         return new MessageSearchResult(archivedMessages.ToList().AsReadOnly(), totalAmountOfMessages);
     }
+
+    public async Task<MessageSearchResult> SearchMeteringPointMessagesAsync(GetMeteringPointMessagesQuery queryInput, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(queryInput);
+        var input = new QueryBuilder(_authenticatedActor.CurrentActorIdentity).BuildFrom(queryInput);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var sql = $@"
+            {input.SqlStatement};
+            {input.SqlStatementTotalCount}";
+
+        using var multi = await connection.QueryMultipleAsync(sql, input.Parameters).ConfigureAwait(false);
+        var archivedMessages = (await multi.ReadAsync<MessageInfo>().ConfigureAwait(false)).ToList();
+        var totalAmountOfMessages = await multi.ReadSingleAsync<int>().ConfigureAwait(false);
+
+        // When navigating backwards the list must be reversed to get the correct order.
+        // Because sql use top to limit the result set and backwards is looking at the records from behind.
+        if (!queryInput.Pagination.NavigationForward)
+            archivedMessages.Reverse();
+
+        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly(), totalAmountOfMessages);
+    }
 }

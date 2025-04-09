@@ -105,5 +105,5 @@ public class ArchivedMessageDto
 
     public ArchivedMessageStreamDto ArchivedMessageStream { get; }
 
-    public IEnumerable<string>? MeteringPointsIds { get; }
+    public IEnumerable<string> MeteringPointsIds { get; }
 }

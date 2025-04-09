@@ -43,4 +43,12 @@ public interface IArchivedMessageRepository
     /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
     Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Search for messages related to a given metering point ID in the database
+    /// </summary>
+    /// <param name="queryInput"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
+    Task<MessageSearchResult> SearchMeteringPointMessagesAsync(GetMeteringPointMessagesQuery queryInput, CancellationToken cancellationToken);
 }

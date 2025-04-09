@@ -34,6 +34,19 @@ internal static class GetMessagesQueryMapper
             IncludeRelatedMessages: dto.IncludeRelatedMessages);
     }
 
+    internal static GetMeteringPointMessagesQuery Map(GetMeteringPointMessagesQueryDto dto)
+    {
+        return new GetMeteringPointMessagesQuery(
+            MeteringPointId: dto.MeteringPointId,
+            Pagination: SetSortedCursorBasedPagination(dto.Pagination),
+            CreationPeriod: SetMessageCreationPeriod(dto.CreationPeriod),
+            SenderNumber: dto.SenderNumber,
+            SenderRoleCode: dto.SenderRoleCode,
+            ReceiverNumber: dto.ReceiverNumber,
+            ReceiverRoleCode: dto.ReceiverRoleCode,
+            DocumentTypes: dto.DocumentTypes);
+    }
+
     private static SortedCursorBasedPagination SetSortedCursorBasedPagination(SortedCursorBasedPaginationDto dto)
     {
         return new SortedCursorBasedPagination(
