@@ -14,7 +14,6 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
 
