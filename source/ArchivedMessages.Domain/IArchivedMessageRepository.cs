@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain;
 
 /// <summary>
 /// Responsible for archiving messages.

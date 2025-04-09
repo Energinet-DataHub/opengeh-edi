@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Dapper;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -48,9 +49,9 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
         var sql = @"INSERT INTO [dbo].[ArchivedMessages]
-                       ([Id], [EventIds], [DocumentType], [ReceiverNumber], [ReceiverRoleCode], [SenderNumber], [SenderRoleCode], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId])
+                       ([Id], [EventIds], [DocumentType], [ReceiverNumber], [ReceiverRoleCode], [SenderNumber], [SenderRoleCode], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId], [MeteringPointsIds])
                        VALUES
-                       (@Id, @EventIds, @DocumentType, @ReceiverNumber, @ReceiverRoleCode, @SenderNumber, @SenderRoleCode, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId)";
+                       (@Id, @EventIds, @DocumentType, @ReceiverNumber, @ReceiverRoleCode, @SenderNumber, @SenderRoleCode, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId, @MeteringPointsIds)";
 
         var parameters = new
         {
@@ -66,6 +67,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
             FileStorageReference = message.FileStorageReference.Path,
             message.MessageId,
             RelatedToMessageId = message.RelatedToMessageId?.Value,
+            MeteringPointsIds = message.MeteringPointsIds.Distinct().ToString(),
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);

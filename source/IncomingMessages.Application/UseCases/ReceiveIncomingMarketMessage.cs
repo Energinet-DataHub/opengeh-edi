@@ -189,6 +189,12 @@ public class ReceiveIncomingMarketMessage
         IncomingDocumentType incomingDocumentType,
         CancellationToken cancellationToken)
     {
+        var meteringPointIds = incomingMessage is MeteredDataForMeteringPointMessageBase
+            ? incomingMessage.Series
+                .Select(series => ((MeteredDataForMeteringPointSeries)series).MeteringPointLocationId ?? string.Empty)
+                .Distinct()
+            : [];
+
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
                 new ArchivedMessageDto(
@@ -203,7 +209,8 @@ public class ReceiveIncomingMarketMessage
                     _clock.GetCurrentInstant(),
                     incomingMessage.BusinessReason,
                     ArchivedMessageTypeDto.IncomingMessage,
-                    incomingMarketMessageStream),
+                    incomingMarketMessageStream,
+                    meteringPointsIds: meteringPointIds),
                 cancellationToken)
             .ConfigureAwait(false);
     }

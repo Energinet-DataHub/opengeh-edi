@@ -34,6 +34,7 @@ public class ArchivedMessage
         string? businessReason,
         ArchivedMessageType archivedMessageType,
         ArchivedMessageStream archivedMessageStream,
+        string[] meteringPointsIds,
         MessageId? relatedToMessageId = null)
     {
         Id = id;
@@ -48,6 +49,7 @@ public class ArchivedMessage
         BusinessReason = businessReason;
         RelatedToMessageId = relatedToMessageId;
         ArchivedMessageStream = archivedMessageStream;
+        MeteringPointsIds = meteringPointsIds;
 
         var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(
             archivedMessageType,
@@ -85,6 +87,8 @@ public class ArchivedMessage
     public FileStorageReference FileStorageReference { get; }
 
     public ArchivedMessageStream ArchivedMessageStream { get; }
+
+    public string[] MeteringPointsIds { get; }
 
     private static string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType, string senderActorNumber, string receiverActorNumber)
     {

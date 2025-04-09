@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Application;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;

@@ -19,8 +19,6 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 public class ArchivedMessageDto
 {
-    public static readonly FileStorageCategory FileStorageCategory = ArchivedFile.FileStorageCategory;
-
     public ArchivedMessageDto(
         string? messageId,
         IReadOnlyList<EventId> eventIds,
@@ -47,10 +45,10 @@ public class ArchivedMessageDto
         string? businessReason,
         ArchivedMessageTypeDto archivedMessageType,
         IIncomingMarketMessageStream incomingMarketMessageStream,
-        MessageId? relatedToMessageId = null)
-        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStreamDto(incomingMarketMessageStream)) { }
+        IEnumerable<string>? meteringPointsIds = null)
+        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStreamDto(incomingMarketMessageStream), meteringPointsIds: meteringPointsIds) { }
 
-    public ArchivedMessageDto(
+    internal ArchivedMessageDto(
         string? messageId,
         IReadOnlyList<EventId> eventIds,
         string documentType,
@@ -62,7 +60,8 @@ public class ArchivedMessageDto
         string? businessReason,
         ArchivedMessageTypeDto archivedMessageType,
         ArchivedMessageStreamDto archivedMessageStream,
-        MessageId? relatedToMessageId = null)
+        MessageId? relatedToMessageId = null,
+        IEnumerable<string>? meteringPointsIds = null)
     {
         Id = ArchivedMessageIdDto.Create();
         MessageId = messageId;
@@ -77,6 +76,7 @@ public class ArchivedMessageDto
         RelatedToMessageId = relatedToMessageId;
         ArchivedMessageType = archivedMessageType;
         ArchivedMessageStream = archivedMessageStream;
+        MeteringPointsIds = meteringPointsIds ?? [];
     }
 
     public ArchivedMessageIdDto Id { get; }
@@ -104,4 +104,6 @@ public class ArchivedMessageDto
     public ArchivedMessageTypeDto ArchivedMessageType { get; }
 
     public ArchivedMessageStreamDto ArchivedMessageStream { get; }
+
+    public IEnumerable<string>? MeteringPointsIds { get; }
 }
