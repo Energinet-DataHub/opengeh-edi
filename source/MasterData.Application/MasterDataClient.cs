@@ -114,7 +114,7 @@ public sealed class MasterDataClient : IMasterDataClient
         CancellationToken cancellationToken)
     {
         var builder = ImmutableList.CreateBuilder<GridAreaOwnerDto>();
-        await foreach (var gridAreaOwner in _gridAreaRepository.GetAllGridAreaOwnersAsync(cancellationToken))
+        await foreach (var gridAreaOwner in _gridAreaRepository.GetAllGridAreaOwnersAsync(cancellationToken).ConfigureAwait(false))
         {
             builder.Add(
                 new GridAreaOwnerDto(

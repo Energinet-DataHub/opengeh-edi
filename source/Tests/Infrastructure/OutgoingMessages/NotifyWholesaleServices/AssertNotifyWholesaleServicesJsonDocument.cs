@@ -641,7 +641,6 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         decimal expectedAmount,
         QuantityQuality? expectedQuantityQuality)
     {
-        ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("Point")

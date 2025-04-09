@@ -23,28 +23,28 @@ public interface IDelegatedIncomingMessageSeries
     /// <summary>
     /// Whether the incoming message series is delegated
     /// </summary>
-    public bool IsDelegated { get; }
+    bool IsDelegated { get; }
 
     /// <summary>
     /// Who the incoming message series is delegated by (who originally was supposed to send the message)
     /// </summary>
-    public ActorNumber? OriginalActorNumber { get; }
+    ActorNumber? OriginalActorNumber { get; }
 
     /// <summary>
     /// The role of the actor which the series is delegated to
     ///     (the one who sends the message, and the queue that should receive it)
     /// </summary>
-    public ActorRole? RequestedByActorRole { get; }
+    ActorRole? RequestedByActorRole { get; }
 
     /// <summary>
     /// What grid areas the incoming message is delegated in (if any).
     ///     This is used if the GridArea is null and the message is delegated, then we need to know which grid areas
     ///     the message is delegated in, to make sure Wholesale only retrieves data in the delegated grid areas
     /// </summary>
-    public IReadOnlyCollection<string> DelegatedGridAreas { get; }
+    IReadOnlyCollection<string> DelegatedGridAreas { get; }
 
     /// <summary>
     /// Sets the incoming message series as delegated
     /// </summary>
-    public void DelegateSeries(ActorNumber? originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas);
+    void DelegateSeries(ActorNumber? originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas);
 }

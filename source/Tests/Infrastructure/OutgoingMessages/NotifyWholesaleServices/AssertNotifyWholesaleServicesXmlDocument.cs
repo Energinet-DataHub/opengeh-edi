@@ -405,7 +405,6 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         decimal expectedAmount,
         QuantityQuality? expectedQuantityQuality)
     {
-        ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = _documentAsserter
             .GetElements("Series[1]/Period/Point")!;
 
