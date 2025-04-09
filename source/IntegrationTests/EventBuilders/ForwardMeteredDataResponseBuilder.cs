@@ -131,8 +131,6 @@ public static class ForwardMeteredDataResponseBuilder
         var rejectRequest = new ForwardMeteredDataRejectedV1(
             requestMeteredDataForMeteringPointInputV1.ActorMessageId,
             requestMeteredDataForMeteringPointInputV1.TransactionId,
-            PMActorNumber.Create(requestMeteredDataForMeteringPointInputV1.ActorNumber),
-            PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole),
             PMActorRole.FromName(requestMeteredDataForMeteringPointInputV1.ActorRole),
             PMBusinessReason.FromName(requestMeteredDataForMeteringPointInputV1.BusinessReason),
             new List<ValidationErrorDto>()
