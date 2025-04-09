@@ -46,7 +46,7 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 
 builder.Services
     // Swagger
-    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API", null)
+    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API")
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
 
     // Logging
