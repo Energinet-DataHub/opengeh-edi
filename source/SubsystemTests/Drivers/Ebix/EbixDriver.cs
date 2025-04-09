@@ -17,7 +17,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Security;
-using System.Text;
 using System.Xml;
 using Xunit.Abstractions;
 
