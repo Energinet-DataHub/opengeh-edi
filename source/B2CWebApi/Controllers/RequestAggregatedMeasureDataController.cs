@@ -17,7 +17,9 @@ using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
+using Energinet.DataHub.EDI.B2CWebApi.Factories.V1;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -72,7 +74,6 @@ public class RequestAggregatedMeasureDataController : ControllerBase
 
         var message =
             RequestAggregatedMeasureDataDtoFactoryV1.Create(
-                TransactionId.New(),
                 request,
                 currentUser.ActorNumber,
                 currentUser.MarketRole,

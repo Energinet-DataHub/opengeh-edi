@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
-using ChargeType = Energinet.DataHub.EDI.B2CWebApi.Models.ChargeType;
+using ChargeType = Energinet.DataHub.EDI.B2CWebApi.Models.V1.ChargeType;
 using RequestWholesaleSettlementChargeType = Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models.RequestWholesaleSettlementChargeType;
 using RequestWholesaleSettlementSeries = Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models.RequestWholesaleSettlementSeries;
-using Resolution = Energinet.DataHub.EDI.B2CWebApi.Models.Resolution;
+using Resolution = Energinet.DataHub.EDI.B2CWebApi.Models.V1.Resolution;
 using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
+namespace Energinet.DataHub.EDI.B2CWebApi.Factories.V1;
 
 public static class RequestWholesaleSettlementDtoFactoryV1
 {
@@ -33,7 +33,6 @@ public static class RequestWholesaleSettlementDtoFactoryV1
     private const string Electricity = "23";
 
     public static RequestWholesaleSettlementDto Create(
-        TransactionId transactionId,
         RequestWholesaleSettlementMarketRequestV1 request,
         string senderNumber,
         string senderRole,
@@ -46,46 +45,43 @@ public static class RequestWholesaleSettlementDtoFactoryV1
         var chargeTypes = new List<RequestWholesaleSettlementChargeType>();
         if (request.ChargeType != null)
         {
-            chargeTypes.Add(new RequestWholesaleSettlementChargeType(null, MapChargeType(request.ChargeType)));
+            chargeTypes.Add(new RequestWholesaleSettlementChargeType(null, MapChargeTypeCode(request.ChargeType)));
         }
 
         var series = new RequestWholesaleSettlementSeries(
-            transactionId.Value,
-            request.StartDate.ToString(),
-            request.EndDate.ToString(),
-            request.GridArea,
-            request.EnergySupplierId,
-            MapToSettlementVersion(request),
-            MapToResolution(request),
-            null,
-            chargeTypes);
+            Id: TransactionId.New().Value,
+            StartDateAndOrTimeDateTime: request.StartDate.ToString(),
+            EndDateAndOrTimeDateTime: request.EndDate.ToString(),
+            MeteringGridAreaDomainId: request.GridArea,
+            EnergySupplierMarketParticipantId: request.EnergySupplierId,
+            SettlementVersion: MapSettlementVersionCode(request),
+            Resolution: MapResolutionCode(request),
+            ChargeOwner: null,
+            ChargeTypes: chargeTypes);
 
         return new RequestWholesaleSettlementDto(
-            senderNumber,
-            senderRoleCode,
-            DataHubDetails.DataHubActorNumber.Value,
-            ActorRole.MeteredDataAdministrator.Code,
-            MapToBusinessReasonCode(request),
-            WholesaleSettlementMessageType,
-            Guid.NewGuid().ToString(),
-            now.ToString(),
-            Electricity,
-            new[] { series });
+            SenderNumber: senderNumber,
+            SenderRoleCode: senderRoleCode,
+            ReceiverNumber: DataHubDetails.DataHubActorNumber.Value,
+            ReceiverRoleCode: ActorRole.MeteredDataAdministrator.Code,
+            BusinessReason: MapBusinessReasonCode(request),
+            MessageType: WholesaleSettlementMessageType,
+            MessageId: MessageId.New().Value,
+            CreatedAt: now.ToString(),
+            BusinessType: Electricity,
+            Series: [series]);
     }
 
-    private static string? MapToResolution(RequestWholesaleSettlementMarketRequestV1 request)
+    private static string? MapResolutionCode(RequestWholesaleSettlementMarketRequestV1 request)
     {
         return request.Resolution switch
         {
-            Resolution.Hourly => BuildingBlocks.Domain.Models.Resolution.Hourly.Code,
-            Resolution.Daily => BuildingBlocks.Domain.Models.Resolution.Daily.Code,
             Resolution.Monthly => BuildingBlocks.Domain.Models.Resolution.Monthly.Code,
-            Resolution.QuarterHourly => BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Code,
             _ => null,
         };
     }
 
-    private static string? MapChargeType(ChargeType? requestChargeType)
+    private static string? MapChargeTypeCode(ChargeType? requestChargeType)
     {
         return requestChargeType switch
         {
@@ -96,29 +92,29 @@ public static class RequestWholesaleSettlementDtoFactoryV1
         };
     }
 
-    private static string? MapToSettlementVersion(RequestWholesaleSettlementMarketRequestV1 calculationType)
+    private static string? MapSettlementVersionCode(RequestWholesaleSettlementMarketRequestV1 calculationType)
     {
         return calculationType.SettlementVersion switch
         {
-            Models.SettlementVersion.FirstCorrection => SettlementVersion.FirstCorrection.Code,
-            Models.SettlementVersion.SecondCorrection => SettlementVersion.SecondCorrection.Code,
-            Models.SettlementVersion.ThirdCorrection => SettlementVersion.ThirdCorrection.Code,
+            Models.V1.SettlementVersion.FirstCorrection => SettlementVersion.FirstCorrection.Code,
+            Models.V1.SettlementVersion.SecondCorrection => SettlementVersion.SecondCorrection.Code,
+            Models.V1.SettlementVersion.ThirdCorrection => SettlementVersion.ThirdCorrection.Code,
             _ => null,
         };
     }
 
-    private static string MapToBusinessReasonCode(RequestWholesaleSettlementMarketRequestV1 calculationType)
+    private static string MapBusinessReasonCode(RequestWholesaleSettlementMarketRequestV1 request)
     {
-        return calculationType.BusinessReason switch
+        return request.BusinessReason switch
         {
-            Models.BusinessReason.PreliminaryAggregation => BusinessReason.PreliminaryAggregation.Code,
-            Models.BusinessReason.BalanceFixing => BusinessReason.BalanceFixing.Code,
-            Models.BusinessReason.WholesaleFixing => BusinessReason.WholesaleFixing.Code,
-            Models.BusinessReason.Correction => BusinessReason.Correction.Code,
+            Models.V1.BusinessReason.PreliminaryAggregation => BusinessReason.PreliminaryAggregation.Code,
+            Models.V1.BusinessReason.BalanceFixing => BusinessReason.BalanceFixing.Code,
+            Models.V1.BusinessReason.WholesaleFixing => BusinessReason.WholesaleFixing.Code,
+            Models.V1.BusinessReason.Correction => BusinessReason.Correction.Code,
             _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                calculationType,
-                "Unknown CalculationType"),
+                nameof(request),
+                request,
+                "Unknown BusinessReason"),
         };
     }
 

@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 
-public enum SettlementMethod
+public enum Resolution
 {
-    NonProfiled,
-    Flex,
+    Monthly,
 }

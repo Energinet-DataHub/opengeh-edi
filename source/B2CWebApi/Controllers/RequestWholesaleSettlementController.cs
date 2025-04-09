@@ -17,7 +17,9 @@ using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
+using Energinet.DataHub.EDI.B2CWebApi.Factories.V1;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -35,7 +37,6 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 public class RequestWholesaleSettlementController : ControllerBase
 {
     private readonly UserContext<FrontendUser> _userContext;
-    private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
     private readonly IClock _clock;
@@ -43,14 +44,12 @@ public class RequestWholesaleSettlementController : ControllerBase
 
     public RequestWholesaleSettlementController(
         UserContext<FrontendUser> userContext,
-        DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
         IClock clock,
         IAuditLogger auditLogger)
     {
         _userContext = userContext;
-        _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
         _clock = clock;
@@ -77,7 +76,6 @@ public class RequestWholesaleSettlementController : ControllerBase
 
         var message =
             RequestWholesaleSettlementDtoFactoryV1.Create(
-                TransactionId.New(),
                 request,
                 currentUser.ActorNumber,
                 currentUser.MarketRole,

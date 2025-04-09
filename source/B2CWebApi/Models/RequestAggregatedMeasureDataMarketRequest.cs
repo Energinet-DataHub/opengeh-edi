@@ -14,6 +14,15 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
+public enum MeteringPointType
+{
+    Production,
+    FlexConsumption,
+    TotalConsumption,
+    NonProfiledConsumption,
+    Exchange,
+}
+
 /// <summary>
 /// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>

@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
-using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
-using SettlementMethod = Energinet.DataHub.EDI.B2CWebApi.Models.SettlementMethod;
-using SettlementVersion = Energinet.DataHub.EDI.B2CWebApi.Models.SettlementVersion;
+using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.V1.MeteringPointType;
+using SettlementMethod = Energinet.DataHub.EDI.B2CWebApi.Models.V1.SettlementMethod;
+using SettlementVersion = Energinet.DataHub.EDI.B2CWebApi.Models.V1.SettlementVersion;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
+namespace Energinet.DataHub.EDI.B2CWebApi.Factories.V1;
 
 public static class RequestAggregatedMeasureDataDtoFactoryV1
 {
@@ -31,7 +31,6 @@ public static class RequestAggregatedMeasureDataDtoFactoryV1
     private const string Electricity = "23";
 
     public static RequestAggregatedMeasureDataDto Create(
-        TransactionId transactionId,
         RequestAggregatedMeasureDataMarketRequestV1 request,
         string senderNumber,
         string senderRole,
@@ -42,86 +41,75 @@ public static class RequestAggregatedMeasureDataDtoFactoryV1
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
         var series = new RequestAggregatedMeasureDataSeries(
-            Id: transactionId.Value,
-            MarketEvaluationPointType: MapEvaluationPointType(request),
-            MarketEvaluationSettlementMethod: MapSettlementMethod(request),
+            Id: TransactionId.New().Value,
+            MarketEvaluationPointType: MapEvaluationPointTypeCode(request),
+            MarketEvaluationSettlementMethod: MapSettlementMethodCode(request),
             StartDateAndOrTimeDateTime: request.StartDate.ToString(),
             EndDateAndOrTimeDateTime: request.EndDate.ToString(),
             MeteringGridAreaDomainId: request.GridAreaCode,
             EnergySupplierMarketParticipantId: request.EnergySupplierId,
             BalanceResponsiblePartyMarketParticipantId: request.BalanceResponsibleId,
-            SettlementVersion: SetSettlementVersion(request));
+            SettlementVersion: MapSettlementVersionCode(request));
 
         return new RequestAggregatedMeasureDataDto(
             SenderNumber: senderNumber,
             SenderRoleCode: senderRoleCode,
             ReceiverNumber: DataHubDetails.DataHubActorNumber.Value,
             ReceiverRoleCode: ActorRole.MeteredDataAdministrator.Code,
-            BusinessReason: MapToBusinessReasonCode(request),
+            BusinessReason: MapBusinessReasonCode(request),
             MessageType: AggregatedMeasureDataMessageType,
-            MessageId: Guid.NewGuid().ToString(),
+            MessageId: MessageId.New().Value,
             CreatedAt: now.ToString(),
             BusinessType: Electricity,
             Serie: [series]);
     }
 
-    private static string? SetSettlementVersion(RequestAggregatedMeasureDataMarketRequestV1 calculationType)
+    private static string? MapSettlementVersionCode(RequestAggregatedMeasureDataMarketRequestV1 request)
     {
-        if (calculationType.SettlementVersion == SettlementVersion.FirstCorrection)
+        return request.SettlementVersion switch
         {
-            return "D01";
-        }
-
-        if (calculationType.SettlementVersion == SettlementVersion.SecondCorrection)
-        {
-            return "D02";
-        }
-
-        if (calculationType.SettlementVersion == SettlementVersion.ThirdCorrection)
-        {
-            return "D03";
-        }
-
-        return null;
-    }
-
-    private static string MapToBusinessReasonCode(RequestAggregatedMeasureDataMarketRequestV1 requestCalculationType)
-    {
-        return requestCalculationType.BusinessReason switch
-        {
-            Models.BusinessReason.PreliminaryAggregation => BusinessReason.PreliminaryAggregation.Code,
-            Models.BusinessReason.BalanceFixing => BusinessReason.BalanceFixing.Code,
-            Models.BusinessReason.WholesaleFixing => BusinessReason.WholesaleFixing.Code,
-            Models.BusinessReason.Correction => BusinessReason.Correction.Code,
-            _ => throw new ArgumentOutOfRangeException(nameof(requestCalculationType), requestCalculationType, "Unknown CalculationType"),
+            SettlementVersion.SecondCorrection => BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection.Code,
+            SettlementVersion.ThirdCorrection => BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Code,
+            SettlementVersion.FirstCorrection => BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection.Code,
+            _ => null,
         };
     }
 
-    private static string? MapEvaluationPointType(RequestAggregatedMeasureDataMarketRequestV1 request)
+    private static string MapBusinessReasonCode(RequestAggregatedMeasureDataMarketRequestV1 request)
+    {
+        return request.BusinessReason switch
+        {
+            Models.V1.BusinessReason.PreliminaryAggregation => BusinessReason.PreliminaryAggregation.Code,
+            Models.V1.BusinessReason.BalanceFixing => BusinessReason.BalanceFixing.Code,
+            Models.V1.BusinessReason.WholesaleFixing => BusinessReason.WholesaleFixing.Code,
+            Models.V1.BusinessReason.Correction => BusinessReason.Correction.Code,
+            _ => throw new ArgumentOutOfRangeException(nameof(request), request, "Unknown BusinessReason"),
+        };
+    }
+
+    private static string? MapEvaluationPointTypeCode(RequestAggregatedMeasureDataMarketRequestV1 request)
     {
         switch (request.MeteringPointType)
         {
             case MeteringPointType.Production:
-                return "E18";
-            case MeteringPointType.FlexConsumption:
-            case MeteringPointType.TotalConsumption:
-            case MeteringPointType.NonProfiledConsumption:
-                return "E17";
+                return BuildingBlocks.Domain.Models.MeteringPointType.Production.Code;
+            case MeteringPointType.Consumption:
+                return BuildingBlocks.Domain.Models.MeteringPointType.Consumption.Code;
             case MeteringPointType.Exchange:
-                return "E20";
+                return BuildingBlocks.Domain.Models.MeteringPointType.Exchange.Code;
         }
 
         return null;
     }
 
-    private static string? MapSettlementMethod(RequestAggregatedMeasureDataMarketRequestV1 request)
+    private static string? MapSettlementMethodCode(RequestAggregatedMeasureDataMarketRequestV1 request)
     {
         switch (request.SettlementMethod)
         {
             case SettlementMethod.Flex:
-                return "D01";
+                return BuildingBlocks.Domain.Models.SettlementMethod.Flex.Code;
             case SettlementMethod.NonProfiled:
-                return "E02";
+                return BuildingBlocks.Domain.Models.SettlementMethod.NonProfiled.Code;
         }
 
         return null;

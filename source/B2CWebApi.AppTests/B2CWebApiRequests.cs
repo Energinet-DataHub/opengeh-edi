@@ -14,10 +14,11 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using NodaTime;
-using BusinessReason = Energinet.DataHub.EDI.B2CWebApi.Models.BusinessReason;
-using SettlementMethod = Energinet.DataHub.EDI.B2CWebApi.Models.SettlementMethod;
+using BusinessReason = Energinet.DataHub.EDI.B2CWebApi.Models.V1.BusinessReason;
+using SettlementMethod = Energinet.DataHub.EDI.B2CWebApi.Models.V1.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
 

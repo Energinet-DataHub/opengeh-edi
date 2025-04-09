@@ -12,17 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 
-/// <summary>
-/// Responsible for carrying the market message data from the incoming message before any data validation.
-/// </summary>
-public sealed record RequestWholesaleSettlementMarketRequestV1(
-    SettlementVersion? SettlementVersion,
-    BusinessReason BusinessReason,
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate,
-    string? GridArea,
-    string? EnergySupplierId,
-    Resolution? Resolution,
-    ChargeType? ChargeType);
+public enum BusinessReason
+{
+    BalanceFixing,
+    PreliminaryAggregation,
+    WholesaleFixing,
+    Correction,
+}
