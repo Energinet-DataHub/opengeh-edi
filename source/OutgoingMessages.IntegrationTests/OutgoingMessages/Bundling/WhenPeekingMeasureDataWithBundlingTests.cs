@@ -76,7 +76,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
             .ToList();
 
         // var maxBundleSize = bundlingOptions.MaxBundleSize; // Max bundle size = 2000
-        const int maxBundleSize = 100;
+        const int maxBundleSize = 2000;
         var documentFormat = DocumentFormat.Ebix;
 
         var messagesToEnqueue = Enumerable.Range(0, maxBundleSize)
