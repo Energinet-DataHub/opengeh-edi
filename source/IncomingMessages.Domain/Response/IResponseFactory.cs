@@ -26,12 +26,12 @@ public interface IResponseFactory
     /// <summary>
     /// Specifies the handled CIM format
     /// </summary>
-    public DocumentFormat HandledFormat { get; }
+    DocumentFormat HandledFormat { get; }
 
     /// <summary>
     /// Create response message
     /// </summary>
     /// <param name="result"></param>
     /// <returns><see cref="ResponseMessage"/></returns>
-    public ResponseMessage From(Result result);
+    ResponseMessage From(Result result);
 }

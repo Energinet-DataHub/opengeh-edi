@@ -31,10 +31,10 @@ jobs:
       matrix:
         tests_filter_expression:
           - name: Tests
-            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
+            paths: \source\Tests\bin\Release\net9.0\Energinet.DataHub.EDI.Tests.dll
 
           - name: OutgoingMessages Unit Tests
-            paths: \source\OutgoingMessages.UnitTests\bin\Release\net8.0\Energinet.DataHub.EDI.OutgoingMessages.UnitTests.dll
+            paths: \source\OutgoingMessages.UnitTests\bin\Release\net9.0\Energinet.DataHub.EDI.OutgoingMessages.UnitTests.dll
 
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
@@ -51,115 +51,115 @@ jobs:
       matrix:
         tests_filter_expression:
           - name: Architecture Tests
-            paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
+            paths: \source\ArchitectureTests\bin\Release\net9.0\Energinet.DataHub.EDI.ArchitectureTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: B2BApi AppTests
-            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
+            paths: \source\Tests\bin\Release\net9.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: B2CWebApi AppTests
-            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2CWebApi.AppTests.dll
+            paths: \source\Tests\bin\Release\net9.0\Energinet.DataHub.EDI.B2CWebApi.AppTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName!~V2)&(DisplayName!~WholesaleServices)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests WholesaleServices
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName!~V2)&(DisplayName~WholesaleServices)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests V2
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName!~WholesaleServices)&(DisplayName!~WithDelegation)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests V2 with Delegation
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName!~WholesaleServices)&(DisplayName~WithDelegation)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests V2 WholesaleServices
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName~WholesaleServices)&(DisplayName!~WithDelegation)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IncomingRequests V2 WholesaleServices with Delegation
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)&(DisplayName~V2)&(DisplayName~WholesaleServices)&(DisplayName~WithDelegation)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IntegrationEvents - BalanceFixing
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IntegrationEvents)&(DisplayName~BalanceFixing)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - IntegrationEvents - Other
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IntegrationEvents)&(DisplayName!~BalanceFixing)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Behaviours - Other
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName!~Behaviours.IncomingRequests)&(DisplayName!~Behaviours.IntegrationEvents)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - CalculationResults
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName~IntegrationTests.CalculationResults)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: Integration tests - Other
-            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            paths: \source\IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationTests.dll
             filter: (DisplayName!~IntegrationTests.Behaviours)&(DisplayName!~IntegrationTests.CalculationResults)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: ArchivedMessages - integration tests
-            paths: \source\ArchivedMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.dll
+            paths: \source\ArchivedMessages.IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: IntegrationEvents - integration tests
-            paths: \source\IntegrationEvents.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.dll
+            paths: \source\IntegrationEvents.IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: MasterData - integration tests
-            paths: \source\MasterData.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.MasterData.IntegrationTests.dll
+            paths: \source\MasterData.IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.MasterData.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: IncomingMessages - integration tests
-            paths: \source\IncomingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.dll
+            paths: \source\IncomingMessages.IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: OutgoingMessages - integration tests
-            paths: \source\OutgoingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.dll
+            paths: \source\OutgoingMessages.IntegrationTests\bin\Release\net9.0\Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip

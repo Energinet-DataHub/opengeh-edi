@@ -24,10 +24,10 @@ public interface IIntegrationEventProcessor
     /// <summary>
     /// Event type the processor handles
     /// </summary>
-    public string EventTypeToHandle { get; }
+    string EventTypeToHandle { get; }
 
     /// <summary>
     /// Process a single integration event
     /// </summary>
-    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
+    Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
 }

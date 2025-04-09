@@ -38,8 +38,6 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     [Produces("text/plain")]
     public async Task<ActionResult> RequestAsync(Guid id, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(id);
-
         await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.ArchivedMessagesGet,

@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 public interface IActorRequestsClient
 {
-    public Task<int> EnqueueAggregatedMeasureDataAsync(
+    Task<int> EnqueueAggregatedMeasureDataAsync(
         EventId eventId,
         Guid orchestrationInstanceId,
         MessageId originalMessageId,
@@ -38,7 +38,7 @@ public interface IActorRequestsClient
         AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
         CancellationToken cancellationToken);
 
-    public Task<int> EnqueueWholesaleServicesAsync(
+    Task<int> EnqueueWholesaleServicesAsync(
         WholesaleServicesQueryParameters wholesaleServicesQueryParameters,
         ActorNumber requestedByActorNumber,
         ActorRole requestedByActorRole,
@@ -50,15 +50,15 @@ public interface IActorRequestsClient
         TransactionId originalTransactionId,
         CancellationToken cancellationToken);
 
-    public Task EnqueueRejectAggregatedMeasureDataRequestAsync(
+    Task EnqueueRejectAggregatedMeasureDataRequestAsync(
         RejectedEnergyResultMessageDto rejectedEnergyResultMessageDto,
         CancellationToken cancellationToken);
 
-    public Task EnqueueRejectWholesaleServicesRequestAsync(
+    Task EnqueueRejectWholesaleServicesRequestAsync(
         RejectedWholesaleServicesMessageDto enqueueRejectedMessageDto,
         CancellationToken cancellationToken);
 
-    public Task EnqueueRejectAggregatedMeasureDataRequestWithNoDataAsync(
+    Task EnqueueRejectAggregatedMeasureDataRequestWithNoDataAsync(
         Guid orchestrationInstanceId,
         MessageId originalMessageId,
         EventId eventId,
@@ -71,7 +71,7 @@ public interface IActorRequestsClient
         AggregatedTimeSeriesQueryParameters aggregatedTimeSeriesQueryParameters,
         CancellationToken cancellationToken);
 
-    public Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
+    Task EnqueueRejectWholesaleServicesRequestWithNoDataAsync(
         WholesaleServicesQueryParameters queryParameters,
         ActorNumber requestedByActorNumber,
         ActorRole requestedByActorRole,

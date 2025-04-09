@@ -131,7 +131,7 @@ public class ActorRequestsClient(
         var wholesaleServicesQuery = _wholesaleServicesQueries.GetAsync(wholesaleServicesQueryParameters);
 
         var enqueuedCount = 0;
-        await foreach (var data in wholesaleServicesQuery)
+        await foreach (var data in wholesaleServicesQuery.ConfigureAwait(false))
         {
             var points = data.TimeSeriesPoints.OrderBy(p => p.Time)
                 .Select(
