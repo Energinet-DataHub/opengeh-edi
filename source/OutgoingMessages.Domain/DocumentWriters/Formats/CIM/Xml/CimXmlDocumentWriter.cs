@@ -52,6 +52,14 @@ public abstract class CimXmlDocumentWriter : IDocumentWriter
         return new MarketDocumentStream(stream);
     }
 
+    public Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<FileStorageFile> marketActivityRecords,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     public virtual bool HandlesType(DocumentType documentType)
     {
         ArgumentNullException.ThrowIfNull(documentType);

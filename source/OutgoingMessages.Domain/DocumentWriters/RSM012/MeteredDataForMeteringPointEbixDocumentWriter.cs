@@ -29,6 +29,32 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
             typeCode: "E66"),
         parser)
 {
+    private const string PayloadEnergyTimeSeriesName = "PayloadEnergyTimeSeries";
+    private const string FunctionName = "Function";
+    private const string IdentificationName = "Identification";
+    private const string ListAgencyIdentifierName = "listAgencyIdentifier";
+    private const string ObservationTimeSeriesPeriodName = "ObservationTimeSeriesPeriod";
+    private const string ResolutionDurationName = "ResolutionDuration";
+    private const string IntervalEnergyObservationName = "IntervalEnergyObservation";
+    private const string PositionName = "Position";
+    private const string EnergyQuantityName = "EnergyQuantity";
+    private const string QuantityQualityName = "QuantityQuality";
+    private const string QuantityMissingName = "QuantityMissing";
+    private const string TrueValue = "true";
+    private const string OriginalBusinessDocumentName = "OriginalBusinessDocument";
+    private const string MeteringPointDomainLocationName = "MeteringPointDomainLocation";
+    private const string DetailMeasurementMeteringPointCharacteristicName = "DetailMeasurementMeteringPointCharacteristic";
+    private const string TypeOfMeteringPointName = "TypeOfMeteringPoint";
+    private const string IncludedProductCharacteristicName = "IncludedProductCharacteristic";
+    private const string UnitTypeName = "UnitType";
+    private const string? Value260 = "260";
+    private const string? Value9 = "9";
+    private const string EndName = "End";
+    private const string StartName = "Start";
+    private const string? Value6 = "6";
+
+    private static readonly NumberFormatInfo _numberFormatInfo = NumberFormatInfo.InvariantInfo;
+
     public override bool HandlesType(DocumentType documentType)
     {
         return documentType == DocumentType.NotifyValidatedMeasureData;
@@ -45,79 +71,79 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
         {
             var forwardMeteredDataRecord = ParseFrom<MeteredDataForMeteringPointMarketActivityRecord>(forwardMeteredDataRecordPayload);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null)
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, PayloadEnergyTimeSeriesName, null)
                 .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
-                "Identification",
+                IdentificationName,
                 null,
                 forwardMeteredDataRecord.TransactionId.Value).ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Function", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
-            await writer.WriteStringAsync("9").ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, FunctionName, null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, ListAgencyIdentifierName, null, Value6).ConfigureAwait(false);
+            await writer.WriteStringAsync(Value9).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ObservationTimeSeriesPeriod", null)
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, ObservationTimeSeriesPeriodName, null)
                 .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
-                "ResolutionDuration",
+                ResolutionDurationName,
                 null,
                 forwardMeteredDataRecord.Resolution.Code)
             .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
-                "Start",
+                StartName,
                 null,
                 forwardMeteredDataRecord.StartedDateTime.ToString())
             .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
-                "End",
+                EndName,
                 null,
                 forwardMeteredDataRecord.EndedDateTime.ToString())
             .ConfigureAwait(false);
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IncludedProductCharacteristic", null).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, IncludedProductCharacteristicName, null).ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "9").ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, IdentificationName, null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, ListAgencyIdentifierName, null, Value9).ConfigureAwait(false);
             await writer.WriteStringAsync(forwardMeteredDataRecord.Product).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "UnitType", null).ConfigureAwait(false);
-            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, UnitTypeName, null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, ListAgencyIdentifierName, null, Value260).ConfigureAwait(false);
             await writer.WriteStringAsync(forwardMeteredDataRecord.QuantityMeasureUnit.Code).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, DetailMeasurementMeteringPointCharacteristicName, null).ConfigureAwait(false);
             await WriteCodeWithCodeListReferenceAttributesAsync(
-                "TypeOfMeteringPoint",
-                EbixCode.Of(forwardMeteredDataRecord.MarketEvaluationPointType),
-                writer)
-            .ConfigureAwait(false);
+                    TypeOfMeteringPointName,
+                    EbixCode.Of(forwardMeteredDataRecord.MarketEvaluationPointType),
+                    writer)
+                .ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringPointDomainLocation", null).ConfigureAwait(false);
-            await WriteGlnOrEicCodeWithAttributesAsync("Identification", forwardMeteredDataRecord.MarketEvaluationPointNumber, writer).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, MeteringPointDomainLocationName, null).ConfigureAwait(false);
+            await WriteGlnOrEicCodeWithAttributesAsync(IdentificationName, forwardMeteredDataRecord.MarketEvaluationPointNumber, writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             foreach (var energyObservation in forwardMeteredDataRecord.EnergyObservations)
             {
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null).ConfigureAwait(false);
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, IntervalEnergyObservationName, null).ConfigureAwait(false);
 
                 await writer.WriteElementStringAsync(
                     DocumentDetails.Prefix,
-                    "Position",
+                    PositionName,
                     null,
                     energyObservation.Position.ToString())
                 .ConfigureAwait(false);
@@ -126,9 +152,9 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                 {
                     await writer.WriteElementStringAsync(
                         DocumentDetails.Prefix,
-                        "EnergyQuantity",
+                        EnergyQuantityName,
                         null,
-                        energyObservation.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo))
+                        energyObservation.Quantity.Value.ToString(_numberFormatInfo))
                     .ConfigureAwait(false);
 
                     if (energyObservation.Quality is not null)
@@ -136,7 +162,7 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                         var quality = EbixCode.Of(energyObservation.Quality);
                         if (quality is not null)
                         {
-                            await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", quality, writer)
+                            await WriteCodeWithCodeListReferenceAttributesAsync(QuantityQualityName, quality, writer)
                                 .ConfigureAwait(false);
                         }
                     }
@@ -145,9 +171,9 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                 {
                     await writer.WriteElementStringAsync(
                         DocumentDetails.Prefix,
-                        "QuantityMissing",
+                        QuantityMissingName,
                         null,
-                        "true")
+                        TrueValue)
                     .ConfigureAwait(false);
                 }
 
@@ -158,13 +184,155 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
             {
                 await writer.WriteElementStringAsync(
                     DocumentDetails.Prefix,
-                    "OriginalBusinessDocument",
+                    OriginalBusinessDocumentName,
                     null,
                     forwardMeteredDataRecord.OriginalTransactionIdReferenceId.Value)
                 .ConfigureAwait(false);
             }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
+        }
+    }
+
+    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<FileStorageFile> marketActivityPayloads, XmlWriter writer)
+    {
+        ArgumentNullException.ThrowIfNull(marketActivityPayloads);
+        ArgumentNullException.ThrowIfNull(writer);
+
+        foreach (var payloadFile in marketActivityPayloads)
+        {
+            // var payloadString = await payloadFile.ReadAsStringAsync().ConfigureAwait(false);
+            var forwardMeteredDataRecord = await ParseFromAsync<MeteredDataForMeteringPointMarketActivityRecord>(
+                    payloadFile,
+                    CancellationToken.None)
+                .ConfigureAwait(false);
+            // Dispose the payload after reading, to avoid holding all files in a bundle in memory
+            // payloadString = null; // "Dispose" the string by removing the reference to it
+            payloadFile.Dispose();
+            GC.Collect();
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, PayloadEnergyTimeSeriesName, null)
+                .ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(
+                DocumentDetails.Prefix,
+                IdentificationName,
+                null,
+                forwardMeteredDataRecord.TransactionId.Value).ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, FunctionName, null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, ListAgencyIdentifierName, null, Value6).ConfigureAwait(false);
+            await writer.WriteStringAsync(Value9).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, ObservationTimeSeriesPeriodName, null)
+                .ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(
+                DocumentDetails.Prefix,
+                ResolutionDurationName,
+                null,
+                forwardMeteredDataRecord.Resolution.Code)
+            .ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(
+                DocumentDetails.Prefix,
+                StartName,
+                null,
+                forwardMeteredDataRecord.StartedDateTime.ToString())
+            .ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(
+                DocumentDetails.Prefix,
+                EndName,
+                null,
+                forwardMeteredDataRecord.EndedDateTime.ToString())
+            .ConfigureAwait(false);
+
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, IncludedProductCharacteristicName, null).ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, IdentificationName, null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, ListAgencyIdentifierName, null, Value9).ConfigureAwait(false);
+            await writer.WriteStringAsync(forwardMeteredDataRecord.Product).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, UnitTypeName, null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, ListAgencyIdentifierName, null, Value260).ConfigureAwait(false);
+            await writer.WriteStringAsync(forwardMeteredDataRecord.QuantityMeasureUnit.Code).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, DetailMeasurementMeteringPointCharacteristicName, null).ConfigureAwait(false);
+            await WriteCodeWithCodeListReferenceAttributesAsync(
+                TypeOfMeteringPointName,
+                EbixCode.Of(forwardMeteredDataRecord.MarketEvaluationPointType),
+                writer)
+            .ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, MeteringPointDomainLocationName, null).ConfigureAwait(false);
+            await WriteGlnOrEicCodeWithAttributesAsync(IdentificationName, forwardMeteredDataRecord.MarketEvaluationPointNumber, writer).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            foreach (var energyObservation in forwardMeteredDataRecord.EnergyObservations)
+            {
+                await writer.WriteStartElementAsync(DocumentDetails.Prefix, IntervalEnergyObservationName, null).ConfigureAwait(false);
+
+                await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    PositionName,
+                    null,
+                    energyObservation.Position.ToString())
+                .ConfigureAwait(false);
+
+                if (energyObservation.Quantity is not null)
+                {
+                    await writer.WriteElementStringAsync(
+                        DocumentDetails.Prefix,
+                        EnergyQuantityName,
+                        null,
+                        energyObservation.Quantity.Value.ToString(_numberFormatInfo))
+                    .ConfigureAwait(false);
+
+                    if (energyObservation.Quality is not null)
+                    {
+                        var quality = EbixCode.Of(energyObservation.Quality);
+                        if (quality is not null)
+                        {
+                            await WriteCodeWithCodeListReferenceAttributesAsync(QuantityQualityName, quality, writer)
+                                .ConfigureAwait(false);
+                        }
+                    }
+                }
+                else
+                {
+                    await writer.WriteElementStringAsync(
+                        DocumentDetails.Prefix,
+                        QuantityMissingName,
+                        null,
+                        TrueValue)
+                    .ConfigureAwait(false);
+                }
+
+                await writer.WriteEndElementAsync().ConfigureAwait(false);
+            }
+
+            if (forwardMeteredDataRecord.OriginalTransactionIdReferenceId is not null)
+            {
+                await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    OriginalBusinessDocumentName,
+                    null,
+                    forwardMeteredDataRecord.OriginalTransactionIdReferenceId.Value)
+                .ConfigureAwait(false);
+            }
+
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.FlushAsync().ConfigureAwait(false);
         }
     }
 }

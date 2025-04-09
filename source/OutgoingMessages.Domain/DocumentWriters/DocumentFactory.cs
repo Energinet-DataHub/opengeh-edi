@@ -28,7 +28,7 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<MarketDocumentStream> CreateFromAsync(
+    public async Task<MarketDocumentStream> CreateFromAsync(
         OutgoingMessageBundle bundle,
         DocumentFormat documentFormat,
         Instant timestamp,
@@ -44,17 +44,25 @@ public class DocumentFactory
             ?? throw new OutgoingMessageException(
                 $"Could not handle document type {bundle.DocumentType} in format {documentFormat}");
 
-        return documentWriter.WriteAsync(
-            new OutgoingMessageHeader(
-                bundle.BusinessReason,
-                bundle.SenderId.Value,
-                bundle.SenderRole.Code,
-                bundle.Receiver.Number.Value,
-                bundle.DocumentReceiver.ActorRole.Code,
-                bundle.MessageId.Value,
-                bundle.RelatedToMessageId?.Value,
-                timestamp),
-            bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList(),
-            cancellationToken);
+        // var contentTasks = bundle.OutgoingMessages
+        //     .Select(message => message.GetContent().ReadAsStringAsync());
+        //
+        // var payloads = await Task.WhenAll(contentTasks).ConfigureAwait(false);
+
+        var marketDocumentStream = await documentWriter.WriteAsync(
+                header: new OutgoingMessageHeader(
+                    BusinessReason: bundle.BusinessReason,
+                    SenderId: bundle.SenderId.Value,
+                    SenderRole: bundle.SenderRole.Code,
+                    ReceiverId: bundle.Receiver.Number.Value,
+                    ReceiverRole: bundle.DocumentReceiver.ActorRole.Code,
+                    MessageId: bundle.MessageId.Value,
+                    RelatedToMessageId: bundle.RelatedToMessageId?.Value,
+                    TimeStamp: timestamp),
+                marketActivityRecords: bundle.OutgoingMessages.Select(message => message.GetContent()).ToList(),
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        return marketDocumentStream;
     }
 }

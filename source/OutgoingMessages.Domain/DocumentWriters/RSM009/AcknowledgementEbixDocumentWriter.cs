@@ -156,4 +156,9 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
     }
+
+    protected override Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<FileStorageFile> marketActivityPayloads, XmlWriter writer)
+    {
+        throw new NotImplementedException();
+    }
 }

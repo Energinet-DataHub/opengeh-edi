@@ -187,4 +187,9 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             // End PayloadEnergyTimeSeries
         }
     }
+
+    protected override Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<FileStorageFile> marketActivityPayloads, XmlWriter writer)
+    {
+        throw new NotImplementedException();
+    }
 }

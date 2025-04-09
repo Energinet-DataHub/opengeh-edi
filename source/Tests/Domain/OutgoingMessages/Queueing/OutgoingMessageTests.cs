@@ -117,7 +117,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
-    public void Ensure_energy_result_can_be_deserialized_to_market_activity_record()
+    public async Task Ensure_energy_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
         var serializer = new Serializer();
@@ -131,7 +131,7 @@ public class OutgoingMessageTests
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
-        var deserializedContent = serializer.Deserialize<TimeSeriesMarketActivityRecord>(outgoingMessage.GetSerializedContent());
+        var deserializedContent = serializer.Deserialize<TimeSeriesMarketActivityRecord>(await outgoingMessage.GetContent().ReadAsStringAsync());
         energyResultMessageDto.Series.Should().BeEquivalentTo(
             deserializedContent,
             "because the point should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
@@ -141,7 +141,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
-    public void Ensure_accepted_energy_result_can_be_deserialized_to_market_activity_record()
+    public async Task Ensure_accepted_energy_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
         var serializer = new Serializer();
@@ -155,7 +155,7 @@ public class OutgoingMessageTests
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
-        var deserializedContent = serializer.Deserialize<TimeSeriesMarketActivityRecord>(outgoingMessage.GetSerializedContent());
+        var deserializedContent = serializer.Deserialize<TimeSeriesMarketActivityRecord>(await outgoingMessage.GetContent().ReadAsStringAsync());
         acceptedEnergyResultMessageDto.Series.Should().BeEquivalentTo(
             deserializedContent,
             "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
@@ -165,7 +165,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
-    public void Ensure_rejected_energy_result_can_be_deserialized_to_market_activity_record()
+    public async Task Ensure_rejected_energy_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
         var serializer = new Serializer();
@@ -178,7 +178,7 @@ public class OutgoingMessageTests
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
-        var deserializedContent = serializer.Deserialize<RejectedTimeSerieMarketActivityRecord>(outgoingMessage.GetSerializedContent());
+        var deserializedContent = serializer.Deserialize<RejectedTimeSerieMarketActivityRecord>(await outgoingMessage.GetContent().ReadAsStringAsync());
         rejectedEnergyResultMessageDto.Series.Should().BeEquivalentTo(
             deserializedContent,
             "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
@@ -188,7 +188,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
-    public void Ensure_wholesale_services_can_be_deserialized_to_market_activity_record()
+    public async Task Ensure_wholesale_services_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
         var serializer = new Serializer();
@@ -201,14 +201,19 @@ public class OutgoingMessageTests
             serializer,
             SystemClock.Instance.GetCurrentInstant());
 
+        var outgoingMessagesContent = await Task.WhenAll(
+            outgoingMessages
+                    .Select(om => om.GetContent().ReadAsStringAsync().AsTask())
+                    .ToList());
+
         // Assert
-        outgoingMessages.Should()
+        outgoingMessagesContent.Should()
             .AllSatisfy(
-                outgoingMesssage =>
+                outgoingMessageContent =>
                 {
                     var deserializedContent =
                         serializer.Deserialize<WholesaleCalculationMarketActivityRecord>(
-                            outgoingMesssage.GetSerializedContent());
+                            outgoingMessageContent);
                     wholesaleServicesMessageDto.Series.Should().BeEquivalentTo(
                         deserializedContent,
                         "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
@@ -219,7 +224,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
-    public void Ensure_accepted_wholesale_services_result_can_be_deserialized_to_market_activity_record()
+    public async Task Ensure_accepted_wholesale_services_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
         var serializer = new Serializer();
@@ -232,7 +237,7 @@ public class OutgoingMessageTests
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
-        var deserializedContent = serializer.Deserialize<WholesaleCalculationMarketActivityRecord>(outgoingMessage.GetSerializedContent());
+        var deserializedContent = serializer.Deserialize<WholesaleCalculationMarketActivityRecord>(await outgoingMessage.GetContent().ReadAsStringAsync());
         acceptedWholesaleServicesMessageDto.Series.Should().BeEquivalentTo(
             deserializedContent,
             "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
@@ -242,7 +247,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
-    public void Ensure_rejected_wholesale_services_can_be_deserialized_to_market_activity_record()
+    public async Task Ensure_rejected_wholesale_services_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
         var serializer = new Serializer();
@@ -255,7 +260,7 @@ public class OutgoingMessageTests
             SystemClock.Instance.GetCurrentInstant());
 
         // Assert
-        var deserializedContent = serializer.Deserialize<RejectedWholesaleServicesRecord>(outgoingMessage.GetSerializedContent());
+        var deserializedContent = serializer.Deserialize<RejectedWholesaleServicesRecord>(await outgoingMessage.GetContent().ReadAsStringAsync());
         rejectedWholesaleServicesMessageDto.Series.Should().BeEquivalentTo(
             deserializedContent,
             "the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");

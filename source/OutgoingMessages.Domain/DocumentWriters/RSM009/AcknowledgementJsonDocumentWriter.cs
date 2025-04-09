@@ -79,6 +79,14 @@ public sealed class AcknowledgementJsonDocumentWriter(IMessageRecordParser parse
         return new MarketDocumentStream(stream);
     }
 
+    public Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<FileStorageFile> marketActivityRecords,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     private void WriteSeries(
         RejectedForwardMeteredDataRecord rejectedForwardMeteredDataRecord,
         Utf8JsonWriter writer)

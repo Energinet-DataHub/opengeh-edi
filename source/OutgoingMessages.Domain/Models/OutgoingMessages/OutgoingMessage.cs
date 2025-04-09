@@ -21,11 +21,13 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
+[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "?")]
 public class OutgoingMessage
 {
     public static readonly FileStorageCategory FileStorageCategory = FileStorageCategory.OutgoingMessage();
 
-    private string? _serializedContent;
+    // private string? _serializedContent;
+    private FileStorageFile? _content;
 
     public OutgoingMessage(
         EventId eventId,
@@ -50,7 +52,7 @@ public class OutgoingMessage
         BusinessReason = businessReason;
         MessageCreatedFromProcess = messageCreatedFromProcess;
         GridAreaCode = gridAreaCode;
-        _serializedContent = serializedContent;
+        // _serializedContent = serializedContent;
         RelatedToMessageId = relatedToMessageId;
         Receiver = receiver;
         DocumentReceiver = documentReceiver;
@@ -59,6 +61,8 @@ public class OutgoingMessage
         ExternalId = externalId;
         CalculationId = calculationId;
         PeriodStartedAt = periodStartedAt;
+
+        SetContent(serializedContent);
     }
 
     /// <summary>
@@ -99,6 +103,7 @@ public class OutgoingMessage
         // DocumentReceiver, EF will set this after the constructor
         // Receiver, EF will set this after the constructor
         // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
+        // _content is set later in OutgoingMessageRepository, by getting the content from File Storage
     }
 
     public OutgoingMessageId Id { get; }
@@ -174,18 +179,36 @@ public class OutgoingMessage
         AssignedBundleId = bundleId;
     }
 
-    public void SetSerializedContent(string serializedMessageContent)
+    // public void SetSerializedContent(string serializedMessageContent)
+    // {
+    //     _serializedContent = serializedMessageContent;
+    // }
+
+    public void SetContent(string content)
     {
-        _serializedContent = serializedMessageContent;
+        _content = new FileStorageFile(content);
     }
 
-    [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
-    public string GetSerializedContent()
+    public void SetContent(FileStorageFile fileStorageFile)
     {
-        if (_serializedContent == null)
-            throw new InvalidOperationException($"{nameof(OutgoingMessage)}.{nameof(_serializedContent)} is null which shouldn't be possible. Make sure the {nameof(OutgoingMessage)} is retrieved by a {nameof(IOutgoingMessageRepository)}, which sets the {nameof(_serializedContent)} field");
+        _content = fileStorageFile;
+    }
 
-        return _serializedContent;
+    // [SuppressMessage("Design", "CA1024:Use properties where appropriate", Justification = "Can cause error as a property because of serialization and message record maybe being null at the time")]
+    // public string GetSerializedContent()
+    // {
+    //     if (_serializedContent == null)
+    //         throw new InvalidOperationException($"{nameof(OutgoingMessage)}.{nameof(_serializedContent)} is null which shouldn't be possible. Make sure the {nameof(OutgoingMessage)} is retrieved by a {nameof(IOutgoingMessageRepository)}, which sets the {nameof(_serializedContent)} field");
+    //
+    //     return _serializedContent;
+    // }
+
+    public FileStorageFile GetContent()
+    {
+        if (_content == null)
+            throw new InvalidOperationException($"{nameof(OutgoingMessage)}.{nameof(_content)} is null which shouldn't be possible. Make sure the {nameof(OutgoingMessage)} is retrieved by a {nameof(IOutgoingMessageRepository)}, which sets the {nameof(_content)} field");
+
+        return _content!;
     }
 
     /// <summary>

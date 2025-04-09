@@ -17,33 +17,64 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// <summary>
 /// A file downloaded from File Storage, using a IFileStorageClient/>
 /// </summary>
-public sealed record FileStorageFile(Stream Stream) : IDisposable
+public sealed record FileStorageFile : IDisposable
 {
     private string? _contentAsString;
+    private Stream? _contentAsStream;
+
+    public FileStorageFile(Stream stream)
+    {
+        _contentAsStream = stream;
+    }
+
+    public FileStorageFile(string content)
+    {
+        _contentAsString = content;
+    }
 
     /// <summary>
-    /// The <see cref="Stream"/> contains the stream from file storage. If using a DataLakeFileStorageClient the file is downloaded the first time this stream is read.
+    /// Reads the content as a stream.
     /// </summary>
-    public Stream Stream { get; } = Stream;
+    public Stream ReadAsStream()
+    {
+        if (_contentAsStream != null)
+            return _contentAsStream;
+
+        if (_contentAsString is null)
+            throw new NullReferenceException("Content and stream is null, cannot read from it");
+
+        var memoryStream = new MemoryStream();
+        using var streamWriter = new StreamWriter(memoryStream);
+        streamWriter.Write(_contentAsString);
+        streamWriter.Flush();
+        memoryStream.Position = 0;
+
+        _contentAsStream = memoryStream;
+
+        return _contentAsStream;
+    }
 
     /// <summary>
-    /// Reads and caches the underlying stream into a string
+    /// Reads (and caches) the underlying stream into a string
     /// </summary>
-    public async Task<string> ReadAsStringAsync()
+    public async ValueTask<string> ReadAsStringAsync()
     {
         if (!string.IsNullOrEmpty(_contentAsString))
             return _contentAsString;
 
-        var stream = Stream;
-        if (stream.Position != 0 && !stream.CanSeek)
+        if (_contentAsStream is null)
+            throw new NullReferenceException("Stream and content is null, cannot read from it");
+
+        if (_contentAsStream.Position != 0 && !_contentAsStream.CanSeek)
             throw new InvalidOperationException("Stream is already read from, and cannot perform seek to reset position");
 
-        stream.Position = 0;
+        _contentAsStream.Position = 0;
 
-#pragma warning disable CA2000 // We cannot dispose the stream reader, disposing a stream reader disposes the underlying stream, which means we can't read it again
-        var streamReader = new StreamReader(stream);
-#pragma warning restore CA2000
+        using var streamReader = new StreamReader(_contentAsStream);
         _contentAsString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+
+        await _contentAsStream.DisposeAsync().ConfigureAwait(false);
+        _contentAsStream = null;
 
         return _contentAsString;
     }
@@ -59,7 +90,9 @@ public sealed record FileStorageFile(Stream Stream) : IDisposable
     {
         if (disposing)
         {
-            Stream.Dispose();
+            _contentAsString = null; // "Dispose" string by setting it to null
+            _contentAsStream?.Dispose();
+            _contentAsStream = null;
         }
     }
 }

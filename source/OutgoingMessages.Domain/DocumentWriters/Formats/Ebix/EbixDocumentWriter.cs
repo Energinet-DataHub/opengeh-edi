@@ -58,6 +58,43 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return new MarketDocumentStream(stream);
     }
 
+    public async Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<FileStorageFile> marketActivityRecords,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
+        // var stream = new MarketDocumentWriterMemoryStream();
+
+        var path = Path.Combine(
+            "C://",
+            "temp",
+            "write",
+            "file.txt");
+
+        var directoryPath = Path.GetDirectoryName(path)!;
+        if (!Directory.Exists(directoryPath))
+            Directory.CreateDirectory(directoryPath);
+
+        var fileStream = new FileStream(
+            path,
+            FileMode.Create,
+            FileAccess.ReadWrite);
+
+        using (var writer = XmlWriter.Create(fileStream, settings))
+        {
+            await WriteHeaderAsync(header, _documentDetails, writer, null).ConfigureAwait(false);
+            await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
+            await WriteEndAsync(writer).ConfigureAwait(false);
+        }
+
+        fileStream.Position = 0;
+        await fileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+        return new MarketDocumentStream(new FileStorageFile(fileStream));
+    }
+
     public abstract bool HandlesType(DocumentType documentType);
 
 #pragma warning disable CA1822
@@ -74,6 +111,8 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer);
 
+    protected abstract Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<FileStorageFile> marketActivityPayloads, XmlWriter writer);
+
     protected IReadOnlyCollection<TMarketActivityRecord> ParseFrom<TMarketActivityRecord>(IReadOnlyCollection<string> payloads)
     {
         ArgumentNullException.ThrowIfNull(payloads);
@@ -89,6 +128,11 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     protected TMarketActivityRecord ParseFrom<TMarketActivityRecord>(string payload)
     {
         return _parser.From<TMarketActivityRecord>(payload);
+    }
+
+    protected ValueTask<TMarketActivityRecord> ParseFromAsync<TMarketActivityRecord>(FileStorageFile payload, CancellationToken cancellationToken)
+    {
+        return _parser.FromAsync<TMarketActivityRecord>(payload.ReadAsStream(), cancellationToken);
     }
 
     protected Task WriteElementAsync(string name, string value, XmlWriter writer)

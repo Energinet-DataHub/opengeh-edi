@@ -21,11 +21,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 public record MarketDocumentStream : StreamValueObject, IMarketDocumentStream
 {
     public MarketDocumentStream(IArchivedFile archivedFile)
-        : base(archivedFile?.Document.Stream)
+        : base(archivedFile.Document.Stream)
     { }
 
     public MarketDocumentStream(FileStorageFile fileStorageFile)
-        : base(fileStorageFile?.Stream) { }
+        : base(fileStorageFile.ReadAsStream()) { }
 
     public MarketDocumentStream(MarketDocumentWriterMemoryStream stream)
         : base(stream)

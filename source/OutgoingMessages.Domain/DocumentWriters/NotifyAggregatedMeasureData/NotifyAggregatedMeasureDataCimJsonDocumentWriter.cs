@@ -60,6 +60,14 @@ public sealed class NotifyAggregatedMeasureDataCimJsonDocumentWriter(
         return new MarketDocumentStream(stream);
     }
 
+    public Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<FileStorageFile> marketActivityRecords,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecords);

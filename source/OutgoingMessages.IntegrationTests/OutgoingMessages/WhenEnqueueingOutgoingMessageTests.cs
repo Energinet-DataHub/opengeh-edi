@@ -272,7 +272,7 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
         fileStorageReference.Should().NotBeNull();
 
         var fileContent = await GetFileContentFromFileStorageAsync("outgoing", fileStorageReference!);
-        fileContent.Should().Be(outgoingMessage.GetSerializedContent());
+        fileContent.Should().Be(await outgoingMessage.GetContent().ReadAsStringAsync());
     }
 
     [Fact]

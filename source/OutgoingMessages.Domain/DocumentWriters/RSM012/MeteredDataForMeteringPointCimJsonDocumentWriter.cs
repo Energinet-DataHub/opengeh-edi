@@ -60,6 +60,14 @@ public class MeteredDataForMeteringPointCimJsonDocumentWriter(IMessageRecordPars
         return new MarketDocumentStream(stream);
     }
 
+    public Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<FileStorageFile> marketActivityRecords,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     private Document ParseFrom(OutgoingMessageHeader header, IReadOnlyCollection<string> transactions)
     {
         ArgumentNullException.ThrowIfNull(transactions);

@@ -181,6 +181,8 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         Assert.NotNull(peekResult);
         Assert.Equal(biggestPossibleBundle.MessageId, peekResult.MessageId);
 
+        peekResult.Bundle.Flush();
+        GC.Collect();
         peekResult.Bundle.Seek(0, SeekOrigin.Begin);
         var filePath = Path.Combine("C://", "temp", $"bundle-{documentFormat.Name.ToLower()}-{measureDataForLongestPeriodCount}points-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
         var directoryPath = Path.GetDirectoryName(filePath)!;

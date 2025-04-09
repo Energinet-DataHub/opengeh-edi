@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessageStream
 {
     public ArchivedMessageStream(FileStorageFile fileStorageFile)
-        : base(fileStorageFile?.Stream) { }
+        : base(fileStorageFile.ReadAsStream()) { }
 
     /// <summary>
     /// This is only intended for testing and mapping purposes

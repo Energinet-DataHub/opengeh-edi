@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 public sealed record ArchivedMessageStreamDto : StreamValueObject, IArchivedMessageStream
 {
     public ArchivedMessageStreamDto(FileStorageFile fileStorageFile)
-        : base(fileStorageFile?.Stream) { }
+        : base(fileStorageFile.ReadAsStream()) { }
 
     public ArchivedMessageStreamDto(IMarketDocumentStream marketDocumentStream)
         : base(marketDocumentStream?.Stream) { }

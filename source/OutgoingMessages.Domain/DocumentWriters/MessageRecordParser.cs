@@ -34,4 +34,9 @@ public class MessageRecordParser : IMessageRecordParser
     {
         return _serializer.Deserialize<TMessageRecord>(payload);
     }
+
+    public ValueTask<TMessageRecord> FromAsync<TMessageRecord>(Stream payload, CancellationToken cancellationToken)
+    {
+        return _serializer.DeserializeAsync<TMessageRecord>(payload, cancellationToken);
+    }
 }

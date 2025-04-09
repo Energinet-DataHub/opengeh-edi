@@ -47,7 +47,7 @@ public class OutgoingMessageRepository(
         // Must await here to make sure the file is uploaded correctly before adding the outgoing message to the db context
         await _fileStorageClient.UploadAsync(
                 message.FileStorageReference,
-                message.GetSerializedContent())
+                await message.GetContent().ReadAsStringAsync().ConfigureAwait(false))
             .ConfigureAwait(false);
 
         _context.OutgoingMessages.Add(message);
@@ -169,9 +169,7 @@ public class OutgoingMessageRepository(
             .DownloadAsync(outgoingMessage.FileStorageReference, cancellationToken)
             .ConfigureAwait(false);
 
-        var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
-
-        outgoingMessage.SetSerializedContent(messageRecord);
+        outgoingMessage.SetContent(fileStorageFile);
     }
 
     private IQueryable<OutgoingMessage> GetMessagesReadyToBeBundledQuery()

@@ -31,4 +31,6 @@ public interface IMessageRecordParser
     /// </summary>
     /// <param name="payload"></param>
     TMessageRecord From<TMessageRecord>(string payload);
+
+    ValueTask<TMessageRecord> FromAsync<TMessageRecord>(Stream payload, CancellationToken cancellationToken);
 }
