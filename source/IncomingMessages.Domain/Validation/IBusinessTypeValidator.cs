@@ -22,5 +22,5 @@ public interface IBusinessTypeValidator
     /// <summary>
     /// Validates Business Type
     /// </summary>
-    public Task<Result> ValidateAsync(string? businessType, CancellationToken cancellationToken);
+    Task<Result> ValidateAsync(string? businessType, CancellationToken cancellationToken);
 }

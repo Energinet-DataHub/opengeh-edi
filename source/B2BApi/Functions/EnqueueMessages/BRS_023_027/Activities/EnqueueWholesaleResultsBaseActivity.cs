@@ -46,7 +46,10 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
 
         var activityStopwatch = Stopwatch.StartNew();
         var databricksStopwatch = Stopwatch.StartNew();
-        await foreach (var queryResult in _wholesaleResultEnumerator.GetAsync(query))
+
+        var wholesaleResults = _wholesaleResultEnumerator.GetAsync(query);
+
+        await foreach (var wholesaleResult in wholesaleResults.ConfigureAwait(false))
         {
             databricksStopwatch.Stop();
             // Only log databricks query time if it took more than 1 second
@@ -56,19 +59,19 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
                     "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
                     databricksStopwatch.Elapsed,
                     query.GetType().Name,
-                    queryResult.Result?.ExternalId.Value,
+                    wholesaleResult.Result?.ExternalId.Value,
                     input.Actor,
                     input.CalculationId,
                     input.EventId);
             }
 
-            if (queryResult.IsSuccess)
+            if (wholesaleResult.IsSuccess)
             {
                 using var scope = _serviceScopeFactory.CreateScope();
                 try
                 {
                     var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                    await EnqueueAndCommitWholesaleResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
+                    await EnqueueAndCommitWholesaleResult(scopedOutgoingMessagesClient, wholesaleResult.Result!).ConfigureAwait(false);
 
                     numberOfHandledResults++;
                 }
@@ -79,7 +82,7 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
                         ex,
                         "Enqueue and commit threw exception for wholesale result, query type: {QueryType}, external id: {ExternalId}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
                         query.GetType().Name,
-                        queryResult.Result?.ExternalId.Value,
+                        wholesaleResult.Result?.ExternalId.Value,
                         input.Actor,
                         input.CalculationId,
                         input.EventId);

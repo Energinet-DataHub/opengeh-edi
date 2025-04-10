@@ -24,22 +24,22 @@ public interface IIncomingMessageSeries : IDelegatedIncomingMessageSeries
     /// <summary>
     /// Id of the incoming message series
     /// </summary>
-    public string TransactionId { get; }
+    string TransactionId { get; }
 
     /// <summary>
     /// Start Date and Time of the incoming message series
     /// </summary>
-    public string StartDateTime { get; }
+    string StartDateTime { get; }
 
     /// <summary>
     /// End Date and Time of the incoming message series
     /// </summary>
-    public string? EndDateTime { get; }
+    string? EndDateTime { get; }
 
     /// <summary>
     /// Grid Area of the incoming message series
     /// </summary>
-    public string? GridArea { get; }
+    string? GridArea { get; }
 
     /// <summary>
     /// Get the actor number from the series based on the role. Eg. if the role is EnergySupplier,
@@ -50,5 +50,5 @@ public interface IIncomingMessageSeries : IDelegatedIncomingMessageSeries
     /// The grid area owner for the grid area in the series, used to find the actor number if the role is GridOperator.
     /// Can be null if GridArea in the series is null, or if no owner is found.
     /// </param>
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner);
+    ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner);
 }
