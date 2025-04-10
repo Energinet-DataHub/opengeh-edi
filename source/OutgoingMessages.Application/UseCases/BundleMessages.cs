@@ -157,18 +157,40 @@ public class BundleMessages(
 
         var bundlesToCreate = new List<(Bundle Bundle, int MessageCount, Duration Timespan)>();
 
-        var bundleSize = _bundlingOptions.MaxBundleSize;
-        var outgoingMessagesList = new List<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
+        var maxBundleMessageCount = _bundlingOptions.MaxBundleMessageCount;
+        var maxDataCount = _bundlingOptions.MaxBundleDataCount;
+
+        var outgoingMessagesList = new LinkedList<OutgoingMessage>(outgoingMessages.OrderBy(om => om.CreatedAt));
         while (outgoingMessagesList.Count > 0)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var outgoingMessagesForBundle = outgoingMessagesList
-                .Take(bundleSize)
-                .ToList();
+            var dataCount = 0;
+            var outgoingMessagesForBundle = new List<OutgoingMessage>();
+            while (outgoingMessagesList.Count > 0
+                   && outgoingMessagesForBundle.Count < maxBundleMessageCount
+                   && dataCount < maxDataCount)
+            {
+                var nextOutgoingMessageForBundle = outgoingMessagesList.First?.Value;
+                if (nextOutgoingMessageForBundle == null)
+                    break; // No more messages to bundle
+
+                var newDataCount = dataCount + nextOutgoingMessageForBundle.DataCount;
+                // Bundle is full if the new data count exceeds the max data count, and there already is a message in the bundle.
+                // We need to check if there is a message in the bundle, because if a single message has a higher
+                // data count than the max data count, it should still be bundled (in its own bundle).
+                var bundleIsFull = newDataCount > maxDataCount
+                                   && outgoingMessagesForBundle.Count > 0;
+                if (bundleIsFull)
+                    break;
+
+                dataCount = newDataCount;
+                outgoingMessagesForBundle.Add(nextOutgoingMessageForBundle);
+                outgoingMessagesList.RemoveFirst();
+            }
 
             // If the bundle isn't full, and no messages are older than the bundle duration, then do not create the bundle (yet).
-            var isPartialBundle = outgoingMessagesForBundle.Count < bundleSize;
+            var isPartialBundle = outgoingMessagesForBundle.Count < maxBundleMessageCount && dataCount < maxDataCount;
             if (isPartialBundle)
             {
                 var anyMessageIsReadyToBeBundled = IsAnyMessageReadyToBeBundledYet(outgoingMessagesForBundle);
@@ -187,8 +209,6 @@ public class BundleMessages(
                 outgoingMessagesForBundle.Last().CreatedAt - outgoingMessagesForBundle.First().CreatedAt;
 
             bundlesToCreate.Add((bundle, outgoingMessagesForBundle.Count, bundleTimespan));
-
-            outgoingMessagesList.RemoveRange(0, outgoingMessagesForBundle.Count);
         }
 
         return bundlesToCreate;
@@ -259,8 +279,8 @@ public class BundleMessages(
     {
         var maxBundleSize = documentType switch
         {
-            var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleSize,
-            var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleSize,
+            var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleMessageCount,
+            var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleMessageCount,
             _ => throw new ArgumentOutOfRangeException(nameof(documentType), documentType, "Document type doesn't support bundling."),
         };
 

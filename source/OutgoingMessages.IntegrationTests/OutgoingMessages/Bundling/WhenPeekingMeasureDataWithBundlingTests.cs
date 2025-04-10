@@ -14,7 +14,6 @@
 
 using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
@@ -27,13 +26,11 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.Tests.Factories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit.Abstractions;
-using Period = NodaTime.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages.Bundling;
 
@@ -52,10 +49,8 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
     }
 
     [Fact]
-    public async Task Given_EnqueuedBundleWithMaximumSize_When_PeekMessages_Then_BundleSizeIsBelow50MB()
+    public async Task Given_EnqueuedRsm012BundleWithMaximumSize_When_PeekMessages_Then_BundleSizeIsBelow50MB()
     {
-        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
-
         var receiver = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
 
@@ -64,22 +59,29 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         // Max measure data period is one year
         var longestMeasureDataPeriod = new Interval(
             Instant.FromUtc(2024, 12, 31, 23, 00, 00),
+            // Instant.FromUtc(2024, 12, 31, 23, 15, 00)); // 15 minutes
+            Instant.FromUtc(2025, 01, 01, 4, 00, 00)); // 4 hours
+            // Instant.FromUtc(2025, 01, 01, 18, 00, 00)); // 18 hours
             // Instant.FromUtc(2025, 01, 01, 23, 00, 00)); // One day
-            Instant.FromUtc(2025, 01, 31, 23, 00, 00)); // One month
+            // Instant.FromUtc(2025, 01, 31, 23, 00, 00)); // One month
             // Instant.FromUtc(2025, 12, 31, 23, 00, 00)); // One year
 
         var resolution = Resolution.QuarterHourly;
         var resolutionDuration = Duration.FromMinutes(15);
-        var measureDataForLongestPeriodCount = longestMeasureDataPeriod.Duration / resolutionDuration;
-        var measureDataForLongestPeriod = Enumerable.Range(0, (int)Math.Ceiling(measureDataForLongestPeriodCount))
-            .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated)) // TODO: What is the highest expected quantity value?
+        var measureDataForPeriodCount = longestMeasureDataPeriod.Duration / resolutionDuration;
+        var measureDataForPeriod = Enumerable.Range(0, (int)Math.Ceiling(measureDataForPeriodCount))
+            .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated))
             .ToList();
 
         // var maxBundleSize = bundlingOptions.MaxBundleSize; // Max bundle size = 2000
         const int maxBundleSize = 2000;
+        const int maxMeasureDataCount = 150000;
+
+        // Create bundles for either maxBundleSize or the amount of bundles before the maxMeasureDataCount is exceeded
+        var bundlesToCreateCount = Math.Min(maxBundleSize, maxMeasureDataCount / measureDataForPeriod.Count);
         var documentFormat = DocumentFormat.Ebix;
 
-        var messagesToEnqueue = Enumerable.Range(0, maxBundleSize)
+        var messagesToEnqueue = Enumerable.Range(0, bundlesToCreateCount)
             .Select(
                 i => new AcceptedForwardMeteredDataMessageDto(
                     eventId: eventId,
@@ -98,7 +100,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                         Resolution: resolution,
                         StartedDateTime: longestMeasureDataPeriod.Start,
                         EndedDateTime: longestMeasureDataPeriod.End,
-                        EnergyObservations: measureDataForLongestPeriod)))
+                        EnergyObservations: measureDataForPeriod)))
             .Cast<OutgoingMessageDto>()
             .ToList();
 
@@ -181,10 +183,154 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         Assert.NotNull(peekResult);
         Assert.Equal(biggestPossibleBundle.MessageId, peekResult.MessageId);
 
-        peekResult.Bundle.Flush();
-        GC.Collect();
         peekResult.Bundle.Seek(0, SeekOrigin.Begin);
-        var filePath = Path.Combine("C://", "temp", $"bundle-{documentFormat.Name.ToLower()}-{measureDataForLongestPeriodCount}points-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
+        var filePath = Path.Combine("C://", "temp", $"rsm-012-bundle-{documentFormat.Name.ToLower()}-{measureDataForPeriodCount}points-{bundlesToCreateCount}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
+        var directoryPath = Path.GetDirectoryName(filePath)!;
+        if (!Directory.Exists(directoryPath))
+            Directory.CreateDirectory(directoryPath);
+
+        await using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+        {
+            await peekResult.Bundle.CopyToAsync(fs);
+        }
+
+        peekResult.Bundle.Seek(0, SeekOrigin.Begin);
+
+        var messageSizeAsBytes = peekResult.Bundle.Length;
+        var sizeInMegabytes = messageSizeAsBytes / (1024.0 * 1024.0);
+
+        _testOutputHelper.WriteLine("Bundle size was {0:F}MB", sizeInMegabytes);
+
+        Assert.True(sizeInMegabytes <= 50.0, $"The peeked message size should be below 50MB, but was {sizeInMegabytes:F1}MB");
+    }
+
+    [Fact]
+    public async Task Given_EnqueuedRsm009BundleWithMaximumSize_When_PeekMessages_Then_BundleSizeIsBelow50MB()
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        var receiver = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+
+        var eventId = EventId.From(Guid.NewGuid());
+        var relatedToMessageId = MessageId.New();
+
+        // var maxBundleSize = bundlingOptions.MaxBundleSize; // Max bundle size = 2000
+        const int maxBundleSize = 2000;
+        var documentFormat = DocumentFormat.Ebix;
+
+        var rejectReasons = new List<Interfaces.Models.MeteredDataForMeteringPoint.RejectReason>
+        {
+            new("XX1", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX2", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX3", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX4", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX5", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX6", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX7", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX8", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("XX9", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+            new("X10", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
+        };
+
+        var messagesToEnqueue = Enumerable.Range(0, maxBundleSize)
+            .Select(
+                i => new RejectedForwardMeteredDataMessageDto(
+                    eventId: eventId,
+                    externalId: new ExternalId(Guid.NewGuid()),
+                    receiverNumber: receiver.Number,
+                    receiverRole: receiver.ActorRole,
+                    businessReason: BusinessReason.PeriodicMetering,
+                    relatedToMessageId: relatedToMessageId,
+                    documentReceiverRole: receiver.ActorRole,
+                    series: new RejectedForwardMeteredDataSeries(
+                        TransactionId: TransactionId.New(),
+                        OriginalTransactionIdReference: TransactionId.New(),
+                        RejectReasons: rejectReasons)))
+            .Cast<OutgoingMessageDto>()
+            .ToList();
+
+        // - Set messages created at to "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        // - Create actor message queue for receiver
+        await using (var arrangeScope = ServiceProvider.CreateAsyncScope())
+        {
+            var arrangeDbContext = arrangeScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            arrangeDbContext.ActorMessageQueues.Add(actorMessageQueue);
+            await arrangeDbContext.SaveChangesAsync();
+        }
+
+        // - Enqueue messages for receivers
+        var enqueueStopwatch = Stopwatch.StartNew();
+        _testOutputHelper.WriteLine("Enqueueing {0} messages", messagesToEnqueue.Count);
+        var enqueuedMessagesCount = await EnqueueAndCommitMessages(
+            messagesToEnqueue: messagesToEnqueue);
+        enqueueStopwatch.Stop();
+        _testOutputHelper.WriteLine("Enqueued {0} messages in {1:F} seconds", enqueuedMessagesCount, enqueueStopwatch.Elapsed.TotalSeconds);
+
+        Bundle biggestPossibleBundle;
+        await using (var arrangeScope = ServiceProvider.CreateAsyncScope())
+        {
+            var arrangeDbContext = arrangeScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+            biggestPossibleBundle = new Bundle(
+                actorMessageQueueId: actorMessageQueue.Id,
+                businessReason: BusinessReason.PeriodicMetering,
+                documentTypeInBundle: DocumentType.Acknowledgement,
+                maxNumberOfMessagesInABundle: maxBundleSize,
+                created: now,
+                relatedToMessageId: relatedToMessageId);
+
+            var outgoingMessagesForBundle = await arrangeDbContext.OutgoingMessages.ToListAsync();
+            foreach (var outgoingMessageForBundle in outgoingMessagesForBundle)
+            {
+                biggestPossibleBundle.Add(outgoingMessageForBundle);
+            }
+
+            biggestPossibleBundle.Close(now);
+
+            arrangeDbContext.Bundles.Add(biggestPossibleBundle);
+
+            await arrangeDbContext.SaveChangesAsync();
+        }
+
+        // When peeking
+        PeekResultDto? peekResult;
+        var peekStopwatch = new Stopwatch();
+        await using (var actScope = ServiceProvider.CreateAsyncScope())
+        {
+            var authenticatedActor = actScope.ServiceProvider.GetRequiredService<AuthenticatedActor>();
+            authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+                actorNumber: receiver.Number,
+                restriction: Restriction.None,
+                actorRole: receiver.ActorRole,
+                actorClientId: Guid.NewGuid(),
+                actorId: Guid.NewGuid()));
+
+            var peekMessages = actScope.ServiceProvider.GetRequiredService<PeekMessage>();
+
+            _testOutputHelper.WriteLine("Peeking biggest possible bundle");
+            peekStopwatch.Start();
+            peekResult = await peekMessages.PeekAsync(
+                new PeekRequestDto(
+                    receiver.Number,
+                    MessageCategory.MeasureData,
+                    receiver.ActorRole,
+                    documentFormat),
+                CancellationToken.None);
+            peekStopwatch.Stop();
+        }
+
+        _testOutputHelper.WriteLine("Peeked biggest possible bundle in {0:F} seconds", peekStopwatch.Elapsed.TotalSeconds);
+
+        // Then message is below 50MB
+        Assert.NotNull(peekResult);
+        Assert.Equal(biggestPossibleBundle.MessageId, peekResult.MessageId);
+
+        peekResult.Bundle.Seek(0, SeekOrigin.Begin);
+        var filePath = Path.Combine("C://", "temp", $"rsm-009-bundle-{documentFormat.Name.ToLower()}-{rejectReasons.Count}reasons-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
         var directoryPath = Path.GetDirectoryName(filePath)!;
         if (!Directory.Exists(directoryPath))
             Directory.CreateDirectory(directoryPath);
@@ -206,50 +352,26 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
 
     private async Task<int> EnqueueAndCommitMessages(List<OutgoingMessageDto> messagesToEnqueue)
     {
+        using var scope = ServiceProvider.CreateScope();
+        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
         var enqueuedMessagesCount = 0;
-        var enqueueTasks = messagesToEnqueue
-            .Select(async m =>
+        foreach (var messageDto in messagesToEnqueue)
+        {
+            _ = messageDto switch
             {
-                await EnqueueAndCommitMessage(m, useNewScope: true);
-                enqueuedMessagesCount++;
-
-                if (enqueuedMessagesCount % 100 == 0)
-                    _testOutputHelper.WriteLine("Enqueued {0} messages", enqueuedMessagesCount);
-            })
-            .ToList();
-        await Task.WhenAll(enqueueTasks);
-
-        return enqueueTasks.Count;
-    }
-
-    private async Task<Guid> EnqueueAndCommitMessage(OutgoingMessageDto message, bool useNewScope)
-    {
-        IOutgoingMessagesClient outgoingMessagesClient;
-        ActorMessageQueueContext dbContext;
-        IServiceScope? scope = null;
-        if (useNewScope)
-        {
-            scope = ServiceProvider.CreateScope();
-            outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-            dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+                AcceptedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+                RejectedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+                _ => throw new NotImplementedException($"Enqueueing outgoing message of type {messageDto.GetType()} is not implemented."),
+            };
+            enqueuedMessagesCount++;
+            if (enqueuedMessagesCount % 500 == 0)
+                _testOutputHelper.WriteLine("Enqueued {0} messages", enqueuedMessagesCount);
         }
-        else
-        {
-            outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-            dbContext = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
-        }
-
-        var messageId = message switch
-        {
-            AcceptedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
-            RejectedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAndCommitAsync(m, CancellationToken.None),
-            _ => throw new NotImplementedException($"Enqueueing outgoing message of type {message.GetType()} is not implemented."),
-        };
 
         await dbContext.SaveChangesAsync();
 
-        scope?.Dispose();
-
-        return messageId;
+        return enqueuedMessagesCount;
     }
 }

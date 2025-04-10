@@ -114,7 +114,7 @@ public interface IOutgoingMessagesClient
     /// <summary>
     /// Enqueue RSM-009 messages.
     /// </summary>
-    Task<Guid> EnqueueAndCommitAsync(
+    Task<Guid> EnqueueAsync(
         RejectedForwardMeteredDataMessageDto rejectedForwardMeteredDataMessageDto,
         CancellationToken cancellationToken);
 }

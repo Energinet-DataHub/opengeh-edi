@@ -380,10 +380,10 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
         // We need to save changes between enqueues to not fail on unique index for bundling
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
-        await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
         // Assert
