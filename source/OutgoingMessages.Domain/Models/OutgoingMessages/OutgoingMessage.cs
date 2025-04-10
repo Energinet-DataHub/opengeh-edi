@@ -61,8 +61,6 @@ public class OutgoingMessage
         CalculationId = calculationId;
         PeriodStartedAt = periodStartedAt;
         DataCount = dataCount;
-
-        SetContent(serializedContent);
     }
 
     /// <summary>
