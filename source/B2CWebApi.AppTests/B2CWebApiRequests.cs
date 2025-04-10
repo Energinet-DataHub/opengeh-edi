@@ -150,9 +150,9 @@ public static class B2CWebApiRequests
         return request;
     }
 
-    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageRequest()
+    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageSearchRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMeasureDataMessageSearch")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMeasureDataMessage/search")
         {
             Content = CreateJsonContent(
                 new ArchivedMeasureDataMessageSearchCriteria(
@@ -162,6 +162,12 @@ public static class B2CWebApiRequests
                     Receiver: new Actor(ActorRole: ActorRole.MeteredDataResponsible, ActorNumber: "1234567890123"),
                     DocumentTypes: [MeasureDataDocumentType.NotifyValidatedMeasureData])),
         };
+        return request;
+    }
+
+    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageGetRequest()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/ArchivedMeasureDataMessage/{Guid.NewGuid()}");
         return request;
     }
 

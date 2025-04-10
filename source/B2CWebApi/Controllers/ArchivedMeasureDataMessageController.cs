@@ -21,16 +21,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
+[ApiVersion("1.0")]
 [ApiController]
 [Route("[controller]")]
-public class ArchivedMeasureDataMessageSearchController(
+public class ArchivedMeasureDataMessageController(
     IAuditLogger auditLogger)
     : ControllerBase
 {
     private readonly IAuditLogger _auditLogger = auditLogger;
 
-    [ApiVersion("1.0")]
+    private readonly AuditLogEntityType _affectedEntityType = AuditLogEntityType.ArchivedMeasureDataMessage;
+
     [HttpPost]
+    [Route("search")]
     [ProducesResponseType(typeof(ArchivedMeasureDataMessageSearchResponseV1), StatusCodes.Status200OK)]
     public async Task<ActionResult> SearchV1Async(
         ArchivedMeasureDataMessageSearchCriteria request,
@@ -41,7 +44,7 @@ public class ArchivedMeasureDataMessageSearchController(
                 activity: AuditLogActivity.ArchivedMeasureDataMessageSearch,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
-                affectedEntityType: AuditLogEntityType.ArchivedMessage,
+                affectedEntityType: _affectedEntityType,
                 affectedEntityKey: null,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -59,5 +62,22 @@ public class ArchivedMeasureDataMessageSearchController(
         };
 
         return Ok(new ArchivedMeasureDataMessageSearchResponseV1(messages, messages.Count));
+    }
+
+    [HttpGet("{id:guid}")]
+    [Produces("text/plain")]
+    public async Task<ActionResult> GetDocumentAsync(Guid id, CancellationToken cancellationToken)
+    {
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.ArchivedMeasureDataMessageGet,
+                activityOrigin: HttpContext.Request.GetDisplayUrl(),
+                activityPayload: null,
+                affectedEntityType: _affectedEntityType,
+                affectedEntityKey: id.ToString(),
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        return NoContent();
     }
 }

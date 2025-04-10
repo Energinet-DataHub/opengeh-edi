@@ -27,6 +27,7 @@ public record AuditLogActivity(string Identifier, bool AuthenticatedUserRequired
     public static readonly AuditLogActivity ArchivedMessagesGet = new("ArchivedMessagesGet");
 
     public static readonly AuditLogActivity ArchivedMeasureDataMessageSearch = new("ArchivedMeasureDataMessageSearch");
+    public static readonly AuditLogActivity ArchivedMeasureDataMessageGet = new("ArchivedMeasureDataMessageGet");
 
     public static readonly AuditLogActivity OrchestrationsSearch = new("OrchestrationsSearch");
     public static readonly AuditLogActivity OrchestrationsGet = new("OrchestrationsGet");
