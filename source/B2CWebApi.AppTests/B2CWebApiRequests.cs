@@ -14,7 +14,7 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
-using NodaTime;
+using Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
 
@@ -146,6 +146,21 @@ public static class B2CWebApiRequests
                     EnergySupplierId: null,
                     Resolution: null,
                     PriceType: null)),
+        };
+        return request;
+    }
+
+    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageRequest()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMeasureDataMessageSearch")
+        {
+            Content = CreateJsonContent(
+                new ArchivedMeasureDataMessageSearchCriteria(
+                    MeteringPointId: "123456789",
+                    CreatedDuringPeriod: new MessageCreationPeriod(Start: DateTimeOffset.Parse("2024-08-27T00:00:00Z"), End: DateTimeOffset.Parse("2024-08-28T00:00:00Z")),
+                    Sender: new Actor(ActorRole: ActorRole.DataHubAdministrator, ActorNumber: "1234567890123"),
+                    Receiver: new Actor(ActorRole: ActorRole.MeteredDataResponsible, ActorNumber: "1234567890123"),
+                    DocumentTypes: [MeasureDataDocumentType.NotifyValidatedMeasureData])),
         };
         return request;
     }
