@@ -44,7 +44,7 @@ public class HeaderClientCertificateRetriever : IClientCertificateRetriever
 
         try
         {
-            certificate = new X509Certificate2(Convert.FromHexString(certificates.Single()));
+            certificate = X509CertificateLoader.LoadCertificate(Convert.FromHexString(certificates.Single()));
         }
         catch (CryptographicException e)
         {

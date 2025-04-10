@@ -45,7 +45,10 @@ public abstract class EnqueueEnergyResultsBaseActivity(
 
         var activityStopwatch = Stopwatch.StartNew();
         var databricksStopwatch = Stopwatch.StartNew();
-        await foreach (var queryResult in _energyResultEnumerator.GetAsync(query))
+
+        var energyResults = _energyResultEnumerator.GetAsync(query);
+
+        await foreach (var energyResult in energyResults.ConfigureAwait(false))
         {
             databricksStopwatch.Stop();
             // Only log databricks query time if it took more than 1 second
@@ -55,19 +58,19 @@ public abstract class EnqueueEnergyResultsBaseActivity(
                     "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                     databricksStopwatch.Elapsed,
                     query.GetType().Name,
-                    queryResult.Result?.ExternalId.Value,
+                    energyResult.Result?.ExternalId.Value,
                     input.CalculationId,
                     input.EventId);
             }
 
-            if (queryResult.IsSuccess)
+            if (energyResult.IsSuccess)
             {
                 using var scope = _serviceScopeFactory.CreateScope();
                 try
                 {
                     var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                    await EnqueueAndCommitEnergyResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
+                    await EnqueueAndCommitEnergyResult(scopedOutgoingMessagesClient, energyResult.Result!).ConfigureAwait(false);
 
                     numberOfHandledResults++;
                 }
@@ -78,7 +81,7 @@ public abstract class EnqueueEnergyResultsBaseActivity(
                         ex,
                         "Enqueue and commit threw exception for energy result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                         query.GetType().Name,
-                        queryResult.Result?.ExternalId.Value,
+                        energyResult.Result?.ExternalId.Value,
                         input.CalculationId,
                         input.EventId);
                 }

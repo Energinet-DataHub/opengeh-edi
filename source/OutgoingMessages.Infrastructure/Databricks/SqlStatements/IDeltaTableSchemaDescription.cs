@@ -22,17 +22,17 @@ public interface IDeltaTableSchemaDescription
     /// <summary>
     /// Name of database.
     /// </summary>
-    public string DatabaseName { get; }
+    string DatabaseName { get; }
 
     /// <summary>
     /// Name of view or table.
     /// </summary>
-    public string DataObjectName { get; }
+    string DataObjectName { get; }
 
     /// <summary>
     /// The schema definition of the view or table expressed as (Column name, Data type, Is nullable).
     ///
     /// Can be used in tests to create a matching data object (e.g. table).
     /// </summary>
-    public Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
+    Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 }

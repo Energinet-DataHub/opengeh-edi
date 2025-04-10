@@ -95,4 +95,37 @@ public class ArchivedMessagesBrs021Tests : IAsyncLifetime
         searchResult.Messages.Should().BeEmpty();
         searchResult.TotalAmountOfMessages.Should().Be(0);
     }
+
+    [Fact]
+    public async Task Given_Brs021ArchivedMessage_When_Creating_Then_MessageIsStored()
+    {
+        // Arrange
+        var incomingMessage1 = await _fixture.CreateArchivedMessageAsync(
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
+            documentType: IncomingDocumentType.NotifyValidatedMeasureData.Name,
+            storeMessage: false,
+            meteringPointIds: ["1234"]);
+
+        var incomingMessage2 = await _fixture.CreateArchivedMessageAsync(
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
+            documentType: IncomingDocumentType.NotifyValidatedMeasureData.Name,
+            storeMessage: false,
+            meteringPointIds: ["1234"]);
+
+        // Act
+        await _sut.CreateAsync(incomingMessage1, CancellationToken.None);
+        await _sut.CreateAsync(incomingMessage2, CancellationToken.None);
+
+        // Assert
+        var searchResult = await _sut.SearchMeteringPointMessagesAsync(
+            new GetMeteringPointMessagesQueryDto(
+                incomingMessage1.MeteringPointIds.First(),
+                new SortedCursorBasedPaginationDto()),
+            CancellationToken.None);
+
+        using var assertionScope = new AssertionScope();
+        searchResult.Should().NotBeNull();
+        searchResult.Messages.Should().ContainSingle().Subject.MessageId.Should().Be(incomingMessage1.MessageId);
+        searchResult.TotalAmountOfMessages.Should().Be(1);
+    }
 }

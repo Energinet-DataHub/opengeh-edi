@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
-
-namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 /// <summary>
-/// Validation for Message Type
+/// Represents a query options for retrieving messages.
+/// Including the pagination for the specific query.
 /// </summary>
-public interface IMessageTypeValidator
-{
-    /// <summary>
-    /// Validates Message Type
-    /// </summary>
-    /// <param name="message"></param>
-    /// <param name="cancellationToken"></param>
-    Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken);
-}
+public sealed record GetMeteringPointMessagesQueryDto(
+    string MeteringPointId,
+    SortedCursorBasedPaginationDto Pagination,
+    MessageCreationPeriodDto? CreationPeriod = null,
+    string? SenderNumber = null,
+    string? SenderRoleCode = null,
+    string? ReceiverNumber = null,
+    string? ReceiverRoleCode = null,
+    IReadOnlyCollection<string>? DocumentTypes = null);

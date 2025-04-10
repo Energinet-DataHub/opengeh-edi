@@ -83,8 +83,8 @@
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.4"/>
         <PackageReference Include="Azure.Storage.Blobs" Version="12.23.0"/>
         <PackageReference Include="Dapper" Version="2.1.66"/>
-        <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="7.2.1"/>
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.2.1"/>
+        <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="8.0.0" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="8.0.0" />
         <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="4.0.0" />
         <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="1.19.0" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
@@ -51,6 +52,13 @@ public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRe
         ArgumentNullException.ThrowIfNull(queryInputDto);
 
         var result = await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
+
+        return MessagesSearchResultMapper.Map(result);
+    }
+
+    public async Task<MessageSearchResultDto> SearchMeteringPointMessagesAsync(GetMeteringPointMessagesQueryDto queryInputDto, CancellationToken cancellationToken)
+    {
+        var result = await _archivedMessageRepository.SearchMeteringPointMessagesAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
 
         return MessagesSearchResultMapper.Map(result);
     }
