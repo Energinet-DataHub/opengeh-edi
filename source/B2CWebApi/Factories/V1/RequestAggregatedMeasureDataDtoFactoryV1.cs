@@ -89,30 +89,23 @@ public static class RequestAggregatedMeasureDataDtoFactoryV1
 
     private static string? MapEvaluationPointTypeCode(RequestAggregatedMeasureDataMarketRequestV1 request)
     {
-        switch (request.MeteringPointType)
+        return request.MeteringPointType switch
         {
-            case MeteringPointType.Production:
-                return BuildingBlocks.Domain.Models.MeteringPointType.Production.Code;
-            case MeteringPointType.Consumption:
-                return BuildingBlocks.Domain.Models.MeteringPointType.Consumption.Code;
-            case MeteringPointType.Exchange:
-                return BuildingBlocks.Domain.Models.MeteringPointType.Exchange.Code;
-        }
-
-        return null;
+            MeteringPointType.Production => BuildingBlocks.Domain.Models.MeteringPointType.Production.Code,
+            MeteringPointType.Consumption => BuildingBlocks.Domain.Models.MeteringPointType.Consumption.Code,
+            MeteringPointType.Exchange => BuildingBlocks.Domain.Models.MeteringPointType.Exchange.Code,
+            _ => null,
+        };
     }
 
     private static string? MapSettlementMethodCode(RequestAggregatedMeasureDataMarketRequestV1 request)
     {
-        switch (request.SettlementMethod)
+        return request.SettlementMethod switch
         {
-            case SettlementMethod.Flex:
-                return BuildingBlocks.Domain.Models.SettlementMethod.Flex.Code;
-            case SettlementMethod.NonProfiled:
-                return BuildingBlocks.Domain.Models.SettlementMethod.NonProfiled.Code;
-        }
-
-        return null;
+            SettlementMethod.Flex => BuildingBlocks.Domain.Models.SettlementMethod.Flex.Code,
+            SettlementMethod.NonProfiled => BuildingBlocks.Domain.Models.SettlementMethod.NonProfiled.Code,
+            _ => null,
+        };
     }
 
     private static string MapRoleNameToCode(string roleName)

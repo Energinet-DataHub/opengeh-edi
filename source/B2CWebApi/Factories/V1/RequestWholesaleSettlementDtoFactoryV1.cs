@@ -52,7 +52,7 @@ public static class RequestWholesaleSettlementDtoFactoryV1
             Id: TransactionId.New().Value,
             StartDateAndOrTimeDateTime: request.StartDate.ToString(),
             EndDateAndOrTimeDateTime: request.EndDate.ToString(),
-            MeteringGridAreaDomainId: request.GridArea,
+            MeteringGridAreaDomainId: request.GridAreaCode,
             EnergySupplierMarketParticipantId: request.EnergySupplierId,
             SettlementVersion: MapSettlementVersionCode(request),
             Resolution: MapResolutionCode(request),

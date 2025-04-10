@@ -132,7 +132,7 @@ public static class B2CWebApiRequests
                     BusinessReason: BusinessReason.WholesaleFixing,
                     StartDate: Instant.FromUtc(2024, 08, 27, 22, 00).ToDateTimeOffset(),
                     EndDate: Instant.FromUtc(2024, 08, 28, 22, 00).ToDateTimeOffset(),
-                    GridArea: null,
+                    GridAreaCode: null,
                     EnergySupplierId: null,
                     Resolution: null,
                     ChargeType: null)),

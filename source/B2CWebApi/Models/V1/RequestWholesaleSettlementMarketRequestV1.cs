@@ -22,7 +22,7 @@ public sealed record RequestWholesaleSettlementMarketRequestV1(
     BusinessReason BusinessReason,
     DateTimeOffset StartDate,
     DateTimeOffset EndDate,
-    string? GridArea,
+    string? GridAreaCode,
     string? EnergySupplierId,
     Resolution? Resolution,
     ChargeType? ChargeType);
