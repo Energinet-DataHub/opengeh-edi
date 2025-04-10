@@ -184,18 +184,6 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         // Then message is below 50MB
         Assert.NotNull(peekResult);
         Assert.Equal(biggestPossibleBundle.MessageId, peekResult.MessageId);
-
-        peekResult.Bundle.Seek(0, SeekOrigin.Begin);
-        var filePath = Path.Combine("C://", "temp", $"rsm-012-bundle-{documentFormat.Name.ToLower()}-{measureDataForPeriodCount}points-{bundlesToCreateCount}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
-        var directoryPath = Path.GetDirectoryName(filePath)!;
-        if (!Directory.Exists(directoryPath))
-            Directory.CreateDirectory(directoryPath);
-
-        await using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-        {
-            await peekResult.Bundle.CopyToAsync(fs);
-        }
-
         peekResult.Bundle.Seek(0, SeekOrigin.Begin);
 
         var messageSizeAsBytes = peekResult.Bundle.Length;
@@ -204,6 +192,18 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         _testOutputHelper.WriteLine("Bundle size was {0:F}MB", sizeInMegabytes);
 
         Assert.True(sizeInMegabytes <= 50.0, $"The peeked message size should be below 50MB, but was {sizeInMegabytes:F1}MB");
+
+        // -- Uncomment below to save the peeked bundle to c://temp, if you need to inspect it.
+        // peekResult.Bundle.Seek(0, SeekOrigin.Begin);
+        // var filePath = Path.Combine("C://", "temp", $"rsm-012-bundle-{documentFormat.Name.ToLower()}-{measureDataForPeriodCount}points-{bundlesToCreateCount}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
+        // var directoryPath = Path.GetDirectoryName(filePath)!;
+        // if (!Directory.Exists(directoryPath))
+        //     Directory.CreateDirectory(directoryPath);
+        //
+        // await using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+        // {
+        //     await peekResult.Bundle.CopyToAsync(fs);
+        // }
     }
 
     [Fact]
@@ -327,17 +327,6 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         Assert.Equal(biggestPossibleBundle.MessageId, peekResult.MessageId);
 
         peekResult.Bundle.Seek(0, SeekOrigin.Begin);
-        var filePath = Path.Combine("C://", "temp", $"rsm-009-bundle-{documentFormat.Name.ToLower()}-{rejectReasonsForEachMessage.Count}reasons-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
-        var directoryPath = Path.GetDirectoryName(filePath)!;
-        if (!Directory.Exists(directoryPath))
-            Directory.CreateDirectory(directoryPath);
-
-        await using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-        {
-            await peekResult.Bundle.CopyToAsync(fs);
-        }
-
-        peekResult.Bundle.Seek(0, SeekOrigin.Begin);
 
         var messageSizeAsBytes = peekResult.Bundle.Length;
         var sizeInMegabytes = messageSizeAsBytes / (1024.0 * 1024.0);
@@ -345,6 +334,18 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         _testOutputHelper.WriteLine("Bundle size was {0:F}MB", sizeInMegabytes);
 
         Assert.True(sizeInMegabytes <= 50.0, $"The peeked message size should be below 50MB, but was {sizeInMegabytes:F1}MB");
+
+        // Uncomment below to save the peeked bundle to c://temp, if you need to inspect it.
+        // peekResult.Bundle.Seek(0, SeekOrigin.Begin);
+        // var filePath = Path.Combine("C://", "temp", $"rsm-009-bundle-{documentFormat.Name.ToLower()}-{rejectReasonsForEachMessage.Count}reasons-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
+        // var directoryPath = Path.GetDirectoryName(filePath)!;
+        // if (!Directory.Exists(directoryPath))
+        //     Directory.CreateDirectory(directoryPath);
+        //
+        // await using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+        // {
+        //     await peekResult.Bundle.CopyToAsync(fs);
+        // }
     }
 
     private async Task<int> EnqueueAndCommitMessages(List<OutgoingMessageDto> messagesToEnqueue)
