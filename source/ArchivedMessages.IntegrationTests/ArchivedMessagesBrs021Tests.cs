@@ -119,7 +119,7 @@ public class ArchivedMessagesBrs021Tests : IAsyncLifetime
         // Assert
         var searchResult = await _sut.SearchMeteringPointMessagesAsync(
             new GetMeteringPointMessagesQueryDto(
-                incomingMessage1.MeteringPointsIds.First(),
+                incomingMessage1.MeteringPointIds.First(),
                 new SortedCursorBasedPaginationDto()),
             CancellationToken.None);
 

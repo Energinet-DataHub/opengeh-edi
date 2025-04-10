@@ -49,9 +49,9 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
         var sql = @"INSERT INTO [dbo].[ArchivedMessages]
-                       ([Id], [EventIds], [DocumentType], [ReceiverNumber], [ReceiverRoleCode], [SenderNumber], [SenderRoleCode], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId], [MeteringPointsIds])
+                       ([Id], [EventIds], [DocumentType], [ReceiverNumber], [ReceiverRoleCode], [SenderNumber], [SenderRoleCode], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId], [MeteringPointIds])
                        VALUES
-                       (@Id, @EventIds, @DocumentType, @ReceiverNumber, @ReceiverRoleCode, @SenderNumber, @SenderRoleCode, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId, @MeteringPointsIds)";
+                       (@Id, @EventIds, @DocumentType, @ReceiverNumber, @ReceiverRoleCode, @SenderNumber, @SenderRoleCode, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId, @MeteringPointIds)";
 
         var parameters = new
         {
@@ -67,7 +67,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
             FileStorageReference = message.FileStorageReference.Path,
             message.MessageId,
             RelatedToMessageId = message.RelatedToMessageId?.Value,
-            MeteringPointsIds = message.MeteringPointsIds.Distinct().ToString(),
+            MeteringPointIds = message.MeteringPointIds.Distinct().ToString(),
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);

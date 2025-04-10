@@ -45,8 +45,8 @@ public class ArchivedMessageDto
         string? businessReason,
         ArchivedMessageTypeDto archivedMessageType,
         IIncomingMarketMessageStream incomingMarketMessageStream,
-        IEnumerable<string>? meteringPointsIds = null)
-        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStreamDto(incomingMarketMessageStream), meteringPointsIds: meteringPointsIds) { }
+        IEnumerable<string>? meteringPointIds = null)
+        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStreamDto(incomingMarketMessageStream), meteringPointIds: meteringPointIds) { }
 
     internal ArchivedMessageDto(
         string? messageId,
@@ -61,7 +61,7 @@ public class ArchivedMessageDto
         ArchivedMessageTypeDto archivedMessageType,
         ArchivedMessageStreamDto archivedMessageStream,
         MessageId? relatedToMessageId = null,
-        IEnumerable<string>? meteringPointsIds = null)
+        IEnumerable<string>? meteringPointIds = null)
     {
         Id = ArchivedMessageIdDto.Create();
         MessageId = messageId;
@@ -76,7 +76,7 @@ public class ArchivedMessageDto
         RelatedToMessageId = relatedToMessageId;
         ArchivedMessageType = archivedMessageType;
         ArchivedMessageStream = archivedMessageStream;
-        MeteringPointsIds = meteringPointsIds ?? [];
+        MeteringPointIds = meteringPointIds ?? [];
     }
 
     public ArchivedMessageIdDto Id { get; }
@@ -105,5 +105,5 @@ public class ArchivedMessageDto
 
     public ArchivedMessageStreamDto ArchivedMessageStream { get; }
 
-    public IEnumerable<string> MeteringPointsIds { get; }
+    public IEnumerable<string> MeteringPointIds { get; }
 }

@@ -135,7 +135,7 @@ internal sealed class QueryBuilder
     public QueryInput BuildFrom(GetMeteringPointMessagesQuery query)
     {
         AddFilter(
-            "MeteringPointsIds LIKE '%' + @MeteringPointId + '%'", // TODO: Is this right?
+            "MeteringPointIds LIKE '%' + @MeteringPointId + '%'", // TODO: Is this right?
             new KeyValuePair<string, object>("MeteringPointId", query.MeteringPointId));
 
         if (query.CreationPeriod is not null)

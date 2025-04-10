@@ -34,7 +34,7 @@ public class ArchivedMessage
         string? businessReason,
         ArchivedMessageType archivedMessageType,
         ArchivedMessageStream archivedMessageStream,
-        IEnumerable<string> meteringPointsIds,
+        IEnumerable<string> meteringPointIds,
         MessageId? relatedToMessageId = null)
     {
         Id = id;
@@ -49,7 +49,7 @@ public class ArchivedMessage
         BusinessReason = businessReason;
         RelatedToMessageId = relatedToMessageId;
         ArchivedMessageStream = archivedMessageStream;
-        MeteringPointsIds = meteringPointsIds;
+        MeteringPointIds = meteringPointIds;
 
         var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(
             archivedMessageType,
@@ -88,7 +88,7 @@ public class ArchivedMessage
 
     public ArchivedMessageStream ArchivedMessageStream { get; }
 
-    public IEnumerable<string> MeteringPointsIds { get; }
+    public IEnumerable<string> MeteringPointIds { get; }
 
     private static string GetActorNumberForFileStoragePlacement(ArchivedMessageType archivedMessageType, string senderActorNumber, string receiverActorNumber)
     {

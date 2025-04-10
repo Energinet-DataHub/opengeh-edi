@@ -38,7 +38,7 @@ public static class ArchivedMessageMapper
             businessReason: dto.BusinessReason,
             archivedMessageType: (ArchivedMessageType)dto.ArchivedMessageType,
             archivedMessageStream: new ArchivedMessageStream(dto.ArchivedMessageStream.Stream),
-            meteringPointsIds: dto.MeteringPointsIds,
+            meteringPointIds: dto.MeteringPointIds,
             relatedToMessageId: dto.RelatedToMessageId);
     }
 }

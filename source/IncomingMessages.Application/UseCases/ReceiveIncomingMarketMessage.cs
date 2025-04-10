@@ -210,7 +210,7 @@ public class ReceiveIncomingMarketMessage
                     incomingMessage.BusinessReason,
                     ArchivedMessageTypeDto.IncomingMessage,
                     incomingMarketMessageStream,
-                    meteringPointsIds: meteringPointIds),
+                    meteringPointIds: meteringPointIds),
                 cancellationToken)
             .ConfigureAwait(false);
     }
