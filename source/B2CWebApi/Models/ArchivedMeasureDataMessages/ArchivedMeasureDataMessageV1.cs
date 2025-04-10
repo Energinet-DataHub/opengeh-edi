@@ -16,7 +16,6 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 
 public record ArchivedMeasureDataMessageV1(
     Guid Id,
-    string MessageId,
     MeasureDataDocumentType DocumentType,
     DateTimeOffset CreatedAt,
     Actor Sender,

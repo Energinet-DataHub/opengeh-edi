@@ -48,7 +48,6 @@ public class ArchivedMeasureDataMessageSearchController(
 
         var message = new ArchivedMeasureDataMessageV1(
             Id: Guid.NewGuid(),
-            MessageId: Guid.NewGuid().ToString(),
             DocumentType: MeasureDataDocumentType.NotifyValidatedMeasureData,
             CreatedAt: DateTimeOffset.UtcNow,
             Sender: request.Sender ?? new Actor(ActorRole: ActorRole.DataHubAdministrator, ActorNumber: "1234567890123"),
