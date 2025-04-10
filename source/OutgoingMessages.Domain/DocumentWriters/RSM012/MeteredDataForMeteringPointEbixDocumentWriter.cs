@@ -209,7 +209,6 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
             // Dispose the payload after reading, to avoid holding all files in a bundle in memory
             // payloadString = null; // "Dispose" the string by removing the reference to it
             payloadFile.Dispose();
-            GC.Collect();
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, PayloadEnergyTimeSeriesName, null)
                 .ConfigureAwait(false);

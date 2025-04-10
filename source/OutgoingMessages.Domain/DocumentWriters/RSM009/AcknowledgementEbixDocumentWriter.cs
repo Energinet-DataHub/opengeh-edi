@@ -157,8 +157,56 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
         }
     }
 
-    protected override Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<FileStorageFile> marketActivityPayloads, XmlWriter writer)
+    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<FileStorageFile> marketActivityPayloads, XmlWriter writer)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(marketActivityPayloads);
+        ArgumentNullException.ThrowIfNull(writer);
+
+        foreach (var payload in marketActivityPayloads)
+        {
+            var rejectedForwardMeteredDataRecord =
+                await ParseFromAsync<RejectedForwardMeteredDataRecord>(payload, CancellationToken.None)
+                    .ConfigureAwait(false);
+            payload.Dispose();
+
+            if (rejectedForwardMeteredDataRecord.RejectReasons.Count == 0)
+            {
+                throw new NotSupportedException("Unable to create reject message if no reason is supplied");
+            }
+
+            // Ebix only support one reject reason, hence we only take the first one
+            var firstRejectReason = rejectedForwardMeteredDataRecord.RejectReasons.First();
+
+            // Begin PayloadResponseEvent
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadResponseEvent", null)
+                .ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "Identification",
+                    null,
+                    rejectedForwardMeteredDataRecord.TransactionId.Value)
+                .ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "StatusType", null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
+            await writer.WriteStringAsync(EbixCode.Of(ReasonCode.FullyRejected)).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ResponseReasonType", null)
+                .ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "listIdentifier", null, "DK").ConfigureAwait(false);
+            await writer.WriteStringAsync(firstRejectReason.ErrorCode).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "ReasonText", null, firstRejectReason.ErrorMessage)
+                .ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "OriginalBusinessDocument", null, rejectedForwardMeteredDataRecord.OriginalTransactionIdReference.Value)
+                .ConfigureAwait(false);
+            // End PayloadResponseEvent
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
+        }
     }
 }

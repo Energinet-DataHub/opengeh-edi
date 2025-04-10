@@ -72,27 +72,27 @@ public abstract class EbixDocumentWriter : IDocumentWriter
             "C://",
             "temp",
             "write",
-            "file.txt");
+            "file.xml");
 
         var directoryPath = Path.GetDirectoryName(path)!;
         if (!Directory.Exists(directoryPath))
             Directory.CreateDirectory(directoryPath);
 
-        var fileStream = new FileStream(
+        var stream = new FileStream(
             path,
             FileMode.Create,
             FileAccess.ReadWrite);
 
-        using (var writer = XmlWriter.Create(fileStream, settings))
+        using (var writer = XmlWriter.Create(stream, settings))
         {
             await WriteHeaderAsync(header, _documentDetails, writer, null).ConfigureAwait(false);
             await WriteMarketActivityRecordsAsync(marketActivityRecords, writer).ConfigureAwait(false);
             await WriteEndAsync(writer).ConfigureAwait(false);
         }
 
-        fileStream.Position = 0;
-        await fileStream.FlushAsync(cancellationToken).ConfigureAwait(false);
-        return new MarketDocumentStream(new FileStorageFile(fileStream));
+        stream.Position = 0;
+        await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+        return new MarketDocumentStream(new FileStorageFile(stream));
     }
 
     public abstract bool HandlesType(DocumentType documentType);
