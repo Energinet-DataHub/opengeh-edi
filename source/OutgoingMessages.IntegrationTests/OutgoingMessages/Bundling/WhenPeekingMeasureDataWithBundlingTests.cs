@@ -51,35 +51,37 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
     [Fact]
     public async Task Given_EnqueuedRsm012BundleWithMaximumSize_When_PeekMessages_Then_BundleSizeIsBelow50MB()
     {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
         var receiver = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
 
         var eventId = EventId.From(Guid.NewGuid());
 
-        // Max measure data period is one year
-        var longestMeasureDataPeriod = new Interval(
+        // 18 hours duration produces the biggest possible bundle when using MaxBundleMessageCount = 2.000
+        // and MaxBundleDataCount = 150.000
+        var measureDataPeriod = new Interval(
             Instant.FromUtc(2024, 12, 31, 23, 00, 00),
             // Instant.FromUtc(2024, 12, 31, 23, 15, 00)); // 15 minutes
-            Instant.FromUtc(2025, 01, 01, 4, 00, 00)); // 4 hours
-            // Instant.FromUtc(2025, 01, 01, 18, 00, 00)); // 18 hours
+            // Instant.FromUtc(2025, 01, 01, 4, 00, 00)); // 4 hour intervals
+            Instant.FromUtc(2025, 01, 01, 18, 00, 00)); // 18 hours
             // Instant.FromUtc(2025, 01, 01, 23, 00, 00)); // One day
             // Instant.FromUtc(2025, 01, 31, 23, 00, 00)); // One month
             // Instant.FromUtc(2025, 12, 31, 23, 00, 00)); // One year
 
         var resolution = Resolution.QuarterHourly;
         var resolutionDuration = Duration.FromMinutes(15);
-        var measureDataForPeriodCount = longestMeasureDataPeriod.Duration / resolutionDuration;
+        var measureDataForPeriodCount = measureDataPeriod.Duration / resolutionDuration;
         var measureDataForPeriod = Enumerable.Range(0, (int)Math.Ceiling(measureDataForPeriodCount))
             .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated))
             .ToList();
 
-        // var maxBundleSize = bundlingOptions.MaxBundleSize; // Max bundle size = 2000
-        const int maxBundleSize = 2000;
-        const int maxMeasureDataCount = 150000;
+        var maxBundleMessageSize = bundlingOptions.MaxBundleMessageCount;
+        var maxBundleDataCount = bundlingOptions.MaxBundleDataCount;
 
         // Create bundles for either maxBundleSize or the amount of bundles before the maxMeasureDataCount is exceeded
-        var bundlesToCreateCount = Math.Min(maxBundleSize, maxMeasureDataCount / measureDataForPeriod.Count);
-        var documentFormat = DocumentFormat.Ebix;
+        var bundlesToCreateCount = Math.Min(maxBundleMessageSize, maxBundleDataCount / measureDataForPeriod.Count);
+        var documentFormat = DocumentFormat.Ebix; // ebIX is the largest format for RSM-012
 
         var messagesToEnqueue = Enumerable.Range(0, bundlesToCreateCount)
             .Select(
@@ -96,10 +98,10 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                         OriginalTransactionIdReferenceId: TransactionId.New(),
                         Product: "1234567890123456",
                         QuantityMeasureUnit: MeasurementUnit.KilowattHour,
-                        RegistrationDateTime: longestMeasureDataPeriod.Start,
+                        RegistrationDateTime: measureDataPeriod.Start,
                         Resolution: resolution,
-                        StartedDateTime: longestMeasureDataPeriod.Start,
-                        EndedDateTime: longestMeasureDataPeriod.End,
+                        StartedDateTime: measureDataPeriod.Start,
+                        EndedDateTime: measureDataPeriod.End,
                         EnergyObservations: measureDataForPeriod)))
             .Cast<OutgoingMessageDto>()
             .ToList();
@@ -133,7 +135,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                 actorMessageQueueId: actorMessageQueue.Id,
                 businessReason: BusinessReason.PeriodicMetering,
                 documentTypeInBundle: DocumentType.NotifyValidatedMeasureData,
-                maxNumberOfMessagesInABundle: maxBundleSize,
+                maxNumberOfMessagesInABundle: maxBundleMessageSize,
                 created: now,
                 relatedToMessageId: null);
 
@@ -215,23 +217,18 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         var eventId = EventId.From(Guid.NewGuid());
         var relatedToMessageId = MessageId.New();
 
-        // var maxBundleSize = bundlingOptions.MaxBundleSize; // Max bundle size = 2000
-        const int maxBundleSize = 2000;
-        var documentFormat = DocumentFormat.Ebix;
+        var maxBundleSize = bundlingOptions.MaxBundleMessageCount;
+        var documentFormat = DocumentFormat.Json; // ebIX only writes one reject reason in each RSM-009, so we use CIM JSON instead.
 
-        var rejectReasons = new List<Interfaces.Models.MeteredDataForMeteringPoint.RejectReason>
-        {
-            new("XX1", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX2", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX3", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX4", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX5", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX6", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX7", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX8", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("XX9", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-            new("X10", "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"),
-        };
+        // We should usually not have more than a couple of reject reasons in each message, but we test with 50
+        // to make sure we can handle a lot of reject reasons in a combined bundle (50 * 2000), without exceeding 50MB.
+        const int rejectReasonsCount = 50;
+        var rejectReasonsForEachMessage = Enumerable.Range(0, count: rejectReasonsCount)
+            .Select(
+                i => new RejectReason(
+                    $"XX{i}",
+                    "En lang fejlbesked der eksisterer på både dansk og engelsk, og indeholder en del tekst / a long error message that exists in both Danish and English, and contains a lot of text"))
+            .ToList();
 
         var messagesToEnqueue = Enumerable.Range(0, maxBundleSize)
             .Select(
@@ -246,7 +243,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     series: new RejectedForwardMeteredDataSeries(
                         TransactionId: TransactionId.New(),
                         OriginalTransactionIdReference: TransactionId.New(),
-                        RejectReasons: rejectReasons)))
+                        RejectReasons: rejectReasonsForEachMessage)))
             .Cast<OutgoingMessageDto>()
             .ToList();
 
@@ -330,7 +327,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         Assert.Equal(biggestPossibleBundle.MessageId, peekResult.MessageId);
 
         peekResult.Bundle.Seek(0, SeekOrigin.Begin);
-        var filePath = Path.Combine("C://", "temp", $"rsm-009-bundle-{documentFormat.Name.ToLower()}-{rejectReasons.Count}reasons-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
+        var filePath = Path.Combine("C://", "temp", $"rsm-009-bundle-{documentFormat.Name.ToLower()}-{rejectReasonsForEachMessage.Count}reasons-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
         var directoryPath = Path.GetDirectoryName(filePath)!;
         if (!Directory.Exists(directoryPath))
             Directory.CreateDirectory(directoryPath);
