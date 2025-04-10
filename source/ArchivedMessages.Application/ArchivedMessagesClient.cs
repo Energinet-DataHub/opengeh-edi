@@ -58,8 +58,6 @@ public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRe
 
     public async Task<MessageSearchResultDto> SearchMeteringPointMessagesAsync(GetMeteringPointMessagesQueryDto queryInputDto, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(queryInputDto);
-
         var result = await _archivedMessageRepository.SearchMeteringPointMessagesAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
 
         return MessagesSearchResultMapper.Map(result);

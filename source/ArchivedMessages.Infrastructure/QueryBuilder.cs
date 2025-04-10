@@ -212,7 +212,7 @@ internal sealed class QueryBuilder
             "DocumentType NOT IN @ExcludedDocumentType",
             new KeyValuePair<string, object>("ExcludedDocumentType", new string[] { DocumentType.NotifyValidatedMeasureData.Name, DocumentType.Acknowledgement.Name }));
 
-        return new QueryInput(BuildStatement(query), BuildTotalCountStatement(query), _queryParameters);
+        return new QueryInput(BuildStatement(query), BuildTotalCountStatement(), _queryParameters);
     }
 
     private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, SortingCursor cursor, bool isForward)
@@ -308,6 +308,30 @@ internal sealed class QueryBuilder
             var selectStatement = $"SELECT Count(*) FROM dbo.ArchivedMessages";
             sqlStatement = selectStatement + whereClause;
         }
+
+        return sqlStatement;
+    }
+
+    private string BuildStatement(GetMeteringPointMessagesQuery query)
+    {
+        var whereClause = " WHERE ";
+        whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
+        whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
+        string sqlStatement;
+
+        var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) RecordId, Id, MessageId, DocumentType, SenderNumber, SenderRoleCode, ReceiverNumber, ReceiverRoleCode, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
+        sqlStatement = selectStatement + whereClause;
+
+        sqlStatement += OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);
+        return sqlStatement;
+    }
+
+    private string BuildTotalCountStatement()
+    {
+        var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)} " : string.Empty;
+        var selectStatement = $"SELECT Count(*) FROM dbo.ArchivedMessages";
+
+        var sqlStatement = selectStatement + whereClause;
 
         return sqlStatement;
     }

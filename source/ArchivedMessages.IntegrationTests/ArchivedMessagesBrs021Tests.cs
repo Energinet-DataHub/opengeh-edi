@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
@@ -101,25 +100,32 @@ public class ArchivedMessagesBrs021Tests : IAsyncLifetime
     public async Task Given_Brs021ArchivedMessage_When_Creating_Then_MessageIsStored()
     {
         // Arrange
-        var incomingMessage = await _fixture.CreateArchivedMessageAsync(
+        var incomingMessage1 = await _fixture.CreateArchivedMessageAsync(
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
+            documentType: IncomingDocumentType.NotifyValidatedMeasureData.Name,
+            storeMessage: false,
+            meteringPointIds: ["1234"]);
+
+        var incomingMessage2 = await _fixture.CreateArchivedMessageAsync(
             archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
             documentType: IncomingDocumentType.NotifyValidatedMeasureData.Name,
             storeMessage: false,
             meteringPointIds: ["1234"]);
 
         // Act
-        await _sut.CreateAsync(incomingMessage, CancellationToken.None);
+        await _sut.CreateAsync(incomingMessage1, CancellationToken.None);
+        await _sut.CreateAsync(incomingMessage2, CancellationToken.None);
 
         // Assert
         var searchResult = await _sut.SearchMeteringPointMessagesAsync(
             new GetMeteringPointMessagesQueryDto(
-                incomingMessage.MeteringPointsIds.First(),
+                incomingMessage1.MeteringPointsIds.First(),
                 new SortedCursorBasedPaginationDto()),
             CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
         searchResult.Should().NotBeNull();
-        searchResult.Messages.Should().ContainSingle().Subject.MessageId.Should().Be(incomingMessage.MessageId);
+        searchResult.Messages.Should().ContainSingle().Subject.MessageId.Should().Be(incomingMessage1.MessageId);
         searchResult.TotalAmountOfMessages.Should().Be(1);
     }
 }
