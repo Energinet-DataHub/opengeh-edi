@@ -46,7 +46,7 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [EventIds] varchar(4000) NULL, 
     -- Size: MaxBundleDataCount is 150000, the minimum amount of dataCount for a MeteringPointId is 4(quarterly) * 4(hours) = 16 
     -- 150.000 / 16 = 9375 (max metering point ids per bundle)
-    -- In Json Format: (amount of guids * (GUID_Length + double quotes + comma separator)) + array brackets
+    -- In Json Format: (amount of guids * (MeteringPointId_Length + double quotes + comma separator)) + array brackets
     -- (9375 * (36 + 2 + 1)) + 2 = 337,500 --> 337500 exceeds the 8,060-byte in-row limit, so the data will be stored off-row = max
     [MeteringPointIds] [varchar](max) NULL,
     CONSTRAINT [PK_MeteringPointArchivedMessages_Id] PRIMARY KEY NONCLUSTERED ([Id] ASC)
