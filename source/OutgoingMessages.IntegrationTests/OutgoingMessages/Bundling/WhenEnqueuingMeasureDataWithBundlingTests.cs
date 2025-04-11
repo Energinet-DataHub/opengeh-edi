@@ -188,7 +188,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.Equal(DocumentType.NotifyValidatedMeasureData, bundle.DocumentTypeInBundle),
             () => Assert.Equal(MessageCategory.MeasureData, bundle.MessageCategory),
             () => Assert.Equal(BusinessReason.PeriodicMetering, bundle.BusinessReason),
-            () => Assert.Equal(bundlingOptions.MaxBundleSize, bundle.MaxMessageCount),
+            () => Assert.Equal(bundlingOptions.MaxBundleMessageCount, bundle.MaxMessageCount),
             () => Assert.Null(bundle.RelatedToMessageId));
     }
 
@@ -246,7 +246,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             () => Assert.Equal(DocumentType.Acknowledgement, bundle.DocumentTypeInBundle),
             () => Assert.Equal(MessageCategory.MeasureData, bundle.MessageCategory),
             () => Assert.Equal(BusinessReason.PeriodicMetering, bundle.BusinessReason),
-            () => Assert.Equal(bundlingOptions.MaxBundleSize, bundle.MaxMessageCount),
+            () => Assert.Equal(bundlingOptions.MaxBundleMessageCount, bundle.MaxMessageCount),
             () => Assert.Equal(outgoingMessage.RelatedToMessageId, bundle.RelatedToMessageId));
     }
 
@@ -260,7 +260,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
 
         // - Create messages for two bundles
-        var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
+        var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleMessageCount)
             .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId: null))
             .ToList();
         var messageForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId: null);
@@ -300,12 +300,12 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - The bundle has a count of MaxBundleSize
         Assert.Multiple(
             () => Assert.Single(bundles),
-            () => Assert.Equal(bundlingOptions.MaxBundleSize + 1, outgoingMessages.Count),
+            () => Assert.Equal(bundlingOptions.MaxBundleMessageCount + 1, outgoingMessages.Count),
             () => Assert.Single(outgoingMessages, om => om.AssignedBundleId == null),
             () => Assert.Collection(
                 collection: bundles,
                 elementInspectors: b => Assert.Equal(
-                    expected: bundlingOptions.MaxBundleSize,
+                    expected: bundlingOptions.MaxBundleMessageCount,
                     actual: outgoingMessages.Count(om => om.AssignedBundleId == b.Id))));
     }
 
@@ -319,7 +319,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
 
         // - Create messages for two bundles
-        var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleSize)
+        var messagesForBundle1 = Enumerable.Range(0, bundlingOptions.MaxBundleMessageCount)
             .Select(_ => CreateMessage(documentType, receiver, relatedToMessageId: null))
             .ToList();
         var message1ForPartialBundle = CreateMessage(documentType, receiver, relatedToMessageId: null);
@@ -365,7 +365,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - 2 messages are assigned bundle 2
         Assert.Multiple(
             () => Assert.Equal(2, bundles.Count),
-            () => Assert.Equal(bundlingOptions.MaxBundleSize + 2, outgoingMessages.Count),
+            () => Assert.Equal(bundlingOptions.MaxBundleMessageCount + 2, outgoingMessages.Count),
             () => Assert.All(outgoingMessages, om => Assert.NotNull(om.AssignedBundleId)),
             () => Assert.Collection(
                 collection: bundles.OrderByDescending(b => outgoingMessages.Count(om => om.AssignedBundleId == b.Id)),
@@ -373,7 +373,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                 [
                     // First bundle has MaxBundleSize messages
                     b => Assert.Equal(
-                        expected: bundlingOptions.MaxBundleSize,
+                        expected: bundlingOptions.MaxBundleMessageCount,
                         actual: outgoingMessages.Count(om => om.AssignedBundleId == b.Id)),
                     // Second bundle has 2 messages
                     b => Assert.Equal(
@@ -383,7 +383,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
     }
 
     [Fact]
-    public async Task Given_MessagesEnqueuedForTwoDifferentReceivers_When_BundleMessages_Then_AllMessagesAreInCorrectBundles()
+    public async Task Given_ManyMessagesEnqueuedForTwoDifferentReceivers_When_BundleMessages_Then_AllMessagesAreInCorrectBundles()
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
 
@@ -403,7 +403,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         // - Create messages for receivers
         var eventId = EventId.From(Guid.NewGuid());
         var startTime = Instant.FromUtc(2024, 03, 21, 23, 00, 00);
-        var bundleSize = bundlingOptions.MaxBundleSize; // Max bundle size = 2000
+        var bundleSize = bundlingOptions.MaxBundleMessageCount; // Max bundle size = 2000
         const int receiver1MessageCount = 7234; // 4 bundles for receiver 1
         var receiver1BundleCount = (int)Math.Ceiling((double)receiver1MessageCount / bundleSize);
         const int receiver2MessageCount = 1111; // 1 bundle for receiver 2
@@ -544,6 +544,245 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                 }));
     }
 
+    [Theory]
+    [InlineData(1, 2000, 2)] // 4*24 points * 1 day * 2000 messages = 192000 data points, should be in 2 bundles.
+    [InlineData(31, 200, 4)] // 4*24 points * 31 days * 200 messages = 595200 data points, should be in 4 bundles.
+    [InlineData(365, 20, 5)] // 4*24 points * 365 days * 20 messages = 700800 data points, should be in 5 bundles.
+    public async Task Given_MessagesEnqueuedThatExceedMaxDataCount_When_BundleMessages_Then_AllMessagesAreInCorrectBundles(
+        int periodDays,
+        int enqueueMessageCount,
+        int expectedBundleCount)
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        if (enqueueMessageCount > bundlingOptions.MaxBundleMessageCount)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(enqueueMessageCount),
+                enqueueMessageCount,
+                "Enqueue message count must be less than or equal to max bundle message count, since this test is about max data count.");
+        }
+
+        var receiver = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
+        var resolution = Resolution.QuarterHourly;
+        var resolutionDuration = Duration.FromMinutes(15);
+
+        // - Create actor message queue for receiver
+        using (var setupScope = ServiceProvider.CreateScope())
+        {
+            var amqContext = setupScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(receiver));
+            await amqContext.SaveChangesAsync();
+        }
+
+        // - Create messages for receiver
+        var startDate = Instant.FromUtc(2024, 12, 31, 23, 00, 00);
+        var endDate = startDate.Plus(Duration.FromDays(periodDays));
+
+        var messagePeriod = new Interval(startDate, endDate);
+        var measureDataForEachMessageCount = (int)Math.Ceiling(messagePeriod.Duration / resolutionDuration);
+        var measureDataForEachMessage = Enumerable.Range(0, measureDataForEachMessageCount)
+            .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated))
+            .ToList();
+
+        var totalMeasureDataCount = (double)measureDataForEachMessageCount * enqueueMessageCount;
+
+        var maxBundleDataCount = (double)bundlingOptions.MaxBundleDataCount;
+
+        var messagesToEnqueue = Enumerable.Range(0, enqueueMessageCount)
+            .Select(
+                i => new AcceptedForwardMeteredDataMessageDto(
+                    eventId: EventId.From(Guid.NewGuid()),
+                    externalId: new ExternalId(Guid.NewGuid()),
+                    receiver: receiver.ToActor(),
+                    businessReason: BusinessReason.PeriodicMetering,
+                    relatedToMessageId: MessageId.New(),
+                    series: new ForwardMeteredDataMessageSeriesDto(
+                        TransactionId: TransactionId.New(),
+                        MarketEvaluationPointNumber: "1234567890123456",
+                        MarketEvaluationPointType: MeteringPointType.Consumption,
+                        OriginalTransactionIdReferenceId: TransactionId.New(),
+                        Product: "1234567890123456",
+                        QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                        RegistrationDateTime: messagePeriod.Start,
+                        Resolution: resolution,
+                        StartedDateTime: messagePeriod.Start,
+                        EndedDateTime: messagePeriod.End,
+                        EnergyObservations: measureDataForEachMessage)))
+            .Cast<OutgoingMessageDto>()
+            .ToList();
+
+        // - Set messages created at to "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        // - Enqueue messages for receivers
+        var enqueueStopwatch = Stopwatch.StartNew();
+        var enqueuedMessagesCount = await EnqueueAndCommitMessages(
+            messagesToEnqueue: messagesToEnqueue);
+        enqueueStopwatch.Stop();
+
+        _testOutputHelper.WriteLine("Finished enqueueing {0} messages. Elapsed time: {1:D2}m{2:D2}s", enqueuedMessagesCount, enqueueStopwatch.Elapsed.Minutes, enqueueStopwatch.Elapsed.Seconds);
+
+        // When bundling the messages
+        // - Move clock to when bundles should be created
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Bundle messages
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+
+        var bundleStopwatch = Stopwatch.StartNew();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+        bundleStopwatch.Stop();
+
+        // Then all messages are in correct bundles
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var nullBundleKey = BundleId.Create(Guid.Empty);
+        var outgoingMessages = await dbContext.OutgoingMessages
+            .GroupBy(om => om.AssignedBundleId)
+            .ToDictionaryAsync(
+                keySelector: om => om.Key ?? nullBundleKey,
+                elementSelector: om => om.ToList());
+
+        var bundles = await dbContext.Bundles
+            .ToListAsync();
+
+        _testOutputHelper.WriteLine(
+            "Created {0} bundles (for {1} messages, {5} total measure data). Elapsed time: {2:D2}m{3:D2}s{4:D2}ms",
+            bundles.Count,
+            enqueuedMessagesCount,
+            bundleStopwatch.Elapsed.Minutes,
+            bundleStopwatch.Elapsed.Seconds,
+            bundleStopwatch.Elapsed.Milliseconds,
+            totalMeasureDataCount);
+
+        Assert.Multiple(
+            () => Assert.Equal(enqueuedMessagesCount, outgoingMessages.SelectMany(om => om.Value).Count()), // All messages are enqueued
+            () => Assert.DoesNotContain(outgoingMessages, om => om.Key == nullBundleKey), // All messages are assigned a bundle
+            () => Assert.Equal(expectedBundleCount, bundles.Count), // The created bundle count is as expected
+            () => Assert.All(
+                bundles,
+                // The bundles data count does not exceed the max data count
+                b =>
+                {
+                    var outgoingMessagesForBundle = outgoingMessages[b.Id];
+                    var totalMeasureDataCountForBundle = outgoingMessagesForBundle.Sum(om => om.DataCount);
+                    Assert.True(totalMeasureDataCountForBundle <= maxBundleDataCount, $"Bundle data count must be below max data count ({maxBundleDataCount}), but was {totalMeasureDataCount}");
+                }));
+    }
+
+    /// <summary>
+    /// If a message's data count exceeds the max data count, then it should be bundled in a separate bundle.
+    /// </summary>
+    [Fact]
+    public async Task Given_TwoMessagesEnqueuedThatBothExceedMaxDataCount_When_BundleMessages_Then_2BundlesAreCreated()
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+        var countThatExceedsMaxBundleDataCount = bundlingOptions.MaxBundleDataCount + 1;
+
+        var receiver = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
+
+        // - Create actor message queue for receiver
+        using (var setupScope = ServiceProvider.CreateScope())
+        {
+            var amqContext = setupScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            amqContext.ActorMessageQueues.Add(ActorMessageQueue.CreateFor(receiver));
+            await amqContext.SaveChangesAsync();
+        }
+
+        var measureDataForEachMessage = Enumerable.Range(0, count: countThatExceedsMaxBundleDataCount)
+            .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated))
+            .ToList();
+
+        var messagesToEnqueue = Enumerable.Range(start: 0, count: 2)
+            .Select(
+                _ => new AcceptedForwardMeteredDataMessageDto(
+                    eventId: EventId.From(Guid.NewGuid()),
+                    externalId: new ExternalId(Guid.NewGuid()),
+                    receiver: receiver.ToActor(),
+                    businessReason: BusinessReason.PeriodicMetering,
+                    relatedToMessageId: MessageId.New(),
+                    series: new ForwardMeteredDataMessageSeriesDto(
+                        TransactionId: TransactionId.New(),
+                        MarketEvaluationPointNumber: "1234567890123456",
+                        MarketEvaluationPointType: MeteringPointType.Consumption,
+                        OriginalTransactionIdReferenceId: TransactionId.New(),
+                        Product: "1234567890123456",
+                        QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                        RegistrationDateTime: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
+                        Resolution: Resolution.QuarterHourly,
+                        StartedDateTime: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
+                        EndedDateTime: Instant.FromUtc(2024, 12, 31, 23, 15, 00),
+                        EnergyObservations: measureDataForEachMessage)))
+            .Cast<OutgoingMessageDto>()
+            .ToList();
+
+        var totalMeasureDataCount = (double)measureDataForEachMessage.Count * messagesToEnqueue.Count;
+
+        // - Set messages created at to "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        // - Enqueue messages for receiver
+        var enqueueStopwatch = Stopwatch.StartNew();
+        var enqueuedMessagesCount = await EnqueueAndCommitMessages(
+            messagesToEnqueue: messagesToEnqueue);
+        enqueueStopwatch.Stop();
+
+        _testOutputHelper.WriteLine("Finished enqueueing {0} messages. Elapsed time: {1:D2}m{2:D2}s", enqueuedMessagesCount, enqueueStopwatch.Elapsed.Minutes, enqueueStopwatch.Elapsed.Seconds);
+
+        // When bundling the messages
+        // - Move clock to when bundles should be created
+        var whenBundlesShouldBeCreated = now.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+        _clockStub.SetCurrentInstant(whenBundlesShouldBeCreated);
+
+        // - Bundle messages
+        var bundleClient = ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+
+        var bundleStopwatch = Stopwatch.StartNew();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+        bundleStopwatch.Stop();
+
+        // Then all messages are in correct bundles
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var nullBundleKey = BundleId.Create(Guid.Empty);
+        var outgoingMessages = await dbContext.OutgoingMessages
+            .GroupBy(om => om.AssignedBundleId)
+            .ToDictionaryAsync(
+                keySelector: om => om.Key ?? nullBundleKey,
+                elementSelector: om => om.ToList());
+
+        var bundles = await dbContext.Bundles
+            .ToListAsync();
+
+        _testOutputHelper.WriteLine(
+            "Created {0} bundles (for {1} messages, {5} total measure data). Elapsed time: {2:D2}m{3:D2}s{4:D2}ms",
+            bundles.Count,
+            enqueuedMessagesCount,
+            bundleStopwatch.Elapsed.Minutes,
+            bundleStopwatch.Elapsed.Seconds,
+            bundleStopwatch.Elapsed.Milliseconds,
+            totalMeasureDataCount);
+
+        Assert.Multiple(
+            () => Assert.Equal(enqueuedMessagesCount, outgoingMessages.SelectMany(om => om.Value).Count()), // All messages are enqueued
+            () => Assert.DoesNotContain(outgoingMessages, om => om.Key == nullBundleKey), // All messages are assigned a bundle
+            () => Assert.Equal(2, bundles.Count), // The created bundle count is as expected
+            () => Assert.All(
+                bundles,
+                // Each bundle only contains a single outgoing message
+                b =>
+                {
+                    var outgoingMessagesForBundle = outgoingMessages[b.Id];
+                    Assert.Single(outgoingMessagesForBundle);
+                }));
+    }
+
     [Fact]
     public async Task Given_EnqueuedTwoAcknowledgementMessagesWithDifferentRelatedToMessageIds_When_BundlingMessages_Then_TheABundleIsCreatedForEachMessage()
     {
@@ -681,7 +920,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var messageId = message switch
         {
             AcceptedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
-            RejectedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAndCommitAsync(m, CancellationToken.None),
+            RejectedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
             _ => throw new NotImplementedException($"Enqueueing outgoing message of type {message.GetType()} is not implemented."),
         };
 

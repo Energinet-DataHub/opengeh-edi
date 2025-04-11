@@ -126,7 +126,10 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                                 ErrorMessage: validationError.Message))
                     .ToList()));
 
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+        await _outgoingMessagesClient.EnqueueAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)
