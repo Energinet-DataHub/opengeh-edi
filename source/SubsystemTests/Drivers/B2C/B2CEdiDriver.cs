@@ -19,6 +19,7 @@ using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
+using Instant = NodaTime.Instant;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
@@ -64,15 +65,21 @@ public sealed class B2CEdiDriver : IDisposable
         var webApiClient = await CreateWebApiClientAsync();
 
         var start = Instant.FromUtc(2024, 09, 24, 00, 00);
+        var requestAggregatedMeasureDataMarketRequestV1 = new RequestAggregatedMeasureDataMarketRequestV1
+        {
+            BusinessReason = BusinessReason.BalanceFixing,
+            SettlementMethod = SettlementMethod.NonProfiled,
+            SettlementVersion = null,
+            MeteringPointType = null,
+            StartDate = Instant.FromUtc(2024, 08, 27, 22, 00).ToDateTimeOffset(),
+            EndDate = Instant.FromUtc(2024, 08, 28, 22, 00).ToDateTimeOffset(),
+            GridAreaCode = null,
+            EnergySupplierId = null,
+            BalanceResponsibleId = null,
+        };
+
         await webApiClient.RequestAggregatedMeasureDataAsync(
-                body: new RequestAggregatedMeasureDataMarketRequest
-                {
-                    CalculationType = CalculationType.BalanceFixing,
-                    StartDate = InstantPattern.General.Format(start),
-                    EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(1))),
-                    GridArea = "804",
-                    EnergySupplierId = "5790001330552",
-                },
+                body: requestAggregatedMeasureDataMarketRequestV1,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }
@@ -101,11 +108,11 @@ public sealed class B2CEdiDriver : IDisposable
 
         var start = Instant.FromUtc(2024, 09, 01, 00, 00);
         await webApiClient.RequestWholesaleSettlementAsync(
-                body: new RequestWholesaleSettlementMarketRequest
+                body: new RequestWholesaleSettlementMarketRequestV1
                 {
-                    CalculationType = CalculationType.WholesaleFixing,
-                    StartDate = InstantPattern.General.Format(start),
-                    EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(30))),
+                    BusinessReason = BusinessReason.BalanceFixing,
+                    StartDate = start.ToDateTimeOffset(),
+                    EndDate = start.Plus(Duration.FromDays(30)).ToDateTimeOffset(),
                     GridArea = "804",
                 },
                 cancellationToken: cancellationToken)
