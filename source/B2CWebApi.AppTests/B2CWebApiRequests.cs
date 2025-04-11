@@ -167,7 +167,7 @@ public static class B2CWebApiRequests
 
     public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageGetRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/ArchivedMeasureDataMessage/{Guid.NewGuid()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/ArchivedMeasureDataMessage?id={Guid.NewGuid()}");
         return request;
     }
 

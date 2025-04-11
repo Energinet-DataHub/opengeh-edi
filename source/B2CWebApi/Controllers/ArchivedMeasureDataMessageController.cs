@@ -66,7 +66,7 @@ public class ArchivedMeasureDataMessageController(
 
     [HttpGet("{id:guid}")]
     [Produces("text/plain")]
-    public async Task<ActionResult> GetDocumentAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetDocumentV1Async(Guid id, CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
