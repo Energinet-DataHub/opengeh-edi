@@ -72,7 +72,7 @@ public class ArchivedMeasureDataMessageController(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.ArchivedMeasureDataMessageGet,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
-                activityPayload: null,
+                activityPayload: id,
                 affectedEntityType: _affectedEntityType,
                 affectedEntityKey: id.ToString(),
                 cancellationToken: cancellationToken)
