@@ -171,9 +171,8 @@ public class BundleMessages(
                    && outgoingMessagesForBundle.Count < maxBundleMessageCount
                    && dataCount < maxDataCount)
             {
-                var nextOutgoingMessageForBundle = outgoingMessagesList.First?.Value;
-                if (nextOutgoingMessageForBundle == null)
-                    break; // No more messages to bundle
+                var nextOutgoingMessageForBundle = outgoingMessagesList.First?.Value
+                    ?? throw new NullReferenceException("Next outgoing messages in list was null, even though the while loop should prevent that.");
 
                 var newDataCount = dataCount + nextOutgoingMessageForBundle.DataCount;
                 // Bundle is full if the new data count exceeds the max data count, and there already is a message in the bundle.

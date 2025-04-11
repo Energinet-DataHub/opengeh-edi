@@ -172,7 +172,7 @@ public static class OutgoingMessageFactory
                 externalId: messageDto.ExternalId,
                 calculationId: messageDto.CalculationId,
                 messageDto.SeriesForEnergySupplier.Period.Start,
-                dataCount: messageDto.SeriesForBalanceResponsible.Point.Count + messageDto.SeriesForEnergySupplier.Point.Count),
+                dataCount: messageDto.SeriesForEnergySupplier.Point.Count),
         ];
 
         // Only create a message for the balance responsible if the business reason is BalanceFixing or PreliminaryAggregation
@@ -194,7 +194,7 @@ public static class OutgoingMessageFactory
                 externalId: messageDto.ExternalId,
                 calculationId: messageDto.CalculationId,
                 messageDto.SeriesForBalanceResponsible.Period.Start,
-                dataCount: messageDto.SeriesForBalanceResponsible.Point.Count + messageDto.SeriesForEnergySupplier.Point.Count);
+                dataCount: messageDto.SeriesForBalanceResponsible.Point.Count);
 
             outgoingMessages.Add(outgoingMessageToBalanceResponsible);
         }
