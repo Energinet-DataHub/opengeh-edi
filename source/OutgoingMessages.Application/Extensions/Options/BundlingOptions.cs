@@ -24,13 +24,13 @@ public class BundlingOptions
     /// How old an outgoing messages can be before it should be bundled.
     /// </summary>
     [Required]
-    public double BundleMessagesOlderThanSeconds { get; set; } = 300; // 5 minutes
+    public double BundleMessagesOlderThanSeconds { get; set; } = 300; // Default values only affect tests, the environments always has assigned a value.
 
     /// <summary>
     /// The maximum amount of messages that should be added to a bundle.
     /// </summary>
     [Required]
-    public int MaxBundleMessageCount { get; set; } = 2000;
+    public int MaxBundleMessageCount { get; set; } = 2000; // Default values only affect tests, the environments always has assigned a value.
 
     /// <summary>
     /// The maximum amount of data points that should be added to a bundle. An example of a data point could be
@@ -42,5 +42,5 @@ public class BundlingOptions
     /// </remarks>
     /// </summary>
     [Required]
-    public int MaxBundleDataCount { get; set; } = 150000;
+    public int MaxBundleDataCount { get; set; } = 150000; // Default values only affect tests, the environments always has assigned a value.
 }
