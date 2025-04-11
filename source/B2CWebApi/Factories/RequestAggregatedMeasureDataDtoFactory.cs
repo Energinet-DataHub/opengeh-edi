@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
+using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
 using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;

@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2CWebApi.Models.V1;
-
-namespace Energinet.DataHub.EDI.B2CWebApi.Models;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 
 /// <summary>
 /// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
-public sealed record RequestWholesaleSettlementMarketRequest(
-    CalculationType CalculationType,
-    string StartDate,
-    string EndDate,
-    string? GridArea,
+public record RequestAggregatedMeasureDataMarketRequestV1(
+    BusinessReason BusinessReason,
+    SettlementVersion? SettlementVersion,
+    SettlementMethod? SettlementMethod,
+    MeteringPointType? MeteringPointType,
+    DateTimeOffset StartDate,
+    DateTimeOffset EndDate,
+    string? GridAreaCode,
     string? EnergySupplierId,
-
-    // TODO: Remove Resolution when PriceType is fully implemented in the UI
-    [property: Obsolete("Use 'PriceType' instead")]
-    string? Resolution,
-
-    PriceType? PriceType);
+    string? BalanceResponsibleId);
