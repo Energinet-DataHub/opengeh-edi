@@ -110,7 +110,7 @@ public sealed class B2CEdiDriver : IDisposable
         await webApiClient.RequestWholesaleSettlementAsync(
                 body: new RequestWholesaleSettlementMarketRequestV1
                 {
-                    BusinessReason = BusinessReason.BalanceFixing,
+                    BusinessReason = BusinessReason.WholesaleFixing,
                     StartDate = start.ToDateTimeOffset(),
                     EndDate = start.Plus(Duration.FromDays(30)).ToDateTimeOffset(),
                     GridArea = "804",
