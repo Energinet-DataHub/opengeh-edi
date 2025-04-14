@@ -14,6 +14,7 @@
 
 using System.Data;
 using Dapper;
+using Energinet.DataHub.EDI.IntegrationEvents.Application;
 using Microsoft.Data.SqlClient;
 using NodaTime;
 

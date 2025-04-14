@@ -20,7 +20,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.DependencyInjection;
 
 public static class HealthCheckExtensions
 {

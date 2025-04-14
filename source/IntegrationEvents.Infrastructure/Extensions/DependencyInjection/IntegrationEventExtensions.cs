@@ -20,7 +20,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
+using Energinet.DataHub.EDI.IntegrationEvents.Application;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -29,7 +29,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.DependencyInjection;
 
 public static class IntegrationEventExtensions
 {
