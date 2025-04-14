@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.Messaging.Communication;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
-
-/// <summary>
-/// Process specific type(s) of integration events
-/// </summary>
-public interface IIntegrationEventProcessor
+public enum MeasureDataDocumentType
 {
-    /// <summary>
-    /// Event type the processor handles
-    /// </summary>
-    public string EventTypeToHandle { get; }
-
-    /// <summary>
-    /// Process a single integration event
-    /// </summary>
-    public Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
+    Acknowledgement = 0,
+    NotifyValidatedMeasureData = 1,
 }
