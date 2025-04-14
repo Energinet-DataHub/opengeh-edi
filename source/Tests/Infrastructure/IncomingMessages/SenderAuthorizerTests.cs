@@ -138,6 +138,34 @@ public class SenderAuthorizerTests
         result.Errors.Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task
+        Given_AuthorizedActorIsDelegated_When_MeteredDataForMeteringPoint_Then_SenderIsAuthorized()
+    {
+        var authorizedSenderRole = ActorRole.Delegated;
+        var documentSenderRole = ActorRole.MeteredDataResponsible;
+        var authenticatedActor = CreateAuthenticatedActor(
+            ActorNumber.Create("1213141516178"),
+            authorizedSenderRole);
+        var sut = CreateSut(authenticatedActor);
+
+        var incomingMessage = new MeteredDataForMeteringPointMessageBase(
+            "MessageId",
+            "MessageType",
+            "CreatedAt",
+            "1213141516178",
+            DataHubDetails.DataHubActorNumber.Value,
+            documentSenderRole.Code,
+            "BusinessReason",
+            string.Empty,
+            "BusinessType",
+            new List<IIncomingMessageSeries>());
+
+        var result = await sut.AuthorizeAsync(incomingMessage, false);
+        result.Success.Should().BeTrue();
+        result.Errors.Should().BeEmpty();
+    }
+
     private AuthenticatedActor CreateAuthenticatedActor(ActorNumber actorNumber, ActorRole actorRole)
     {
         var actorIdentity = new ActorIdentity(actorNumber, Restriction.Owned, actorRole, null, _actorId);

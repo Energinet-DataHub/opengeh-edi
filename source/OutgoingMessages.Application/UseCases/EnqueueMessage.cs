@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -32,6 +34,7 @@ public class EnqueueMessage
     private readonly IClock _clock;
     private readonly ILogger<EnqueueMessage> _logger;
     private readonly DelegateMessage _delegateMessage;
+    private readonly BundlingOptions _bundlingOptions;
 
     public EnqueueMessage(
         IOutgoingMessageRepository outgoingMessageRepository,
@@ -39,7 +42,8 @@ public class EnqueueMessage
         IBundleRepository bundleRepository,
         IClock clock,
         ILogger<EnqueueMessage> logger,
-        DelegateMessage delegateMessage)
+        DelegateMessage delegateMessage,
+        IOptions<BundlingOptions> bundlingOptions)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
@@ -47,6 +51,7 @@ public class EnqueueMessage
         _clock = clock;
         _logger = logger;
         _delegateMessage = delegateMessage;
+        _bundlingOptions = bundlingOptions.Value;
     }
 
     public async Task<OutgoingMessageId> EnqueueAsync(
@@ -63,16 +68,20 @@ public class EnqueueMessage
                 messageToEnqueue.ExternalId,
                 messageToEnqueue.PeriodStartedAt)
             .ConfigureAwait(false);
+
         if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
             return existingMessage.Id;
 
-        var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
-                messageToEnqueue.GetActorMessageQueueMetadata(),
-                cancellationToken)
+        if (!IsBundlingEnabled(messageToEnqueue.DocumentType))
+        {
+            // If bundling is disabled, then a bundle can be created & closed immediately
+            var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
+                    messageToEnqueue.GetActorMessageQueueMetadata(),
+                    cancellationToken)
                 .ConfigureAwait(false);
 
-        var newBundle = CreateBundle(messageToEnqueue, actorMessageQueueId);
-        newBundle.Add(messageToEnqueue);
+            CreateAndCloseBundle(messageToEnqueue, actorMessageQueueId);
+        }
 
         // Add to outgoing message repository (and upload to file storage) after adding actor message queue and bundle,
         // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
@@ -88,14 +97,30 @@ public class EnqueueMessage
         return messageToEnqueue.Id;
     }
 
-    private Bundle CreateBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId)
+    /// <summary>
+    /// Create bundle, add message to it, and close it immediately. This can be done if the max bundle size is 1.
+    /// </summary>
+    private void CreateAndCloseBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId)
     {
-        var newBundle = CreateBundle(
-            actorMessageQueueId,
-            BusinessReason.FromName(messageToEnqueue.BusinessReason),
-            messageToEnqueue.DocumentType,
-            _clock.GetCurrentInstant(),
-            messageToEnqueue.RelatedToMessageId);
+        var bundle = CreateBundle(messageToEnqueue, actorMessageQueueId, maxBundleSize: 1);
+
+        // Add message to bundle.
+        bundle.Add(messageToEnqueue);
+
+        // Close bundle immediately, since max bundle size is 1.
+        bundle.Close(_clock.GetCurrentInstant());
+    }
+
+    private Bundle CreateBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId, int maxBundleSize)
+    {
+        var newBundle = new Bundle(
+            actorMessageQueueId: actorMessageQueueId,
+            businessReason: BusinessReason.FromName(messageToEnqueue.BusinessReason),
+            documentTypeInBundle: messageToEnqueue.DocumentType,
+            maxNumberOfMessagesInABundle: maxBundleSize,
+            created: _clock.GetCurrentInstant(),
+            relatedToMessageId: GetRelatedToMessageIdForBundling(messageToEnqueue));
+
         _bundleRepository.Add(newBundle);
 
         return newBundle;
@@ -119,8 +144,25 @@ public class EnqueueMessage
         return actorMessageQueueId;
     }
 
-    private Bundle CreateBundle(ActorMessageQueueId actorMessageQueueId, BusinessReason businessReason, DocumentType messageType, Instant created, MessageId? relatedToMessageId = null)
+    private bool IsBundlingEnabled(DocumentType documentType)
     {
-        return new Bundle(actorMessageQueueId, businessReason, messageType, 1, created, relatedToMessageId);
+        // Using max bundle size > 1 because we want to support disabling bundling by setting it to 1.
+        var maxBundleSize = documentType switch
+        {
+            var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleMessageCount,
+            var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleMessageCount,
+            _ => 1,
+        };
+
+        return maxBundleSize > 1;
+    }
+
+    private MessageId? GetRelatedToMessageIdForBundling(OutgoingMessage messageToEnqueue)
+    {
+        // RSM-012 NotifyValidatedMeasureData messages can be bundled with different related to message id's,
+        // so the bundle should not contain a related to message id for that document type.
+        return messageToEnqueue.DocumentType == DocumentType.NotifyValidatedMeasureData
+            ? null
+            : messageToEnqueue.RelatedToMessageId;
     }
 }

@@ -65,7 +65,9 @@ public class IncomingMessagePublisher
         }
     }
 
-    private async Task SendInitializeAggregatedMeasureDataProcessAsync(InitializeAggregatedMeasureDataProcessDto initializeAggregatedMeasureDataProcessDto, CancellationToken cancellationToken)
+    private async Task SendInitializeAggregatedMeasureDataProcessAsync(
+        InitializeAggregatedMeasureDataProcessDto initializeAggregatedMeasureDataProcessDto,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(initializeAggregatedMeasureDataProcessDto);
 
@@ -75,7 +77,9 @@ public class IncomingMessagePublisher
                 .ConfigureAwait(false);
     }
 
-    private async Task SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto, CancellationToken cancellationToken)
+    private async Task SendInitializeWholesaleServicesProcessAsync(
+        InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(initializeWholesaleServicesProcessDto);
 
@@ -85,7 +89,9 @@ public class IncomingMessagePublisher
                 .ConfigureAwait(false);
     }
 
-    private async Task SendInitializeMeteredDataForMeteringPointMessageProcessAsync(MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessageBase, CancellationToken cancellationToken)
+    private async Task SendInitializeMeteredDataForMeteringPointMessageProcessAsync(
+        MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessageBase,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(meteredDataForMeteringPointMessageBase);
 

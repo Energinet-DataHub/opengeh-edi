@@ -20,10 +20,12 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 
-public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) : MessageParserBase<XmlSchema>()
+public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider, ILogger<EbixMessageParserBase> logger)
+    : MessageParserBase<XmlSchema>()
 {
     private const string HeaderElementName = "HeaderEnergyDocument";
     private const string EnergyContextElementName = "ProcessEnergyContext";
@@ -36,6 +38,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     private const string EnergyBusinessProcessRoleElementName = "EnergyBusinessProcessRole";
     private const string EnergyIndustryClassificationElementName = "EnergyIndustryClassification";
     private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
+    private readonly ILogger<EbixMessageParserBase> _logger = logger;
 
     protected abstract string RootPayloadElementName { get; }
 
@@ -46,20 +49,30 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         XmlSchema schemaResult,
         CancellationToken cancellationToken)
     {
-        using var reader = XmlReader.Create(marketMessage.Stream, CreateXmlReaderSettings(schemaResult));
-        var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
-        if (ValidationErrors.Count > 0)
+        try
         {
-            return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
+            using var reader = XmlReader.Create(marketMessage.Stream, CreateXmlReaderSettings(schemaResult));
+
+            var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
+            if (ValidationErrors.Count > 0)
+            {
+                return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
+            }
+
+            var @namespace = GetNamespace(marketMessage);
+            var ns = XNamespace.Get(@namespace);
+
+            var header = ParseHeader(document, ns);
+            var transactions = ParseTransactions(document, ns, header.SenderId, header.CreatedAt);
+            return CreateResult(header, transactions);
         }
-
-        var @namespace = GetNamespace(marketMessage);
-        var ns = XNamespace.Get(@namespace);
-
-        var header = ParseHeader(document, ns);
-        var transactions = ParseTransactions(document, ns, header.SenderId, header.CreatedAt);
-
-        return CreateResult(header, transactions);
+        catch (XmlSchemaValidationException e)
+        {
+            var streamContent = await new StreamReader(marketMessage.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogError(e, "Error validating incoming message: {StreamContent}", streamContent.Substring(0, 5000));
+            _logger.LogError(e, "Schema with target namespace '{TargetNamespace}' and source URI '{SourceUri}' to XmlReaderSettings", schemaResult.TargetNamespace, schemaResult.SourceUri);
+            throw;
+        }
     }
 
     protected override async Task<(XmlSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
@@ -203,11 +216,26 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         {
             Async = true,
             ValidationType = ValidationType.Schema,
-            ValidationFlags = XmlSchemaValidationFlags.ProcessInlineSchema |
-                              XmlSchemaValidationFlags.ReportValidationWarnings,
+            ValidationFlags =
+                // When this flag is set, the XML validator will process any inline schema definitions found within the
+                // XML document being validated. This allows the validator to use schema definitions that are embedded
+                // directly within the XML document itself, rather than relying solely on external schema files.
+                XmlSchemaValidationFlags.ProcessInlineSchema |
+                // When this flag is set, the validator will raise events for both warnings and errors during
+                // the validation process, allowing you to handle and log them accordingly
+                XmlSchemaValidationFlags.ReportValidationWarnings,
         };
 
-        settings.Schemas.Add(xmlSchema);
+        try
+        {
+            settings.Schemas.Add(xmlSchema);
+        }
+        catch (XmlSchemaException e)
+        {
+            _logger.LogError(e, "Error adding schema with target namespace '{TargetNamespace}' and source URI '{SourceUri}' to XmlReaderSettings", xmlSchema.TargetNamespace, xmlSchema.SourceUri);
+            throw;
+        }
+
         settings.ValidationEventHandler += OnValidationError;
         return settings;
     }

@@ -18,14 +18,18 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit.Abstractions;
@@ -38,6 +42,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ClockStub _clockStub;
+    private readonly IUnitOfWork _unitOfWork;
 
     public WhenAPeekIsRequestedTests(OutgoingMessagesTestFixture outgoingMessagesTestFixture, ITestOutputHelper testOutputHelper)
         : base(outgoingMessagesTestFixture, testOutputHelper)
@@ -45,6 +50,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        _unitOfWork = GetService<IUnitOfWork>();
         _clockStub = (ClockStub)GetService<IClock>();
     }
 
@@ -69,7 +75,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     public async Task When_no_messages_are_available_return_empty_result()
     {
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder.Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitMessage(message);
 
         var result = await PeekMessageAsync(MessageCategory.None);
 
@@ -83,7 +89,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitMessage(message);
 
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
@@ -99,7 +105,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitMessage(message);
 
         var firstPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
@@ -120,7 +126,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitMessage(message);
 
         // Act
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
@@ -152,7 +158,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(receiverNumber)
             .Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitMessage(message);
 
         // Act
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
@@ -171,7 +177,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitMessage(message);
 
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
@@ -187,7 +193,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        await EnqueueMessage(message);
+        await EnqueueAndCommitMessage(message);
 
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
@@ -252,7 +258,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
 
         var act = async () =>
         {
-            await EnqueueMessage(message);
+            await EnqueueAndCommitMessage(message);
 
             var result = await PeekMessageAsync(MessageCategory.Aggregations, message.ReceiverNumber, message.ReceiverRole, documentFormat: documentFormat);
             return result;
@@ -274,7 +280,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         // The receiver of a EnergyResultPerEnergySupplierPerBalanceResponsibleMessage is always the balance responsible
         var receiver = (ReceiverNumber: outgoingMessage.BalanceResponsibleNumber, ReceiverRole: ActorRole.BalanceResponsibleParty);
 
-        await EnqueueMessage(outgoingMessage);
+        await EnqueueAndCommitMessage(outgoingMessage);
 
         var year = 2023;
         var month = 1;
@@ -331,6 +337,31 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         }
     }
 
+    [Fact]
+    public async Task Given_OutgoingMessagesForBundling_When_MessagesArePeeked_Then_PeekReturnsNothing()
+    {
+        // Arrange / Given
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var bundledMessage1 = new AcceptedForwardMeteredDataMessageDtoBuilder()
+            .WithReceiver(receiver)
+            .Build();
+        var bundledMessage2 = new AcceptedForwardMeteredDataMessageDtoBuilder()
+            .WithReceiver(receiver)
+            .Build();
+
+        await EnqueueAndCommitMessage(bundledMessage1);
+        await EnqueueAndCommitMessage(bundledMessage2);
+
+        // Act / When
+        var peekResult = await PeekMessageAsync(
+            MessageCategory.MeasureData,
+            actorNumber: receiver.ActorNumber,
+            actorRole: receiver.ActorRole);
+
+        // Assert / Then
+        peekResult.Should().BeNull("because the messages shouldn't be bundled yet, so no message should be peeked");
+    }
+
     private async Task<bool> BundleIsRegistered()
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -354,8 +385,14 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         return exists;
     }
 
-    private async Task EnqueueMessage(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto message)
+    private async Task EnqueueAndCommitMessage(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto message)
     {
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+    }
+
+    private async Task EnqueueAndCommitMessage(AcceptedForwardMeteredDataMessageDto message)
+    {
+        await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        await _unitOfWork.CommitTransactionAsync(CancellationToken.None);
     }
 }

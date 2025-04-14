@@ -221,7 +221,7 @@ public class OutgoingMessagesTestBase : IDisposable
             .AddJavaScriptEncoder()
             .AddSerializer()
             .AddTestLogger(testOutputHelper)
-            .AddScoped<IClock>(_ => new ClockStub())
+            .AddSingleton<IClock>(_ => new ClockStub()) // If the clock isn't a singleton, then the clock will be different if the code creates new DI scopes.
             .AddOutgoingMessagesModule(config)
             .AddArchivedMessagesModule(config)
             .AddMasterDataModule(config)

@@ -12,21 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
-using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
+using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using NodaTime.Extensions;
 using Polly;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
+[SuppressMessage(
+    "StyleCop.CSharp.ReadabilityRules",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "Readability")]
 public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
@@ -67,7 +71,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: acceptedData.MeteringPointId,
                         MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                        OriginalTransactionIdReferenceId: TransactionId.From(acceptedData.OriginalTransactionId),
+                        OriginalTransactionIdReferenceId: null,
                         Product: acceptedData.ProductNumber,
                         QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
                         RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
@@ -96,6 +100,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
     protected override async Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
+        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
         ForwardMeteredDataRejectedV1 rejectedData,
         CancellationToken cancellationToken)
     {
@@ -107,8 +112,9 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),
-            receiverId: ActorNumber.Create(rejectedData.ForwardedByActorNumber),
-            receiverRole: ActorRole.Create(rejectedData.ForwardedByActorRole),
+            receiverNumber: ActorNumber.Create(orchestrationStartedByActor.ActorNumber),
+            receiverRole: ActorRole.FromName(orchestrationStartedByActor.ActorRole.ToString()),
+            documentReceiverRole: ActorRole.FromName(rejectedData.ForwardedForActorRole.Name),
             relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId),
@@ -119,7 +125,11 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                                 ErrorCode: validationError.ErrorCode,
                                 ErrorMessage: validationError.Message))
                     .ToList()));
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+
+        await _outgoingMessagesClient.EnqueueAsync(rejectedForwardMeteredDataMessageDto, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)

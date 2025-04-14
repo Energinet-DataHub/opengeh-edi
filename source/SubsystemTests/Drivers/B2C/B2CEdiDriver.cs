@@ -19,6 +19,7 @@ using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
+using Instant = NodaTime.Instant;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
@@ -64,7 +65,32 @@ public sealed class B2CEdiDriver : IDisposable
         var webApiClient = await CreateWebApiClientAsync();
 
         var start = Instant.FromUtc(2024, 09, 24, 00, 00);
+        var requestAggregatedMeasureDataMarketRequestV1 = new RequestAggregatedMeasureDataMarketRequestV1
+        {
+            BusinessReason = BusinessReason.BalanceFixing,
+            SettlementMethod = SettlementMethod.NonProfiled,
+            SettlementVersion = null,
+            MeteringPointType = null,
+            StartDate = Instant.FromUtc(2024, 08, 27, 22, 00).ToDateTimeOffset(),
+            EndDate = Instant.FromUtc(2024, 08, 28, 22, 00).ToDateTimeOffset(),
+            GridAreaCode = null,
+            EnergySupplierId = null,
+            BalanceResponsibleId = null,
+        };
+
         await webApiClient.RequestAggregatedMeasureDataAsync(
+                body: requestAggregatedMeasureDataMarketRequestV1,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task RequestAggregatedMeasureDataTempAsync(CancellationToken cancellationToken)
+    {
+        var webApiClient = await CreateWebApiClientAsync();
+
+        var start = Instant.FromUtc(2024, 09, 24, 00, 00);
+        await webApiClient.TempRequestAggregatedMeasureDataAsync(
+                api_version: "1.0",
                 body: new RequestAggregatedMeasureDataMarketRequest
                 {
                     CalculationType = CalculationType.BalanceFixing,
@@ -73,8 +99,7 @@ public sealed class B2CEdiDriver : IDisposable
                     GridArea = "804",
                     EnergySupplierId = "5790001330552",
                 },
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+                cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     public async Task RequestWholesaleSettlementAsync(CancellationToken cancellationToken)
@@ -83,11 +108,31 @@ public sealed class B2CEdiDriver : IDisposable
 
         var start = Instant.FromUtc(2024, 09, 01, 00, 00);
         await webApiClient.RequestWholesaleSettlementAsync(
+                body: new RequestWholesaleSettlementMarketRequestV1
+                {
+                    BusinessReason = BusinessReason.WholesaleFixing,
+                    StartDate = start.ToDateTimeOffset(),
+                    EndDate = start.Plus(Duration.FromDays(30)).ToDateTimeOffset(),
+                    GridArea = "804",
+                },
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task RequestWholesaleSettlementTempAsync(CancellationToken cancellationToken)
+    {
+        var webApiClient = await CreateWebApiClientAsync();
+
+        var start = Instant.FromUtc(2024, 08, 31, 22, 00);
+        var end = Instant.FromUtc(2024, 09, 30, 22, 00);
+
+        await webApiClient.TempRequestWholesaleSettlementAsync(
+                api_version: "1.0",
                 body: new RequestWholesaleSettlementMarketRequest
                 {
                     CalculationType = CalculationType.WholesaleFixing,
                     StartDate = InstantPattern.General.Format(start),
-                    EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(30))),
+                    EndDate = InstantPattern.General.Format(end),
                     GridArea = "804",
                 },
                 cancellationToken: cancellationToken)

@@ -166,13 +166,16 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
     public async Task Given_EnqueueRejectBrs028Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued()
     {
         // => Given enqueue rejected BRS-028 service bus message
+        var actorMessageId = Guid.NewGuid().ToString();
+
         var eventId = EventId.From(Guid.NewGuid());
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
         var businessReason = BusinessReason.BalanceFixing;
         var orchestrationInstanceId = Guid.NewGuid();
         var enqueueMessagesData = new RequestCalculatedWholesaleServicesRejectedV1(
-            OriginalMessageId: Guid.NewGuid().ToString(),
+            OriginalMessageId: actorMessageId,
+            OriginalActorMessageId: actorMessageId,
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: businessReason.ToProcessManagerBusinessReason(),
             RequestedForActorNumber: requestedForActorNumber.ToProcessManagerActorNumber(),
@@ -223,7 +226,7 @@ public class EnqueueBrs028MessagesTests : IAsyncLifetime
         actualOutgoingMessage!.DocumentType.Should().Be(DocumentType.RejectRequestWholesaleSettlement);
         actualOutgoingMessage.BusinessReason.Should().Be(businessReason.Name);
         actualOutgoingMessage.RelatedToMessageId.Should().NotBeNull();
-        actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalMessageId);
+        actualOutgoingMessage.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
         actualOutgoingMessage.Receiver.Number.Value.Should().Be(requestedForActorNumber.Value);
         actualOutgoingMessage.Receiver.ActorRole.Name.Should().Be(requestedForActorRole.Name);
 
