@@ -394,7 +394,6 @@ public class RequestProcessOrchestrationStarterTests
                 StartDateTime: expectedStart,
                 EndDateTime: expectedEndDate,
                 GridAccessProviderNumber: requestedByActor.ActorNumber.Value,
-                DelegatedGridAreaCodes: null,
                 MeteredDataList:
                 [
                     new ForwardMeteredDataInputV1.MeteredData(
