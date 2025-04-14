@@ -73,7 +73,7 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     -- In Json Format: (amount of guids * (MeteringPointId_Length + double quotes + comma separator)) + array brackets
     -- (9375 * (36 + 2 + 1)) + 2 = 337,500 --> 337500 exceeds the 8,060-byte in-row limit, so the data will be stored off-row = max
     [MeteringPointIds] [varchar](max) NULL,
-    CONSTRAINT [PK_MeteringPointArchivedMessages_Id] PRIMARY KEY NONCLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_MeteringPointArchivedMessages_Id] PRIMARY KEY NONCLUSTERED ([Id] ASC, [CreatedAt] ASC)
     ) ON PS_CreatedAt(CreatedAt);
 
 
