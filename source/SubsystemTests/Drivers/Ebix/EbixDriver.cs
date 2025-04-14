@@ -161,7 +161,7 @@ internal sealed class EbixDriver : IDisposable
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
 
-    public async Task<string> SendMeteredDataForMeteringPointAsync(CancellationToken cancellationToken)
+    public async Task<string> SendForwardMeteredDataAsync(CancellationToken cancellationToken)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();
@@ -184,7 +184,7 @@ internal sealed class EbixDriver : IDisposable
         return response.MessageId;
     }
 
-    public async Task<string> SendMeteredDataForMeteringPointWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
+    public async Task<string> SendForwardMeteredDataWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
     {
         if (_ebixServiceClient.State != CommunicationState.Opened)
             _ebixServiceClient.Open();

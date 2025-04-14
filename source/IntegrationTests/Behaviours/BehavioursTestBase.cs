@@ -324,6 +324,13 @@ public class BehavioursTestBase : IDisposable
         return messages;
     }
 
+    protected async Task GivenBundleMessagesHasBeenTriggered()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var bundleClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+    }
+
     protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat, MessageCategory messageCategory)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();

@@ -53,7 +53,11 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
             [B2CWebApiRequests.CreateOrchestrationRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsGet],
             [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsTerminate],
             [B2CWebApiRequests.CreateRequestAggregatedMeasureDataRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestEnergyResults],
+            [B2CWebApiRequests.CreateRequestAggregatedMeasureDataRequestTemp(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestEnergyResults],
             [B2CWebApiRequests.CreateRequestWholesaleSettlementRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestWholesaleResults],
+            [B2CWebApiRequests.CreateRequestWholesaleSettlementTempRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestWholesaleResults],
+            [B2CWebApiRequests.CreateRequestArchivedMeasureDataMessageSearchRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMeasureDataMessageSearch],
+            [B2CWebApiRequests.CreateRequestArchivedMeasureDataMessageGetRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMeasureDataMessageGet],
         ];
     }
 

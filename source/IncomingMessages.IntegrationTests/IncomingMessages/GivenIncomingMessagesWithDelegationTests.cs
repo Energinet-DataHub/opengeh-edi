@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -352,11 +353,13 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     }
 
     [Fact]
-    public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegatedAndDelegationDoesNotExists_Then_ReturnsErrorMessage()
+    public async Task AndGiven_MessageIsMeteredDataForMeteringPoint_When_SenderIsDelegated_Then_MessageIsReceivedAndActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.Brs021ForwardMeteredDataStartSender);
         var sut = GetService<IIncomingMessageClient>();
+        var transactionId = "555555555";
+        var resolution = Resolution.QuarterHourly;
 
         var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -371,7 +374,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             documentFormat,
             delegatedToAsDelegated.ActorNumber,
             [
-                ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
+                (transactionId, Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), resolution),
             ]);
 
         // Act
@@ -385,11 +388,28 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         // Assert
         using (new AssertionScope())
         {
-            response.IsErrorResponse.Should().BeTrue();
-            response.MessageBody.Should().Contain("The user of the SendMessage operation is not allowed to send this type of message (DocumentType) for its role");
+            response.IsErrorResponse.Should().BeFalse();
+            senderSpy.LatestMessage.Should().NotBeNull();
 
-            senderSpy.LatestMessage.Should().BeNull();
+            var startOrchestrationInstance = GetStartOrchestrationInstanceV1(senderSpy);
+            var serializer = new Serializer();
+            var requestInput = serializer.Deserialize<ForwardMeteredDataInputV1>(startOrchestrationInstance.Input);
+            startOrchestrationInstance.StartedByActor.ActorRole.Should().Be(ConvertToActorRoleV1(delegatedToAsDelegated.ActorRole));
+            startOrchestrationInstance.StartedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber.Value);
+            requestInput.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber.Value);
+            requestInput.ActorRole.Should().Be(ActorRole.MeteredDataResponsible.Name);
+            requestInput.TransactionId.Should().Be(transactionId);
+            requestInput.Resolution.Should().Be(resolution.Name);
         }
+    }
+
+    private static ActorRoleV1 ConvertToActorRoleV1(ActorRole actorRole)
+    {
+        return actorRole.Name switch
+        {
+            "Delegated" => ActorRoleV1.Delegated,
+            _ => throw new ArgumentException($"Unknown actor role: {actorRole.Name}"),
+        };
     }
 
     private static RequestCalculatedEnergyTimeSeriesInputV1 GetRequestCalculatedEnergyTimeSeriesInputV1(
@@ -400,6 +420,14 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         var message = parser.ParseJson(senderSpy.LatestMessage!.Body.ToString());
         var input = serializer.Deserialize<RequestCalculatedEnergyTimeSeriesInputV1>(message.Input);
         return input;
+    }
+
+    private static StartOrchestrationInstanceV1 GetStartOrchestrationInstanceV1(
+        ServiceBusSenderSpy senderSpy)
+    {
+        var parser = new MessageParser<StartOrchestrationInstanceV1>(() => new StartOrchestrationInstanceV1());
+        var message = parser.ParseJson(senderSpy.LatestMessage!.Body.ToString());
+        return message;
     }
 
     private async Task AddDelegationAsync(

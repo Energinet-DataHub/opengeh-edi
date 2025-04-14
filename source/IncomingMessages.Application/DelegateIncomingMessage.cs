@@ -49,6 +49,12 @@ public class DelegateIncomingMessage
 
         var processType = MapToProcessType(documentType);
 
+        // Delegation for incoming metered data is skipped in EDI and handled in ProcessManager
+        if (processType == ProcessType.IncomingMeteredDataForMeteringPoint)
+        {
+            return;
+        }
+
         // Incoming message has current actor as sender, but uses the role of the original actor. This means:
         // - message.SenderNumber is the delegated TO actor number (requested by actor number)
         // - AuthenticatedActor has the delegated TO actor role (requested by actor role)
@@ -78,8 +84,7 @@ public class DelegateIncomingMessage
         foreach (var series in message.Series)
         {
             if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
-                && series.GridArea == null
-                && processType != ProcessType.IncomingMeteredDataForMeteringPoint)
+                && series.GridArea == null)
             {
                 continue;
             }
@@ -103,13 +108,6 @@ public class DelegateIncomingMessage
                             series.GridArea,
                             cancellationToken)
                         .ConfigureAwait(false);
-                }
-
-                if (processType == ProcessType.IncomingMeteredDataForMeteringPoint)
-                {
-                    // For incoming metered data for metering point, we do not know the owner of the metering point yet (original actor). Therefore, all delegated grid ares are parsed on.
-                    // Then in the async validation we will check that the metering point belongs to any of the grid areas.
-                    series.DelegateSeries(null, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
                 }
 
                 var originalActorNumber = series.GetActorNumberForRole(originalActorRole, gridAreaOwner?.ActorNumber);

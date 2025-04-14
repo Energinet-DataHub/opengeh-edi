@@ -14,6 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028;
@@ -55,9 +56,11 @@ public class EnqueueBrs028MessageFactory
 
     public static ServiceBusMessage CreateReject(Actor actor)
     {
+        var actorMessageId = Guid.NewGuid().ToString();
         var reject = new RequestCalculatedWholesaleServicesRejectedV1(
+            OriginalMessageId: actorMessageId,
+            OriginalActorMessageId: actorMessageId,
             OriginalTransactionId: Guid.NewGuid().ToString(),
-            OriginalMessageId: Guid.NewGuid().ToString(),
             RequestedForActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             RequestedForActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             RequestedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
@@ -74,7 +77,7 @@ public class EnqueueBrs028MessageFactory
     private static ServiceBusMessage CreateServiceBusMessage<TData>(
         TData data,
         Actor actor)
-        where TData : class
+        where TData : IEnqueueDataDto
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {

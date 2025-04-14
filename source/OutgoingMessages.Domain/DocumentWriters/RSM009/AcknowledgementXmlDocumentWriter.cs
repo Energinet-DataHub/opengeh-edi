@@ -25,7 +25,7 @@ public sealed class AcknowledgementXmlDocumentWriter(IMessageRecordParser parser
     : CimXmlDocumentWriter(
           new DocumentDetails(
               "Acknowledgement_MarketDocument",
-              "urn:ediel.org:general:acknowledgement:0:1 ack.xsd",
+              "urn:ediel.org:general:acknowledgement:0:1 urn-ediel-org-general-acknowledgement-0-1.xsd",
               "urn:ediel.org:general:acknowledgement:0:1",
               "cim",
               string.Empty),

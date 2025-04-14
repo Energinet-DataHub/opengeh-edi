@@ -225,7 +225,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId.Value;
     }
 
-    public async Task<Guid> EnqueueAndCommitAsync(
+    public async Task<Guid> EnqueueAsync(
         RejectedForwardMeteredDataMessageDto rejectedForwardMeteredDataMessageDto,
         CancellationToken cancellationToken)
     {
@@ -235,7 +235,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _clock.GetCurrentInstant());
 
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return messageId.Value;
     }
