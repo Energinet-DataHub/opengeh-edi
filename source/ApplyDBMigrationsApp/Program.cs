@@ -30,6 +30,6 @@ public static class Program
 
     private static string ParseConnectionStringFrom(string[] args)
     {
-        return "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Database=ArchivedMessages;Trust Server Certificate=True;";
+        return args.First();
     }
 }
