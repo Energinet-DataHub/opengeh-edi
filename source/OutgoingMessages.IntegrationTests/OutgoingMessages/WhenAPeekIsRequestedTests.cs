@@ -309,7 +309,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
             { "BusinessReason", businessReason => businessReason.Should().Be(BusinessReason.FromName(outgoingMessage.BusinessReason).Code) },
             { "CreatedAt", createdAt => createdAt.Should().Be(expectedTimestamp) },
             { "DocumentType", documentType => documentType.Should().Be(outgoingMessage.DocumentType.Name) },
-            //{ "EventIds", eventIds => eventIds.Should().Be(expectedEventId.Value) },
+            { "EventIds", eventIds => eventIds.Should().BeNull() },
             { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
             { "Id", id => id.Should().NotBeNull() },
             { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.Value) },
