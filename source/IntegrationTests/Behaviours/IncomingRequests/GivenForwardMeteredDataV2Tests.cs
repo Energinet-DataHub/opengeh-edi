@@ -373,7 +373,6 @@ public sealed class GivenForwardMeteredDataV2Tests(
             StartDateTime: documentFormat == DocumentFormat.Ebix ? "2024-12-31T23:00:00Z" : "2024-12-31T23:00Z",
             EndDateTime: documentFormat == DocumentFormat.Ebix ? "2025-01-01T02:00:00Z" : "2025-01-01T02:00Z",
             GridAccessProviderNumber: senderActor.ActorNumber.Value,
-            DelegatedGridAreaCodes: [],
             MeteredDataList: [ // Start -> End = 3 hours = 3 points (with hourly resolution)
                 new("1", "1.01", Quality.Measured.Name),
                 new("2", "1.02", Quality.Calculated.Name),
@@ -395,7 +394,6 @@ public sealed class GivenForwardMeteredDataV2Tests(
             StartDateTime: documentFormat == DocumentFormat.Ebix ? "2024-12-31T23:00:00Z" : "2024-12-31T23:00Z",
             EndDateTime: documentFormat == DocumentFormat.Ebix ? "2025-01-01T04:00:00Z" : "2025-01-01T04:00Z",
             GridAccessProviderNumber: senderActor.ActorNumber.Value,
-            DelegatedGridAreaCodes: [],
             MeteredDataList: [ // Start -> End = 5 hours = 5 points (with hourly resolution)
                 new("1", "2.01", Quality.Measured.Name),
                 new("2", "2.02", Quality.Measured.Name),

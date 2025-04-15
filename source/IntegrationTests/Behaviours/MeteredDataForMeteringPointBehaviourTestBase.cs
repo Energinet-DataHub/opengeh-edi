@@ -199,7 +199,6 @@ public abstract class MeteredDataForMeteringPointBehaviourTestBase : BehavioursT
             }
 
             message.GridAccessProviderNumber.Should().BeEquivalentTo(input.GridAccessProviderNumber);
-            message.DelegatedGridAreaCodes.Should().BeNull();
 
             message.MeteredDataList.Should()
                 .BeEquivalentTo(
