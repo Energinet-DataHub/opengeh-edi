@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
+
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 /// <summary>
@@ -40,11 +42,18 @@ public sealed record FileStorageFile(Stream Stream) : IDisposable
 
         stream.Position = 0;
 
-#pragma warning disable CA2000 // We cannot dispose the stream reader, disposing a stream reader disposes the underlying stream, which means we can't read it again
-        var streamReader = new StreamReader(stream);
-#pragma warning restore CA2000
-        _contentAsString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+        // Use StringBuilder to reduce memory overhead by using a stream reader.
+        // When StreamReader is instantiated repeatedly in a tight loop, the cumulative overhead can become noticeable
+        var stringBuilder = new StringBuilder();
+        var buffer = new byte[8192]; // Read in chunks of 8 KB
+        int bytesRead;
 
+        while ((bytesRead = await Stream.ReadAsync(buffer.AsMemory()).ConfigureAwait(false)) > 0)
+        {
+            stringBuilder.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
+        }
+
+        _contentAsString = stringBuilder.ToString();
         return _contentAsString;
     }
 
