@@ -255,6 +255,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202409121115 Change Id length for ChargeType.sql" />
     <None Remove="Scripts\Model\202503111600 Delete Process tables.sql" />
     <EmbeddedResource Include="Scripts\Model\202503111600 Delete Process tables.sql" />
+    <None Remove="Scripts\Model\202504101458 Create MeteringPointArchivedMessages Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202504101458 Create MeteringPointArchivedMessages Table.sql" />
   </ItemGroup>
 
   <ItemGroup>
