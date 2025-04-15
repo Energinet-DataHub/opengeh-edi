@@ -60,11 +60,11 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [SenderRoleCode] TINYINT NULL,
     [CreatedAt] [datetime2](7) NOT NULL,
     [BusinessReason] TINYINT NOT NULL,
-    -- Sync validation rule that prevents the use of a messageId that is longer than 36 characters
+    -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
     [MessageId] [varchar](36) NULL, 
     -- {actorNumber}/{year:0000}/{month:00}/{day:00}/{id.ToString("N")} => 16 + 1 + 4 + 1 + 2 + 1 + 2 + 1 + 32 = 60
     [FileStorageReference] [varchar](60) NOT NULL, 
-    -- Sync validation rule that prevents the use of a messageId that is longer than 36 characters
+    -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
     [RelatedToMessageId] [varchar](36) NULL, 
     -- Size is limited to 4000 characters (4,000 ÷ 36 ≈ 111 GUIDs).
     [EventIds] varchar(4000) NULL, 
@@ -72,10 +72,9 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     -- 150.000 / 16 = 9375 (max metering point ids per bundle)
     -- In Json Format: (amount of guids * (MeteringPointId_Length + double quotes + comma separator)) + array brackets
     -- (9375 * (36 + 2 + 1)) + 2 = 337,500 --> 337500 exceeds the 8,060-byte in-row limit, so the data will be stored off-row = max
-    [MeteringPointIds] [varchar](max) NULL,
+    [MeteringPointIds] [varchar](max) NOT NULL,
     CONSTRAINT [PK_MeteringPointArchivedMessages_Id] PRIMARY KEY NONCLUSTERED ([Id] ASC, [CreatedAt] ASC)
     ) ON PS_CreatedAt(CreatedAt);
-
 
 -- Create a composite index for combined queries
 CREATE NONCLUSTERED INDEX IX_MeteringPointArchivedMessages_Optimized
