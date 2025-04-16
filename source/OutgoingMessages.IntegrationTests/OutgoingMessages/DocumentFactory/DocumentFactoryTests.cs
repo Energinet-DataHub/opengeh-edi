@@ -25,6 +25,12 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
+    private readonly IEnumerable<DocumentType> _notOutGoingMessagesDocumentTypes = new[]
+    {
+        DocumentType.RequestAggregatedMeasureData,
+        DocumentType.RequestWholesaleSettlement,
+    };
+
     public DocumentFactoryTests(OutgoingMessagesTestFixture outgoingMessagesTestFixture, ITestOutputHelper testOutputHelper)
         : base(outgoingMessagesTestFixture, testOutputHelper)
     {
@@ -41,6 +47,11 @@ public class DocumentFactoryTests
     [MemberData(nameof(GetDocumentTypes))]
     public void Ensure_that_all_document_support_xml(DocumentType documentType)
     {
+        if (_notOutGoingMessagesDocumentTypes.Contains(documentType))
+        {
+            return;
+        }
+
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
@@ -51,6 +62,11 @@ public class DocumentFactoryTests
     [MemberData(nameof(GetDocumentTypes))]
     public void Ensure_that_all_document_support_json(DocumentType documentType)
     {
+        if (_notOutGoingMessagesDocumentTypes.Contains(documentType))
+        {
+            return;
+        }
+
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
 
@@ -61,6 +77,11 @@ public class DocumentFactoryTests
     [MemberData(nameof(GetDocumentTypes))]
     public void Ensure_that_all_document_support_ebix(DocumentType documentType)
     {
+        if (_notOutGoingMessagesDocumentTypes.Contains(documentType))
+        {
+            return;
+        }
+
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
 

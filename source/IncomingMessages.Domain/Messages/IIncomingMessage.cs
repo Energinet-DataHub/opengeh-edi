@@ -76,4 +76,6 @@ public interface IIncomingMessage
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons { get; }
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles { get; }
+
+    IReadOnlyList<MeteringPointId> MeteringPointIds { get; }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using System.Reflection;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
@@ -30,7 +31,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
+public class SearchArchivedMeteredDataMessagesTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -42,7 +43,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         actorClientId: null,
         actorId: Guid.Parse("00000000-0000-0000-0000-000000000001"));
 
-    public ArchivedMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
+    public SearchArchivedMeteredDataMessagesTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
 
@@ -52,20 +53,29 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         _sut = services.GetRequiredService<IArchivedMessagesClient>();
     }
 
-    public static IEnumerable<object[]> GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy()
+    public static TheoryData<FieldToSortByDto, DirectionToSortByDto> GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy()
     {
         var fieldsToSortBy =
             typeof(FieldToSortByDto).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
         var directionsToSortBy =
             typeof(DirectionToSortByDto).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
+        var theoryData = new TheoryData<FieldToSortByDto, DirectionToSortByDto>();
         foreach (var field in fieldsToSortBy)
         {
+            var fieldValue = (FieldToSortByDto)field.GetValue(null)!;
+
+            // Skip the DocumentType field, as it is not a valid field to sort by since it uses tinyInt
+            if (fieldValue.Equals(FieldToSortByDto.DocumentType)) continue;
+
             foreach (var direction in directionsToSortBy)
             {
-                yield return [field.GetValue(null)!, direction.GetValue(null)!];
+                var directionValue = (DirectionToSortByDto)direction.GetValue(null)!;
+                theoryData.Add(fieldValue, directionValue);
             }
         }
+
+        return theoryData;
     }
 
     public Task InitializeAsync()
@@ -81,55 +91,11 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_ArchivedMessage_When_Creating_Then_MessageIsStoredInDatabaseAndBlob()
-    {
-        // Arrange
-        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
-            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
-            storeMessage: false);
-
-        var messageCreatedAt = archivedMessage.CreatedAt.ToDateTimeUtc();
-
-        // Since the message is an incoming message, we need the "senderNumber" in the path
-        var expectedBlobPath = $"{archivedMessage.SenderNumber.Value}/"
-                               + $"{messageCreatedAt.Year:0000}/"
-                               + $"{messageCreatedAt.Month:00}/"
-                               + $"{messageCreatedAt.Day:00}/"
-                               + $"{archivedMessage.Id.Value:N}"; // remove dashes from guid
-
-        var expectedBlocReference = new FileStorageReference(
-            category: FileStorageCategory.ArchivedMessage(),
-            path: expectedBlobPath);
-
-        // Act
-        await _sut.CreateAsync(archivedMessage, CancellationToken.None);
-
-        // Assert
-        var dbResult = await _fixture.GetAllMessagesInDatabase();
-
-        var message = dbResult.Single();
-        using var assertionScope = new AssertionScope();
-
-        message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
-        message.SenderRoleCode.Should().Be(archivedMessage.SenderRole.Code);
-        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
-        message.ReceiverRoleCode.Should().Be(archivedMessage.ReceiverRole.Code);
-        message.DocumentType.Should().Be(archivedMessage.DocumentType.Name);
-        message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.Name);
-        message.MessageId.Should().Be(archivedMessage.MessageId);
-        message.FileStorageReference.Should().Be(expectedBlocReference.Path);
-        message.RelatedToMessageId.Should().BeNull();
-        message.EventIds.Should().BeNull();
-
-        var blobResult = await _fixture.GetMessagesFromBlob(expectedBlocReference);
-        blobResult.Should().NotBeNull();
-    }
-
-    [Fact]
     public async Task Given_ArchivedMessagesInStorage_When_GettingMessage_Then_StreamExists()
     {
         // Arrange
-        var archivedMessage = await _fixture.CreateArchivedMessageAsync();
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData); // MeteredData DocumentType
 
         // Act
         var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
@@ -143,10 +109,20 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     public async Task Given_ArchivedMessage_When_SearchingWithoutCriteria_Then_ReturnsExpectedMessage()
     {
         // Arrange
-        var archivedMessage = await _fixture.CreateArchivedMessageAsync();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
-        var result = await _sut.SearchAsync(new GetMessagesQueryDto(new SortedCursorBasedPaginationDto()), CancellationToken.None);
+        var result = await _sut.SearchAsync(
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1)))),
+            CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
@@ -175,15 +151,26 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var expectedCreatedAt = CreatedAt("2023-05-01T22:00:00Z");
-        await _fixture.CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(-1));
-        await _fixture.CreateArchivedMessageAsync(timestamp: expectedCreatedAt);
-        await _fixture.CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(1));
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        await _fixture.CreateArchivedMessageAsync(
+            timestamp: expectedCreatedAt.PlusDays(-1),
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            timestamp: expectedCreatedAt,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            timestamp: expectedCreatedAt.PlusDays(1),
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
-                new MessageCreationPeriodDto(
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(
                     expectedCreatedAt.PlusHours(-2),
                     expectedCreatedAt.PlusHours(2))),
             CancellationToken.None);
@@ -199,13 +186,24 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var expectedSenderNumber = "9999999999999";
-        await _fixture.CreateArchivedMessageAsync(senderNumber: expectedSenderNumber);
-        await _fixture.CreateArchivedMessageAsync();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            senderNumber: expectedSenderNumber,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]); // MeteredData DocumentType
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]); // MeteredData DocumentType
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 SenderNumber: expectedSenderNumber),
             CancellationToken.None);
 
@@ -221,13 +219,24 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var expectedSenderRole = ActorRole.SystemOperator;
-        await _fixture.CreateArchivedMessageAsync(senderRole: expectedSenderRole);
-        await _fixture.CreateArchivedMessageAsync();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            senderRole: expectedSenderRole,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
         new GetMessagesQueryDto(
         new SortedCursorBasedPaginationDto(),
+        MeteringPointId: meteringPointId,
+        CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
         SenderRoleCode: expectedSenderRole.Code),
         CancellationToken.None);
 
@@ -243,13 +252,24 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var expectedReceiverRole = ActorRole.SystemOperator;
-        await _fixture.CreateArchivedMessageAsync(receiverRole: expectedReceiverRole);
-        await _fixture.CreateArchivedMessageAsync();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            receiverRole: expectedReceiverRole,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
         new GetMessagesQueryDto(
         new SortedCursorBasedPaginationDto(),
+        MeteringPointId: meteringPointId,
+        CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
         ReceiverRoleCode: expectedReceiverRole.Code),
         CancellationToken.None);
 
@@ -266,13 +286,25 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         // Arrange
         var expectedSenderRole = ActorRole.Delegated;
         var expectedReceiverRole = ActorRole.SystemOperator;
-        await _fixture.CreateArchivedMessageAsync(senderRole: expectedSenderRole, receiverRole: expectedReceiverRole);
-        await _fixture.CreateArchivedMessageAsync();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            senderRole: expectedSenderRole,
+            receiverRole: expectedReceiverRole,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
         new GetMessagesQueryDto(
         new SortedCursorBasedPaginationDto(),
+        MeteringPointId: meteringPointId,
+        CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
         ReceiverRoleCode: expectedReceiverRole.Code),
         CancellationToken.None);
 
@@ -290,13 +322,24 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var expectedReceiverNumber = "9999999999999";
-        await _fixture.CreateArchivedMessageAsync(receiverNumber: expectedReceiverNumber);
-        await _fixture.CreateArchivedMessageAsync();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            receiverNumber: expectedReceiverNumber,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 ReceiverNumber: expectedReceiverNumber),
             CancellationToken.None);
 
@@ -312,13 +355,24 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var expectedMessageId = Guid.NewGuid().ToString();
-        await _fixture.CreateArchivedMessageAsync(messageId: expectedMessageId);
-        await _fixture.CreateArchivedMessageAsync();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 MessageId: expectedMessageId),
             CancellationToken.None);
 
@@ -333,15 +387,25 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     public async Task Given_TwoArchivedMessages_When_SearchingByDocumentType_Then_ReturnsExpectedMessage()
     {
         // Arrange
-        var expectedDocumentType = DocumentType.NotifyAggregatedMeasureData;
+        var expectedDocumentType = DocumentType.NotifyValidatedMeasureData; // MeteredData DocumentType;
         var unexpectedDocumentType = DocumentType.RejectRequestAggregatedMeasureData;
-        await _fixture.CreateArchivedMessageAsync(documentType: expectedDocumentType);
-        await _fixture.CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: expectedDocumentType,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: unexpectedDocumentType,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 DocumentTypes: [expectedDocumentType.Name]),
             CancellationToken.None);
 
@@ -356,17 +420,30 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     public async Task Given_ThreeArchivedMessages_When_SearchingByDocumentTypes_Then_ReturnsExpectedMessages()
     {
         // Arrange
-        var expectedDocumentType1 = DocumentType.NotifyAggregatedMeasureData;
-        var expectedDocumentType2 = DocumentType.NotifyWholesaleServices;
+        var expectedDocumentType1 = DocumentType.NotifyValidatedMeasureData;
+        var expectedDocumentType2 = DocumentType.Acknowledgement;
         var unexpectedDocumentType = DocumentType.RejectRequestAggregatedMeasureData;
-        await _fixture.CreateArchivedMessageAsync(documentType: expectedDocumentType1);
-        await _fixture.CreateArchivedMessageAsync(documentType: expectedDocumentType2);
-        await _fixture.CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: expectedDocumentType1,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: expectedDocumentType2,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: unexpectedDocumentType,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 DocumentTypes:
                 [
                     expectedDocumentType1.Name,
@@ -393,13 +470,25 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         // Arrange
         var expectedBusinessReason = BusinessReason.MoveIn;
         var unexpectedBusinessReason = BusinessReason.BalanceFixing;
-        await _fixture.CreateArchivedMessageAsync(businessReason: expectedBusinessReason);
-        await _fixture.CreateArchivedMessageAsync(businessReason: unexpectedBusinessReason);
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            businessReason: expectedBusinessReason,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            businessReason: unexpectedBusinessReason,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 BusinessReasons: [expectedBusinessReason.Name]),
             CancellationToken.None);
 
@@ -417,14 +506,30 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var expectedBusinessReason1 = BusinessReason.MoveIn;
         var expectedBusinessReason2 = BusinessReason.Correction;
         var unexpectedBusinessReason = BusinessReason.BalanceFixing;
-        await _fixture.CreateArchivedMessageAsync(businessReason: expectedBusinessReason1);
-        await _fixture.CreateArchivedMessageAsync(businessReason: expectedBusinessReason2);
-        await _fixture.CreateArchivedMessageAsync(businessReason: unexpectedBusinessReason);
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        await _fixture.CreateArchivedMessageAsync(
+            businessReason: expectedBusinessReason1,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            businessReason: expectedBusinessReason2,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
+        await _fixture.CreateArchivedMessageAsync(
+            businessReason: unexpectedBusinessReason,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 BusinessReasons:
                 [
                     expectedBusinessReason1.Name,
@@ -453,64 +558,72 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var expectedCreatedAt = CreatedAt("2023-05-01T22:00:00Z");
         var expectedSenderNumber = "9999999999999";
         var expectedReceiverNumber = "9999999999998";
-        var expectedDocumentType = DocumentType.NotifyWholesaleServices;
+        var expectedDocumentType = DocumentType.Acknowledgement;
         var expectedBusinessReason = BusinessReason.MoveIn;
-
+        var meteringPointId = MeteringPointId.From("1234567890123");
         var expectedMessage = await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
             timestamp: expectedCreatedAt,
             senderNumber: expectedSenderNumber,
             receiverNumber: expectedReceiverNumber,
             documentType: expectedDocumentType,
-            businessReason: expectedBusinessReason);
+            businessReason: expectedBusinessReason,
+            meteringPointIds: [meteringPointId]);
         var messageWithMismatchingId = await _fixture.CreateArchivedMessageAsync(
             messageId: Guid.NewGuid().ToString(),
             timestamp: expectedCreatedAt,
             senderNumber: expectedSenderNumber,
             receiverNumber: expectedReceiverNumber,
             documentType: expectedDocumentType,
-            businessReason: expectedBusinessReason);
+            businessReason: expectedBusinessReason,
+            meteringPointIds: [meteringPointId]);
         var messageWithMismatchingTimestamp = await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
             timestamp: expectedCreatedAt.PlusDays(-2),
             senderNumber: expectedSenderNumber,
             receiverNumber: expectedReceiverNumber,
             documentType: expectedDocumentType,
-            businessReason: expectedBusinessReason);
+            businessReason: expectedBusinessReason,
+            meteringPointIds: [meteringPointId]);
         var messageWithMismatchingSenderNumber = await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
             timestamp: expectedCreatedAt,
             senderNumber: expectedSenderNumber + "999",
             receiverNumber: expectedReceiverNumber,
             documentType: expectedDocumentType,
-            businessReason: expectedBusinessReason);
+            businessReason: expectedBusinessReason,
+            meteringPointIds: [meteringPointId]);
         var messageWithMismatchingReceiverNumber = await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
             timestamp: expectedCreatedAt,
             senderNumber: expectedSenderNumber,
             receiverNumber: expectedReceiverNumber + "999",
             documentType: expectedDocumentType,
-            businessReason: expectedBusinessReason);
+            businessReason: expectedBusinessReason,
+            meteringPointIds: [meteringPointId]);
         var messageWithMismatchingDocumentType = await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
             timestamp: expectedCreatedAt,
             senderNumber: expectedSenderNumber,
             receiverNumber: expectedReceiverNumber,
             documentType: DocumentType.RejectRequestAggregatedMeasureData,
-            businessReason: expectedBusinessReason);
+            businessReason: expectedBusinessReason,
+            meteringPointIds: [meteringPointId]);
         var messageWithMismatchingBusinessReason = await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
             timestamp: expectedCreatedAt,
             senderNumber: expectedSenderNumber,
             receiverNumber: expectedReceiverNumber,
             documentType: expectedDocumentType,
-            businessReason: BusinessReason.PreliminaryAggregation);
+            businessReason: BusinessReason.PreliminaryAggregation,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MessageId: expectedMessageId,
+                MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(
                     expectedCreatedAt.PlusHours(-2),
                     expectedCreatedAt.PlusHours(2)),
@@ -560,18 +673,28 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     {
         // Arrange
         var expectedMessageId = Guid.NewGuid().ToString();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
-            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
         await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(expectedMessageId),
-            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MessageId: expectedMessageId,
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 IncludeRelatedMessages: false),
             CancellationToken.None);
 
@@ -586,22 +709,34 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     public async Task Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned()
     {
         // Arrange
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: null,
-            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
         var messageWithRelation = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage);
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
         var messageWithRelation2 = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage);
-        var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            timestamp: now,
+            meteringPointIds: [meteringPointId]);
 
         // Act
         // This could simulate a search for a message, where the message is a request with two responses
         var searchForRequest = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 MessageId: messageWithoutRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
@@ -610,6 +745,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var searchForResponse = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 MessageId: messageWithRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
@@ -646,11 +783,14 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
+        var meteringPointId = MeteringPointId.From("1234567890123");
         foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
-                messageId: messageToCreate.MessageId);
+                messageId: messageToCreate.MessageId,
+                documentType: DocumentType.NotifyValidatedMeasureData,
+                meteringPointIds: [meteringPointId]);
         }
 
         var pagination = new SortedCursorBasedPaginationDto(
@@ -659,7 +799,10 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(pagination),
+            new GetMessagesQueryDto(
+                pagination,
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
             CancellationToken.None);
 
         // Assert
@@ -686,11 +829,14 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
+        var meteringPointId = MeteringPointId.From("1234567890123");
         foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
-                messageId: messageToCreate.MessageId);
+                messageId: messageToCreate.MessageId,
+                documentType: DocumentType.NotifyValidatedMeasureData,
+                meteringPointIds: [meteringPointId]);
         }
 
         var pagination = new SortedCursorBasedPaginationDto(
@@ -699,7 +845,10 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(pagination),
+            new GetMessagesQueryDto(
+                pagination,
+                MeteringPointId: meteringPointId,
+                CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
             CancellationToken.None);
 
         // Assert
@@ -748,15 +897,23 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
         };
 
+        var meteringPointId = MeteringPointId.From("1234567890123");
         // Create messages in order when they were created at
         foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
         {
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
-                messageId: messageToCreate.MessageId);
+                messageId: messageToCreate.MessageId,
+                documentType: DocumentType.NotifyValidatedMeasureData,
+                meteringPointIds: [meteringPointId]);
         }
 
-        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true);
+        var messageCreationPeriodDto = new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"));
+        var firstPageMessages = await SkipFirstPage(
+            pageSize,
+            navigatingForward: true,
+            meteringPointId,
+            messageCreationPeriodDto);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
         var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId);
@@ -768,7 +925,10 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(pagination),
+            new GetMessagesQueryDto(
+                pagination,
+                MeteringPointId: meteringPointId,
+                CreationPeriod: messageCreationPeriodDto),
             CancellationToken.None);
 
         // Assert
@@ -806,15 +966,23 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
         };
 
+        var meteringPointId = MeteringPointId.From("1234567890123");
         // Create messages in order when they were created at
         foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
         {
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
-                messageId: messageToCreate.MessageId);
+                messageId: messageToCreate.MessageId,
+                documentType: DocumentType.NotifyValidatedMeasureData,
+                meteringPointIds: [meteringPointId]);
         }
 
-        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: false);
+        var messageCreationPeriodDto = new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"));
+        var firstPageMessages = await SkipFirstPage(
+            pageSize,
+            navigatingForward: false,
+            meteringPointId,
+            messageCreationPeriodDto);
         // The cursor points at the first item of the previous page, when navigating backward
         var firstMessageInOnThePreviousPage = firstPageMessages.Messages.First();
         var cursor = new SortingCursorDto(RecordId: firstMessageInOnThePreviousPage.RecordId);
@@ -826,7 +994,10 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(pagination),
+            new GetMessagesQueryDto(
+                pagination,
+                MeteringPointId: meteringPointId,
+                CreationPeriod: messageCreationPeriodDto),
             CancellationToken.None);
 
         // Assert
@@ -859,38 +1030,39 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                     Guid.NewGuid().ToString(),
                     "1234512345128",
                     "1234512345122",
-                    DocumentType.NotifyAggregatedMeasureData),
+                    DocumentType.NotifyValidatedMeasureData),
                 new(
                     CreatedAt("2023-04-02T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345127",
                     "1234512345123",
-                    DocumentType.NotifyWholesaleServices),
+                    DocumentType.NotifyValidatedMeasureData),
                 new(
                     CreatedAt("2023-04-03T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345125",
                     "1234512345121",
-                    DocumentType.RejectRequestAggregatedMeasureData),
+                    DocumentType.NotifyValidatedMeasureData),
                 new(
                     CreatedAt("2023-04-04T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345123",
                     "1234512345126",
-                    DocumentType.NotifyAggregatedMeasureData),
+                    DocumentType.Acknowledgement),
                 new(
                     CreatedAt("2023-04-05T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345123",
                     "1234512345128",
-                    DocumentType.RejectRequestWholesaleSettlement),
+                    DocumentType.NotifyValidatedMeasureData),
                 new(
                     CreatedAt("2023-04-06T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345122",
                     "1234512345128",
-                    DocumentType.NotifyAggregatedMeasureData),
+                    DocumentType.Acknowledgement),
             };
+        var meteringPointId = MeteringPointId.From("1234567890123");
         var recordIdsForMessages = new Dictionary<string, int>();
         var recordId = 0;
         foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
@@ -901,7 +1073,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 messageId: messageToCreate.MessageId,
                 documentType: messageToCreate.DocumentType,
                 senderNumber: messageToCreate.Sender,
-                receiverNumber: messageToCreate.Receiver);
+                receiverNumber: messageToCreate.Receiver,
+                meteringPointIds: [meteringPointId]);
         }
 
         var pagination = new SortedCursorBasedPaginationDto(
@@ -912,7 +1085,10 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-                new GetMessagesQueryDto(pagination),
+                new GetMessagesQueryDto(
+                    pagination,
+                    MeteringPointId: meteringPointId,
+                    CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
                 CancellationToken.None);
 
         // Assert
@@ -940,38 +1116,39 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                     Guid.NewGuid().ToString(),
                     "1234512345128",
                     "1234512345122",
-                    DocumentType.NotifyAggregatedMeasureData),
+                    DocumentType.NotifyValidatedMeasureData),
                 new(
                     CreatedAt("2023-04-02T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345127",
                     "1234512345123",
-                    DocumentType.NotifyWholesaleServices),
+                    DocumentType.Acknowledgement),
                 new(
                     CreatedAt("2023-04-03T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345125",
                     "1234512345121",
-                    DocumentType.RejectRequestAggregatedMeasureData),
+                    DocumentType.NotifyValidatedMeasureData),
                 new(
                     CreatedAt("2023-04-04T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345123",
                     "1234512345126",
-                    DocumentType.NotifyAggregatedMeasureData),
+                    DocumentType.Acknowledgement),
                 new(
                     CreatedAt("2023-04-05T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345123",
                     "1234512345128",
-                    DocumentType.RejectRequestWholesaleSettlement),
+                    DocumentType.NotifyValidatedMeasureData),
                 new(
                     CreatedAt("2023-04-06T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345122",
                     "1234512345128",
-                    DocumentType.NotifyAggregatedMeasureData),
+                    DocumentType.Acknowledgement),
             };
+        var meteringPointId = MeteringPointId.From("1234567890123");
         var recordIdsForMessages = new Dictionary<string, int>();
         var recordId = 0;
         foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
@@ -982,7 +1159,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 messageId: messageToCreate.MessageId,
                 documentType: messageToCreate.DocumentType,
                 senderNumber: messageToCreate.Sender,
-                receiverNumber: messageToCreate.Receiver);
+                receiverNumber: messageToCreate.Receiver,
+                meteringPointIds: [meteringPointId]);
         }
 
         var pagination = new SortedCursorBasedPaginationDto(
@@ -993,7 +1171,10 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-                new GetMessagesQueryDto(pagination),
+                new GetMessagesQueryDto(
+                    pagination,
+                    MeteringPointId: meteringPointId,
+                    CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T00:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
                 CancellationToken.None);
 
         // Assert
@@ -1021,11 +1202,14 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
+        var meteringPointId = MeteringPointId.From("1234567890123");
         foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
-                messageId: messageToCreate.MessageId);
+                messageId: messageToCreate.MessageId,
+                documentType: DocumentType.Acknowledgement,
+                meteringPointIds: [meteringPointId]);
         }
 
         var pagination = new SortedCursorBasedPaginationDto(
@@ -1038,7 +1222,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 pagination,
                 new MessageCreationPeriodDto(
                 expectedPeriodStartedAt,
-                expectedPeriodEndedAt)),
+                expectedPeriodEndedAt),
+                MeteringPointId: meteringPointId),
             CancellationToken.None);
 
         // Assert
@@ -1068,16 +1253,25 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345122"),
         };
 
+        var meteringPointId = MeteringPointId.From("1234567890123");
         // Create messages in order when they were created at
         foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
         {
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
                 messageId: messageToCreate.MessageId,
-                senderNumber: messageToCreate.SenderNumber);
+                senderNumber: messageToCreate.SenderNumber,
+                documentType: DocumentType.Acknowledgement,
+                meteringPointIds: [meteringPointId]);
         }
 
-        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true, orderByField: FieldToSortByDto.SenderNumber);
+        var messageCreationPeriodDto = new MessageCreationPeriodDto(expectedPeriodStartedAt, expectedPeriodEndedAt);
+        var firstPageMessages = await SkipFirstPage(
+            pageSize,
+            navigatingForward: true,
+            meteringPointId,
+            messageCreationPeriodDto,
+            orderByField: FieldToSortByDto.SenderNumber);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
         var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
@@ -1093,7 +1287,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 pagination,
-                new MessageCreationPeriodDto(expectedPeriodStartedAt, expectedPeriodEndedAt)),
+                messageCreationPeriodDto,
+                MeteringPointId: meteringPointId),
             CancellationToken.None);
 
         // Assert
@@ -1101,6 +1296,39 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         result.TotalAmountOfMessages.Should().Be(5);
     }
 
+    [Fact]
+    public async Task Given_10000ArchivedMessagesSearch_GettingFirstPage_Then_ShouldCompleteWithinExpectedTime()
+    {
+        // Arrange
+        const int totalMessages = 10000;
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+
+        // Seed 10,000 messages
+        for (var i = 0; i < totalMessages; i++)
+        {
+            await _fixture.CreateArchivedMessageAsync(
+                timestamp: now.Plus(Duration.FromSeconds(i)),
+                messageId: Guid.NewGuid().ToString(),
+                documentType: DocumentType.NotifyValidatedMeasureData,
+                meteringPointIds: [meteringPointId]);
+        }
+
+        var query = new GetMessagesQueryDto(
+            new SortedCursorBasedPaginationDto(PageSize: 20, NavigationForward: true),
+            MeteringPointId: meteringPointId,
+            CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))));
+
+        // Act
+        var stopwatch = Stopwatch.StartNew();
+        var result = await _sut.SearchAsync(query, CancellationToken.None);
+        stopwatch.Stop();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Messages.Should().NotBeEmpty();
+        stopwatch.ElapsedMilliseconds.Should().BeLessThan(500); // Expect the search to complete within ½ a second
+    }
     #endregion
 
     private static Instant CreatedAt(string date)
@@ -1158,11 +1386,16 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     private async Task<MessageSearchResultDto> SkipFirstPage(
         int pageSize,
         bool navigatingForward,
+        MeteringPointId meteringPointId,
+        MessageCreationPeriodDto creationPeriod,
         FieldToSortByDto? orderByField = null)
     {
         var pagination = new SortedCursorBasedPaginationDto(PageSize: pageSize, NavigationForward: navigatingForward, FieldToSortBy: orderByField, DirectionToSortBy: DirectionToSortByDto.Descending);
         return await _sut.SearchAsync(
-            new GetMessagesQueryDto(pagination),
+            new GetMessagesQueryDto(
+                pagination,
+                CreationPeriod: creationPeriod,
+                MeteringPointId: meteringPointId),
             CancellationToken.None);
     }
 }

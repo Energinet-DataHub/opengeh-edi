@@ -17,16 +17,16 @@ using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 namespace Energinet.DataHub.EDI.ArchivedMessages.Domain;
 
 /// <summary>
-/// Responsible for archiving messages.
+/// Responsible for archiving metering point messages.
 /// </summary>
-public interface IArchivedMessageRepository
+public interface IArchivedMeteringPointMessageRepository
 {
     /// <summary>
-    /// Archiving a message.
+    /// Archiving a dataMessage.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
-    Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken);
+    Task AddAsync(ArchivedMeteringPointMessage message, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get document.
@@ -36,11 +36,11 @@ public interface IArchivedMessageRepository
     /// <returns>Stream</returns>
     Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
 
-    /// <summary>
-    /// Search for messages in the database
-    /// </summary>
-    /// <param name="queryInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
+    // /// <summary>
+    // /// Search for messages in the database
+    // /// </summary>
+    // /// <param name="queryInput"></param>
+    // /// <param name="cancellationToken"></param>
+    // /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
     Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken);
 }

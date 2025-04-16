@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
@@ -20,18 +21,32 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application;
 
-public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRepository) : IArchivedMessagesClient
+public class ArchivedMessagesClient(
+    IArchivedMessageRepository archivedMessageRepository,
+    IArchivedMeteringPointMessageRepository archivedMeteringPointMessageRepository) : IArchivedMessagesClient
 {
     private readonly IArchivedMessageRepository _archivedMessageRepository = archivedMessageRepository;
+    private readonly IArchivedMeteringPointMessageRepository _archivedMeteringPointMessageRepository = archivedMeteringPointMessageRepository;
+
+    private readonly IReadOnlyCollection<DocumentType> _meteredDataDocumentTypes = new[]
+    {
+        DocumentType.NotifyValidatedMeasureData,
+        DocumentType.Acknowledgement,
+    };
 
     public async Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
 
+        if (IsMeteredDataMessage(message.DocumentType))
+        {
+            var meteredDataMessage = ArchivedMeteredDataMessageMapper.Map(message);
+            await _archivedMeteringPointMessageRepository.AddAsync(meteredDataMessage, cancellationToken).ConfigureAwait(false);
+            return new ArchivedFile(meteredDataMessage.FileStorageReference, meteredDataMessage.ArchivedMessageStream);
+        }
+
         var mappedArchivedMessage = ArchivedMessageMapper.Map(message);
-
         await _archivedMessageRepository.AddAsync(mappedArchivedMessage, cancellationToken).ConfigureAwait(false);
-
         return new ArchivedFile(mappedArchivedMessage.FileStorageReference, mappedArchivedMessage.ArchivedMessageStream);
     }
 
@@ -41,7 +56,14 @@ public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRe
 
         var archivedMessageId = new ArchivedMessageId(id.Value);
 
-        var result = await _archivedMessageRepository.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
+        var tasks = new[]
+        {
+            _archivedMessageRepository.GetAsync(archivedMessageId, cancellationToken),
+            _archivedMeteringPointMessageRepository.GetAsync(archivedMessageId, cancellationToken),
+        };
+
+        var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+        var result = results.FirstOrDefault(r => r != null);
 
         return result != null ? new ArchivedMessageStreamDto(result.Stream) : null;
     }
@@ -49,9 +71,17 @@ public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRe
     public async Task<MessageSearchResultDto> SearchAsync(GetMessagesQueryDto queryInputDto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(queryInputDto);
+        var result = queryInputDto.MeteringPointId != null
+                ? await _archivedMeteringPointMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false)
+                : await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
 
-        var result = await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
-
+        // TODO: How to determine if the result is from ArchivedMessage or ArchivedMeteringPointMessage?, is the query different?
         return MessagesSearchResultMapper.Map(result);
+    }
+
+    private bool IsMeteredDataMessage(DocumentType messageDocumentType)
+    {
+        return _meteredDataDocumentTypes
+            .Any(x => x == messageDocumentType);
     }
 }

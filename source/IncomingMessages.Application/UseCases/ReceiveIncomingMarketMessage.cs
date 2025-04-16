@@ -186,14 +186,14 @@ public class ReceiveIncomingMarketMessage
     private async Task ArchiveIncomingMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         IIncomingMessage incomingMessage,
-        IncomingDocumentType incomingDocumentType,
+        IncomingDocumentType incomingDocument,
         CancellationToken cancellationToken)
     {
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
                 new ArchivedMessageDto(
                     incomingMessage.MessageId,
-                    incomingDocumentType.Name,
+                    MapToDocumentType(incomingDocument),
                     authenticatedActor.ActorNumber,
                     authenticatedActor.ActorRole,
                     // For RequestAggregatedMeteringData and RequestWholesaleServices,
@@ -201,10 +201,30 @@ public class ReceiveIncomingMarketMessage
                     DataHubDetails.DataHubActorNumber,
                     ActorRole.MeteredDataAdministrator,
                     _clock.GetCurrentInstant(),
-                    incomingMessage.BusinessReason,
+                    BusinessReason.TryFromCode(incomingMessage.BusinessReason),
                     ArchivedMessageTypeDto.IncomingMessage,
-                    incomingMarketMessageStream),
+                    incomingMarketMessageStream,
+                    incomingMessage.MeteringPointIds),
                 cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    private DocumentType MapToDocumentType(IncomingDocumentType incomingDocumentType)
+    {
+        switch (incomingDocumentType)
+        {
+            case var incomingDocType when incomingDocType == IncomingDocumentType.RequestAggregatedMeasureData:
+                return DocumentType.RequestAggregatedMeasureData;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.B2CRequestAggregatedMeasureData:
+                return DocumentType.RequestAggregatedMeasureData;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.RequestWholesaleSettlement:
+                return DocumentType.RequestWholesaleSettlement;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.B2CRequestWholesaleSettlement:
+                return DocumentType.RequestWholesaleSettlement;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.NotifyValidatedMeasureData:
+                return DocumentType.NotifyValidatedMeasureData;
+            default:
+                throw new NotSupportedException($"Document type '{incomingDocumentType}' is not supported.");
+        }
     }
 }

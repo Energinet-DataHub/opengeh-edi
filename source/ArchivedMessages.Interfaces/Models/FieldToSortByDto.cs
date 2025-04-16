@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
-public readonly struct FieldToSortByDto
+public readonly record struct FieldToSortByDto
 {
     public static readonly FieldToSortByDto MessageId = new("MessageId");
     public static readonly FieldToSortByDto DocumentType = new("DocumentType");

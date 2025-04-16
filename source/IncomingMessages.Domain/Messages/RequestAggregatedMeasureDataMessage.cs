@@ -46,6 +46,8 @@ public record RequestAggregatedMeasureDataMessage(
         ActorRole.MeteredDataResponsible,
         ActorRole.BalanceResponsibleParty,
     ];
+
+    public IReadOnlyList<MeteringPointId> MeteringPointIds => Array.Empty<MeteringPointId>();
 }
 
 public record RequestAggregatedMeasureDataMessageSeries(

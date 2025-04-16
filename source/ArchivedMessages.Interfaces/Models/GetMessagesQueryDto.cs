@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 /// <summary>
@@ -28,4 +30,5 @@ public sealed record GetMessagesQueryDto(
     string? ReceiverRoleCode = null,
     IReadOnlyCollection<string>? DocumentTypes = null,
     IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessages = false);
+    bool IncludeRelatedMessages = false,
+    MeteringPointId? MeteringPointId = null);

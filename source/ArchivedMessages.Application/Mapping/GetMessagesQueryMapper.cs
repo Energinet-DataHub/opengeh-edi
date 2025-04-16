@@ -31,7 +31,8 @@ internal static class GetMessagesQueryMapper
             ReceiverRoleCode: dto.ReceiverRoleCode,
             DocumentTypes: dto.DocumentTypes,
             BusinessReasons: dto.BusinessReasons,
-            IncludeRelatedMessages: dto.IncludeRelatedMessages);
+            IncludeRelatedMessages: dto.IncludeRelatedMessages,
+            MeteringPointId: dto.MeteringPointId);
     }
 
     private static SortedCursorBasedPagination SetSortedCursorBasedPagination(SortedCursorBasedPaginationDto dto)
