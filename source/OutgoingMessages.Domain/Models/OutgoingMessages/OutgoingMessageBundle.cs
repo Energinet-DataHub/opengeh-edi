@@ -28,6 +28,7 @@ public class OutgoingMessageBundle
         ActorRole senderRole,
         MessageId messageId,
         IReadOnlyCollection<string> serializedContentOfOutgoingMessages,
+        IReadOnlyList<EventId> eventIds,
         MessageId? relatedToMessageId = null)
     {
         DocumentType = documentType;
@@ -38,6 +39,7 @@ public class OutgoingMessageBundle
         SenderRole = senderRole;
         MessageId = messageId;
         SerializedContentOfOutgoingMessages = serializedContentOfOutgoingMessages;
+        EventIds = eventIds;
         RelatedToMessageId = relatedToMessageId;
     }
 
@@ -64,4 +66,6 @@ public class OutgoingMessageBundle
     public MessageId? RelatedToMessageId { get; private set; }
 
     public IReadOnlyCollection<string> SerializedContentOfOutgoingMessages { get; set; }
+
+    public IReadOnlyList<EventId> EventIds { get; set; }
 }

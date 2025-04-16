@@ -58,17 +58,19 @@ public class OutgoingMessageRepository(
         ArgumentNullException.ThrowIfNull(peekResult);
 
         var serializedContentOfOutgoingMessages = new List<string>();
+        var eventIds = new List<EventId>();
         // This approach processes the data row by row instead of loading the entire result set into memory at once.
         // To avoid a huge memory spike and allowing DownloadAndSetMessageRecordAsync to dispose of the file storage stream per message to limit memory usage.
-        await foreach (var fileStorageReference in _context.OutgoingMessages
+        await foreach (var result in _context.OutgoingMessages
                            .AsNoTracking()
                            .Where(x => x.AssignedBundleId == peekResult.BundleId)
-                           .Select(x => x.FileStorageReference)
+                           .Select(x => new { x.FileStorageReference, x.EventId })
                            .AsAsyncEnumerable()
                            .WithCancellation(cancellationToken))
         {
-            var serializedContent = await DownloadAndSetMessageRecordAsync(fileStorageReference, cancellationToken).ConfigureAwait(false);
+            var serializedContent = await DownloadAndSetMessageRecordAsync(result.FileStorageReference, cancellationToken).ConfigureAwait(false);
             serializedContentOfOutgoingMessages.Add(serializedContent);
+            eventIds.Add(result.EventId);
         }
 
         // All messages in a bundle have the same meta data
@@ -85,6 +87,7 @@ public class OutgoingMessageRepository(
             firstMessage.SenderRole,
             peekResult.MessageId,
             serializedContentOfOutgoingMessages,
+            eventIds,
             firstMessage.RelatedToMessageId);
     }
 
