@@ -41,10 +41,14 @@ public class MetricNameGenerationTests
     private static readonly string[] _documentMetrics =
     [
         "NotifyAggregatedMeasureData",
+        "RequestAggregatedMeasureData",
+        "RequestAggregatedMeasureDataResponse",
         "NotifyAggregatedMeasureDataResponse",
         "RejectRequestAggregatedMeasureData",
         "NotifyWholesaleServices",
         "NotifyWholesaleServicesResponse",
+        "RequestWholesaleSettlement",
+        "RequestWholesaleSettlementResponse",
         "RejectRequestWholesaleSettlement",
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",

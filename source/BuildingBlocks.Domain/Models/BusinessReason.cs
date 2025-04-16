@@ -17,7 +17,7 @@ using PMTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueOb
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public sealed class BusinessReason : DataHubTypeWithUnused<BusinessReason>
+public sealed class BusinessReason : DataHubType<BusinessReason>
 {
     public static readonly BusinessReason MoveIn = new(PMTypes.BusinessReason.MoveIn.Name, "E65", 1);
     public static readonly BusinessReason BalanceFixing = new(PMTypes.BusinessReason.BalanceFixing.Name, "D04", 2);
@@ -37,10 +37,9 @@ public sealed class BusinessReason : DataHubTypeWithUnused<BusinessReason>
     /// <param name="name"></param>
     /// <param name="code"></param>
     /// <param name="databaseValue">Represents the business reason in the database as a byte for database efficiency.</param>
-    /// <param name="isUnused"></param>
     [JsonConstructor]
-    private BusinessReason(string name, string code, byte databaseValue, bool isUnused = false)
-     : base(name, code, isUnused)
+    private BusinessReason(string name, string code, byte databaseValue)
+     : base(name, code)
     {
         DatabaseValue = databaseValue;
     }

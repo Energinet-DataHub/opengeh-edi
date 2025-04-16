@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
@@ -131,5 +131,13 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
         builder.Property<string>("CreatedBy");
         builder.Property<string?>("ModifiedBy");
         builder.Property<Instant?>("ModifiedAt");
+
+        builder.Property(x => x.MeteringPointIds)
+            .HasConversion(
+                toDbValue => System.Text.Json.JsonSerializer.Serialize(toDbValue, (JsonSerializerOptions?)null),
+                fromDbValue => System.Text.Json.JsonSerializer.Deserialize<List<string>>(fromDbValue ?? "[]", (JsonSerializerOptions?)null)!
+                    .Select(MeteringPointId.From).ToList().AsReadOnly())
+            .HasColumnName("MeteringPointIds")
+            .IsRequired(false);
     }
 }
