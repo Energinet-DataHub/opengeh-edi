@@ -53,6 +53,18 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         _archivedMessagesClient = services.GetRequiredService<IArchivedMessagesClient>();
     }
 
+    public static TheoryData<DocumentType> GetDocumentTypes()
+    {
+        var theoryData = new TheoryData<DocumentType>();
+
+        foreach (var documentType in EnumerationType.GetAll<DocumentType>())
+        {
+            theoryData.Add(documentType);
+        }
+
+        return theoryData;
+    }
+
     public Task InitializeAsync()
     {
         _fixture.CleanupDatabase();
@@ -65,10 +77,11 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    [Fact]
-    public async Task Given_ArchivedDocument_When_Created_Then_CanBeRetrieved()
+    [Theory]
+    [MemberData(nameof(GetDocumentTypes))]
+    public async Task Given_ArchivedDocument_When_Created_Then_CanBeRetrieved(DocumentType documentType)
     {
-        var correctArchivedMessage = await CreateArchivedMessageAsync();
+        var correctArchivedMessage = await CreateArchivedMessageAsync(documentType: documentType);
 
         var result = await _archivedMessagesClient.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
 
@@ -132,15 +145,16 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         var archivedMessageDto = new ArchivedMessageDto(
             Guid.NewGuid().ToString(),
             new[] { EventId.From(Guid.NewGuid()) },
-            DocumentType.NotifyAggregatedMeasureData.Name,
+            DocumentType.NotifyAggregatedMeasureData,
             ActorNumber.Create("1234512345123"),
             ActorRole.EnergySupplier,
             ActorNumber.Create("1234512345128"),
             ActorRole.EnergySupplier,
             Instant.FromUtc(2023, 01, 01, 0, 0),
-            BusinessReason.BalanceFixing.Name,
+            BusinessReason.BalanceFixing,
             ArchivedMessageTypeDto.OutgoingMessage,
-            new ArchivedMessageStreamDto(new MemoryStream()));
+            new ArchivedMessageStreamDto(new MemoryStream()),
+            Array.Empty<MeteringPointId>());
         await clientWithoutFileStorage.CreateAsync(archivedMessageDto, CancellationToken.None);
         var createDuplicateArchivedMessage = new Func<Task>(() => clientWithoutFileStorage.CreateAsync(archivedMessageDto, CancellationToken.None));
 
@@ -161,12 +175,60 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
+    [Fact]
+    public async Task Given_MeteringPointArchivedMessage_When_Creating_Then_MessageIsStoredInDatabaseAndBlob()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
+            documentType: DocumentType.NotifyValidatedMeasureData, // MeteredData DocumentType
+            meteringPointIds: [MeteringPointId.From("1234567890123")],
+            storeMessage: false);
+
+        var messageCreatedAt = archivedMessage.CreatedAt.ToDateTimeUtc();
+
+        // Since the message is an incoming message, we need the "senderNumber" in the path
+        var expectedBlobPath = $"{archivedMessage.SenderNumber.Value}/"
+                               + $"{messageCreatedAt.Year:0000}/"
+                               + $"{messageCreatedAt.Month:00}/"
+                               + $"{messageCreatedAt.Day:00}/"
+                               + $"{archivedMessage.Id.Value:N}"; // remove dashes from guid
+
+        var expectedBlocReference = new FileStorageReference(
+            category: FileStorageCategory.ArchivedMessage(),
+            path: expectedBlobPath);
+
+        // Act
+        await _archivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
+
+        // Assert
+        var dbResult = await _fixture.GetAllMeteringPointMessagesInDatabase();
+
+        var message = dbResult.Single();
+        using var assertionScope = new AssertionScope();
+
+        message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
+        message.SenderRoleCode.Should().Be(archivedMessage.SenderRole.DatabaseValue);
+        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
+        message.ReceiverRoleCode.Should().Be(archivedMessage.ReceiverRole.DatabaseValue);
+        message.DocumentType.Should().Be(archivedMessage.DocumentType.DatabaseValue);
+        message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.DatabaseValue);
+        message.MessageId.Should().Be(archivedMessage.MessageId);
+        message.FileStorageReference.Should().Be(expectedBlocReference.Path);
+        message.RelatedToMessageId.Should().BeNull();
+        message.EventIds.Should().BeNull();
+
+        var blobResult = await _fixture.GetMessagesFromBlob(expectedBlocReference);
+        blobResult.Should().NotBeNull();
+    }
+
     private async Task<ArchivedMessageDto> CreateArchivedMessageAsync(
         ArchivedMessageTypeDto? archivedMessageType = null,
         string? messageId = null,
         string? documentContent = null,
         string? senderNumber = null,
         string? receiverNumber = null,
+        DocumentType? documentType = null,
         Instant? timestamp = null)
     {
         var documentStream = new MemoryStream();
@@ -185,8 +247,8 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
             archivedMessageType ?? ArchivedMessageTypeDto.OutgoingMessage,
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             documentContent,
-            DocumentType.NotifyAggregatedMeasureData.Name,
-            BusinessReason.BalanceFixing.Name,
+            documentType ?? DocumentType.NotifyAggregatedMeasureData,
+            BusinessReason.BalanceFixing,
             ActorNumber.Create(senderNumber ?? "1234512345123").Value,
             ActorRole.EnergySupplier,
             ActorNumber.Create(receiverNumber ?? "1234512345128").Value,

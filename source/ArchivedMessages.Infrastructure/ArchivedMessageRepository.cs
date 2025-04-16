@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Dapper;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -56,13 +56,13 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         {
             Id = message.Id.Value.ToString(),
             EventIds = message.EventIds.Count > 0 ? string.Join("::", message.EventIds.Select(id => id.Value)) : null,
-            message.DocumentType,
+            DocumentType = message.DocumentType.Name,
             ReceiverNumber = message.ReceiverNumber.Value,
             ReceiverRoleCode = message.ReceiverRole.Code,
             SenderNumber = message.SenderNumber.Value,
             SenderRoleCode = message.SenderRole.Code,
             message.CreatedAt,
-            message.BusinessReason,
+            BusinessReason = message.BusinessReason?.Name,
             FileStorageReference = message.FileStorageReference.Path,
             message.MessageId,
             RelatedToMessageId = message.RelatedToMessageId?.Value,
@@ -125,6 +125,6 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         if (!queryInput.Pagination.NavigationForward)
             archivedMessages.Reverse();
 
-        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly(), totalAmountOfMessages);
+        return new MessageSearchResult(archivedMessages.AsReadOnly(), totalAmountOfMessages);
     }
 }

@@ -44,6 +44,8 @@ public record RequestWholesaleServicesMessage(
         ActorRole.GridAccessProvider,
         ActorRole.SystemOperator,
     ];
+
+    public IReadOnlyList<MeteringPointId> MeteringPointIds => Array.Empty<MeteringPointId>();
 }
 
 public record RequestWholesaleServicesSeries(

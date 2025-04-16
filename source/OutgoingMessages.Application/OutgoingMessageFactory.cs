@@ -415,7 +415,8 @@ public static class OutgoingMessageFactory
             externalId: message.ExternalId,
             calculationId: null,
             message.Series.StartedDateTime,
-            dataCount: message.Series.EnergyObservations.Count);
+            dataCount: message.Series.EnergyObservations.Count,
+            meteringPointIds: new List<MeteringPointId> { MeteringPointId.From(message.Series.MarketEvaluationPointNumber) });
     }
 
     public static OutgoingMessage CreateMessage(
@@ -442,6 +443,8 @@ public static class OutgoingMessageFactory
             calculationId: null,
             periodStartedAt: null,
             dataCount: message.Series.RejectReasons.Count);
+        // TODO: Metering Point Id is not present on reject?
+        // meteringPointIds: new List<MeteringPointId> { MeteringPointId.From(message.Series.MarketEvaluationPointNumber) });
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

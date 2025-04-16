@@ -151,15 +151,16 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         ArchivedMessageTypeDto? archivedMessageType = null,
         string? messageId = null,
         string? documentContent = null,
-        string? documentType = null,
-        string? businessReasons = null,
+        DocumentType? documentType = null,
+        BusinessReason? businessReason = null,
         string? senderNumber = null,
         ActorRole? senderRole = null,
         string? receiverNumber = null,
         ActorRole? receiverRole = null,
         Instant? timestamp = null,
         MessageId? relatedToMessageId = null,
-        bool storeMessage = true)
+        bool storeMessage = true,
+        IReadOnlyList<MeteringPointId>? meteringPointIds = null)
     {
         var documentStream = new MemoryStream();
 
@@ -173,15 +174,16 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         var archivedMessage = new ArchivedMessageDto(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             Array.Empty<EventId>(),
-            documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
+            documentType ?? DocumentType.NotifyAggregatedMeasureData,
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             senderRole ?? ActorRole.MeteredDataAdministrator,
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
             receiverRole ?? ActorRole.DanishEnergyAgency,
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
-            businessReasons ?? BusinessReason.BalanceFixing.Name,
+            businessReason ?? BusinessReason.BalanceFixing,
             archivedMessageType ?? ArchivedMessageTypeDto.IncomingMessage,
             new ArchivedMessageStreamDto(documentStream),
+            meteringPointIds ?? Array.Empty<MeteringPointId>(),
             relatedToMessageId ?? null);
 
         if (storeMessage)
@@ -201,6 +203,31 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
                 .ConfigureAwait(false);
 
         return archivedMessages.ToList().AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<MeteringPointArchivedMessageFromDb>> GetAllMeteringPointMessagesInDatabase()
+    {
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>()!;
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var archivedMessages =
+            await connection.QueryAsync<MeteringPointArchivedMessageFromDb>(
+                    "SELECT * FROM dbo.[MeteringPointArchivedMessages]")
+                .ConfigureAwait(false);
+
+        return archivedMessages.ToList().AsReadOnly();
+    }
+
+    public async Task<int> GetNumberOfCreatedMeteredDataMessages()
+    {
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>()!;
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var rowCount = await connection.QuerySingleAsync<int>(
+                "SELECT COUNT(*) FROM dbo.[MeteringPointArchivedMessages]")
+            .ConfigureAwait(false);
+
+        return rowCount;
     }
 
     public async Task<ArchivedMessageStreamDto> GetMessagesFromBlob(
