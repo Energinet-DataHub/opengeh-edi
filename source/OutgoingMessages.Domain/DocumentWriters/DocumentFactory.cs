@@ -54,7 +54,7 @@ public class DocumentFactory
                 bundle.MessageId.Value,
                 bundle.RelatedToMessageId?.Value,
                 timestamp),
-            bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList(),
+            bundle.SerializedContentOfOutgoingMessages,
             cancellationToken);
     }
 }
