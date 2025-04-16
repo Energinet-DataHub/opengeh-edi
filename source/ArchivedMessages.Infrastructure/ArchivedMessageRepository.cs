@@ -62,7 +62,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
             SenderNumber = message.SenderNumber.Value,
             SenderRoleCode = message.SenderRole.Code,
             message.CreatedAt,
-            BusinessReason = message.BusinessReason?.Name,
+            BusinessReason = message.BusinessReason?.Code,
             FileStorageReference = message.FileStorageReference.Path,
             message.MessageId,
             RelatedToMessageId = message.RelatedToMessageId?.Value,

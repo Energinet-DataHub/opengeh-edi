@@ -122,6 +122,7 @@ public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
             () => Assert.Equal(message.ExternalId.Value, messageFromDatabase.ExternalId),
             () => Assert.Equal(message.CalculationId, messageFromDatabase.CalculationId),
             () => Assert.NotNull(messageFromDatabase.PeriodStartedAt),
+            () => Assert.Null(messageFromDatabase.MeteringPoints),
             () => Assert.Equal(message.Series.Point.Count, messageFromDatabase.DataCount),
         };
 

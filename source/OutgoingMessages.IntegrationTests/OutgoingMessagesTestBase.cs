@@ -144,6 +144,8 @@ public class OutgoingMessagesTestBase : IDisposable
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var archivedMessage = await connection.QuerySingleOrDefaultAsync($"SELECT * FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+        if (archivedMessage == null)
+            archivedMessage = await connection.QuerySingleOrDefaultAsync($"SELECT * FROM [dbo].[MeteringPointArchivedMessages] WHERE MessageId = '{messageId}'");
 
         return archivedMessage;
     }

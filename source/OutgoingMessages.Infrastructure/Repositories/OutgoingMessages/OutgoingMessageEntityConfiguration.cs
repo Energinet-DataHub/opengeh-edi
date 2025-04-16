@@ -134,9 +134,8 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
 
         builder.Property(x => x.MeteringPointIds)
             .HasConversion(
-                toDbValue => System.Text.Json.JsonSerializer.Serialize(toDbValue, (JsonSerializerOptions?)null),
-                fromDbValue => System.Text.Json.JsonSerializer.Deserialize<List<string>>(fromDbValue ?? "[]", (JsonSerializerOptions?)null)!
-                    .Select(MeteringPointId.From).ToList().AsReadOnly())
+                toDbValue => JsonSerializer.Serialize(toDbValue.Select(x => x.Value), (JsonSerializerOptions?)null),
+                fromDbValue => JsonSerializer.Deserialize<List<string>>(fromDbValue, (JsonSerializerOptions?)null)!.Select(MeteringPointId.From).ToList().AsReadOnly())
             .HasColumnName("MeteringPointIds")
             .IsRequired(false);
     }
