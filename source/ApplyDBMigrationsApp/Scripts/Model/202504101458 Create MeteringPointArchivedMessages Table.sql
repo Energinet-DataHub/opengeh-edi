@@ -1,6 +1,6 @@
 -- Step 1: Create a Partition Function
 -- Define monthly ranges for the next 12 years
-CREATE PARTITION FUNCTION PF_CreatedAt (DATETIME2)
+CREATE PARTITION FUNCTION PF_MeteringPointArchivedMessages_CreatedAt (DATETIME2)
 AS RANGE RIGHT FOR VALUES
 (
     '2024-05-01 00:00:00', '2024-06-01 00:00:00', '2024-07-01 00:00:00', '2024-08-01 00:00:00',
@@ -43,7 +43,7 @@ AS RANGE RIGHT FOR VALUES
 -- Step 2: Create a Partition Scheme
 -- Map all partitions to the primary filegroup
 CREATE PARTITION SCHEME PS_MeteringPointArchivedMessages_CreatedAt
-AS PARTITION PF_CreatedAt
+AS PARTITION PF_MeteringPointArchivedMessages_CreatedAt
 ALL TO ([PRIMARY]);
 
 -- Step 4: Create the Partitioned Table
@@ -72,8 +72,14 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     -- In Json Format: (amount of guids * (MeteringPointId_Length + double quotes + comma separator)) + array brackets
     -- (9375 * (36 + 2 + 1)) + 2 = 337,500 --> 337500 exceeds the 8,060-byte in-row limit, so the data will be stored off-row = max
     [MeteringPointIds] [varchar](max) NOT NULL,
-    CONSTRAINT [PK_MeteringPointArchivedMessages_Id] PRIMARY KEY NONCLUSTERED ([Id] ASC, [CreatedAt] ASC)
-    ) ON PS_CreatedAt(CreatedAt);
+    CONSTRAINT [PK_MeteringPointArchivedMessages_Id] PRIMARY KEY NONCLUSTERED ([Id] ASC)
+    ) ON PS_MeteringPointArchivedMessages_CreatedAt(CreatedAt);
+
+CREATE UNIQUE CLUSTERED INDEX [CI_MeteringPointArchivedMessages_Id_CreatedAt] ON [dbo].[MeteringPointArchivedMessages]
+(
+    [CreatedAt] ASC,
+    [Id] ASC
+)
 
 -- Create a composite index for combined queries
 CREATE NONCLUSTERED INDEX IX_MeteringPointArchivedMessages_Optimized
@@ -85,4 +91,3 @@ ON [dbo].[MeteringPointArchivedMessages](
     SenderNumber,
     SenderRoleCode
 )
-INCLUDE (Id, MessageId, BusinessReason, FileStorageReference);
