@@ -78,7 +78,7 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     ) ON [PRIMARY]
 
 -- Drop existing clustered index (we'll recreate it with partitioning)
-DROP INDEX IF EXISTS [CI_MessageArchive] ON [dbo].[MessageArchive]
+DROP INDEX IF EXISTS [CI_MeteringPointArchivedMessages] ON [dbo].[MeteringPointArchivedMessages]
 
 -- Recreate the clustered index with partitioning
 CREATE UNIQUE CLUSTERED INDEX [CI_MeteringPointArchivedMessages_Id_CreatedAt] ON [dbo].[MeteringPointArchivedMessages]
