@@ -58,7 +58,7 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [SenderNumber] [varchar](16) NOT NULL,
     [SenderRoleCode] TINYINT NOT NULL,
     [CreatedAt] [datetime2](7) NOT NULL,
-    [BusinessReason] TINYINT NOT NULL,
+    [BusinessReason] TINYINT NULL,
     [MessageId] [varchar](255) NOT NULL,
     -- {actorNumber}/{year:0000}/{month:00}/{day:00}/{id.ToString("N")} => 16 + 1 + 4 + 1 + 2 + 1 + 2 + 1 + 32 = 60
     [FileStorageReference] [varchar](60) NOT NULL,
@@ -72,13 +72,20 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     -- (9375 * (36 + 2 + 1)) + 2 = 337,500 --> 337500 exceeds the 8,060-byte in-row limit, so the data will be stored off-row = max
     [MeteringPointIds] [varchar](max) NOT NULL,
     CONSTRAINT [PK_MessageArchive] PRIMARY KEY NONCLUSTERED
-(
-[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    (
+        [Id] ASC
+    ) WITH 
+    (
+        PAD_INDEX = OFF,
+        STATISTICS_NORECOMPUTE = OFF,
+        IGNORE_DUP_KEY = OFF,
+        ALLOW_ROW_LOCKS = ON,
+        ALLOW_PAGE_LOCKS = ON
     ) ON [PRIMARY]
+) ON [PRIMARY]
 
 -- Drop existing clustered index (we'll recreate it with partitioning)
-DROP INDEX IF EXISTS [CI_MessageArchive] ON [dbo].[MessageArchive]
+DROP INDEX IF EXISTS [CI_MeteringPointArchivedMessages] ON [dbo].[MeteringPointArchivedMessages]
 
 -- Recreate the clustered index with partitioning
 CREATE UNIQUE CLUSTERED INDEX [CI_MeteringPointArchivedMessages_Id_CreatedAt] ON [dbo].[MeteringPointArchivedMessages]

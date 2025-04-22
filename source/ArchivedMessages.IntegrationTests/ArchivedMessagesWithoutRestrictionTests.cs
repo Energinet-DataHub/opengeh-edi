@@ -115,7 +115,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
         message.ReceiverRoleCode.Should().Be(archivedMessage.ReceiverRole.Code);
         message.DocumentType.Should().Be(archivedMessage.DocumentType.Name);
-        message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.Name);
+        message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.Code);
         message.MessageId.Should().Be(archivedMessage.MessageId);
         message.FileStorageReference.Should().Be(expectedBlocReference.Path);
         message.RelatedToMessageId.Should().BeNull();
@@ -165,7 +165,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         message.ReceiverRoleCode.Should()
             .Be(archivedMessage.ReceiverRole.Code);
         message.DocumentType.Should().Be(archivedMessage.DocumentType.Name);
-        message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.Name);
+        message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.Code);
         message.CreatedAt.Should().Be(archivedMessage.CreatedAt);
         message.Id.Should().Be(archivedMessage.Id.Value);
     }
@@ -400,14 +400,14 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var result = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
-                BusinessReasons: [expectedBusinessReason.Name]),
+                BusinessReasons: [expectedBusinessReason.Code]),
             CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
         result.Messages.Should().ContainSingle()
-            .Which.BusinessReason.Should().Be(expectedBusinessReason.Name);
+            .Which.BusinessReason.Should().Be(expectedBusinessReason.Code);
     }
 
     [Fact]
@@ -427,8 +427,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 new SortedCursorBasedPaginationDto(),
                 BusinessReasons:
                 [
-                    expectedBusinessReason1.Name,
-                    expectedBusinessReason2.Name,
+                    expectedBusinessReason1.Code,
+                    expectedBusinessReason2.Code,
                 ]),
             CancellationToken.None);
 
@@ -440,8 +440,8 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             .Should()
             .BeEquivalentTo(
             [
-                expectedBusinessReason1.Name,
-                expectedBusinessReason2.Name,
+                expectedBusinessReason1.Code,
+                expectedBusinessReason2.Code,
             ]);
     }
 
@@ -517,7 +517,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                 SenderNumber: expectedSenderNumber,
                 ReceiverNumber: expectedReceiverNumber,
                 DocumentTypes: [expectedDocumentType.Name],
-                BusinessReasons: [expectedBusinessReason.Name]),
+                BusinessReasons: [expectedBusinessReason.Code]),
             CancellationToken.None);
 
         // Assert
@@ -533,7 +533,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
                     message.MessageId.Should().Be(expectedMessageId);
                     message.CreatedAt.Should().Be(expectedCreatedAt);
                     message.DocumentType.Should().Be(expectedDocumentType.Name);
-                    message.BusinessReason.Should().Be(expectedBusinessReason.Name);
+                    message.BusinessReason.Should().Be(expectedBusinessReason.Code);
                 });
         result.Messages.Select(message => message.SenderNumber)
             .Should()
