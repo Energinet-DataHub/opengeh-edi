@@ -59,26 +59,44 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [SenderRoleCode] TINYINT NOT NULL,
     [CreatedAt] [datetime2](7) NOT NULL,
     [BusinessReason] TINYINT NOT NULL,
-    [MessageId] [varchar](255) NOT NULL, 
+    [MessageId] [varchar](255) NOT NULL,
     -- {actorNumber}/{year:0000}/{month:00}/{day:00}/{id.ToString("N")} => 16 + 1 + 4 + 1 + 2 + 1 + 2 + 1 + 32 = 60
-    [FileStorageReference] [varchar](60) NOT NULL, 
+    [FileStorageReference] [varchar](60) NOT NULL,
     -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
-    [RelatedToMessageId] [varchar](36) NULL, 
+    [RelatedToMessageId] [varchar](36) NULL,
     -- Greater size than MeteringPointIds
-    [EventIds] [varchar](max) NULL, 
+    [EventIds] [varchar](max) NULL,
     -- Size: MaxBundleDataCount is 150000, the minimum amount of dataCount for a MeteringPointId is 4(quarterly) * 4(hours) = 16 
     -- 150.000 / 16 = 9375 (max metering point ids per bundle)
     -- In Json Format: (amount of guids * (MeteringPointId_Length + double quotes + comma separator)) + array brackets
     -- (9375 * (36 + 2 + 1)) + 2 = 337,500 --> 337500 exceeds the 8,060-byte in-row limit, so the data will be stored off-row = max
     [MeteringPointIds] [varchar](max) NOT NULL,
-    CONSTRAINT [PK_MeteringPointArchivedMessages_Id] PRIMARY KEY NONCLUSTERED ([Id] ASC)
-    ) ON PS_MeteringPointArchivedMessages_CreatedAt(CreatedAt);
+    CONSTRAINT [PK_MessageArchive] PRIMARY KEY NONCLUSTERED
+(
+[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    ) ON [PRIMARY]
 
+-- Drop existing clustered index (we'll recreate it with partitioning)
+DROP INDEX IF EXISTS [CI_MessageArchive] ON [dbo].[MessageArchive]
+
+-- Recreate the clustered index with partitioning
 CREATE UNIQUE CLUSTERED INDEX [CI_MeteringPointArchivedMessages_Id_CreatedAt] ON [dbo].[MeteringPointArchivedMessages]
 (
     [CreatedAt] ASC,
     [Id] ASC
 )
+WITH (
+    PAD_INDEX = OFF, 
+    STATISTICS_NORECOMPUTE = OFF, 
+    SORT_IN_TEMPDB = OFF, 
+    DROP_EXISTING = OFF, 
+    ONLINE = OFF, 
+    ALLOW_ROW_LOCKS = ON, 
+    ALLOW_PAGE_LOCKS = ON, 
+    FILLFACTOR = 90
+) 
+ON PS_MeteringPointArchivedMessages_CreatedAt(CreatedAt);
 
 -- Create a composite index for combined queries
 CREATE NONCLUSTERED INDEX IX_MeteringPointArchivedMessages_Optimized
