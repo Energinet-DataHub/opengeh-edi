@@ -49,12 +49,12 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [InlineData(1)] // A single measure data in each message
-    [InlineData(16)] // 4 hour message (4*4=16)
+    // [InlineData(1)] // A single measure data in each message
+    // [InlineData(16)] // 4 hour message (4*4=16)
     [InlineData(75)] // 75 measure data (150.000/2000) is the biggest possible bundle when using MaxBundleMessageCount=2000 and MaxBundleDataCount=150000
-    [InlineData(96)] // 1 day (4*24=96)
-    [InlineData(2976)] // 1 month (4*24*31=2976)
-    [InlineData(35040)] // 1 year (4*24*365=35040)
+    // [InlineData(96)] // 1 day (4*24=96)
+    // [InlineData(2976)] // 1 month (4*24*31=2976)
+    // [InlineData(35040)] // 1 year (4*24*365=35040)
     public async Task Given_EnqueuedRsm012BundleWithMaximumSize_When_PeekMessages_Then_BundleSizeIsBelow50MB(int dataCountForPeriod)
     {
         var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;

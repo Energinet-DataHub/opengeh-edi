@@ -42,7 +42,7 @@ AS RANGE RIGHT FOR VALUES
 
 -- Step 2: Create a Partition Scheme
 -- Map all partitions to the primary filegroup
-CREATE PARTITION SCHEME PS_CreatedAt
+CREATE PARTITION SCHEME PS_MeteringPointArchivedMessages_CreatedAt
 AS PARTITION PF_CreatedAt
 ALL TO ([PRIMARY]);
 
@@ -52,11 +52,11 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [Id] [uniqueidentifier] NOT NULL,
     [DocumentType] TINYINT NOT NULL,
     -- CIM has a maxLength of  for this field, but Ebix does not have a size limit
-    [ReceiverNumber] [varchar](16) NULL,
-    [ReceiverRoleCode] TINYINT NULL,
+    [ReceiverNumber] [varchar](16) NOT NULL,
+    [ReceiverRoleCode] TINYINT NOT NULL,
     -- CIM has a maxLength of 16 for this field, but Ebix does not have a size limit
-    [SenderNumber] [varchar](16) NULL,
-    [SenderRoleCode] TINYINT NULL,
+    [SenderNumber] [varchar](16) NOT NULL,
+    [SenderRoleCode] TINYINT NOT NULL,
     [CreatedAt] [datetime2](7) NOT NULL,
     [BusinessReason] TINYINT NOT NULL,
     -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
