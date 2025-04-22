@@ -17,7 +17,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
-public class ArchivedMeteringPointMessage(
+public class MeteringPointArchivedMessage(
     ArchivedMessageId id,
     string? messageId,
     IReadOnlyList<EventId> eventIds,

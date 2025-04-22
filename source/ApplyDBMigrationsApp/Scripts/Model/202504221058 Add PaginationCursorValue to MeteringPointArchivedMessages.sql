@@ -1,4 +1,4 @@
--- Step 1: Add the PaginationCursor column
+-- Step 1: Add the PaginationCursorValue column
 ALTER TABLE [dbo].[MeteringPointArchivedMessages]
     ADD [PaginationCursorValue] BIGINT NOT NULL IDENTITY(1,1);
 

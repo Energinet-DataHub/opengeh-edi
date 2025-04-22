@@ -32,7 +32,7 @@ public class ArchivedMeteringPointMessageRepository(
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
     private readonly IFileStorageClient _fileStorageClient = fileStorageClient;
 
-    public async Task AddAsync(ArchivedMeteringPointMessage message, CancellationToken cancellationToken)
+    public async Task AddAsync(MeteringPointArchivedMessage message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
 

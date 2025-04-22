@@ -24,7 +24,7 @@ public interface IArchivedMeteringPointMessageRepository
     /// <summary>
     /// Archiving a dataMessage.
     /// </summary>
-    Task AddAsync(ArchivedMeteringPointMessage message, CancellationToken cancellationToken);
+    Task AddAsync(MeteringPointArchivedMessage message, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get document.

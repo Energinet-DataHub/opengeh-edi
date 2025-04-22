@@ -219,7 +219,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202503280930 Create index IX_OutgoingMessages_MessagesForBundle.sql" />
     <EmbeddedResource Include="Scripts\Model\202503311523 Add RelatedToMessageId to index IX_OutgoingMessages_BundleMetadataForMessagesReadyToBeBundled.sql" />
     <EmbeddedResource Include="Scripts\Model\202504101204 Add DataCount to OutgoingMessages.sql" />
-    <EmbeddedResource Include="Scripts\Model\202504161255 Add MeteringPointIds to OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202504161255 Add MeteringPointId to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202504221058 Add PaginationCursorValue to MeteringPointArchivedMessages.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />

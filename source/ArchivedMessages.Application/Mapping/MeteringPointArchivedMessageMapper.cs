@@ -19,13 +19,13 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Validation;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 
-public static class ArchivedMeteredDataMessageMapper
+public static class ArchivedMeteringPointMessageMapper
 {
-    public static ArchivedMeteringPointMessage Map(ArchivedMessageDto dto)
+    public static MeteringPointArchivedMessage Map(ArchivedMessageDto dto)
     {
         return !EnumCompatibilityChecker.AreEnumsCompatible<ArchivedMessageType, ArchivedMessageTypeDto>()
             ? throw new InvalidEnumMappingException($"Enum of type {nameof(ArchivedMessageType)} cannot be mapped to type {nameof(ArchivedMessageTypeDto)}.")
-            : new ArchivedMeteringPointMessage(
+            : new MeteringPointArchivedMessage(
                 id: new ArchivedMessageId(dto.Id.Value),
                 messageId: dto.MessageId,
                 eventIds: dto.EventIds,

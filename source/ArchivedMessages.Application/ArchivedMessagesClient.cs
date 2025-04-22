@@ -40,7 +40,7 @@ public class ArchivedMessagesClient(
 
         if (IsMeteredDataMessage(message.DocumentType))
         {
-            var meteredDataMessage = ArchivedMeteredDataMessageMapper.Map(message);
+            var meteredDataMessage = ArchivedMeteringPointMessageMapper.Map(message);
             await _archivedMeteringPointMessageRepository.AddAsync(meteredDataMessage, cancellationToken).ConfigureAwait(false);
             return new ArchivedFile(meteredDataMessage.FileStorageReference, meteredDataMessage.ArchivedMessageStream);
         }
