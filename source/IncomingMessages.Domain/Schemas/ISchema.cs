@@ -22,7 +22,7 @@ public interface ISchema
     /// <summary>
     /// bla
     /// </summary>
-    public string SchemaPath { get; }
+    string SchemaPath { get; }
 
     /// <summary>
     /// bla
@@ -30,5 +30,5 @@ public interface ISchema
     /// <param name="businessProcessType"></param>
     /// <param name="version"></param>
     /// <returns><see cref="string"/></returns>
-    public string? GetSchemaLocation(string businessProcessType, string version);
+    string? GetSchemaLocation(string businessProcessType, string version);
 }

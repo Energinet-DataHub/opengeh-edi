@@ -26,5 +26,5 @@ public interface IMessageTypeValidator
     /// </summary>
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
-    public Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken);
+    Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken);
 }

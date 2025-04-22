@@ -24,58 +24,58 @@ public interface IIncomingMessage
     /// <summary>
     /// Id of the incoming message
     /// </summary>
-    public string MessageId { get; }
+    string MessageId { get; }
 
     /// <summary>
     /// Receiver number of the incoming message
     /// </summary>
-    public string ReceiverNumber { get; }
+    string ReceiverNumber { get; }
 
     /// <summary>
     /// Receiver Role of the incoming message
     /// </summary>
-    public string ReceiverRoleCode { get; }
+    string ReceiverRoleCode { get; }
 
     /// <summary>
     /// Sender Number of the incoming message
     /// </summary>
-    public string SenderNumber { get; }
+    string SenderNumber { get; }
 
     /// <summary>
     /// Sender Role of the incoming message
     /// </summary>
-    public string SenderRoleCode { get; }
+    string SenderRoleCode { get; }
 
     /// <summary>
     /// Business Reason of the incoming message
     /// </summary>
-    public string BusinessReason { get; }
+    string BusinessReason { get; }
 
     /// <summary>
     /// Message Type of the incoming message
     /// </summary>
-    public string MessageType { get; }
+    string MessageType { get; }
 
     /// <summary>
     /// When the message was created
     /// </summary>
-    public string CreatedAt { get; }
+    string CreatedAt { get; }
 
     /// <summary>
     /// Business Type of the incoming message
     /// </summary>
-    public string? BusinessType { get; }
+    string? BusinessType { get; }
 
     /// <summary>
     /// Series of the incoming message
     /// </summary>
     IReadOnlyCollection<IIncomingMessageSeries> Series { get; }
 
-    public IReadOnlyCollection<MessageType> AllowedMessageTypes { get; }
+    IReadOnlyCollection<MessageType> AllowedMessageTypes { get; }
 
-    public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons { get; }
+    IReadOnlyCollection<BusinessReason> AllowedBusinessReasons { get; }
 
-    public IReadOnlyCollection<ActorRole> AllowedSenderRoles { get; }
+    IReadOnlyCollection<ActorRole> AllowedSenderRoles { get; }
 
-    public IReadOnlyList<MeteringPointId> MeteringPointIds { get; }
+    IReadOnlyList<MeteringPointId> MeteringPointIds { get; }
 }
