@@ -30,5 +30,18 @@ public sealed record GetMessagesQuery(
     string? ReceiverRoleCode = null,
     IReadOnlyCollection<string>? DocumentTypes = null,
     IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessages = false,
-    MeteringPointId? MeteringPointId = null);
+    bool IncludeRelatedMessages = false);
+
+/// <summary>
+/// Represents a query options for retrieving messages.
+/// Including the pagination for the specific query.
+/// </summary>
+public sealed record GetMeteringPointMessagesQuery(
+    SortedCursorBasedPagination Pagination,
+    MeteringPointId MeteringPointId,
+    MessageCreationPeriod CreationPeriod,
+    string? SenderNumber = null,
+    string? SenderRoleCode = null,
+    string? ReceiverNumber = null,
+    string? ReceiverRoleCode = null,
+    IReadOnlyCollection<string>? DocumentTypes = null);

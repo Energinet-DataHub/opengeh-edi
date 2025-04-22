@@ -17,7 +17,7 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 public record MeteringPointMessageInfo(
-    long RecordId,
+    long PaginationCursor,
     Guid Id,
     string MessageId,
     byte DocumentType,

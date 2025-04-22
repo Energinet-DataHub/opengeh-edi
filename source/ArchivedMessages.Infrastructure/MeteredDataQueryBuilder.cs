@@ -35,7 +35,7 @@ internal sealed class MeteredDataQueryBuilder
     /// Build a query for fetching archived messages based on the given query options.
     /// </summary>
     /// <param name="query"></param>
-    public QueryInput BuildFrom(GetMessagesQuery query)
+    public QueryInput BuildFrom(GetMeteringPointMessagesQuery query)
     {
         if (query.MeteringPointId is null)
             throw new ArgumentNullException(nameof(query.MeteringPointId), "MeteringPointId cannot be null.");
@@ -50,13 +50,6 @@ internal sealed class MeteredDataQueryBuilder
             "CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod",
             new KeyValuePair<string, object>("StartOfPeriod", query.CreationPeriod.DateToSearchFrom.ToString()),
             new KeyValuePair<string, object>("EndOfPeriod", query.CreationPeriod.DateToSearchTo.ToString()));
-
-        if (query.MessageId is not null)
-        {
-            AddFilter(
-                query.IncludeRelatedMessages ? "(MessageId=@MessageId or RelatedToMessageId = @MessageId)" : "MessageId=@MessageId",
-                new KeyValuePair<string, object>("MessageId", query.MessageId));
-        }
 
         if (query.SenderNumber is not null && query.ReceiverNumber is not null)
         {
@@ -106,14 +99,6 @@ internal sealed class MeteredDataQueryBuilder
                     .Select(x => EnumerationType.FromName<DocumentType>(x).DatabaseValue)));
         }
 
-        if (query.BusinessReasons is not null)
-        {
-            AddFilter(
-                "BusinessReason in @BusinessReason",
-                new KeyValuePair<string, object>("BusinessReason", query.BusinessReasons
-                    .Select(x => EnumerationType.FromName<BusinessReason>(x).DatabaseValue)));
-        }
-
         if (_actorIdentity.HasRestriction(Restriction.Owned))
         {
             AddFilter(
@@ -135,8 +120,8 @@ internal sealed class MeteredDataQueryBuilder
     {
         if (cursor.SortedFieldValue is null)
         {
-            return isForward ? $" (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0) "
-                    : $" (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0) ";
+            return isForward ? $" (PaginationCursor < {cursor.RecordId} OR {cursor.RecordId} = 0) "
+                    : $" (PaginationCursor > {cursor.RecordId} OR {cursor.RecordId} = 0) ";
         }
 
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
@@ -144,11 +129,11 @@ internal sealed class MeteredDataQueryBuilder
                 : directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
         return isForward
             ? $"""
-                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursor < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}'))
               """
             : $"""
-                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursor > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
                    OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}')) 
                """;
     }
@@ -162,72 +147,28 @@ internal sealed class MeteredDataQueryBuilder
         var pagingDirection = navigatingForward ? "DESC" : "ASC";
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
         var sortDirection = navigatingForward ? sortByDirection : sortByDirection.Identifier == DirectionToSortBy.Ascending.Identifier ? DirectionToSortBy.Descending : DirectionToSortBy.Ascending;
-        return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, RecordId {pagingDirection}";
+        return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, PaginationCursor {pagingDirection}";
     }
 
-    private string BuildStatement(GetMessagesQuery query)
+    private string BuildStatement(GetMeteringPointMessagesQuery query)
     {
         var whereClause = " WHERE ";
         whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
         whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
-        string sqlStatement;
 
-        if (query.IncludeRelatedMessages == true && query.MessageId is not null)
-        {
-            // Messages may be related in different ways, hence we have the following 3 cases:
-            // 1. The message is related to other messages (Searching for a request with responses)
-            // 2. The message is related to a message that is related to another message (Searching for a response with a request, where the request has multiple responses)
-            // 3. The message is not related to any other messages
-            // Case 1 and 2 may be solve by joining every request onto a response (t1.RelatedToMessageId = t2.MessageId)
-            // and every response onto another response (t1.RelatedToMessageId = t2.RelatedToMessageId)
-            // Hence, if we were in case 1: Table 2 would consist of all responses to the request and the request itself (containing duplications)
-            // For case 2: Table 2 would consists of the response you searched for, all other responses which has a reference to the same request and the request itself (containing duplications)
-
-            // Case 3 is solved by joining every message onto itself (t1.MessageId = t2.MessageId)
-            // Since table 2 would be empty without it, hence we would not get anything when we do our inner join
-            sqlStatement = $"SELECT DISTINCT TOP ({query.Pagination.PageSize}) t2.RecordId, t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.SenderRoleCode, t2.ReceiverNumber, t2.ReceiverRoleCode, t2.CreatedAt, t2.BusinessReason " +
-                           $"FROM ( SELECT * FROM dbo.MeteringPointArchivedMessages {whereClause} ) AS t1 " +
-                           "INNER JOIN dbo.MeteringPointArchivedMessages as t2 " +
-                           "ON t1.RelatedToMessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId OR t1.MessageId= t2.MessageId";
-        }
-        else
-        {
-            var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) RecordId, Id, MessageId, DocumentType, SenderNumber, SenderRoleCode, ReceiverNumber, ReceiverRoleCode, CreatedAt, BusinessReason FROM dbo.MeteringPointArchivedMessages";
-            sqlStatement = selectStatement + whereClause;
-        }
+        var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) PaginationCursor, Id, MessageId, DocumentType, SenderNumber, SenderRoleCode, ReceiverNumber, ReceiverRoleCode, CreatedAt, BusinessReason FROM dbo.MeteringPointArchivedMessages";
+        var sqlStatement = selectStatement + whereClause;
 
         sqlStatement += OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);
         return sqlStatement;
     }
 
-    private string BuildTotalCountStatement(GetMessagesQuery query)
+    private string BuildTotalCountStatement(GetMeteringPointMessagesQuery query)
     {
         var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)} " : string.Empty;
-        string sqlStatement;
 
-        if (query.IncludeRelatedMessages == true && query.MessageId is not null)
-        {
-            // Messages may be related in different ways, hence we have the following 3 cases:
-            // 1. The message is related to other messages (Searching for a request with responses)
-            // 2. The message is related to a message that is related to another message (Searching for a response with a request, where the request has multiple responses)
-            // 3. The message is not related to any other messages
-            // Case 1 and 2 may be solve by joining every request onto a response (t1.RelatedToMessageId = t2.MessageId)
-            // and every response onto another response (t1.RelatedToMessageId = t2.RelatedToMessageId)
-            // Hence, if we were in case 1: Table 2 would consist of all responses to the request and the request itself (containing duplications)
-            // For case 2: Table 2 would consists of the response you searched for, all other responses which has a reference to the same request and the request itself (containing duplications)
-
-            // Case 3 is solved by joining every message onto itself (t1.MessageId = t2.MessageId)
-            // Since table 2 would be empty without it, hence we would not get anything when we do our inner join
-            sqlStatement = $"SELECT Count(DISTINCT t2.RecordId) " +
-                           $"FROM ( SELECT * FROM dbo.MeteringPointArchivedMessages {whereClause} ) AS t1 " +
-                           "INNER JOIN dbo.MeteringPointArchivedMessages as t2 " +
-                           "ON t1.RelatedToMessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId OR t1.MessageId= t2.MessageId";
-        }
-        else
-        {
-            var selectStatement = $"SELECT Count(*) FROM dbo.MeteringPointArchivedMessages";
-            sqlStatement = selectStatement + whereClause;
-        }
+        var selectStatement = $"SELECT Count(*) FROM dbo.MeteringPointArchivedMessages";
+        var sqlStatement = selectStatement + whereClause;
 
         return sqlStatement;
     }

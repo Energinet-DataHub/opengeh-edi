@@ -24,23 +24,15 @@ public interface IArchivedMeteringPointMessageRepository
     /// <summary>
     /// Archiving a dataMessage.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="cancellationToken"></param>
     Task AddAsync(ArchivedMeteringPointMessage message, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get document.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Stream</returns>
     Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
 
     // /// <summary>
     // /// Search for messages in the database
     // /// </summary>
-    // /// <param name="queryInput"></param>
-    // /// <param name="cancellationToken"></param>
-    // /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken);
+    Task<MessageSearchResult> SearchAsync(GetMeteringPointMessagesQuery queryInput, CancellationToken cancellationToken);
 }

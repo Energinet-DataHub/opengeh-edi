@@ -72,10 +72,9 @@ public class ArchivedMessagesClient(
     {
         ArgumentNullException.ThrowIfNull(queryInputDto);
         var result = queryInputDto.MeteringPointId != null
-                ? await _archivedMeteringPointMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false)
+                ? await _archivedMeteringPointMessageRepository.SearchAsync(GetMeteringPointMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false)
                 : await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
 
-        // TODO: How to determine if the result is from ArchivedMessage or ArchivedMeteringPointMessage?, is the query different?
         return MessagesSearchResultMapper.Map(result);
     }
 

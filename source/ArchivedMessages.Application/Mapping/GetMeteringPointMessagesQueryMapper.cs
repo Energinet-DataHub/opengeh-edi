@@ -17,21 +17,24 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 
-internal static class GetMessagesQueryMapper
+internal static class GetMeteringPointMessagesQueryMapper
 {
-    internal static GetMessagesQuery Map(GetMessagesQueryDto dto)
+    internal static GetMeteringPointMessagesQuery Map(GetMessagesQueryDto dto)
     {
-        return new GetMessagesQuery(
+        if (dto.CreationPeriod is null)
+            throw new ArgumentNullException(nameof(dto.CreationPeriod), "CreationPeriod cannot be null.");
+        if (dto.MeteringPointId is null)
+            throw new ArgumentNullException(nameof(dto.MeteringPointId), "MeteringPointId cannot be null.");
+
+        return new GetMeteringPointMessagesQuery(
             Pagination: SetSortedCursorBasedPagination(dto.Pagination),
+            MeteringPointId: dto.MeteringPointId,
             CreationPeriod: SetMessageCreationPeriod(dto.CreationPeriod),
-            MessageId: dto.MessageId,
             SenderNumber: dto.SenderNumber,
             SenderRoleCode: dto.SenderRoleCode,
             ReceiverNumber: dto.ReceiverNumber,
             ReceiverRoleCode: dto.ReceiverRoleCode,
-            DocumentTypes: dto.DocumentTypes,
-            BusinessReasons: dto.BusinessReasons,
-            IncludeRelatedMessages: dto.IncludeRelatedMessages);
+            DocumentTypes: dto.DocumentTypes);
     }
 
     private static SortedCursorBasedPagination SetSortedCursorBasedPagination(SortedCursorBasedPaginationDto dto)
@@ -44,11 +47,9 @@ internal static class GetMessagesQueryMapper
                 directionToSortBy: SetDirectionToSortBy(dto.DirectionToSortBy));
     }
 
-    private static MessageCreationPeriod? SetMessageCreationPeriod(MessageCreationPeriodDto? messageCreationPeriod)
+    private static MessageCreationPeriod SetMessageCreationPeriod(MessageCreationPeriodDto messageCreationPeriod)
     {
-        return messageCreationPeriod is not null
-            ? new MessageCreationPeriod(messageCreationPeriod.DateToSearchFrom, messageCreationPeriod.DateToSearchTo)
-            : null;
+        return new MessageCreationPeriod(messageCreationPeriod.DateToSearchFrom, messageCreationPeriod.DateToSearchTo);
     }
 
     private static SortingCursor? SetSortingCursor(SortingCursorDto? sortingCursor)

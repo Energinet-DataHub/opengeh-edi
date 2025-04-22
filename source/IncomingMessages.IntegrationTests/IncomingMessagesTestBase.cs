@@ -137,6 +137,12 @@ public class IncomingMessagesTestBase : IDisposable
         var fileStorageReference = await connection.ExecuteScalarAsync<string>(
             $"SELECT FileStorageReference FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
 
+        if (fileStorageReference == null)
+        {
+            fileStorageReference = await connection.ExecuteScalarAsync<string>(
+                $"SELECT FileStorageReference FROM [dbo].[MeteringPointArchivedMessages] WHERE MessageId = '{messageId}'");
+        }
+
         return fileStorageReference;
     }
 
@@ -147,6 +153,12 @@ public class IncomingMessagesTestBase : IDisposable
 
         var archivedMessage = await connection.QuerySingleOrDefaultAsync(
             $"SELECT * FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+        if (archivedMessage == null)
+        {
+            archivedMessage = await connection.QuerySingleOrDefaultAsync(
+                $"SELECT * FROM [dbo].[MeteringPointArchivedMessages] WHERE MessageId = '{messageId}'");
+        }
 
         return archivedMessage;
     }
