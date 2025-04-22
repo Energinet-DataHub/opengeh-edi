@@ -49,25 +49,24 @@ ALL TO ([PRIMARY]);
 -- Step 4: Create the Partitioned Table
 -- Use the partition scheme for the table
 CREATE TABLE [dbo].[MeteringPointArchivedMessages](
-    [RecordId] [bigint] IDENTITY(1,1) NOT NULL,
     [Id] [uniqueidentifier] NOT NULL,
     [DocumentType] TINYINT NOT NULL,
-    -- CIM has a maxLength of 16 for this field, but Ebix does not have a size limit
-    [ReceiverNumber] [varchar](255) NULL,
+    -- CIM has a maxLength of  for this field, but Ebix does not have a size limit
+    [ReceiverNumber] [varchar](16) NULL,
     [ReceiverRoleCode] TINYINT NULL,
     -- CIM has a maxLength of 16 for this field, but Ebix does not have a size limit
-    [SenderNumber] [varchar](255) NULL,
+    [SenderNumber] [varchar](16) NULL,
     [SenderRoleCode] TINYINT NULL,
     [CreatedAt] [datetime2](7) NOT NULL,
     [BusinessReason] TINYINT NOT NULL,
     -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
-    [MessageId] [varchar](36) NULL, 
+    [MessageId] [nvarchar](255) NULL, 
     -- {actorNumber}/{year:0000}/{month:00}/{day:00}/{id.ToString("N")} => 16 + 1 + 4 + 1 + 2 + 1 + 2 + 1 + 32 = 60
     [FileStorageReference] [varchar](60) NOT NULL, 
     -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
     [RelatedToMessageId] [varchar](36) NULL, 
-    -- Size is limited to 4000 characters (4,000 ÷ 36 ≈ 111 GUIDs).
-    [EventIds] varchar(4000) NULL, 
+    -- Greater size than MeteringPointIds
+    [EventIds] [varchar](max) NULL, 
     -- Size: MaxBundleDataCount is 150000, the minimum amount of dataCount for a MeteringPointId is 4(quarterly) * 4(hours) = 16 
     -- 150.000 / 16 = 9375 (max metering point ids per bundle)
     -- In Json Format: (amount of guids * (MeteringPointId_Length + double quotes + comma separator)) + array brackets
