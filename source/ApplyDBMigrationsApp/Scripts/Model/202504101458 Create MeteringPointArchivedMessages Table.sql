@@ -72,10 +72,17 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     -- (9375 * (36 + 2 + 1)) + 2 = 337,500 --> 337500 exceeds the 8,060-byte in-row limit, so the data will be stored off-row = max
     [MeteringPointIds] [varchar](max) NOT NULL,
     CONSTRAINT [PK_MessageArchive] PRIMARY KEY NONCLUSTERED
-(
-[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+    (
+        [Id] ASC
+    ) WITH 
+    (
+        PAD_INDEX = OFF,
+        STATISTICS_NORECOMPUTE = OFF,
+        IGNORE_DUP_KEY = OFF,
+        ALLOW_ROW_LOCKS = ON,
+        ALLOW_PAGE_LOCKS = ON
     ) ON [PRIMARY]
+) ON [PRIMARY]
 
 -- Drop existing clustered index (we'll recreate it with partitioning)
 DROP INDEX IF EXISTS [CI_MeteringPointArchivedMessages] ON [dbo].[MeteringPointArchivedMessages]
