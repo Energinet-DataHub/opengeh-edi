@@ -17,7 +17,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Security;
-using System.Text;
 using System.Xml;
 using Xunit.Abstractions;
 
@@ -54,7 +53,7 @@ internal sealed class EbixDriver : IDisposable
 
         _ebixServiceClient = new marketMessagingB2BServiceV01PortTypeClient(binding, endpoint);
 
-        _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = new X509Certificate2(
+        _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = X509CertificateLoader.LoadPkcs12FromFile(
             $"./Drivers/Ebix/{ebixCredentials.CertificateName}",
             ebixCredentials.CertificatePassword);
 
