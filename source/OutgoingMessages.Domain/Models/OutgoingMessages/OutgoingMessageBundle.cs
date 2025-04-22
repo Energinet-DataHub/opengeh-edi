@@ -67,5 +67,5 @@ public class OutgoingMessageBundle
 
     public IReadOnlyCollection<string> SerializedContentOfOutgoingMessages { get; set; }
 
-    public IReadOnlyList<EventId> EventIds { get; set; }
+    public IReadOnlyCollection<EventId> EventIds { get; set; }
 }
