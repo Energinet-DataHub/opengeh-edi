@@ -120,8 +120,8 @@ internal sealed class MeteredDataQueryBuilder
     {
         if (cursor.SortedFieldValue is null)
         {
-            return isForward ? $" (PaginationCursor < {cursor.RecordId} OR {cursor.RecordId} = 0) "
-                    : $" (PaginationCursor > {cursor.RecordId} OR {cursor.RecordId} = 0) ";
+            return isForward ? $" (PaginationCursorValue < {cursor.CursorPosition} OR {cursor.CursorPosition} = 0) "
+                    : $" (PaginationCursorValue > {cursor.CursorPosition} OR {cursor.CursorPosition} = 0) ";
         }
 
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
@@ -129,11 +129,11 @@ internal sealed class MeteredDataQueryBuilder
                 : directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
         return isForward
             ? $"""
-                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursor < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursorValue < {cursor.CursorPosition} OR {cursor.CursorPosition} = 0)) 
                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}'))
               """
             : $"""
-                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursor > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursorValue > {cursor.CursorPosition} OR {cursor.CursorPosition} = 0)) 
                    OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}')) 
                """;
     }
@@ -147,7 +147,7 @@ internal sealed class MeteredDataQueryBuilder
         var pagingDirection = navigatingForward ? "DESC" : "ASC";
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
         var sortDirection = navigatingForward ? sortByDirection : sortByDirection.Identifier == DirectionToSortBy.Ascending.Identifier ? DirectionToSortBy.Descending : DirectionToSortBy.Ascending;
-        return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, PaginationCursor {pagingDirection}";
+        return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, PaginationCursorValue {pagingDirection}";
     }
 
     private string BuildStatement(GetMeteringPointMessagesQuery query)
@@ -156,7 +156,7 @@ internal sealed class MeteredDataQueryBuilder
         whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
         whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
 
-        var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) PaginationCursor, Id, MessageId, DocumentType, SenderNumber, SenderRoleCode, ReceiverNumber, ReceiverRoleCode, CreatedAt, BusinessReason FROM dbo.MeteringPointArchivedMessages";
+        var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) PaginationCursorValue, Id, MessageId, DocumentType, SenderNumber, SenderRoleCode, ReceiverNumber, ReceiverRoleCode, CreatedAt, BusinessReason FROM dbo.MeteringPointArchivedMessages";
         var sqlStatement = selectStatement + whereClause;
 
         sqlStatement += OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);

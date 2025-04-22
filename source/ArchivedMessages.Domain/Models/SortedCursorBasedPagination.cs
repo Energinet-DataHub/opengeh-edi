@@ -58,5 +58,5 @@ public class SortedCursorBasedPagination(
 /// and when navigating backward, the cursor points to the first record of the current page.
 /// </summary>
 /// <param name="SortedFieldValue">If dataset should be sorted, we need to point at the current value of the field being sorted on.</param>
-/// <param name="RecordId"></param>
-public record SortingCursor(string? SortedFieldValue = null, long RecordId = 0);
+/// <param name="CursorPosition"></param>
+public record SortingCursor(string? SortedFieldValue = null, long CursorPosition = 0);

@@ -132,8 +132,8 @@ internal sealed class QueryBuilder
     {
         if (cursor.SortedFieldValue is null)
         {
-            return isForward ? $" (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0) "
-                    : $" (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0) ";
+            return isForward ? $" (RecordId < {cursor.CursorPosition} OR {cursor.CursorPosition} = 0) "
+                    : $" (RecordId > {cursor.CursorPosition} OR {cursor.CursorPosition} = 0) ";
         }
 
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
@@ -141,11 +141,11 @@ internal sealed class QueryBuilder
                 : directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
         return isForward
             ? $"""
-                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.CursorPosition} OR {cursor.CursorPosition} = 0)) 
                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}'))
               """
             : $"""
-                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId > {cursor.CursorPosition} OR {cursor.CursorPosition} = 0)) 
                    OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}')) 
                """;
     }

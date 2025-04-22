@@ -155,7 +155,7 @@ public class ArchivedMeteringPointMessageRepository(
 
         return new MessageSearchResult(
             archivedMessages.Select(x => new MessageInfo(
-                x.PaginationCursor,
+                x.PaginationCursorValue,
                 x.Id,
                 x.MessageId,
                 DocumentType.FromDatabaseValue(x.DocumentType).Name,
