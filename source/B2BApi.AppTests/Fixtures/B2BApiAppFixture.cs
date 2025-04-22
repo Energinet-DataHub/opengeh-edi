@@ -383,7 +383,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         var buildConfiguration = GetBuildConfiguration();
 
         var appHostSettings = HostConfigurationBuilder.CreateFunctionAppHostSettings();
-        appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
+        appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net9.0";
         appHostSettings.Port = ++port;
 
         // It seems the host + worker is not ready if we use the default startup log message, so we override it here

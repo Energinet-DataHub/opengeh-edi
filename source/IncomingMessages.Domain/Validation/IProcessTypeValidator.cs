@@ -25,5 +25,5 @@ public interface IProcessTypeValidator
     /// <summary>
     /// Validates Process Type
     /// </summary>
-    public Task<Result> ValidateAsync(IIncomingMessage message, DocumentFormat documentFormat, CancellationToken cancellationToken);
+    Task<Result> ValidateAsync(IIncomingMessage message, DocumentFormat documentFormat, CancellationToken cancellationToken);
 }

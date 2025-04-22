@@ -78,7 +78,8 @@ public class AggregatedTimeSeriesQueries(
                                    previousRow,
                                    querySnippetProvider.DatabricksContract),
                            EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint,
-                           sqlStatement))
+                           sqlStatement)
+                           .ConfigureAwait(false))
         {
             yield return aggregatedTimeSeries;
         }

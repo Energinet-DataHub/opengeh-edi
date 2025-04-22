@@ -45,9 +45,9 @@ public interface IOutgoingMessageRepository
     /// </summary>
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt);
 
-    public Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken);
+    Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken);
 
-    public Task<IReadOnlyCollection<OutgoingMessage>> GetMessagesForBundleAsync(
+    Task<IReadOnlyCollection<OutgoingMessage>> GetMessagesForBundleAsync(
         Receiver receiver,
         BusinessReason businessReason,
         DocumentType documentType,
