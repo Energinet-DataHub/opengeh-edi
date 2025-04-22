@@ -60,7 +60,7 @@ public class OutgoingMessageRepository(
         var serializedContentOfOutgoingMessages = new List<string>();
         var eventIds = new List<EventId>();
         // This approach processes the data row by row instead of loading the entire result set into memory at once.
-        // To avoid a huge memory spike and allowing DownloadAndSetMessageRecordAsync to dispose of the file storage stream per message to limit memory usage.
+        // To avoid a huge memory spike and allowing DownloadMessageContentAsync to dispose of the file storage stream per message to limit memory usage.
         await foreach (var result in _context.OutgoingMessages
                            .AsNoTracking()
                            .Where(x => x.AssignedBundleId == peekResult.BundleId)
@@ -68,7 +68,7 @@ public class OutgoingMessageRepository(
                            .AsAsyncEnumerable()
                            .WithCancellation(cancellationToken))
         {
-            var serializedContent = await DownloadAndSetMessageRecordAsync(result.FileStorageReference, cancellationToken).ConfigureAwait(false);
+            var serializedContent = await DownloadMessageContentAsync(result.FileStorageReference, cancellationToken).ConfigureAwait(false);
             serializedContentOfOutgoingMessages.Add(serializedContent);
             eventIds.Add(result.EventId);
         }
@@ -172,7 +172,7 @@ public class OutgoingMessageRepository(
             .CountAsync(cancellationToken);
     }
 
-    private async Task<string> DownloadAndSetMessageRecordAsync(FileStorageReference fileStorageReference, CancellationToken cancellationToken)
+    private async Task<string> DownloadMessageContentAsync(FileStorageReference fileStorageReference, CancellationToken cancellationToken)
     {
         using var fileStorageFile = await _fileStorageClient
             .DownloadAsync(fileStorageReference, cancellationToken)
