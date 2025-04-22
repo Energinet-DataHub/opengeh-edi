@@ -58,7 +58,7 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [SenderNumber] [varchar](16) NOT NULL,
     [SenderRoleCode] TINYINT NOT NULL,
     [CreatedAt] [datetime2](7) NOT NULL,
-    [BusinessReason] TINYINT NOT NULL,
+    [BusinessReason] TINYINT NULL,
     [MessageId] [varchar](255) NOT NULL,
     -- {actorNumber}/{year:0000}/{month:00}/{day:00}/{id.ToString("N")} => 16 + 1 + 4 + 1 + 2 + 1 + 2 + 1 + 32 = 60
     [FileStorageReference] [varchar](60) NOT NULL,
