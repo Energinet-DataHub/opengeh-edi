@@ -51,7 +51,7 @@ ALL TO ([PRIMARY]);
 CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [Id] [uniqueidentifier] NOT NULL,
     [DocumentType] TINYINT NOT NULL,
-    -- CIM has a maxLength of  for this field, but Ebix does not have a size limit
+    -- CIM has a maxLength of 16 for this field, but Ebix does not have a size limit
     [ReceiverNumber] [varchar](16) NOT NULL,
     [ReceiverRoleCode] TINYINT NOT NULL,
     -- CIM has a maxLength of 16 for this field, but Ebix does not have a size limit
@@ -59,8 +59,7 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [SenderRoleCode] TINYINT NOT NULL,
     [CreatedAt] [datetime2](7) NOT NULL,
     [BusinessReason] TINYINT NOT NULL,
-    -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
-    [MessageId] [varchar](255) NULL, 
+    [MessageId] [varchar](255) NOT NULL, 
     -- {actorNumber}/{year:0000}/{month:00}/{day:00}/{id.ToString("N")} => 16 + 1 + 4 + 1 + 2 + 1 + 2 + 1 + 32 = 60
     [FileStorageReference] [varchar](60) NOT NULL, 
     -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
