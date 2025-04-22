@@ -1,3 +1,3 @@
 ALTER TABLE [dbo].[OutgoingMessages]
-    ADD [MeteringPointIds] [varchar](max) NULL
+    ADD [MeteringPointId] [varchar](36) NULL
 GO

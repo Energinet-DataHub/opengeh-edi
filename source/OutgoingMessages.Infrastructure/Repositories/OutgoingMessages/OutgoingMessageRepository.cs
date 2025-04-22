@@ -57,18 +57,28 @@ public class OutgoingMessageRepository(
     {
         ArgumentNullException.ThrowIfNull(peekResult);
 
-        var outgoingMessages = await _context.OutgoingMessages
-            .Where(x => x.AssignedBundleId == peekResult.BundleId)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
-
-        var downloadAndSetMessageRecordTasks = outgoingMessages
-            .Select(x => DownloadAndSetMessageRecordAsync(x, cancellationToken));
-
-        await Task.WhenAll(downloadAndSetMessageRecordTasks).ConfigureAwait(false);
+        var serializedContentOfOutgoingMessages = new List<string>();
+        var eventIds = new List<EventId>();
+        var meteringPointIds = new List<MeteringPointId>();
+        // This approach processes the data row by row instead of loading the entire result set into memory at once.
+        // To avoid a huge memory spike and allowing DownloadMessageContentAsync to dispose of the file storage stream per message to limit memory usage.
+        await foreach (var result in _context.OutgoingMessages
+                           .AsNoTracking()
+                           .Where(x => x.AssignedBundleId == peekResult.BundleId)
+                           .Select(x => new { x.FileStorageReference, x.EventId, x.MeteringPointId })
+                           .AsAsyncEnumerable()
+                           .WithCancellation(cancellationToken))
+        {
+            var serializedContent = await DownloadMessageContentAsync(result.FileStorageReference, cancellationToken).ConfigureAwait(false);
+            serializedContentOfOutgoingMessages.Add(serializedContent);
+            eventIds.Add(result.EventId);
+            if (result.MeteringPointId is not null) meteringPointIds.Add(result.MeteringPointId);
+        }
 
         // All messages in a bundle have the same meta data
-        var firstMessage = outgoingMessages.First();
+        var firstMessage = _context.OutgoingMessages
+            .AsNoTracking()
+            .First(x => x.AssignedBundleId == peekResult.BundleId);
 
         return new OutgoingMessageBundle(
             firstMessage.DocumentType,
@@ -78,7 +88,9 @@ public class OutgoingMessageRepository(
             firstMessage.SenderId,
             firstMessage.SenderRole,
             peekResult.MessageId,
-            outgoingMessages,
+            serializedContentOfOutgoingMessages,
+            eventIds,
+            meteringPointIds.Distinct().ToList(),
             firstMessage.RelatedToMessageId);
     }
 
@@ -163,15 +175,13 @@ public class OutgoingMessageRepository(
             .CountAsync(cancellationToken);
     }
 
-    private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage, CancellationToken cancellationToken)
+    private async Task<string> DownloadMessageContentAsync(FileStorageReference fileStorageReference, CancellationToken cancellationToken)
     {
-        var fileStorageFile = await _fileStorageClient
-            .DownloadAsync(outgoingMessage.FileStorageReference, cancellationToken)
+        using var fileStorageFile = await _fileStorageClient
+            .DownloadAsync(fileStorageReference, cancellationToken)
             .ConfigureAwait(false);
 
-        var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
-
-        outgoingMessage.SetSerializedContent(messageRecord);
+        return await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
     }
 
     private IQueryable<OutgoingMessage> GetMessagesReadyToBeBundledQuery()

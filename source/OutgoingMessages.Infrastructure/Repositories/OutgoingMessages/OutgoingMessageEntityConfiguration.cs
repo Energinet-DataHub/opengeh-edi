@@ -124,6 +124,7 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
         builder.Property(x => x.PeriodStartedAt);
         builder.Property(x => x.DataCount);
         builder.Property(x => x.CreatedAt);
+        builder.Property(x => x.MeteringPointId);
 
         builder.Property(b => b.RowVersion)
             .IsRowVersion();
@@ -131,12 +132,5 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
         builder.Property<string>("CreatedBy");
         builder.Property<string?>("ModifiedBy");
         builder.Property<Instant?>("ModifiedAt");
-
-        builder.Property(x => x.MeteringPointIds)
-            .HasConversion(
-                toDbValue => JsonSerializer.Serialize(toDbValue.Select(x => x.Value), (JsonSerializerOptions?)null),
-                fromDbValue => JsonSerializer.Deserialize<List<string>>(fromDbValue, (JsonSerializerOptions?)null)!.Select(MeteringPointId.From).ToList().AsReadOnly())
-            .HasColumnName("MeteringPointIds")
-            .IsRequired(false);
     }
 }
