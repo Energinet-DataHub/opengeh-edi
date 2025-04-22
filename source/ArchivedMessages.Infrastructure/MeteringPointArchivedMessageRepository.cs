@@ -22,11 +22,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
-public class ArchivedMeteringPointMessageRepository(
+public class MeteringPointArchivedMessageRepository(
     IDatabaseConnectionFactory connectionFactory,
     AuthenticatedActor authenticatedActor,
     IFileStorageClient fileStorageClient)
-    : IArchivedMeteringPointMessageRepository
+    : IMeteringPointArchivedMessageRepository
 {
     private readonly IDatabaseConnectionFactory _connectionFactory = connectionFactory;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
@@ -136,7 +136,7 @@ public class ArchivedMeteringPointMessageRepository(
     public async Task<MessageSearchResult> SearchAsync(GetMeteringPointMessagesQuery queryInput, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(queryInput);
-        var input = new MeteredDataQueryBuilder(_authenticatedActor.CurrentActorIdentity).BuildFrom(queryInput);
+        var input = new MeteringPointQueryBuilder(_authenticatedActor.CurrentActorIdentity).BuildFrom(queryInput);
         using var connection =
             await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 

@@ -20,16 +20,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
-internal sealed class MeteredDataQueryBuilder
+internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
 {
-    private readonly ActorIdentity _actorIdentity;
     private readonly DynamicParameters _queryParameters = new();
     private readonly List<string> _statement = new();
-
-    public MeteredDataQueryBuilder(ActorIdentity actorIdentity)
-    {
-        _actorIdentity = actorIdentity;
-    }
+    private readonly ActorIdentity _actorIdentity = actorIdentity;
 
     /// <summary>
     /// Build a query for fetching archived messages based on the given query options.

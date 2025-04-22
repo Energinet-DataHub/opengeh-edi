@@ -77,5 +77,5 @@ public interface IIncomingMessage
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles { get; }
 
-    IReadOnlyList<MeteringPointId> MeteringPointIds { get; }
+    public IReadOnlyList<MeteringPointId> MeteringPointIds { get; }
 }

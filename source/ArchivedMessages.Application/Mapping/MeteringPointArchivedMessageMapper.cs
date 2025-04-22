@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Validation;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 
-public static class ArchivedMeteringPointMessageMapper
+public static class MeteringPointArchivedMessageMapper
 {
     public static MeteringPointArchivedMessage Map(ArchivedMessageDto dto)
     {

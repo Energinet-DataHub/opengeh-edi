@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 /// <summary>
 /// Represents a query options for retrieving messages.
 /// Including the pagination for the specific query.
 /// </summary>
-public sealed record GetMessagesQuery(
+public sealed record GetMeteringPointMessagesQuery(
     SortedCursorBasedPagination Pagination,
-    MessageCreationPeriod? CreationPeriod = null,
-    string? MessageId = null,
+    MeteringPointId MeteringPointId,
+    MessageCreationPeriod CreationPeriod,
     string? SenderNumber = null,
     string? SenderRoleCode = null,
     string? ReceiverNumber = null,
     string? ReceiverRoleCode = null,
-    IReadOnlyCollection<string>? DocumentTypes = null,
-    IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessages = false);
+    IReadOnlyCollection<string>? DocumentTypes = null);

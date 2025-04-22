@@ -83,7 +83,7 @@ public class ArchivedMessagesBrs021Tests : IAsyncLifetime
         await _sut.CreateAsync(outgoingMessage, CancellationToken.None);
 
         // Assert
-        var numberOfRowsCreated = await _fixture.GetNumberOfCreatedMeteredDataMessages();
+        var numberOfRowsCreated = await _fixture.GetNumberOfCreatedMeteringPointMessages();
         var searchResult = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto()),

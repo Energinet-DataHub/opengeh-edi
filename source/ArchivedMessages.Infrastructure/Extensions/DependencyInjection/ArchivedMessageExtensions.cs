@@ -30,7 +30,7 @@ public static class ArchivedMessageExtensions
     {
         services
             .AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>()
-            .AddTransient<IArchivedMeteringPointMessageRepository, ArchivedMeteringPointMessageRepository>()
+            .AddTransient<IMeteringPointArchivedMessageRepository, MeteringPointArchivedMessageRepository>()
             .AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>()
             .AddDapperConnectionToDatabase(configuration);
 

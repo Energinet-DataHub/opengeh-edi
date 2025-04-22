@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Domain;
 /// <summary>
 /// Responsible for archiving metering point messages.
 /// </summary>
-public interface IArchivedMeteringPointMessageRepository
+public interface IMeteringPointArchivedMessageRepository
 {
     /// <summary>
     /// Archiving a dataMessage.

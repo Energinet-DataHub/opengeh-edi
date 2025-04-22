@@ -218,7 +218,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         return archivedMessages.ToList().AsReadOnly();
     }
 
-    public async Task<int> GetNumberOfCreatedMeteredDataMessages()
+    public async Task<int> GetNumberOfCreatedMeteringPointMessages()
     {
         var connectionFactory = Services.GetService<IDatabaseConnectionFactory>()!;
         using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
