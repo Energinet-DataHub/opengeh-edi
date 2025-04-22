@@ -60,7 +60,7 @@ CREATE TABLE [dbo].[MeteringPointArchivedMessages](
     [CreatedAt] [datetime2](7) NOT NULL,
     [BusinessReason] TINYINT NOT NULL,
     -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
-    [MessageId] [nvarchar](255) NULL, 
+    [MessageId] [varchar](255) NULL, 
     -- {actorNumber}/{year:0000}/{month:00}/{day:00}/{id.ToString("N")} => 16 + 1 + 4 + 1 + 2 + 1 + 2 + 1 + 32 = 60
     [FileStorageReference] [varchar](60) NOT NULL, 
     -- Sync validation rule prevents the use of a messageId that is longer than 36 characters
