@@ -114,7 +114,7 @@ public class PeekMessage
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         var archivedMessageToCreate = new ArchivedMessageDto(
             messageId: outgoingMessageBundle.MessageId.Value,
-            eventIds: outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
+            eventIds: outgoingMessageBundle.EventIds.ToList(),
             documentType: outgoingMessageBundle.DocumentType.ToString(),
             senderNumber: outgoingMessageBundle.SenderId,
             senderRole: outgoingMessageBundle.SenderRole,
