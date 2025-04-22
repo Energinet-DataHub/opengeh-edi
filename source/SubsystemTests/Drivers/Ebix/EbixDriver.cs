@@ -53,7 +53,6 @@ internal sealed class EbixDriver : IDisposable
 
         _ebixServiceClient = new marketMessagingB2BServiceV01PortTypeClient(binding, endpoint);
 
-        // TODO: is this correct?
         _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = X509CertificateLoader.LoadPkcs12FromFile(
             $"./Drivers/Ebix/{ebixCredentials.CertificateName}",
             ebixCredentials.CertificatePassword);
