@@ -148,6 +148,11 @@ public class ArchivedMeteringPointMessageRepository(
         var archivedMessages = (await multi.ReadAsync<MeteringPointMessageInfo>().ConfigureAwait(false)).ToList();
         var totalAmountOfMessages = await multi.ReadSingleAsync<int>().ConfigureAwait(false);
 
+        // When navigating backwards the list must be reversed to get the correct order.
+        // Because sql use top to limit the result set and backwards is looking at the records from behind.
+        if (!queryInput.Pagination.NavigationForward)
+            archivedMessages.Reverse();
+
         return new MessageSearchResult(
             archivedMessages.Select(x => new MessageInfo(
                 x.PaginationCursor,
