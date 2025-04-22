@@ -50,8 +50,8 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
         {
             AddFilter(
                 "(SenderNumber=@SenderNumber OR ReceiverNumber=@ReceiverNumber)",
-                new KeyValuePair<string, object>("SenderNumber", query.Sender.ActorNumber),
-                new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber));
+                new KeyValuePair<string, object>("SenderNumber", query.Sender.ActorNumber.Value),
+                new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber.Value));
 
             AddFilter(
                 "(SenderRoleCode=@SenderRoleCode OR ReceiverRoleCode=@ReceiverRoleCode)",
@@ -62,7 +62,7 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
         {
             AddFilter(
                 "SenderNumber=@SenderNumber",
-                new KeyValuePair<string, object>("SenderNumber", query.Sender.ActorNumber));
+                new KeyValuePair<string, object>("SenderNumber", query.Sender.ActorNumber.Value));
             AddFilter(
                 "SenderRoleCode=@SenderRoleCode",
                 new KeyValuePair<string, object>("SenderRoleCode", ActorRole.FromCode(query.Sender.ActorRole.Code).DatabaseValue));
@@ -71,7 +71,7 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
         {
             AddFilter(
                 "ReceiverNumber=@ReceiverNumber",
-                new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber));
+                new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber.Value));
             AddFilter(
                 "ReceiverRoleCode=@ReceiverRoleCode",
                 new KeyValuePair<string, object>("ReceiverRoleCode", ActorRole.FromCode(query.Receiver.ActorRole.Code).DatabaseValue));
