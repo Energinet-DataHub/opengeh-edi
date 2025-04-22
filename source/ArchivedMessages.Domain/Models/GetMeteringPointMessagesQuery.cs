@@ -24,8 +24,6 @@ public sealed record GetMeteringPointMessagesQuery(
     SortedCursorBasedPagination Pagination,
     MeteringPointId MeteringPointId,
     MessageCreationPeriod CreationPeriod,
-    string? SenderNumber = null,
-    string? SenderRoleCode = null,
-    string? ReceiverNumber = null,
-    string? ReceiverRoleCode = null,
+    Actor? Sender = null,
+    Actor? Receiver = null,
     IReadOnlyCollection<string>? DocumentTypes = null);

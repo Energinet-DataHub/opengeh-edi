@@ -28,7 +28,7 @@ public class ArchivedMessagesClient(
     private readonly IArchivedMessageRepository _archivedMessageRepository = archivedMessageRepository;
     private readonly IMeteringPointArchivedMessageRepository _meteringPointArchivedMessageRepository = meteringPointArchivedMessageRepository;
 
-    private readonly IReadOnlyCollection<DocumentType> _meteredDataDocumentTypes = new[]
+    private readonly IReadOnlyCollection<DocumentType> _meteringPointDocumentTypes = new[]
     {
         DocumentType.NotifyValidatedMeasureData,
         DocumentType.Acknowledgement,
@@ -80,7 +80,7 @@ public class ArchivedMessagesClient(
 
     private bool IsMeteringPointMessage(DocumentType messageDocumentType)
     {
-        return _meteredDataDocumentTypes
+        return _meteringPointDocumentTypes
             .Any(x => x == messageDocumentType);
     }
 }

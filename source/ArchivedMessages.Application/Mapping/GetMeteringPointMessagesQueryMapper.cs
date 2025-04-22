@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 
@@ -26,14 +27,24 @@ internal static class GetMeteringPointMessagesQueryMapper
         if (dto.MeteringPointId is null)
             throw new ArgumentNullException(nameof(dto.MeteringPointId), "MeteringPointId cannot be null.");
 
+        Actor? sender = null;
+        if (dto.SenderNumber is not null && dto.SenderRoleCode is not null)
+        {
+            sender = new Actor(ActorNumber.Create(dto.SenderNumber), ActorRole.FromCode(dto.SenderRoleCode));
+        }
+
+        Actor? receiver = null;
+        if (dto.ReceiverNumber is not null && dto.ReceiverRoleCode is not null)
+        {
+            receiver = new Actor(ActorNumber.Create(dto.ReceiverNumber), ActorRole.FromCode(dto.ReceiverRoleCode));
+        }
+
         return new GetMeteringPointMessagesQuery(
             Pagination: SetSortedCursorBasedPagination(dto.Pagination),
             MeteringPointId: dto.MeteringPointId,
             CreationPeriod: SetMessageCreationPeriod(dto.CreationPeriod),
-            SenderNumber: dto.SenderNumber,
-            SenderRoleCode: dto.SenderRoleCode,
-            ReceiverNumber: dto.ReceiverNumber,
-            ReceiverRoleCode: dto.ReceiverRoleCode,
+            Sender: sender,
+            Receiver: receiver,
             DocumentTypes: dto.DocumentTypes);
     }
 

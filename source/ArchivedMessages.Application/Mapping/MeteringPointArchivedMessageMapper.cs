@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Exceptions;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Validation;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
@@ -30,10 +31,8 @@ public static class MeteringPointArchivedMessageMapper
                 messageId: dto.MessageId,
                 eventIds: dto.EventIds,
                 documentType: dto.DocumentType,
-                senderNumber: dto.SenderNumber,
-                senderRole: dto.SenderRole,
-                receiverNumber: dto.ReceiverNumber,
-                receiverRole: dto.ReceiverRole,
+                sender: new Actor(dto.SenderNumber, dto.SenderRole),
+                receiver: new Actor(dto.ReceiverNumber, dto.ReceiverRole),
                 createdAt: dto.CreatedAt,
                 businessReason: dto.BusinessReason,
                 archivedMessageType: (ArchivedMessageType)dto.ArchivedMessageType,

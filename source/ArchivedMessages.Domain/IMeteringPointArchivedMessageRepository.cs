@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Domain;
 public interface IMeteringPointArchivedMessageRepository
 {
     /// <summary>
-    /// Archiving a dataMessage.
+    /// Archiving metering point messages.
     /// </summary>
     Task AddAsync(MeteringPointArchivedMessage message, CancellationToken cancellationToken);
 
@@ -31,8 +31,8 @@ public interface IMeteringPointArchivedMessageRepository
     /// </summary>
     Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
 
-    // /// <summary>
-    // /// Search for messages in the database
-    // /// </summary>
+    /// <summary>
+    /// Search for messages in the database
+    /// </summary>
     Task<MessageSearchResult> SearchAsync(GetMeteringPointMessagesQuery queryInput, CancellationToken cancellationToken);
 }

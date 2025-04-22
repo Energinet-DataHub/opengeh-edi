@@ -46,44 +46,35 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
             new KeyValuePair<string, object>("StartOfPeriod", query.CreationPeriod.DateToSearchFrom.ToString()),
             new KeyValuePair<string, object>("EndOfPeriod", query.CreationPeriod.DateToSearchTo.ToString()));
 
-        if (query.SenderNumber is not null && query.ReceiverNumber is not null)
+        if (query.Sender is not null && query.Receiver is not null)
         {
             AddFilter(
                 "(SenderNumber=@SenderNumber OR ReceiverNumber=@ReceiverNumber)",
-                new KeyValuePair<string, object>("SenderNumber", query.SenderNumber),
-                new KeyValuePair<string, object>("ReceiverNumber", query.ReceiverNumber));
+                new KeyValuePair<string, object>("SenderNumber", query.Sender.ActorNumber),
+                new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber));
+
+            AddFilter(
+                "(SenderRoleCode=@SenderRoleCode OR ReceiverRoleCode=@ReceiverRoleCode)",
+                new KeyValuePair<string, object>("SenderRoleCode", ActorRole.FromCode(query.Sender.ActorRole.Code).DatabaseValue),
+                new KeyValuePair<string, object>("ReceiverRoleCode", ActorRole.FromCode(query.Receiver.ActorRole.Code).DatabaseValue));
         }
-        else if (query.SenderNumber is not null)
+        else if (query.Sender is not null)
         {
             AddFilter(
                 "SenderNumber=@SenderNumber",
-                new KeyValuePair<string, object>("SenderNumber", query.SenderNumber));
+                new KeyValuePair<string, object>("SenderNumber", query.Sender.ActorNumber));
+            AddFilter(
+                "SenderRoleCode=@SenderRoleCode",
+                new KeyValuePair<string, object>("SenderRoleCode", ActorRole.FromCode(query.Sender.ActorRole.Code).DatabaseValue));
         }
-        else if (query.ReceiverNumber is not null)
+        else if (query.Receiver is not null)
         {
             AddFilter(
                 "ReceiverNumber=@ReceiverNumber",
-                new KeyValuePair<string, object>("ReceiverNumber", query.ReceiverNumber));
-        }
-
-        if (query.SenderRoleCode is not null && query.ReceiverRoleCode is not null)
-        {
-            AddFilter(
-                "(SenderRoleCode=@SenderRoleCode OR ReceiverRoleCode=@ReceiverRoleCode)",
-                new KeyValuePair<string, object>("SenderRoleCode", ActorRole.FromCode(query.SenderRoleCode).DatabaseValue),
-                new KeyValuePair<string, object>("ReceiverRoleCode", ActorRole.FromCode(query.ReceiverRoleCode).DatabaseValue));
-        }
-        else if (query.SenderRoleCode is not null)
-        {
-            AddFilter(
-                "SenderRoleCode=@SenderRoleCode",
-                new KeyValuePair<string, object>("SenderRoleCode", ActorRole.FromCode(query.SenderRoleCode).DatabaseValue));
-        }
-        else if (query.ReceiverRoleCode is not null)
-        {
+                new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber));
             AddFilter(
                 "ReceiverRoleCode=@ReceiverRoleCode",
-                new KeyValuePair<string, object>("ReceiverRoleCode", ActorRole.FromCode(query.ReceiverRoleCode).DatabaseValue));
+                new KeyValuePair<string, object>("ReceiverRoleCode", ActorRole.FromCode(query.Receiver.ActorRole.Code).DatabaseValue));
         }
 
         if (query.DocumentTypes is not null)
