@@ -53,7 +53,8 @@ public static class OutgoingMessageFactory
             gridAreaCode: acceptedMessage.Series.GridAreaCode,
             externalId: acceptedMessage.ExternalId,
             calculationId: null,
-            acceptedMessage.Series.Period.Start);
+            acceptedMessage.Series.Period.Start,
+            dataCount: acceptedMessage.Series.Point.Count);
     }
 
     /// <summary>
@@ -81,7 +82,8 @@ public static class OutgoingMessageFactory
             gridAreaCode: null,
             externalId: rejectedMessage.ExternalId,
             calculationId: null,
-            periodStartedAt: null);
+            periodStartedAt: null,
+            dataCount: rejectedMessage.Series.RejectReasons.Count);
     }
 
     /// <summary>
@@ -109,7 +111,8 @@ public static class OutgoingMessageFactory
             messageDto.Series.GridAreaCode,
             messageDto.ExternalId,
             messageDto.CalculationId,
-            messageDto.Series.Period.Start);
+            messageDto.Series.Period.Start,
+            dataCount: messageDto.Series.Point.Count);
     }
 
     /// <summary>
@@ -137,7 +140,8 @@ public static class OutgoingMessageFactory
             messageDto.Series.GridAreaCode,
             messageDto.ExternalId,
             messageDto.CalculationId,
-            messageDto.Series.Period.Start);
+            messageDto.Series.Period.Start,
+            dataCount: messageDto.Series.Point.Count);
     }
 
     /// <summary>
@@ -167,7 +171,8 @@ public static class OutgoingMessageFactory
                 gridAreaCode: messageDto.GridArea,
                 externalId: messageDto.ExternalId,
                 calculationId: messageDto.CalculationId,
-                messageDto.SeriesForEnergySupplier.Period.Start),
+                messageDto.SeriesForEnergySupplier.Period.Start,
+                dataCount: messageDto.SeriesForEnergySupplier.Point.Count),
         ];
 
         // Only create a message for the balance responsible if the business reason is BalanceFixing or PreliminaryAggregation
@@ -188,7 +193,8 @@ public static class OutgoingMessageFactory
                 gridAreaCode: messageDto.GridArea,
                 externalId: messageDto.ExternalId,
                 calculationId: messageDto.CalculationId,
-                messageDto.SeriesForBalanceResponsible.Period.Start);
+                messageDto.SeriesForBalanceResponsible.Period.Start,
+                dataCount: messageDto.SeriesForBalanceResponsible.Point.Count);
 
             outgoingMessages.Add(outgoingMessageToBalanceResponsible);
         }
@@ -224,7 +230,8 @@ public static class OutgoingMessageFactory
                 wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleAmountPerChargeMessageDto.ExternalId,
                 wholesaleAmountPerChargeMessageDto.CalculationId,
-                wholesaleAmountPerChargeMessageDto.Series.Period.Start),
+                wholesaleAmountPerChargeMessageDto.Series.Period.Start,
+                dataCount: wholesaleAmountPerChargeMessageDto.Series.Points.Count),
             new(
                 wholesaleAmountPerChargeMessageDto.EventId,
                 wholesaleAmountPerChargeMessageDto.DocumentType,
@@ -243,7 +250,8 @@ public static class OutgoingMessageFactory
                 wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleAmountPerChargeMessageDto.ExternalId,
                 wholesaleAmountPerChargeMessageDto.CalculationId,
-                wholesaleAmountPerChargeMessageDto.Series.Period.Start),
+                wholesaleAmountPerChargeMessageDto.Series.Period.Start,
+                dataCount: wholesaleAmountPerChargeMessageDto.Series.Points.Count),
         };
     }
 
@@ -275,7 +283,8 @@ public static class OutgoingMessageFactory
                 wholesaleMonthlyAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleMonthlyAmountPerChargeMessageDto.ExternalId,
                 wholesaleMonthlyAmountPerChargeMessageDto.CalculationId,
-                wholesaleMonthlyAmountPerChargeMessageDto.Series.Period.Start),
+                wholesaleMonthlyAmountPerChargeMessageDto.Series.Period.Start,
+                dataCount: wholesaleMonthlyAmountPerChargeMessageDto.Series.Points.Count),
             new(
                 wholesaleMonthlyAmountPerChargeMessageDto.EventId,
                 wholesaleMonthlyAmountPerChargeMessageDto.DocumentType,
@@ -294,7 +303,8 @@ public static class OutgoingMessageFactory
                 wholesaleMonthlyAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleMonthlyAmountPerChargeMessageDto.ExternalId,
                 wholesaleMonthlyAmountPerChargeMessageDto.CalculationId,
-                wholesaleMonthlyAmountPerChargeMessageDto.Series.Period.Start),
+                wholesaleMonthlyAmountPerChargeMessageDto.Series.Period.Start,
+                dataCount: wholesaleMonthlyAmountPerChargeMessageDto.Series.Points.Count),
         };
     }
 
@@ -320,7 +330,8 @@ public static class OutgoingMessageFactory
             wholesaleTotalAmountMessageDto.Series.GridAreaCode,
             wholesaleTotalAmountMessageDto.ExternalId,
             wholesaleTotalAmountMessageDto.CalculationId,
-            wholesaleTotalAmountMessageDto.Series.Period.Start);
+            wholesaleTotalAmountMessageDto.Series.Period.Start,
+            dataCount: wholesaleTotalAmountMessageDto.Series.Points.Count);
     }
 
     /// <summary>
@@ -348,7 +359,8 @@ public static class OutgoingMessageFactory
             gridAreaCode: null,
             externalId: message.ExternalId,
             calculationId: null,
-            periodStartedAt: null);
+            periodStartedAt: null,
+            dataCount: message.Series.RejectReasons.Count);
     }
 
     /// <summary>
@@ -376,7 +388,8 @@ public static class OutgoingMessageFactory
             gridAreaCode: message.Series.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
-            message.Series.Period.Start);
+            message.Series.Period.Start,
+            dataCount: message.Series.Points.Count);
     }
 
     public static OutgoingMessage CreateMessage(
@@ -401,7 +414,8 @@ public static class OutgoingMessageFactory
             gridAreaCode: null,
             externalId: message.ExternalId,
             calculationId: null,
-            message.Series.StartedDateTime);
+            message.Series.StartedDateTime,
+            dataCount: message.Series.EnergyObservations.Count);
     }
 
     public static OutgoingMessage CreateMessage(
@@ -426,7 +440,8 @@ public static class OutgoingMessageFactory
             gridAreaCode: null,
             externalId: message.ExternalId,
             calculationId: null,
-            periodStartedAt: null);
+            periodStartedAt: null,
+            dataCount: message.Series.RejectReasons.Count);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

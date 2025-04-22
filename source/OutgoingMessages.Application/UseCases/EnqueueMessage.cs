@@ -149,8 +149,8 @@ public class EnqueueMessage
         // Using max bundle size > 1 because we want to support disabling bundling by setting it to 1.
         var maxBundleSize = documentType switch
         {
-            var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleSize,
-            var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleSize,
+            var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleMessageCount,
+            var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleMessageCount,
             _ => 1,
         };
 

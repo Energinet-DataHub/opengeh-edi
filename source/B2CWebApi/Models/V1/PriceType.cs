@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 
 /// <summary>
 /// The price type enum is used to make B2C Wholesale Settlement requests from the UI, and describes a combination of

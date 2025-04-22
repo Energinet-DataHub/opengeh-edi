@@ -25,6 +25,11 @@ public record AuditLogEntityType(string Identifier)
     public static readonly AuditLogEntityType ArchivedMessage = new("ArchivedMessage");
 
     /// <summary>
+    /// Used when searching for archived measure data messages or getting a specific archived measure data message
+    /// </summary>
+    public static readonly AuditLogEntityType ArchivedMeasureDataMessage = new("ArchivedMeasureDataMessage");
+
+    /// <summary>
     /// Used when peeking and dequeueing a bundle from the actor message queue and cleaned up.
     /// </summary>
     public static readonly AuditLogEntityType Bundle = new("Bundle");

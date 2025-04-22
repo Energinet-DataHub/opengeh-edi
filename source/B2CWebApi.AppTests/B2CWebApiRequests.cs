@@ -14,6 +14,11 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
+using Energinet.DataHub.EDI.B2CWebApi.Models.V1;
+using NodaTime;
+using BusinessReason = Energinet.DataHub.EDI.B2CWebApi.Models.V1.BusinessReason;
+using SettlementMethod = Energinet.DataHub.EDI.B2CWebApi.Models.V1.SettlementMethod;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
 
@@ -86,12 +91,14 @@ public static class B2CWebApiRequests
         var request = new HttpRequestMessage(HttpMethod.Post, "/RequestAggregatedMeasureData")
         {
             Content = CreateJsonContent(
-                new RequestAggregatedMeasureDataMarketRequest(
-                    CalculationType: CalculationType.BalanceFixing,
+                new RequestAggregatedMeasureDataMarketRequestV1(
+                    BusinessReason: BusinessReason.BalanceFixing,
+                    SettlementMethod: SettlementMethod.NonProfiled,
+                    SettlementVersion: null,
                     MeteringPointType: null,
-                    StartDate: "2024-08-27T00:00:00Z",
-                    EndDate: "2024-08-28T00:00:00Z",
-                    GridArea: null,
+                    StartDate: Instant.FromUtc(2024, 08, 27, 22, 00).ToDateTimeOffset(),
+                    EndDate: Instant.FromUtc(2024, 08, 28, 22, 00).ToDateTimeOffset(),
+                    GridAreaCode: null,
                     EnergySupplierId: null,
                     BalanceResponsibleId: null)),
         };
@@ -120,14 +127,15 @@ public static class B2CWebApiRequests
         var request = new HttpRequestMessage(HttpMethod.Post, "/RequestWholesaleSettlement")
         {
             Content = CreateJsonContent(
-                new RequestWholesaleSettlementMarketRequest(
-                    CalculationType: CalculationType.WholesaleFixing,
-                    StartDate: "2024-08-27T00:00:00Z",
-                    EndDate: "2024-08-28T00:00:00Z",
-                    GridArea: null,
+                new RequestWholesaleSettlementMarketRequestV1(
+                    SettlementVersion: null,
+                    BusinessReason: BusinessReason.WholesaleFixing,
+                    StartDate: Instant.FromUtc(2024, 08, 27, 22, 00).ToDateTimeOffset(),
+                    EndDate: Instant.FromUtc(2024, 08, 28, 22, 00).ToDateTimeOffset(),
+                    GridAreaCode: null,
                     EnergySupplierId: null,
                     Resolution: null,
-                    PriceType: null)),
+                    ChargeType: null)),
         };
         return request;
     }
@@ -146,6 +154,27 @@ public static class B2CWebApiRequests
                     Resolution: null,
                     PriceType: null)),
         };
+        return request;
+    }
+
+    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageSearchRequest()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMeasureDataMessage/search")
+        {
+            Content = CreateJsonContent(
+                new ArchivedMeasureDataMessageSearchCriteria(
+                    MeteringPointId: "123456789",
+                    CreatedDuringPeriod: new MessageCreationPeriod(Start: DateTimeOffset.Parse("2024-08-27T00:00:00Z"), End: DateTimeOffset.Parse("2024-08-28T00:00:00Z")),
+                    Sender: new Actor(ActorRole: ActorRole.DataHubAdministrator, ActorNumber: "1234567890123"),
+                    Receiver: new Actor(ActorRole: ActorRole.MeteredDataResponsible, ActorNumber: "1234567890123"),
+                    DocumentTypes: [MeasureDataDocumentType.NotifyValidatedMeasureData])),
+        };
+        return request;
+    }
+
+    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageGetRequest()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/ArchivedMeasureDataMessage/{Guid.NewGuid()}");
         return request;
     }
 

@@ -12,22 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.Messaging.Communication;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
-
-/// <summary>
-/// Process specific type(s) of integration events
-/// </summary>
-public interface IIntegrationEventProcessor
+public enum SettlementVersion
 {
-    /// <summary>
-    /// Event type the processor handles
-    /// </summary>
-    string EventTypeToHandle { get; }
-
-    /// <summary>
-    /// Process a single integration event
-    /// </summary>
-    Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
+    FirstCorrection,
+    SecondCorrection,
+    ThirdCorrection,
 }
