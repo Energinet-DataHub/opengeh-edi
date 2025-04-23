@@ -34,7 +34,7 @@ public class DocumentTypeTests
     {
         var documentTypes = new List<(DocumentType ExpectedValue, string Name, byte DatabaseValue)>()
         {
-            (DocumentType.RequestAggregatedMeasureData, "Aggregations", 1),
+            (DocumentType.RequestAggregatedMeasureData, "RequestAggregatedMeasureData", 1),
             (DocumentType.NotifyAggregatedMeasureData, "NotifyAggregatedMeasureData", 2),
             (DocumentType.RejectRequestAggregatedMeasureData, "RejectRequestAggregatedMeasureData", 3),
             (DocumentType.RequestWholesaleSettlement, "RequestWholesaleSettlement", 4),
