@@ -32,19 +32,19 @@ public class ActorRoleTests
     [Fact]
     public void Ensure_all_ActorRoles()
     {
-        var actorRole = new List<(ActorRole ExpectedValue, string Name, string Code)>()
+        var actorRole = new List<(ActorRole ExpectedValue, string Name, string Code, byte DatabaseValue)>()
         {
-            (ActorRole.MeteredDataResponsible, "MeteredDataResponsible", "MDR"),
-            (ActorRole.MeteredDataAdministrator, "MeteredDataAdministrator", "DGL"),
-            (ActorRole.GridAccessProvider, "GridAccessProvider", "DDM"),
-            (ActorRole.BalanceResponsibleParty, "BalanceResponsibleParty", "DDK"),
-            (ActorRole.EnergySupplier, "EnergySupplier", "DDQ"),
-            (ActorRole.MeteringPointAdministrator, "MeteringPointAdministrator", "DDZ"),
-            (ActorRole.ImbalanceSettlementResponsible, "ImbalanceSettlementResponsible", "DDX"),
-            (ActorRole.SystemOperator, "SystemOperator", "EZ"),
-            (ActorRole.DanishEnergyAgency, "DanishEnergyAgency", "STS"),
-            (ActorRole.Delegated, "Delegated", "DEL"),
-            (ActorRole.DataHubAdministrator, "DataHubAdministrator", string.Empty),
+            (ActorRole.MeteredDataResponsible, "MeteredDataResponsible", "MDR", 5),
+            (ActorRole.MeteredDataAdministrator, "MeteredDataAdministrator", "DGL", 4),
+            (ActorRole.GridAccessProvider, "GridAccessProvider", "DDM", 3),
+            (ActorRole.BalanceResponsibleParty, "BalanceResponsibleParty", "DDK", 6),
+            (ActorRole.EnergySupplier, "EnergySupplier", "DDQ", 2),
+            (ActorRole.MeteringPointAdministrator, "MeteringPointAdministrator", "DDZ", 1),
+            (ActorRole.ImbalanceSettlementResponsible, "ImbalanceSettlementResponsible", "DDX", 7),
+            (ActorRole.SystemOperator, "SystemOperator", "EZ", 8),
+            (ActorRole.DanishEnergyAgency, "DanishEnergyAgency", "STS", 9),
+            (ActorRole.Delegated, "Delegated", "DEL", 10),
+            (ActorRole.DataHubAdministrator, "DataHubAdministrator", string.Empty, 11),
         };
 
         using var scope = new AssertionScope();
@@ -52,6 +52,7 @@ public class ActorRoleTests
         {
             ActorRole.FromName(test.Name).Should().Be(test.ExpectedValue);
             ActorRole.FromCode(test.Code).Should().Be(test.ExpectedValue);
+            ActorRole.FromDatabaseValue(test.DatabaseValue).Should().Be(test.ExpectedValue);
         }
 
         actorRole.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllActorRoles());
