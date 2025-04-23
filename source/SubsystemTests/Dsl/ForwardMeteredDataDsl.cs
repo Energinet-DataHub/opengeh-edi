@@ -64,7 +64,7 @@ internal sealed class ForwardMeteredDataDsl(
         return await _ediDriver.SendForwardMeteredDataAsync(cancellationToken);
     }
 
-    public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor)
+    public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor, MeteringPointId? meteringPointId = null)
     {
         await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
         await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
@@ -72,7 +72,8 @@ internal sealed class ForwardMeteredDataDsl(
             start: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
             end: Instant.FromUtc(2025, 01, 31, 23, 00, 00),
             originalActorMessageId: Guid.NewGuid().ToString(),
-            eventId: Guid.NewGuid());
+            eventId: Guid.NewGuid(),
+            meteringPointId: meteringPointId);
     }
 
     public async Task<string> ConfirmResponseIsAvailable()

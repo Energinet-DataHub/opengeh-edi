@@ -77,14 +77,16 @@ internal class ProcessManagerDriver(
         Instant start,
         Instant end,
         string originalActorMessageId,
-        Guid eventId)
+        Guid eventId,
+        MeteringPointId? meteringPointId = null)
     {
         var serviceBusMessage = EnqueueBrs021ForwardMeteredDataFactory.CreateAcceptedV1(
             actor,
             start,
             end,
             originalActorMessageId,
-            eventId);
+            eventId,
+            meteringPointId);
 
         await _client.SendAsync(serviceBusMessage, CancellationToken.None);
     }

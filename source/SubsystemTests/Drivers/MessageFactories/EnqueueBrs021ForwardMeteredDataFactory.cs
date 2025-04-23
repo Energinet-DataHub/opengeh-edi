@@ -35,7 +35,8 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         Instant start,
         Instant end,
         string originalActorMessageId,
-        Guid eventId)
+        Guid eventId,
+        MeteringPointId? meteringPointId = null)
     {
         var resolution = BuildingBlocks.Domain.Models.Resolution.QuarterHourly;
         var resolutionDuration = resolution.ToDuration();
@@ -69,7 +70,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
 
         var accepted = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: originalActorMessageId,
-            MeteringPointId: "1234567890123",
+            MeteringPointId: meteringPointId?.Value ?? "1234567890123",
             MeteringPointType: MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
             RegistrationDateTime: start.ToDateTimeOffset(),

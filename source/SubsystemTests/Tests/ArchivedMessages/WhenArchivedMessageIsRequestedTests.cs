@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
@@ -28,7 +29,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     private readonly ArchivedMessageDsl _archivedMessages;
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
     private readonly CalculationCompletedDsl _calculationCompleted;
-    private readonly ForwardMeteredDataDsl _forwardMeteredData;
+    private readonly ForwardMeteredDataDsl _forwardMeteredDataAsGridAccessProvider;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
@@ -50,7 +51,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
             output,
             fixture.BalanceFixingCalculationId,
             fixture.WholesaleFixingCalculationId);
-        _forwardMeteredData = new ForwardMeteredDataDsl(
+        _forwardMeteredDataAsGridAccessProvider = new ForwardMeteredDataDsl(
             ebix: new EbixDriver(
                 fixture.EbixUri,
                 fixture.EbixGridAccessProviderCredentials,
@@ -88,6 +89,14 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_get_the_metering_point_archived_message()
     {
+        await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredData(
+            new Actor(
+                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
+                actorRole: ActorRole.EnergySupplier),
+            meteringPointId: MeteringPointId.From("9999999999"));
+
+        await _forwardMeteredDataAsGridAccessProvider.ConfirmResponseIsAvailable();
+
         await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch();
     }
 }

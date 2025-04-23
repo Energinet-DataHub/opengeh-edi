@@ -174,8 +174,8 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "ArchivedMeasureDataMessage/search"
-                    urlBuilder_.Append("ArchivedMeasureDataMessage/search");
+                    // Operation Path: "MeteringPointArchivedMessage/search"
+                    urlBuilder_.Append("MeteringPointArchivedMessage/search");
                     urlBuilder_.Append('?');
                     if (api_version != null)
                     {
@@ -253,8 +253,8 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "ArchivedMeasureDataMessage/{id}"
-                    urlBuilder_.Append("ArchivedMeasureDataMessage/");
+                    // Operation Path: "MeteringPointArchivedMessage/{id}"
+                    urlBuilder_.Append("MeteringPointArchivedMessage/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
                     urlBuilder_.Append('?');
                     if (api_version != null)
