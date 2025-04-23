@@ -16,10 +16,12 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
+using MessageCreationPeriod = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.MessageCreationPeriod;
 using SearchArchivedMessagesCriteriaV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesCriteria;
 using SearchArchivedMessagesPagination = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesPagination;
 using SearchArchivedMessagesPaginationV3 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3.SearchArchivedMessagesPagination;
@@ -147,5 +149,26 @@ public class ArchivedMessageDsl
             .And.Match($"*\"SystemId\":\"688b2dca-7231-490f-a731-d7869d33fe5e\"*")
             .And.Match($"*\"ActorNumber\":\"{SubsystemTestFixture.B2CActorNumber}\"*")
             .And.Match($"*\"Permissions\":\"*actors:manage*\"*");
+    }
+
+    internal async Task ConfirmMeteringPointArchivedMessageSearch()
+    {
+        var now = DateTime.Now;
+
+        var request = new ArchivedMeasureDataMessageSearchCriteria
+        {
+            MeteringPointId = "1234567890123",
+            CreatedDuringPeriod =
+                new MessageCreationPeriod
+                {
+                    Start = now.AddMinutes(-2),
+                    End = now.AddMinutes(2),
+                },
+        };
+
+        var archivedMessagesResponse = await _b2cEdiDriver.SearchMeteringPointArchivedMessageAsync(request, CancellationToken.None);
+
+        archivedMessagesResponse.Should().NotBeNull();
+        archivedMessagesResponse.TotalCount.Should().BeGreaterThan(0);
     }
 }
