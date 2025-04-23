@@ -24,6 +24,7 @@ public class RejectedForwardMeteredDataMessageDtoBuilder
     private BusinessReason _businessReason = BusinessReason.PeriodicMetering;
     private Actor _receiver = new(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
     private MessageId _relatedToMessageId = MessageId.New();
+    private MeteringPointId _meteringPointId = MeteringPointId.From("1234567890123");
     private RejectedForwardMeteredDataSeries _series = new(
         RejectReasons: new List<RejectReason> { new("E01", "Test error message") },
         TransactionId: TransactionId.New(),
@@ -40,6 +41,7 @@ public class RejectedForwardMeteredDataMessageDtoBuilder
             _receiver.ActorNumber,
             _receiver.ActorRole,
             _relatedToMessageId,
+            _meteringPointId,
             _series,
             _documentReceiverRole);
     }
@@ -47,6 +49,12 @@ public class RejectedForwardMeteredDataMessageDtoBuilder
     public RejectedForwardMeteredDataMessageDtoBuilder WithEventId(EventId eventId)
     {
         _eventId = eventId;
+        return this;
+    }
+
+    public RejectedForwardMeteredDataMessageDtoBuilder WithMeteringPointId(MeteringPointId meteringPointId)
+    {
+        _meteringPointId = meteringPointId;
         return this;
     }
 

@@ -23,6 +23,7 @@ public sealed class RejectedForwardMeteredDataMessageDto(
     ActorNumber receiverNumber,
     ActorRole receiverRole,
     MessageId relatedToMessageId,
+    MeteringPointId meteringPointId,
     RejectedForwardMeteredDataSeries series,
     ActorRole documentReceiverRole)
     : OutgoingMessageDto(
@@ -35,6 +36,8 @@ public sealed class RejectedForwardMeteredDataMessageDto(
         externalId,
         relatedToMessageId)
 {
+    public MeteringPointId MeteringPointId { get; } = meteringPointId;
+
     public RejectedForwardMeteredDataSeries Series { get; } = series;
 
     public ActorRole DocumentReceiverRole { get; } = documentReceiverRole;

@@ -31,7 +31,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class SearchArchivedMeteredDataMessagesTests : IAsyncLifetime
+public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -43,7 +43,7 @@ public class SearchArchivedMeteredDataMessagesTests : IAsyncLifetime
         actorClientId: null,
         actorId: Guid.Parse("00000000-0000-0000-0000-000000000001"));
 
-    public SearchArchivedMeteredDataMessagesTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
+    public SearchMeteringPointArchivedMessagesTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
 
