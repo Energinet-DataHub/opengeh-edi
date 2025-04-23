@@ -123,7 +123,6 @@ public class PeekMessage
             receiverRole: authenticatedActor.ActorRole,
             createdAt: timestamp,
             businessReason: BusinessReason.FromName(outgoingMessageBundle.BusinessReason),
-            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
             marketDocumentStream: marketDocumentStream,
             meteringPointIds: outgoingMessageBundle.MeteringPointIds.ToList(),
             relatedToMessageId: outgoingMessageBundle.RelatedToMessageId);
