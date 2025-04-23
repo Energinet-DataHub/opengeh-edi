@@ -113,7 +113,7 @@ public sealed class B2CEdiDriver : IDisposable
                     BusinessReason = BusinessReason.WholesaleFixing,
                     StartDate = start.ToDateTimeOffset(),
                     EndDate = start.Plus(Duration.FromDays(30)).ToDateTimeOffset(),
-                    GridArea = "804",
+                    GridAreaCode = "804",
                 },
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -137,6 +137,16 @@ public sealed class B2CEdiDriver : IDisposable
                 },
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    public async Task<ArchivedMeasureDataMessageSearchResponseV1> SearchMeteringPointArchivedMessageAsync(ArchivedMeasureDataMessageSearchCriteria request, CancellationToken cancellationToken)
+    {
+        var webApiClient = await CreateWebApiClientAsync();
+
+        return await webApiClient.SearchAsync(
+            api_version: "1.0",
+            body: request,
+            cancellationToken: cancellationToken);
     }
 
     private async Task<B2CEdiClient> CreateWebApiClientAsync()

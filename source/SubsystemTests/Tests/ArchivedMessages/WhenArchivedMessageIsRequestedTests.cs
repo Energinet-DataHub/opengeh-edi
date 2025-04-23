@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Xunit.Abstractions;
 
@@ -27,6 +28,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     private readonly ArchivedMessageDsl _archivedMessages;
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
     private readonly CalculationCompletedDsl _calculationCompleted;
+    private readonly ForwardMeteredDataDsl _forwardMeteredData;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
@@ -48,6 +50,14 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
             output,
             fixture.BalanceFixingCalculationId,
             fixture.WholesaleFixingCalculationId);
+        _forwardMeteredData = new ForwardMeteredDataDsl(
+            ebix: new EbixDriver(
+                fixture.EbixUri,
+                fixture.EbixGridAccessProviderCredentials,
+                output),
+            ediDriver: ediDriver,
+            ediDatabaseDriver: ediDatabaseDriver,
+            processManagerDriver: processManagerDriver);
         _notifyAggregatedMeasureData = new NotifyAggregatedMeasureDataResultDsl(ediDriver);
     }
 
@@ -73,5 +83,11 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     {
         var (messageId, createdAfter) = await _archivedMessages.PerformArchivedMessageSearchV3(pageSize: 10);
         await _archivedMessages.ConfirmArchivedMessageSearchAuditLogExistsForMessageId(messageId, createdAfter);
+    }
+
+    [Fact]
+    public async Task B2C_actor_can_get_the_metering_point_archived_message()
+    {
+        await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch();
     }
 }
