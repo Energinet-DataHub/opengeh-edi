@@ -29,6 +29,7 @@ public class OutgoingMessageBundle
         MessageId messageId,
         IReadOnlyCollection<string> serializedContentOfOutgoingMessages,
         IReadOnlyList<EventId> eventIds,
+        IReadOnlyCollection<MeteringPointId> meteringPointIds,
         MessageId? relatedToMessageId = null)
     {
         DocumentType = documentType;
@@ -40,6 +41,7 @@ public class OutgoingMessageBundle
         MessageId = messageId;
         SerializedContentOfOutgoingMessages = serializedContentOfOutgoingMessages;
         EventIds = eventIds;
+        MeteringPointIds = meteringPointIds;
         RelatedToMessageId = relatedToMessageId;
     }
 
@@ -68,4 +70,6 @@ public class OutgoingMessageBundle
     public IReadOnlyCollection<string> SerializedContentOfOutgoingMessages { get; set; }
 
     public IReadOnlyCollection<EventId> EventIds { get; set; }
+
+    public IReadOnlyCollection<MeteringPointId> MeteringPointIds { get; set; }
 }

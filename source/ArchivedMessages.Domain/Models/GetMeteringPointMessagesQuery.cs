@@ -14,21 +14,16 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 /// <summary>
 /// Represents a query options for retrieving messages.
 /// Including the pagination for the specific query.
 /// </summary>
-public sealed record GetMessagesQueryDto(
-    SortedCursorBasedPaginationDto Pagination,
-    MessageCreationPeriodDto? CreationPeriod = null,
-    string? MessageId = null,
-    string? SenderNumber = null,
-    string? SenderRoleCode = null,
-    string? ReceiverNumber = null,
-    string? ReceiverRoleCode = null,
-    IReadOnlyCollection<string>? DocumentTypes = null,
-    IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessages = false,
-    MeteringPointId? MeteringPointId = null);
+public sealed record GetMeteringPointMessagesQuery(
+    SortedCursorBasedPagination Pagination,
+    MeteringPointId MeteringPointId,
+    MessageCreationPeriod CreationPeriod,
+    Actor? Sender = null,
+    Actor? Receiver = null,
+    IReadOnlyCollection<string>? DocumentTypes = null);

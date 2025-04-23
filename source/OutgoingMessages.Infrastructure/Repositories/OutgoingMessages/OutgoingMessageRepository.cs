@@ -59,18 +59,20 @@ public class OutgoingMessageRepository(
 
         var serializedContentOfOutgoingMessages = new List<string>();
         var eventIds = new List<EventId>();
+        var meteringPointIds = new List<MeteringPointId>();
         // This approach processes the data row by row instead of loading the entire result set into memory at once.
         // To avoid a huge memory spike and allowing DownloadMessageContentAsync to dispose of the file storage stream per message to limit memory usage.
         await foreach (var result in _context.OutgoingMessages
                            .AsNoTracking()
                            .Where(x => x.AssignedBundleId == peekResult.BundleId)
-                           .Select(x => new { x.FileStorageReference, x.EventId })
+                           .Select(x => new { x.FileStorageReference, x.EventId, x.MeteringPointId })
                            .AsAsyncEnumerable()
                            .WithCancellation(cancellationToken))
         {
             var serializedContent = await DownloadMessageContentAsync(result.FileStorageReference, cancellationToken).ConfigureAwait(false);
             serializedContentOfOutgoingMessages.Add(serializedContent);
             eventIds.Add(result.EventId);
+            if (result.MeteringPointId is not null) meteringPointIds.Add(result.MeteringPointId);
         }
 
         // All messages in a bundle have the same meta data
@@ -88,6 +90,7 @@ public class OutgoingMessageRepository(
             peekResult.MessageId,
             serializedContentOfOutgoingMessages,
             eventIds,
+            meteringPointIds.Distinct().ToList(),
             firstMessage.RelatedToMessageId);
     }
 

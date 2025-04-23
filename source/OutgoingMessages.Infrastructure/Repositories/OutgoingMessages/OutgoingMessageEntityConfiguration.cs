@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
@@ -124,6 +123,10 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
         builder.Property(x => x.PeriodStartedAt);
         builder.Property(x => x.DataCount);
         builder.Property(x => x.CreatedAt);
+        builder.Property(x => x.MeteringPointId)
+            .HasConversion(
+                toDbValue => toDbValue != null ? toDbValue.Value : null,
+                fromDbValue => fromDbValue != null ? MeteringPointId.From(fromDbValue) : null);
 
         builder.Property(b => b.RowVersion)
             .IsRowVersion();

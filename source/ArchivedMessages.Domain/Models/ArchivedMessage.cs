@@ -25,13 +25,13 @@ public class ArchivedMessage
         ArchivedMessageId id,
         string? messageId,
         IReadOnlyList<EventId> eventIds,
-        string documentType,
+        DocumentType documentType,
         ActorNumber senderNumber,
         ActorRole senderRole,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         Instant createdAt,
-        string? businessReason,
+        BusinessReason? businessReason,
         ArchivedMessageType archivedMessageType,
         ArchivedMessageStream archivedMessageStream,
         MessageId? relatedToMessageId = null)
@@ -66,7 +66,7 @@ public class ArchivedMessage
 
     public IReadOnlyList<EventId> EventIds { get; }
 
-    public string DocumentType { get; }
+    public DocumentType DocumentType { get; }
 
     public ActorNumber SenderNumber { get; }
 
@@ -78,7 +78,7 @@ public class ArchivedMessage
 
     public Instant CreatedAt { get; }
 
-    public string? BusinessReason { get; }
+    public BusinessReason? BusinessReason { get; }
 
     public MessageId? RelatedToMessageId { get; private set; }
 

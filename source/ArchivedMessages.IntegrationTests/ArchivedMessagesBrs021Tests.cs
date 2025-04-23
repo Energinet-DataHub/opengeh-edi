@@ -70,12 +70,12 @@ public class ArchivedMessagesBrs021Tests : IAsyncLifetime
         // Arrange
         var incomingMessage = await _fixture.CreateArchivedMessageAsync(
             archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
-            documentType: IncomingDocumentType.NotifyValidatedMeasureData.Name,
+            documentType: DocumentType.NotifyValidatedMeasureData,
             storeMessage: false);
 
         var outgoingMessage = await _fixture.CreateArchivedMessageAsync(
             archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
-            documentType: DocumentType.NotifyValidatedMeasureData.Name,
+            documentType: DocumentType.NotifyValidatedMeasureData,
             storeMessage: false);
 
         // Act
@@ -83,14 +83,14 @@ public class ArchivedMessagesBrs021Tests : IAsyncLifetime
         await _sut.CreateAsync(outgoingMessage, CancellationToken.None);
 
         // Assert
-        var dbResult = await _fixture.GetAllMessagesInDatabase();
+        var numberOfRowsCreated = await _fixture.GetNumberOfCreatedMeteringPointMessages();
         var searchResult = await _sut.SearchAsync(
             new GetMessagesQueryDto(
                 new SortedCursorBasedPaginationDto()),
             CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
-        dbResult.Should().NotBeNull().And.HaveCount(2);
+        numberOfRowsCreated.Should().Be(2);
         searchResult.Should().NotBeNull();
         searchResult.Messages.Should().BeEmpty();
         searchResult.TotalAmountOfMessages.Should().Be(0);

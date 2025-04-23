@@ -63,6 +63,12 @@ public class MeteredDataForMeteringPointMessageBase(
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [
         ActorRole.MeteredDataResponsible,
     ];
+
+    public IReadOnlyList<MeteringPointId> MeteringPointIds => Series
+        .Cast<MeteredDataForMeteringPointSeries>()
+        .Where(x => x.MeteringPointLocationId != null)
+        .Select(x => MeteringPointId.From(x.MeteringPointLocationId!))
+        .ToList();
 }
 
 public record MeteredDataForMeteringPointSeries(

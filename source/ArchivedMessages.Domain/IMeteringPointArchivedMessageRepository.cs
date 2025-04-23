@@ -17,30 +17,22 @@ using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 namespace Energinet.DataHub.EDI.ArchivedMessages.Domain;
 
 /// <summary>
-/// Responsible for archiving messages.
+/// Responsible for archiving metering point messages.
 /// </summary>
-public interface IArchivedMessageRepository
+public interface IMeteringPointArchivedMessageRepository
 {
     /// <summary>
-    /// Archiving a message.
+    /// Archiving metering point messages.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="cancellationToken"></param>
-    Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken);
+    Task AddAsync(MeteringPointArchivedMessage message, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get document.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Stream</returns>
     Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Search for messages in the database
     /// </summary>
-    /// <param name="queryInput"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken);
+    Task<MessageSearchResult> SearchAsync(GetMeteringPointMessagesQuery queryInput, CancellationToken cancellationToken);
 }

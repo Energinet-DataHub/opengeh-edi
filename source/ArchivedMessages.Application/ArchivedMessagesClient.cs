@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
+using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
@@ -20,18 +21,32 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application;
 
-public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRepository) : IArchivedMessagesClient
+public class ArchivedMessagesClient(
+    IArchivedMessageRepository archivedMessageRepository,
+    IMeteringPointArchivedMessageRepository meteringPointArchivedMessageRepository) : IArchivedMessagesClient
 {
     private readonly IArchivedMessageRepository _archivedMessageRepository = archivedMessageRepository;
+    private readonly IMeteringPointArchivedMessageRepository _meteringPointArchivedMessageRepository = meteringPointArchivedMessageRepository;
+
+    private readonly IReadOnlyCollection<DocumentType> _meteringPointDocumentTypes = new[]
+    {
+        DocumentType.NotifyValidatedMeasureData,
+        DocumentType.Acknowledgement,
+    };
 
     public async Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(message);
 
+        if (IsMeteringPointMessage(message.DocumentType))
+        {
+            var meteringPointArchivedMessage = MeteringPointArchivedMessageMapper.Map(message);
+            await _meteringPointArchivedMessageRepository.AddAsync(meteringPointArchivedMessage, cancellationToken).ConfigureAwait(false);
+            return new ArchivedFile(meteringPointArchivedMessage.FileStorageReference, meteringPointArchivedMessage.ArchivedMessageStream);
+        }
+
         var mappedArchivedMessage = ArchivedMessageMapper.Map(message);
-
         await _archivedMessageRepository.AddAsync(mappedArchivedMessage, cancellationToken).ConfigureAwait(false);
-
         return new ArchivedFile(mappedArchivedMessage.FileStorageReference, mappedArchivedMessage.ArchivedMessageStream);
     }
 
@@ -41,7 +56,14 @@ public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRe
 
         var archivedMessageId = new ArchivedMessageId(id.Value);
 
-        var result = await _archivedMessageRepository.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
+        var tasks = new[]
+        {
+            _archivedMessageRepository.GetAsync(archivedMessageId, cancellationToken),
+            _meteringPointArchivedMessageRepository.GetAsync(archivedMessageId, cancellationToken),
+        };
+
+        var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+        var result = results.FirstOrDefault(r => r != null);
 
         return result != null ? new ArchivedMessageStreamDto(result.Stream) : null;
     }
@@ -49,9 +71,16 @@ public class ArchivedMessagesClient(IArchivedMessageRepository archivedMessageRe
     public async Task<MessageSearchResultDto> SearchAsync(GetMessagesQueryDto queryInputDto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(queryInputDto);
-
-        var result = await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
+        var result = queryInputDto.MeteringPointId != null
+                ? await _meteringPointArchivedMessageRepository.SearchAsync(GetMeteringPointMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false)
+                : await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
 
         return MessagesSearchResultMapper.Map(result);
+    }
+
+    private bool IsMeteringPointMessage(DocumentType messageDocumentType)
+    {
+        return _meteringPointDocumentTypes
+            .Any(x => x == messageDocumentType);
     }
 }

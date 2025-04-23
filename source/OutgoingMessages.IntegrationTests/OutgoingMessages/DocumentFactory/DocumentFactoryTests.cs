@@ -31,14 +31,22 @@ public class DocumentFactoryTests
         _documentWriters = GetService<IEnumerable<IDocumentWriter>>();
     }
 
-    public static IEnumerable<object[]> GetDocumentTypes()
+    public static TheoryData<DocumentType> GetOutgoingDocumentTypes()
     {
-        var documentTypes = EnumerationType.GetAll<DocumentType>();
-        return documentTypes.Select(document => new object[] { document }).ToList();
+        var notOutGoingMessagesDocumentTypes = new[]
+        {
+            DocumentType.RequestAggregatedMeasureData,
+            DocumentType.RequestWholesaleSettlement,
+        };
+        var documentTypes = EnumerationType.GetAll<DocumentType>()
+            .Where(x => !notOutGoingMessagesDocumentTypes.Contains(x))
+            .ToArray();
+
+        return new TheoryData<DocumentType>(documentTypes);
     }
 
     [Theory]
-    [MemberData(nameof(GetDocumentTypes))]
+    [MemberData(nameof(GetOutgoingDocumentTypes))]
     public void Ensure_that_all_document_support_xml(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
@@ -48,7 +56,7 @@ public class DocumentFactoryTests
     }
 
     [Theory]
-    [MemberData(nameof(GetDocumentTypes))]
+    [MemberData(nameof(GetOutgoingDocumentTypes))]
     public void Ensure_that_all_document_support_json(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
@@ -58,7 +66,7 @@ public class DocumentFactoryTests
     }
 
     [Theory]
-    [MemberData(nameof(GetDocumentTypes))]
+    [MemberData(nameof(GetOutgoingDocumentTypes))]
     public void Ensure_that_all_document_support_ebix(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>

@@ -115,16 +115,16 @@ public class PeekMessage
         var archivedMessageToCreate = new ArchivedMessageDto(
             messageId: outgoingMessageBundle.MessageId.Value,
             eventIds: outgoingMessageBundle.EventIds.ToList(),
-            documentType: outgoingMessageBundle.DocumentType.ToString(),
+            documentType: outgoingMessageBundle.DocumentType,
             senderNumber: outgoingMessageBundle.SenderId,
             senderRole: outgoingMessageBundle.SenderRole,
             // The receiver is always the authenticated actor
             receiverNumber: authenticatedActor.ActorNumber,
             receiverRole: authenticatedActor.ActorRole,
             createdAt: timestamp,
-            businessReason: BusinessReason.FromName(outgoingMessageBundle.BusinessReason).Code,
-            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
+            businessReason: BusinessReason.FromName(outgoingMessageBundle.BusinessReason),
             marketDocumentStream: marketDocumentStream,
+            meteringPointIds: outgoingMessageBundle.MeteringPointIds.ToList(),
             relatedToMessageId: outgoingMessageBundle.RelatedToMessageId);
 
         var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);

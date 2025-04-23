@@ -193,7 +193,7 @@ public class ReceiveIncomingMarketMessage
         await _archivedMessagesClient.CreateAsync(
                 new ArchivedMessageDto(
                     incomingMessage.MessageId,
-                    incomingDocumentType.Name,
+                    MapToDocumentType(incomingDocumentType),
                     authenticatedActor.ActorNumber,
                     authenticatedActor.ActorRole,
                     // For RequestAggregatedMeteringData and RequestWholesaleServices,
@@ -201,10 +201,29 @@ public class ReceiveIncomingMarketMessage
                     DataHubDetails.DataHubActorNumber,
                     ActorRole.MeteredDataAdministrator,
                     _clock.GetCurrentInstant(),
-                    incomingMessage.BusinessReason,
-                    ArchivedMessageTypeDto.IncomingMessage,
-                    incomingMarketMessageStream),
+                    BusinessReason.TryFromCode(incomingMessage.BusinessReason),
+                    incomingMarketMessageStream,
+                    incomingMessage.MeteringPointIds),
                 cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    private DocumentType MapToDocumentType(IncomingDocumentType incomingDocumentType)
+    {
+        switch (incomingDocumentType)
+        {
+            case var incomingDocType when incomingDocType == IncomingDocumentType.RequestAggregatedMeasureData:
+                return DocumentType.RequestAggregatedMeasureData;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.B2CRequestAggregatedMeasureData:
+                return DocumentType.RequestAggregatedMeasureData;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.RequestWholesaleSettlement:
+                return DocumentType.RequestWholesaleSettlement;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.B2CRequestWholesaleSettlement:
+                return DocumentType.RequestWholesaleSettlement;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.NotifyValidatedMeasureData:
+                return DocumentType.NotifyValidatedMeasureData;
+            default:
+                throw new NotSupportedException($"Document type '{incomingDocumentType}' is not supported.");
+        }
     }
 }

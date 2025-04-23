@@ -58,6 +58,12 @@ public class MetricNameGenerationTests
         DocumentType.Acknowledgement,
     ];
 
+    private static readonly DocumentType[] _isDocumentTypeAnIncomingMessage =
+    [
+        DocumentType.RequestAggregatedMeasureData,
+        DocumentType.RequestWholesaleSettlement,
+    ];
+
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(
         format => _documentMetrics.Select(
                 measurement => $"{measurement}{format}"))
@@ -87,6 +93,12 @@ public class MetricNameGenerationTests
         {
             foreach (var documentType in documentTypes)
             {
+                if (_isDocumentTypeAnIncomingMessage.Contains(documentType))
+                {
+                    // Incoming messages are not logged
+                    continue;
+                }
+
                 // Most documents are logged as an outgoing message and as a response to a corresponding incoming message
                 names.Add(MetricNameMapper.MessageGenerationMetricName(
                     documentType,

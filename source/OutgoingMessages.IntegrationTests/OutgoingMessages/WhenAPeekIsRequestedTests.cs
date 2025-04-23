@@ -239,12 +239,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var builder = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber);
 
-        if (dataHubTypeWithUnused == typeof(BusinessReason))
-        {
-            unusedCode = "A47";
-            builder.WithBusinessReason(BusinessReason.FromCodeOrUnused(unusedCode));
-        }
-        else if (dataHubTypeWithUnused == typeof(SettlementVersion))
+        if (dataHubTypeWithUnused == typeof(SettlementVersion))
         {
             unusedCode = "D10";
             builder.WithSettlementVersion(SettlementVersion.FromCodeOrUnused(unusedCode));

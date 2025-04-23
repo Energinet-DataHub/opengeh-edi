@@ -65,6 +65,8 @@ public class DocumentTypeMapperTests
                         .Where(dt => dt != null)
                         .Select(dt => dt!.Name));
 
+        supportedDocumentTypes = supportedDocumentTypes.Distinct();
+
         // TODO - Remove this line when all DocumentTypes are supported in B2C
         supportedDocumentTypes = supportedDocumentTypes
             .Where(x => x != IncomingDocumentType.NotifyValidatedMeasureData.Name);
