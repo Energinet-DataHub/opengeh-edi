@@ -201,7 +201,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
                                + $"{messageCreatedAt.Day:00}/"
                                + $"{archivedMessage.Id.Value:N}"; // remove dashes from guid
 
-        var expectedBlocReference = new FileStorageReference(
+        var expectedBlobReference = new FileStorageReference(
             category: FileStorageCategory.ArchivedMessage(),
             path: expectedBlobPath);
 
@@ -221,11 +221,11 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         message.DocumentType.Should().Be(archivedMessage.DocumentType.DatabaseValue);
         message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.DatabaseValue);
         message.MessageId.Should().Be(archivedMessage.MessageId);
-        message.FileStorageReference.Should().Be(expectedBlocReference.Path);
+        message.FileStorageReference.Should().Be(expectedBlobReference.Path);
         message.RelatedToMessageId.Should().BeNull();
         message.EventIds.Should().BeNull();
 
-        var blobResult = await _fixture.GetMessagesFromBlob(expectedBlocReference);
+        var blobResult = await _fixture.GetMessagesFromBlob(expectedBlobReference);
         blobResult.Should().NotBeNull();
     }
 
