@@ -239,6 +239,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: relatedToMessageId,
                     documentReceiverRole: receiver.ActorRole,
+                    meteringPointId: MeteringPointId.From("1234567890123456"),
                     series: new RejectedForwardMeteredDataSeries(
                         TransactionId: TransactionId.New(),
                         OriginalTransactionIdReference: TransactionId.New(),

@@ -367,6 +367,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             receiverRole: ActorRole.MeteredDataResponsible,
             documentReceiverRole: ActorRole.MeteredDataResponsible,
             relatedToMessageId: MessageId.New(),
+            meteringPointId: MeteringPointId.From("1234567890123"),
             series: new RejectedForwardMeteredDataSeries(
                 OriginalTransactionIdReference: TransactionId.New(),
                 TransactionId: TransactionId.New(),

@@ -53,6 +53,12 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         _archivedMessagesClient = services.GetRequiredService<IArchivedMessagesClient>();
     }
 
+    public static TheoryData<DocumentType> MeteringPointDocumentTypes => new()
+    {
+        DocumentType.NotifyValidatedMeasureData,
+        DocumentType.Acknowledgement,
+    };
+
     public static TheoryData<DocumentType> GetDocumentTypes()
     {
         var theoryData = new TheoryData<DocumentType>();
@@ -175,13 +181,14 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    [Fact]
-    public async Task Given_MeteringPointArchivedMessage_When_Creating_Then_MessageIsStoredInDatabaseAndBlob()
+    [Theory]
+    [MemberData(nameof(MeteringPointDocumentTypes))]
+    public async Task Given_MeteringPointArchivedMessage_When_Creating_Then_MessageIsStoredInDatabaseAndBlob(DocumentType meteringPointDocumentType)
     {
         // Arrange
         var archivedMessage = await _fixture.CreateArchivedMessageAsync(
             archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
-            documentType: DocumentType.NotifyValidatedMeasureData, // MeteredData DocumentType
+            documentType: meteringPointDocumentType,
             meteringPointIds: [MeteringPointId.From("1234567890123")],
             storeMessage: false);
 
