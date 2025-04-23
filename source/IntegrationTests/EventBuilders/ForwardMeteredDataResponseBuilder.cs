@@ -136,7 +136,8 @@ public static class ForwardMeteredDataResponseBuilder
             new List<ValidationErrorDto>()
             {
                 new("Invalid Period", "E17"),
-            });
+            },
+            requestMeteredDataForMeteringPointInputV1.MeteringPointId!);
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_021_ForwardedMeteredData.Name,
