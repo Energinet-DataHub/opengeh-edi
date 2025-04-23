@@ -163,11 +163,12 @@ public static class B2CWebApiRequests
         {
             Content = CreateJsonContent(
                 new ArchivedMeasureDataMessageSearchCriteria(
+                    new SearchArchivedMessagesPagination(),
                     MeteringPointId: "123456789",
                     CreatedDuringPeriod: new MessageCreationPeriod(Start: DateTimeOffset.Parse("2024-08-27T00:00:00Z"), End: DateTimeOffset.Parse("2024-08-28T00:00:00Z")),
                     Sender: new Actor(ActorRole: ActorRole.DataHubAdministrator, ActorNumber: "1234567890123"),
                     Receiver: new Actor(ActorRole: ActorRole.MeteredDataResponsible, ActorNumber: "1234567890123"),
-                    DocumentTypes: [MeasureDataDocumentType.NotifyValidatedMeasureData])),
+                    MeasureDataDocumentTypes: [MeteringPointDocumentType.NotifyValidatedMeasureData])),
         };
         return request;
     }

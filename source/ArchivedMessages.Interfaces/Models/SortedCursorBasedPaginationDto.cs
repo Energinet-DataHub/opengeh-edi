@@ -47,4 +47,4 @@ public sealed record SortedCursorBasedPaginationDto(
     public DirectionToSortByDto SortDirection { get; } = DirectionToSortBy ?? DirectionToSortByDto.Descending;
 }
 
-public sealed record SortingCursorDto(string? SortedFieldValue = null, long RecordId = 0);
+public sealed record SortingCursorDto(string? SortedFieldValue = null, long Value = 0);

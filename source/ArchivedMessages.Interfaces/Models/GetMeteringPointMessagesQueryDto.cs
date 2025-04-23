@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public record ArchivedMeasureDataMessageSearchResponseV1(
-    IEnumerable<MeteringPointArchivedMessageV1> Messages,
-    int TotalCount);
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+
+/// <summary>
+/// Represents a query options for retrieving metering point messages.
+/// Including the pagination for the specific query.
+/// </summary>
+public sealed record GetMeteringPointMessagesQueryDto(
+    SortedCursorBasedPaginationDto Pagination,
+    MeteringPointId MeteringPointId,
+    MessageCreationPeriodDto CreationPeriod,
+    Actor? Sender = null,
+    Actor? Receiver = null,
+    IReadOnlyCollection<DocumentType>? DocumentTypes = null);

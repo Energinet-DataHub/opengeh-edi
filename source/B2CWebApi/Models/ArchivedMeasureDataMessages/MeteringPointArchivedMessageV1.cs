@@ -14,9 +14,10 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 
-public record ArchivedMeasureDataMessageV1(
+public record MeteringPointArchivedMessageV1(
+    long CursorValue,
     Guid Id,
-    MeasureDataDocumentType DocumentType,
+    MeteringPointDocumentType DocumentType,
     DateTimeOffset CreatedAt,
     Actor Sender,
     Actor Receiver);

@@ -13,11 +13,17 @@
 // limitations under the License.
 
 using Asp.Versioning;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.B2CWebApi.Mappers;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime.Extensions;
+using Actor = Energinet.DataHub.EDI.B2CWebApi.Models.Actor;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
@@ -25,10 +31,12 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class ArchivedMeasureDataMessageController(
-    IAuditLogger auditLogger)
+    IAuditLogger auditLogger,
+    IArchivedMessagesClient archivedMessagesClient)
     : ControllerBase
 {
     private readonly IAuditLogger _auditLogger = auditLogger;
+    private readonly IArchivedMessagesClient _archivedMessagesClient = archivedMessagesClient;
 
     private readonly AuditLogEntityType _affectedEntityType = AuditLogEntityType.ArchivedMeasureDataMessage;
 
@@ -49,19 +57,50 @@ public class ArchivedMeasureDataMessageController(
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        var message = new ArchivedMeasureDataMessageV1(
-            Id: Guid.NewGuid(),
-            DocumentType: MeasureDataDocumentType.NotifyValidatedMeasureData,
-            CreatedAt: DateTimeOffset.UtcNow,
-            Sender: request.Sender ?? new Actor(ActorRole: ActorRole.DataHubAdministrator, ActorNumber: "1234567890123"),
-            Receiver: request.Receiver ?? new Actor(ActorRole: ActorRole.MeteredDataResponsible, ActorNumber: "0987654321098"));
+        var messageCreationPeriod = new MessageCreationPeriodDto(
+            request.CreatedDuringPeriod.Start.ToInstant(),
+            request.CreatedDuringPeriod.End.ToInstant());
 
-        var messages = new List<ArchivedMeasureDataMessageV1>()
-        {
-            message,
-        };
+        var cursor = request.Pagination.Cursor != null
+            ? new SortingCursorDto(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
+            : null;
+        var pageSize = request.Pagination.PageSize;
+        var navigationForward = request.Pagination.NavigationForward;
+        var fieldToSortBy = FieldToSortByMapper.MapToFieldToSortBy(request.Pagination.SortBy);
+        var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
 
-        return Ok(new ArchivedMeasureDataMessageSearchResponseV1(messages, messages.Count));
+        var sender = request.Sender != null
+            ? new BuildingBlocks.Domain.Models.Actor(ActorNumber.Create(request.Sender!.ActorNumber), ActorRoleMapper.ToActorRoleDomain(request.Sender!.ActorRole))
+            : null;
+        var receiver = request.Receiver != null
+            ? new BuildingBlocks.Domain.Models.Actor(ActorNumber.Create(request.Receiver!.ActorNumber), ActorRoleMapper.ToActorRoleDomain(request.Receiver!.ActorRole))
+            : null;
+        var documentTypes = request.MeasureDataDocumentTypes?.Select(MeasureDataDocumentTypeMapper.ToDocumentType).ToList().AsReadOnly();
+        var query = new GetMeteringPointMessagesQueryDto(
+            new SortedCursorBasedPaginationDto(
+                cursor,
+                pageSize,
+                navigationForward,
+                fieldToSortBy,
+                directionToSortBy),
+            CreationPeriod: messageCreationPeriod,
+            Sender: sender,
+            Receiver: receiver,
+            DocumentTypes: documentTypes,
+            MeteringPointId: MeteringPointId.From(request.MeteringPointId));
+
+        var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
+
+        var messages = result.Messages.Select(
+            x => new MeteringPointArchivedMessageV1(
+                CursorValue: x.CursorValue,
+                Id: x.Id,
+                DocumentType: MeasureDataDocumentTypeMapper.ToMeteringPointDocumentType(x.DocumentType),
+                Sender: new Actor(x.SenderNumber, ActorRoleMapper.ToActorRole(x.SenderRoleCode!)),
+                Receiver: new Actor(x.ReceiverNumber, ActorRoleMapper.ToActorRole(x.ReceiverRoleCode!)),
+                CreatedAt: x.CreatedAt.ToDateTimeOffset()));
+
+        return Ok(new ArchivedMeasureDataMessageSearchResponseV1(messages, TotalCount: result.TotalAmountOfMessages));
     }
 
     [HttpGet("{id:guid}")]
@@ -78,6 +117,9 @@ public class ArchivedMeasureDataMessageController(
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return NoContent();
+        var archivedMessageId = new ArchivedMessageIdDto(id);
+        var archivedMessageStream = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
+
+        return archivedMessageStream is null ? NoContent() : Ok(archivedMessageStream.Stream);
     }
 }

@@ -17,7 +17,7 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 public record MessageInfoDto(
-    long RecordId,
+    long CursorValue,
     Guid Id,
     string? MessageId,
     string DocumentType,

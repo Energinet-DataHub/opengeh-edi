@@ -54,7 +54,7 @@ internal static class GetMessagesQueryMapper
     private static SortingCursor? SetSortingCursor(SortingCursorDto? sortingCursor)
     {
         return sortingCursor is not null
-            ? new SortingCursor(sortingCursor.SortedFieldValue, sortingCursor.RecordId)
+            ? new SortingCursor(sortingCursor.SortedFieldValue, sortingCursor.Value)
             : null;
     }
 
