@@ -5,6 +5,107 @@
     "version": "1.0"
   },
   "paths": {
+    "/ArchivedMeasureDataMessage/search": {
+      "post": {
+        "tags": [
+          "ArchivedMeasureDataMessage"
+        ],
+        "operationId": "search",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ArchivedMeasureDataMessage/{id}": {
+      "get": {
+        "tags": [
+          "ArchivedMeasureDataMessage"
+        ],
+        "operationId": "ArchivedMeasureDataMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/ArchivedMessageGetDocument": {
       "post": {
         "tags": [
@@ -387,6 +488,171 @@
   },
   "components": {
     "schemas": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.Actor": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "actorNumber": {
+            "type": "string"
+          },
+          "actorRole": {
+            "x-enumNames": [
+              "MeteringPointAdministrator",
+              "EnergySupplier",
+              "GridAccessProvider",
+              "MeteredDataAdministrator",
+              "MeteredDataResponsible",
+              "BalanceResponsibleParty",
+              "ImbalanceSettlementResponsible",
+              "SystemOperator",
+              "DanishEnergyAgency",
+              "Delegated",
+              "DataHubAdministrator"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ActorRole"
+              }
+            ]
+          }
+        }
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ActorRole": {
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "MeteringPointAdministrator",
+          "EnergySupplier",
+          "GridAccessProvider",
+          "MeteredDataAdministrator",
+          "MeteredDataResponsible",
+          "BalanceResponsibleParty",
+          "ImbalanceSettlementResponsible",
+          "SystemOperator",
+          "DanishEnergyAgency",
+          "Delegated",
+          "DataHubAdministrator"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "meteringPointId": {
+            "type": "string"
+          },
+          "createdDuringPeriod": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.MessageCreationPeriod"
+              }
+            ]
+          },
+          "sender": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.Actor"
+              }
+            ]
+          },
+          "receiver": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.Actor"
+              }
+            ]
+          },
+          "documentTypes": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeasureDataDocumentType"
+            }
+          }
+        }
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageV1"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageV1": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "documentType": {
+            "x-enumNames": [
+              "Acknowledgement",
+              "NotifyValidatedMeasureData"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeasureDataDocumentType"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sender": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.Actor"
+              }
+            ]
+          },
+          "receiver": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.Actor"
+              }
+            ]
+          }
+        }
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeasureDataDocumentType": {
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "Acknowledgement",
+          "NotifyValidatedMeasureData"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
       "Energinet.DataHub.EDI.B2CWebApi.Models.CalculationType": {
         "type": "integer",
         "format": "int32",
@@ -406,6 +672,20 @@
           4,
           5
         ]
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.MessageCreationPeriod": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       },
       "Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType": {
         "type": "integer",
@@ -689,7 +969,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "gridArea": {
+          "gridAreaCode": {
             "type": "string",
             "nullable": true
           },
