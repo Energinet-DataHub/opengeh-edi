@@ -260,7 +260,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
                 new ValidationErrorDto(
                     Message: "Invalid end date",
                     ErrorCode: "999"),
-            ]);
+            ],
+            MeteringPointId: "1234567890123");
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();
         var enqueueActorMessages = new EnqueueActorMessagesV1

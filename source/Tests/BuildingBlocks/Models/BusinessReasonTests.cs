@@ -40,15 +40,15 @@ public class BusinessReasonTests
     [Fact]
     public void Ensure_all_businessReasons()
     {
-        var businessReasons = new List<(BusinessReason ExpectedValue, string Name, string Code)>()
+        var businessReasons = new List<(BusinessReason ExpectedValue, string Name, string Code, byte DatabaseValue)>()
         {
-            (BusinessReason.BalanceFixing, "BalanceFixing", "D04"),
-            (BusinessReason.Correction, "Correction", "D32"),
-            (BusinessReason.MoveIn, "MoveIn", "E65"),
-            (BusinessReason.PreliminaryAggregation, "PreliminaryAggregation", "D03"),
-            (BusinessReason.WholesaleFixing, "WholesaleFixing", "D05"),
-            (BusinessReason.PeriodicMetering, "PeriodicMetering", "E23"),
-            (BusinessReason.PeriodicFlexMetering, "PeriodicFlexMetering", "D42"),
+            (BusinessReason.BalanceFixing, "BalanceFixing", "D04", 2),
+            (BusinessReason.Correction, "Correction", "D32", 5),
+            (BusinessReason.MoveIn, "MoveIn", "E65", 1),
+            (BusinessReason.PreliminaryAggregation, "PreliminaryAggregation", "D03", 3),
+            (BusinessReason.WholesaleFixing, "WholesaleFixing", "D05", 4),
+            (BusinessReason.PeriodicMetering, "PeriodicMetering", "E23", 6),
+            (BusinessReason.PeriodicFlexMetering, "PeriodicFlexMetering", "D42", 7),
         };
 
         using var scope = new AssertionScope();
@@ -56,6 +56,7 @@ public class BusinessReasonTests
         {
             BusinessReason.FromName(test.Name).Should().Be(test.ExpectedValue);
             BusinessReason.FromCode(test.Code).Should().Be(test.ExpectedValue);
+            BusinessReason.FromDatabaseValue(test.DatabaseValue).Should().Be(test.ExpectedValue);
         }
 
         businessReasons.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllBusinessReasons());

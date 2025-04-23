@@ -22,8 +22,8 @@ public record MeteringPointMessageInfo(
     string MessageId,
     byte DocumentType,
     string SenderNumber,
-    byte SenderRoleCode,
+    byte SenderRole,
     string ReceiverNumber,
-    byte ReceiverRoleCode,
+    byte ReceiverRole,
     Instant CreatedAt,
     byte? BusinessReason);

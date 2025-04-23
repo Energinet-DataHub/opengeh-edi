@@ -31,11 +31,10 @@ public class ArchivedMessageDto
         ActorRole receiverRole,
         Instant createdAt,
         BusinessReason? businessReason,
-        ArchivedMessageTypeDto archivedMessageType,
         IMarketDocumentStream marketDocumentStream,
         IReadOnlyList<MeteringPointId> meteringPointIds,
         MessageId? relatedToMessageId = null)
-        : this(messageId, eventIds, documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStreamDto(marketDocumentStream), meteringPointIds, relatedToMessageId) { }
+        : this(messageId, eventIds, documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, ArchivedMessageTypeDto.OutgoingMessage, new ArchivedMessageStreamDto(marketDocumentStream), meteringPointIds, relatedToMessageId) { }
 
     public ArchivedMessageDto(
         string? messageId,
@@ -46,10 +45,9 @@ public class ArchivedMessageDto
         ActorRole receiverRole,
         Instant createdAt,
         BusinessReason? businessReason,
-        ArchivedMessageTypeDto archivedMessageType,
         IIncomingMarketMessageStream incomingMarketMessageStream,
         IReadOnlyList<MeteringPointId> meteringPointIds)
-        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStreamDto(incomingMarketMessageStream), meteringPointIds) { }
+        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, ArchivedMessageTypeDto.IncomingMessage, new ArchivedMessageStreamDto(incomingMarketMessageStream), meteringPointIds) { }
 
     public ArchivedMessageDto(
         string? messageId,

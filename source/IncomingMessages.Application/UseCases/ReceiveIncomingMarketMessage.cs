@@ -186,14 +186,14 @@ public class ReceiveIncomingMarketMessage
     private async Task ArchiveIncomingMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         IIncomingMessage incomingMessage,
-        IncomingDocumentType incomingDocument,
+        IncomingDocumentType incomingDocumentType,
         CancellationToken cancellationToken)
     {
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
                 new ArchivedMessageDto(
                     incomingMessage.MessageId,
-                    MapToDocumentType(incomingDocument),
+                    MapToDocumentType(incomingDocumentType),
                     authenticatedActor.ActorNumber,
                     authenticatedActor.ActorRole,
                     // For RequestAggregatedMeteringData and RequestWholesaleServices,
@@ -202,7 +202,6 @@ public class ReceiveIncomingMarketMessage
                     ActorRole.MeteredDataAdministrator,
                     _clock.GetCurrentInstant(),
                     BusinessReason.TryFromCode(incomingMessage.BusinessReason),
-                    ArchivedMessageTypeDto.IncomingMessage,
                     incomingMarketMessageStream,
                     incomingMessage.MeteringPointIds),
                 cancellationToken)

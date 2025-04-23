@@ -48,7 +48,7 @@ public sealed class BusinessReason : DataHubType<BusinessReason>
     /// Each business reason is assigned a unique byte value, allowing for efficient storage and retrieval.
     /// It ensures consistency and performance while mapping business reason to database values and application logic.
     /// Creating a new business reason must be done with caution to avoid conflicts with existing business reason.
-    /// Changing the byte value of an existing role is not allowed, as it would break the mapping.
+    /// Changing the byte value of an existing business reason is not allowed, as it would break the mapping.
     /// </summary>
     public byte DatabaseValue { get; }
 

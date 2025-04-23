@@ -48,9 +48,9 @@ public class MeteringPointArchivedMessageRepository(
                          [EventIds],
                          [DocumentType],
                          [ReceiverNumber],
-                         [ReceiverRoleCode],
+                         [ReceiverRole],
                          [SenderNumber],
-                         [SenderRoleCode],
+                         [SenderRole],
                          [CreatedAt],
                          [BusinessReason],
                          [FileStorageReference],
@@ -62,9 +62,9 @@ public class MeteringPointArchivedMessageRepository(
                          @EventIds,
                          @DocumentType,
                          @ReceiverNumber,
-                         @ReceiverRoleCode,
+                         @ReceiverRole,
                          @SenderNumber,
-                         @SenderRoleCode,
+                         @SenderRole,
                          @CreatedAt,
                          @BusinessReason,
                          @FileStorageReference,
@@ -78,9 +78,9 @@ public class MeteringPointArchivedMessageRepository(
             EventIds = message.EventIds.Count > 0 ? string.Join("::", message.EventIds.Select(id => id.Value)) : null,
             DocumentType = message.DocumentType.DatabaseValue,
             ReceiverNumber = message.ReceiverNumber.Value,
-            ReceiverRoleCode = message.ReceiverRole.DatabaseValue,
+            ReceiverRole = message.ReceiverRole.DatabaseValue,
             SenderNumber = message.SenderNumber.Value,
-            SenderRoleCode = message.SenderRole.DatabaseValue,
+            SenderRole = message.SenderRole.DatabaseValue,
             message.CreatedAt,
             BusinessReason = message.BusinessReason?.DatabaseValue,
             FileStorageReference = message.FileStorageReference.Path,
@@ -105,11 +105,11 @@ public class MeteringPointArchivedMessageRepository(
         if (_authenticatedActor.CurrentActorIdentity.Restriction == Restriction.Owned)
         {
             sqlStatement += $" AND ("
-                            + $"( ReceiverNumber=@ActorNumber AND ReceiverRoleCode = @ActorRoleCode ) "
-                            + $"OR ( SenderNumber=@ActorNumber AND SenderRoleCode = @ActorRoleCode )"
+                            + $"( ReceiverNumber=@ActorNumber AND ReceiverRole = @ActorRole ) "
+                            + $"OR ( SenderNumber=@ActorNumber AND SenderRole = @ActorRole )"
                             + $")";
             parameters.Add("ActorNumber", _authenticatedActor.CurrentActorIdentity.ActorNumber.Value);
-            parameters.Add("ActorRoleCode", _authenticatedActor.CurrentActorIdentity.ActorRole.DatabaseValue);
+            parameters.Add("ActorRole", _authenticatedActor.CurrentActorIdentity.ActorRole.DatabaseValue);
         }
 
         using var connection =
@@ -160,9 +160,9 @@ public class MeteringPointArchivedMessageRepository(
                 x.MessageId,
                 DocumentType.FromDatabaseValue(x.DocumentType).Name,
                 x.SenderNumber,
-                ActorRole.FromDatabaseValue(x.SenderRoleCode).Code,
+                ActorRole.FromDatabaseValue(x.SenderRole).Code,
                 x.ReceiverNumber,
-                ActorRole.FromDatabaseValue(x.ReceiverRoleCode).Code,
+                ActorRole.FromDatabaseValue(x.ReceiverRole).Code,
                 x.CreatedAt,
                 x.BusinessReason is not null ? BusinessReason.FromDatabaseValue(x.BusinessReason.Value).Name : null)).ToList().AsReadOnly(),
             totalAmountOfMessages);

@@ -52,7 +52,7 @@ public class DocumentType : EnumerationType
     /// Each document type is assigned a unique byte value, allowing for efficient storage and retrieval.
     /// It ensures consistency and performance while mapping document type to database values and application logic.
     /// Creating a new document type must be done with caution to avoid conflicts with existing document type.
-    /// Changing the byte value of an existing role is not allowed, as it would break the mapping.
+    /// Changing the byte value of an existing document type is not allowed, as it would break the mapping.
     /// </summary>
     public static DocumentType FromDatabaseValue(byte databaseValue)
     {

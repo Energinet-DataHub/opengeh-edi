@@ -38,7 +38,7 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
             throw new ArgumentNullException(nameof(query.CreationPeriod), "CreationPeriod cannot be null.");
 
         AddFilter(
-            "JSON_QUERY(MeteringPointIds) IS NOT NULL AND EXISTS (SELECT 1 FROM OPENJSON(MeteringPointIds)  WHERE value = @MeteringPointId)",
+            "JSON_QUERY(MeteringPointIds) IS NOT NULL AND EXISTS (SELECT 1 FROM OPENJSON(MeteringPointIds) WHERE value = @MeteringPointId)",
             new KeyValuePair<string, object>("MeteringPointId", query.MeteringPointId.Value));
 
         AddFilter(
@@ -54,9 +54,9 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
                 new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber.Value));
 
             AddFilter(
-                "(SenderRoleCode=@SenderRoleCode OR ReceiverRoleCode=@ReceiverRoleCode)",
-                new KeyValuePair<string, object>("SenderRoleCode", ActorRole.FromCode(query.Sender.ActorRole.Code).DatabaseValue),
-                new KeyValuePair<string, object>("ReceiverRoleCode", ActorRole.FromCode(query.Receiver.ActorRole.Code).DatabaseValue));
+                "(SenderRole=@SenderRole OR ReceiverRole=@ReceiverRole)",
+                new KeyValuePair<string, object>("SenderRole", query.Sender.ActorRole.DatabaseValue),
+                new KeyValuePair<string, object>("ReceiverRole", query.Receiver.ActorRole.DatabaseValue));
         }
         else if (query.Sender is not null)
         {
@@ -64,8 +64,8 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
                 "SenderNumber=@SenderNumber",
                 new KeyValuePair<string, object>("SenderNumber", query.Sender.ActorNumber.Value));
             AddFilter(
-                "SenderRoleCode=@SenderRoleCode",
-                new KeyValuePair<string, object>("SenderRoleCode", ActorRole.FromCode(query.Sender.ActorRole.Code).DatabaseValue));
+                "SenderRole=@SenderRole",
+                new KeyValuePair<string, object>("SenderRole", query.Sender.ActorRole.DatabaseValue));
         }
         else if (query.Receiver is not null)
         {
@@ -73,8 +73,8 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
                 "ReceiverNumber=@ReceiverNumber",
                 new KeyValuePair<string, object>("ReceiverNumber", query.Receiver.ActorNumber.Value));
             AddFilter(
-                "ReceiverRoleCode=@ReceiverRoleCode",
-                new KeyValuePair<string, object>("ReceiverRoleCode", ActorRole.FromCode(query.Receiver.ActorRole.Code).DatabaseValue));
+                "ReceiverRole=@ReceiverRole",
+                new KeyValuePair<string, object>("ReceiverRole", query.Receiver.ActorRole.DatabaseValue));
         }
 
         if (query.DocumentTypes is not null)
@@ -91,8 +91,8 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
                 "(ReceiverNumber=@Requester OR SenderNumber=@Requester)",
                 new KeyValuePair<string, object>("Requester", _actorIdentity.ActorNumber.Value));
             AddFilter(
-                "(ReceiverRoleCode=@RequesterRoleCode OR SenderRoleCode=@RequesterRoleCode)",
-                new KeyValuePair<string, object>("RequesterRoleCode", _actorIdentity.ActorRole.DatabaseValue));
+                "(ReceiverRole=@RequesterRole OR SenderRole=@RequesterRole)",
+                new KeyValuePair<string, object>("RequesterRole", _actorIdentity.ActorRole.DatabaseValue));
         }
         else if (!_actorIdentity.HasRestriction(Restriction.None))
         {
@@ -142,7 +142,7 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
         whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
         whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
 
-        var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) PaginationCursorValue, Id, MessageId, DocumentType, SenderNumber, SenderRoleCode, ReceiverNumber, ReceiverRoleCode, CreatedAt, BusinessReason FROM dbo.MeteringPointArchivedMessages";
+        var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) PaginationCursorValue, Id, MessageId, DocumentType, SenderNumber, SenderRole, ReceiverNumber, ReceiverRole, CreatedAt, BusinessReason FROM dbo.MeteringPointArchivedMessages";
         var sqlStatement = selectStatement + whereClause;
 
         sqlStatement += OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);

@@ -215,9 +215,9 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
 
         message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
-        message.SenderRoleCode.Should().Be(archivedMessage.SenderRole.DatabaseValue);
+        message.SenderRole.Should().Be(archivedMessage.SenderRole.DatabaseValue);
         message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
-        message.ReceiverRoleCode.Should().Be(archivedMessage.ReceiverRole.DatabaseValue);
+        message.ReceiverRole.Should().Be(archivedMessage.ReceiverRole.DatabaseValue);
         message.DocumentType.Should().Be(archivedMessage.DocumentType.DatabaseValue);
         message.BusinessReason.Should().Be(archivedMessage.BusinessReason?.DatabaseValue);
         message.MessageId.Should().Be(archivedMessage.MessageId);
