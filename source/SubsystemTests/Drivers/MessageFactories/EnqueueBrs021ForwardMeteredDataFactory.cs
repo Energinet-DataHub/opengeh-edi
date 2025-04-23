@@ -94,7 +94,8 @@ public class EnqueueBrs021ForwardMeteredDataFactory
             ValidationErrors:
             [
                 new ValidationErrorDto(validationError, "XYZ"),
-            ]);
+            ],
+            MeteringPointId: "1234567890123");
 
         return CreateServiceBusMessage(rejected, actor, eventId);
     }
