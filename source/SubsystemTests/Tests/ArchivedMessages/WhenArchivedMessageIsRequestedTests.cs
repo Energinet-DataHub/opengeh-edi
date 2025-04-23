@@ -89,14 +89,15 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_get_the_metering_point_archived_message()
     {
+        var meteringPointId = MeteringPointId.From("9999999999");
         await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredData(
             new Actor(
                 actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
                 actorRole: ActorRole.EnergySupplier),
-            meteringPointId: MeteringPointId.From("9999999999"));
+            meteringPointId: meteringPointId);
 
         await _forwardMeteredDataAsGridAccessProvider.ConfirmResponseIsAvailable();
 
-        await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch();
+        await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch(meteringPointId);
     }
 }

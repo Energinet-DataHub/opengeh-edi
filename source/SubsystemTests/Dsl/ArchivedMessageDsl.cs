@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client;
@@ -151,13 +152,13 @@ public class ArchivedMessageDsl
             .And.Match($"*\"Permissions\":\"*actors:manage*\"*");
     }
 
-    internal async Task ConfirmMeteringPointArchivedMessageSearch()
+    internal async Task ConfirmMeteringPointArchivedMessageSearch(MeteringPointId meteringPointId)
     {
         var now = DateTime.Now;
 
         var request = new ArchivedMeasureDataMessageSearchCriteria
         {
-            MeteringPointId = "1234567890123",
+            MeteringPointId = meteringPointId.Value,
             CreatedDuringPeriod =
                 new MessageCreationPeriod
                 {
