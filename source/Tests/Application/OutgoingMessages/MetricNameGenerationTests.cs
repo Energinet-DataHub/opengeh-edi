@@ -41,14 +41,10 @@ public class MetricNameGenerationTests
     private static readonly string[] _documentMetrics =
     [
         "NotifyAggregatedMeasureData",
-        "RequestAggregatedMeasureData",
-        "RequestAggregatedMeasureDataResponse",
         "NotifyAggregatedMeasureDataResponse",
         "RejectRequestAggregatedMeasureData",
         "NotifyWholesaleServices",
         "NotifyWholesaleServicesResponse",
-        "RequestWholesaleSettlement",
-        "RequestWholesaleSettlementResponse",
         "RejectRequestWholesaleSettlement",
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",
@@ -60,6 +56,12 @@ public class MetricNameGenerationTests
         DocumentType.RejectRequestWholesaleSettlement,
         DocumentType.RejectRequestAggregatedMeasureData,
         DocumentType.Acknowledgement,
+    ];
+
+    private static readonly DocumentType[] _isDocumentTypeAnIncomingMessage =
+    [
+        DocumentType.RequestAggregatedMeasureData,
+        DocumentType.RequestWholesaleSettlement,
     ];
 
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(
@@ -91,6 +93,12 @@ public class MetricNameGenerationTests
         {
             foreach (var documentType in documentTypes)
             {
+                if (_isDocumentTypeAnIncomingMessage.Contains(documentType))
+                {
+                    // Incoming messages are not logged
+                    continue;
+                }
+
                 // Most documents are logged as an outgoing message and as a response to a corresponding incoming message
                 names.Add(MetricNameMapper.MessageGenerationMetricName(
                     documentType,
