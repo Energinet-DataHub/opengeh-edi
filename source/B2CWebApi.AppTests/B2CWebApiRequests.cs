@@ -157,9 +157,9 @@ public static class B2CWebApiRequests
         return request;
     }
 
-    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageSearchRequest()
+    public static HttpRequestMessage CreateMeteringPointArchivedMessageSearchRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMeasureDataMessage/search")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/MeteringPointArchivedMessage/search")
         {
             Content = CreateJsonContent(
                 new ArchivedMeasureDataMessageSearchCriteria(
@@ -173,9 +173,9 @@ public static class B2CWebApiRequests
         return request;
     }
 
-    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageGetRequest()
+    public static HttpRequestMessage CreateMeteringPointArchivedMessageGetDocumentRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/ArchivedMeasureDataMessage/{Guid.NewGuid()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/MeteringPointArchivedMessage/{Guid.NewGuid()}");
         return request;
     }
 

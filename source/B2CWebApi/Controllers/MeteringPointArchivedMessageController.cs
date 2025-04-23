@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Mappers;
-using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -30,7 +29,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 [ApiVersion("1.0")]
 [ApiController]
 [Route("[controller]")]
-public class ArchivedMeasureDataMessageController(
+public class MeteringPointArchivedMessageController(
     IAuditLogger auditLogger,
     IArchivedMessagesClient archivedMessagesClient)
     : ControllerBase
@@ -49,7 +48,7 @@ public class ArchivedMeasureDataMessageController(
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.ArchivedMeasureDataMessageSearch,
+                activity: AuditLogActivity.MeteringPointArchivedMessageSearch,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
                 affectedEntityType: _affectedEntityType,
@@ -109,7 +108,7 @@ public class ArchivedMeasureDataMessageController(
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.ArchivedMeasureDataMessageGet,
+                activity: AuditLogActivity.MeteringPointArchivedMessageGet,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: id,
                 affectedEntityType: _affectedEntityType,
