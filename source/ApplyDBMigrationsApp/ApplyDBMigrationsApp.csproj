@@ -221,7 +221,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202504101204 Add DataCount to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202504161255 Add MeteringPointId to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202504221058 Add PaginationCursorValue to MeteringPointArchivedMessages.sql" />
-    <EmbeddedResource Include="Scripts\Model\202504241128 rename SenderRoleCode to SenderRole and ReceiverRoleCode to ReceiverRole in MeteringPointArchivedMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202504241128 Rename SenderRoleCode to SenderRole and ReceiverRoleCode to ReceiverRole in MeteringPointArchivedMessages.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
