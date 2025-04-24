@@ -54,7 +54,7 @@ public class DelegateMessage
         }
 
         if (string.IsNullOrEmpty(messageToEnqueue.GridAreaCode))
-            throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}");
+            throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}.");
 
         var delegatedTo = await GetDelegatedReceiverAsync(
             messageToEnqueue.DocumentReceiver.Number,
