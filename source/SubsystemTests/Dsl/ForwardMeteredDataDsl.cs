@@ -64,7 +64,7 @@ internal sealed class ForwardMeteredDataDsl(
         return await _ediDriver.SendForwardMeteredDataAsync(cancellationToken);
     }
 
-    public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor, MeteringPointId? meteringPointId = null)
+    public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor)
     {
         await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
         await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
@@ -72,8 +72,7 @@ internal sealed class ForwardMeteredDataDsl(
             start: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
             end: Instant.FromUtc(2025, 01, 31, 23, 00, 00),
             originalActorMessageId: Guid.NewGuid().ToString(),
-            eventId: Guid.NewGuid(),
-            meteringPointId: meteringPointId);
+            eventId: Guid.NewGuid());
     }
 
     public async Task<string> ConfirmResponseIsAvailable()
@@ -92,14 +91,15 @@ internal sealed class ForwardMeteredDataDsl(
         return messageId!;
     }
 
-    public async Task PublishEnqueueBrs021ForwardMeteredDataRejected(Actor actor)
+    public async Task PublishEnqueueBrs021ForwardMeteredDataRejected(Actor actor, MeteringPointId? meteringPointId = null)
     {
         await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
         await _processManagerDriver.PublishBrs021ForwardMeteredDataRejectedAsync(
             actor: actor,
             originalActorMessageId: Guid.NewGuid().ToString(),
             eventId: Guid.NewGuid(),
-            validationError: SubsystemTestValidationError);
+            validationError: SubsystemTestValidationError,
+            meteringPointId: meteringPointId);
     }
 
     public async Task<string> ConfirmRejectedResponseIsAvailable()

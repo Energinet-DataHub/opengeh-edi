@@ -89,13 +89,13 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
     [Fact]
     [Order(110)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
-    public async Task B2C_actor_can_get_the_metering_point_archived_message()
+    public async Task B2C_actor_can_get_the_rejected_metering_point_archived_message()
     {
         var meteringPointId = MeteringPointId.From("9999999999");
-        await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredData(
+        await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredDataRejected(
             new Actor(
-                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
-                actorRole: ActorRole.EnergySupplier),
+                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimGridAccessProviderNumber),
+                actorRole: ActorRole.GridAccessProvider),
             meteringPointId: meteringPointId);
 
         await _forwardMeteredDataAsGridAccessProvider.ConfirmResponseIsAvailable();

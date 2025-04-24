@@ -35,8 +35,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         Instant start,
         Instant end,
         string originalActorMessageId,
-        Guid eventId,
-        MeteringPointId? meteringPointId = null)
+        Guid eventId)
     {
         var resolution = BuildingBlocks.Domain.Models.Resolution.QuarterHourly;
         var resolutionDuration = resolution.ToDuration();
@@ -70,7 +69,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
 
         var accepted = new ForwardMeteredDataAcceptedV1(
             OriginalActorMessageId: originalActorMessageId,
-            MeteringPointId: meteringPointId?.Value ?? "1234567890123",
+            MeteringPointId: "1234567890123",
             MeteringPointType: MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
             RegistrationDateTime: start.ToDateTimeOffset(),
@@ -85,7 +84,8 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         Actor actor,
         string originalActorMessageId,
         Guid eventId,
-        string validationError)
+        string validationError,
+        MeteringPointId? meteringPointId = null)
     {
         var rejected = new ForwardMeteredDataRejectedV1(
             OriginalActorMessageId: originalActorMessageId,
@@ -96,7 +96,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
             [
                 new ValidationErrorDto(validationError, "XYZ"),
             ],
-            MeteringPointId: "1234567890123");
+            MeteringPointId: meteringPointId?.Value ?? "1234567890123");
 
         return CreateServiceBusMessage(rejected, actor, eventId);
     }
