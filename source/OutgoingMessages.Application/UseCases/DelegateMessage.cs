@@ -46,9 +46,7 @@ public class DelegateMessage
         // Do not delegate outgoing message if it is created from a request,
         // because the receiver must be the same as the one who made the request
         if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults
-            || messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestEnergyResults
-            // TODO (MWO): We skip delegation for now
-            || messageToEnqueue.MessageCreatedFromProcess == ProcessType.OutgoingMeteredDataForMeteringPoint)
+            || messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestEnergyResults)
         {
             return messageToEnqueue;
         }
