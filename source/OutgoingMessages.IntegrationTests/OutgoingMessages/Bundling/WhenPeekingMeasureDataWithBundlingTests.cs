@@ -90,6 +90,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
+                    gridAreaCode: "804",
                     series: new ForwardMeteredDataMessageSeriesDto(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: "1234567890123456",
