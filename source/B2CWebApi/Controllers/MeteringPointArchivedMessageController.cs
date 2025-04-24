@@ -43,7 +43,7 @@ public class MeteringPointArchivedMessageController(
     [Route("search")]
     [ProducesResponseType(typeof(MeteringPointArchivedMessageSearchResponseV1), StatusCodes.Status200OK)]
     public async Task<ActionResult> SearchV1Async(
-        ArchivedMeasureDataMessageSearchCriteria request,
+        MeteringPointArchivedMessageSearchCriteria request,
         CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
@@ -69,10 +69,10 @@ public class MeteringPointArchivedMessageController(
         var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
 
         var sender = request.Sender != null
-            ? new BuildingBlocks.Domain.Models.Actor(ActorNumber.Create(request.Sender!.ActorNumber), ActorRoleMapper.ToActorRoleDomain(request.Sender!.ActorRole))
+            ? ActorMapper.ToDomainActor(request.Sender!)
             : null;
         var receiver = request.Receiver != null
-            ? new BuildingBlocks.Domain.Models.Actor(ActorNumber.Create(request.Receiver!.ActorNumber), ActorRoleMapper.ToActorRoleDomain(request.Receiver!.ActorRole))
+            ? ActorMapper.ToDomainActor(request.Receiver!)
             : null;
         var documentTypes = request.MeasureDataDocumentTypes?.Select(MeasureDataDocumentTypeMapper.ToDocumentType).ToList().AsReadOnly();
         var query = new GetMeteringPointMessagesQueryDto(

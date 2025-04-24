@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-[Serializable]
-public record ArchivedMeasureDataMessageSearchCriteria(
-    SearchArchivedMessagesPagination Pagination,
-    string MeteringPointId,
-    MessageCreationPeriod CreatedDuringPeriod,
-    Actor? Sender,
-    Actor? Receiver,
-    IReadOnlyCollection<MeteringPointDocumentType>? MeasureDataDocumentTypes);
+namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
+
+public static class ActorMapper
+{
+    public static Actor ToDomainActor(Models.Actor actor)
+    {
+        return new Actor(
+            ActorNumber.Create(actor.ActorNumber),
+            ActorRoleMapper.ToActorRoleDomain(actor.ActorRole));
+    }
+}

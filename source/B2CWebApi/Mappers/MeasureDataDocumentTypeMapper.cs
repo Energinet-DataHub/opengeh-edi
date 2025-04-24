@@ -33,6 +33,6 @@ public static class MeasureDataDocumentTypeMapper
     public static MeteringPointDocumentType ToMeteringPointDocumentType(string documentTypeName)
     {
         return _measureDataDocumentTypeMappings
-            .FirstOrDefault(x => x.Value.ToString().Equals(documentTypeName, StringComparison.OrdinalIgnoreCase)).Key;
+            .First(x => x.Value.ToString().Equals(documentTypeName, StringComparison.OrdinalIgnoreCase)).Key;
     }
 }

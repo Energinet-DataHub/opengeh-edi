@@ -26,7 +26,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria"
                   }
                 ]
               }
@@ -35,7 +35,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria"
                   }
                 ]
               }
@@ -44,7 +44,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria"
                   }
                 ]
               }
@@ -547,7 +547,7 @@
           10
         ]
       },
-      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

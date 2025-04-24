@@ -162,7 +162,7 @@ public static class B2CWebApiRequests
         var request = new HttpRequestMessage(HttpMethod.Post, "/MeteringPointArchivedMessage/search")
         {
             Content = CreateJsonContent(
-                new ArchivedMeasureDataMessageSearchCriteria(
+                new MeteringPointArchivedMessageSearchCriteria(
                     new SearchArchivedMessagesPagination(),
                     MeteringPointId: "123456789",
                     CreatedDuringPeriod: new MessageCreationPeriod(Start: DateTimeOffset.Parse("2024-08-27T00:00:00Z"), End: DateTimeOffset.Parse("2024-08-28T00:00:00Z")),
