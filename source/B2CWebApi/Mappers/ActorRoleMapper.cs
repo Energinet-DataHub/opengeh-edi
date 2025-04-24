@@ -45,9 +45,10 @@ public static class ActorRoleMapper
 
     public static string? ToActorRoleCode(Models.ActorRole? actorRole)
     {
-        return actorRole == null
+        var domainActorRole = actorRole == null
             ? null
-            : ActorRoleMappings.FirstOrDefault(x => x.Value == actorRole).Key.Code;
+            : ActorRoleMappings.FirstOrDefault(x => x.Value == actorRole).Key;
+        return domainActorRole?.Code;
     }
 
     public static ActorRole ToActorRoleDomain(Models.ActorRole actorRole)
