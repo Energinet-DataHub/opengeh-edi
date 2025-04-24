@@ -47,14 +47,14 @@ public class DelegateMessage
         // because the receiver must be the same as the one who made the request
         if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults
             || messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestEnergyResults
-            // TODO (MWO): We skip delegation for now
-            || messageToEnqueue.MessageCreatedFromProcess == ProcessType.OutgoingMeteredDataForMeteringPoint)
+            // Acknowledgement messages are not delegated
+            || messageToEnqueue.DocumentType == DocumentType.Acknowledgement)
         {
             return messageToEnqueue;
         }
 
         if (string.IsNullOrEmpty(messageToEnqueue.GridAreaCode))
-            throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}");
+            throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}.");
 
         var delegatedTo = await GetDelegatedReceiverAsync(
             messageToEnqueue.DocumentReceiver.Number,

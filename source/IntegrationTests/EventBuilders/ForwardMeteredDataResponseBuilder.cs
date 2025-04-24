@@ -101,7 +101,8 @@ public static class ForwardMeteredDataResponseBuilder
             RegistrationDateTime: InstantPattern.General.Parse(forwardMeteredDataInput.RegistrationDateTime).Value.ToDateTimeOffset(),
             StartDateTime: startDateTime,
             EndDateTime: endDateTime,
-            ReceiversWithMeteredData: receiversWithMeteredData);
+            ReceiversWithMeteredData: receiversWithMeteredData,
+            "804");
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {

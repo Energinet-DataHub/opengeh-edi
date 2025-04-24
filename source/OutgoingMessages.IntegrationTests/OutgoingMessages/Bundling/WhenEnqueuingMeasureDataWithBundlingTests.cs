@@ -424,6 +424,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                         receiver: receiver.ToActor(),
                         businessReason: BusinessReason.PeriodicMetering,
                         relatedToMessageId: MessageId.New(),
+                        gridAreaCode: "804",
                         series: new ForwardMeteredDataMessageSeriesDto(
                             TransactionId: TransactionId.New(),
                             MarketEvaluationPointNumber: "1234567890123",
@@ -597,6 +598,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
+                    gridAreaCode: "804",
                     series: new ForwardMeteredDataMessageSeriesDto(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: "1234567890123456",
@@ -705,6 +707,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
+                    gridAreaCode: "804",
                     series: new ForwardMeteredDataMessageSeriesDto(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: "1234567890123456",

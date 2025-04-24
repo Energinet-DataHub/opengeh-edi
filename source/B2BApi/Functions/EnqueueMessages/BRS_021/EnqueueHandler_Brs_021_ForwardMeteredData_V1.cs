@@ -67,6 +67,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                     receiver: new Actor(ActorNumber.Create(actor.ActorNumber), ActorRole.FromName(actor.ActorRole.Name)),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
+                    gridAreaCode: acceptedData.GridAreaCode,
                     series: new ForwardMeteredDataMessageSeriesDto(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: acceptedData.MeteringPointId,
