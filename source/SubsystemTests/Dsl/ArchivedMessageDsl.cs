@@ -158,6 +158,10 @@ public class ArchivedMessageDsl
 
         var request = new MeteringPointArchivedMessageSearchCriteria()
         {
+            Pagination = new Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.SearchArchivedMessagesPagination
+            {
+                PageSize = 1,
+            },
             MeteringPointId = meteringPointId.Value,
             CreatedDuringPeriod =
                 new MessageCreationPeriod
