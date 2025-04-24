@@ -411,7 +411,7 @@ public static class OutgoingMessageFactory
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
             relatedToMessageId: message.RelatedToMessageId,
-            gridAreaCode: null,
+            gridAreaCode: message.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
             message.Series.StartedDateTime,

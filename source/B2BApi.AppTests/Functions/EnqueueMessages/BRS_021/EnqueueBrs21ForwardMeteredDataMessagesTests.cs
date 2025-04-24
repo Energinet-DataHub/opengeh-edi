@@ -157,7 +157,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
                                 EnergyQuantity: receiver2Quantity,
                                 QuantityQuality: PMValueTypes.Quality.AsProvided),
                     ]),
-            ]);
+            ],
+            "804");
 
         var orchestrationInstanceId = Guid.NewGuid().ToString();
         var enqueueActorMessages = new EnqueueActorMessagesV1
