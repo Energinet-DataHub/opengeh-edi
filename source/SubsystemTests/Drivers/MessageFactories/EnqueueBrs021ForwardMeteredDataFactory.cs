@@ -75,7 +75,8 @@ public class EnqueueBrs021ForwardMeteredDataFactory
             RegistrationDateTime: start.ToDateTimeOffset(),
             StartDateTime: start.ToDateTimeOffset(),
             EndDateTime: end.ToDateTimeOffset(),
-            ReceiversWithMeteredData: [receiversWithMeteredData]);
+            ReceiversWithMeteredData: [receiversWithMeteredData],
+            "804");
 
         return CreateServiceBusMessage(accepted, actor, eventId);
     }
