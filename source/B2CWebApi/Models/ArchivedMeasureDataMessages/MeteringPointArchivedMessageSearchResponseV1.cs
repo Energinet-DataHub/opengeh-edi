@@ -14,6 +14,6 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 
-public record ArchivedMeasureDataMessageSearchResponseV1(
+public record MeteringPointArchivedMessageSearchResponseV1(
     IEnumerable<MeteringPointArchivedMessageV1> Messages,
     int TotalCount);

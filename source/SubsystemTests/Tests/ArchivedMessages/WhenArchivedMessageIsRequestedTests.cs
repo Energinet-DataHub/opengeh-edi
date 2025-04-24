@@ -91,7 +91,6 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     }
 
     [Fact]
-    [Order(110)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task B2C_actor_can_get_the_rejected_metering_point_archived_message()
     {
         var meteringPointId = MeteringPointId.From("9999999999");

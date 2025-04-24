@@ -41,7 +41,7 @@ public class MeteringPointArchivedMessageController(
 
     [HttpPost]
     [Route("search")]
-    [ProducesResponseType(typeof(ArchivedMeasureDataMessageSearchResponseV1), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MeteringPointArchivedMessageSearchResponseV1), StatusCodes.Status200OK)]
     public async Task<ActionResult> SearchV1Async(
         ArchivedMeasureDataMessageSearchCriteria request,
         CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ public class MeteringPointArchivedMessageController(
                 Receiver: new Actor(x.ReceiverNumber, ActorRoleMapper.ToActorRole(x.ReceiverRoleCode!)),
                 CreatedAt: x.CreatedAt.ToDateTimeOffset()));
 
-        return Ok(new ArchivedMeasureDataMessageSearchResponseV1(messages, TotalCount: result.TotalAmountOfMessages));
+        return Ok(new MeteringPointArchivedMessageSearchResponseV1(messages, TotalCount: result.TotalAmountOfMessages));
     }
 
     [HttpGet("{id:guid}")]

@@ -112,7 +112,6 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     }
 
     [Fact]
-    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task Actor_can_peek_and_dequeue_forward_metered_data_rejected()
     {
         await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredDataRejected(
