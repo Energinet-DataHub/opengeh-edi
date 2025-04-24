@@ -32,8 +32,6 @@ public class MicrosoftFeatureFlagManager(
 
     public Task<bool> UsePeekMessagesAsync() => IsEnabledAsync(FeatureFlagName.UsePeekMessages);
 
-    public Task<bool> ArchiveBrs021MessagesAsync() => IsEnabledAsync(FeatureFlagName.ArchiveBrs021Messages);
-
     // Product Goals
     public Task<bool> ReceiveForwardMeteredDataInCimAsync() => IsEnabledAsync(FeatureFlagName.PM25CIM);
 
