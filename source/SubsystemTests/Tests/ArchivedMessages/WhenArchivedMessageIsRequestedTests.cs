@@ -57,7 +57,10 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 fixture.EbixUri,
                 fixture.EbixGridAccessProviderCredentials,
                 output),
-            ediDriver: ediDriver,
+            ediDriver: new EdiDriver(
+                fixture.DurableClient,
+                fixture.B2BClients.GridAccessProvider,
+                output),
             ediDatabaseDriver: ediDatabaseDriver,
             processManagerDriver: processManagerDriver);
         _notifyAggregatedMeasureData = new NotifyAggregatedMeasureDataResultDsl(ediDriver);
@@ -98,7 +101,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
                 actorRole: ActorRole.GridAccessProvider),
             meteringPointId: meteringPointId);
 
-        await _forwardMeteredDataAsGridAccessProvider.ConfirmResponseIsAvailable();
+        await _forwardMeteredDataAsGridAccessProvider.ConfirmRejectedResponseIsAvailable();
 
         await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch(meteringPointId);
     }
