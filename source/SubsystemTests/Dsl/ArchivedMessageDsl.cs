@@ -156,7 +156,7 @@ public class ArchivedMessageDsl
     {
         var now = DateTime.Now;
 
-        var request = new ArchivedMeasureDataMessageSearchCriteria
+        var request = new MeteringPointArchivedMessageSearchCriteria()
         {
             MeteringPointId = meteringPointId.Value,
             CreatedDuringPeriod =
