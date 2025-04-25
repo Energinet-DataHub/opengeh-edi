@@ -102,18 +102,15 @@ public class ReceiveIncomingMarketMessage
             return _responseFactory.From(res, responseDocumentFormat);
         }
 
-        if (await ShouldArchiveAsync(documentType).ConfigureAwait(false))
-        {
-            stopwatch.Restart();
-            await ArchiveIncomingMessageAsync(
-                    incomingMarketMessageStream,
-                    incomingMarketMessageParserResult.IncomingMessage,
-                    documentType,
-                    cancellationToken)
-                .ConfigureAwait(false);
-            stopwatch.Stop();
-            _logger.LogInformation($"IncomingMessage Archiving execution time: {stopwatch.ElapsedMilliseconds} ms");
-        }
+        stopwatch.Restart();
+        await ArchiveIncomingMessageAsync(
+                incomingMarketMessageStream,
+                incomingMarketMessageParserResult.IncomingMessage,
+                documentType,
+                cancellationToken)
+            .ConfigureAwait(false);
+        stopwatch.Stop();
+        _logger.LogInformation($"IncomingMessage Archiving execution time: {stopwatch.ElapsedMilliseconds} ms");
 
         stopwatch.Restart();
         await _delegateIncomingMessage
@@ -157,16 +154,6 @@ public class ReceiveIncomingMarketMessage
             incomingMarketMessageParserResult.IncomingMessage!.MessageId,
             string.Join(',', incomingMarketMessageParserResult.Errors.Select(e => e.ToString())));
         return _responseFactory.From(result, responseDocumentFormat);
-    }
-
-    private async Task<bool> ShouldArchiveAsync(IncomingDocumentType documentType)
-    {
-        if (documentType == IncomingDocumentType.NotifyValidatedMeasureData)
-        {
-            return await _featureFlagManager.ArchiveBrs021MessagesAsync().ConfigureAwait(false);
-        }
-
-        return true;
     }
 
     private async Task<IncomingMarketMessageParserResult> ParseIncomingMessageAsync(
