@@ -82,7 +82,7 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
             AddFilter(
                 "DocumentType in @DocumentType",
                 new KeyValuePair<string, object>("DocumentType", query.DocumentTypes
-                    .Select(x => EnumerationType.FromName<DocumentType>(x).DatabaseValue)));
+                    .Select(x => x.DatabaseValue)));
         }
 
         if (_actorIdentity.HasRestriction(Restriction.Owned))

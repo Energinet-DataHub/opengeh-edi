@@ -85,7 +85,8 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         Actor actor,
         string originalActorMessageId,
         Guid eventId,
-        string validationError)
+        string validationError,
+        MeteringPointId? meteringPointId = null)
     {
         var rejected = new ForwardMeteredDataRejectedV1(
             OriginalActorMessageId: originalActorMessageId,
@@ -96,7 +97,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
             [
                 new ValidationErrorDto(validationError, "XYZ"),
             ],
-            MeteringPointId: "1234567890123");
+            MeteringPointId: meteringPointId?.Value ?? "1234567890123");
 
         return CreateServiceBusMessage(rejected, actor, eventId);
     }

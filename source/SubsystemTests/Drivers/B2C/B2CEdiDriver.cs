@@ -139,7 +139,7 @@ public sealed class B2CEdiDriver : IDisposable
             .ConfigureAwait(false);
     }
 
-    public async Task<ArchivedMeasureDataMessageSearchResponseV1> SearchMeteringPointArchivedMessageAsync(ArchivedMeasureDataMessageSearchCriteria request, CancellationToken cancellationToken)
+    public async Task<MeteringPointArchivedMessageSearchResponseV1> SearchMeteringPointArchivedMessageAsync(MeteringPointArchivedMessageSearchCriteria request, CancellationToken cancellationToken)
     {
         var webApiClient = await CreateWebApiClientAsync();
 

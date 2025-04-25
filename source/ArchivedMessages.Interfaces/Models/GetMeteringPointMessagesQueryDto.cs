@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
-public record MessageInfoDto(
-    long CursorValue,
-    Guid Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string? SenderRoleCode,
-    string ReceiverNumber,
-    string? ReceiverRoleCode,
-    Instant CreatedAt,
-    string? BusinessReason);
+/// <summary>
+/// Represents a query options for retrieving metering point messages.
+/// Including the pagination for the specific query.
+/// </summary>
+public sealed record GetMeteringPointMessagesQueryDto(
+    SortedCursorBasedPaginationDto Pagination,
+    MeteringPointId MeteringPointId,
+    MessageCreationPeriodDto CreationPeriod,
+    Actor? Sender = null,
+    Actor? Receiver = null,
+    IReadOnlyCollection<DocumentType>? DocumentTypes = null);

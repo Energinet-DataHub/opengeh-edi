@@ -118,7 +118,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1)))),
@@ -167,7 +167,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(
@@ -185,11 +185,11 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
     public async Task Given_TwoArchivedMessages_When_SearchingBySenderNumber_Then_ReturnsExpectedMessage()
     {
         // Arrange
-        var expectedSenderNumber = "9999999999999";
+        var expectedSenderNumber = ActorNumber.Create("9999999999999");
         var meteringPointId = MeteringPointId.From("1234567890123");
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         await _fixture.CreateArchivedMessageAsync(
-            senderNumber: expectedSenderNumber,
+            senderNumber: expectedSenderNumber.Value,
             senderRole: ActorRole.MeteredDataResponsible,
             documentType: DocumentType.NotifyValidatedMeasureData,
             timestamp: now,
@@ -201,19 +201,18 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
-                SenderNumber: expectedSenderNumber,
-                SenderRoleCode: ActorRole.MeteredDataResponsible.Code),
+                Sender: new Actor(expectedSenderNumber, ActorRole.MeteredDataResponsible)),
             CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
         result.Messages.Should().ContainSingle()
-            .Which.SenderNumber.Should().Be(expectedSenderNumber);
+            .Which.SenderNumber.Should().Be(expectedSenderNumber.Value);
     }
 
     [Fact]
@@ -221,12 +220,12 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
     {
         // Arrange
         var expectedSenderRole = ActorRole.SystemOperator;
-        var senderNumber = "9999999999999";
+        var senderNumber = ActorNumber.Create("9999999999999");
         var meteringPointId = MeteringPointId.From("1234567890123");
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         await _fixture.CreateArchivedMessageAsync(
             senderRole: expectedSenderRole,
-            senderNumber: senderNumber,
+            senderNumber: senderNumber.Value,
             documentType: DocumentType.NotifyValidatedMeasureData,
             timestamp: now,
             meteringPointIds: [meteringPointId]);
@@ -237,12 +236,11 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-        new GetMessagesQueryDto(
+        new GetMeteringPointMessagesQueryDto(
         new SortedCursorBasedPaginationDto(),
         MeteringPointId: meteringPointId,
         CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
-        SenderRoleCode: expectedSenderRole.Code,
-        SenderNumber: senderNumber),
+        Sender: new Actor(senderNumber, expectedSenderRole)),
         CancellationToken.None);
 
         // Assert
@@ -257,12 +255,12 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
     {
         // Arrange
         var expectedReceiverRole = ActorRole.SystemOperator;
-        var receiverNumber = "9999999999999";
+        var receiverNumber = ActorNumber.Create("9999999999999");
         var meteringPointId = MeteringPointId.From("1234567890123");
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         await _fixture.CreateArchivedMessageAsync(
             receiverRole: expectedReceiverRole,
-            receiverNumber: receiverNumber,
+            receiverNumber: receiverNumber.Value,
             documentType: DocumentType.NotifyValidatedMeasureData,
             timestamp: now,
             meteringPointIds: [meteringPointId]);
@@ -273,12 +271,11 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-        new GetMessagesQueryDto(
+        new GetMeteringPointMessagesQueryDto(
         new SortedCursorBasedPaginationDto(),
         MeteringPointId: meteringPointId,
         CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
-        ReceiverRoleCode: expectedReceiverRole.Code,
-        ReceiverNumber: receiverNumber),
+        Receiver: new Actor(receiverNumber, expectedReceiverRole)),
         CancellationToken.None);
 
         // Assert
@@ -294,15 +291,15 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
         // Arrange
         var expectedSenderRole = ActorRole.Delegated;
         var expectedReceiverRole = ActorRole.SystemOperator;
-        var senderNumber = "9999999999999";
-        var receiverNumber = "8888888888888";
+        var senderNumber = ActorNumber.Create("9999999999999");
+        var receiverNumber = ActorNumber.Create("8888888888888");
         var meteringPointId = MeteringPointId.From("1234567890123");
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         await _fixture.CreateArchivedMessageAsync(
             senderRole: expectedSenderRole,
-            senderNumber: senderNumber,
+            senderNumber: senderNumber.Value,
             receiverRole: expectedReceiverRole,
-            receiverNumber: receiverNumber,
+            receiverNumber: receiverNumber.Value,
             documentType: DocumentType.NotifyValidatedMeasureData,
             timestamp: now,
             meteringPointIds: [meteringPointId]);
@@ -313,12 +310,11 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-        new GetMessagesQueryDto(
+        new GetMeteringPointMessagesQueryDto(
         new SortedCursorBasedPaginationDto(),
         MeteringPointId: meteringPointId,
         CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
-        ReceiverRoleCode: expectedReceiverRole.Code,
-        ReceiverNumber: receiverNumber),
+        Receiver: new Actor(receiverNumber, expectedReceiverRole)),
         CancellationToken.None);
 
         // Assert
@@ -334,11 +330,11 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
     public async Task Given_TwoArchivedMessages_When_SearchingByReceiverNumber_Then_ReturnsExpectedMessage()
     {
         // Arrange
-        var expectedReceiverNumber = "9999999999999";
+        var expectedReceiverNumber = ActorNumber.Create("9999999999999");
         var meteringPointId = MeteringPointId.From("1234567890123");
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         await _fixture.CreateArchivedMessageAsync(
-            receiverNumber: expectedReceiverNumber,
+            receiverNumber: expectedReceiverNumber.Value,
             receiverRole: ActorRole.MeteredDataAdministrator,
             documentType: DocumentType.NotifyValidatedMeasureData,
             timestamp: now,
@@ -350,19 +346,18 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
-                ReceiverNumber: expectedReceiverNumber,
-                ReceiverRoleCode: ActorRole.MeteredDataAdministrator.Code),
+                Receiver: new Actor(expectedReceiverNumber, ActorRole.MeteredDataAdministrator)),
             CancellationToken.None);
 
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
         result.Messages.Should().ContainSingle()
-            .Which.ReceiverNumber.Should().Be(expectedReceiverNumber);
+            .Which.ReceiverNumber.Should().Be(expectedReceiverNumber.Value);
     }
 
     [Fact]
@@ -384,11 +379,11 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
-                DocumentTypes: [expectedDocumentType.Name]),
+                DocumentTypes: [expectedDocumentType]),
             CancellationToken.None);
 
         // Assert
@@ -422,14 +417,14 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 new SortedCursorBasedPaginationDto(),
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))),
                 DocumentTypes:
                 [
-                    expectedDocumentType1.Name,
-                    expectedDocumentType2.Name,
+                    expectedDocumentType1,
+                    expectedDocumentType2,
                 ]),
             CancellationToken.None);
 
@@ -477,7 +472,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 pagination,
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
@@ -523,7 +518,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 pagination,
                 MeteringPointId: meteringPointId,
                 CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
@@ -594,7 +589,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
             messageCreationPeriodDto);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
-        var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId);
+        var cursor = new SortingCursorDto(Value: lastMessageInOnThePreviousPage.CursorValue);
 
         var pagination = new SortedCursorBasedPaginationDto(
             Cursor: cursor,
@@ -603,7 +598,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 pagination,
                 MeteringPointId: meteringPointId,
                 CreationPeriod: messageCreationPeriodDto),
@@ -663,7 +658,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
             messageCreationPeriodDto);
         // The cursor points at the first item of the previous page, when navigating backward
         var firstMessageInOnThePreviousPage = firstPageMessages.Messages.First();
-        var cursor = new SortingCursorDto(RecordId: firstMessageInOnThePreviousPage.RecordId);
+        var cursor = new SortingCursorDto(Value: firstMessageInOnThePreviousPage.CursorValue);
 
         var pagination = new SortedCursorBasedPaginationDto(
             Cursor: cursor,
@@ -672,7 +667,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 pagination,
                 MeteringPointId: meteringPointId,
                 CreationPeriod: messageCreationPeriodDto),
@@ -763,7 +758,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-                new GetMessagesQueryDto(
+                new GetMeteringPointMessagesQueryDto(
                     pagination,
                     MeteringPointId: meteringPointId,
                     CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T20:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
@@ -849,7 +844,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-                new GetMessagesQueryDto(
+                new GetMeteringPointMessagesQueryDto(
                     pagination,
                     MeteringPointId: meteringPointId,
                     CreationPeriod: new MessageCreationPeriodDto(CreatedAt("2023-04-01T00:00:00Z"), CreatedAt("2023-04-08T22:00:00Z"))),
@@ -896,9 +891,9 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 pagination,
-                new MessageCreationPeriodDto(
+                CreationPeriod: new MessageCreationPeriodDto(
                 expectedPeriodStartedAt,
                 expectedPeriodEndedAt),
                 MeteringPointId: meteringPointId),
@@ -952,7 +947,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
             orderByField: FieldToSortByDto.SenderNumber);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
-        var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
+        var cursor = new SortingCursorDto(Value: lastMessageInOnThePreviousPage.CursorValue, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
 
         var pagination = new SortedCursorBasedPaginationDto(
             Cursor: cursor,
@@ -963,9 +958,9 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 pagination,
-                messageCreationPeriodDto,
+                CreationPeriod: messageCreationPeriodDto,
                 MeteringPointId: meteringPointId),
             CancellationToken.None);
 
@@ -992,7 +987,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
                 meteringPointIds: [meteringPointId]);
         }
 
-        var query = new GetMessagesQueryDto(
+        var query = new GetMeteringPointMessagesQueryDto(
             new SortedCursorBasedPaginationDto(PageSize: 20, NavigationForward: true),
             MeteringPointId: meteringPointId,
             CreationPeriod: new MessageCreationPeriodDto(now.Minus(Duration.FromDays(1)), now.Plus(Duration.FromDays(1))));
@@ -1070,7 +1065,7 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
     {
         var pagination = new SortedCursorBasedPaginationDto(PageSize: pageSize, NavigationForward: navigatingForward, FieldToSortBy: orderByField, DirectionToSortBy: DirectionToSortByDto.Descending);
         return await _sut.SearchAsync(
-            new GetMessagesQueryDto(
+            new GetMeteringPointMessagesQueryDto(
                 pagination,
                 CreationPeriod: creationPeriod,
                 MeteringPointId: meteringPointId),

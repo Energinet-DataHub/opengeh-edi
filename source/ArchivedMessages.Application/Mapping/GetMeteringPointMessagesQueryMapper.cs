@@ -20,31 +20,14 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 
 internal static class GetMeteringPointMessagesQueryMapper
 {
-    internal static GetMeteringPointMessagesQuery Map(GetMessagesQueryDto dto)
+    internal static GetMeteringPointMessagesQuery Map(GetMeteringPointMessagesQueryDto dto)
     {
-        if (dto.CreationPeriod is null)
-            throw new ArgumentNullException(nameof(dto.CreationPeriod), "CreationPeriod cannot be null.");
-        if (dto.MeteringPointId is null)
-            throw new ArgumentNullException(nameof(dto.MeteringPointId), "MeteringPointId cannot be null.");
-
-        Actor? sender = null;
-        if (dto.SenderNumber is not null && dto.SenderRoleCode is not null)
-        {
-            sender = new Actor(ActorNumber.Create(dto.SenderNumber), ActorRole.FromCode(dto.SenderRoleCode));
-        }
-
-        Actor? receiver = null;
-        if (dto.ReceiverNumber is not null && dto.ReceiverRoleCode is not null)
-        {
-            receiver = new Actor(ActorNumber.Create(dto.ReceiverNumber), ActorRole.FromCode(dto.ReceiverRoleCode));
-        }
-
         return new GetMeteringPointMessagesQuery(
             Pagination: SetSortedCursorBasedPagination(dto.Pagination),
             MeteringPointId: dto.MeteringPointId,
             CreationPeriod: SetMessageCreationPeriod(dto.CreationPeriod),
-            Sender: sender,
-            Receiver: receiver,
+            Sender: dto.Sender,
+            Receiver: dto.Receiver,
             DocumentTypes: dto.DocumentTypes);
     }
 
@@ -66,7 +49,7 @@ internal static class GetMeteringPointMessagesQueryMapper
     private static SortingCursor? SetSortingCursor(SortingCursorDto? sortingCursor)
     {
         return sortingCursor is not null
-            ? new SortingCursor(sortingCursor.SortedFieldValue, sortingCursor.RecordId)
+            ? new SortingCursor(sortingCursor.SortedFieldValue, sortingCursor.Value)
             : null;
     }
 

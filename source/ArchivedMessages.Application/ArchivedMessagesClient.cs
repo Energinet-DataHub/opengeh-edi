@@ -71,9 +71,15 @@ public class ArchivedMessagesClient(
     public async Task<MessageSearchResultDto> SearchAsync(GetMessagesQueryDto queryInputDto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(queryInputDto);
-        var result = queryInputDto.MeteringPointId != null
-                ? await _meteringPointArchivedMessageRepository.SearchAsync(GetMeteringPointMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false)
-                : await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
+        var result = await _archivedMessageRepository.SearchAsync(GetMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
+
+        return MessagesSearchResultMapper.Map(result);
+    }
+
+    public async Task<MessageSearchResultDto> SearchAsync(GetMeteringPointMessagesQueryDto queryInputDto, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(queryInputDto);
+        var result = await _meteringPointArchivedMessageRepository.SearchAsync(GetMeteringPointMessagesQueryMapper.Map(queryInputDto), cancellationToken).ConfigureAwait(false);
 
         return MessagesSearchResultMapper.Map(result);
     }

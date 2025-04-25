@@ -28,7 +28,7 @@ internal static class MessagesSearchResultMapper
     private static ReadOnlyCollection<MessageInfoDto> SetMessageInfoCollection(IReadOnlyCollection<MessageInfo> collection)
     {
         return collection.Select(mi => new MessageInfoDto(
-            RecordId: mi.RecordId,
+            CursorValue: mi.RecordId,
             Id: mi.Id,
             MessageId: mi.MessageId,
             DocumentType: mi.DocumentType,

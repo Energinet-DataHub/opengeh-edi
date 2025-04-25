@@ -157,24 +157,25 @@ public static class B2CWebApiRequests
         return request;
     }
 
-    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageSearchRequest()
+    public static HttpRequestMessage CreateMeteringPointArchivedMessageSearchRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMeasureDataMessage/search")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/MeteringPointArchivedMessage/search")
         {
             Content = CreateJsonContent(
-                new ArchivedMeasureDataMessageSearchCriteria(
+                new MeteringPointArchivedMessageSearchCriteria(
+                    new SearchArchivedMessagesPagination(),
                     MeteringPointId: "123456789",
                     CreatedDuringPeriod: new MessageCreationPeriod(Start: DateTimeOffset.Parse("2024-08-27T00:00:00Z"), End: DateTimeOffset.Parse("2024-08-28T00:00:00Z")),
                     Sender: new Actor(ActorRole: ActorRole.DataHubAdministrator, ActorNumber: "1234567890123"),
                     Receiver: new Actor(ActorRole: ActorRole.MeteredDataResponsible, ActorNumber: "1234567890123"),
-                    DocumentTypes: [MeasureDataDocumentType.NotifyValidatedMeasureData])),
+                    MeasureDataDocumentTypes: [MeteringPointDocumentType.NotifyValidatedMeasureData])),
         };
         return request;
     }
 
-    public static HttpRequestMessage CreateRequestArchivedMeasureDataMessageGetRequest()
+    public static HttpRequestMessage CreateMeteringPointArchivedMessageGetDocumentRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/ArchivedMeasureDataMessage/{Guid.NewGuid()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/MeteringPointArchivedMessage/{Guid.NewGuid()}");
         return request;
     }
 
