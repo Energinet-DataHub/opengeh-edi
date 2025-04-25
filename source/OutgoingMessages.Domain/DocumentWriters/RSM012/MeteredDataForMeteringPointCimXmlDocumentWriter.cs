@@ -60,13 +60,10 @@ public class MeteredDataForMeteringPointCimXmlDocumentWriter(
             seriesElement.Add(
                 new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType.Code));
 
-            if (activityRecord.RegistrationDateTime is not null)
-            {
-                seriesElement.Add(
-                    new XElement(
-                        @namespace + "registration_DateAndOrTime.dateTime",
-                        activityRecord.RegistrationDateTime));
-            }
+            seriesElement.Add(
+                new XElement(
+                    @namespace + "registration_DateAndOrTime.dateTime",
+                    activityRecord.RegistrationDateTime));
 
             if (activityRecord.Product is not null)
             {

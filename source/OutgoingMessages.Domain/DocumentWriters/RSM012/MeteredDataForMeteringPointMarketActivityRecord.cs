@@ -24,7 +24,7 @@ public sealed record MeteredDataForMeteringPointMarketActivityRecord(
     TransactionId? OriginalTransactionIdReferenceId,
     string? Product,
     MeasurementUnit QuantityMeasureUnit,
-    Instant? RegistrationDateTime,
+    Instant RegistrationDateTime,
     Resolution Resolution,
     Instant StartedDateTime,
     Instant EndedDateTime,

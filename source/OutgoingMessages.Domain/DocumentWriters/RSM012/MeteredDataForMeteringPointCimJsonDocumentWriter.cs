@@ -75,7 +75,7 @@ public class MeteredDataForMeteringPointCimJsonDocumentWriter(IMessageRecordPars
                     activityRecord.OriginalTransactionIdReferenceId?.Value,
                     activityRecord.Product,
                     activityRecord.QuantityMeasureUnit.Code,
-                    activityRecord.RegistrationDateTime?.ToString(),
+                    activityRecord.RegistrationDateTime.ToString(),
                     new Period(
                         activityRecord.Resolution.Code,
                         new TimeInterval(
