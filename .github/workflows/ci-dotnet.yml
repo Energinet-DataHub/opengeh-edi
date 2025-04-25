@@ -24,7 +24,7 @@ jobs:
     with:
       solution_file_path: source/Edi.Repository.sln
 
-  # Tests that do not require the integration test environment
+  # Tests that do not require an integration test environment
   tests:
     strategy:
       fail-fast: false
