@@ -5,107 +5,6 @@
     "version": "1.0"
   },
   "paths": {
-    "/ArchivedMeasureDataMessage/search": {
-      "post": {
-        "tags": [
-          "ArchivedMeasureDataMessage"
-        ],
-        "operationId": "search",
-        "parameters": [
-          {
-            "name": "api-version",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
-                  }
-                ]
-              }
-            },
-            "text/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
-                  }
-                ]
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ArchivedMeasureDataMessage/{id}": {
-      "get": {
-        "tags": [
-          "ArchivedMeasureDataMessage"
-        ],
-        "operationId": "ArchivedMeasureDataMessage",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "api-version",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/ArchivedMessageGetDocument": {
       "post": {
         "tags": [
@@ -139,6 +38,107 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/MeteringPointArchivedMessage/search": {
+      "post": {
+        "tags": [
+          "MeteringPointArchivedMessage"
+        ],
+        "operationId": "search",
+        "parameters": [
+          {
+            "name": "api-version",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchResponseV1"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchResponseV1"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/MeteringPointArchivedMessage/{id}": {
+      "get": {
+        "tags": [
+          "MeteringPointArchivedMessage"
+        ],
+        "operationId": "MeteringPointArchivedMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "api-version",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -547,10 +547,18 @@
           10
         ]
       },
-      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchCriteria": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchCriteria": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "pagination": {
+            "description": "Pagination when searching for archived messages that supports sorting on a specific field.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.SearchArchivedMessagesPagination"
+              }
+            ]
+          },
           "meteringPointId": {
             "type": "string"
           },
@@ -577,23 +585,23 @@
               }
             ]
           },
-          "documentTypes": {
+          "measureDataDocumentTypes": {
             "type": "array",
             "nullable": true,
             "items": {
-              "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeasureDataDocumentType"
+              "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointDocumentType"
             }
           }
         }
       },
-      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageSearchResponseV1": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageSearchResponseV1": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "messages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageV1"
+              "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageV1"
             }
           },
           "totalCount": {
@@ -602,10 +610,14 @@
           }
         }
       },
-      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.ArchivedMeasureDataMessageV1": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointArchivedMessageV1": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "cursorValue": {
+            "type": "integer",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -617,7 +629,7 @@
             ],
             "allOf": [
               {
-                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeasureDataDocumentType"
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointDocumentType"
               }
             ]
           },
@@ -641,7 +653,7 @@
           }
         }
       },
-      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeasureDataDocumentType": {
+      "Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages.MeteringPointDocumentType": {
         "type": "integer",
         "format": "int32",
         "x-enumNames": [
@@ -671,6 +683,38 @@
           3,
           4,
           5
+        ]
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy": {
+        "type": "integer",
+        "description": "Represents the direction to sort by when searching for archived messages.",
+        "format": "int32",
+        "x-enumNames": [
+          "Ascending",
+          "Descending"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy": {
+        "type": "integer",
+        "description": "Represents the fields that can be sorted on when searching for archived messages.",
+        "format": "int32",
+        "x-enumNames": [
+          "MessageId",
+          "DocumentType",
+          "SenderNumber",
+          "ReceiverNumber",
+          "CreatedAt"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
         ]
       },
       "Energinet.DataHub.EDI.B2CWebApi.Models.MessageCreationPeriod": {
@@ -799,6 +843,62 @@
                 "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.V1.PriceType"
               }
             ]
+          }
+        }
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.SearchArchivedMessagesCursor": {
+        "type": "object",
+        "description": "Pagination cursor for the search of archived messages.\r\nPointing to the field being sorted by and the record id.\r\nWhen navigating forward, the cursor points to the last record of the current page.\r\nand when navigating backward, the cursor points to the first record of the current page.",
+        "additionalProperties": false,
+        "properties": {
+          "fieldToSortByValue": {
+            "type": "string",
+            "description": "is null if dataset is not being sorted",
+            "nullable": true
+          },
+          "recordId": {
+            "type": "integer",
+            "description": "",
+            "format": "int64"
+          }
+        }
+      },
+      "Energinet.DataHub.EDI.B2CWebApi.Models.SearchArchivedMessagesPagination": {
+        "type": "object",
+        "description": "Pagination when searching for archived messages that supports sorting on a specific field.",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor for the search of archived messages.\r\nPointing to the field being sorted by and the record id.\r\nWhen navigating forward, the cursor points to the last record of the current page.\r\nand when navigating backward, the cursor points to the first record of the current page.",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.SearchArchivedMessagesCursor"
+              }
+            ]
+          },
+          "sortBy": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy"
+              }
+            ]
+          },
+          "directionToSortBy": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy"
+              }
+            ]
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "navigationForward": {
+            "type": "boolean"
           }
         }
       },

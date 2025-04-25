@@ -18,28 +18,41 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
 
 public static class ActorRoleMapper
 {
-    private static readonly Dictionary<string, Models.ActorRole> ActorRoleMappings = new()
+    private static readonly Dictionary<ActorRole, Models.ActorRole> ActorRoleMappings = new()
     {
-        { ActorRole.MeteringPointAdministrator.Code, Models.ActorRole.MeteringPointAdministrator },
-        { ActorRole.EnergySupplier.Code, Models.ActorRole.EnergySupplier },
-        { ActorRole.GridAccessProvider.Code, Models.ActorRole.GridAccessProvider },
-        { ActorRole.MeteredDataAdministrator.Code, Models.ActorRole.MeteredDataAdministrator },
-        { ActorRole.MeteredDataResponsible.Code, Models.ActorRole.MeteredDataResponsible },
-        { ActorRole.BalanceResponsibleParty.Code, Models.ActorRole.BalanceResponsibleParty },
-        { ActorRole.ImbalanceSettlementResponsible.Code, Models.ActorRole.ImbalanceSettlementResponsible },
-        { ActorRole.SystemOperator.Code, Models.ActorRole.SystemOperator },
-        { ActorRole.DanishEnergyAgency.Code, Models.ActorRole.DanishEnergyAgency },
-        { ActorRole.Delegated.Code, Models.ActorRole.Delegated },
-        { ActorRole.DataHubAdministrator.Code, Models.ActorRole.DataHubAdministrator },
+        { ActorRole.MeteringPointAdministrator, Models.ActorRole.MeteringPointAdministrator },
+        { ActorRole.EnergySupplier, Models.ActorRole.EnergySupplier },
+        { ActorRole.GridAccessProvider, Models.ActorRole.GridAccessProvider },
+        { ActorRole.MeteredDataAdministrator, Models.ActorRole.MeteredDataAdministrator },
+        { ActorRole.MeteredDataResponsible, Models.ActorRole.MeteredDataResponsible },
+        { ActorRole.BalanceResponsibleParty, Models.ActorRole.BalanceResponsibleParty },
+        { ActorRole.ImbalanceSettlementResponsible, Models.ActorRole.ImbalanceSettlementResponsible },
+        { ActorRole.SystemOperator, Models.ActorRole.SystemOperator },
+        { ActorRole.DanishEnergyAgency, Models.ActorRole.DanishEnergyAgency },
+        { ActorRole.Delegated, Models.ActorRole.Delegated },
+        { ActorRole.DataHubAdministrator, Models.ActorRole.DataHubAdministrator },
     };
 
-    public static Models.ActorRole? ToActorRole(string? actorRoleCode)
+    public static Models.ActorRole? ToActorRoleOrDefault(string? actorRoleCode)
     {
-        return actorRoleCode == null ? null : ActorRoleMappings[actorRoleCode];
+        return actorRoleCode == null ? null : ActorRoleMappings[ActorRole.FromCode(actorRoleCode)];
+    }
+
+    public static Models.ActorRole ToActorRole(string actorRoleCode)
+    {
+        return ActorRoleMappings[ActorRole.FromCode(actorRoleCode)];
     }
 
     public static string? ToActorRoleCode(Models.ActorRole? actorRole)
     {
-        return ActorRoleMappings.FirstOrDefault(x => x.Value == actorRole).Key;
+        var domainActorRole = actorRole == null
+            ? null
+            : ActorRoleMappings.FirstOrDefault(x => x.Value == actorRole).Key;
+        return domainActorRole?.Code;
+    }
+
+    public static ActorRole ToActorRoleDomain(Models.ActorRole actorRole)
+    {
+        return ActorRoleMappings.First(x => x.Value == actorRole).Key;
     }
 }

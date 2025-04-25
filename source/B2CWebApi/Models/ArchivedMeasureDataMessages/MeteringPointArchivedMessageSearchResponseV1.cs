@@ -12,18 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
-
-public record MessageInfoDto(
-    long CursorValue,
-    Guid Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string? SenderRoleCode,
-    string ReceiverNumber,
-    string? ReceiverRoleCode,
-    Instant CreatedAt,
-    string? BusinessReason);
+public record MeteringPointArchivedMessageSearchResponseV1(
+    IEnumerable<MeteringPointArchivedMessageV1> Messages,
+    int TotalCount);

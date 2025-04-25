@@ -30,5 +30,4 @@ public sealed record GetMessagesQueryDto(
     string? ReceiverRoleCode = null,
     IReadOnlyCollection<string>? DocumentTypes = null,
     IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessages = false,
-    MeteringPointId? MeteringPointId = null);
+    bool IncludeRelatedMessages = false);
