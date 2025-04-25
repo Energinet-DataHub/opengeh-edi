@@ -55,7 +55,7 @@ public class GivenAggregatedMeasureDataV2RequestTests : AggregatedMeasureDataBeh
 
     public static object[][] DocumentFormatsWithActorRoleCombinations(bool nullGridArea)
     {
-        // The actor roles who can perform AggregatedMeasureDataRequest's
+        // The actor roles who can perform AggregatedMeasureDataRequest's.
         var actorRoles = new List<ActorRole>
         {
             ActorRole.EnergySupplier,
