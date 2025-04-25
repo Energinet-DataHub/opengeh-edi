@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public record ArchivedMeasureDataMessageSearchResponseV1(
-    IEnumerable<ArchivedMeasureDataMessageV1> Messages,
-    int TotalCount);
+namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
+
+public static class ActorMapper
+{
+    public static Actor ToDomainActor(Models.Actor actor)
+    {
+        return new Actor(
+            ActorNumber.Create(actor.ActorNumber),
+            ActorRoleMapper.ToActorRoleDomain(actor.ActorRole));
+    }
+}

@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
+using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests.ArchivedMessages;
@@ -28,7 +30,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     private readonly ArchivedMessageDsl _archivedMessages;
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
     private readonly CalculationCompletedDsl _calculationCompleted;
-    private readonly ForwardMeteredDataDsl _forwardMeteredData;
+    private readonly ForwardMeteredDataDsl _forwardMeteredDataAsGridAccessProvider;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
@@ -50,12 +52,15 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
             output,
             fixture.BalanceFixingCalculationId,
             fixture.WholesaleFixingCalculationId);
-        _forwardMeteredData = new ForwardMeteredDataDsl(
+        _forwardMeteredDataAsGridAccessProvider = new ForwardMeteredDataDsl(
             ebix: new EbixDriver(
                 fixture.EbixUri,
                 fixture.EbixGridAccessProviderCredentials,
                 output),
-            ediDriver: ediDriver,
+            ediDriver: new EdiDriver(
+                fixture.DurableClient,
+                fixture.B2BClients.GridAccessProvider,
+                output),
             ediDatabaseDriver: ediDatabaseDriver,
             processManagerDriver: processManagerDriver);
         _notifyAggregatedMeasureData = new NotifyAggregatedMeasureDataResultDsl(ediDriver);
@@ -86,8 +91,17 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task B2C_actor_can_get_the_metering_point_archived_message()
+    public async Task B2C_actor_can_get_the_rejected_metering_point_archived_message()
     {
-        await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch();
+        var meteringPointId = MeteringPointId.From("9999999999");
+        await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredDataRejected(
+            new Actor(
+                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimGridAccessProviderNumber),
+                actorRole: ActorRole.GridAccessProvider),
+            meteringPointId: meteringPointId);
+
+        await _forwardMeteredDataAsGridAccessProvider.ConfirmRejectedResponseIsAvailable();
+
+        await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch(meteringPointId);
     }
 }

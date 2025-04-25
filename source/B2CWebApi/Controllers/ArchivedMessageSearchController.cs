@@ -91,7 +91,7 @@ public class ArchivedMessageSearchController : ControllerBase
 
         var messages = result.Messages.Select(
             x => new ArchivedMessageResultV2(
-                x.RecordId,
+                x.CursorValue,
                 x.Id.ToString(),
                 x.MessageId,
                 x.DocumentType,
@@ -156,14 +156,14 @@ public class ArchivedMessageSearchController : ControllerBase
         var messages = result.Messages
             .Select(
                 x => new ArchivedMessageResultV3(
-                    x.RecordId,
+                    x.CursorValue,
                     x.Id.ToString(),
                     x.MessageId,
                     DocumentTypeMapper.ToDocumentType(x.DocumentType),
                     x.SenderNumber,
-                    ActorRoleMapper.ToActorRole(x.SenderRoleCode),
+                    ActorRoleMapper.ToActorRoleOrDefault(x.SenderRoleCode),
                     x.ReceiverNumber,
-                    ActorRoleMapper.ToActorRole(x.ReceiverRoleCode),
+                    ActorRoleMapper.ToActorRoleOrDefault(x.ReceiverRoleCode),
                     x.CreatedAt.ToDateTimeOffset(),
                     x.BusinessReason));
         return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));

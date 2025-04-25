@@ -91,14 +91,15 @@ internal sealed class ForwardMeteredDataDsl(
         return messageId!;
     }
 
-    public async Task PublishEnqueueBrs021ForwardMeteredDataRejected(Actor actor)
+    public async Task PublishEnqueueBrs021ForwardMeteredDataRejected(Actor actor, MeteringPointId? meteringPointId = null)
     {
         await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
         await _processManagerDriver.PublishBrs021ForwardMeteredDataRejectedAsync(
             actor: actor,
             originalActorMessageId: Guid.NewGuid().ToString(),
             eventId: Guid.NewGuid(),
-            validationError: SubsystemTestValidationError);
+            validationError: SubsystemTestValidationError,
+            meteringPointId: meteringPointId);
     }
 
     public async Task<string> ConfirmRejectedResponseIsAvailable()

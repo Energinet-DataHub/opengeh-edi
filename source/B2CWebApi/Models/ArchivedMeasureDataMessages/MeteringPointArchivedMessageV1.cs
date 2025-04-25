@@ -14,10 +14,10 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 
-[Serializable]
-public record ArchivedMeasureDataMessageSearchCriteria(
-    string MeteringPointId,
-    MessageCreationPeriod CreatedDuringPeriod,
-    Actor? Sender,
-    Actor? Receiver,
-    IReadOnlyCollection<MeasureDataDocumentType>? DocumentTypes);
+public record MeteringPointArchivedMessageV1(
+    long CursorValue,
+    Guid Id,
+    MeteringPointDocumentType DocumentType,
+    DateTimeOffset CreatedAt,
+    Actor Sender,
+    Actor Receiver);

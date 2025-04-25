@@ -26,4 +26,4 @@ public sealed record GetMeteringPointMessagesQuery(
     MessageCreationPeriod CreationPeriod,
     Actor? Sender = null,
     Actor? Receiver = null,
-    IReadOnlyCollection<string>? DocumentTypes = null);
+    IReadOnlyCollection<DocumentType>? DocumentTypes = null);

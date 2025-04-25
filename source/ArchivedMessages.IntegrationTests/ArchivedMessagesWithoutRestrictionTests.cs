@@ -759,7 +759,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
-        var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId);
+        var cursor = new SortingCursorDto(Value: lastMessageInOnThePreviousPage.CursorValue);
 
         var pagination = new SortedCursorBasedPaginationDto(
             Cursor: cursor,
@@ -817,7 +817,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: false);
         // The cursor points at the first item of the previous page, when navigating backward
         var firstMessageInOnThePreviousPage = firstPageMessages.Messages.First();
-        var cursor = new SortingCursorDto(RecordId: firstMessageInOnThePreviousPage.RecordId);
+        var cursor = new SortingCursorDto(Value: firstMessageInOnThePreviousPage.CursorValue);
 
         var pagination = new SortedCursorBasedPaginationDto(
             Cursor: cursor,
@@ -1080,7 +1080,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true, orderByField: FieldToSortByDto.SenderNumber);
         // The cursor points at the last item of the previous page, when navigating backward
         var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
-        var cursor = new SortingCursorDto(RecordId: lastMessageInOnThePreviousPage.RecordId, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
+        var cursor = new SortingCursorDto(Value: lastMessageInOnThePreviousPage.CursorValue, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
 
         var pagination = new SortedCursorBasedPaginationDto(
             Cursor: cursor,
