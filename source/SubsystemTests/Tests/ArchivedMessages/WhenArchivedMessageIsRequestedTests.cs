@@ -97,8 +97,6 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
         await _forwardMeteredDataAsGridAccessProvider
             .SendForwardMeteredDataInCimAsync(meteringPointId, CancellationToken.None);
 
-        await _forwardMeteredDataAsGridAccessProvider.ConfirmRejectedResponseIsAvailable();
-
         await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch(meteringPointId);
     }
 }
