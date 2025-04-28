@@ -66,7 +66,9 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
     public async Task Actor_can_send_forward_metered_data_in_cim_to_datahub()
     {
         var messageId = await _forwardMeteredDataAsGridAccessProvider
-            .SendForwardMeteredDataInCimAsync(null, CancellationToken.None);
+            .SendForwardMeteredDataInCimAsync(
+                meteringPointId: null,
+                cancellationToken: CancellationToken.None);
 
         await _forwardMeteredDataAsGridAccessProvider.ConfirmRequestIsReceivedAsync(
             messageId,
