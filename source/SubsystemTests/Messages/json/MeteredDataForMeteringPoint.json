@@ -48,7 +48,7 @@
               "value": "2024-06-28T22:00Z"
             },
             "end": {
-              "value": "2024-06-29T22:00Z"
+              "value": "2024-06-29T04:00Z"
             }
           },
           "Point": [
@@ -84,7 +84,7 @@
                 "value": 5
               },
               "quality": {
-                "value": "A05"
+                "value": "A04"
               },
               "quantity": 191
             },
