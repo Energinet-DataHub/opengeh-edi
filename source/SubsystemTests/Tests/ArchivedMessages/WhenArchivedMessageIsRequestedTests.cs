@@ -94,11 +94,8 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     public async Task B2C_actor_can_get_the_rejected_metering_point_archived_message()
     {
         var meteringPointId = MeteringPointId.From("9999999999");
-        await _forwardMeteredDataAsGridAccessProvider.PublishEnqueueBrs021ForwardMeteredDataRejected(
-            new Actor(
-                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimGridAccessProviderNumber),
-                actorRole: ActorRole.GridAccessProvider),
-            meteringPointId: meteringPointId);
+        await _forwardMeteredDataAsGridAccessProvider
+            .SendForwardMeteredDataInCimAsync(meteringPointId, CancellationToken.None);
 
         await _forwardMeteredDataAsGridAccessProvider.ConfirmRejectedResponseIsAvailable();
 

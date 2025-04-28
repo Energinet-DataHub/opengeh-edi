@@ -30,12 +30,11 @@
         "mRID": "{TransactionId}",
         "marketEvaluationPoint.mRID": {
           "codingScheme": "A10",
-          "value": "571313000000002000"
+          "value": "{MeteringPointId}"
         },
         "marketEvaluationPoint.type": {
           "value": "E18"
         },
-        "originalTransactionIDReference_Series.mRID": "C1875000",
         "product": "8716867000030",
         "quantity_Measure_Unit.name": {
           "value": "KWH"
