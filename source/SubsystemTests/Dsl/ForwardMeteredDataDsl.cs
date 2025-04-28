@@ -59,9 +59,12 @@ internal sealed class ForwardMeteredDataDsl(
         response.Should().BeEquivalentTo(errorMessage);
     }
 
-    public async Task<string> SendForwardMeteredDataInCimAsync(CancellationToken cancellationToken)
+    public async Task<string> SendForwardMeteredDataInCimAsync(
+        MeteringPointId? meteringPointId,
+        CancellationToken cancellationToken)
     {
-        return await _ediDriver.SendForwardMeteredDataAsync(cancellationToken);
+        return await _ediDriver.SendForwardMeteredDataAsync(
+            meteringPointId ?? MeteringPointId.From("571313000000002000"), cancellationToken);
     }
 
     public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor)

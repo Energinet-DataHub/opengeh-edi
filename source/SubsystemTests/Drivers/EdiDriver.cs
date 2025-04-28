@@ -142,12 +142,14 @@ internal sealed class EdiDriver
         return requestContent.MessageId;
     }
 
-    internal async Task<string> SendForwardMeteredDataAsync(CancellationToken cancellationToken)
+    internal async Task<string> SendForwardMeteredDataAsync(
+        MeteringPointId meteringPointId,
+        CancellationToken cancellationToken)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/notifyvalidatedmeasuredata");
         var contentType = "application/json";
-        var requestContent = await GetMeteredDataForMeteringPointContentAsync(cancellationToken)
+        var requestContent = await GetMeteredDataForMeteringPointContentAsync(meteringPointId, cancellationToken)
             .ConfigureAwait(false);
         request.Content = new StringContent(
             requestContent.Content,
@@ -216,7 +218,9 @@ internal sealed class EdiDriver
         return (messageId, jsonContent);
     }
 
-    private static async Task<(Guid MessageId, string Content)> GetMeteredDataForMeteringPointContentAsync(CancellationToken cancellationToken)
+    private static async Task<(Guid MessageId, string Content)> GetMeteredDataForMeteringPointContentAsync(
+        MeteringPointId meteringPointId,
+        CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid();
         var jsonContent = await File.ReadAllTextAsync("Messages/json/MeteredDataForMeteringPoint.json", cancellationToken)
@@ -224,6 +228,7 @@ internal sealed class EdiDriver
 
         jsonContent = jsonContent.Replace("{MessageId}", messageId.ToString(), StringComparison.InvariantCulture);
         jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{MeteringPointId}", meteringPointId.Value, StringComparison.InvariantCulture);
 
         return (messageId, jsonContent);
     }
