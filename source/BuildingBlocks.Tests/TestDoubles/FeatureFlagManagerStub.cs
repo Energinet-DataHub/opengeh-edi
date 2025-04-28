@@ -30,7 +30,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.PM25CIM, true },
         { FeatureFlagName.PM25Ebix, true },
         { FeatureFlagName.PM25Messages, true },
-        { FeatureFlagName.ArchiveBrs021Messages, false },
     };
 
     public void SetFeatureFlag(string featureFlagName, bool value)
@@ -45,6 +44,4 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> ReceiveForwardMeteredDataInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25CIM]);
 
     public Task<bool> ReceiveForwardMeteredDataInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Ebix]);
-
-    public Task<bool> ArchiveBrs021MessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.ArchiveBrs021Messages]);
 }

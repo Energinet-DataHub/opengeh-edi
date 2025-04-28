@@ -43,9 +43,4 @@ public interface IFeatureFlagManager
     /// Whether to allow receiving metered data for metering points Ebix.
     /// </summary>
     Task<bool> ReceiveForwardMeteredDataInEbixAsync();
-
-    /// <summary>
-    /// Whether to archive BRS-021 messages.
-    /// </summary>
-    Task<bool> ArchiveBrs021MessagesAsync();
 }

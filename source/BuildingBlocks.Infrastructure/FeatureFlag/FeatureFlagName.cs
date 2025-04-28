@@ -39,9 +39,4 @@ public static class FeatureFlagName
     /// Whether to allow actors to peek metered data for metering points.
     /// </summary>
     public const string PM25Messages = "PM25-MESSAGES";
-
-    /// <summary>
-    /// Whether to archive BRS-021 messages.
-    /// </summary>
-    public const string ArchiveBrs021Messages = "ArchiveBrs021Messages";
 }
