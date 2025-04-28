@@ -26,6 +26,8 @@ public class MeasurementUnit : DataHubType<MeasurementUnit>
     // Subscription and Fees are measured in pieces
     public static readonly MeasurementUnit Pieces = new(PMTypes.MeasurementUnit.Pieces.Name, "H87");
 
+    public static readonly MeasurementUnit KiloVoltAmpereReactiveHour = new(PMTypes.MeasurementUnit.KiloVoltAmpereReactiveHour.Name, "K3");
+
     [JsonConstructor]
     private MeasurementUnit(string name, string code)
         : base(name, code)

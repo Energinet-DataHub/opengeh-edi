@@ -35,7 +35,9 @@ public class MeasurementUnitTests
     {
         var measurementUnits = new List<(MeasurementUnit ExpectedValue, string Name, string Code)>()
         {
-            (MeasurementUnit.KilowattHour, "KilowattHour", "KWH"), (MeasurementUnit.Pieces, "Pieces", "H87"),
+            (MeasurementUnit.KilowattHour, "KilowattHour", "KWH"),
+            (MeasurementUnit.Pieces, "Pieces", "H87"),
+            (MeasurementUnit.KiloVoltAmpereReactiveHour, "KiloVoltAmpereReactiveHour", "K3"),
         };
 
         using var scope = new AssertionScope();
