@@ -91,7 +91,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task B2C_actor_can_get_the_rejected_metering_point_archived_message()
+    public async Task B2C_actor_can_get_the_send_forward_metering_point_archived_message()
     {
         var meteringPointId = MeteringPointId.From("9999999999");
         await _forwardMeteredDataAsGridAccessProvider
