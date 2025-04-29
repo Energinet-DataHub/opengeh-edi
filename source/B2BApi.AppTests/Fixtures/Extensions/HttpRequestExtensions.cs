@@ -14,10 +14,12 @@
 
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 
@@ -86,6 +88,37 @@ public static class HttpRequestExtensions
             actor,
             HttpMethod.Delete,
             $"api/dequeue/{messageId}");
+    }
+
+    public static async Task<HttpRequestMessage> CreateFooBarHttpRequestAsync(
+        this B2BApiAppFixture fixture,
+        ForwardMeteredDataAcceptedV1 forwardMeteredDataAcceptedV1,
+        string calculationTypeName)
+    {
+        HttpRequestMessage? request = null;
+        try
+        {
+            request = await CreateHttpRequestAsync(
+                fixture,
+                new Actor(
+                    ActorNumber.Create(
+                        forwardMeteredDataAcceptedV1.ReceiversWithMeteredData.Single().Actors.Single().ActorNumber),
+                    ActorRole.FromName(
+                        forwardMeteredDataAcceptedV1.ReceiversWithMeteredData.Single().Actors.Single().ActorRole.Name)),
+                HttpMethod.Post,
+                $"api/enqueue/brs021/calculations/{calculationTypeName}",
+                new StringContent(
+                    JsonSerializer.Serialize(forwardMeteredDataAcceptedV1),
+                    Encoding.UTF8,
+                    "application/json"));
+
+            return request;
+        }
+        catch
+        {
+            request?.Dispose();
+            throw;
+        }
     }
 
     private static async Task<HttpRequestMessage> CreateIncomingMessageHttpRequestAsync(
