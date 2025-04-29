@@ -121,14 +121,6 @@ public class BundleMessages(
         LogBundlingMetrics(bundleMetadata, bundlesToCreate, createBundlesStopwatch);
     }
 
-    private async Task<bool> AllowedToPeekMeteringPointMessagesAsync(Bundle bundle)
-    {
-        var isFeatureEnabled = await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false);
-        var isDocumentTypeMeteringPointRelated = bundle.DocumentTypeInBundle == DocumentType.Acknowledgement
-                                                 || bundle.DocumentTypeInBundle == DocumentType.NotifyValidatedMeasureData;
-        return isFeatureEnabled && isDocumentTypeMeteringPointRelated;
-    }
-
     private async Task LogMessagesReadyToBeBundledMetricAsync(CancellationToken cancellationToken)
     {
         var messagesReadyToBeBundledCount = await _outgoingMessageRepository
@@ -245,11 +237,14 @@ public class BundleMessages(
 
         bundle.Close(_clock.GetCurrentInstant());
 
-        if (!await AllowedToPeekMeteringPointMessagesAsync(bundle).ConfigureAwait(false))
+        var isForwardMeteredDataMessage = bundle.DocumentTypeInBundle == DocumentType.Acknowledgement
+                 || bundle.DocumentTypeInBundle == DocumentType.NotifyValidatedMeasureData;
+        if (isForwardMeteredDataMessage
+            && !await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
         {
-            // If the bundle is not allowed to be peeked, we need to peek and dequeue the messages in the bundle.
+            // We peek and dequeue the messages in the bundle. To prevent the Actor to retrieve the bundle.
             bundle.Peek();
-            bundle.TryDequeue();
+            if (!bundle.TryDequeue()) throw new InvalidOperationException("Bundle was not dequeued.");
         }
 
         return bundle;

@@ -315,6 +315,7 @@ public sealed class GivenForwardMeteredDataV2Tests(
             documentFormat);
 
         // Assert
+        // TODO: Assert that the bundle is created and is peeked and dequeued.
         peekResults.Should().BeEmpty();
     }
 
