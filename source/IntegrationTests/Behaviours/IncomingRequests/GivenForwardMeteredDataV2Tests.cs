@@ -249,12 +249,13 @@ public sealed class GivenForwardMeteredDataV2Tests(
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
 
         var transactionId = Guid.NewGuid().ToString("N");
+        var incomingMessageId = MessageId.New();
 
         // Act
         await GivenReceivedMeteredDataForMeteringPoint(
             documentFormat: documentFormat,
             senderActorNumber: senderActor.ActorNumber,
-            MessageId.New(),
+            incomingMessageId,
             [
                 (TransactionId: transactionId,
                     PeriodStart: startDate,
@@ -315,8 +316,8 @@ public sealed class GivenForwardMeteredDataV2Tests(
             documentFormat);
 
         // Assert
-        // TODO: Assert that the bundle is created and is peeked and dequeued.
         peekResults.Should().BeEmpty();
+        await AssertBundleIsDequeued(DocumentType.NotifyValidatedMeasureData);
     }
 
     [Theory]

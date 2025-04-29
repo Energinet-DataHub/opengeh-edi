@@ -37,6 +37,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.Marke
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -329,6 +330,18 @@ public class BehavioursTestBase : IDisposable
         using var scope = _serviceProvider.CreateScope();
         var bundleClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
         await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+    }
+
+    protected async Task AssertBundleIsDequeued(DocumentType expectedDocumentType)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
+        var dequeueBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromSeconds(1)),
+            1,
+            CancellationToken.None);
+        var dequeuedBundle = dequeueBundles.Should().ContainSingle().Subject;
+        dequeuedBundle.DocumentTypeInBundle.Should().Be(expectedDocumentType);
     }
 
     protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat, MessageCategory messageCategory)
