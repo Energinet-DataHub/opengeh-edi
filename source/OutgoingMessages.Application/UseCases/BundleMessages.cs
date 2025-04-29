@@ -244,7 +244,7 @@ public class BundleMessages(
         {
             // We peek and dequeue the messages in the bundle. To prevent the Actor to retrieve the bundle.
             bundle.Peek();
-            if (!bundle.TryDequeue()) throw new InvalidOperationException("Bundle was not dequeued.");
+            if (!bundle.TryDequeue()) throw new InvalidOperationException("Unable to dequeue bundle for NotifyValidatedMeasureData/Acknowledgement which is not enabled to be peeked.");
         }
 
         return bundle;
