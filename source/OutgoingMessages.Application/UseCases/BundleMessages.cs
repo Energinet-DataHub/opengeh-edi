@@ -14,6 +14,7 @@
 
 using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
@@ -32,7 +33,8 @@ public class BundleMessages(
     IClock clock,
     IServiceScopeFactory serviceScopeFactory,
     IOptions<BundlingOptions> bundlingOptions,
-    IOutgoingMessageRepository outgoingMessageRepository)
+    IOutgoingMessageRepository outgoingMessageRepository,
+    IFeatureFlagManager featureFlagManager)
 {
     private const string BundleSizeMetricName = "Bundle Size";
     private const string BundleTimespanSecondsMetricName = "Bundle Timespan (seconds)";
@@ -46,6 +48,7 @@ public class BundleMessages(
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly BundlingOptions _bundlingOptions = bundlingOptions.Value;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository = outgoingMessageRepository;
+    private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
 
     /// <summary>
     /// Closes bundles that are ready to be closed in a single transaction, and returns the number of closed bundles.
@@ -116,6 +119,14 @@ public class BundleMessages(
         createBundlesStopwatch.Stop();
 
         LogBundlingMetrics(bundleMetadata, bundlesToCreate, createBundlesStopwatch);
+    }
+
+    private async Task<bool> AllowedToPeekMeteringPointMessagesAsync(Bundle bundle)
+    {
+        var isFeatureEnabled = await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false);
+        var isDocumentTypeMeteringPointRelated = bundle.DocumentTypeInBundle == DocumentType.Acknowledgement
+                                                 || bundle.DocumentTypeInBundle == DocumentType.NotifyValidatedMeasureData;
+        return isFeatureEnabled && isDocumentTypeMeteringPointRelated;
     }
 
     private async Task LogMessagesReadyToBeBundledMetricAsync(CancellationToken cancellationToken)
@@ -197,12 +208,13 @@ public class BundleMessages(
                     break;
             }
 
-            var bundle = CreateAndCloseBundleForMessages(
+            var bundle = await CreateAndCloseBundleForMessagesAsync(
                 actorMessageQueueId: actorMessageQueueId,
                 documentType: bundleMetadata.DocumentType,
                 businessReason: businessReason,
                 relatedToMessageId: bundleMetadata.RelatedToMessageId,
-                outgoingMessagesForBundle: outgoingMessagesForBundle);
+                outgoingMessagesForBundle: outgoingMessagesForBundle)
+                .ConfigureAwait(false);
 
             var bundleTimespan =
                 outgoingMessagesForBundle.Last().CreatedAt - outgoingMessagesForBundle.First().CreatedAt;
@@ -213,7 +225,7 @@ public class BundleMessages(
         return bundlesToCreate;
     }
 
-    private Bundle CreateAndCloseBundleForMessages(
+    private async Task<Bundle> CreateAndCloseBundleForMessagesAsync(
         ActorMessageQueueId actorMessageQueueId,
         DocumentType documentType,
         BusinessReason businessReason,
@@ -232,6 +244,14 @@ public class BundleMessages(
         }
 
         bundle.Close(_clock.GetCurrentInstant());
+
+        if (!await AllowedToPeekMeteringPointMessagesAsync(bundle).ConfigureAwait(false))
+        {
+            // If the bundle is not allowed to be peeked, we need to peek and dequeue the messages in the bundle.
+            bundle.Peek();
+            bundle.TryDequeue();
+        }
+
         return bundle;
     }
 
