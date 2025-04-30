@@ -15,10 +15,9 @@
 using System.Net;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -31,11 +30,11 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 public class EnqueueTrigger_Brs_021_Calculations(
     ILogger<EnqueueTrigger_Brs_021_Calculations> logger,
     IOutgoingMessagesClient outgoingMessagesClient,
-    UnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork)
 {
     private readonly ILogger<EnqueueTrigger_Brs_021_Calculations> _logger = logger;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
-    private readonly UnitOfWork _unitOfWork = unitOfWork;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     [Function(nameof(EnqueueTrigger_Brs_021_Calculations))]
     public async Task<HttpResponseData> RunAsync(
@@ -47,7 +46,10 @@ public class EnqueueTrigger_Brs_021_Calculations(
     {
         _logger.LogInformation("BRS-021 enqueue request for {calculationTypeName} received", calculationTypeName);
 
-        var measurements = JsonSerializer.Deserialize<EnqueueMeasureDataSyncV1>(request.Body)!;
+        var requestBodyStream = request.Body;
+        using var reader = new StreamReader(requestBodyStream);
+        var requestBody = await reader.ReadToEndAsync(hostCancellationToken).ConfigureAwait(false);
+        var measurements = JsonSerializer.Deserialize<EnqueueMeasureDataSyncV1>(requestBody)!;
 
         var energyObservations = measurements.MeasureData
             .Select(x =>
@@ -60,7 +62,7 @@ public class EnqueueTrigger_Brs_021_Calculations(
         // TODO: New data structure without `RelatedToMessageId` and `OriginalTransactionIdReferenceId`?
         var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
             eventId:
-            EventId.From(measurements.GetHashCode().ToString()), // TODO: Use the correct EventId and externalId
+            EventId.From(measurements.MeteringPointId), // TODO: Use the correct EventId and externalId
             externalId: new ExternalId(Guid.NewGuid()),
             receiver: new Actor(
                 ActorNumber.Create(measurements.Receiver.ActorNumber),

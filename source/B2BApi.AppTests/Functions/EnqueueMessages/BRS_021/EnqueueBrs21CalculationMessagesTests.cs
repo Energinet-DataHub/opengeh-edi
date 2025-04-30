@@ -99,14 +99,8 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         const int receiver2Quantity = 22;
 
         var startDateTime = Instant.FromUtc(2025, 01, 31, 23, 00, 00);
-
-        var receiver1Start = startDateTime;
-        var receiver1End = startDateTime.Plus(Duration.FromMinutes(15));
-
-        var receiver2Start = receiver1End;
-        var receiver2End = receiver2Start.Plus(Duration.FromMinutes(15));
-
-        var endDateTime = receiver2End;
+        var firstPositionEnd = startDateTime.Plus(Duration.FromMinutes(15));
+        var secondPositionEnd = firstPositionEnd.Plus(Duration.FromMinutes(15));
 
         var enqueueMessagesData = new EnqueueMeasureDataSyncV1(
             MeteringPointId: "1234567890123",
@@ -114,7 +108,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
             ProductNumber: "test-product-number",
             RegistrationDateTime: startDateTime.ToDateTimeOffset(),
             StartDateTime: startDateTime.ToDateTimeOffset(),
-            EndDateTime: endDateTime.ToDateTimeOffset(),
+            EndDateTime: secondPositionEnd.ToDateTimeOffset(),
             GridAreaCode: "804",
             Receiver: new ProcessManager.Components.Abstractions.EnqueueActorMessages.Actor(
                 ActorNumber.Create(receiver1ActorNumber).ToProcessManagerActorNumber(),
@@ -145,61 +139,54 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         await _fixture.AppHostManager.TriggerFunctionAsync(nameof(OutgoingMessagesBundler));
 
         // Verify the bundling function was executed
-        var bundleFunctionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
-            functionName: nameof(OutgoingMessagesBundler));
+        var bundleFunctionResult =
+            await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+                functionName: nameof(OutgoingMessagesBundler));
+
         bundleFunctionResult.Succeeded.Should()
             .BeTrue(
-                "because the OutgoingMessagesBundler function should have been completed with success. Host log:\n{0}",
+                "the OutgoingMessagesBundler function should have been completed with success. Host log:\n{0}",
                 bundleFunctionResult.HostLog);
 
         using var assertionScope = new AssertionScope();
 
         // => Verify that outgoing messages were enqueued
-        var hashCode = enqueueMessagesData.GetHashCode().ToString();
+        var hashCode = EventId.From(enqueueMessagesData.MeteringPointId);
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId.Value == hashCode && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
+            .Where(om => om.EventId == hashCode && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
 
-        enqueuedOutgoingMessages.Should().HaveCount(1);
+        enqueuedOutgoingMessages.Should().ContainSingle();
 
         // => Verify that the enqueued message can be peeked
-        List<(Actor Actor, decimal EnergyQuantity, Instant Start, Instant End)> expectedReceivers =
-        [
-            (new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole), receiver1Quantity, receiver1Start,
-                receiver2End),
-        ];
+        var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
+            actor: new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole),
+            category: MessageCategory.MeasureData);
 
-        foreach (var expectedReceiver in expectedReceivers)
-        {
-            var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
-                actor: expectedReceiver.Actor,
-                category: MessageCategory.MeasureData);
+        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
+        await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
 
-            var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
-            await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+        // Ensure status code is 200 OK, since EnsureSuccessStatusCode() also allows 204 No Content
+        peekResponse.StatusCode.Should()
+            .Be(
+                HttpStatusCode.OK,
+                $"the peek request for receiver {receiver1ActorNumber} should return OK status code (with content)");
 
-            // Ensure status code is 200 OK, since EnsureSuccessStatusCode() also allows 204 No Content
-            peekResponse.StatusCode.Should()
-                .Be(
-                    HttpStatusCode.OK,
-                    $"because the peek request for receiver {expectedReceiver.Actor.ActorNumber} should return OK status code (with content)");
-
-            var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
-            peekResponseContent.Should()
-                .NotBeNullOrEmpty()
-                .And.Contain(
-                    "NotifyValidatedMeasureData",
-                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should be a notify validated measure data")
-                .And.Contain(
-                    $"\"quantity\": {expectedReceiver.EnergyQuantity}",
-                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected measure data")
-                .And.Contain(
-                    $"\"value\": \"{expectedReceiver.Start.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
-                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected start")
-                .And.Contain(
-                    $"\"value\": \"{expectedReceiver.End.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
-                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected end");
-        }
+        var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
+        peekResponseContent.Should()
+            .NotBeNullOrEmpty()
+            .And.Contain(
+                "NotifyValidatedMeasureData",
+                $"the peeked messages for receiver {receiver1ActorNumber} should be a notify validated measure data")
+            .And.Contain(
+                $"\"quantity\": {receiver1Quantity}",
+                $"the peeked messages for receiver {receiver1ActorNumber} should have the expected measure data")
+            .And.Contain(
+                $"\"value\": \"{startDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
+                $"the peeked messages for receiver {receiver1ActorNumber} should have the expected start")
+            .And.Contain(
+                $"\"value\": \"{secondPositionEnd.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
+                $"the peeked messages for receiver {receiver1ActorNumber} should have the expected end");
     }
 }
