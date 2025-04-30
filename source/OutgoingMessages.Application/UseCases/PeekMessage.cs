@@ -82,7 +82,7 @@ public class PeekMessage
         }
 
         // Since Ebix does not support message categories, we set the category to Aggregations
-        // if peeking measurement data is not enabled.
+        // if peeking measurement data is not enabled, which skips all measurement data messages.
         if (request.DocumentFormat == DocumentFormat.Ebix
             && !await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
         {

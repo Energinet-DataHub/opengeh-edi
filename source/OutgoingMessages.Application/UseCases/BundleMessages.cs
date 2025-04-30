@@ -14,7 +14,6 @@
 
 using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
@@ -33,8 +32,7 @@ public class BundleMessages(
     IClock clock,
     IServiceScopeFactory serviceScopeFactory,
     IOptions<BundlingOptions> bundlingOptions,
-    IOutgoingMessageRepository outgoingMessageRepository,
-    IFeatureFlagManager featureFlagManager)
+    IOutgoingMessageRepository outgoingMessageRepository)
 {
     private const string BundleSizeMetricName = "Bundle Size";
     private const string BundleTimespanSecondsMetricName = "Bundle Timespan (seconds)";
@@ -48,7 +46,6 @@ public class BundleMessages(
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly BundlingOptions _bundlingOptions = bundlingOptions.Value;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository = outgoingMessageRepository;
-    private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
 
     /// <summary>
     /// Closes bundles that are ready to be closed in a single transaction, and returns the number of closed bundles.
@@ -235,7 +232,6 @@ public class BundleMessages(
         }
 
         bundle.Close(_clock.GetCurrentInstant());
-
         return bundle;
     }
 
