@@ -375,7 +375,7 @@ public class BehavioursTestBase : IDisposable
 
                 if (peekResult is null)
                 {
-                    break;
+                    continue;
                 }
 
                 thereWasNothingToPeek = false;
