@@ -155,9 +155,10 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
 
         // => Verify that outgoing messages were enqueued
+        var hashCode = enqueueMessagesData.GetHashCode().ToString();
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId.Value == enqueueMessagesData.GetHashCode().ToString() && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
+            .Where(om => om.EventId.Value == hashCode && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
 
         enqueuedOutgoingMessages.Should().HaveCount(1);
