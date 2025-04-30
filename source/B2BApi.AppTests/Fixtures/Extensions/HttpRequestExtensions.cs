@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 
@@ -92,7 +93,7 @@ public static class HttpRequestExtensions
 
     public static async Task<HttpRequestMessage> CreateFooBarHttpRequestAsync(
         this B2BApiAppFixture fixture,
-        ForwardMeteredDataAcceptedV1 forwardMeteredDataAcceptedV1,
+        EnqueueMeasureDataSyncV1 forwardMeteredDataAcceptedV1,
         string calculationTypeName)
     {
         HttpRequestMessage? request = null;
@@ -101,10 +102,8 @@ public static class HttpRequestExtensions
             request = await CreateHttpRequestAsync(
                 fixture,
                 new Actor(
-                    ActorNumber.Create(
-                        forwardMeteredDataAcceptedV1.ReceiversWithMeteredData.Single().Actors.Single().ActorNumber),
-                    ActorRole.FromName(
-                        forwardMeteredDataAcceptedV1.ReceiversWithMeteredData.Single().Actors.Single().ActorRole.Name)),
+                    ActorNumber.Create(forwardMeteredDataAcceptedV1.Receiver.ActorNumber),
+                    ActorRole.FromName(forwardMeteredDataAcceptedV1.Receiver.ActorRole.Name)),
                 HttpMethod.Post,
                 $"api/enqueue/brs021/calculations/{calculationTypeName}",
                 new StringContent(

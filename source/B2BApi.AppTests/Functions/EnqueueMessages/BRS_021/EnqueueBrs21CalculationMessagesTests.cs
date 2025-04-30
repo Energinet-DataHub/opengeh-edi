@@ -28,6 +28,7 @@ using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -107,40 +108,30 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
         var endDateTime = receiver2End;
 
-        var enqueueMessagesData = new ForwardMeteredDataAcceptedV1(
-            OriginalActorMessageId: Guid.NewGuid().ToString(),
+        var enqueueMessagesData = new EnqueueMeasureDataSyncV1(
             MeteringPointId: "1234567890123",
             MeteringPointType: ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
             RegistrationDateTime: startDateTime.ToDateTimeOffset(),
             StartDateTime: startDateTime.ToDateTimeOffset(),
             EndDateTime: endDateTime.ToDateTimeOffset(),
-            ReceiversWithMeteredData:
+            GridAreaCode: "804",
+            Receiver: new ProcessManager.Components.Abstractions.EnqueueActorMessages.Actor(
+                ActorNumber.Create(receiver1ActorNumber).ToProcessManagerActorNumber(),
+                receiver1ActorRole.ToProcessManagerActorRole()),
+            Resolution: ProcessManager.Components.Abstractions.ValueObjects.Resolution.QuarterHourly,
+            MeasureUnit: ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit.KilowattHour,
+            MeasureData:
             [
-                new ReceiversWithMeteredDataV1(
-                    Actors:
-                    [
-                        new MarketActorRecipientV1(
-                            ActorNumber: ActorNumber.Create(receiver1ActorNumber).ToProcessManagerActorNumber(),
-                            ActorRole: receiver1ActorRole.ToProcessManagerActorRole()),
-                    ],
-                    Resolution: ProcessManager.Components.Abstractions.ValueObjects.Resolution.QuarterHourly,
-                    MeasureUnit: ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit.KilowattHour,
-                    StartDateTime: receiver1Start.ToDateTimeOffset(),
-                    EndDateTime: receiver2End.ToDateTimeOffset(),
-                    MeteredData:
-                    [
-                        new ReceiversWithMeteredDataV1.AcceptedMeteredData(
-                            Position: 1,
-                            EnergyQuantity: receiver1Quantity,
-                            QuantityQuality: ProcessManager.Components.Abstractions.ValueObjects.Quality.AsProvided),
-                        new ReceiversWithMeteredDataV1.AcceptedMeteredData(
-                            Position: 2,
-                            EnergyQuantity: receiver2Quantity,
-                            QuantityQuality: ProcessManager.Components.Abstractions.ValueObjects.Quality.AsProvided),
-                    ]),
-            ],
-            "804");
+                new MeasureData(
+                    Position: 1,
+                    EnergyQuantity: receiver1Quantity,
+                    QuantityQuality: ProcessManager.Components.Abstractions.ValueObjects.Quality.AsProvided),
+                new MeasureData(
+                    Position: 2,
+                    EnergyQuantity: receiver2Quantity,
+                    QuantityQuality: ProcessManager.Components.Abstractions.ValueObjects.Quality.AsProvided),
+            ]);
 
         // Act
         // => When message is received

@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -46,46 +47,42 @@ public class EnqueueTrigger_Brs_021_Calculations(
     {
         _logger.LogInformation("BRS-021 enqueue request for {calculationTypeName} received", calculationTypeName);
 
-        var acceptedData = JsonSerializer.Deserialize<ForwardMeteredDataAcceptedV1>(request.Body)!;
+        var measurements = JsonSerializer.Deserialize<EnqueueMeasureDataSyncV1>(request.Body)!;
 
-        foreach (var receivers in acceptedData.ReceiversWithMeteredData)
-        {
-            var energyObservations = receivers.MeteredData
-                .Select(x =>
-                    new EnergyObservationDto(
-                        Position: x.Position,
-                        Quantity: x.EnergyQuantity,
-                        Quality: x.QuantityQuality != null ? Quality.FromName(x.QuantityQuality.Name) : null))
-                .ToList();
+        var energyObservations = measurements.MeasureData
+            .Select(x =>
+                new EnergyObservationDto(
+                    Position: x.Position,
+                    Quantity: x.EnergyQuantity,
+                    Quality: Quality.FromName(x.QuantityQuality.Name)))
+            .ToList();
 
-            foreach (var actor in receivers.Actors)
-            {
-                var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
-                    eventId: EventId.From(acceptedData.GetHashCode().ToString()), // TODO: Use the correct EventId and externalId
-                    externalId: new ExternalId(Guid.NewGuid()),
-                    receiver: new Actor(
-                        ActorNumber.Create(actor.ActorNumber),
-                        ActorRole.FromName(actor.ActorRole.Name)),
-                    businessReason: BusinessReason.PeriodicMetering,
-                    relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-                    gridAreaCode: acceptedData.GridAreaCode,
-                    series: new ForwardMeteredDataMessageSeriesDto(
-                        TransactionId: TransactionId.New(),
-                        MarketEvaluationPointNumber: acceptedData.MeteringPointId,
-                        MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                        OriginalTransactionIdReferenceId: null,
-                        Product: acceptedData.ProductNumber,
-                        QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
-                        RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
-                        Resolution: Resolution.FromName(receivers.Resolution.Name),
-                        StartedDateTime: receivers.StartDateTime.ToInstant(),
-                        EndedDateTime: receivers.EndDateTime.ToInstant(),
-                        EnergyObservations: energyObservations));
+        // TODO: New data structure without `RelatedToMessageId` and `OriginalTransactionIdReferenceId`?
+        var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
+            eventId:
+            EventId.From(measurements.GetHashCode().ToString()), // TODO: Use the correct EventId and externalId
+            externalId: new ExternalId(Guid.NewGuid()),
+            receiver: new Actor(
+                ActorNumber.Create(measurements.Receiver.ActorNumber),
+                ActorRole.FromName(measurements.Receiver.ActorRole.Name)),
+            businessReason: BusinessReason.PeriodicMetering,
+            relatedToMessageId: MessageId.Create(Guid.NewGuid().ToString("N")), // TODO: Use the correct MessageId
+            gridAreaCode: measurements.GridAreaCode,
+            series: new ForwardMeteredDataMessageSeriesDto(
+                TransactionId: TransactionId.New(),
+                MarketEvaluationPointNumber: measurements.MeteringPointId,
+                MarketEvaluationPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
+                OriginalTransactionIdReferenceId: null,
+                Product: measurements.ProductNumber,
+                QuantityMeasureUnit: MeasurementUnit.FromName(measurements.MeasureUnit.Name),
+                RegistrationDateTime: measurements.RegistrationDateTime.ToInstant(),
+                Resolution: Resolution.FromName(measurements.Resolution.Name),
+                StartedDateTime: measurements.StartDateTime.ToInstant(),
+                EndedDateTime: measurements.EndDateTime.ToInstant(),
+                EnergyObservations: energyObservations));
 
-                await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None)
-                    .ConfigureAwait(false);
-            }
-        }
+        await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None)
+            .ConfigureAwait(false);
 
         await _unitOfWork.CommitTransactionAsync(hostCancellationToken).ConfigureAwait(false);
 
