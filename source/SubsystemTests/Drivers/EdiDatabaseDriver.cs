@@ -72,7 +72,9 @@ internal sealed class EdiDatabaseDriver
     /// <summary>
     /// Mark bundles from load test as dequeued from a month ago to ensure that they are cleaned up by the retention service
     /// </summary>
-    internal async Task MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync(CancellationToken cancellationToken)
+    internal async Task MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync(
+        string relatedToMessageIdPrefix,
+        CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
 
@@ -89,7 +91,7 @@ internal sealed class EdiDatabaseDriver
                                 AND om.RelatedToMessageId like @RelatedToMessageIdPrefix
                         )
                 """;
-            updateBundles.Parameters.AddWithValue("RelatedToMessageIdPrefix", "perf_test_%");
+            updateBundles.Parameters.AddWithValue("RelatedToMessageIdPrefix", relatedToMessageIdPrefix + "%");
 
             updateBundles.Connection = connection;
             updateBundles.CommandTimeout = (int)TimeSpan.FromMinutes(4).TotalSeconds;
