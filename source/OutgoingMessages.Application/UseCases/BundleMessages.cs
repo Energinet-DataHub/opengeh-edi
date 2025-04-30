@@ -242,7 +242,7 @@ public class BundleMessages(
         if (isForwardMeteredDataMessage
             && !await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
         {
-            // We peek and dequeue the messages in the bundle. To prevent the Actor to retrieve the bundle.
+            // We peek and dequeue the bundle. To prevent the Actor from being able to retrieve the bundle.
             bundle.Peek();
             if (!bundle.TryDequeue()) throw new InvalidOperationException("Unable to dequeue bundle for NotifyValidatedMeasureData/Acknowledgement which is not enabled to be peeked.");
         }
