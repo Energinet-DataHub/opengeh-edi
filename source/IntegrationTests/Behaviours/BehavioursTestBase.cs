@@ -38,6 +38,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjec
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -332,16 +333,15 @@ public class BehavioursTestBase : IDisposable
         await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
     }
 
-    protected async Task AssertBundleIsDequeued(DocumentType expectedDocumentType)
+    protected async Task AssertBundleIsCreated(DocumentType documentType)
     {
         using var scope = _serviceProvider.CreateScope();
-        var bundleRepository = scope.ServiceProvider.GetRequiredService<IBundleRepository>();
-        var dequeueBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(
-            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromSeconds(1)),
-            1,
-            CancellationToken.None);
-        var dequeuedBundle = dequeueBundles.Should().ContainSingle().Subject;
-        dequeuedBundle.DocumentTypeInBundle.Should().Be(expectedDocumentType);
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var createdBundles = await dbContext.Bundles
+            .Where(x => x.DocumentTypeInBundle == documentType)
+            .ToListAsync()
+            .ConfigureAwait(false);
+        createdBundles.Should().ContainSingle();
     }
 
     protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat, MessageCategory messageCategory)
@@ -364,6 +364,13 @@ public class BehavioursTestBase : IDisposable
             var thereWasNothingToPeek = true;
             foreach (var messageCategory in EnumerationType.GetAll<MessageCategory>())
             {
+                // Skip if the message category None, which is not relevant for the document format in CIM
+                if ((documentFormat == DocumentFormat.Json || documentFormat == DocumentFormat.Xml)
+                    && messageCategory == MessageCategory.None)
+                {
+                    continue;
+                }
+
                 var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat, messageCategory);
 
                 if (peekResult is null)

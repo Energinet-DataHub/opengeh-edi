@@ -217,7 +217,7 @@ public class BundleMessages(
         return bundlesToCreate;
     }
 
-    private async Task<Bundle> CreateAndCloseBundleForMessagesAsync(
+    private Task<Bundle> CreateAndCloseBundleForMessagesAsync(
         ActorMessageQueueId actorMessageQueueId,
         DocumentType documentType,
         BusinessReason businessReason,
@@ -237,17 +237,7 @@ public class BundleMessages(
 
         bundle.Close(_clock.GetCurrentInstant());
 
-        var isForwardMeteredDataMessage = bundle.DocumentTypeInBundle == DocumentType.Acknowledgement
-                 || bundle.DocumentTypeInBundle == DocumentType.NotifyValidatedMeasureData;
-        if (isForwardMeteredDataMessage
-            && !await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
-        {
-            // We peek and dequeue the messages in the bundle. To prevent the Actor to retrieve the bundle.
-            bundle.Peek();
-            if (!bundle.TryDequeue()) throw new InvalidOperationException("Unable to dequeue bundle for NotifyValidatedMeasureData/Acknowledgement which is not enabled to be peeked.");
-        }
-
-        return bundle;
+        return Task.FromResult(bundle);
     }
 
     /// <summary>

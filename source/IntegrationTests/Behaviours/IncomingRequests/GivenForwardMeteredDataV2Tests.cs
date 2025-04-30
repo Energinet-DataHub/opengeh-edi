@@ -317,7 +317,7 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         // Assert
         peekResults.Should().BeEmpty();
-        await AssertBundleIsDequeued(DocumentType.NotifyValidatedMeasureData);
+        await AssertBundleIsCreated(DocumentType.NotifyValidatedMeasureData);
     }
 
     [Theory]
