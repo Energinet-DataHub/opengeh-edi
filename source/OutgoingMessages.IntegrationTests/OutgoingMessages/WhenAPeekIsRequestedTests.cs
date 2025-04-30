@@ -18,8 +18,10 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
@@ -29,6 +31,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMet
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Extensions;
@@ -53,6 +56,9 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         _unitOfWork = GetService<IUnitOfWork>();
         _clockStub = (ClockStub)GetService<IClock>();
     }
+
+    public static TheoryData<DocumentFormat> GetAllDocumentFormat => new TheoryData<DocumentFormat>(
+        EnumerationType.GetAll<DocumentFormat>().ToArray());
 
     public static object[][] GetUnusedDataHubTypesWithDocumentFormat()
     {
@@ -355,6 +361,74 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
 
         // Assert / Then
         peekResult.Should().BeNull("because the messages shouldn't be bundled yet, so no message should be peeked");
+    }
+
+    [Theory]
+    [MemberData(nameof(GetAllDocumentFormat))]
+    public async Task Given_EnqueuedRsm012_AndGiven_DisallowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsNothing(DocumentFormat documentFormat)
+    {
+        // Arrange / Given
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.PM25Messages, false);
+
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()
+            .WithReceiver(receiver)
+            .Build();
+        var whenMessageIsEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
+        _clockStub.SetCurrentInstant(whenMessageIsEnqueued);
+
+        await EnqueueAndCommitMessage(bundledMessage);
+
+        await GivenBundleMessagesHasBeenTriggered(whenMessageIsEnqueued);
+
+        // Act / When
+        var peekResult = await PeekMessageAsync(
+            documentFormat == DocumentFormat.Ebix ? MessageCategory.None : MessageCategory.MeasureData,
+            actorNumber: receiver.ActorNumber,
+            actorRole: receiver.ActorRole,
+            documentFormat: documentFormat);
+
+        // Assert / Then
+        peekResult.Should().BeNull("because the messages shouldn't be allowed to be peeked.");
+    }
+
+    [Theory]
+    [MemberData(nameof(GetAllDocumentFormat))]
+    public async Task Given_EnqueuedRsm012_AndGiven_AllowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsDocument(DocumentFormat documentFormat)
+    {
+        // Arrange / Given
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.PM25Messages, true);
+
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()
+            .WithReceiver(receiver)
+            .Build();
+        var whenMessageIsEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
+        _clockStub.SetCurrentInstant(whenMessageIsEnqueued);
+
+        await EnqueueAndCommitMessage(bundledMessage);
+
+        await GivenBundleMessagesHasBeenTriggered(whenMessageIsEnqueued);
+
+        // Act / When
+        var peekResult = await PeekMessageAsync(
+            documentFormat == DocumentFormat.Ebix ? MessageCategory.None : MessageCategory.MeasureData,
+            actorNumber: receiver.ActorNumber,
+            actorRole: receiver.ActorRole,
+            documentFormat: documentFormat);
+
+        // Assert / Then
+        peekResult.Should().NotBeNull("because the messages is allowed to be peeked.");
+    }
+
+    private async Task GivenBundleMessagesHasBeenTriggered(Instant whenMessageIsEnqueued)
+    {
+        var bundlingOptions = GetService<IOptions<BundlingOptions>>().Value;
+        var whenBundleShouldBeClosed = whenMessageIsEnqueued.Plus(Duration.FromSeconds(bundlingOptions.BundleMessagesOlderThanSeconds));
+        _clockStub.SetCurrentInstant(whenBundleShouldBeClosed);
+        using var scope = ServiceProvider.CreateScope();
+        var bundleClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
+        await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
     }
 
     private async Task<bool> BundleIsRegistered()

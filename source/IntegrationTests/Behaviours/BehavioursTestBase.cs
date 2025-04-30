@@ -37,6 +37,8 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.Marke
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -329,6 +331,17 @@ public class BehavioursTestBase : IDisposable
         using var scope = _serviceProvider.CreateScope();
         var bundleClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesBundleClient>();
         await bundleClient.BundleMessagesAndCommitAsync(CancellationToken.None);
+    }
+
+    protected async Task AssertBundleIsCreated(DocumentType documentType)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+        var createdBundles = await dbContext.Bundles
+            .Where(x => x.DocumentTypeInBundle == documentType)
+            .ToListAsync()
+            .ConfigureAwait(false);
+        createdBundles.Should().ContainSingle();
     }
 
     protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat, MessageCategory messageCategory)
