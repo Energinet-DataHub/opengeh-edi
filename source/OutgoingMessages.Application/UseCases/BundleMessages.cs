@@ -200,13 +200,12 @@ public class BundleMessages(
                     break;
             }
 
-            var bundle = await CreateAndCloseBundleForMessagesAsync(
+            var bundle = CreateAndCloseBundleForMessages(
                 actorMessageQueueId: actorMessageQueueId,
                 documentType: bundleMetadata.DocumentType,
                 businessReason: businessReason,
                 relatedToMessageId: bundleMetadata.RelatedToMessageId,
-                outgoingMessagesForBundle: outgoingMessagesForBundle)
-                .ConfigureAwait(false);
+                outgoingMessagesForBundle: outgoingMessagesForBundle);
 
             var bundleTimespan =
                 outgoingMessagesForBundle.Last().CreatedAt - outgoingMessagesForBundle.First().CreatedAt;
@@ -217,7 +216,7 @@ public class BundleMessages(
         return bundlesToCreate;
     }
 
-    private Task<Bundle> CreateAndCloseBundleForMessagesAsync(
+    private Bundle CreateAndCloseBundleForMessages(
         ActorMessageQueueId actorMessageQueueId,
         DocumentType documentType,
         BusinessReason businessReason,
@@ -237,7 +236,7 @@ public class BundleMessages(
 
         bundle.Close(_clock.GetCurrentInstant());
 
-        return Task.FromResult(bundle);
+        return bundle;
     }
 
     /// <summary>
