@@ -67,6 +67,6 @@ public sealed class ForwardMeteredData : IClassFixture<LoadTestFixture>
 
     private async Task CleanUp()
     {
-        await _ediDatabaseDriver.MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync("perf_test_", CancellationToken.None);
+        await _ediDatabaseDriver.MarkBundlesFromLoadTestAsDequeuedAMonthAgoAsync(CancellationToken.None);
     }
 }
