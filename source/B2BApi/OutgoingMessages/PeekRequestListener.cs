@@ -108,17 +108,6 @@ public class PeekRequestListener
                 : EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
 
-        // This does not prevent RSM012 to be peeked for Ebix messages!
-        // Since the message category is not used for Ebix requests.
-        // PO says it is okay!
-        if (parsedMessageCategory == MessageCategory.MeasureData && !await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
-        {
-            var noContentResponse = HttpResponseData.CreateResponse(request);
-            noContentResponse.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
-            noContentResponse.StatusCode = HttpStatusCode.NoContent;
-            return noContentResponse;
-        }
-
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
                 new PeekRequestDto(
                     _authenticatedActor.CurrentActorIdentity.ActorNumber,
