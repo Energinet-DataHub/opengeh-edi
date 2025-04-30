@@ -364,18 +364,11 @@ public class BehavioursTestBase : IDisposable
             var thereWasNothingToPeek = true;
             foreach (var messageCategory in EnumerationType.GetAll<MessageCategory>())
             {
-                // Skip if the message category None, which is not relevant for the document format in CIM
-                if ((documentFormat == DocumentFormat.Json || documentFormat == DocumentFormat.Xml)
-                    && messageCategory == MessageCategory.None)
-                {
-                    continue;
-                }
-
                 var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat, messageCategory);
 
                 if (peekResult is null)
                 {
-                    continue;
+                    break;
                 }
 
                 thereWasNothingToPeek = false;
