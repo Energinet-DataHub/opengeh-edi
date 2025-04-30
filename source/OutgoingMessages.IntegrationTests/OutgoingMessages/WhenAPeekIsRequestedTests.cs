@@ -394,7 +394,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
 
     [Theory]
     [MemberData(nameof(GetAllDocumentFormat))]
-    public async Task Given_EnqueuedRsm012_AndGiven_AllowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsNothing(DocumentFormat documentFormat)
+    public async Task Given_EnqueuedRsm012_AndGiven_AllowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsDocument(DocumentFormat documentFormat)
     {
         // Arrange / Given
         FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.PM25Messages, true);
