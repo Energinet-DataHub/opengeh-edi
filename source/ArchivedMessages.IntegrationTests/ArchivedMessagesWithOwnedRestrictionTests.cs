@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -127,6 +128,54 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
 
         // Assert
         result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should()
+            .HaveCount(2)
+            .And.OnlyContain(
+                message => message.ReceiverNumber == _authenticatedActor.ActorNumber.Value
+                           || message.SenderNumber == _authenticatedActor.ActorNumber.Value);
+    }
+
+    [Fact]
+    public async Task Given_ThreeMeteringPointArchivedMessages_When_SearchingWithoutCriteria_Then_ReturnsTwoOwnMessages()
+    {
+        // Arrange
+        var meteringPointId = MeteringPointId.From("1234");
+        var anotherActor = "9999999999999";
+        await _fixture.CreateArchivedMessageAsync(
+            timestamp: Instant.FromUtc(2025, 01, 02, 0, 0),
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            receiverNumber: anotherActor);
+
+        // This messages owned by the authenticated actor
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            meteringPointIds: new List<MeteringPointId>()
+            {
+                meteringPointId,
+            },
+            receiverNumber: _authenticatedActor.ActorNumber.Value,
+            receiverRole: _authenticatedActor.ActorRole);
+        await _fixture.CreateArchivedMessageAsync(
+            documentType: DocumentType.NotifyValidatedMeasureData,
+            meteringPointIds: new List<MeteringPointId>()
+            {
+                meteringPointId,
+            },
+            senderNumber: _authenticatedActor.ActorNumber.Value,
+            senderRole: _authenticatedActor.ActorRole);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMeteringPointMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
+                meteringPointId,
+                new MessageCreationPeriodDto(
+                    Instant.FromUtc(2025, 01, 01, 0, 0),
+                    Instant.FromUtc(2025, 01, 03, 0, 0))),
+            CancellationToken.None);
+
+        // Assert
         using var assertionScope = new AssertionScope();
         result.Messages.Should()
             .HaveCount(2)
