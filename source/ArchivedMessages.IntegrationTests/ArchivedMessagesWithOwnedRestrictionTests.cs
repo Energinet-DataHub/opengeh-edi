@@ -149,6 +149,7 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
 
         // This messages owned by the authenticated actor
         await _fixture.CreateArchivedMessageAsync(
+            timestamp: Instant.FromUtc(2025, 01, 02, 0, 0),
             documentType: DocumentType.NotifyValidatedMeasureData,
             meteringPointIds: new List<MeteringPointId>()
             {
@@ -157,6 +158,7 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
             receiverNumber: _authenticatedActor.ActorNumber.Value,
             receiverRole: _authenticatedActor.ActorRole);
         await _fixture.CreateArchivedMessageAsync(
+            timestamp: Instant.FromUtc(2025, 01, 02, 0, 0),
             documentType: DocumentType.NotifyValidatedMeasureData,
             meteringPointIds: new List<MeteringPointId>()
             {
