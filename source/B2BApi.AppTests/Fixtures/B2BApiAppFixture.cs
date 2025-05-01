@@ -26,6 +26,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
+using Energinet.DataHub.EDI.B2BApi.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -58,6 +59,10 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 /// </summary>
 public class B2BApiAppFixture : IAsyncLifetime
 {
+    public const string ApplicationIdUri = "https://management.azure.com";
+
+    private const string Issuer = "123"; // TODO: Update this
+
     /// <summary>
     /// Durable Functions Task Hub Name
     /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
@@ -518,6 +523,13 @@ public class B2BApiAppFixture : IAsyncLifetime
             nameof(AppConfiguration.AppConfigEndpoint),
             AppConfigEndpoint);
 
+        // Subsystem authentication
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.ApplicationIdUri)}",
+            ApplicationIdUri);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.Issuer)}",
+            Issuer);
         return appHostSettings;
     }
 
