@@ -24,7 +24,7 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 
-public static class EdiProcessManagerExtensions
+public static class EdiTopicExtensions
 {
     public static IServiceCollection AddEnqueueActorMessagesFromProcessManager(this IServiceCollection services, TokenCredential credential)
     {
