@@ -15,37 +15,26 @@
 using System.Globalization;
 using System.Net;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
-using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
-using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
-using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using BusinessReason = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.BusinessReason;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 {
-    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
-    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
-
     private readonly B2BApiAppFixture _fixture;
 
     public EnqueueBrs21CalculationMessagesTests(
@@ -129,7 +118,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
         // Act
         // => When message is received
-        var httpRequest = await _fixture.CreateFooBarHttpRequestAsync(
+        var httpRequest = await _fixture.CreateEnqueueMeasureDataSyncV1HttpRequestAsync(
             enqueueMessagesData,
             "electricalHeatingOrSomething");
 
