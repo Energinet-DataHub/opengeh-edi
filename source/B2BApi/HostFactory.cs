@@ -31,7 +31,9 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.Dependen
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OutboxContext = Energinet.DataHub.EDI.Outbox.Infrastructure.OutboxContext;
@@ -126,7 +128,13 @@ public static class HostFactory
                         .AddOutboxRetention()
 
                         // Enqueue messages from PM (using Edi Topic)
-                        .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential);
+                        .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential)
+
+                        // Configure Kestrel options
+                        .Configure<KestrelServerOptions>(options =>
+                        {
+                            options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50mb
+                        });
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>
