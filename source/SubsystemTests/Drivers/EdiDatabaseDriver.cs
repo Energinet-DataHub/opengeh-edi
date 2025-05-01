@@ -84,8 +84,12 @@ internal sealed class EdiDatabaseDriver
             updateBundles.CommandText = """
                     UPDATE Bundles
                     SET DequeuedAt = DATEADD(DAY, -1, DATEADD(MONTH, -1, GETDATE()))
-                    WHERE [RelatedToMessageId] like @RelatedToMessageIdPrefix
-                    AND DequeuedAt is null
+                    WHERE DequeuedAt is null
+                        AND EXISTS (
+                            SELECT 1 FROM OutgoingMessages om
+                            WHERE Bundles.Id = om.AssignedBundleId
+                                AND om.RelatedToMessageId like @RelatedToMessageIdPrefix
+                        )
                 """;
             updateBundles.Parameters.AddWithValue("RelatedToMessageIdPrefix", relatedToMessageIdPrefix + "%");
 
@@ -177,11 +181,12 @@ internal sealed class EdiDatabaseDriver
 
         var enqueuedMessagesCount = await connection.ExecuteScalarAsync<int>(
             sql: """
-                 SELECT COUNT([Id])
-                 FROM [Bundles]
-                 WHERE ([DocumentTypeInBundle] = 'NotifyValidatedMeasureData' or [DocumentTypeInBundle] = 'Acknowledgement')
-                 AND RelatedToMessageId like 'perf_test_%'
-                 AND DequeuedAt is null
+                 SELECT COUNT(om.[Id])
+                 FROM OutgoingMessages om
+                 JOIN Bundles b ON om.AssignedBundleId = b.Id
+                 WHERE b.[DequeuedAt] IS NULL
+                 AND om.[RelatedToMessageId] like 'perf_test_%'
+                 AND b.[DocumentType] = 'NotifyValidatedMeasureData'
                  """);
 
         return enqueuedMessagesCount;
