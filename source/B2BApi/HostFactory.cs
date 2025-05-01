@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Apache.Arrow;
 using Azure.Identity;
 using DurableFunctionsMonitor.DotNetIsolated;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
@@ -31,9 +32,11 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.Dependen
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using DefaultAzureCredential = Azure.Identity.DefaultAzureCredential;
 using OutboxContext = Energinet.DataHub.EDI.Outbox.Infrastructure.OutboxContext;
 
 namespace Energinet.DataHub.EDI.B2BApi;
@@ -57,6 +60,9 @@ public static class HostFactory
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
                         functionContext => functionContext.IsProtectedHttpTrigger());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
+
+                    // Subsystem authentication
+                    builder.UseFunctionsAuthorization();
 
                     // Host the Durable Function Monitor as a part of this app.
                     // The Durable Function Monitor can be accessed at: {host url}/api/durable-functions-monitor
@@ -97,6 +103,7 @@ public static class HostFactory
 
                         // Security
                         .AddB2BAuthentication(tokenValidationParameters)
+                        .AddSubsystemAuthentication(context.Configuration)
 
                         // System timer
                         .AddNodaTimeForApplication()
