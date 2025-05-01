@@ -67,7 +67,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SubsystemRequestWithInValidToken_When_Requesting_Then_RejectedRequest()
+    public async Task Given_SubsystemRequestWithInvalidToken_When_Requesting_Then_RejectedRequest()
     {
         // Arrange
         var token = "InvalidToken";
@@ -81,7 +81,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
 
     private HttpRequestMessage CreateHttpRequest(string token)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "monitor/live");
+        var request = new HttpRequestMessage(HttpMethod.Get, "api/monitor/live");
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return request;
