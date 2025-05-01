@@ -59,16 +59,13 @@ public class EnqueueTrigger_Brs_021_Calculations(
                     Quality: Quality.FromName(x.QuantityQuality.Name)))
             .ToList();
 
-        // TODO: New data structure without `RelatedToMessageId` and `OriginalTransactionIdReferenceId`?
-        var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
-            eventId:
-            EventId.From(measurements.MeteringPointId), // TODO: Use the correct EventId and externalId
+        var acceptedForwardMeteredDataMessageDto = new CalculatedMeteredDataMessageDto(
+            eventId: EventId.From(new Random(requestBody.GetHashCode()).NextInt64().ToString()),
             externalId: new ExternalId(Guid.NewGuid()),
             receiver: new Actor(
                 ActorNumber.Create(measurements.Receiver.ActorNumber),
                 ActorRole.FromName(measurements.Receiver.ActorRole.Name)),
             businessReason: BusinessReason.PeriodicMetering,
-            relatedToMessageId: MessageId.Create(Guid.NewGuid().ToString("N")), // TODO: Use the correct MessageId
             gridAreaCode: measurements.GridAreaCode,
             series: new ForwardMeteredDataMessageSeriesDto(
                 TransactionId: TransactionId.New(),

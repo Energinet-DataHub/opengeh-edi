@@ -82,7 +82,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
     [Fact]
     public async Task
-        Given_EnqueueAcceptedBrs021MessageWithMultipleReceivers_When_MessageIsReceived_AndWhen_MessageIsBundled_Then_AcceptedMessagesAreEnqueued_AndThen_AcceptedMessagesCanBePeeked()
+        Given_EnqueueMeasureDataSyncV1_When_MessageIsReceived_AndWhen_MessageIsBundled_Then_MessageIsEnqueued_AndThen_MessageCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
@@ -151,10 +151,9 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
 
         // => Verify that outgoing messages were enqueued
-        var hashCode = EventId.From(enqueueMessagesData.MeteringPointId);
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId == hashCode && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
+            .Where(om => om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
 
         enqueuedOutgoingMessages.Should().ContainSingle();

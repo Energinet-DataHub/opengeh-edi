@@ -112,6 +112,13 @@ public interface IOutgoingMessagesClient
         CancellationToken cancellationToken);
 
     /// <summary>
+    /// Enqueue metered data for metering point messages, handles enqueuing messages to all appropriate parties in a single transaction.
+    /// </summary>
+    Task<Guid> EnqueueAsync(
+        CalculatedMeteredDataMessageDto acceptedForwardMeteredDataMessageDto,
+        CancellationToken cancellationToken);
+
+    /// <summary>
     /// Enqueue RSM-009 messages.
     /// </summary>
     Task<Guid> EnqueueAsync(

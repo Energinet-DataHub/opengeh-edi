@@ -226,6 +226,20 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAsync(
+        CalculatedMeteredDataMessageDto calculatedMeteredDataMessageDto,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessageFactory.CreateMessage(
+            calculatedMeteredDataMessageDto,
+            _serializer,
+            _clock.GetCurrentInstant());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+
+        return messageId.Value;
+    }
+
+    public async Task<Guid> EnqueueAsync(
         RejectedForwardMeteredDataMessageDto rejectedForwardMeteredDataMessageDto,
         CancellationToken cancellationToken)
     {

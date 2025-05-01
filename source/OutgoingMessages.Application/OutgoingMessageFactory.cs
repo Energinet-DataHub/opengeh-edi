@@ -420,6 +420,33 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
+        CalculatedMeteredDataMessageDto message,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(message);
+
+        return new OutgoingMessage(
+            eventId: message.EventId,
+            documentType: message.DocumentType,
+            receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            processId: message.ProcessId,
+            businessReason: message.BusinessReason,
+            serializedContent: serializer.Serialize(message.Series),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
+            relatedToMessageId: message.RelatedToMessageId,
+            gridAreaCode: message.GridAreaCode,
+            externalId: message.ExternalId,
+            calculationId: null,
+            message.Series.StartedDateTime,
+            dataCount: message.Series.EnergyObservations.Count,
+            meteringPointId: MeteringPointId.From(message.Series.MarketEvaluationPointNumber));
+    }
+
+    public static OutgoingMessage CreateMessage(
         RejectedForwardMeteredDataMessageDto message,
         ISerializer serializer,
         Instant timestamp)
