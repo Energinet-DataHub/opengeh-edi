@@ -37,37 +37,43 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
         var requestBody = await reader.ReadToEndAsync(hostCancellationToken).ConfigureAwait(false);
         var measurements = JsonSerializer.Deserialize<EnqueueCalculatedMeasurementsHttpV1>(requestBody)!;
 
-        var energyObservations = measurements.MeasureData
-            .Select(x =>
-                new EnergyObservationDto(
-                    Position: x.Position,
-                    Quantity: x.EnergyQuantity,
-                    Quality: Quality.FromName(x.QuantityQuality.Name)))
-            .ToList();
+        foreach (var receiversWithMeasurements in measurements.Data)
+        {
+            foreach (var receiver in receiversWithMeasurements.Receivers)
+            {
+                var energyObservations = receiversWithMeasurements.Measurements
+                    .Select(x =>
+                        new EnergyObservationDto(
+                            Position: x.Position,
+                            Quantity: x.EnergyQuantity,
+                            Quality: Quality.FromName(x.QuantityQuality.Name)))
+                    .ToList();
 
-        var acceptedForwardMeteredDataMessageDto = new CalculatedMeasurementsMessageDto(
-            eventId: EventId.From(new Random(requestBody.GetHashCode()).NextInt64().ToString()),
-            externalId: new ExternalId(Guid.NewGuid()),
-            receiver: new Actor(
-                ActorNumber.Create(measurements.Receiver.ActorNumber),
-                ActorRole.FromName(measurements.Receiver.ActorRole.Name)),
-            businessReason: BusinessReason.PeriodicMetering,
-            gridAreaCode: measurements.GridAreaCode,
-            series: new ForwardMeasurementsMessageSeriesDto(
-                TransactionId: TransactionId.New(),
-                MarketEvaluationPointNumber: measurements.MeteringPointId,
-                MarketEvaluationPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
-                OriginalTransactionIdReferenceId: null,
-                Product: measurements.ProductNumber,
-                QuantityMeasureUnit: MeasurementUnit.FromName(measurements.MeasureUnit.Name),
-                RegistrationDateTime: measurements.RegistrationDateTime.ToInstant(),
-                Resolution: Resolution.FromName(measurements.Resolution.Name),
-                StartedDateTime: measurements.StartDateTime.ToInstant(),
-                EndedDateTime: measurements.EndDateTime.ToInstant(),
-                EnergyObservations: energyObservations));
+                var acceptedForwardMeteredDataMessageDto = new CalculatedMeasurementsMessageDto(
+                    eventId: EventId.From(measurements.TransactionId),
+                    externalId: new ExternalId(Guid.NewGuid()),
+                    receiver: new Actor(
+                        ActorNumber.Create(receiver.ActorNumber),
+                        ActorRole.FromName(receiver.ActorRole.Name)),
+                    businessReason: BusinessReason.PeriodicMetering,
+                    gridAreaCode: receiversWithMeasurements.GridAreaCode,
+                    series: new ForwardMeasurementsMessageSeriesDto(
+                        TransactionId: TransactionId.New(),
+                        MarketEvaluationPointNumber: measurements.MeteringPointId,
+                        MarketEvaluationPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
+                        OriginalTransactionIdReferenceId: null,
+                        Product: string.Empty, // TODO (MWO): What should we put here?
+                        QuantityMeasureUnit: MeasurementUnit.FromName(measurements.MeasureUnit.Name),
+                        RegistrationDateTime: receiversWithMeasurements.RegistrationDateTime.ToInstant(),
+                        Resolution: Resolution.FromName(measurements.Resolution.Name),
+                        StartedDateTime: receiversWithMeasurements.StartDateTime.ToInstant(),
+                        EndedDateTime: receiversWithMeasurements.EndDateTime.ToInstant(),
+                        EnergyObservations: energyObservations));
 
-        await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, hostCancellationToken)
-            .ConfigureAwait(false);
+                await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, hostCancellationToken)
+                    .ConfigureAwait(false);
+            }
+        }
 
         await _unitOfWork.CommitTransactionAsync(hostCancellationToken).ConfigureAwait(false);
     }

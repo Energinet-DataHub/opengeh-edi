@@ -29,6 +29,10 @@ using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
+using MeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
+using Quality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
+using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
@@ -85,35 +89,64 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         var receiver1ActorRole = ActorRole.EnergySupplier;
         const int receiver1Quantity = 11;
 
+        const string receiver2ActorNumber = "2222222222222";
+        var receiver2ActorRole = ActorRole.EnergySupplier;
         const int receiver2Quantity = 22;
 
         var startDateTime = Instant.FromUtc(2025, 01, 31, 23, 00, 00);
-        var firstPositionEnd = startDateTime.Plus(Duration.FromMinutes(15));
-        var secondPositionEnd = firstPositionEnd.Plus(Duration.FromMinutes(15));
+
+        var receiver1Start = startDateTime;
+        var receiver1End = startDateTime.Plus(Duration.FromMinutes(15));
+
+        var receiver2Start = receiver1End;
+        var receiver2End = receiver2Start.Plus(Duration.FromMinutes(15));
 
         var enqueueMessagesData = new EnqueueCalculatedMeasurementsHttpV1(
+            OrchestrationInstanceId: Guid.NewGuid(),
+            TransactionId: Guid.NewGuid(),
             MeteringPointId: "1234567890123",
-            MeteringPointType: ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType.Consumption,
-            ProductNumber: "test-product-number",
-            RegistrationDateTime: startDateTime.ToDateTimeOffset(),
-            StartDateTime: startDateTime.ToDateTimeOffset(),
-            EndDateTime: secondPositionEnd.ToDateTimeOffset(),
-            GridAreaCode: "804",
-            Receiver: new ProcessManager.Components.Abstractions.EnqueueActorMessages.Actor(
-                ActorNumber.Create(receiver1ActorNumber).ToProcessManagerActorNumber(),
-                receiver1ActorRole.ToProcessManagerActorRole()),
-            Resolution: ProcessManager.Components.Abstractions.ValueObjects.Resolution.QuarterHourly,
-            MeasureUnit: ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit.KilowattHour,
-            MeasureData:
+            MeteringPointType: MeteringPointType.Consumption,
+            Resolution: Resolution.QuarterHourly,
+            MeasureUnit: MeasurementUnit.KilowattHour,
+            //ProductNumber: "test-product-number",
+            Data:
             [
-                new MeasureData(
-                    Position: 1,
-                    EnergyQuantity: receiver1Quantity,
-                    QuantityQuality: ProcessManager.Components.Abstractions.ValueObjects.Quality.AsProvided),
-                new MeasureData(
-                    Position: 2,
-                    EnergyQuantity: receiver2Quantity,
-                    QuantityQuality: ProcessManager.Components.Abstractions.ValueObjects.Quality.AsProvided),
+                new EnqueueCalculatedMeasurementsHttpV1.ReceiversWithMeasurements(
+                    Receivers:
+                    [
+                        new EnqueueCalculatedMeasurementsHttpV1.Actor(
+                            ActorNumber: ActorNumber.Create(receiver1ActorNumber).ToProcessManagerActorNumber(),
+                            ActorRole: receiver1ActorRole.ToProcessManagerActorRole()),
+                    ],
+                    StartDateTime: receiver1Start.ToDateTimeOffset(),
+                    EndDateTime: receiver1End.ToDateTimeOffset(),
+                    RegistrationDateTime: startDateTime.ToDateTimeOffset(),
+                    GridAreaCode: "804",
+                    Measurements:
+                    [
+                        new EnqueueCalculatedMeasurementsHttpV1.Measurement(
+                            Position: 1,
+                            EnergyQuantity: receiver1Quantity,
+                            QuantityQuality: Quality.AsProvided),
+                    ]),
+                new EnqueueCalculatedMeasurementsHttpV1.ReceiversWithMeasurements(
+                    Receivers:
+                    [
+                        new EnqueueCalculatedMeasurementsHttpV1.Actor(
+                            ActorNumber: ActorNumber.Create(receiver2ActorNumber).ToProcessManagerActorNumber(),
+                            ActorRole: receiver2ActorRole.ToProcessManagerActorRole()),
+                    ],
+                    StartDateTime: receiver2Start.ToDateTimeOffset(),
+                    EndDateTime: receiver2End.ToDateTimeOffset(),
+                    RegistrationDateTime: startDateTime.ToDateTimeOffset(),
+                    GridAreaCode: "804",
+                    Measurements:
+                    [
+                        new EnqueueCalculatedMeasurementsHttpV1.Measurement(
+                            Position: 1,
+                            EnergyQuantity: receiver2Quantity,
+                            QuantityQuality: Quality.AsProvided),
+                    ]),
             ]);
 
         // Act
@@ -145,36 +178,51 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
             .Where(om => om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
 
-        enqueuedOutgoingMessages.Should().ContainSingle();
+        enqueuedOutgoingMessages.Should().HaveCount(2);
 
         // => Verify that the enqueued message can be peeked
-        var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
-            actor: new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole),
-            category: MessageCategory.MeasureData);
+        List<(Actor Actor, decimal EnergyQuantity, Instant Start, Instant End)> expectedReceivers =
+        [
+            (new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole),
+                receiver1Quantity,
+                receiver1Start,
+                receiver1End),
+            (new Actor(ActorNumber.Create(receiver2ActorNumber), receiver2ActorRole),
+                receiver2Quantity,
+                receiver2Start,
+                receiver2End),
+        ];
 
-        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
-        await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+        foreach (var expectedReceiver in expectedReceivers)
+        {
+            var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
+                actor: expectedReceiver.Actor,
+                category: MessageCategory.MeasureData);
 
-        // Ensure status code is 200 OK, since EnsureSuccessStatusCode() also allows 204 No Content
-        peekResponse.StatusCode.Should()
-            .Be(
-                HttpStatusCode.OK,
-                $"the peek request for receiver {receiver1ActorNumber} should return OK status code (with content)");
+            var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
+            await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
 
-        var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
-        peekResponseContent.Should()
-            .NotBeNullOrEmpty()
-            .And.Contain(
-                "NotifyValidatedMeasureData",
-                $"the peeked messages for receiver {receiver1ActorNumber} should be a notify validated measure data")
-            .And.Contain(
-                $"\"quantity\": {receiver1Quantity}",
-                $"the peeked messages for receiver {receiver1ActorNumber} should have the expected measure data")
-            .And.Contain(
-                $"\"value\": \"{startDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
-                $"the peeked messages for receiver {receiver1ActorNumber} should have the expected start")
-            .And.Contain(
-                $"\"value\": \"{secondPositionEnd.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
-                $"the peeked messages for receiver {receiver1ActorNumber} should have the expected end");
+            // Ensure status code is 200 OK, since EnsureSuccessStatusCode() also allows 204 No Content
+            peekResponse.StatusCode.Should()
+                .Be(
+                    HttpStatusCode.OK,
+                    $"because the peek request for receiver {expectedReceiver.Actor.ActorNumber} should return OK status code (with content)");
+
+            var peekResponseContent = await peekResponse.Content.ReadAsStringAsync();
+            peekResponseContent.Should()
+                .NotBeNullOrEmpty()
+                .And.Contain(
+                    "NotifyValidatedMeasureData",
+                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should be a notify validated measure data")
+                .And.Contain(
+                    $"\"quantity\": {expectedReceiver.EnergyQuantity}",
+                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected measure data")
+                .And.Contain(
+                    $"\"value\": \"{expectedReceiver.Start.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
+                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected start")
+                .And.Contain(
+                    $"\"value\": \"{expectedReceiver.End.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)}\"",
+                    $"because the peeked messages for receiver {expectedReceiver.Actor.ActorNumber} should have the expected end");
+        }
     }
 }
