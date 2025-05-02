@@ -91,7 +91,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new ForwardMeteredDataMessageSeriesDto(
+                    series: new ForwardMeasurementsMessageSeriesDto(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: "1234567890123456",
                         MarketEvaluationPointType: MeteringPointType.Consumption,

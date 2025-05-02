@@ -425,7 +425,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                         businessReason: BusinessReason.PeriodicMetering,
                         relatedToMessageId: MessageId.New(),
                         gridAreaCode: "804",
-                        series: new ForwardMeteredDataMessageSeriesDto(
+                        series: new ForwardMeasurementsMessageSeriesDto(
                             TransactionId: TransactionId.New(),
                             MarketEvaluationPointNumber: "1234567890123",
                             MarketEvaluationPointType: MeteringPointType.Consumption,
@@ -599,7 +599,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new ForwardMeteredDataMessageSeriesDto(
+                    series: new ForwardMeasurementsMessageSeriesDto(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: "1234567890123456",
                         MarketEvaluationPointType: MeteringPointType.Consumption,
@@ -708,7 +708,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new ForwardMeteredDataMessageSeriesDto(
+                    series: new ForwardMeasurementsMessageSeriesDto(
                         TransactionId: TransactionId.New(),
                         MarketEvaluationPointNumber: "1234567890123456",
                         MarketEvaluationPointType: MeteringPointType.Consumption,

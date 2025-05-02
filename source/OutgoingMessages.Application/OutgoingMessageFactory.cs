@@ -420,7 +420,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        CalculatedMeteredDataMessageDto message,
+        CalculatedMeasurementsMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {

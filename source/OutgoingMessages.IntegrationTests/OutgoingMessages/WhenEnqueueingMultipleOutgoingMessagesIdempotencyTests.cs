@@ -413,7 +413,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             businessReason: BusinessReason.PeriodicMetering,
             relatedToMessageId: relatedToMessageId,
             gridAreaCode: "804",
-            series: new ForwardMeteredDataMessageSeriesDto(
+            series: new ForwardMeasurementsMessageSeriesDto(
                 TransactionId: TransactionId.New(),
                 MarketEvaluationPointNumber: "1234567890123",
                 MarketEvaluationPointType: MeteringPointType.Consumption,

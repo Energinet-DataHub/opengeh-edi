@@ -45,7 +45,7 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
                     Quality: Quality.FromName(x.QuantityQuality.Name)))
             .ToList();
 
-        var acceptedForwardMeteredDataMessageDto = new CalculatedMeteredDataMessageDto(
+        var acceptedForwardMeteredDataMessageDto = new CalculatedMeasurementsMessageDto(
             eventId: EventId.From(new Random(requestBody.GetHashCode()).NextInt64().ToString()),
             externalId: new ExternalId(Guid.NewGuid()),
             receiver: new Actor(
@@ -53,7 +53,7 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
                 ActorRole.FromName(measurements.Receiver.ActorRole.Name)),
             businessReason: BusinessReason.PeriodicMetering,
             gridAreaCode: measurements.GridAreaCode,
-            series: new ForwardMeteredDataMessageSeriesDto(
+            series: new ForwardMeasurementsMessageSeriesDto(
                 TransactionId: TransactionId.New(),
                 MarketEvaluationPointNumber: measurements.MeteringPointId,
                 MarketEvaluationPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),

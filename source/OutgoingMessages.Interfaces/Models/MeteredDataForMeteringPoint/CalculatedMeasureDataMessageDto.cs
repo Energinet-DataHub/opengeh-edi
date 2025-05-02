@@ -16,13 +16,13 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed class CalculatedMeteredDataMessageDto(
+public sealed class CalculatedMeasurementsMessageDto(
     EventId eventId,
     ExternalId externalId,
     Actor receiver,
     BusinessReason businessReason,
     string gridAreaCode,
-    ForwardMeteredDataMessageSeriesDto series)
+    ForwardMeasurementsMessageSeriesDto series)
     : OutgoingMessageDto(
         DocumentType.NotifyValidatedMeasureData,
         receiver.ActorNumber,
@@ -33,7 +33,7 @@ public sealed class CalculatedMeteredDataMessageDto(
         externalId,
         null)
 {
-    public ForwardMeteredDataMessageSeriesDto Series { get; } = series;
+    public ForwardMeasurementsMessageSeriesDto Series { get; } = series;
 
     public string GridAreaCode { get; set; } = gridAreaCode;
 }

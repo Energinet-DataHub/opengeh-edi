@@ -23,7 +23,7 @@ public sealed class AcceptedForwardMeteredDataMessageDto(
     BusinessReason businessReason,
     MessageId relatedToMessageId,
     string gridAreaCode,
-    ForwardMeteredDataMessageSeriesDto series)
+    ForwardMeasurementsMessageSeriesDto series)
     : OutgoingMessageDto(
         DocumentType.NotifyValidatedMeasureData,
         receiver.ActorNumber,
@@ -34,7 +34,7 @@ public sealed class AcceptedForwardMeteredDataMessageDto(
         externalId,
         relatedToMessageId)
 {
-    public ForwardMeteredDataMessageSeriesDto Series { get; } = series;
+    public ForwardMeasurementsMessageSeriesDto Series { get; } = series;
 
     public string GridAreaCode { get; set; } = gridAreaCode;
 }
