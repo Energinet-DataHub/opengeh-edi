@@ -48,8 +48,6 @@ public class B2CWebApiFixture : IAsyncLifetime
             IntegrationTestConfiguration.Credential);
 
         B2CWebApiApplicationFactory = new B2CWebApiApplicationFactory();
-
-        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public EdiDatabaseManager DatabaseManager { get; }
@@ -68,8 +66,6 @@ public class B2CWebApiFixture : IAsyncLifetime
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private B2CWebApiApplicationFactory B2CWebApiApplicationFactory { get; }
-
-    private string AppConfigEndpoint { get; }
 
     public async Task InitializeAsync()
     {
@@ -151,7 +147,7 @@ public class B2CWebApiFixture : IAsyncLifetime
             { $"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
-            { AppConfiguration.AppConfigEndpoint, AppConfigEndpoint },
+            { AppConfiguration.AppConfigEndpoint, IntegrationTestConfiguration.AppConfigurationEndpoint },
         };
 
         return appSettings;

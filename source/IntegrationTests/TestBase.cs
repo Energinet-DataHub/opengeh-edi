@@ -224,7 +224,7 @@ public class TestBase : IDisposable
         var config = new ConfigurationBuilder()
                 .AddAzureAppConfiguration(options =>
                 {
-                    var appConfigEndpoint = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
+                    var appConfigEndpoint = Fixture.IntegrationTestConfiguration.AppConfigurationEndpoint;
                     options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
                         .UseFeatureFlags(featureFlagOptions =>
                         {
@@ -255,7 +255,7 @@ public class TestBase : IDisposable
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
                     // => App Configuration
-                    [$"{nameof(BuildingBlocks.Infrastructure.Configuration.AppConfiguration.AppConfigEndpoint)}"] = Fixture.AppConfigEndpoint,
+                    [$"{nameof(BuildingBlocks.Infrastructure.Configuration.AppConfiguration.AppConfigEndpoint)}"] = Fixture.IntegrationTestConfiguration.AppConfigurationEndpoint,
                 })
             .Build();
 

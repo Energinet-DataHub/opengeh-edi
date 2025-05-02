@@ -128,8 +128,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(AuditLogMockServer));
 
         LogStopwatch(constructorStopwatch, "B2BApiAppFixture constructor");
-
-        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public AuditLogMockServer AuditLogMockServer { get; }
@@ -174,8 +172,6 @@ public class B2BApiAppFixture : IAsyncLifetime
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
-
-    private string AppConfigEndpoint { get; }
 
     public async Task InitializeAsync()
     {
@@ -516,7 +512,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         // App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(AppConfiguration.AppConfigEndpoint),
-            AppConfigEndpoint);
+            IntegrationTestConfiguration.AppConfigurationEndpoint);
 
         return appHostSettings;
     }
