@@ -31,7 +31,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string subsystemName = "EDI";
 
-// Configure Azure App Configuration
+// Feature management
+//  * Configure load/refresh from Azure App Configuration
 builder.Configuration.AddAzureAppConfigurationForWebApp(builder.Configuration);
 
 builder.Services
@@ -90,6 +91,10 @@ var app = builder.Build();
 
 var isDevelopment = app.Environment.IsDevelopment();
 
+// Feature management
+//  * Enables middleware that handles refresh from Azure App Configuration
+app.UseAzureAppConfiguration();
+
 app.UseRouting();
 
 if (isDevelopment)
@@ -98,8 +103,6 @@ if (isDevelopment)
 app
     .UseSwaggerForWebApp()
     .UseHttpsRedirection()
-    // Azure App Configuration middleware that ensures feature flags are refreshed
-    .UseAzureAppConfiguration()
     .UseAuthentication()
     .UseAuthorization()
     .UseUserMiddlewareForWebApp<FrontendUser>();

@@ -97,6 +97,10 @@ public static class HostFactory
             })
             .ConfigureFunctionsWebApplication(builder =>
             {
+                // Feature management
+                //  * Enables middleware that handles refresh from Azure App Configuration
+                builder.UseAzureAppConfiguration();
+
                 // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                 builder.UseWhen<UnHandledExceptionMiddleware>(
                     functionContext => functionContext.IsProtectedHttpTrigger());
@@ -110,12 +114,11 @@ public static class HostFactory
                 {
                     settings.Mode = DfmMode.ReadOnly;
                 });
-
-                // Azure App Configuration middleware that ensures feature flags are refreshed
-                builder.UseAzureAppConfiguration();
             })
             .ConfigureAppConfiguration((context, configBuilder) =>
             {
+                // Feature management
+                //  * Configure load/refresh from Azure App Configuration
                 configBuilder.AddAzureAppConfigurationForIsolatedWorker();
             })
             .ConfigureLogging((hostingContext, logging) =>
