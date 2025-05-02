@@ -66,7 +66,7 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
                 EndedDateTime: measurements.EndDateTime.ToInstant(),
                 EnergyObservations: energyObservations));
 
-        await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None)
+        await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, hostCancellationToken)
             .ConfigureAwait(false);
 
         await _unitOfWork.CommitTransactionAsync(hostCancellationToken).ConfigureAwait(false);
