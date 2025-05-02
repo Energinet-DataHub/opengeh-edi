@@ -14,9 +14,6 @@
 
 using System.Net;
 using System.Net.Http.Headers;
-using AutoFixture;
-using Azure.Core;
-using Azure.Identity;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using FluentAssertions;
 using Xunit;
