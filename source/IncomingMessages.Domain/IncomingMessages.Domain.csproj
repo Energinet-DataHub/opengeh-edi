@@ -11,7 +11,7 @@
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="JsonSchema.Net" Version="7.3.3" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.3" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
       <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
