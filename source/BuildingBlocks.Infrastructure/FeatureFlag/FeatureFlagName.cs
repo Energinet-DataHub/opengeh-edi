@@ -15,8 +15,12 @@
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+/// List of all Feature Flags that exists in the subsystem.
+/// The feature flags can be locally configured through app settings,
+/// or exist in Azure App Configuration.
+/// If configured locally the name of a feature flag configuration
+/// must be prefixed with "FeatureManagement__",
+/// ie. "FeatureManagement__UseMonthlyAmountPerChargeResultProduced".
 /// </summary>
 public static class FeatureFlagName
 {
