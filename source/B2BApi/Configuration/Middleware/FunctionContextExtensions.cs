@@ -97,27 +97,4 @@ public static class FunctionContextExtensions
 
         return mediaType;
     }
-
-    /// <summary>
-    /// Checks if the function associated with the FunctionContext has the [Authorize] attribute.
-    /// </summary>
-    /// <param name="context">The FunctionContext.</param>
-    /// <returns>True if the function has the [Authorize] attribute, otherwise false.</returns>
-    private static bool HasAuthorizeAttribute(this FunctionContext context)
-    {
-        var functionType = context.FunctionDefinition.EntryPoint.GetType();
-
-        var jek1 = context.FunctionDefinition.EntryPoint
-            .GetType()
-            .Assembly
-            .GetType(context.FunctionDefinition.EntryPoint)
-            ?
-            .GetCustomAttributes(false);
-
-        var hej = functionType.GetCustomAttributes(true);
-        var hasAuthorizeAttribute = functionType.GetCustomAttributes(false)
-            .FirstOrDefault(attr => attr.GetType().Name == "AuthorizeAttribute") != null;
-
-        return hasAuthorizeAttribute;
-    }
 }
