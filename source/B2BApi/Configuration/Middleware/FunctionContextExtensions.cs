@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Net;
+using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -29,10 +31,9 @@ public static class FunctionContextExtensions
         var isHealthCheckEndpoint = context.FunctionDefinition.Name == "HealthCheck";
         var isDurableFunctionMonitorEndpoint = context.FunctionDefinition.PathToAssembly.EndsWith("durablefunctionsmonitor.dotnetisolated.core.dll");
 
-        // TODO: Fix this string
-        var isEnqueueTrigger = context.FunctionDefinition.Name == "EnqueueTrigger";
+        var hasAttribute = HasAuthorizeAttribute(context.FunctionDefinition.EntryPoint);
 
-        return isHttpTrigger && !isHealthCheckEndpoint && !isDurableFunctionMonitorEndpoint && !isEnqueueTrigger;
+        return isHttpTrigger && !isHealthCheckEndpoint && !isDurableFunctionMonitorEndpoint && !hasAttribute;
     }
 
     /// <summary>
@@ -96,5 +97,27 @@ public static class FunctionContextExtensions
         var mediaType = contentType?.Split(';').FirstOrDefault(s => s.Contains('/'))?.Trim();
 
         return mediaType;
+    }
+
+    private static bool HasAuthorizeAttribute(string fullMethodName)
+    {
+        var methodInfo = GetMethodInfo(fullMethodName);
+        if (methodInfo == null)
+            return false;
+
+        var hasAuthorize = methodInfo.GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).Any();
+        return hasAuthorize;
+    }
+
+    private static MethodInfo? GetMethodInfo(string fullMethodName)
+    {
+        var lastDot = fullMethodName.LastIndexOf('.');
+        if (lastDot < 0) return null;
+
+        var typeName = fullMethodName.Substring(0, lastDot);
+        var methodName = fullMethodName.Substring(lastDot + 1);
+
+        var type = Type.GetType(typeName);
+        return type?.GetMethod(methodName);
     }
 }
