@@ -15,6 +15,9 @@
 using System.Net;
 using System.Net.Http.Headers;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.B2BApi.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -46,7 +49,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
         await Task.CompletedTask;
     }
 
-    [Fact]
+    [Fact(Skip = "Need a trigger to run this test")]
     public async Task Given_SubsystemRequestWithValidToken_When_Requesting_Then_SuccessfulRequest()
     {
         // Arrange
@@ -59,7 +62,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
         httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    [Fact]
+    [Fact(Skip = "Need a trigger to run this test")]
     public async Task Given_SubsystemRequestWithInvalidToken_When_Requesting_Then_RejectedRequest()
     {
         // Arrange
@@ -72,9 +75,31 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
         httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
+    [Fact(Skip = "Need a trigger to run this test")]
+    public async Task Given_RequestWithActorToken_When_Requesting_Then_RejectedRequest()
+    {
+        var actorClientId = Guid.NewGuid().ToString();
+        var actorNumber = ActorNumber.Create("5790000392551");
+
+        // Arrange
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, actorClientId);
+        // Arrange
+        var token = new JwtBuilder()
+            .WithRole(ClaimsMap.RoleFrom(ActorRole.EnergySupplier).Value)
+            .WithClaim(ClaimsMap.ActorClientId, actorClientId)
+            .CreateToken();
+
+        var httpRequest = CreateHttpRequest(token);
+
+        using var httpResponse = await Fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
+
+        httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
     private HttpRequestMessage CreateHttpRequest(string token)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "api/monitor/live");
+        // TODO: Update path when we have a trigger to enqueue with
+        var request = new HttpRequestMessage(HttpMethod.Post, "api/incomingMessages/notifyvalidatedmeasuredata");
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return request;

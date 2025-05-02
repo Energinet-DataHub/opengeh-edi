@@ -29,7 +29,10 @@ public static class FunctionContextExtensions
         var isHealthCheckEndpoint = context.FunctionDefinition.Name == "HealthCheck";
         var isDurableFunctionMonitorEndpoint = context.FunctionDefinition.PathToAssembly.EndsWith("durablefunctionsmonitor.dotnetisolated.core.dll");
 
-        return isHttpTrigger && !isHealthCheckEndpoint && !isDurableFunctionMonitorEndpoint;
+        // TODO: Fix this string
+        var isEnqueueTrigger = context.FunctionDefinition.Name == "EnqueueTrigger";
+
+        return isHttpTrigger && !isHealthCheckEndpoint && !isDurableFunctionMonitorEndpoint && !isEnqueueTrigger;
     }
 
     /// <summary>
@@ -93,5 +96,28 @@ public static class FunctionContextExtensions
         var mediaType = contentType?.Split(';').FirstOrDefault(s => s.Contains('/'))?.Trim();
 
         return mediaType;
+    }
+
+    /// <summary>
+    /// Checks if the function associated with the FunctionContext has the [Authorize] attribute.
+    /// </summary>
+    /// <param name="context">The FunctionContext.</param>
+    /// <returns>True if the function has the [Authorize] attribute, otherwise false.</returns>
+    private static bool HasAuthorizeAttribute(this FunctionContext context)
+    {
+        var functionType = context.FunctionDefinition.EntryPoint.GetType();
+
+        var jek1 = context.FunctionDefinition.EntryPoint
+            .GetType()
+            .Assembly
+            .GetType(context.FunctionDefinition.EntryPoint)
+            ?
+            .GetCustomAttributes(false);
+
+        var hej = functionType.GetCustomAttributes(true);
+        var hasAuthorizeAttribute = functionType.GetCustomAttributes(false)
+            .FirstOrDefault(attr => attr.GetType().Name == "AuthorizeAttribute") != null;
+
+        return hasAuthorizeAttribute;
     }
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -28,8 +27,6 @@ public class HealthCheckEndpoint
 
     private IHealthCheckEndpointHandler EndpointHandler { get; }
 
-    // TODO: REMOVE THIS AUTHORIZATION
-    [Authorize]
     [Function("HealthCheck")]
     public Task<HttpResponseData> RunAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "monitor/{endpoint}")]
