@@ -175,7 +175,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         // => Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.DocumentType == DocumentType.NotifyValidatedMeasureData)
+            .Where(om => om.ExternalId == new ExternalId(enqueueMessagesData.TransactionId) && om.DocumentType == DocumentType.NotifyValidatedMeasureData)
             .ToListAsync();
 
         enqueuedOutgoingMessages.Should().HaveCount(2);

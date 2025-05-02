@@ -50,8 +50,8 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
                     .ToList();
 
                 var acceptedForwardMeteredDataMessageDto = new CalculatedMeasurementsMessageDto(
-                    eventId: EventId.From(measurements.TransactionId),
-                    externalId: new ExternalId(Guid.NewGuid()),
+                    eventId: EventId.From(Guid.CreateVersion7()),
+                    externalId: new ExternalId(measurements.TransactionId),
                     receiver: new Actor(
                         ActorNumber.Create(receiver.ActorNumber),
                         ActorRole.FromName(receiver.ActorRole.Name)),
