@@ -14,6 +14,7 @@
 
 using System.Net;
 using System.Net.Http.Headers;
+using AutoFixture;
 using Azure.Core;
 using Azure.Identity;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -26,8 +27,6 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.SubsystemHttpTrigger;
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueHttpEndpointTests : IAsyncLifetime
 {
-    private const string ApplicationIdUriForTests = "https://management.azure.com";
-
     public EnqueueHttpEndpointTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
@@ -54,10 +53,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
     public async Task Given_SubsystemRequestWithValidToken_When_Requesting_Then_SuccessfulRequest()
     {
         // Arrange
-        var token = (
-            await new DefaultAzureCredential()
-            .GetTokenAsync(new TokenRequestContext([ApplicationIdUriForTests]), CancellationToken.None))
-        .Token;
+        var token = Fixture.CreateSubsystemToken();
 
         var httpRequest = CreateHttpRequest(token);
         using var httpResponse = await Fixture.AppHostManager.HttpClient.SendAsync(httpRequest);

@@ -14,6 +14,8 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
+using Azure.Core;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
@@ -59,10 +61,6 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 /// </summary>
 public class B2BApiAppFixture : IAsyncLifetime
 {
-    public const string ApplicationIdUri = "https://management.azure.com";
-
-    private const string Issuer = "123"; // TODO: Update this
-
     /// <summary>
     /// Durable Functions Task Hub Name
     /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
@@ -331,6 +329,14 @@ public class B2BApiAppFixture : IAsyncLifetime
                 elementSelector: (element) => element.Value.ToString().ToLower()));
     }
 
+    public string CreateSubsystemToken(string applicationIdUri = AuthenticationOptionsForTests.ApplicationIdUri)
+    {
+        var tokenResponse = IntegrationTestConfiguration.Credential.GetToken(
+            new TokenRequestContext([applicationIdUri]), CancellationToken.None);
+
+        return tokenResponse.Token;
+    }
+
     private static void StartHost(FunctionAppHostManager hostManager)
     {
         IEnumerable<string> hostStartupLog;
@@ -526,10 +532,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         // Subsystem authentication
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.ApplicationIdUri)}",
-            ApplicationIdUri);
+            AuthenticationOptionsForTests.ApplicationIdUri);
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.Issuer)}",
-            Issuer);
+            AuthenticationOptionsForTests.Issuer);
         return appHostSettings;
     }
 
