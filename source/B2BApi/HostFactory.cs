@@ -131,7 +131,7 @@ public static class HostFactory
             .ConfigureLogging(
                 (hostingContext, logging) =>
                 {
-                    logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
+                    logging.AddLoggingConfigurationForIsolatedWorker(hostingContext.Configuration);
                 })
             .Build();
     }
