@@ -222,15 +222,6 @@ public class TestBase : IDisposable
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
-                .AddAzureAppConfiguration(options =>
-                {
-                    var appConfigEndpoint = Fixture.IntegrationTestConfiguration.AppConfigurationEndpoint;
-                    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
-                        .UseFeatureFlags(featureFlagOptions =>
-                        {
-                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(1));
-                        });
-                })
             .AddEnvironmentVariables()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
@@ -254,8 +245,6 @@ public class TestBase : IDisposable
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
-                    // => App Configuration
-                    [$"{nameof(BuildingBlocks.Infrastructure.Configuration.AppConfiguration.AppConfigEndpoint)}"] = Fixture.IntegrationTestConfiguration.AppConfigurationEndpoint,
                 })
             .Build();
 

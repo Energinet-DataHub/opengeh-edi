@@ -15,8 +15,10 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.AppConfiguration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
@@ -511,8 +513,11 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(AppConfiguration.AppConfigEndpoint),
+            $"{AzureAppConfigurationOptions.SectionName}:{nameof(AzureAppConfigurationOptions.Endpoint)}",
             IntegrationTestConfiguration.AppConfigurationEndpoint);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            AppConfigurationManager.DisableProviderSettingName,
+            "true");
 
         return appHostSettings;
     }

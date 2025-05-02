@@ -14,6 +14,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.Core.App.Common.Extensions.Options;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.AppConfiguration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.OpenIdJwt;
@@ -147,7 +149,9 @@ public class B2CWebApiFixture : IAsyncLifetime
             { $"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
-            { AppConfiguration.AppConfigEndpoint, IntegrationTestConfiguration.AppConfigurationEndpoint },
+            // Configure Azure App Configuration
+            { $"{AzureAppConfigurationOptions.SectionName}:{nameof(AzureAppConfigurationOptions.Endpoint)}", IntegrationTestConfiguration.AppConfigurationEndpoint },
+            { AppConfigurationManager.DisableProviderSettingName, "true" },
         };
 
         return appSettings;
