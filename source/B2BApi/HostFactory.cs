@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Apache.Arrow;
 using Azure.Identity;
 using DurableFunctionsMonitor.DotNetIsolated;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
@@ -36,7 +35,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using DefaultAzureCredential = Azure.Identity.DefaultAzureCredential;
 using OutboxContext = Energinet.DataHub.EDI.Outbox.Infrastructure.OutboxContext;
 
 namespace Energinet.DataHub.EDI.B2BApi;
