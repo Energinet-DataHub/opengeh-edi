@@ -35,7 +35,7 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
         var requestBodyStream = request.Body;
         using var reader = new StreamReader(requestBodyStream);
         var requestBody = await reader.ReadToEndAsync(hostCancellationToken).ConfigureAwait(false);
-        var measurements = JsonSerializer.Deserialize<EnqueueMeasureDataSyncV1>(requestBody)!;
+        var measurements = JsonSerializer.Deserialize<EnqueueCalculatedMeasurementsHttpV1>(requestBody)!;
 
         var energyObservations = measurements.MeasureData
             .Select(x =>

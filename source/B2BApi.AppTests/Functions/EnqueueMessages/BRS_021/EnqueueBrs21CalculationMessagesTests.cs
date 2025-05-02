@@ -71,7 +71,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
     [Fact]
     public async Task
-        Given_EnqueueMeasureDataSyncV1_When_MessageIsReceived_AndWhen_MessageIsBundled_Then_MessageIsEnqueued_AndThen_MessageCanBePeeked()
+        Given_EnqueueCalculatedMeasurementsHttpV1_When_MessageIsReceived_AndWhen_MessageIsBundled_Then_MessageIsEnqueued_AndThen_MessageCanBePeeked()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
@@ -91,7 +91,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         var firstPositionEnd = startDateTime.Plus(Duration.FromMinutes(15));
         var secondPositionEnd = firstPositionEnd.Plus(Duration.FromMinutes(15));
 
-        var enqueueMessagesData = new EnqueueMeasureDataSyncV1(
+        var enqueueMessagesData = new EnqueueCalculatedMeasurementsHttpV1(
             MeteringPointId: "1234567890123",
             MeteringPointType: ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
@@ -118,7 +118,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
         // Act
         // => When message is received
-        var httpRequest = await _fixture.CreateEnqueueMeasureDataSyncV1HttpRequestAsync(
+        var httpRequest = await _fixture.CreateEnqueueCalculatedMeasurementsHttpV1RequestAsync(
             enqueueMessagesData,
             "electricalHeatingOrSomething");
 

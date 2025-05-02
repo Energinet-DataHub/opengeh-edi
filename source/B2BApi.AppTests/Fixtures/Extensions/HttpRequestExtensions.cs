@@ -91,9 +91,9 @@ public static class HttpRequestExtensions
             $"api/dequeue/{messageId}");
     }
 
-    public static async Task<HttpRequestMessage> CreateEnqueueMeasureDataSyncV1HttpRequestAsync(
+    public static async Task<HttpRequestMessage> CreateEnqueueCalculatedMeasurementsHttpV1RequestAsync(
         this B2BApiAppFixture fixture,
-        EnqueueMeasureDataSyncV1 forwardMeteredDataAcceptedV1,
+        EnqueueCalculatedMeasurementsHttpV1 forwardMeteredDataAcceptedV1,
         string calculationTypeName)
     {
         HttpRequestMessage? request = null;
