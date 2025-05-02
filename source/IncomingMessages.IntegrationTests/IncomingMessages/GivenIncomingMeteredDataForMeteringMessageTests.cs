@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -31,6 +32,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessag
 
 public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesTestBase
 {
+    private readonly ITestOutputHelper _testOutputHelper;
     private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ActorIdentity _actorIdentity;
@@ -40,6 +42,7 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
         ITestOutputHelper testOutputHelper)
         : base(incomingMessagesTestFixture, testOutputHelper)
     {
+        _testOutputHelper = testOutputHelper;
         _messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
             parser => (parser.DocumentType, parser.DocumentFormat),
             parser => parser);
@@ -55,6 +58,15 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
 
         _validateIncomingMessage = GetService<ValidateIncomingMessage>();
     }
+
+    // public static TheoryData<DocumentFormat> GetAllDocumentFormat => new(
+    //     EnumerationType.GetAll<DocumentFormat>().ToArray());
+
+    public static TheoryData<DocumentFormat> GetAllDocumentFormat => new(
+        new List<DocumentFormat>
+        {
+            DocumentFormat.Json,
+        });
 
     [Fact]
     public async Task When_ReceiverIdIsDatahub_Then_ValidationSucceed()
@@ -661,6 +673,69 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
         var messageParser = await ParseMessageAsync(message.Stream, documentFormat);
         messageParser.ParserResult.Errors.Should().Contain(error => error is InvalidMessageStructure);
         messageParser.ParserResult.Success.Should().BeFalse();
+    }
+
+    [Theory]
+    [MemberData(nameof(GetAllDocumentFormat))]
+    public async Task AndGiven_EachTransactionHasOneYearDataWithQuarterlyResolution_When_MessageSizeIs50mb_Then_ValidationSucceedAndWithinAllowedExecutionTimeAndMemoryUsage(DocumentFormat documentFormat)
+    {
+        // Measure memory before
+        var memoryBefore = GC.GetTotalMemory(false);
+
+        // Set max number of transactions based on document format before exceeding the limit of 50mb
+        var maxNumberOfTransactions = DocumentFormat.Ebix == documentFormat ? 6
+                                           : DocumentFormat.Xml == documentFormat ? 12
+                                           : 17;
+
+        // Create transaction for document format
+        var transactions = new List<(string TransactionId, Instant PeriodStart, Instant PeriodEnd, Resolution Resolution)>();
+        for (var i = 0; i < maxNumberOfTransactions; i++)
+        {
+           transactions.Add(
+               (
+                   TransactionId: $"{i}{i}{i}{i}",
+                   PeriodStart: Instant.FromUtc(2024, 1, 1, 0, 0),
+                   PeriodEnd: Instant.FromUtc(2024, 12, 31, 23, 45),
+                   Resolution: Resolution.QuarterHourly));
+        }
+
+        var message = MeteredDataForMeteringPointBuilder.CreateIncomingMessage(
+            documentFormat,
+            _actorIdentity.ActorNumber,
+            transactions,
+            businessType: "23");
+
+        if (message.Stream.CanSeek)
+        {
+            var byteSize = message.Stream.Length;
+            _testOutputHelper.WriteLine($"Message Stream size in bytes: {byteSize} ({byteSize / 1024 / 1024} MB)");
+
+            // Rewind the stream to the beginning
+            message.Stream.Position = 0;
+        }
+
+        // Act
+        var stopwatch = Stopwatch.StartNew();
+        var messageParser = await ParseMessageAsync(message.Stream, documentFormat);
+        var result = await _validateIncomingMessage.ValidateAsync(
+            messageParser.IncomingMessage!,
+            documentFormat,
+            CancellationToken.None);
+
+        stopwatch.Stop();
+         // Measure memory after
+        var memoryAfter = GC.GetTotalMemory(false);
+
+        result.Should().NotBeNull();
+        result.Success.Should().BeTrue();
+
+        // Assert memory usage (allowing some tolerance for runtime variations)
+        var memoryUsed = memoryAfter - memoryBefore;
+        var maxAllowedMemoryUse = 50 * 1024 * 1024;
+
+        _testOutputHelper.WriteLine($"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB) within {stopwatch.ElapsedMilliseconds} ms");
+        Assert.True(memoryUsed < maxAllowedMemoryUse, $"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB), expected {maxAllowedMemoryUse} bytes ({maxAllowedMemoryUse / 1024 / 1024} MB).");
+        Assert.True(stopwatch.ElapsedMilliseconds < 500, $"Execution time: {stopwatch.ElapsedMilliseconds} ms, expected less than 500 ms.");
     }
 
     private async Task<(MeteredDataForMeteringPointMessageBase? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(
