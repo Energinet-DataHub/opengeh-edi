@@ -54,9 +54,9 @@ public static class HostFactory
                 {
                     // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                     builder.UseWhen<UnHandledExceptionMiddleware>(
-                        functionContext => functionContext.IsProtectedHttpTrigger());
+                        functionContext => functionContext.IsActorProtectedEndpoint());
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
-                        functionContext => functionContext.IsProtectedHttpTrigger());
+                        functionContext => functionContext.IsActorProtectedEndpoint());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
 
                     // Subsystem authentication
