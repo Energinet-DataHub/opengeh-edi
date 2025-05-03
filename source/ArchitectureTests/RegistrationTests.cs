@@ -82,8 +82,8 @@ public class RegistrationTests
         // App Configuration settings
         Environment.SetEnvironmentVariable(nameof(AppConfiguration.AppConfigEndpoint), "https://appcs-intgra-t-we-002.azconfig.io");
 
-        Environment.SetEnvironmentVariable($"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.ApplicationIdUri)}", "NotEmpty");
-        Environment.SetEnvironmentVariable($"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.Issuer)}", "NotEmpty");
+        Environment.SetEnvironmentVariable($"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.ApplicationIdUri)}", "NotEmpty");
+        Environment.SetEnvironmentVariable($"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.Issuer)}", "NotEmpty");
 
         _host = HostFactory.CreateHost(Program.TokenValidationParameters);
     }

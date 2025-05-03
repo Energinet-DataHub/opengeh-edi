@@ -531,10 +531,10 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Subsystem authentication
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.ApplicationIdUri)}",
+            $"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.ApplicationIdUri)}",
             AuthenticationOptionsForTests.ApplicationIdUri);
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{AuthenticationOptions.SectionName}__{nameof(AuthenticationOptions.Issuer)}",
+            $"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.Issuer)}",
             AuthenticationOptionsForTests.Issuer);
         return appHostSettings;
     }

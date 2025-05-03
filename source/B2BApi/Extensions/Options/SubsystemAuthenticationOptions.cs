@@ -17,12 +17,12 @@ using System.ComponentModel.DataAnnotations;
 namespace Energinet.DataHub.EDI.B2BApi.Extensions.Options;
 
 /// <summary>
-/// Contains options for validating the JWT bearer tokens that must be sent as
-/// part of any http request for protected http endpoints.
+/// Contains options for validating the JWT bearer tokens from other subsystems,
+/// when they request on a http function trigger with the attribute: [Authorize] (<see cref="Microsoft.AspNetCore.Authorization.AuthorizeAttribute"/>)
 /// </summary>
-public class AuthenticationOptions
+public class SubsystemAuthenticationOptions
 {
-    public const string SectionName = "Auth";
+    public const string SectionName = "SubsystemAuthentication";
 
     /// <summary>
     /// Uri (scope) which must match the audience of the token.

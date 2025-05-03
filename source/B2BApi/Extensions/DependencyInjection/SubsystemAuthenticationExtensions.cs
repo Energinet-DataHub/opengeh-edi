@@ -16,7 +16,6 @@ using DarkLoop.Azure.Functions.Authorization;
 using Energinet.DataHub.EDI.B2BApi.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Protocols.Configuration;
 
 namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 
@@ -26,15 +25,19 @@ public static class SubsystemAuthenticationExtensions
     /// Register services necessary for enabling an Azure Function App (isolated worker model)
     /// to use JWT Bearer authentication for HttpTrigger's. This is using DarkLoop Authorization extension.
     ///
-    /// Expects <see cref="AuthenticationOptions"/> has been configured in <see cref="AuthenticationOptions.SectionName"/>.
+    /// Expects <see cref="SubsystemAuthenticationOptions"/> has been configured in <see cref="SubsystemAuthenticationOptions.SectionName"/>.
     /// </summary>
+    /// <remarks>
+    /// This extension enables the use of the attribute [Authorize] (<see cref="Microsoft.AspNetCore.Authorization.AuthorizeAttribute"/>) on a HttpTrigger.
+    /// When this attribute is used, the authentication middlewares will expect that the requester is another subsystem
+    /// </remarks>
     internal static IServiceCollection AddSubsystemAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
         var authenticationOptions = configuration
-            .GetRequiredSection(AuthenticationOptions.SectionName)
-            .Get<AuthenticationOptions>();
+            .GetRequiredSection(SubsystemAuthenticationOptions.SectionName)
+            .Get<SubsystemAuthenticationOptions>();
 
         if (authenticationOptions == null)
             throw new InvalidOperationException("Missing authentication configuration.");
@@ -52,11 +55,11 @@ public static class SubsystemAuthenticationExtensions
         return services;
     }
 
-    private static void GuardAuthenticationOptions(AuthenticationOptions authenticationOptions)
+    private static void GuardAuthenticationOptions(SubsystemAuthenticationOptions subsystemAuthenticationOptions)
     {
-        if (string.IsNullOrWhiteSpace(authenticationOptions.ApplicationIdUri))
-            throw new InvalidConfigurationException($"Missing '{nameof(AuthenticationOptions.ApplicationIdUri)}'.");
-        if (string.IsNullOrWhiteSpace(authenticationOptions.Issuer))
-            throw new InvalidConfigurationException($"Missing '{nameof(AuthenticationOptions.Issuer)}'.");
+        if (string.IsNullOrWhiteSpace(subsystemAuthenticationOptions.ApplicationIdUri))
+            throw new InvalidOperationException($"Missing '{nameof(SubsystemAuthenticationOptions.ApplicationIdUri)}'.");
+        if (string.IsNullOrWhiteSpace(subsystemAuthenticationOptions.Issuer))
+            throw new InvalidOperationException($"Missing '{nameof(SubsystemAuthenticationOptions.Issuer)}'.");
     }
 }
