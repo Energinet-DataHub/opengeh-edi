@@ -108,7 +108,6 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
             MeteringPointType: MeteringPointType.Consumption,
             Resolution: Resolution.QuarterHourly,
             MeasureUnit: MeasurementUnit.KilowattHour,
-            //ProductNumber: "test-product-number",
             Data:
             [
                 new EnqueueCalculatedMeasurementsHttpV1.ReceiversWithMeasurements(
