@@ -62,7 +62,7 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
                         MarketEvaluationPointNumber: measurements.MeteringPointId,
                         MarketEvaluationPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
                         OriginalTransactionIdReferenceId: null,
-                        Product: string.Empty, // TODO (MWO): What should we put here?
+                        Product: "8716867000030",
                         QuantityMeasureUnit: MeasurementUnit.FromName(measurements.MeasureUnit.Name),
                         RegistrationDateTime: receiversWithMeasurements.RegistrationDateTime.ToInstant(),
                         Resolution: Resolution.FromName(measurements.Resolution.Name),
