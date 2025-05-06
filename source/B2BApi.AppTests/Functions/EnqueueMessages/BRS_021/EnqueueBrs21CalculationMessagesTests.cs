@@ -84,7 +84,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         ]);
 
         // Arrange
-        // => Given enqueue BRS-021 service bus message
+        // => Given enqueue BRS-021 http request
         const string receiver1ActorNumber = "1111111111111";
         var receiver1ActorRole = ActorRole.EnergySupplier;
         const int receiver1Quantity = 11;
