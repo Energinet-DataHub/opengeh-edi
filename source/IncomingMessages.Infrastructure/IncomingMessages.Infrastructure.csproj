@@ -25,7 +25,7 @@
       <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="5.0.1"/>
       <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="2.1.4"/>
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.11.0" />
-      <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.4"/>
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.4"/>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
