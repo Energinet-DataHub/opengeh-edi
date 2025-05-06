@@ -119,7 +119,7 @@ public static class HostFactory
             {
                 // Feature management
                 //  * Configure load/refresh from Azure App Configuration
-                configBuilder.AddAzureAppConfigurationForIsolatedWorker();
+                configBuilder.AddAzureAppConfigurationForIsolatedWorker(defaultAzureCredential);
             })
             .ConfigureLogging((hostingContext, logging) =>
             {
