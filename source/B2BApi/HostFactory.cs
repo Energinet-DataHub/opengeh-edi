@@ -99,7 +99,7 @@ public static class HostFactory
             {
                 // Feature management
                 //  * Enables middleware that handles refresh from Azure App Configuration
-                builder.UseAzureAppConfiguration();
+                builder.UseAzureAppConfigurationForIsolatedWorker();
 
                 // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                 builder.UseWhen<UnHandledExceptionMiddleware>(
