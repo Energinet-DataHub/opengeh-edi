@@ -85,11 +85,11 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-021 http request
-        const string receiver1ActorNumber = "1111111111111";
+        var receiver1ActorNumber = ActorNumber.Create("1111111111111");
         var receiver1ActorRole = ActorRole.EnergySupplier;
         const int receiver1Quantity = 11;
 
-        const string receiver2ActorNumber = "2222222222222";
+        var receiver2ActorNumber = ActorNumber.Create("2222222222222");
         var receiver2ActorRole = ActorRole.EnergySupplier;
         const int receiver2Quantity = 22;
 
@@ -115,7 +115,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
                     Receivers:
                     [
                         new EnqueueCalculatedMeasurementsHttpV1.Actor(
-                            ActorNumber: ActorNumber.Create(receiver1ActorNumber).ToProcessManagerActorNumber(),
+                            ActorNumber: receiver1ActorNumber.ToProcessManagerActorNumber(),
                             ActorRole: receiver1ActorRole.ToProcessManagerActorRole()),
                     ],
                     StartDateTime: receiver1Start.ToDateTimeOffset(),
@@ -133,7 +133,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
                     Receivers:
                     [
                         new EnqueueCalculatedMeasurementsHttpV1.Actor(
-                            ActorNumber: ActorNumber.Create(receiver2ActorNumber).ToProcessManagerActorNumber(),
+                            ActorNumber: receiver2ActorNumber.ToProcessManagerActorNumber(),
                             ActorRole: receiver2ActorRole.ToProcessManagerActorRole()),
                     ],
                     StartDateTime: receiver2Start.ToDateTimeOffset(),
@@ -152,8 +152,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         // Act
         // => When message is received
         var httpRequest = await _fixture.CreateEnqueueCalculatedMeasurementsHttpV1RequestAsync(
-            enqueueMessagesData,
-            "electricalHeatingOrSomething");
+            enqueueMessagesData);
 
         await _fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
 
@@ -183,11 +182,11 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
         // => Verify that the enqueued message can be peeked
         List<(Actor Actor, decimal EnergyQuantity, Instant Start, Instant End)> expectedReceivers =
         [
-            (new Actor(ActorNumber.Create(receiver1ActorNumber), receiver1ActorRole),
+            (new Actor(receiver1ActorNumber, receiver1ActorRole),
                 receiver1Quantity,
                 receiver1Start,
                 receiver1End),
-            (new Actor(ActorNumber.Create(receiver2ActorNumber), receiver2ActorRole),
+            (new Actor(receiver2ActorNumber, receiver2ActorRole),
                 receiver2Quantity,
                 receiver2Start,
                 receiver2End),

@@ -93,8 +93,7 @@ public static class HttpRequestExtensions
 
     public static async Task<HttpRequestMessage> CreateEnqueueCalculatedMeasurementsHttpV1RequestAsync(
         this B2BApiAppFixture fixture,
-        EnqueueCalculatedMeasurementsHttpV1 enqueueCalculatedMeasurementsHttpV1,
-        string calculationTypeName)
+        EnqueueCalculatedMeasurementsHttpV1 enqueueCalculatedMeasurementsHttpV1)
     {
         HttpRequestMessage? request = null;
         try
@@ -105,7 +104,7 @@ public static class HttpRequestExtensions
                     ActorNumber.Create(enqueueCalculatedMeasurementsHttpV1.Data.First().Receivers.First().ActorNumber),
                     ActorRole.FromName(enqueueCalculatedMeasurementsHttpV1.Data.First().Receivers.First().ActorRole.Name)),
                 HttpMethod.Post,
-                $"api/enqueue/brs021/calculations/{calculationTypeName}",
+                $"api/enqueue/{enqueueCalculatedMeasurementsHttpV1.Route}",
                 new StringContent(
                     JsonSerializer.Serialize(enqueueCalculatedMeasurementsHttpV1),
                     Encoding.UTF8,

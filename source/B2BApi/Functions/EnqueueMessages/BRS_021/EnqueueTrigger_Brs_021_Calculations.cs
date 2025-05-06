@@ -36,13 +36,15 @@ public class EnqueueTrigger_Brs_021_Calculations(
 
     [Function(nameof(EnqueueTrigger_Brs_021_Calculations))]
     public async Task<HttpResponseData> RunAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "enqueue/brs021/calculations/{calculationTypeName}")] // TODO (MWO): What so we want the route to be?
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = $"enqueue/{EnqueueCalculatedMeasurementsHttpV1.RouteName}")]
         HttpRequestData request,
         FunctionContext executionContext,
-        string? calculationTypeName, // TODO (MWO): Do we need this?
         CancellationToken hostCancellationToken)
     {
-        _logger.LogInformation("BRS-021 enqueue request for {calculationTypeName} received", calculationTypeName);
+        _logger.LogInformation("BRS-021 enqueue request for calculation received");
 
         await _handler.HandleAsync(request, hostCancellationToken).ConfigureAwait(false);
 
