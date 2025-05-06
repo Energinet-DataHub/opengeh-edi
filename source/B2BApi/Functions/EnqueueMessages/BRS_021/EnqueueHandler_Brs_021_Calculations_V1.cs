@@ -58,7 +58,7 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
                     businessReason: BusinessReason.PeriodicMetering,
                     gridAreaCode: receiversWithMeasurements.GridAreaCode,
                     series: new ForwardMeasurementsMessageSeriesDto(
-                        TransactionId: TransactionId.New(),
+                        TransactionId: TransactionId.Create(measurements.TransactionId),
                         MarketEvaluationPointNumber: measurements.MeteringPointId,
                         MarketEvaluationPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
                         OriginalTransactionIdReferenceId: null,
