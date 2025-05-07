@@ -71,14 +71,14 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                 DocumentDetails.Prefix,
                 "Start",
                 null,
-                forwardMeteredDataRecord.Period.StartToString())
+                forwardMeteredDataRecord.Period.StartToEbixString())
             .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
                 "End",
                 null,
-                forwardMeteredDataRecord.Period.EndToString())
+                forwardMeteredDataRecord.Period.EndToEbixString())
             .ConfigureAwait(false);
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
