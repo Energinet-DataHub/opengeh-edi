@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Net;
+using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -20,7 +22,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 
 public static class FunctionContextExtensions
 {
-    internal static bool IsProtectedHttpTrigger(this FunctionContext context)
+    internal static bool IsActorProtectedEndpoint(this FunctionContext context)
     {
         var isHttpTrigger = context.FunctionDefinition.InputBindings.Values
             .First(metadata => metadata.Type.EndsWith("Trigger"))
@@ -29,7 +31,9 @@ public static class FunctionContextExtensions
         var isHealthCheckEndpoint = context.FunctionDefinition.Name == "HealthCheck";
         var isDurableFunctionMonitorEndpoint = context.FunctionDefinition.PathToAssembly.EndsWith("durablefunctionsmonitor.dotnetisolated.core.dll");
 
-        return isHttpTrigger && !isHealthCheckEndpoint && !isDurableFunctionMonitorEndpoint;
+        var isSubsystemEndpoint = HasAuthorizeAttribute(context.FunctionDefinition.EntryPoint);
+
+        return isHttpTrigger && !isHealthCheckEndpoint && !isDurableFunctionMonitorEndpoint && !isSubsystemEndpoint;
     }
 
     /// <summary>
@@ -93,5 +97,27 @@ public static class FunctionContextExtensions
         var mediaType = contentType?.Split(';').FirstOrDefault(s => s.Contains('/'))?.Trim();
 
         return mediaType;
+    }
+
+    private static bool HasAuthorizeAttribute(string fullMethodName)
+    {
+        var methodInfo = GetMethodInfo(fullMethodName);
+        if (methodInfo == null)
+            return false;
+
+        var hasAuthorizeAttribute = methodInfo.GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true).Any();
+        return hasAuthorizeAttribute;
+    }
+
+    private static MethodInfo? GetMethodInfo(string fullMethodName)
+    {
+        var lastDot = fullMethodName.LastIndexOf('.');
+        if (lastDot < 0) return null;
+
+        var typeName = fullMethodName.Substring(0, lastDot);
+        var methodName = fullMethodName.Substring(lastDot + 1);
+
+        var type = Type.GetType(typeName);
+        return type?.GetMethod(methodName);
     }
 }
