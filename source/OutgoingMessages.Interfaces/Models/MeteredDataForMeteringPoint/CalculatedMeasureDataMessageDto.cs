@@ -22,7 +22,7 @@ public sealed class CalculatedMeasurementsMessageDto(
     Actor receiver,
     BusinessReason businessReason,
     string gridAreaCode,
-    ForwardMeasurementsMessageSeriesDto series)
+    SendMeasurementsMessageSeriesDto series)
     : OutgoingMessageDto(
         DocumentType.NotifyValidatedMeasureData,
         receiver.ActorNumber,
@@ -33,7 +33,7 @@ public sealed class CalculatedMeasurementsMessageDto(
         externalId,
         null)
 {
-    public ForwardMeasurementsMessageSeriesDto Series { get; } = series;
+    public SendMeasurementsMessageSeriesDto Series { get; } = series;
 
     public string GridAreaCode { get; set; } = gridAreaCode;
 }

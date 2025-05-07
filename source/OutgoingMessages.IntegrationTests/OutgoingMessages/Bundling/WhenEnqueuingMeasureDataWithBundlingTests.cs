@@ -30,6 +30,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit.Abstractions;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages.Bundling;
 
@@ -425,20 +426,19 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                         businessReason: BusinessReason.PeriodicMetering,
                         relatedToMessageId: MessageId.New(),
                         gridAreaCode: "804",
-                        series: new ForwardMeasurementsMessageSeriesDto(
+                        series: new SendMeasurementsMessageSeriesDto(
                             TransactionId: TransactionId.New(),
-                            MarketEvaluationPointNumber: "1234567890123",
-                            MarketEvaluationPointType: MeteringPointType.Consumption,
-                            OriginalTransactionIdReferenceId: TransactionId.New(),
+                            MeteringPointId: "1234567890123",
+                            MeteringPointType: MeteringPointType.Consumption,
+                            OriginalTransactionIdReference: TransactionId.New(),
                             Product: "test-product",
-                            QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                            MeasurementUnit: MeasurementUnit.KilowattHour,
                             RegistrationDateTime: time,
                             Resolution: Resolution.QuarterHourly,
-                            StartedDateTime: time,
-                            EndedDateTime: time.Plus(resolutionDuration),
-                            EnergyObservations:
+                            Period: new Period(time, time.Plus(resolutionDuration)),
+                            Measurements:
                             [
-                                new EnergyObservationDto(1, 1, Quality.Calculated),
+                                new MeasurementDto(1, 1, Quality.Calculated),
                             ]));
                 })
             .Cast<OutgoingMessageDto>()
@@ -583,7 +583,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         var messagePeriod = new Interval(startDate, endDate);
         var measureDataForEachMessageCount = (int)Math.Ceiling(messagePeriod.Duration / resolutionDuration);
         var measureDataForEachMessage = Enumerable.Range(0, measureDataForEachMessageCount)
-            .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated))
+            .Select(i => new MeasurementDto(i + 1, decimal.MaxValue, Quality.Calculated))
             .ToList();
 
         var totalMeasureDataCount = (double)measureDataForEachMessageCount * enqueueMessageCount;
@@ -599,18 +599,17 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new ForwardMeasurementsMessageSeriesDto(
+                    series: new SendMeasurementsMessageSeriesDto(
                         TransactionId: TransactionId.New(),
-                        MarketEvaluationPointNumber: "1234567890123456",
-                        MarketEvaluationPointType: MeteringPointType.Consumption,
-                        OriginalTransactionIdReferenceId: TransactionId.New(),
+                        MeteringPointId: "1234567890123456",
+                        MeteringPointType: MeteringPointType.Consumption,
+                        OriginalTransactionIdReference: TransactionId.New(),
                         Product: "1234567890123456",
-                        QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                        MeasurementUnit: MeasurementUnit.KilowattHour,
                         RegistrationDateTime: messagePeriod.Start,
                         Resolution: resolution,
-                        StartedDateTime: messagePeriod.Start,
-                        EndedDateTime: messagePeriod.End,
-                        EnergyObservations: measureDataForEachMessage)))
+                        Period: new Period(messagePeriod.Start, messagePeriod.End),
+                        Measurements: measureDataForEachMessage)))
             .Cast<OutgoingMessageDto>()
             .ToList();
 
@@ -696,7 +695,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
         }
 
         var measureDataForEachMessage = Enumerable.Range(0, count: countThatExceedsMaxBundleDataCount)
-            .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated))
+            .Select(i => new MeasurementDto(i + 1, decimal.MaxValue, Quality.Calculated))
             .ToList();
 
         var messagesToEnqueue = Enumerable.Range(start: 0, count: 2)
@@ -708,18 +707,19 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new ForwardMeasurementsMessageSeriesDto(
+                    series: new SendMeasurementsMessageSeriesDto(
                         TransactionId: TransactionId.New(),
-                        MarketEvaluationPointNumber: "1234567890123456",
-                        MarketEvaluationPointType: MeteringPointType.Consumption,
-                        OriginalTransactionIdReferenceId: TransactionId.New(),
+                        MeteringPointId: "1234567890123456",
+                        MeteringPointType: MeteringPointType.Consumption,
+                        OriginalTransactionIdReference: TransactionId.New(),
                         Product: "1234567890123456",
-                        QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                        MeasurementUnit: MeasurementUnit.KilowattHour,
                         RegistrationDateTime: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
                         Resolution: Resolution.QuarterHourly,
-                        StartedDateTime: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
-                        EndedDateTime: Instant.FromUtc(2024, 12, 31, 23, 15, 00),
-                        EnergyObservations: measureDataForEachMessage)))
+                        Period: new Period(
+                            Instant.FromUtc(2024, 12, 31, 23, 00, 00),
+                            Instant.FromUtc(2024, 12, 31, 23, 15, 00)),
+                        Measurements: measureDataForEachMessage)))
             .Cast<OutgoingMessageDto>()
             .ToList();
 

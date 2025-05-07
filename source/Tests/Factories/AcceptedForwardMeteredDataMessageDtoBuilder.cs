@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
@@ -56,19 +57,18 @@ public class AcceptedForwardMeteredDataMessageDtoBuilder
             businessReason: _businessReason,
             relatedToMessageId: MessageId.New(),
             gridAreaCode: "804",
-            series: new ForwardMeasurementsMessageSeriesDto(
+            series: new SendMeasurementsMessageSeriesDto(
                 TransactionId: TransactionId.New(),
-                MarketEvaluationPointNumber: _meteringPointId,
-                MarketEvaluationPointType: _meteringPointType,
-                OriginalTransactionIdReferenceId: TransactionId.New(),
+                MeteringPointId: _meteringPointId,
+                MeteringPointType: _meteringPointType,
+                OriginalTransactionIdReference: TransactionId.New(),
                 Product: "test-product",
-                QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                MeasurementUnit: MeasurementUnit.KilowattHour,
                 RegistrationDateTime: _startTime,
                 Resolution: _resolution,
-                StartedDateTime: _startTime,
-                EndedDateTime: _endTime,
-                EnergyObservations: _points
-                    .Select(p => new EnergyObservationDto(p.Position, p.Quantity, p.Quality))
+                Period: new Period(_startTime, _endTime),
+                Measurements: _points
+                    .Select(p => new MeasurementDto(p.Position, p.Quantity, p.Quality))
                     .ToList()));
     }
 

@@ -13,10 +13,19 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public readonly record struct EnergyObservationDto(
-    int? Position,
-    decimal? Quantity,
-    Quality? Quality);
+public sealed record SendMeasurementsMessageSeriesDto(
+    TransactionId TransactionId,
+    string MeteringPointId,
+    MeteringPointType MeteringPointType,
+    TransactionId? OriginalTransactionIdReference,
+    string Product,
+    MeasurementUnit MeasurementUnit,
+    Instant RegistrationDateTime,
+    Resolution Resolution,
+    Period Period,
+    IReadOnlyCollection<MeasurementDto> Measurements);

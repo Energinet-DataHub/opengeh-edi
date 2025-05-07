@@ -414,9 +414,9 @@ public static class OutgoingMessageFactory
             gridAreaCode: message.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
-            message.Series.StartedDateTime,
-            dataCount: message.Series.EnergyObservations.Count,
-            meteringPointId: MeteringPointId.From(message.Series.MarketEvaluationPointNumber));
+            message.Series.Period.Start,
+            dataCount: message.Series.Measurements.Count,
+            meteringPointId: MeteringPointId.From(message.Series.MeteringPointId));
     }
 
     public static OutgoingMessage CreateMessage(
@@ -441,9 +441,9 @@ public static class OutgoingMessageFactory
             gridAreaCode: message.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
-            message.Series.StartedDateTime,
-            dataCount: message.Series.EnergyObservations.Count,
-            meteringPointId: MeteringPointId.From(message.Series.MarketEvaluationPointNumber));
+            message.Series.Period.Start,
+            dataCount: message.Series.Measurements.Count,
+            meteringPointId: MeteringPointId.From(message.Series.MeteringPointId));
     }
 
     public static OutgoingMessage CreateMessage(

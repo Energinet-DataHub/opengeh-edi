@@ -53,7 +53,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
         {
             var energyObservations = receivers.MeteredData
                 .Select(x =>
-                    new EnergyObservationDto(
+                    new MeasurementDto(
                         Position: x.Position,
                         Quantity: x.EnergyQuantity,
                         Quality: x.QuantityQuality != null ? Quality.FromName(x.QuantityQuality.Name) : null))
@@ -68,18 +68,17 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
                     gridAreaCode: acceptedData.GridAreaCode,
-                    series: new ForwardMeasurementsMessageSeriesDto(
+                    series: new SendMeasurementsMessageSeriesDto(
                         TransactionId: TransactionId.New(),
-                        MarketEvaluationPointNumber: acceptedData.MeteringPointId,
-                        MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                        OriginalTransactionIdReferenceId: null,
+                        MeteringPointId: acceptedData.MeteringPointId,
+                        MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
+                        OriginalTransactionIdReference: null,
                         Product: acceptedData.ProductNumber,
-                        QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
+                        MeasurementUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
                         RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
                         Resolution: Resolution.FromName(receivers.Resolution.Name),
-                        StartedDateTime: receivers.StartDateTime.ToInstant(),
-                        EndedDateTime: receivers.EndDateTime.ToInstant(),
-                        EnergyObservations: energyObservations));
+                        Period: new Period(receivers.StartDateTime.ToInstant(), receivers.EndDateTime.ToInstant()),
+                        Measurements: energyObservations));
 
                 await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
             }

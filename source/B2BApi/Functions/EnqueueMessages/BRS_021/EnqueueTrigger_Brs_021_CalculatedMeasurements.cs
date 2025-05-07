@@ -27,26 +27,27 @@ using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
-public class EnqueueTrigger_Brs_021_Calculations(
-    ILogger<EnqueueTrigger_Brs_021_Calculations> logger,
-    EnqueueHandler_Brs_021_Calculations_V1 handler)
+public class EnqueueTrigger_Brs_021_CalculatedMeasurements(
+    ILogger<EnqueueTrigger_Brs_021_CalculatedMeasurements> logger,
+    EnqueueHandler_Brs_021_CalculatedMeasurements_V1 handler)
 {
-    private readonly ILogger<EnqueueTrigger_Brs_021_Calculations> _logger = logger;
-    private readonly EnqueueHandler_Brs_021_Calculations_V1 _handler = handler;
+    private readonly ILogger<EnqueueTrigger_Brs_021_CalculatedMeasurements> _logger = logger;
+    private readonly EnqueueHandler_Brs_021_CalculatedMeasurements_V1 _handler = handler;
 
-    [Function(nameof(EnqueueTrigger_Brs_021_Calculations))]
+    [Function(nameof(EnqueueTrigger_Brs_021_CalculatedMeasurements))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
             "post",
             Route = $"enqueue/{EnqueueCalculatedMeasurementsHttpV1.RouteName}")]
         HttpRequestData request,
+        [FromBody] EnqueueCalculatedMeasurementsHttpV1 measurements,
         FunctionContext executionContext,
         CancellationToken hostCancellationToken)
     {
         _logger.LogInformation("BRS-021 enqueue request for calculation received");
 
-        await _handler.HandleAsync(request, hostCancellationToken).ConfigureAwait(false);
+        await _handler.HandleAsync(measurements, hostCancellationToken).ConfigureAwait(false);
 
         return await Task.FromResult(request.CreateResponse(HttpStatusCode.OK)).ConfigureAwait(false);
     }

@@ -23,27 +23,24 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 
-public class EnqueueHandler_Brs_021_Calculations_V1(
+public class EnqueueHandler_Brs_021_CalculatedMeasurements_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IUnitOfWork unitOfWork)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task HandleAsync(HttpRequestData request, CancellationToken hostCancellationToken)
+    public async Task HandleAsync(
+        EnqueueCalculatedMeasurementsHttpV1 measurements,
+        CancellationToken hostCancellationToken)
     {
-        var requestBodyStream = request.Body;
-        using var reader = new StreamReader(requestBodyStream);
-        var requestBody = await reader.ReadToEndAsync(hostCancellationToken).ConfigureAwait(false);
-        var measurements = JsonSerializer.Deserialize<EnqueueCalculatedMeasurementsHttpV1>(requestBody)!;
-
         foreach (var receiversWithMeasurements in measurements.Data)
         {
             foreach (var receiver in receiversWithMeasurements.Receivers)
             {
-                var energyObservations = receiversWithMeasurements.Measurements
+                var actualMeasurements = receiversWithMeasurements.Measurements
                     .Select(x =>
-                        new EnergyObservationDto(
+                        new MeasurementDto(
                             Position: x.Position,
                             Quantity: x.EnergyQuantity,
                             Quality: Quality.FromName(x.QuantityQuality.Name)))
@@ -57,18 +54,19 @@ public class EnqueueHandler_Brs_021_Calculations_V1(
                         ActorRole.FromName(receiver.ActorRole.Name)),
                     businessReason: BusinessReason.PeriodicMetering,
                     gridAreaCode: receiversWithMeasurements.GridAreaCode,
-                    series: new ForwardMeasurementsMessageSeriesDto(
+                    series: new SendMeasurementsMessageSeriesDto(
                         TransactionId: TransactionId.From(measurements.TransactionId.ToString()),
-                        MarketEvaluationPointNumber: measurements.MeteringPointId,
-                        MarketEvaluationPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
-                        OriginalTransactionIdReferenceId: null,
-                        Product: "8716867000030",
-                        QuantityMeasureUnit: MeasurementUnit.FromName(measurements.MeasureUnit.Name),
+                        MeteringPointId: measurements.MeteringPointId,
+                        MeteringPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
+                        OriginalTransactionIdReference: null,
+                        Product: ProductType.EnergyActive.Code,
+                        MeasurementUnit: MeasurementUnit.FromName(measurements.MeasureUnit.Name),
                         RegistrationDateTime: receiversWithMeasurements.RegistrationDateTime.ToInstant(),
                         Resolution: Resolution.FromName(measurements.Resolution.Name),
-                        StartedDateTime: receiversWithMeasurements.StartDateTime.ToInstant(),
-                        EndedDateTime: receiversWithMeasurements.EndDateTime.ToInstant(),
-                        EnergyObservations: energyObservations));
+                        Period: new Period(
+                            receiversWithMeasurements.StartDateTime.ToInstant(),
+                            receiversWithMeasurements.EndDateTime.ToInstant()),
+                        Measurements: actualMeasurements));
 
                 await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, hostCancellationToken)
                     .ConfigureAwait(false);

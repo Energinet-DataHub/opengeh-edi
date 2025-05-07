@@ -25,6 +25,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit.Abstractions;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using RejectReason = Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint.RejectReason;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
@@ -413,21 +414,23 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             businessReason: BusinessReason.PeriodicMetering,
             relatedToMessageId: relatedToMessageId,
             gridAreaCode: "804",
-            series: new ForwardMeasurementsMessageSeriesDto(
+            series: new SendMeasurementsMessageSeriesDto(
                 TransactionId: TransactionId.New(),
-                MarketEvaluationPointNumber: "1234567890123",
-                MarketEvaluationPointType: MeteringPointType.Consumption,
-                OriginalTransactionIdReferenceId: null,
+                MeteringPointId: "1234567890123",
+                MeteringPointType: MeteringPointType.Consumption,
+                OriginalTransactionIdReference: null,
                 Product: "test-product",
-                QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                MeasurementUnit: MeasurementUnit.KilowattHour,
                 RegistrationDateTime: start,
                 Resolution: Resolution.QuarterHourly,
-                StartedDateTime: start,
-                EndedDateTime: end,
-                EnergyObservations: GenerateEnergyObservations(start, end, resolution)));
+                Period: new Period(start, end),
+                Measurements: GenerateEnergyObservations(start, end, resolution)));
     }
 
-    private IReadOnlyCollection<EnergyObservationDto> GenerateEnergyObservations(Instant start, Instant end, Resolution resolution)
+    private IReadOnlyCollection<MeasurementDto> GenerateEnergyObservations(
+        Instant start,
+        Instant end,
+        Resolution resolution)
     {
         var resolutionInMinutes = resolution switch
         {
@@ -441,8 +444,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var totalNumberOfObservations = minutesInPeriod / resolutionInMinutes;
 
         return Enumerable.Range(0, totalNumberOfObservations)
-            .Select(
-                i => new EnergyObservationDto(
+            .Select(i => new MeasurementDto(
                     Position: i + 1,
                     Quantity: 7,
                     Quality: Quality.Measured))
