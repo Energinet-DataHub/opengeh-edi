@@ -14,6 +14,7 @@
 
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
@@ -47,31 +48,19 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         JsonSchema schemaResult,
         CancellationToken cancellationToken)
     {
-        JsonDocument document;
-        try
-        {
-            document = await JsonDocument.ParseAsync(marketMessage.Stream, cancellationToken: cancellationToken).ConfigureAwait(false);
-        }
-        catch (JsonException exception)
-        {
-            AddValidationError(exception.Message);
+        var document = await TryParseJsonDocumentAsync(marketMessage, cancellationToken).ConfigureAwait(false);
+        if (document == null)
             return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
-        }
 
-        if (!IsValid(document, schemaResult))
-        {
+        var headerElement = GetHeaderElement(document);
+        if (headerElement == null)
             return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
-        }
+
+        var transactions = ValidateAndParseTransactions(document, headerElement, schemaResult);
+        if (transactions == null)
+            return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
 
         var header = ParseHeader(document);
-        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
-        var transactions = new List<IIncomingMessageSeries>(transactionElements.GetArrayLength());
-
-        foreach (var transactionElement in transactionElements.EnumerateArray())
-        {
-            transactions.Add(ParseTransaction(transactionElement, header.SenderId));
-        }
-
         return CreateResult(header, transactions);
     }
 
@@ -102,6 +91,76 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         return element.TryGetProperty("businessSector.type", out var property) ? property.GetProperty("value").GetString() : null;
     }
 
+    private List<IIncomingMessageSeries>? ValidateAndParseTransactions(
+        JsonDocument document,
+        JsonNode headerElement,
+        JsonSchema schemaResult)
+    {
+        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
+        var transactions = new List<IIncomingMessageSeries>(transactionElements.GetArrayLength());
+
+        foreach (var transactionElement in transactionElements.EnumerateArray())
+        {
+            // This validates a full document that contains only a single transaction.
+            // By isolating one transaction per validation, we reduce peak memory usage
+            // and allow memory to be reused between validations.
+            using var documentWithOneTransaction = GetDocumentWithOneSeriesElement(transactionElement, headerElement);
+            if (!IsValid(documentWithOneTransaction, schemaResult))
+                return null;
+
+            var header = ParseHeader(documentWithOneTransaction!);
+            transactions.Add(ParseTransaction(
+                documentWithOneTransaction!.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName).EnumerateArray().First(),
+                header.SenderId));
+        }
+
+        return transactions;
+    }
+
+    private JsonNode? GetHeaderElement(JsonDocument document)
+    {
+        var root = JsonNode.Parse(document.RootElement.GetRawText());
+        var headerElement = root?[HeaderElementName];
+        if (headerElement == null)
+            AddValidationError($"Could not find {HeaderElementName} in the document");
+        return headerElement;
+    }
+
+    private async Task<JsonDocument?> TryParseJsonDocumentAsync(
+        IIncomingMarketMessageStream marketMessage,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await JsonDocument.ParseAsync(marketMessage.Stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+        catch (JsonException exception)
+        {
+            AddValidationError(exception.Message);
+            return null;
+        }
+    }
+
+    private JsonDocument? GetDocumentWithOneSeriesElement(
+        JsonElement seriesElement,
+        JsonNode headerElement)
+    {
+        JsonDocument? documentWithOneTransaction = null;
+        try
+        {
+            var transactionNode = JsonNode.Parse(seriesElement.GetRawText());
+            headerElement[SeriesElementName] = new JsonArray(transactionNode);
+            var modifiedJson = headerElement.Parent!.ToJsonString();
+            documentWithOneTransaction = JsonDocument.Parse(modifiedJson);
+            return documentWithOneTransaction;
+        }
+        catch
+        {
+            documentWithOneTransaction?.Dispose();
+            return null;
+        }
+    }
+
     private MessageHeader ParseHeader(JsonDocument document)
     {
         var headerElement = document.RootElement.GetProperty(HeaderElementName);
@@ -117,18 +176,18 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
             GetBusinessType(headerElement));
     }
 
-    private bool IsValid(JsonDocument jsonDocument, JsonSchema schema)
+    private bool IsValid(JsonDocument? jsonDocument, JsonSchema schema)
     {
+        if (jsonDocument is null || !jsonDocument.RootElement.EnumerateObject().Any())
+        {
+            AddValidationError("Document is empty");
+            return false;
+        }
+
         var result = schema.Evaluate(jsonDocument, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
         if (!result.IsValid)
         {
             FindErrorsForInvalidEvaluation(result);
-        }
-
-        if (!jsonDocument.RootElement.EnumerateObject().Any())
-        {
-            AddValidationError("Document is empty");
-            return false;
         }
 
         return result.IsValid;

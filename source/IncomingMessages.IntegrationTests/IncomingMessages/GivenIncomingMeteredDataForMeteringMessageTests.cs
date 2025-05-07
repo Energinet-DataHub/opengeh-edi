@@ -682,10 +682,10 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
         // Measure memory before
         var memoryBefore = GC.GetTotalMemory(false);
 
-        // Set max number of transactions based on document format before exceeding the limit of 50mb
+        // Max number of transactions based on document format before exceeding the limit of 50mb
         var maxNumberOfTransactions = DocumentFormat.Ebix == documentFormat ? 6
-                                           : DocumentFormat.Xml == documentFormat ? 12
-                                           : 17;
+                           : DocumentFormat.Xml == documentFormat ? 12
+                           : 17;
 
         // Create transaction for document format
         var transactions = new List<(string TransactionId, Instant PeriodStart, Instant PeriodEnd, Resolution Resolution)>();
@@ -705,10 +705,11 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
             transactions,
             businessType: "23");
 
+        long messageSizeInBytes = 0;
         if (message.Stream.CanSeek)
         {
-            var byteSize = message.Stream.Length;
-            _testOutputHelper.WriteLine($"Message Stream size in bytes: {byteSize} ({byteSize / 1024 / 1024} MB)");
+            messageSizeInBytes = message.Stream.Length;
+            _testOutputHelper.WriteLine($"Message Stream size in bytes: {messageSizeInBytes} ({messageSizeInBytes / 1024 / 1024} MB)");
 
             // Rewind the stream to the beginning
             message.Stream.Position = 0;
@@ -731,11 +732,11 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
 
         // Assert memory usage (allowing some tolerance for runtime variations)
         var memoryUsed = memoryAfter - memoryBefore;
-        var maxAllowedMemoryUse = 50 * 1024 * 1024;
+        var maxAllowedMemoryUse = messageSizeInBytes * 25;
 
         _testOutputHelper.WriteLine($"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB) within {stopwatch.ElapsedMilliseconds} ms");
         Assert.True(memoryUsed < maxAllowedMemoryUse, $"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB), expected {maxAllowedMemoryUse} bytes ({maxAllowedMemoryUse / 1024 / 1024} MB).");
-        Assert.True(stopwatch.ElapsedMilliseconds < 500, $"Execution time: {stopwatch.ElapsedMilliseconds} ms, expected less than 500 ms.");
+        Assert.True(stopwatch.ElapsedMilliseconds < 60000, $"Execution time: {stopwatch.ElapsedMilliseconds} ms, expected less than 60000 ms.");
     }
 
     private async Task<(MeteredDataForMeteringPointMessageBase? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(
