@@ -283,13 +283,13 @@ public static class MeteredDataForMeteringPointBuilder
             _ => throw new ArgumentOutOfRangeException(nameof(resolution), "Unsupported resolution"),
         };
 
-        var currentStart = periodStart;
+        var currentStart = periodStart < periodEnd ? periodStart : periodEnd;
+        var end = periodStart > periodEnd ? periodStart : periodEnd;
         var position = 1;
-        var random = new Random();
 
-        while (currentStart <= periodEnd)
+        while (currentStart <= end)
         {
-            observations.Add((position, "A04", random.Next(0, 100)));
+            observations.Add((position, "A04", position));
 
             currentStart = currentStart.Plus(intervalDuration);
             position++;
