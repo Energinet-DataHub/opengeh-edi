@@ -19,15 +19,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 
 public sealed record MeteredDataForMeteringPointMarketActivityRecord(
     TransactionId TransactionId,
-    string MarketEvaluationPointNumber,
-    MeteringPointType MarketEvaluationPointType,
-    TransactionId? OriginalTransactionIdReferenceId,
+    string MeteringPointId,
+    MeteringPointType MeteringPointType,
+    TransactionId? OriginalTransactionIdReference,
     string? Product,
-    MeasurementUnit QuantityMeasureUnit,
+    MeasurementUnit MeasurementUnit,
     Instant RegistrationDateTime,
     Resolution Resolution,
-    Instant StartedDateTime,
-    Instant EndedDateTime,
-    IReadOnlyList<PointActivityRecord> EnergyObservations);
+    BuildingBlocks.Domain.Models.Period Period,
+    IReadOnlyList<PointActivityRecord> Measurements);
 
 public sealed record PointActivityRecord(int Position, Quality? Quality, decimal? Quantity);
