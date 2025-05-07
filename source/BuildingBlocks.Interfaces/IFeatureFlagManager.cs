@@ -16,8 +16,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 /// <summary>
 /// Manage feature flags in the application.
-/// The feature flags are managed through the app configuration, and the name
-/// of a feature flag configuration must be prefixed with "FeatureManagement__",
+/// The feature flags can be locally configured through app settings,
+/// or exist in Azure App Configuration.
+/// If configured locally the name of a feature flag configuration
+/// must be prefixed with "FeatureManagement__",
 /// ie. "FeatureManagement__UseMonthlyAmountPerChargeResultProduced".
 /// The "Feature Flags in EDI" documentation page in confluence should be kept
 /// up-to-date: https://energinet.atlassian.net/wiki/spaces/D3/pages/677412898/Feature+Flags+in+EDI
