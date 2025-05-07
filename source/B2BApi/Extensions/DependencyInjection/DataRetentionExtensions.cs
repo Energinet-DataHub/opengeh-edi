@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
