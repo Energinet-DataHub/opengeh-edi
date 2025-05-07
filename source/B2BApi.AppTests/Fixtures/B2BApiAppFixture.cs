@@ -511,7 +511,7 @@ public class B2BApiAppFixture : IAsyncLifetime
             $"{BundlingOptions.SectionName}__{nameof(BundlingOptions.BundleMessagesOlderThanSeconds)}",
             "0"); // Setting the "bundle messages older than" to 0 ensures that bundles will be created for outgoing messages as soon as the function is triggered
 
-        // App Configuration settings
+        // Feature Management => Azure App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{AzureAppConfigurationOptions.SectionName}:{nameof(AzureAppConfigurationOptions.Endpoint)}",
             IntegrationTestConfiguration.AppConfigurationEndpoint);
