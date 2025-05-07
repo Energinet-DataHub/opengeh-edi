@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjec
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,10 +56,13 @@ public static class HostFactory
                 {
                     // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                     builder.UseWhen<UnHandledExceptionMiddleware>(
-                        functionContext => functionContext.IsProtectedHttpTrigger());
+                        functionContext => functionContext.IsActorProtectedEndpoint());
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
-                        functionContext => functionContext.IsProtectedHttpTrigger());
+                        functionContext => functionContext.IsActorProtectedEndpoint());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
+
+                    // Subsystem authentication
+                    builder.UseFunctionsAuthorization();
 
                     // Host the Durable Function Monitor as a part of this app.
                     // The Durable Function Monitor can be accessed at: {host url}/api/durable-functions-monitor
@@ -99,6 +103,7 @@ public static class HostFactory
 
                         // Security
                         .AddB2BAuthentication(tokenValidationParameters)
+                        .AddSubsystemAuthentication(context.Configuration)
 
                         // System timer
                         .AddNodaTimeForApplication()

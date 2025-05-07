@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi;
+using Energinet.DataHub.EDI.B2BApi.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -80,6 +81,9 @@ public class RegistrationTests
 
         // App Configuration settings
         Environment.SetEnvironmentVariable(nameof(AppConfiguration.AppConfigEndpoint), "https://appcs-intgra-t-we-002.azconfig.io");
+
+        Environment.SetEnvironmentVariable($"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.ApplicationIdUri)}", "NotEmpty");
+        Environment.SetEnvironmentVariable($"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.Issuer)}", "NotEmpty");
 
         _host = HostFactory.CreateHost(Program.TokenValidationParameters);
     }
