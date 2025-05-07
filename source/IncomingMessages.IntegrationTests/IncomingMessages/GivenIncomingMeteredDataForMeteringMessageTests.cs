@@ -59,14 +59,8 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
         _validateIncomingMessage = GetService<ValidateIncomingMessage>();
     }
 
-    // public static TheoryData<DocumentFormat> GetAllDocumentFormat => new(
-    //     EnumerationType.GetAll<DocumentFormat>().ToArray());
-
     public static TheoryData<DocumentFormat> GetAllDocumentFormat => new(
-        new List<DocumentFormat>
-        {
-            DocumentFormat.Json,
-        });
+        EnumerationType.GetAll<DocumentFormat>().ToArray());
 
     [Fact]
     public async Task When_ReceiverIdIsDatahub_Then_ValidationSucceed()
