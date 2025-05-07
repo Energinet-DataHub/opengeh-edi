@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
+using Json.More;
 using Json.Schema;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
@@ -38,7 +39,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
     private const string BusinessSectorTypeElementName = "businessSector.type";
     private readonly JsonSchemaProvider _schemaProvider = schemaProvider;
 
-    private List<ValidationError>? _validationErrors;
+    private List<ValidationError> _validationErrors = [];
 
     protected abstract string HeaderElementName { get; }
 
@@ -49,13 +50,13 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         JsonSchema schemaResult,
         CancellationToken cancellationToken)
     {
-        var document = await TryParseJsonDocumentAsync(marketMessage, cancellationToken).ConfigureAwait(false);
+        using var document = await TryParseJsonDocumentAsync(marketMessage, cancellationToken).ConfigureAwait(false);
         if (document == null)
-            return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
+            return new IncomingMarketMessageParserResult(_validationErrors.ToArray());
 
         var transactions = ValidateAndParseTransactions(document, schemaResult);
         if (transactions == null)
-            return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
+            return new IncomingMarketMessageParserResult(_validationErrors.ToArray());
 
         var header = ParseHeader(document);
         return CreateResult(header, transactions);
@@ -78,12 +79,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
 
     protected abstract IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions);
 
-    private static string? GetBusinessType(JsonElement element)
-    {
-        return element.TryGetProperty("businessSector.type", out var property) ? property.GetProperty("value").GetString() : null;
-    }
-
-    private List<IIncomingMessageSeries>? ValidateAndParseTransactions(
+    private IReadOnlyCollection<IIncomingMessageSeries>? ValidateAndParseTransactions(
         JsonDocument document,
         JsonSchema schemaResult)
     {
@@ -93,20 +89,18 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
 
         var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
         var transactions = new List<IIncomingMessageSeries>(transactionElements.GetArrayLength());
-
+        string? senderId = null;
         foreach (var transactionElement in transactionElements.EnumerateArray())
         {
             // This validates a full document that contains only a single transaction.
             // By isolating one transaction per validation, we reduce peak memory usage
             // and allow memory to be reused between validations.
-            using var documentWithOneTransaction = GetDocumentWithOneSeriesElement(transactionElement, headerElement);
+            var documentWithOneTransaction = GetDocumentWithOneSeriesElement(transactionElement, headerElement);
             if (!IsValid(documentWithOneTransaction, schemaResult))
                 return null;
 
-            var header = ParseHeader(documentWithOneTransaction!);
-            transactions.Add(ParseTransaction(
-                documentWithOneTransaction!.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName).EnumerateArray().First(),
-                header.SenderId));
+            senderId ??= headerElement[SenderIdentificationElementName]?[ValueElementName]?.GetValue<string>() ?? string.Empty;
+            transactions.Add(ParseTransaction(transactionElement, senderId));
         }
 
         return transactions;
@@ -136,18 +130,15 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         }
     }
 
-    private JsonDocument? GetDocumentWithOneSeriesElement(
+    private JsonNode? GetDocumentWithOneSeriesElement(
         JsonElement seriesElement,
         JsonNode headerElement)
     {
         JsonDocument? documentWithOneTransaction = null;
         try
         {
-            var transactionNode = JsonNode.Parse(seriesElement.GetRawText());
-            headerElement[SeriesElementName] = new JsonArray(transactionNode);
-            var modifiedJson = headerElement.Parent!.ToJsonString();
-            documentWithOneTransaction = JsonDocument.Parse(modifiedJson);
-            return documentWithOneTransaction;
+            headerElement[SeriesElementName] = new JsonArray(seriesElement.AsNode());
+            return headerElement.Parent;
         }
         catch
         {
@@ -159,6 +150,10 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
     private MessageHeader ParseHeader(JsonDocument document)
     {
         var headerElement = document.RootElement.GetProperty(HeaderElementName);
+        var businessType = headerElement.TryGetProperty(BusinessSectorTypeElementName, out var property)
+            ? property.GetProperty(ValueElementName).GetString()
+            : null;
+
         return new MessageHeader(
             headerElement.GetProperty(IdentificationElementName).GetString() ?? string.Empty,
             headerElement.GetProperty(MessageTypeElementName).GetProperty(ValueElementName).GetString() ?? string.Empty,
@@ -168,18 +163,19 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
             headerElement.GetProperty(ReceiverIdentificationElementName).GetProperty(ValueElementName).GetString() ?? string.Empty,
             headerElement.GetProperty(ReceiverRoleElementName).GetProperty(ValueElementName).GetString() ?? string.Empty,
             headerElement.GetProperty(CreatedDateElementName).GetString() ?? string.Empty,
-            headerElement.TryGetProperty(BusinessSectorTypeElementName, out var property) ? property.GetProperty(ValueElementName).GetString() : null);
+            businessType);
     }
 
-    private bool IsValid(JsonDocument? jsonDocument, JsonSchema schema)
+    private bool IsValid(JsonNode? jsonDocument, JsonSchema schema)
     {
-        if (jsonDocument is null || !jsonDocument.RootElement.EnumerateObject().Any())
+        if (jsonDocument is null)
         {
             AddValidationError("Document is empty");
             return false;
         }
 
-        var result = schema.Evaluate(jsonDocument, new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical });
+        var evaluationOptions = new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical };
+        var result = schema.Evaluate(jsonDocument, evaluationOptions);
         if (!result.IsValid)
         {
             FindErrorsForInvalidEvaluation(result);
