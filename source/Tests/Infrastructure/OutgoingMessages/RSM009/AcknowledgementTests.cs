@@ -30,13 +30,10 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM009;
 
 public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
 {
-    // _documentValidation depends on incoming messages, which it should not
-    private readonly DocumentValidationFixture _documentValidation;
     private readonly MessageRecordParser _parser;
 
     public AcknowledgementTests(DocumentValidationFixture documentValidation)
     {
-        _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
     }
 
