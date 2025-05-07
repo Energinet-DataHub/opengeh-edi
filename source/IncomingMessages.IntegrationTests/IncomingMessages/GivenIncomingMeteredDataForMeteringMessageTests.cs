@@ -718,17 +718,17 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
             CancellationToken.None);
 
         stopwatch.Stop();
-         // Measure memory after
+
+        // Measure memory after
         var memoryAfter = GC.GetTotalMemory(false);
 
+        // Assert
         result.Should().NotBeNull();
         result.Success.Should().BeTrue();
 
-        // Assert memory usage (allowing some tolerance for runtime variations)
-        var memoryUsed = memoryAfter - memoryBefore;
+        // Currently allowing 25 times the message size in bytes
         var maxAllowedMemoryUse = messageSizeInBytes * 25;
-
-        _testOutputHelper.WriteLine($"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB) within {stopwatch.ElapsedMilliseconds} ms");
+        var memoryUsed = memoryAfter - memoryBefore;
         Assert.True(memoryUsed < maxAllowedMemoryUse, $"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB), expected {maxAllowedMemoryUse} bytes ({maxAllowedMemoryUse / 1024 / 1024} MB).");
         Assert.True(stopwatch.ElapsedMilliseconds < 60000, $"Execution time: {stopwatch.ElapsedMilliseconds} ms, expected less than 60000 ms.");
     }

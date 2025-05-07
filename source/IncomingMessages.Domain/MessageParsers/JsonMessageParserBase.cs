@@ -35,6 +35,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
     private const string SenderRoleElementName = "sender_MarketParticipant.marketRole.type";
     private const string ReceiverRoleElementName = "receiver_MarketParticipant.marketRole.type";
     private const string CreatedDateElementName = "createdDateTime";
+    private const string BusinessSectorTypeElementName = "businessSector.type";
     private readonly JsonSchemaProvider _schemaProvider = schemaProvider;
 
     private List<ValidationError>? _validationErrors;
@@ -52,11 +53,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         if (document == null)
             return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
 
-        var headerElement = GetHeaderElement(document);
-        if (headerElement == null)
-            return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
-
-        var transactions = ValidateAndParseTransactions(document, headerElement, schemaResult);
+        var transactions = ValidateAndParseTransactions(document, schemaResult);
         if (transactions == null)
             return new IncomingMarketMessageParserResult(_validationErrors!.ToArray());
 
@@ -81,11 +78,6 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
 
     protected abstract IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions);
 
-    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
-    {
-        return element.GetString() ?? string.Empty;
-    }
-
     private static string? GetBusinessType(JsonElement element)
     {
         return element.TryGetProperty("businessSector.type", out var property) ? property.GetProperty("value").GetString() : null;
@@ -93,9 +85,12 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
 
     private List<IIncomingMessageSeries>? ValidateAndParseTransactions(
         JsonDocument document,
-        JsonNode headerElement,
         JsonSchema schemaResult)
     {
+        var headerElement = GetHeaderElement(document);
+        if (headerElement == null)
+            return null;
+
         var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
         var transactions = new List<IIncomingMessageSeries>(transactionElements.GetArrayLength());
 
@@ -172,8 +167,8 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
             headerElement.GetProperty(SenderRoleElementName).GetProperty(ValueElementName).GetString() ?? string.Empty,
             headerElement.GetProperty(ReceiverIdentificationElementName).GetProperty(ValueElementName).GetString() ?? string.Empty,
             headerElement.GetProperty(ReceiverRoleElementName).GetProperty(ValueElementName).GetString() ?? string.Empty,
-            GetJsonDateStringWithoutQuotes(headerElement.GetProperty(CreatedDateElementName)),
-            GetBusinessType(headerElement));
+            headerElement.GetProperty(CreatedDateElementName).GetString() ?? string.Empty,
+            headerElement.TryGetProperty(BusinessSectorTypeElementName, out var property) ? property.GetProperty(ValueElementName).GetString() : null);
     }
 
     private bool IsValid(JsonDocument? jsonDocument, JsonSchema schema)
