@@ -150,8 +150,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
         // Act
         // => When message is received
-        var httpRequest = await _fixture.CreateEnqueueCalculatedMeasurementsHttpV1RequestAsync(
-            enqueueMessagesData);
+        var httpRequest = _fixture.CreateEnqueueCalculatedMeasurementsHttpV1Request(enqueueMessagesData);
 
         await _fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
 

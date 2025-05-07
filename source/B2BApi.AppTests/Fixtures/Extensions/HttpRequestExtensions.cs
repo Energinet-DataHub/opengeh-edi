@@ -91,24 +91,24 @@ public static class HttpRequestExtensions
             $"api/dequeue/{messageId}");
     }
 
-    public static async Task<HttpRequestMessage> CreateEnqueueCalculatedMeasurementsHttpV1RequestAsync(
+    public static HttpRequestMessage CreateEnqueueCalculatedMeasurementsHttpV1Request(
         this B2BApiAppFixture fixture,
         EnqueueCalculatedMeasurementsHttpV1 enqueueCalculatedMeasurementsHttpV1)
     {
         HttpRequestMessage? request = null;
         try
         {
-            request = await CreateHttpRequestAsync(
-                fixture,
-                new Actor(
-                    ActorNumber.Create(enqueueCalculatedMeasurementsHttpV1.Data.First().Receivers.First().ActorNumber),
-                    ActorRole.FromName(enqueueCalculatedMeasurementsHttpV1.Data.First().Receivers.First().ActorRole.Name)),
+            request = new HttpRequestMessage(
                 HttpMethod.Post,
-                $"api/enqueue/{enqueueCalculatedMeasurementsHttpV1.Route}",
-                new StringContent(
+                $"api/enqueue/{enqueueCalculatedMeasurementsHttpV1.Route}")
+            {
+                Content = new StringContent(
                     JsonSerializer.Serialize(enqueueCalculatedMeasurementsHttpV1),
                     Encoding.UTF8,
-                    "application/json"));
+                    "application/json"),
+            };
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", fixture.CreateSubsystemToken());
 
             return request;
         }

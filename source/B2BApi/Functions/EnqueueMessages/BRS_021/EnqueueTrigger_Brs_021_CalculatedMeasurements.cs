@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -34,6 +35,7 @@ public class EnqueueTrigger_Brs_021_CalculatedMeasurements(
     private readonly ILogger<EnqueueTrigger_Brs_021_CalculatedMeasurements> _logger = logger;
     private readonly EnqueueHandler_Brs_021_CalculatedMeasurements_V1 _handler = handler;
 
+    [Authorize]
     [Function(nameof(EnqueueTrigger_Brs_021_CalculatedMeasurements))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(
