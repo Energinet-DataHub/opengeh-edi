@@ -46,7 +46,7 @@ public class EnqueueHandler_Brs_021_CalculatedMeasurements_V1(
                             Quality: Quality.FromName(x.QuantityQuality.Name)))
                     .ToList();
 
-                var acceptedForwardMeteredDataMessageDto = new CalculatedMeasurementsMessageDto(
+                var calculatedMeasurementsMessageDto = new CalculatedMeasurementsMessageDto(
                     eventId: EventId.From(Guid.CreateVersion7()),
                     externalId: new ExternalId(measurements.TransactionId),
                     receiver: new Actor(
@@ -68,7 +68,7 @@ public class EnqueueHandler_Brs_021_CalculatedMeasurements_V1(
                             receiversWithMeasurements.EndDateTime.ToInstant()),
                         Measurements: actualMeasurements));
 
-                await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, hostCancellationToken)
+                await _outgoingMessagesClient.EnqueueAsync(calculatedMeasurementsMessageDto, hostCancellationToken)
                     .ConfigureAwait(false);
             }
         }
