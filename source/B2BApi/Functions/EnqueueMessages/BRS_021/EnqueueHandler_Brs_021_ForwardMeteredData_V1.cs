@@ -61,14 +61,14 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
 
             foreach (var actor in receivers.Actors)
             {
-                var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
+                var acceptedForwardMeteredDataMessageDto = new AcceptedSendMeasurementsMessageDto(
                     eventId: EventId.From(serviceBusMessageId),
                     externalId: new ExternalId(orchestrationInstanceId),
                     receiver: new Actor(ActorNumber.Create(actor.ActorNumber), ActorRole.FromName(actor.ActorRole.Name)),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
                     gridAreaCode: acceptedData.GridAreaCode,
-                    series: new SendMeasurementsMessageSeriesDto(
+                    series: new MeasurementsDto(
                         TransactionId: TransactionId.New(),
                         MeteringPointId: acceptedData.MeteringPointId,
                         MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
@@ -108,7 +108,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        var rejectedForwardMeteredDataMessageDto = new RejectedForwardMeteredDataMessageDto(
+        var rejectedForwardMeteredDataMessageDto = new RejectedSendMeasurementsMessageDto(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),

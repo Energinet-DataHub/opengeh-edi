@@ -18,7 +18,7 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed record SendMeasurementsMessageSeriesDto(
+public sealed record MeasurementsDto(
     TransactionId TransactionId,
     string MeteringPointId,
     MeteringPointType MeteringPointType,

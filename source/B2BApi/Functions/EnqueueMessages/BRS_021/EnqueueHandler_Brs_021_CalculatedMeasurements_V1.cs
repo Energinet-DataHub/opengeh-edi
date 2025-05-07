@@ -54,8 +54,8 @@ public class EnqueueHandler_Brs_021_CalculatedMeasurements_V1(
                         ActorRole.FromName(receiver.ActorRole.Name)),
                     businessReason: BusinessReason.PeriodicMetering,
                     gridAreaCode: receiversWithMeasurements.GridAreaCode,
-                    series: new SendMeasurementsMessageSeriesDto(
-                        TransactionId: TransactionId.From(measurements.TransactionId.ToString()),
+                    series: new MeasurementsDto(
+                        TransactionId: TransactionId.New(),
                         MeteringPointId: measurements.MeteringPointId,
                         MeteringPointType: MeteringPointType.FromName(measurements.MeteringPointType.Name),
                         OriginalTransactionIdReference: null,

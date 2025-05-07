@@ -48,16 +48,16 @@ public class AcceptedForwardMeteredDataMessageDtoBuilder
         _meteringPointType = MeteringPointType.Consumption;
     }
 
-    public AcceptedForwardMeteredDataMessageDto Build()
+    public AcceptedSendMeasurementsMessageDto Build()
     {
-        return new AcceptedForwardMeteredDataMessageDto(
+        return new AcceptedSendMeasurementsMessageDto(
             eventId: _eventId,
             externalId: _externalId,
             receiver: _receiver,
             businessReason: _businessReason,
             relatedToMessageId: MessageId.New(),
             gridAreaCode: "804",
-            series: new SendMeasurementsMessageSeriesDto(
+            series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: _meteringPointId,
                 MeteringPointType: _meteringPointType,

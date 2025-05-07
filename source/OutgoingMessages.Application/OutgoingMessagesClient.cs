@@ -212,11 +212,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAsync(
-        AcceptedForwardMeteredDataMessageDto acceptedForwardMeteredDataMessageDto,
+        AcceptedSendMeasurementsMessageDto acceptedSendMeasurementsMessageDto,
         CancellationToken cancellationToken)
     {
         var message = OutgoingMessageFactory.CreateMessage(
-            acceptedForwardMeteredDataMessageDto,
+            acceptedSendMeasurementsMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 
@@ -240,11 +240,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAsync(
-        RejectedForwardMeteredDataMessageDto rejectedForwardMeteredDataMessageDto,
+        RejectedSendMeasurementsMessageDto rejectedSendMeasurementsMessageDto,
         CancellationToken cancellationToken)
     {
         var message = OutgoingMessageFactory.CreateMessage(
-            rejectedForwardMeteredDataMessageDto,
+            rejectedSendMeasurementsMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 

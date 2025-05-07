@@ -360,7 +360,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     {
         // Arrange
         var serviceBusMessageId = Guid.NewGuid();
-        var message = new RejectedForwardMeteredDataMessageDto(
+        var message = new RejectedSendMeasurementsMessageDto(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(serviceBusMessageId),
             businessReason: BusinessReason.PeriodicFlexMetering,
@@ -398,7 +398,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         Assert.Equal(serviceBusMessageId, outgoingMessage.ExternalId.Value);
     }
 
-    private AcceptedForwardMeteredDataMessageDto CreateAcceptedForwardMeteredDataMessage(
+    private AcceptedSendMeasurementsMessageDto CreateAcceptedForwardMeteredDataMessage(
         ExternalId externalId,
         Actor receiver,
         Instant start,
@@ -407,14 +407,14 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     {
         var resolution = Resolution.QuarterHourly;
 
-        return new AcceptedForwardMeteredDataMessageDto(
+        return new AcceptedSendMeasurementsMessageDto(
             eventId: EventId.From(Guid.NewGuid()),
             externalId: externalId,
             receiver: receiver,
             businessReason: BusinessReason.PeriodicMetering,
             relatedToMessageId: relatedToMessageId,
             gridAreaCode: "804",
-            series: new SendMeasurementsMessageSeriesDto(
+            series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: "1234567890123",
                 MeteringPointType: MeteringPointType.Consumption,

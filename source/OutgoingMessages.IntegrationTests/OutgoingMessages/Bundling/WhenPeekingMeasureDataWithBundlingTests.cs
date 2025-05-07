@@ -85,14 +85,14 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
 
         var messagesToEnqueue = Enumerable.Range(0, bundlesToCreateCount)
             .Select(
-                i => new AcceptedForwardMeteredDataMessageDto(
+                i => new AcceptedSendMeasurementsMessageDto(
                     eventId: eventId,
                     externalId: new ExternalId(Guid.NewGuid()),
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new SendMeasurementsMessageSeriesDto(
+                    series: new MeasurementsDto(
                         TransactionId: TransactionId.New(),
                         MeteringPointId: "1234567890123456",
                         MeteringPointType: MeteringPointType.Consumption,
@@ -232,7 +232,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
 
         var messagesToEnqueue = Enumerable.Range(0, maxBundleSize)
             .Select(
-                i => new RejectedForwardMeteredDataMessageDto(
+                i => new RejectedSendMeasurementsMessageDto(
                     eventId: eventId,
                     externalId: new ExternalId(Guid.NewGuid()),
                     receiverNumber: receiver.Number,
@@ -360,8 +360,8 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         {
             _ = messageDto switch
             {
-                AcceptedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
-                RejectedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+                AcceptedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+                RejectedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
                 _ => throw new NotImplementedException($"Enqueueing outgoing message of type {messageDto.GetType()} is not implemented."),
             };
             enqueuedMessagesCount++;

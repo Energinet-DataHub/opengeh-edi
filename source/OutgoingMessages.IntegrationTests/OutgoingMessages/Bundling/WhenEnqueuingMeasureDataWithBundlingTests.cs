@@ -419,14 +419,14 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
                     var resolutionDuration = Duration.FromMinutes(15);
                     var time = startTime.Plus(i * resolutionDuration); // Start every message 15 minutes later
-                    return new AcceptedForwardMeteredDataMessageDto(
+                    return new AcceptedSendMeasurementsMessageDto(
                         eventId: eventId,
                         externalId: new ExternalId(Guid.NewGuid()),
                         receiver: receiver.ToActor(),
                         businessReason: BusinessReason.PeriodicMetering,
                         relatedToMessageId: MessageId.New(),
                         gridAreaCode: "804",
-                        series: new SendMeasurementsMessageSeriesDto(
+                        series: new MeasurementsDto(
                             TransactionId: TransactionId.New(),
                             MeteringPointId: "1234567890123",
                             MeteringPointType: MeteringPointType.Consumption,
@@ -592,14 +592,14 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         var messagesToEnqueue = Enumerable.Range(0, enqueueMessageCount)
             .Select(
-                i => new AcceptedForwardMeteredDataMessageDto(
+                i => new AcceptedSendMeasurementsMessageDto(
                     eventId: EventId.From(Guid.NewGuid()),
                     externalId: new ExternalId(Guid.NewGuid()),
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new SendMeasurementsMessageSeriesDto(
+                    series: new MeasurementsDto(
                         TransactionId: TransactionId.New(),
                         MeteringPointId: "1234567890123456",
                         MeteringPointType: MeteringPointType.Consumption,
@@ -700,14 +700,14 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         var messagesToEnqueue = Enumerable.Range(start: 0, count: 2)
             .Select(
-                _ => new AcceptedForwardMeteredDataMessageDto(
+                _ => new AcceptedSendMeasurementsMessageDto(
                     eventId: EventId.From(Guid.NewGuid()),
                     externalId: new ExternalId(Guid.NewGuid()),
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new SendMeasurementsMessageSeriesDto(
+                    series: new MeasurementsDto(
                         TransactionId: TransactionId.New(),
                         MeteringPointId: "1234567890123456",
                         MeteringPointType: MeteringPointType.Consumption,
@@ -922,8 +922,8 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
 
         var messageId = message switch
         {
-            AcceptedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
-            RejectedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+            AcceptedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+            RejectedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
             _ => throw new NotImplementedException($"Enqueueing outgoing message of type {message.GetType()} is not implemented."),
         };
 
