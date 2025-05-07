@@ -729,8 +729,10 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
         // Currently allowing 25 times the message size in bytes
         var maxAllowedMemoryUse = messageSizeInBytes * 25;
         var memoryUsed = memoryAfter - memoryBefore;
+
         Assert.True(memoryUsed < maxAllowedMemoryUse, $"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB), expected {maxAllowedMemoryUse} bytes ({maxAllowedMemoryUse / 1024 / 1024} MB).");
         Assert.True(stopwatch.ElapsedMilliseconds < 60000, $"Execution time: {stopwatch.ElapsedMilliseconds} ms, expected less than 60000 ms.");
+        _testOutputHelper.WriteLine($"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB) within {stopwatch.ElapsedMilliseconds} ms");
     }
 
     private async Task<(MeteredDataForMeteringPointMessageBase? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(

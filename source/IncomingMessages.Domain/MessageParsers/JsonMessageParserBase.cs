@@ -37,6 +37,14 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
     private const string ReceiverRoleElementName = "receiver_MarketParticipant.marketRole.type";
     private const string CreatedDateElementName = "createdDateTime";
     private const string BusinessSectorTypeElementName = "businessSector.type";
+
+    //JsonSchema.Net optimizes repeated evaluations with the same schema by performing some static analysis during the first evaluation.
+    //https://docs.json-everything.net/schema/basics/#schema-options
+    private static readonly EvaluationOptions _cachedEvaluationOptions = new()
+    {
+        OutputFormat = OutputFormat.Hierarchical,
+    };
+
     private readonly JsonSchemaProvider _schemaProvider = schemaProvider;
 
     private List<ValidationError> _validationErrors = [];
@@ -174,8 +182,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
             return false;
         }
 
-        var evaluationOptions = new EvaluationOptions { OutputFormat = OutputFormat.Hierarchical };
-        var result = schema.Evaluate(jsonDocument, evaluationOptions);
+        var result = schema.Evaluate(jsonDocument, _cachedEvaluationOptions);
         if (!result.IsValid)
         {
             FindErrorsForInvalidEvaluation(result);
