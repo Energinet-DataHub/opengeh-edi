@@ -14,6 +14,8 @@
 
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -22,6 +24,9 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
+using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
+using MeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
+using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.SubsystemHttpTrigger;
 
@@ -99,7 +104,22 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
 
     private HttpRequestMessage CreateHttpRequest(string token)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"api/enqueue/{EnqueueCalculatedMeasurementsHttpV1.RouteName}");
+        var request =
+            new HttpRequestMessage(HttpMethod.Post, $"api/enqueue/{EnqueueCalculatedMeasurementsHttpV1.RouteName}")
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(
+                        new EnqueueCalculatedMeasurementsHttpV1(
+                            Guid.NewGuid(),
+                            Guid.NewGuid(),
+                            "1234567890123",
+                            MeteringPointType.Consumption,
+                            Resolution.QuarterHourly,
+                            MeasurementUnit.KilowattHour,
+                            [])),
+                    Encoding.UTF8,
+                    "application/json"),
+            };
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return request;
