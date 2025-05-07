@@ -727,7 +727,7 @@ public class GivenIncomingMeteredDataForMeteringMessageTests : IncomingMessagesT
         result.Success.Should().BeTrue();
 
         // Currently allowing 25 times the message size in bytes
-        var maxAllowedMemoryUse = messageSizeInBytes * 25;
+        var maxAllowedMemoryUse = messageSizeInBytes * 20;
         var memoryUsed = memoryAfter - memoryBefore;
 
         Assert.True(memoryUsed < maxAllowedMemoryUse, $"Memory used: {memoryUsed} bytes ({memoryUsed / 1024 / 1024} MB), expected {maxAllowedMemoryUse} bytes ({maxAllowedMemoryUse / 1024 / 1024} MB).");

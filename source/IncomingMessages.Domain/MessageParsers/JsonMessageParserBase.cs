@@ -97,7 +97,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
 
         var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
         var transactions = new List<IIncomingMessageSeries>(transactionElements.GetArrayLength());
-        string? senderId = null;
+        var senderId = headerElement[SenderIdentificationElementName]?[ValueElementName]?.GetValue<string>() ?? string.Empty;
         foreach (var transactionElement in transactionElements.EnumerateArray())
         {
             // This validates a full document that contains only a single transaction.
@@ -107,7 +107,6 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
             if (!IsValid(documentWithOneTransaction, schemaResult))
                 return null;
 
-            senderId ??= headerElement[SenderIdentificationElementName]?[ValueElementName]?.GetValue<string>() ?? string.Empty;
             transactions.Add(ParseTransaction(transactionElement, senderId));
         }
 
