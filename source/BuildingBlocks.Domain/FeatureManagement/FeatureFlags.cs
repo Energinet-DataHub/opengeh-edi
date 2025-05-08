@@ -14,7 +14,7 @@
 
 using Microsoft.FeatureManagement;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 
 /// <summary>
 /// Manage feature flags in EDI.

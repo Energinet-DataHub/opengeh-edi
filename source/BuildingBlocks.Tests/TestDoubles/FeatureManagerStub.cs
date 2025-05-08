@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
