@@ -209,7 +209,7 @@ internal sealed class EdiDriver
 
         var json = JsonSerializer.Serialize(data, data.GetType());
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, data.Route);
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/enqueue/" + data.Route);
         request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var httpClient = await _subsystemHttpClient;
