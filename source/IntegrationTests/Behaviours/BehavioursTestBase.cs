@@ -126,7 +126,6 @@ public class BehavioursTestBase : IDisposable
         _integrationTestFixture.DatabaseManager.CleanupDatabase();
         _integrationTestFixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-        FeatureManagerStub = new();
         _clockStub = new ClockStub();
         _serviceProvider = BuildServices(testOutputHelper);
 
@@ -137,7 +136,7 @@ public class BehavioursTestBase : IDisposable
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator, null, _actorId));
     }
 
-    protected FeatureManagerStub FeatureManagerStub { get; }
+    protected FeatureManagerStub FeatureManagerStub { get; } = new();
 
     public void Dispose()
     {
