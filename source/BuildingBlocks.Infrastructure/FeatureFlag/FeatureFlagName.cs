@@ -40,7 +40,7 @@ public static class FeatureFlagName
     public const string PM25Ebix = "PM25-EBIX";
 
     /// <summary>
-    /// Whether to allow actors to peek metered data for metering points.
+    /// Whether to allow actors to peek measurements messages.
     /// </summary>
-    public const string PM25Messages = "PM25-MESSAGES";
+    public const string Brs021PeekMessages = "BRS021-PEEK-MESSAGES";
 }
