@@ -16,7 +16,25 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public readonly record struct EnergyObservationDto(
-    int? Position,
-    decimal? Quantity,
-    Quality? Quality);
+public sealed class AcceptedSendMeasurementsMessageDto(
+    EventId eventId,
+    ExternalId externalId,
+    Actor receiver,
+    BusinessReason businessReason,
+    MessageId relatedToMessageId,
+    string gridAreaCode,
+    MeasurementsDto series)
+    : OutgoingMessageDto(
+        DocumentType.NotifyValidatedMeasureData,
+        receiver.ActorNumber,
+        null,
+        eventId,
+        businessReason.Name,
+        receiver.ActorRole,
+        externalId,
+        relatedToMessageId)
+{
+    public MeasurementsDto Series { get; } = series;
+
+    public string GridAreaCode { get; set; } = gridAreaCode;
+}

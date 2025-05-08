@@ -459,7 +459,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 
-    private async Task EnqueueAndCommitMessage(AcceptedForwardMeteredDataMessageDto message)
+    private async Task EnqueueAndCommitMessage(AcceptedSendMeasurementsMessageDto message)
     {
         await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await _unitOfWork.CommitTransactionAsync(CancellationToken.None);

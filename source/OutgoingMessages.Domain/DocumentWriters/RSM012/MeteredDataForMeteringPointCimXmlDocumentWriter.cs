@@ -43,22 +43,22 @@ public class MeteredDataForMeteringPointCimXmlDocumentWriter(
             var seriesElement = new XElement(@namespace + "Series");
             seriesElement.Add(new XElement(@namespace + "mRID", activityRecord.TransactionId.Value));
 
-            if (activityRecord.OriginalTransactionIdReferenceId is not null)
+            if (activityRecord.OriginalTransactionIdReference is not null)
             {
                 seriesElement.Add(
                     new XElement(
                     @namespace + "originalTransactionIDReference_Series.mRID",
-                    activityRecord.OriginalTransactionIdReferenceId?.Value));
+                    activityRecord.OriginalTransactionIdReference?.Value));
             }
 
             seriesElement.Add(
                 new XElement(
                     @namespace + "marketEvaluationPoint.mRID",
                     new XAttribute("codingScheme", "A10"),
-                    activityRecord.MarketEvaluationPointNumber));
+                    activityRecord.MeteringPointId));
 
             seriesElement.Add(
-                new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MarketEvaluationPointType.Code));
+                new XElement(@namespace + "marketEvaluationPoint.type", activityRecord.MeteringPointType.Code));
 
             seriesElement.Add(
                 new XElement(
@@ -71,7 +71,7 @@ public class MeteredDataForMeteringPointCimXmlDocumentWriter(
             }
 
             seriesElement.Add(
-                new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.QuantityMeasureUnit.Code));
+                new XElement(@namespace + "quantity_Measure_Unit.name", activityRecord.MeasurementUnit.Code));
 
             seriesElement.Add(
                 new XElement(
@@ -79,9 +79,15 @@ public class MeteredDataForMeteringPointCimXmlDocumentWriter(
                     new XElement(@namespace + "resolution", activityRecord.Resolution.Code),
                     new XElement(
                         @namespace + "timeInterval",
-                        new XElement(@namespace + "start", activityRecord.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)),
-                        new XElement(@namespace + "end", activityRecord.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))),
-                    activityRecord.EnergyObservations.Select(x => CreatePointElement(x, @namespace))));
+                        new XElement(
+                            @namespace + "start",
+                            activityRecord.Period.Start.ToString(
+                                "yyyy-MM-dd'T'HH:mm'Z'",
+                                CultureInfo.InvariantCulture)),
+                        new XElement(
+                            @namespace + "end",
+                            activityRecord.Period.End.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))),
+                    activityRecord.Measurements.Select(x => CreatePointElement(x, @namespace))));
 
             await seriesElement.WriteToAsync(writer, CancellationToken.None).ConfigureAwait(false);
         }

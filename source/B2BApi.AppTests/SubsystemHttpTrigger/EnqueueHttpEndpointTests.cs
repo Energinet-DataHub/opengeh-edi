@@ -14,13 +14,19 @@
 
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
+using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
+using MeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
+using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.SubsystemHttpTrigger;
 
@@ -49,7 +55,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
         await Task.CompletedTask;
     }
 
-    [Fact(Skip = "Need a trigger to run this test")]
+    [Fact]
     public async Task Given_SubsystemRequestWithValidToken_When_Requesting_Then_SuccessfulRequest()
     {
         // Arrange
@@ -62,7 +68,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
         httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    [Fact(Skip = "Need a trigger to run this test")]
+    [Fact]
     public async Task Given_SubsystemRequestWithInvalidToken_When_Requesting_Then_RejectedRequest()
     {
         // Arrange
@@ -75,7 +81,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
         httpResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
-    [Fact(Skip = "Need a trigger to run this test")]
+    [Fact]
     public async Task Given_RequestWithActorToken_When_Requesting_Then_RejectedRequest()
     {
         var actorClientId = Guid.NewGuid().ToString();
@@ -98,8 +104,22 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
 
     private HttpRequestMessage CreateHttpRequest(string token)
     {
-        // TODO: Update path when we have a trigger to enqueue with
-        var request = new HttpRequestMessage(HttpMethod.Post, "api/incomingMessages/notifyvalidatedmeasuredata");
+        var request =
+            new HttpRequestMessage(HttpMethod.Post, $"api/enqueue/{EnqueueCalculatedMeasurementsHttpV1.RouteName}")
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(
+                        new EnqueueCalculatedMeasurementsHttpV1(
+                            Guid.NewGuid(),
+                            Guid.NewGuid(),
+                            "1234567890123",
+                            MeteringPointType.Consumption,
+                            Resolution.QuarterHourly,
+                            MeasurementUnit.KilowattHour,
+                            [])),
+                    Encoding.UTF8,
+                    "application/json"),
+            };
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return request;

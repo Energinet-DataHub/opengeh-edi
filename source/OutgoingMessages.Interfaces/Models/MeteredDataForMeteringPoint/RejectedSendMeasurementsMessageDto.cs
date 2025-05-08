@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-public sealed class RejectedForwardMeteredDataMessageDto(
+public sealed class RejectedSendMeasurementsMessageDto(
     EventId eventId,
     ExternalId externalId,
     BusinessReason businessReason,

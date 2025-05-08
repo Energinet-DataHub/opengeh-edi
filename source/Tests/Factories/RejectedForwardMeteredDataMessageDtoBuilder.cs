@@ -32,9 +32,9 @@ public class RejectedForwardMeteredDataMessageDtoBuilder
 
     private ActorRole _documentReceiverRole = ActorRole.MeteredDataResponsible;
 
-    public RejectedForwardMeteredDataMessageDto Build()
+    public RejectedSendMeasurementsMessageDto Build()
     {
-        return new RejectedForwardMeteredDataMessageDto(
+        return new RejectedSendMeasurementsMessageDto(
             _eventId,
             _externalId,
             _businessReason,
