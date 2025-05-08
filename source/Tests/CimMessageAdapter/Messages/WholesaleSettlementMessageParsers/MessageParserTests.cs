@@ -28,6 +28,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
@@ -45,11 +46,24 @@ public sealed class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}wholesalesettlement{Path.DirectorySeparatorChar}";
 
-    private static readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers = new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
+    private static readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers =
+        new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
     {
-        { (IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Xml), new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
-        { (IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Json), new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
-        { (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Json), new WholesaleSettlementB2CJsonMessageParser(new Serializer()) },
+        {
+            (IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Xml),
+            new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas()))
+        },
+        {
+            (IncomingDocumentType.RequestWholesaleSettlement, DocumentFormat.Json),
+            new WholesaleSettlementJsonMessageParser(
+                new JsonSchemaProvider(
+                    new CimJsonSchemas()),
+                new Logger<WholesaleSettlementJsonMessageParser>(new LoggerFactory()))
+        },
+        {
+            (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Json),
+            new WholesaleSettlementB2CJsonMessageParser(new Serializer())
+        },
     };
 
     private readonly Serializer _serializer = new();

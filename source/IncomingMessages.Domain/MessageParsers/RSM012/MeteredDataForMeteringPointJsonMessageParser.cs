@@ -16,10 +16,14 @@ using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDataForMeteringPointJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
+public class MeteredDataForMeteringPointJsonMessageParser(
+    JsonSchemaProvider schemaProvider,
+    ILogger<MeteredDataForMeteringPointJsonMessageParser> logger)
+    : JsonMessageParserBase(schemaProvider, logger)
 {
     private const string ValueElementName = "value";
     private const string MridElementName = "mRID";
@@ -48,50 +52,46 @@ public class MeteredDataForMeteringPointJsonMessageParser(JsonSchemaProvider sch
 
     protected override IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber)
     {
-        var id = transactionElement.GetProperty(MridElementName).ToString() ?? string.Empty;
+        var id = transactionElement.GetProperty(MridElementName).GetString() ?? string.Empty;
         var meteringPointLocationId = transactionElement.GetProperty(MeteringPointIdentificationElementName)
             .GetProperty(ValueElementName)
-            .ToString();
+            .GetString();
 
-        var meteringPointType =
-            transactionElement.GetProperty(MeteringPointTypeElementName).GetProperty(ValueElementName).ToString();
+        var meteringPointType = transactionElement.GetProperty(MeteringPointTypeElementName)
+            .GetProperty(ValueElementName)
+            .GetString();
 
-        var registrationDateAndOrTime =
-            transactionElement.GetProperty(RegistrationDateAndOrTimeElementName).ToString();
-
-        var productNumber =
-            transactionElement.GetProperty(ProductNumberElementName).ToString();
-
-        var productUnitType =
-            transactionElement.GetProperty(ProductUnitTypeElementName).GetProperty(ValueElementName).ToString();
+        var registrationDateAndOrTime = transactionElement.GetProperty(RegistrationDateAndOrTimeElementName).GetString();
+        var productNumber = transactionElement.GetProperty(ProductNumberElementName).GetString();
+        var productUnitType = transactionElement.GetProperty(ProductUnitTypeElementName)
+            .GetProperty(ValueElementName)
+            .GetString();
 
         var periodElement = transactionElement.GetProperty(PeriodElementName);
-        var resolution = periodElement.GetProperty(ResolutionElementName).ToString();
-        var startDateAndOrTimeDateTime = periodElement.GetProperty(TimeIntervalElementName).GetProperty(StartElementName).GetProperty(ValueElementName).ToString();
-        var endDateAndOrTimeDateTime = periodElement.GetProperty(TimeIntervalElementName).GetProperty(EndElementName).GetProperty(ValueElementName).ToString();
+        var resolution = periodElement.GetProperty(ResolutionElementName).GetString();
+        var timeInterval = periodElement.GetProperty(TimeIntervalElementName);
+        var startDateAndOrTimeDateTime = timeInterval.GetProperty(StartElementName)
+            .GetProperty(ValueElementName)
+            .GetString();
+        var endDateAndOrTimeDateTime = timeInterval.GetProperty(EndElementName)
+            .GetProperty(ValueElementName)
+            .GetString();
 
-        var energyObservations = new List<EnergyObservation>();
-        JsonElement? pointsElements = periodElement.TryGetProperty(PointElementName, out var pointsElement)
-            ? pointsElement
-            : null;
-
-        if (pointsElements != null)
+        List<EnergyObservation>? energyObservations = null;
+        if (periodElement.TryGetProperty(PointElementName, out var pointsElement))
         {
-            foreach (var pointElement in pointsElements.Value.EnumerateArray())
+            energyObservations = new List<EnergyObservation>(pointsElement.GetArrayLength());
+            foreach (var pointElement in pointsElement.EnumerateArray())
             {
-                var position = pointElement.GetProperty(PositionElementName).GetProperty(ValueElementName).ToString();
-                string? quality = null;
-                string? quantity = null;
-
-                if (pointElement.TryGetProperty(QualityElementName, out var qualityElement))
-                {
-                    quality = qualityElement.GetProperty(ValueElementName).ToString();
-                }
-
-                if (pointElement.TryGetProperty(QuantityElementName, out var quantityElement))
-                {
-                    quantity = quantityElement.ToString();
-                }
+                var position = pointElement.GetProperty(PositionElementName)
+                    .GetProperty(ValueElementName)
+                    .ToString();
+                var quality = pointElement.TryGetProperty(QualityElementName, out var qualityElement)
+                    ? qualityElement.GetProperty(ValueElementName).GetString()
+                    : null;
+                var quantity = pointElement.TryGetProperty(QuantityElementName, out var quantityElement)
+                    ? quantityElement.ToString()
+                    : null;
 
                 energyObservations.Add(new EnergyObservation(position, quantity, quality));
             }
@@ -100,15 +100,15 @@ public class MeteredDataForMeteringPointJsonMessageParser(JsonSchemaProvider sch
         return new MeteredDataForMeteringPointSeries(
             id,
             resolution,
-            startDateAndOrTimeDateTime,
+            startDateAndOrTimeDateTime!,
             endDateAndOrTimeDateTime,
             productNumber,
-            registrationDateAndOrTime,
+            registrationDateAndOrTime!,
             productUnitType,
             meteringPointType,
             meteringPointLocationId,
             senderNumber,
-            energyObservations);
+            energyObservations ?? new List<EnergyObservation>());
     }
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
