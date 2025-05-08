@@ -56,7 +56,7 @@ public static class FeatureFlags
     }
 
     /// <summary>
-    /// Names of all Feature Flags that exists in EDI.
+    /// Names of Feature Flags that exists in EDI.
     ///
     /// The feature flags can be configured:
     ///  * Locally through app settings
