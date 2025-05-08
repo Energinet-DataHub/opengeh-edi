@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
@@ -51,89 +50,54 @@ public static class HostFactory
 
         var defaultAzureCredential = new DefaultAzureCredential();
         return new HostBuilder()
-            .ConfigureFunctionsWebApplication(
-                builder =>
-                {
-                    // If the endpoint is omitted from auth, we dont want to intercept exceptions.
-                    builder.UseWhen<UnHandledExceptionMiddleware>(
-                        functionContext => functionContext.IsActorProtectedEndpoint());
-                    builder.UseWhen<MarketActorAuthenticatorMiddleware>(
-                        functionContext => functionContext.IsActorProtectedEndpoint());
-                    builder.UseMiddleware<ExecutionContextMiddleware>();
-
-                    // Subsystem authentication
-                    builder.UseFunctionsAuthorization();
-
-                    // Host the Durable Function Monitor as a part of this app.
-                    // The Durable Function Monitor can be accessed at: {host url}/api/durable-functions-monitor
-                    builder.UseDurableFunctionsMonitor(
-                        (settings, _) =>
-                        {
-                            settings.Mode = DfmMode.ReadOnly;
-                        });
-                })
-            .ConfigureAppConfiguration((context, configBuilder) =>
+            .ConfigureServices((context, services) =>
             {
-                var settings = configBuilder.Build();
-                var appConfigEndpoint = settings[AppConfiguration.AppConfigEndpoint]!;
-                configBuilder.AddAzureAppConfiguration(options =>
-                {
-                    options.Connect(new Uri(appConfigEndpoint), defaultAzureCredential)
-                        .UseFeatureFlags(featureFlagOptions =>
-                        {
-                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(5));
-                        });
-                });
-            })
-            .ConfigureServices(
-                (context, services) =>
-                {
-                    services
-                        // Logging
-                        .AddApplicationInsightsForIsolatedWorker(SubsystemName)
+                services
+                    // Logging
+                    .AddApplicationInsightsForIsolatedWorker(SubsystemName)
 
-                        // Health checks
-                        .AddHealthChecksForIsolatedWorker()
+                    // Health checks
+                    .AddHealthChecksForIsolatedWorker()
 
-                        // Azure App Configuration
-                        .AddAzureAppConfiguration()
+                    // Azure App Configuration
+                    .AddAzureAppConfiguration()
 
-                        // Data retention
-                        .AddDataRetention()
+                    // Data retention
+                    .AddDataRetention()
 
-                        // Security
-                        .AddB2BAuthentication(tokenValidationParameters)
-                        .AddSubsystemAuthentication(context.Configuration)
+                    // Security
+                    .AddB2BAuthentication(tokenValidationParameters)
+                    .AddSubsystemAuthentication(context.Configuration)
 
-                        // System timer
-                        .AddNodaTimeForApplication()
+                    // System timer
+                    .AddNodaTimeForApplication()
 
-                        // Encoder
-                        .AddJavaScriptEncoder()
+                    // Encoder
+                    .AddJavaScriptEncoder()
 
-                        // Serializer
-                        .AddSerializer()
+                    // Serializer
+                    .AddSerializer()
 
-                        // Modules
-                        .AddIntegrationEventModule(context.Configuration)
-                        .AddArchivedMessagesModule(context.Configuration)
-                        .AddIncomingMessagesModule(context.Configuration)
-                        .AddOutgoingMessagesModule(context.Configuration)
-                        .AddMasterDataModule(context.Configuration)
-                        .AddDataAccessUnitOfWorkModule()
-                        .AddAuditLog()
+                    // Modules
+                    .AddIntegrationEventModule(context.Configuration)
+                    .AddArchivedMessagesModule(context.Configuration)
+                    .AddIncomingMessagesModule(context.Configuration)
+                    .AddOutgoingMessagesModule(context.Configuration)
+                    .AddMasterDataModule(context.Configuration)
+                    .AddDataAccessUnitOfWorkModule()
+                    .AddAuditLog()
 
-                        // Audit log (outbox publisher)
-                        .AddAuditLogOutboxPublisher(context.Configuration)
+                    // Audit log (outbox publisher)
+                    .AddAuditLogOutboxPublisher(context.Configuration)
 
-                        // Outbox context, client, processor and retention
-                        .AddOutboxContext(context.Configuration)
-                        .AddOutboxClient<OutboxContext>()
-                        .AddOutboxProcessor<OutboxContext>()
-                        .AddOutboxRetention()
+                    // Outbox context, client, processor and retention
+                    .AddOutboxContext(context.Configuration)
+                    .AddOutboxClient<OutboxContext>()
+                    .AddOutboxProcessor<OutboxContext>()
+                    .AddOutboxRetention()
 
-                        // Enqueue messages from PM (using Edi Topic)
-                        .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential)
+                    // Enqueue messages from PM (using Edi Topic)
+                    .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential)
 
                         // Configure Kestrel options
                         .Configure<KestrelServerOptions>(options =>
@@ -141,11 +105,39 @@ public static class HostFactory
                             options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50mb
                         });
                 })
-            .ConfigureLogging(
-                (hostingContext, logging) =>
+            .ConfigureFunctionsWebApplication(builder =>
+            {
+                // Feature management
+                //  * Enables middleware that handles refresh from Azure App Configuration
+                builder.UseAzureAppConfigurationForIsolatedWorker();
+
+                // If the endpoint is omitted from auth, we dont want to intercept exceptions.
+                builder.UseWhen<UnHandledExceptionMiddleware>(
+                    functionContext => functionContext.IsActorProtectedEndpoint());
+                builder.UseWhen<MarketActorAuthenticatorMiddleware>(
+                    functionContext => functionContext.IsActorProtectedEndpoint());
+                builder.UseMiddleware<ExecutionContextMiddleware>();
+
+                // Subsystem authentication
+                builder.UseFunctionsAuthorization();
+
+                // Host the Durable Function Monitor as a part of this app.
+                // The Durable Function Monitor can be accessed at: {host url}/api/durable-functions-monitor
+                builder.UseDurableFunctionsMonitor((settings, _) =>
                 {
-                    logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
-                })
+                    settings.Mode = DfmMode.ReadOnly;
+                });
+            })
+            .ConfigureAppConfiguration((context, configBuilder) =>
+            {
+                // Feature management
+                //  * Configure load/refresh from Azure App Configuration
+                configBuilder.AddAzureAppConfigurationForIsolatedWorker(defaultAzureCredential);
+            })
+            .ConfigureLogging((hostingContext, logging) =>
+            {
+                logging.AddLoggingConfigurationForIsolatedWorker(hostingContext.Configuration);
+            })
             .Build();
     }
 }

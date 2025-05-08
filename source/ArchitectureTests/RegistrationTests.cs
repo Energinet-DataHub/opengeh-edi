@@ -79,8 +79,7 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}", TestEnvironment.CreateFakeStorageUrl());
         Environment.SetEnvironmentVariable($"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.ContainerName)}", "fake-container-name");
 
-        // App Configuration settings
-        Environment.SetEnvironmentVariable(nameof(AppConfiguration.AppConfigEndpoint), "https://appcs-intgra-t-we-002.azconfig.io");
+        Environment.SetEnvironmentVariable($"{AzureAppConfigurationOptions.SectionName}__{nameof(AzureAppConfigurationOptions.Endpoint)}", "https://appcs-intgra-t-we-002.azconfig.io");
 
         Environment.SetEnvironmentVariable($"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.ApplicationIdUri)}", "NotEmpty");
         Environment.SetEnvironmentVariable($"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.Issuer)}", "NotEmpty");
