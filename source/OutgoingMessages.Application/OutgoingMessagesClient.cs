@@ -212,11 +212,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAsync(
-        AcceptedForwardMeteredDataMessageDto acceptedForwardMeteredDataMessageDto,
+        AcceptedSendMeasurementsMessageDto acceptedSendMeasurementsMessageDto,
         CancellationToken cancellationToken)
     {
         var message = OutgoingMessageFactory.CreateMessage(
-            acceptedForwardMeteredDataMessageDto,
+            acceptedSendMeasurementsMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 
@@ -226,11 +226,25 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<Guid> EnqueueAsync(
-        RejectedForwardMeteredDataMessageDto rejectedForwardMeteredDataMessageDto,
+        CalculatedMeasurementsMessageDto calculatedMeasurementsMessageDto,
         CancellationToken cancellationToken)
     {
         var message = OutgoingMessageFactory.CreateMessage(
-            rejectedForwardMeteredDataMessageDto,
+            calculatedMeasurementsMessageDto,
+            _serializer,
+            _clock.GetCurrentInstant());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+
+        return messageId.Value;
+    }
+
+    public async Task<Guid> EnqueueAsync(
+        RejectedSendMeasurementsMessageDto rejectedSendMeasurementsMessageDto,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessageFactory.CreateMessage(
+            rejectedSendMeasurementsMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 
