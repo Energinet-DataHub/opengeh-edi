@@ -48,8 +48,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             new HttpClientFactory(),
             databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
             schemaPrefix: "edi_integration_tests");
-
-        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public EdiDatabaseManager DatabaseManager { get; set; }
@@ -59,8 +57,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     public DatabricksSchemaManager DatabricksSchemaManager { get; }
-
-    public string AppConfigEndpoint { get; private set; }
 
     public async Task InitializeAsync()
     {

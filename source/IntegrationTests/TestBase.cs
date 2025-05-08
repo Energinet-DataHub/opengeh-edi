@@ -35,7 +35,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationTests.AppConfiguration;
 using Energinet.DataHub.EDI.IntegrationTests.DataRetention;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
@@ -80,8 +79,6 @@ public class TestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier, null, ActorId));
-
-        AppConfigurationClient = new AppConfigurationClient(Fixture.AppConfigEndpoint, Fixture.IntegrationTestConfiguration.Credential);
     }
 
     protected Guid ActorId => Guid.Parse("00000000-0000-0000-0000-000000000001");
@@ -93,8 +90,6 @@ public class TestBase : IDisposable
     protected AuthenticatedActor AuthenticatedActor { get; }
 
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
-
-    protected AppConfigurationClient AppConfigurationClient { get; private set; } = null!;
 
     public void Dispose()
     {
@@ -227,15 +222,6 @@ public class TestBase : IDisposable
             Fixture.AzuriteManager.BlobStorageServiceUri.AbsoluteUri);
 
         var config = new ConfigurationBuilder()
-                .AddAzureAppConfiguration(options =>
-                {
-                    var appConfigEndpoint = Fixture.IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
-                    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
-                        .UseFeatureFlags(featureFlagOptions =>
-                        {
-                            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(1));
-                        });
-                })
             .AddEnvironmentVariables()
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
@@ -259,8 +245,6 @@ public class TestBase : IDisposable
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                     // => Calculation Result views
                     [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
-                    // => App Configuration
-                    [$"{nameof(BuildingBlocks.Infrastructure.Configuration.AppConfiguration.AppConfigEndpoint)}"] = Fixture.AppConfigEndpoint,
                 })
             .Build();
 

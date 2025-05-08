@@ -14,7 +14,6 @@
 
 using System.Reflection;
 using Asp.Versioning;
-using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
@@ -22,7 +21,6 @@ using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
@@ -33,16 +31,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string subsystemName = "EDI";
 
-// Add Azure App Configuration
-builder.Configuration.AddAzureAppConfiguration(options =>
-{
-    var appConfigEndpoint = builder.Configuration[AppConfiguration.AppConfigEndpoint]!;
-    options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
-        .UseFeatureFlags(featureFlagOptions =>
-        {
-            featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(5));
-        });
-});
+// Feature management
+//  * Configure load/refresh from Azure App Configuration
+builder.Configuration.AddAzureAppConfigurationForWebApp(builder.Configuration);
 
 builder.Services
     // Swagger
@@ -99,6 +90,10 @@ builder.Services
 var app = builder.Build();
 
 var isDevelopment = app.Environment.IsDevelopment();
+
+// Feature management
+//  * Enables middleware that handles refresh from Azure App Configuration
+app.UseAzureAppConfiguration();
 
 app.UseRouting();
 

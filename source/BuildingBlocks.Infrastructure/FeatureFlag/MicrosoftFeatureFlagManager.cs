@@ -13,22 +13,19 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
-/// A <see cref="IFeatureFlagManager"/> implementation that combines feature flags from Azure App Configuration
-/// with the Microsoft.FeatureManagement package.
+/// A <see cref="IFeatureFlagManager"/> implementation that uses Microsoft.FeatureManagement package
+/// and adds a methods per feature flag.
 /// </summary>
 public class MicrosoftFeatureFlagManager(
-    IFeatureManager featureManager,
-    IConfigurationRefresherProvider refresherProvider)
+    IFeatureManager featureManager)
     : IFeatureFlagManager
 {
     private readonly IFeatureManager _featureManager = featureManager;
-    private readonly IConfigurationRefresher _refresher = refresherProvider.Refreshers.First();
 
     public Task<bool> UsePeekMessagesAsync() => IsEnabledAsync(FeatureFlagName.UsePeekMessages);
 
@@ -39,9 +36,8 @@ public class MicrosoftFeatureFlagManager(
 
     public Task<bool> UsePeekForwardMeteredDataMessagesAsync() => IsEnabledAsync(FeatureFlagName.PM25Messages);
 
-    protected async Task<bool> IsEnabledAsync(string featureFlagName)
+    protected Task<bool> IsEnabledAsync(string featureFlagName)
     {
-        await _refresher.TryRefreshAsync().ConfigureAwait(false);
-        return await _featureManager.IsEnabledAsync(featureFlagName).ConfigureAwait(false);
+        return _featureManager.IsEnabledAsync(featureFlagName);
     }
 }

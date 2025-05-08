@@ -17,8 +17,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using Azure.Core;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.AppConfiguration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
@@ -131,8 +133,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(AuditLogMockServer));
 
         LogStopwatch(constructorStopwatch, "B2BApiAppFixture constructor");
-
-        AppConfigEndpoint = IntegrationTestConfiguration.Configuration["AZURE-APP-CONFIGURATION-ENDPOINT"]!;
     }
 
     public AuditLogMockServer AuditLogMockServer { get; }
@@ -177,8 +177,6 @@ public class B2BApiAppFixture : IAsyncLifetime
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
-
-    private string AppConfigEndpoint { get; }
 
     public async Task InitializeAsync()
     {
@@ -524,10 +522,13 @@ public class B2BApiAppFixture : IAsyncLifetime
             $"{BundlingOptions.SectionName}__{nameof(BundlingOptions.BundleMessagesOlderThanSeconds)}",
             "0"); // Setting the "bundle messages older than" to 0 ensures that bundles will be created for outgoing messages as soon as the function is triggered
 
-        // App Configuration settings
+        // Feature Management => Azure App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(AppConfiguration.AppConfigEndpoint),
-            AppConfigEndpoint);
+            $"{AzureAppConfigurationOptions.SectionName}:{nameof(AzureAppConfigurationOptions.Endpoint)}",
+            IntegrationTestConfiguration.AppConfigurationEndpoint);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            AppConfigurationManager.DisableProviderSettingName,
+            "true");
 
         // Subsystem authentication
         appHostSettings.ProcessEnvironmentVariables.Add(
