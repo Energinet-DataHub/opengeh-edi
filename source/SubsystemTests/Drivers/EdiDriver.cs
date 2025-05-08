@@ -101,7 +101,7 @@ internal sealed class EdiDriver
         if (peekResponse.StatusCode == HttpStatusCode.OK)
         {
             await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
-            await EmptyQueueAsync().ConfigureAwait(false);
+            await EmptyQueueAsync(messageCategory).ConfigureAwait(false);
         }
     }
 
