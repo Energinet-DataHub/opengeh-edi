@@ -40,7 +40,7 @@ internal class EnqueueActorMessagesHttpDsl
 
     internal async Task EnqueueCalculatedMeasurementMessage(Actor receiver, string meteringPointId)
     {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _ediDriver.EmptyQueueAsync(MessageCategory.MeasureData).ConfigureAwait(false);
 
         var processManagerReceiver = new EnqueueCalculatedMeasurementsHttpV1.Actor(
             receiver.ActorNumber.ToProcessManagerActorNumber(),
