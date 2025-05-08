@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_045;
 
@@ -25,7 +26,7 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public Task HandleAsync(
-        object missingMeasurementsLog,
+        EnqueueMissingMeasurementsLogHttpV1 missingMeasurementsLog,
         CancellationToken cancellationToken)
     {
         // TODO: Implement enqueueing outgoing RSM-018 message.

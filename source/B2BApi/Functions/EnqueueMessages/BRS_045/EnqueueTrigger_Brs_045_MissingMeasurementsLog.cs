@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -33,9 +34,9 @@ public class EnqueueTrigger_Brs_045_MissingMeasurementsLog(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
             "post",
-            Route = $"enqueue/v1/enqueue_brs045")]
+            Route = $"enqueue/{EnqueueMissingMeasurementsLogHttpV1.RouteName}")]
         HttpRequestData request,
-        [FromBody] object missingMeasurementsLog,
+        [FromBody] EnqueueMissingMeasurementsLogHttpV1 missingMeasurementsLog,
         FunctionContext executionContext,
         CancellationToken cancellationToken)
     {
