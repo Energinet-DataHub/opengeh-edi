@@ -76,10 +76,10 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         var expectedEnergyObservations = new List<(int Position, string? QualityName, decimal? Quantity)>
         {
-            (1, null, null),
-            (2, "A03", null),
-            (3, null, 123.456m),
-            (4, "A03", 654.321m),
+            (1, "A04", 1), (2, "A04", 2), (3, "A04", 3), (4, "A04", 4), (5, "A04", 5), (6, "A04", 6), (7, "A04", 7),
+            (8, "A04", 8), (9, "A04", 9), (10, "A04", 10), (11, "A04", 11), (12, "A04", 12), (13, "A04", 13),
+            (14, "A04", 14), (15, "A04", 15), (16, "A04", 16), (17, "A04", 17), (18, "A04", 18), (19, "A04", 19),
+            (20, "A04", 20),
         };
 
         var whenMessageIsEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
@@ -189,20 +189,13 @@ public sealed class GivenForwardMeteredDataV2Tests(
                                         Resolution: "PT1H",
                                         StartedDateTime: "2024-11-28T13:51Z",
                                         EndedDateTime: "2024-11-29T09:15Z",
-                                        Points: [
-                                            new AssertPointDocumentFieldsInput(
-                                                new RequiredPointDocumentFields(1),
-                                                new OptionalPointDocumentFields(null, null)),
-                                            new AssertPointDocumentFieldsInput(
-                                                new RequiredPointDocumentFields(2),
-                                                new OptionalPointDocumentFields(Quality.FromCode("A03"), null)),
-                                            new AssertPointDocumentFieldsInput(
-                                                new RequiredPointDocumentFields(3),
-                                                new OptionalPointDocumentFields(null, 123.456M)),
-                                            new AssertPointDocumentFieldsInput(
-                                                new RequiredPointDocumentFields(4),
-                                                new OptionalPointDocumentFields(Quality.FromCode("A03"), 654.321M)),
-                                        ])),
+                                        Points: expectedEnergyObservations
+                                            .Select(eo => new AssertPointDocumentFieldsInput(
+                                                new RequiredPointDocumentFields(eo.Position),
+                                                new OptionalPointDocumentFields(
+                                                    Quantity: eo.Quantity,
+                                                    Quality: eo.QualityName != null ? Quality.FromCode(eo.QualityName!) : null)))
+                                            .ToList())),
                                 OptionalSeriesFields: new OptionalSeriesFields(
                                     OriginalTransactionIdReferenceId: null,
                                     RegistrationDateTime: "2022-12-17T09:30:00Z",
@@ -235,12 +228,11 @@ public sealed class GivenForwardMeteredDataV2Tests(
 
         var expectedEnergyObservations = new List<(int Position, string? QualityName, decimal? Quantity)>
         {
-            (1, null, null),
-            (2, "A03", null),
-            (3, null, 123.456m),
-            (4, "A03", 654.321m),
+            (1, "A04", 1), (2, "A04", 2), (3, "A04", 3), (4, "A04", 4), (5, "A04", 5), (6, "A04", 6), (7, "A04", 7),
+            (8, "A04", 8), (9, "A04", 9), (10, "A04", 10), (11, "A04", 11), (12, "A04", 12), (13, "A04", 13),
+            (14, "A04", 14), (15, "A04", 15), (16, "A04", 16), (17, "A04", 17), (18, "A04", 18), (19, "A04", 19),
+            (20, "A04", 20), (21, "A04", 21),
         };
-
         var whenMessagesAreEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
         GivenNowIs(whenMessagesAreEnqueued);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);

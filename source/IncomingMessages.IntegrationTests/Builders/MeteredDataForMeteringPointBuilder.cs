@@ -132,7 +132,7 @@ public static class MeteredDataForMeteringPointBuilder
             <ns0:MeteringPointDomainLocation>
                 <ns0:Identification schemeAgencyIdentifier=""9"">579999993331812345</ns0:Identification>
             </ns0:MeteringPointDomainLocation>
-        {EnergyObservationEbixBuilder(GetEnergyObservations())}
+        {EnergyObservationEbixBuilder(GetEnergyObservations(resolution: s.Resolution, periodStart: s.PeriodStart, periodEnd: s.PeriodEnd))}
     </ns0:PayloadEnergyTimeSeries>
     "))}
 </ns0:DK_MeteredDataTimeSeries>");
@@ -183,7 +183,7 @@ public static class MeteredDataForMeteringPointBuilder
                     <cim:end>{s.PeriodEnd.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture)}</cim:end>
                 </cim:timeInterval>
 
-            {EnergyObservationXmlBuilder(GetEnergyObservations())}
+            {EnergyObservationXmlBuilder(GetEnergyObservations(resolution: s.Resolution, periodStart: s.PeriodStart, periodEnd: s.PeriodEnd))}
         </cim:Period>
     </cim:Series>
     "))}
@@ -259,7 +259,7 @@ public static class MeteredDataForMeteringPointBuilder
                             }
                           },
                           "Point": [
-                            {{EnergyObservationJsonBuilder(GetEnergyObservations())}}
+                            {{EnergyObservationJsonBuilder(GetEnergyObservations(resolution: s.Resolution, periodStart: s.PeriodStart, periodEnd: s.PeriodEnd))}}
                           ]
                         }
                       }
@@ -268,6 +268,35 @@ public static class MeteredDataForMeteringPointBuilder
             }
           }
           """;
+
+    private static IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> GetEnergyObservations(
+        Resolution resolution,
+        Instant periodStart,
+        Instant periodEnd)
+    {
+        var observations = new List<(int Position, string? Quality, decimal? Quantity)>();
+        var intervalDuration = resolution switch
+        {
+            var res when res == Resolution.QuarterHourly => Duration.FromMinutes(15),
+            var res when res == Resolution.Hourly => Duration.FromHours(1),
+            var res when res == Resolution.Daily => Duration.FromDays(1),
+            _ => throw new ArgumentOutOfRangeException(nameof(resolution), "Unsupported resolution"),
+        };
+
+        var currentStart = periodStart < periodEnd ? periodStart : periodEnd;
+        var end = periodStart > periodEnd ? periodStart : periodEnd;
+        var position = 1;
+
+        while (currentStart <= end)
+        {
+            observations.Add((position, "A04", position));
+
+            currentStart = currentStart.Plus(intervalDuration);
+            position++;
+        }
+
+        return observations;
+    }
 
     private static IReadOnlyCollection<(int Position, string? Quality, decimal? Quantity)> GetEnergyObservations() =>
     [
