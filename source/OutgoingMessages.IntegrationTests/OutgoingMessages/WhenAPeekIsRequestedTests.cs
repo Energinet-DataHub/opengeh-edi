@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -457,7 +458,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 
-    private async Task EnqueueAndCommitMessage(AcceptedForwardMeteredDataMessageDto message)
+    private async Task EnqueueAndCommitMessage(AcceptedSendMeasurementsMessageDto message)
     {
         await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await _unitOfWork.CommitTransactionAsync(CancellationToken.None);
