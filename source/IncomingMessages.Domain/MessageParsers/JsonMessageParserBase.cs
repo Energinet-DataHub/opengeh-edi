@@ -79,7 +79,13 @@ public abstract class JsonMessageParserBase(
         if (validationErrors.Any())
             return new IncomingMarketMessageParserResult(validationErrors.ToArray());
 
-        return CreateResult(header!, series!.AsReadOnly());
+        if (header is null)
+            throw new NullReferenceException("Header cannot be null");
+
+        if (series is null)
+            throw new NullReferenceException("Series cannot be null");
+
+        return CreateResult(header, series.AsReadOnly());
     }
 
     protected abstract IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber);
@@ -121,26 +127,27 @@ public abstract class JsonMessageParserBase(
         header = null;
         series = new List<IIncomingMessageSeries>();
 
-        var validationError = GetHeaderNode(document, out var headerElement);
+        var validationError = GetHeaderNode(document, out var headerNode);
         if (validationError is not null)
             return [validationError];
+
+        if (headerNode is null)
+            throw new NullReferenceException("Header cannot be null");
 
         var transactionElements = document.RootElement
             .GetProperty(HeaderElementName)
             .GetProperty(SeriesElementName);
-        var senderId = headerElement![SenderIdentificationElementName]?[ValueElementName]?
-            .GetValue<string>() ?? string.Empty;
         foreach (var transactionElement in transactionElements.EnumerateArray())
         {
             // This validates a full document that contains only a single transaction.
             // By isolating one transaction per validation, we reduce peak memory usage
             // and allow memory to be reused between validations.
-            var documentWithOneTransaction = GetDocumentWithOneSeriesElement(transactionElement, headerElement);
+            var documentWithOneTransaction = GetDocumentWithOneSeriesElement(transactionElement, headerNode);
             if (!IsValid(documentWithOneTransaction, schemaResult, out var validationErrors))
                 return validationErrors;
 
             header ??= ParseHeader(document);
-            series.Add(ParseTransaction(transactionElement, senderId));
+            series.Add(ParseTransaction(transactionElement, header.SenderId));
         }
 
         return [];
@@ -148,7 +155,7 @@ public abstract class JsonMessageParserBase(
 
     private ValidationError? GetHeaderNode(JsonDocument document, out JsonNode? headerElement)
     {
-        var root = JsonNode.Parse(document.RootElement.GetRawText());
+        var root = document.RootElement.AsNode();
         headerElement = root?[HeaderElementName];
         if (headerElement == null)
             return InvalidMessageStructure.From($"Could not find {HeaderElementName} in the document");
