@@ -132,6 +132,7 @@ internal sealed class EdiDriver
             contentType);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
+        _logger.WriteLine("Sending RequestWholesaleSettlement HTTP request with messageId: {0}", requestContent.MessageId);
         var wholesaleSettlementResponse = await b2bClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (wholesaleSettlementResponse.StatusCode == HttpStatusCode.BadRequest)
         {
@@ -158,6 +159,7 @@ internal sealed class EdiDriver
             contentType);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
+        _logger.WriteLine("Sending ForwardMeteredData HTTP request with messageId: {0}", requestContent.MessageId);
         var meteredDataForMeteringPointResponse = await b2bClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (meteredDataForMeteringPointResponse.StatusCode == HttpStatusCode.BadRequest)
         {
@@ -176,6 +178,7 @@ internal sealed class EdiDriver
         request.Content = new StringContent(requestContent.Content, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
+        _logger.WriteLine("Sending RequestAggregatedMeasureData HTTP request with messageId: {0}", requestContent.MessageId);
         var aggregatedMeasureDataResponse = await b2bClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         if (aggregatedMeasureDataResponse.StatusCode == HttpStatusCode.BadRequest)
         {
@@ -199,11 +202,13 @@ internal sealed class EdiDriver
         await _durableClient.WaitForOrchestrationCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
     }
 
-    private static async Task<(string MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
+    private async Task<(string MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
         bool withSyncError,
         CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid().ToTestMessageUuid();
+        var transactionId = Guid.NewGuid().ToTestMessageUuid();
+
         var jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlement.json", cancellationToken)
             .ConfigureAwait(false);
 
@@ -214,29 +219,42 @@ internal sealed class EdiDriver
         }
 
         jsonContent = jsonContent.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
-        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToTestMessageUuid(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{TransactionId}", transactionId, StringComparison.InvariantCulture);
+
+        _logger.WriteLine(
+            "Creating RequestWholesaleSettlement message with MessageId={0}, TransactionId={1}",
+            messageId,
+            transactionId);
 
         return (messageId, jsonContent);
     }
 
-    private static async Task<(string MessageId, string Content)> GetMeteredDataForMeteringPointContentAsync(
+    private async Task<(string MessageId, string Content)> GetMeteredDataForMeteringPointContentAsync(
         MeteringPointId meteringPointId,
         CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid().ToTestMessageUuid();
+        var transactionId = Guid.NewGuid().ToTestMessageUuid();
         var jsonContent = await File.ReadAllTextAsync("Messages/json/MeteredDataForMeteringPoint.json", cancellationToken)
             .ConfigureAwait(false);
 
         jsonContent = jsonContent.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
-        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToTestMessageUuid(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{TransactionId}", transactionId, StringComparison.InvariantCulture);
         jsonContent = jsonContent.Replace("{MeteringPointId}", meteringPointId.Value, StringComparison.InvariantCulture);
+
+        _logger.WriteLine(
+            "Creating ForwardMeteredData message with MessageId={0}, TransactionId={1}, MeteringPointId={2}",
+            messageId,
+            transactionId,
+            meteringPointId.Value);
 
         return (messageId, jsonContent);
     }
 
-    private static async Task<(string MessageId, string Content)> GetAggregatedMeasureDataContentAsync(bool withSyncError, CancellationToken cancellationToken)
+    private async Task<(string MessageId, string Content)> GetAggregatedMeasureDataContentAsync(bool withSyncError, CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid().ToTestMessageUuid();
+        var transactionId = Guid.NewGuid().ToTestMessageUuid();
 
         var jsonContent = await File.ReadAllTextAsync("Messages/json/RequestAggregatedMeasureData.json", cancellationToken)
             .ConfigureAwait(false);
@@ -248,12 +266,17 @@ internal sealed class EdiDriver
         }
 
         jsonContent = jsonContent.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
-        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToTestMessageUuid(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{TransactionId}", transactionId, StringComparison.InvariantCulture);
+
+        _logger.WriteLine(
+            "Creating RequestAggregatedMeasureData message with MessageId={0}, TransactionId={1}",
+            messageId,
+            transactionId);
 
         return (messageId, jsonContent);
     }
 
-    private static string GetMessageId(HttpResponseMessage peekResponse)
+    private string GetMessageId(HttpResponseMessage peekResponse)
     {
         return peekResponse.Headers.GetValues("MessageId").First();
     }
