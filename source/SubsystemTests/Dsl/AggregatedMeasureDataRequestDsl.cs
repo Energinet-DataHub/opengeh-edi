@@ -43,7 +43,7 @@ public sealed class AggregatedMeasureDataRequestDsl
         return _ediDriver.RequestAggregatedMeasureDataXmlAsync(payload);
     }
 
-    internal async Task<Guid> Request(CancellationToken cancellationToken)
+    internal async Task<string> Request(CancellationToken cancellationToken)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
         return await _ediDriver

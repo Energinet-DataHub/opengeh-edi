@@ -86,14 +86,14 @@ public static class IncomingMessagesExtensions
 
         // => Service Bus
         services
-            .AddOptions<IncomingMessagesQueueOptions>()
-            .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
+            .AddOptions<IncomingMessagesOptions>()
+            .BindConfiguration(IncomingMessagesOptions.SectionName)
             .ValidateDataAnnotations();
 
         var incomingMessagesQueueOptions =
             configuration
-                .GetRequiredSection(IncomingMessagesQueueOptions.SectionName)
-                .Get<IncomingMessagesQueueOptions>()
+                .GetRequiredSection(IncomingMessagesOptions.SectionName)
+                .Get<IncomingMessagesOptions>()
             ?? throw new InvalidOperationException("Missing Incoming Messages configuration.");
 
         services.AddAzureClients(builder =>
@@ -113,12 +113,12 @@ public static class IncomingMessagesExtensions
             .AddHealthChecks()
             .AddAzureServiceBusQueue(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
-                sp => sp.GetRequiredService<IOptions<IncomingMessagesQueueOptions>>().Value.QueueName,
+                sp => sp.GetRequiredService<IOptions<IncomingMessagesOptions>>().Value.QueueName,
                 _ => defaultAzureCredential,
                 name: incomingMessagesQueueOptions.QueueName)
             .AddServiceBusQueueDeadLetter(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
-                sp => sp.GetRequiredService<IOptions<IncomingMessagesQueueOptions>>().Value.QueueName,
+                sp => sp.GetRequiredService<IOptions<IncomingMessagesOptions>>().Value.QueueName,
                 _ => defaultAzureCredential,
                 "Dead-letter (incoming messages)",
                 [HealthChecksConstants.StatusHealthCheckTag])

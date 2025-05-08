@@ -32,7 +32,7 @@ public class IncomingMessagePublisher
 
     public IncomingMessagePublisher(
         AuthenticatedActor authenticatedActor,
-        IOptions<IncomingMessagesQueueOptions> options,
+        IOptions<IncomingMessagesOptions> options,
         IAzureClientFactory<ServiceBusSender> senderFactory,
         IRequestProcessOrchestrationStarter requestProcessOrchestrationStarter,
         ForwardMeteredDataOrchestrationStarter forwardMeteredDataOrchestrationStarter)

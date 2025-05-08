@@ -41,7 +41,7 @@ public sealed class WholesaleSettlementRequestDsl
         _processManagerDriver = processManagerDriver;
     }
 
-    internal async Task<Guid> Request(CancellationToken cancellationToken)
+    internal async Task<string> Request(CancellationToken cancellationToken)
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 

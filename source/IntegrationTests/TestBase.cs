@@ -228,7 +228,7 @@ public class TestBase : IDisposable
                 {
                     // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
-                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
+                    [$"{IncomingMessagesOptions.SectionName}:{nameof(IncomingMessagesOptions.QueueName)}"] = "Fake",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] = "NotEmpty",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] = "NotEmpty",
 
