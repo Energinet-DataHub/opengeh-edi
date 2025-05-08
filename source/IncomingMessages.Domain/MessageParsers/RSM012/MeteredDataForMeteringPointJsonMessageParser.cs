@@ -16,10 +16,14 @@ using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
-public class MeteredDataForMeteringPointJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
+public class MeteredDataForMeteringPointJsonMessageParser(
+    JsonSchemaProvider schemaProvider,
+    Logger<JsonMessageParserBase> logger)
+    : JsonMessageParserBase(schemaProvider, logger)
 {
     private const string ValueElementName = "value";
     private const string MridElementName = "mRID";

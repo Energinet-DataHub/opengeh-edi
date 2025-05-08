@@ -21,10 +21,13 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Json.More;
 using Json.Schema;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 
-public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) : MessageParserBase<JsonSchema>()
+public abstract class JsonMessageParserBase(
+    JsonSchemaProvider schemaProvider,
+    Logger<JsonMessageParserBase> logger) : MessageParserBase<JsonSchema>()
 {
     private const string ValueElementName = "value";
     private const string IdentificationElementName = "mRID";
@@ -47,6 +50,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
     };
 
     private readonly JsonSchemaProvider _schemaProvider = schemaProvider;
+    private readonly Logger<JsonMessageParserBase> _logger = logger;
 
     protected abstract string HeaderElementName { get; }
 
@@ -57,13 +61,15 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         JsonSchema schemaResult,
         CancellationToken cancellationToken)
     {
-        var parseJsonDocumentResult = await TryParseJsonDocumentAsync(
+        using var document = await TryParseJsonDocumentAsync(
             marketMessage,
             cancellationToken)
             .ConfigureAwait(false);
-        using var document = parseJsonDocumentResult.JsonDocument;
         if (document == null)
-            return new IncomingMarketMessageParserResult(parseJsonDocumentResult.ValidationError!);
+        {
+            return new IncomingMarketMessageParserResult(
+                InvalidMessageStructure.From("Failed to parse JSON document."));
+        }
 
         var validationErrors = ValidateAndParse(
             document,
@@ -149,7 +155,7 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         return null;
     }
 
-    private async Task<(JsonDocument? JsonDocument, ValidationError? ValidationError)> TryParseJsonDocumentAsync(
+    private async Task<JsonDocument?> TryParseJsonDocumentAsync(
         IIncomingMarketMessageStream marketMessage,
         CancellationToken cancellationToken)
     {
@@ -157,11 +163,12 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         {
             var document = await JsonDocument.ParseAsync(marketMessage.Stream, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            return (document, null);
+            return document;
         }
         catch (JsonException exception)
         {
-            return (null, InvalidMessageStructure.From(exception.Message));
+            _logger.LogError(exception, "Failed to parse JSON document.");
+            return null;
         }
     }
 
