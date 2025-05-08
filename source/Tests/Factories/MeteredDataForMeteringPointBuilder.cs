@@ -47,8 +47,7 @@ public class MeteredDataForMeteringPointBuilder
             SampleData.QuantityMeasureUnit,
             SampleData.RegistrationDateTime,
             SampleData.Resolution,
-            SampleData.StartedDateTime,
-            SampleData.EndedDateTime,
+            new Period(SampleData.StartedDateTime, SampleData.EndedDateTime),
             points ?? SampleData.Points);
     }
 
@@ -62,7 +61,6 @@ public class MeteredDataForMeteringPointBuilder
             SampleData.QuantityMeasureUnit,
             SampleData.RegistrationDateTime,
             SampleData.Resolution,
-            SampleData.StartedDateTime,
-            SampleData.EndedDateTime,
+            new Period(SampleData.StartedDateTime, SampleData.EndedDateTime),
             SampleData.MinimalPoints);
 }

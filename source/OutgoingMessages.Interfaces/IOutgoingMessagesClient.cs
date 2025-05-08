@@ -108,13 +108,20 @@ public interface IOutgoingMessagesClient
     /// Enqueue metered data for metering point messages, handles enqueuing messages to all appropriate parties in a single transaction.
     /// </summary>
     Task<Guid> EnqueueAsync(
-        AcceptedForwardMeteredDataMessageDto acceptedForwardMeteredDataMessageDto,
+        AcceptedSendMeasurementsMessageDto acceptedSendMeasurementsMessageDto,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue measurements for metering point, handles enqueuing messages to all appropriate parties in a single transaction.
+    /// </summary>
+    Task<Guid> EnqueueAsync(
+        CalculatedMeasurementsMessageDto acceptedForwardMeasurementsMessageDto,
         CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue RSM-009 messages.
     /// </summary>
     Task<Guid> EnqueueAsync(
-        RejectedForwardMeteredDataMessageDto rejectedForwardMeteredDataMessageDto,
+        RejectedSendMeasurementsMessageDto rejectedSendMeasurementsMessageDto,
         CancellationToken cancellationToken);
 }

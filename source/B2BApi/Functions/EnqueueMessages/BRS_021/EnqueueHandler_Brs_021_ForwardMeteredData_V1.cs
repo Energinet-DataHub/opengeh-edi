@@ -53,7 +53,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
         {
             var energyObservations = receivers.MeteredData
                 .Select(x =>
-                    new EnergyObservationDto(
+                    new MeasurementDto(
                         Position: x.Position,
                         Quantity: x.EnergyQuantity,
                         Quality: x.QuantityQuality != null ? Quality.FromName(x.QuantityQuality.Name) : null))
@@ -61,25 +61,24 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
 
             foreach (var actor in receivers.Actors)
             {
-                var acceptedForwardMeteredDataMessageDto = new AcceptedForwardMeteredDataMessageDto(
+                var acceptedForwardMeteredDataMessageDto = new AcceptedSendMeasurementsMessageDto(
                     eventId: EventId.From(serviceBusMessageId),
                     externalId: new ExternalId(orchestrationInstanceId),
                     receiver: new Actor(ActorNumber.Create(actor.ActorNumber), ActorRole.FromName(actor.ActorRole.Name)),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
                     gridAreaCode: acceptedData.GridAreaCode,
-                    series: new ForwardMeteredDataMessageSeriesDto(
+                    series: new MeasurementsDto(
                         TransactionId: TransactionId.New(),
-                        MarketEvaluationPointNumber: acceptedData.MeteringPointId,
-                        MarketEvaluationPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                        OriginalTransactionIdReferenceId: null,
+                        MeteringPointId: acceptedData.MeteringPointId,
+                        MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
+                        OriginalTransactionIdReference: null,
                         Product: acceptedData.ProductNumber,
-                        QuantityMeasureUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
+                        MeasurementUnit: MeasurementUnit.FromName(receivers.MeasureUnit.Name),
                         RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
                         Resolution: Resolution.FromName(receivers.Resolution.Name),
-                        StartedDateTime: receivers.StartDateTime.ToInstant(),
-                        EndedDateTime: receivers.EndDateTime.ToInstant(),
-                        EnergyObservations: energyObservations));
+                        Period: new Period(receivers.StartDateTime.ToInstant(), receivers.EndDateTime.ToInstant()),
+                        Measurements: energyObservations));
 
                 await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
             }
@@ -109,7 +108,7 @@ public sealed class EnqueueHandler_Brs_021_ForwardMeteredData_V1(
             "Received enqueue rejected message(s) for BRS 021. Data: {0}",
             rejectedData);
 
-        var rejectedForwardMeteredDataMessageDto = new RejectedForwardMeteredDataMessageDto(
+        var rejectedForwardMeteredDataMessageDto = new RejectedSendMeasurementsMessageDto(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name),

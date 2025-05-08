@@ -66,10 +66,10 @@ public class GivenForwardMeteredDataDelegationTests(
 
         var expectedEnergyObservations = new List<(int Position, string? QualityName, decimal? Quantity)>
         {
-            (1, null, null),
-            (2, "A03", null),
-            (3, null, 123.456m),
-            (4, "A03", 654.321m),
+            (1, "A04", 1), (2, "A04", 2), (3, "A04", 3), (4, "A04", 4), (5, "A04", 5), (6, "A04", 6), (7, "A04", 7),
+            (8, "A04", 8), (9, "A04", 9), (10, "A04", 10), (11, "A04", 11), (12, "A04", 12), (13, "A04", 13),
+            (14, "A04", 14), (15, "A04", 15), (16, "A04", 16), (17, "A04", 17), (18, "A04", 18), (19, "A04", 19),
+            (20, "A04", 20), (21, "A04", 21),
         };
 
         var whenMessagesAreEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);

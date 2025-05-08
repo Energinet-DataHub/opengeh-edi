@@ -71,14 +71,14 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                 DocumentDetails.Prefix,
                 "Start",
                 null,
-                forwardMeteredDataRecord.StartedDateTime.ToString())
+                forwardMeteredDataRecord.Period.StartToEbixString())
             .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
                 "End",
                 null,
-                forwardMeteredDataRecord.EndedDateTime.ToString())
+                forwardMeteredDataRecord.Period.EndToEbixString())
             .ConfigureAwait(false);
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
@@ -92,7 +92,7 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "UnitType", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(forwardMeteredDataRecord.QuantityMeasureUnit.Code).ConfigureAwait(false);
+            await writer.WriteStringAsync(forwardMeteredDataRecord.MeasurementUnit.Code).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
@@ -100,16 +100,16 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
             await WriteCodeWithCodeListReferenceAttributesAsync(
                 "TypeOfMeteringPoint",
-                EbixCode.Of(forwardMeteredDataRecord.MarketEvaluationPointType),
+                EbixCode.Of(forwardMeteredDataRecord.MeteringPointType),
                 writer)
             .ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringPointDomainLocation", null).ConfigureAwait(false);
-            await WriteGlnOrEicCodeWithAttributesAsync("Identification", forwardMeteredDataRecord.MarketEvaluationPointNumber, writer).ConfigureAwait(false);
+            await WriteGlnOrEicCodeWithAttributesAsync("Identification", forwardMeteredDataRecord.MeteringPointId, writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            foreach (var energyObservation in forwardMeteredDataRecord.EnergyObservations)
+            foreach (var energyObservation in forwardMeteredDataRecord.Measurements)
             {
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null).ConfigureAwait(false);
 
@@ -152,13 +152,13 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 
-            if (forwardMeteredDataRecord.OriginalTransactionIdReferenceId is not null)
+            if (forwardMeteredDataRecord.OriginalTransactionIdReference is not null)
             {
                 await writer.WriteElementStringAsync(
                     DocumentDetails.Prefix,
                     "OriginalBusinessDocument",
                     null,
-                    forwardMeteredDataRecord.OriginalTransactionIdReferenceId.Value)
+                    forwardMeteredDataRecord.OriginalTransactionIdReference.Value)
                 .ConfigureAwait(false);
             }
 

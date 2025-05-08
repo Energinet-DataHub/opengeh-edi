@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
+using Json.More;
 using Json.Schema;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 
-public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) : MessageParserBase<JsonSchema>()
+public abstract class JsonMessageParserBase(
+    JsonSchemaProvider schemaProvider,
+    ILogger<JsonMessageParserBase> logger) : MessageParserBase<JsonSchema>()
 {
     private const string ValueElementName = "value";
     private const string IdentificationElementName = "mRID";
@@ -35,54 +39,68 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
     private const string SenderRoleElementName = "sender_MarketParticipant.marketRole.type";
     private const string ReceiverRoleElementName = "receiver_MarketParticipant.marketRole.type";
     private const string CreatedDateElementName = "createdDateTime";
+    private const string BusinessSectorTypeElementName = "businessSector.type";
+
+    // JsonSchema.Net optimizes repeated evaluations with the same schema by performing some static analysis
+    // during the first evaluation.
+    // https://docs.json-everything.net/schema/basics/#schema-options
+    private static readonly EvaluationOptions _cachedEvaluationOptions = new()
+    {
+        OutputFormat = OutputFormat.Hierarchical,
+    };
+
     private readonly JsonSchemaProvider _schemaProvider = schemaProvider;
+    private readonly ILogger<JsonMessageParserBase> _logger = logger;
 
     protected abstract string HeaderElementName { get; }
 
     protected abstract string DocumentName { get; }
-
-    private Collection<ValidationError> ValidationErrors { get; } = [];
 
     protected override async Task<IncomingMarketMessageParserResult> ParseMessageAsync(
         IIncomingMarketMessageStream marketMessage,
         JsonSchema schemaResult,
         CancellationToken cancellationToken)
     {
-        JsonDocument document;
-        try
+        using var document = await TryParseJsonDocumentAsync(
+            marketMessage,
+            cancellationToken)
+            .ConfigureAwait(false);
+        if (document == null)
         {
-            document = await JsonDocument.ParseAsync(marketMessage.Stream, cancellationToken: cancellationToken).ConfigureAwait(false);
-        }
-        catch (JsonException exception)
-        {
-            AddValidationError(exception.Message);
-            return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
-        }
-
-        if (IsValid(document, schemaResult) == false)
-        {
-            return new IncomingMarketMessageParserResult(ValidationErrors.ToArray());
+            return new IncomingMarketMessageParserResult(
+                InvalidMessageStructure.From("Failed to parse JSON document."));
         }
 
-        var header = ParseHeader(document);
-        var transactionElements = document.RootElement.GetProperty(HeaderElementName).GetProperty(SeriesElementName);
-        var transactions = new List<IIncomingMessageSeries>();
+        var validationErrors = ValidateAndParse(
+            document,
+            schemaResult,
+            out var header,
+            out var series);
+        if (validationErrors.Any())
+            return new IncomingMarketMessageParserResult(validationErrors.ToArray());
 
-        foreach (var transactionElement in transactionElements.EnumerateArray())
-        {
-            transactions.Add(ParseTransaction(transactionElement, header.SenderId));
-        }
+        if (header is null)
+            throw new NullReferenceException("Header cannot be null");
 
-        return CreateResult(header, transactions);
+        if (series is null)
+            throw new NullReferenceException("Series cannot be null");
+
+        return CreateResult(header, series.AsReadOnly());
     }
 
     protected abstract IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber);
 
-    protected override async Task<(JsonSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
+    protected override async Task<(JsonSchema? Schema, ValidationError? ValidationError)> GetSchemaAsync(
+        IIncomingMarketMessageStream marketMessage,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(DocumentName);
-        var schemaVersion = "0";
-        var jsonSchema = await _schemaProvider.GetSchemaAsync<JsonSchema>(DocumentName.ToUpper(CultureInfo.InvariantCulture), schemaVersion, cancellationToken).ConfigureAwait(false);
+        const string schemaVersion = "0";
+        var jsonSchema = await _schemaProvider.GetSchemaAsync<JsonSchema>(
+                DocumentName.ToUpper(CultureInfo.InvariantCulture),
+                schemaVersion,
+                cancellationToken)
+            .ConfigureAwait(false);
         if (jsonSchema is null)
         {
             return (jsonSchema, new InvalidBusinessReasonOrVersion(DocumentName, schemaVersion));
@@ -91,71 +109,149 @@ public abstract class JsonMessageParserBase(JsonSchemaProvider schemaProvider) :
         return (jsonSchema, null);
     }
 
-    protected abstract IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions);
+    protected abstract IncomingMarketMessageParserResult CreateResult(
+        MessageHeader header,
+        IReadOnlyCollection<IIncomingMessageSeries> transactions);
 
-    private static string GetJsonDateStringWithoutQuotes(JsonElement element)
+    private static JsonElement GetPropertyWithValue(JsonElement headerElement, string elementName)
     {
-        return element.ToString().Trim('"');
+        return headerElement.GetProperty(elementName).GetProperty(ValueElementName);
     }
 
-    private static string? GetBusinessType(JsonElement element)
+    private IReadOnlyCollection<ValidationError> ValidateAndParse(
+        JsonDocument document,
+        JsonSchema schemaResult,
+        out MessageHeader? header,
+        out IList<IIncomingMessageSeries>? series)
     {
-        return element.TryGetProperty("businessSector.type", out var property) ? property.GetProperty("value").ToString() : null;
+        header = null;
+        series = new List<IIncomingMessageSeries>();
+
+        var validationError = GetHeaderNode(document, out var headerNode);
+        if (validationError is not null)
+            return [validationError];
+
+        if (headerNode is null)
+            throw new NullReferenceException("Header cannot be null");
+
+        var transactionElements = document.RootElement
+            .GetProperty(HeaderElementName)
+            .GetProperty(SeriesElementName);
+        foreach (var transactionElement in transactionElements.EnumerateArray())
+        {
+            // This validates a full document that contains only a single transaction.
+            // By isolating one transaction per validation, we reduce peak memory usage
+            // and allow memory to be reused between validations.
+            var documentWithOneTransaction = GetDocumentWithOneSeriesElement(transactionElement, headerNode);
+            if (!IsValid(documentWithOneTransaction, schemaResult, out var validationErrors))
+                return validationErrors;
+
+            header ??= ParseHeader(document);
+            series.Add(ParseTransaction(transactionElement, header.SenderId));
+        }
+
+        return [];
+    }
+
+    private ValidationError? GetHeaderNode(JsonDocument document, out JsonNode? headerElement)
+    {
+        var root = document.RootElement.AsNode();
+        headerElement = root?[HeaderElementName];
+        if (headerElement == null)
+            return InvalidMessageStructure.From($"Could not find {HeaderElementName} in the document");
+        return null;
+    }
+
+    private async Task<JsonDocument?> TryParseJsonDocumentAsync(
+        IIncomingMarketMessageStream marketMessage,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var document = await JsonDocument.ParseAsync(marketMessage.Stream, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            return document;
+        }
+        catch (JsonException exception)
+        {
+            _logger.LogError(exception, "Failed to parse JSON document.");
+            return null;
+        }
+    }
+
+    private JsonNode? GetDocumentWithOneSeriesElement(
+        JsonElement seriesElement,
+        JsonNode headerElement)
+    {
+        JsonDocument? documentWithOneTransaction = null;
+        try
+        {
+            headerElement[SeriesElementName] = new JsonArray(seriesElement.AsNode());
+            return headerElement.Parent;
+        }
+        catch
+        {
+            documentWithOneTransaction?.Dispose();
+            return null;
+        }
     }
 
     private MessageHeader ParseHeader(JsonDocument document)
     {
         var headerElement = document.RootElement.GetProperty(HeaderElementName);
+        var businessType = headerElement
+            .TryGetProperty(BusinessSectorTypeElementName, out var property)
+            ? property.GetProperty(ValueElementName).GetString()
+            : null;
+
         return new MessageHeader(
-            headerElement.GetProperty(IdentificationElementName).ToString(),
-            headerElement.GetProperty(MessageTypeElementName).GetProperty(ValueElementName).ToString(),
-            headerElement.GetProperty(ProcessTypeElementName).GetProperty(ValueElementName).ToString(),
-            headerElement.GetProperty(SenderIdentificationElementName).GetProperty(ValueElementName).ToString(),
-            headerElement.GetProperty(SenderRoleElementName).GetProperty(ValueElementName).ToString(),
-            headerElement.GetProperty(ReceiverIdentificationElementName).GetProperty(ValueElementName).ToString(),
-            headerElement.GetProperty(ReceiverRoleElementName).GetProperty(ValueElementName).ToString(),
-            GetJsonDateStringWithoutQuotes(headerElement.GetProperty(CreatedDateElementName)),
-            GetBusinessType(headerElement));
+            headerElement.GetProperty(IdentificationElementName).GetString() ?? string.Empty,
+            GetPropertyWithValue(headerElement, MessageTypeElementName).GetString() ?? string.Empty,
+            GetPropertyWithValue(headerElement, ProcessTypeElementName).GetString() ?? string.Empty,
+            GetPropertyWithValue(headerElement, SenderIdentificationElementName).GetString() ?? string.Empty,
+            GetPropertyWithValue(headerElement, SenderRoleElementName).GetString() ?? string.Empty,
+            GetPropertyWithValue(headerElement, ReceiverIdentificationElementName).GetString() ?? string.Empty,
+            GetPropertyWithValue(headerElement, ReceiverRoleElementName).GetString() ?? string.Empty,
+            headerElement.GetProperty(CreatedDateElementName).GetString() ?? string.Empty,
+            businessType);
     }
 
-    private bool IsValid(JsonDocument jsonDocument, JsonSchema schema)
+    private bool IsValid(JsonNode? jsonDocument, JsonSchema schema, out IReadOnlyList<ValidationError> validationErrors)
     {
-        var result = schema.Evaluate(jsonDocument, new EvaluationOptions() { OutputFormat = OutputFormat.Hierarchical, });
-        if (result.IsValid == false)
+        if (jsonDocument is null)
         {
-            FindErrorsForInvalidEvaluation(result);
-        }
-
-        if (!jsonDocument.RootElement.EnumerateObject().Any())
-        {
-            AddValidationError("Document is empty");
+            validationErrors = [InvalidMessageStructure.From("Document is empty")];
             return false;
         }
 
-        return result.IsValid;
-    }
-
-    private void FindErrorsForInvalidEvaluation(EvaluationResults result)
-    {
+        var result = schema.Evaluate(jsonDocument, _cachedEvaluationOptions);
         if (!result.IsValid)
         {
-            foreach (var detail in result.Details)
+            validationErrors = FindErrorsForInvalidEvaluation(result);
+            return false;
+        }
+
+        validationErrors = new List<ValidationError>();
+        return true;
+    }
+
+    private IReadOnlyList<ValidationError> FindErrorsForInvalidEvaluation(EvaluationResults result)
+    {
+        var validationErrors = new List<ValidationError>();
+        if (!result.IsValid && result.Errors != null)
+        {
+            var propertyName = result.InstanceLocation.ToString();
+            foreach (var error in result.Errors)
             {
-                FindErrorsForInvalidEvaluation(detail);
+                validationErrors.Add(InvalidMessageStructure.From($"{propertyName}: {error}"));
             }
         }
 
-        if (!result.HasErrors || result.Errors == null) return;
-
-        var propertyName = result.InstanceLocation.ToString();
-        foreach (var error in result.Errors)
+        foreach (var detail in result.Details)
         {
-            AddValidationError($"{propertyName}: {error}");
+            validationErrors.AddRange(FindErrorsForInvalidEvaluation(detail));
         }
-    }
 
-    private void AddValidationError(string errorMessage)
-    {
-        ValidationErrors.Add(InvalidMessageStructure.From(errorMessage));
+        return validationErrors;
     }
 }
