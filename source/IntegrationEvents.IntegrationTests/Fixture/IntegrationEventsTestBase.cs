@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.Dependen
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -35,12 +36,11 @@ public class IntegrationEventsTestBase : IAsyncLifetime
     {
         _integrationEventsFixture = integrationEventsFixture;
         _testOutputHelper = testOutputHelper;
-        FeatureFlagManagerStub = new();
     }
 
     protected ServiceProvider Services { get; private set; } = null!;
 
-    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; }
+    protected FeatureManagerStub FeatureManagerStub { get; } = new();
 
     public void SetupServiceCollection()
     {
@@ -59,7 +59,7 @@ public class IntegrationEventsTestBase : IAsyncLifetime
             .AddNodaTimeForApplication()
             .AddMasterDataModule(configuration)
             .AddIntegrationEventModule(configuration)
-            .AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
+            .AddTransient<IFeatureManager>(_ => FeatureManagerStub);
 
         services.AddScoped<IConfiguration>(_ => configuration);
 

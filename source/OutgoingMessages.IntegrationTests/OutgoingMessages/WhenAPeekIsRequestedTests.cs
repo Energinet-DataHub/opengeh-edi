@@ -22,12 +22,10 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -368,7 +366,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     public async Task Given_EnqueuedRsm012_AndGiven_DisallowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsNothing(DocumentFormat documentFormat)
     {
         // Arrange / Given
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlags.PM25Messages, false);
+        FeatureManagerStub.SetFeatureFlag(FeatureFlags.Names.Brs021PeekMessages, false);
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()
@@ -397,7 +395,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     public async Task Given_EnqueuedRsm012_AndGiven_AllowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsDocument(DocumentFormat documentFormat)
     {
         // Arrange / Given
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlags.PM25Messages, true);
+        FeatureManagerStub.SetFeatureFlag(FeatureFlags.Names.Brs021PeekMessages, true);
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()

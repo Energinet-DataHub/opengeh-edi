@@ -40,17 +40,17 @@ public static class FeatureFlags
     }
 
     /// <summary>
-    /// Whether to disallow actors to peek time series messages.
+    /// Whether to allow receiving metered data for metering points Ebix.
     /// </summary>
-    public static Task<bool> UsePeekForwardMeteredDataMessagesAsync(this IFeatureManager featureManager)
+    public static Task<bool> ReceiveForwardMeteredDataInEbixAsync(this IFeatureManager featureManager)
     {
         return featureManager.IsEnabledAsync(Names.PM25Ebix);
     }
 
     /// <summary>
-    /// Whether to allow receiving metered data for metering points Ebix.
+    /// Whether to disallow actors to peek time series messages.
     /// </summary>
-    public static Task<bool> ReceiveForwardMeteredDataInEbixAsync(this IFeatureManager featureManager)
+    public static Task<bool> UsePeekForwardMeteredDataMessagesAsync(this IFeatureManager featureManager)
     {
         return featureManager.IsEnabledAsync(Names.Brs021PeekMessages);
     }
@@ -73,7 +73,7 @@ public static class FeatureFlags
     public static class Names
     {
         /// <summary>
-        /// Whether to disable peek messages
+        /// Whether to disable peek messages.
         /// </summary>
         public const string UsePeekMessages = "UsePeekMessages";
 

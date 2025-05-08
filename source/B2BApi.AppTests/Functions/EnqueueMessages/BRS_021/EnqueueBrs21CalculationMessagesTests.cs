@@ -79,8 +79,8 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlags.PM25Messages, true),
-            new(FeatureFlags.PM25CIM, true),
+            new(FeatureFlags.Names.Brs021PeekMessages, true),
+            new(FeatureFlags.Names.PM25CIM, true),
         ]);
 
         // Arrange

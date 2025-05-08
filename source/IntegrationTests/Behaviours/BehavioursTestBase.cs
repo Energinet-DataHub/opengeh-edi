@@ -51,6 +51,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -125,7 +126,7 @@ public class BehavioursTestBase : IDisposable
         _integrationTestFixture.DatabaseManager.CleanupDatabase();
         _integrationTestFixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-        FeatureFlagManagerStub = new();
+        FeatureManagerStub = new();
         _clockStub = new ClockStub();
         _serviceProvider = BuildServices(testOutputHelper);
 
@@ -136,7 +137,7 @@ public class BehavioursTestBase : IDisposable
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator, null, _actorId));
     }
 
-    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; }
+    protected FeatureManagerStub FeatureManagerStub { get; }
 
     public void Dispose()
     {
@@ -463,12 +464,12 @@ public class BehavioursTestBase : IDisposable
         // Replace the services with stub implementations.
         // - Building blocks
         _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
-        _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
+        _services.AddTransient<IFeatureManager>(_ => FeatureManagerStub);
 
         _services.AddSingleton<TelemetryClient>(x =>
         {
             return new TelemetryClient(
-                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
+                new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         // Add test logger

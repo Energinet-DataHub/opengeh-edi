@@ -14,21 +14,22 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
 /// <summary>
-/// A FeatureFlagManager used to set default values and which allows overriding feature flags during tests
+/// A FeatureManager used to set default values and which allows overriding feature flags during tests
 /// </summary>
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Tests")]
-public class FeatureFlagManagerStub : IFeatureFlagManager
+public class FeatureManagerStub : IFeatureManager
 {
     private readonly Dictionary<string, bool> _featureFlagDictionary = new()
     {
-        { FeatureFlags.UsePeekMessages, true },
-        { FeatureFlags.PM25CIM, true },
-        { FeatureFlags.PM25Ebix, true },
-        { FeatureFlags.PM25Messages, true },
+        { FeatureFlags.Names.UsePeekMessages, true },
+        { FeatureFlags.Names.PM25CIM, true },
+        { FeatureFlags.Names.PM25Ebix, true },
+        { FeatureFlags.Names.Brs021PeekMessages, true },
     };
 
     public void SetFeatureFlag(string featureFlagName, bool value)
@@ -36,11 +37,18 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         _featureFlagDictionary[featureFlagName] = value;
     }
 
-    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.UsePeekMessages]);
+    public IAsyncEnumerable<string> GetFeatureNamesAsync()
+    {
+        throw new NotImplementedException();
+    }
 
-    public Task<bool> UsePeekForwardMeteredDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.PM25Messages]);
+    public Task<bool> IsEnabledAsync(string feature)
+    {
+        return Task.FromResult(_featureFlagDictionary[feature]);
+    }
 
-    public Task<bool> ReceiveForwardMeteredDataInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.PM25CIM]);
-
-    public Task<bool> ReceiveForwardMeteredDataInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.PM25Ebix]);
+    public Task<bool> IsEnabledAsync<TContext>(string feature, TContext context)
+    {
+        throw new NotImplementedException();
+    }
 }
