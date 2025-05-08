@@ -45,12 +45,12 @@ public class EnqueueTrigger_Brs_021_CalculatedMeasurements(
         HttpRequestData request,
         [FromBody] EnqueueCalculatedMeasurementsHttpV1 measurements,
         FunctionContext executionContext,
-        CancellationToken hostCancellationToken)
+        CancellationToken cancellationToken)
     {
-        _logger.LogInformation("BRS-021 enqueue request for calculation received");
+        _logger.LogInformation("BRS-021 enqueue request for calculated measurements received");
 
-        await _handler.HandleAsync(measurements, hostCancellationToken).ConfigureAwait(false);
+        await _handler.HandleAsync(measurements, cancellationToken).ConfigureAwait(false);
 
-        return await Task.FromResult(request.CreateResponse(HttpStatusCode.OK)).ConfigureAwait(false);
+        return request.CreateResponse(HttpStatusCode.OK);
     }
 }
