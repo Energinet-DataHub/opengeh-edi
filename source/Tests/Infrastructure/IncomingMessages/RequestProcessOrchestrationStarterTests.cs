@@ -97,6 +97,11 @@ public class RequestProcessOrchestrationStarterTests
                     It.IsAny<CancellationToken>()))
             .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken _) => actualCommand = command);
 
+        var processManagerClientFactory = new Mock<IProcessManagerClientFactory>();
+        processManagerClientFactory
+            .Setup(c => c.CreateMessageClient(It.IsAny<string>()))
+            .Returns(processManagerClient.Object);
+
         // => Setup authenticated actor
         var expectedActor = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
         var authenticatedActor = new AuthenticatedActor();
@@ -108,7 +113,7 @@ public class RequestProcessOrchestrationStarterTests
             Guid.NewGuid()));
 
         var sut = new RequestProcessOrchestrationStarter(
-            processManagerClient.Object,
+            processManagerClientFactory.Object,
             authenticatedActor);
 
         // Act
@@ -218,8 +223,12 @@ public class RequestProcessOrchestrationStarterTests
                     It.IsAny<CancellationToken>()))
             .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken _) => actualCommand = command);
 
-        // => Setup authenticated actor
+        var processManagerClientFactory = new Mock<IProcessManagerClientFactory>();
+        processManagerClientFactory
+            .Setup(c => c.CreateMessageClient(It.IsAny<string>()))
+            .Returns(processManagerClient.Object);
 
+        // => Setup authenticated actor
         var expectedActor = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var authenticatedActor = new AuthenticatedActor();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
@@ -230,7 +239,7 @@ public class RequestProcessOrchestrationStarterTests
             Guid.NewGuid()));
 
         var sut = new RequestProcessOrchestrationStarter(
-            processManagerClient.Object,
+            processManagerClientFactory.Object,
             authenticatedActor);
 
         // Act
@@ -348,6 +357,10 @@ public class RequestProcessOrchestrationStarterTests
                     It.IsAny<ForwardMeteredDataCommandV1>(),
                     It.IsAny<CancellationToken>()))
             .Callback((StartOrchestrationInstanceMessageCommand<ForwardMeteredDataInputV1> command, CancellationToken _) => actualCommand = command);
+        var processManagerClientFactory = new Mock<IProcessManagerClientFactory>();
+        processManagerClientFactory
+            .Setup(c => c.CreateMessageClient(It.IsAny<string>()))
+            .Returns(processManagerClient.Object);
 
         // => Setup authenticated actor
         var expectedActor = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
@@ -360,7 +373,7 @@ public class RequestProcessOrchestrationStarterTests
             Guid.NewGuid()));
 
         var sut = new ForwardMeteredDataOrchestrationStarter(
-            processManagerClient.Object,
+            processManagerClientFactory.Object,
             authenticatedActor);
 
         // Act

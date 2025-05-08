@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
-using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
@@ -26,9 +25,11 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
     "StyleCop.CSharp.ReadabilityRules",
     "SA1118:Parameter should not span multiple lines",
     Justification = "Needed for inline ebix exception")]
-public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient processManagerMessageClient, AuthenticatedActor authenticatedActor)
+public class ForwardMeteredDataOrchestrationStarter(
+    IProcessManagerClientFactory processManagerClientFactory,
+    AuthenticatedActor authenticatedActor)
 {
-    private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
+    private readonly IProcessManagerClientFactory _processManagerClientFactory = processManagerClientFactory;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
     public async Task StartForwardMeteredDataOrchestrationAsync(
@@ -36,6 +37,7 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
         CancellationToken cancellationToken)
     {
         var actorIdentityDto = GetAuthenticatedActorIdentityDto(meteredDataForMeteringPointMessageBase.MessageId);
+        var processManagerMessageClient = _processManagerClientFactory.CreateMessageClient(meteredDataForMeteringPointMessageBase.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in meteredDataForMeteringPointMessageBase.Series
@@ -87,7 +89,7 @@ public class ForwardMeteredDataOrchestrationStarter(IProcessManagerMessageClient
                     $"{transaction.SenderNumber}-{transaction.TransactionId}");
 
             var startProcessTask =
-                _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+                processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
             startProcessTasks.Add(startProcessTask);
         }
 
