@@ -42,5 +42,5 @@ public static class FeatureFlagName
     /// <summary>
     /// Whether to allow actors to peek measurements messages.
     /// </summary>
-    public const string Brs021MeasurementMessages = "BRS021-MEASUREMENT-MESSAGES";
+    public const string Brs021PeekMessages = "BRS021-PEEK-MESSAGES";
 }
