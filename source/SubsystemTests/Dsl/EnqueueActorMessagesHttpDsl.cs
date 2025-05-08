@@ -107,9 +107,12 @@ internal class EnqueueActorMessagesHttpDsl
 
     private bool IsExpectedMeteringPointType(string content, string meteringPointId)
     {
-        var expectedMeteringPointFormated = "        \"marketEvaluationPoint.mRID\": {\r\n          \"codingScheme\": \"A10\",\r\n          \"value\": \"{meteringPointId}\"\r\n        },";
-        expectedMeteringPointFormated += meteringPointId;
-        expectedMeteringPointFormated += "\"\\r\\n        },\"";
+        var expectedMeteringPointFormated = string.Empty
+                                            + "        \"marketEvaluationPoint.mRID\": {\r\n"
+                                            + "          \"codingScheme\": \"A10\",\r\n"
+                                            + $"          \"value\": \"{meteringPointId}\"\r\n"
+                                            + "        },";
+
         return content.Contains(expectedMeteringPointFormated) == true;
     }
 }
