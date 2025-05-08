@@ -37,10 +37,14 @@ internal sealed class EdiDriver
     private readonly AsyncLazy<HttpClient>? _subsystemHttpClient;
     private readonly ITestOutputHelper _logger;
 
-    public EdiDriver(IDurableClient durableClient, AsyncLazy<HttpClient> b2BB2BHttpClient, ITestOutputHelper logger,  AsyncLazy<HttpClient>? subsystemHttpClient = null)
+    public EdiDriver(
+        IDurableClient durableClient,
+        AsyncLazy<HttpClient> b2BHttpClient,
+        ITestOutputHelper logger,
+        AsyncLazy<HttpClient>? subsystemHttpClient = null)
     {
         _durableClient = durableClient;
-        _b2BHttpClient = b2BB2BHttpClient;
+        _b2BHttpClient = b2BHttpClient;
         _subsystemHttpClient = subsystemHttpClient;
         _logger = logger;
     }

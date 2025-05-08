@@ -42,7 +42,7 @@ public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
     [Fact]
     public async Task Actor_can_peek_messages_enqueued_via_http_endpoint()
     {
-        var meteringPointId = "1234567890123456";
+        var meteringPointId = "TestMeteringPointId";
 
         await _enqueueActorMessagesHttpDsl
             .EnqueueCalculatedMeasurementMessage(

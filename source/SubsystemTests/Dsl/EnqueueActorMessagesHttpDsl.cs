@@ -79,11 +79,12 @@ internal class EnqueueActorMessagesHttpDsl
         var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
 
         var numberOfRetries = 2;
-        var foundMatch = false;
+        var foundExpectedMessage = false;
 
         for (var i = 0; i < numberOfRetries; i++)
         {
             var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
+                documentFormat: DocumentFormat.Json,
                 messageCategory: MessageCategory.MeasureData,
                 timeout: timeout);
 
@@ -91,12 +92,12 @@ internal class EnqueueActorMessagesHttpDsl
 
             if (IsCorrectDocumentType(contentString) && IsExpectedMeteringPointType(contentString, meteringPointId))
             {
-                foundMatch = true;
+                foundExpectedMessage = true;
                 break;
             }
         }
 
-        foundMatch.Should().BeTrue($"because we expected to peek the expected message within {numberOfRetries} retries");
+        foundExpectedMessage.Should().BeTrue($"because we expected to peek the expected message within {numberOfRetries} retries");
     }
 
     private bool IsCorrectDocumentType(string content)
@@ -106,6 +107,9 @@ internal class EnqueueActorMessagesHttpDsl
 
     private bool IsExpectedMeteringPointType(string content, string meteringPointId)
     {
-        return content.Contains(meteringPointId) == true;
+        var expectedMeteringPointFormated = "        \"marketEvaluationPoint.mRID\": {\r\n          \"codingScheme\": \"A10\",\r\n          \"value\": \"{meteringPointId}\"\r\n        },";
+        expectedMeteringPointFormated += meteringPointId;
+        expectedMeteringPointFormated += "\"\\r\\n        },\"";
+        return content.Contains(expectedMeteringPointFormated) == true;
     }
 }
