@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM016;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
@@ -26,6 +27,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models.RequestAggregatedMeasureDataDto;
@@ -42,11 +44,24 @@ public sealed class MessageParserTests
     private static readonly string SubPath =
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
-    private static readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers = new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
+    private static readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers =
+        new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
     {
-        { (IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Xml), new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())) },
-        { (IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Json), new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())) },
-        { (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Json), new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()) },
+        {
+            (IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Xml),
+            new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas()))
+        },
+        {
+            (IncomingDocumentType.RequestAggregatedMeasureData, DocumentFormat.Json),
+            new AggregatedMeasureDataJsonMessageParser(
+                new JsonSchemaProvider(
+                    new CimJsonSchemas()),
+                new Logger<AggregatedMeasureDataJsonMessageParser>(new LoggerFactory()))
+        },
+        {
+            (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Json),
+            new AggregatedMeasureDataB2CJsonMessageParser(new Serializer())
+        },
     };
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()

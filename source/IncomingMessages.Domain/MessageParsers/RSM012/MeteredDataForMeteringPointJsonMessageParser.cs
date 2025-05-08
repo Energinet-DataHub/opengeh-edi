@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 
 public class MeteredDataForMeteringPointJsonMessageParser(
     JsonSchemaProvider schemaProvider,
-    Logger<JsonMessageParserBase> logger)
+    ILogger<MeteredDataForMeteringPointJsonMessageParser> logger)
     : JsonMessageParserBase(schemaProvider, logger)
 {
     private const string ValueElementName = "value";

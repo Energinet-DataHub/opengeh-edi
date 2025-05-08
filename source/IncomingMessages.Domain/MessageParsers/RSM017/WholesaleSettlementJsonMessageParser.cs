@@ -16,10 +16,14 @@ using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM017;
 
-public class WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvider) : JsonMessageParserBase(schemaProvider)
+public class WholesaleSettlementJsonMessageParser(
+    JsonSchemaProvider schemaProvider,
+    ILogger<WholesaleSettlementJsonMessageParser> logger)
+    : JsonMessageParserBase(schemaProvider, logger)
 {
     private const string MridElementName = "mRID";
     private const string StartElementName = "start_DateAndOrTime.dateTime";

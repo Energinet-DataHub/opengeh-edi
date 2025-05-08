@@ -27,7 +27,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 
 public abstract class JsonMessageParserBase(
     JsonSchemaProvider schemaProvider,
-    Logger<JsonMessageParserBase> logger) : MessageParserBase<JsonSchema>()
+    ILogger<JsonMessageParserBase> logger) : MessageParserBase<JsonSchema>()
 {
     private const string ValueElementName = "value";
     private const string IdentificationElementName = "mRID";
@@ -50,7 +50,7 @@ public abstract class JsonMessageParserBase(
     };
 
     private readonly JsonSchemaProvider _schemaProvider = schemaProvider;
-    private readonly Logger<JsonMessageParserBase> _logger = logger;
+    private readonly ILogger<JsonMessageParserBase> _logger = logger;
 
     protected abstract string HeaderElementName { get; }
 
@@ -119,15 +119,15 @@ public abstract class JsonMessageParserBase(
         out IList<IIncomingMessageSeries>? series)
     {
         header = null;
-        var transactionElements = document.RootElement
-            .GetProperty(HeaderElementName)
-            .GetProperty(SeriesElementName);
-        series = new List<IIncomingMessageSeries>(transactionElements.GetArrayLength());
+        series = new List<IIncomingMessageSeries>();
 
         var validationError = GetHeaderNode(document, out var headerElement);
         if (validationError is not null)
             return [validationError];
 
+        var transactionElements = document.RootElement
+            .GetProperty(HeaderElementName)
+            .GetProperty(SeriesElementName);
         var senderId = headerElement![SenderIdentificationElementName]?[ValueElementName]?
             .GetValue<string>() ?? string.Empty;
         foreach (var transactionElement in transactionElements.EnumerateArray())
