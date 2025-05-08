@@ -18,12 +18,13 @@ using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.B2BApi.OutgoingMessages;
 
@@ -32,20 +33,20 @@ public class PeekRequestListener
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly ILogger<PeekRequestListener> _logger;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
-    private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly IFeatureManager _featureManager;
     private readonly IAuditLogger _auditLogger;
 
     public PeekRequestListener(
         AuthenticatedActor authenticatedActor,
         ILogger<PeekRequestListener> logger,
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureFlagManager,
+        IFeatureManager featureManager,
         IAuditLogger auditLogger)
     {
         _authenticatedActor = authenticatedActor;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _outgoingMessagesClient = outgoingMessagesClient;
-        _featureFlagManager = featureFlagManager;
+        _featureManager = featureManager;
         _auditLogger = auditLogger;
     }
 
@@ -94,7 +95,7 @@ public class PeekRequestListener
             return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
+        if (!await _featureManager.UsePeekMessagesAsync().ConfigureAwait(false))
         {
             var noContentResponse = HttpResponseData.CreateResponse(request);
             noContentResponse.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027.V1.Model;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 
@@ -28,13 +28,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 /// <param name="logger"></param>
 public class EnqueueHandler_Brs_023_027_V1(
     ILogger<EnqueueHandler_Brs_023_027_V1> logger,
-    IFeatureFlagManager featureFlagManager,
+    IFeatureManager featureManager,
     IDurableClientFactory durableClientFactory)
     : EnqueueActorMessagesHandlerBase(logger)
 {
     private readonly ILogger _logger = logger;
 
-    private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
+    private readonly IFeatureManager _featureManager = featureManager;
 
     private readonly IDurableClientFactory _durableClientFactory = durableClientFactory;
 

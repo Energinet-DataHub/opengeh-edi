@@ -36,7 +36,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
@@ -489,15 +489,15 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UsePeekMessages}",
+            $"FeatureManagement__{FeatureFlags.Names.UsePeekMessages}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25CIM}",
+            $"FeatureManagement__{FeatureFlags.Names.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25Ebix}",
+            $"FeatureManagement__{FeatureFlags.Names.PM25Ebix}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(

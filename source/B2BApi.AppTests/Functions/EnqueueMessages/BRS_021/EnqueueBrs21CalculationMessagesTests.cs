@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
@@ -79,8 +79,8 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlagName.Brs021PeekMessages, true),
-            new(FeatureFlagName.PM25CIM, true),
+            new(FeatureFlags.PM25Messages, true),
+            new(FeatureFlags.PM25CIM, true),
         ]);
 
         // Arrange

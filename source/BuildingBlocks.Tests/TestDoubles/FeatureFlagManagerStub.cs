@@ -13,8 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 
@@ -26,10 +25,10 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 {
     private readonly Dictionary<string, bool> _featureFlagDictionary = new()
     {
-        { FeatureFlagName.UsePeekMessages, true },
-        { FeatureFlagName.PM25CIM, true },
-        { FeatureFlagName.PM25Ebix, true },
-        { FeatureFlagName.Brs021PeekMessages, true },
+        { FeatureFlags.UsePeekMessages, true },
+        { FeatureFlags.PM25CIM, true },
+        { FeatureFlags.PM25Ebix, true },
+        { FeatureFlags.PM25Messages, true },
     };
 
     public void SetFeatureFlag(string featureFlagName, bool value)
@@ -37,11 +36,11 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         _featureFlagDictionary[featureFlagName] = value;
     }
 
-    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekMessages]);
+    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.UsePeekMessages]);
 
-    public Task<bool> UsePeekForwardMeteredDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.Brs021PeekMessages]);
+    public Task<bool> UsePeekForwardMeteredDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.PM25Messages]);
 
-    public Task<bool> ReceiveForwardMeteredDataInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25CIM]);
+    public Task<bool> ReceiveForwardMeteredDataInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.PM25CIM]);
 
-    public Task<bool> ReceiveForwardMeteredDataInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25Ebix]);
+    public Task<bool> ReceiveForwardMeteredDataInEbixAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlags.PM25Ebix]);
 }

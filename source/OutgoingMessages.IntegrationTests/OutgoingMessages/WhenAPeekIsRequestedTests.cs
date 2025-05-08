@@ -18,7 +18,7 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
@@ -368,7 +368,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     public async Task Given_EnqueuedRsm012_AndGiven_DisallowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsNothing(DocumentFormat documentFormat)
     {
         // Arrange / Given
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.Brs021PeekMessages, false);
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlags.PM25Messages, false);
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()
@@ -397,7 +397,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     public async Task Given_EnqueuedRsm012_AndGiven_AllowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsDocument(DocumentFormat documentFormat)
     {
         // Arrange / Given
-        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlagName.Brs021PeekMessages, true);
+        FeatureFlagManagerStub.SetFeatureFlag(FeatureFlags.PM25Messages, true);
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()
@@ -459,7 +459,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 
-    private async Task EnqueueAndCommitMessage(AcceptedSendMeasurementsMessageDto message)
+    private async Task EnqueueAndCommitMessage(AcceptedForwardMeteredDataMessageDto message)
     {
         await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await _unitOfWork.CommitTransactionAsync(CancellationToken.None);

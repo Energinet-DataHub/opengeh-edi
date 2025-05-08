@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FeatureManagement;
 
@@ -24,7 +22,6 @@ public static class FeatureFlagExtensions
     public static IServiceCollection AddFeatureFlags(this IServiceCollection services)
     {
         services.AddFeatureManagement();
-        services.AddSingleton<IFeatureFlagManager, MicrosoftFeatureFlagManager>();
 
         return services;
     }
