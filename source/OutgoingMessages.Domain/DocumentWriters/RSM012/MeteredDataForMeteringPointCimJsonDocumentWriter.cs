@@ -70,18 +70,18 @@ public class MeteredDataForMeteringPointCimJsonDocumentWriter(IMessageRecordPars
             meteredDataForMeasurementSeries.Add(
                 new MeteredDataForMeasurementSeries(
                     activityRecord.TransactionId.Value,
-                    activityRecord.MarketEvaluationPointNumber,
-                    activityRecord.MarketEvaluationPointType,
-                    activityRecord.OriginalTransactionIdReferenceId?.Value,
+                    activityRecord.MeteringPointId,
+                    activityRecord.MeteringPointType,
+                    activityRecord.OriginalTransactionIdReference?.Value,
                     activityRecord.Product,
-                    activityRecord.QuantityMeasureUnit.Code,
+                    activityRecord.MeasurementUnit.Code,
                     activityRecord.RegistrationDateTime.ToString(),
                     new Period(
                         activityRecord.Resolution.Code,
                         new TimeInterval(
-                            activityRecord.StartedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture),
-                            activityRecord.EndedDateTime.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)),
-                        activityRecord.EnergyObservations.Select(
+                            activityRecord.Period.Start.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture),
+                            activityRecord.Period.End.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)),
+                        activityRecord.Measurements.Select(
                                 p => new Point(
                                     p.Position,
                                     p.Quality,

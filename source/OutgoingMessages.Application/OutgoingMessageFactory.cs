@@ -393,7 +393,7 @@ public static class OutgoingMessageFactory
     }
 
     public static OutgoingMessage CreateMessage(
-        AcceptedForwardMeteredDataMessageDto message,
+        AcceptedSendMeasurementsMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {
@@ -414,13 +414,40 @@ public static class OutgoingMessageFactory
             gridAreaCode: message.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
-            message.Series.StartedDateTime,
-            dataCount: message.Series.EnergyObservations.Count,
-            meteringPointId: MeteringPointId.From(message.Series.MarketEvaluationPointNumber));
+            message.Series.Period.Start,
+            dataCount: message.Series.Measurements.Count,
+            meteringPointId: MeteringPointId.From(message.Series.MeteringPointId));
     }
 
     public static OutgoingMessage CreateMessage(
-        RejectedForwardMeteredDataMessageDto message,
+        CalculatedMeasurementsMessageDto message,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(message);
+
+        return new OutgoingMessage(
+            eventId: message.EventId,
+            documentType: message.DocumentType,
+            receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            processId: message.ProcessId,
+            businessReason: message.BusinessReason,
+            serializedContent: serializer.Serialize(message.Series),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.OutgoingMeteredDataForMeteringPoint,
+            relatedToMessageId: message.RelatedToMessageId,
+            gridAreaCode: message.GridAreaCode,
+            externalId: message.ExternalId,
+            calculationId: null,
+            message.Series.Period.Start,
+            dataCount: message.Series.Measurements.Count,
+            meteringPointId: MeteringPointId.From(message.Series.MeteringPointId));
+    }
+
+    public static OutgoingMessage CreateMessage(
+        RejectedSendMeasurementsMessageDto message,
         ISerializer serializer,
         Instant timestamp)
     {

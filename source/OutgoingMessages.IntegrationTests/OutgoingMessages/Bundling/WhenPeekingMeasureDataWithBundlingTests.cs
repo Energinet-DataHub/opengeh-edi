@@ -31,6 +31,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit.Abstractions;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages.Bundling;
 
@@ -72,7 +73,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
 
         // var measureDataForPeriodCount = measureDataPeriod.Duration / resolutionDuration;
         var measureDataForPeriod = Enumerable.Range(0, dataCountForPeriod)
-            .Select(i => new EnergyObservationDto(i + 1, decimal.MaxValue, Quality.Calculated))
+            .Select(i => new MeasurementDto(i + 1, decimal.MaxValue, Quality.Calculated))
             .ToList();
 
         var maxBundleMessageSize = bundlingOptions.MaxBundleMessageCount;
@@ -84,25 +85,24 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
 
         var messagesToEnqueue = Enumerable.Range(0, bundlesToCreateCount)
             .Select(
-                i => new AcceptedForwardMeteredDataMessageDto(
+                i => new AcceptedSendMeasurementsMessageDto(
                     eventId: eventId,
                     externalId: new ExternalId(Guid.NewGuid()),
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
                     gridAreaCode: "804",
-                    series: new ForwardMeteredDataMessageSeriesDto(
+                    series: new MeasurementsDto(
                         TransactionId: TransactionId.New(),
-                        MarketEvaluationPointNumber: "1234567890123456",
-                        MarketEvaluationPointType: MeteringPointType.Consumption,
-                        OriginalTransactionIdReferenceId: TransactionId.New(),
+                        MeteringPointId: "1234567890123456",
+                        MeteringPointType: MeteringPointType.Consumption,
+                        OriginalTransactionIdReference: TransactionId.New(),
                         Product: "1234567890123456",
-                        QuantityMeasureUnit: MeasurementUnit.KilowattHour,
+                        MeasurementUnit: MeasurementUnit.KilowattHour,
                         RegistrationDateTime: periodEnd,
                         Resolution: resolution,
-                        StartedDateTime: periodStart,
-                        EndedDateTime: periodEnd,
-                        EnergyObservations: measureDataForPeriod)))
+                        Period: new Period(periodStart, periodEnd),
+                        Measurements: measureDataForPeriod)))
             .Cast<OutgoingMessageDto>()
             .ToList();
 
@@ -232,7 +232,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
 
         var messagesToEnqueue = Enumerable.Range(0, maxBundleSize)
             .Select(
-                i => new RejectedForwardMeteredDataMessageDto(
+                i => new RejectedSendMeasurementsMessageDto(
                     eventId: eventId,
                     externalId: new ExternalId(Guid.NewGuid()),
                     receiverNumber: receiver.Number,
@@ -360,8 +360,8 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         {
             _ = messageDto switch
             {
-                AcceptedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
-                RejectedForwardMeteredDataMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+                AcceptedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+                RejectedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
                 _ => throw new NotImplementedException($"Enqueueing outgoing message of type {messageDto.GetType()} is not implemented."),
             };
             enqueuedMessagesCount++;

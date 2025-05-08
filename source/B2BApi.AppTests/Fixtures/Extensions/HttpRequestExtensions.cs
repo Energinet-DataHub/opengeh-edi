@@ -14,10 +14,13 @@
 
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 
@@ -86,6 +89,34 @@ public static class HttpRequestExtensions
             actor,
             HttpMethod.Delete,
             $"api/dequeue/{messageId}");
+    }
+
+    public static HttpRequestMessage CreateEnqueueCalculatedMeasurementsHttpV1Request(
+        this B2BApiAppFixture fixture,
+        EnqueueCalculatedMeasurementsHttpV1 enqueueCalculatedMeasurementsHttpV1)
+    {
+        HttpRequestMessage? request = null;
+        try
+        {
+            request = new HttpRequestMessage(
+                HttpMethod.Post,
+                $"api/enqueue/{enqueueCalculatedMeasurementsHttpV1.Route}")
+            {
+                Content = new StringContent(
+                    JsonSerializer.Serialize(enqueueCalculatedMeasurementsHttpV1),
+                    Encoding.UTF8,
+                    "application/json"),
+            };
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", fixture.CreateSubsystemToken());
+
+            return request;
+        }
+        catch
+        {
+            request?.Dispose();
+            throw;
+        }
     }
 
     private static async Task<HttpRequestMessage> CreateIncomingMessageHttpRequestAsync(
