@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
-using Energinet.DataHub.EDI.SubsystemTests.TestOrdering;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests.ArchivedMessages;
@@ -43,7 +42,10 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
             new B2CEdiDriver(fixture.B2CClients.DatahubAdministrator, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
             ediDatabaseDriver);
 
-        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.MeteredDataResponsible, output);
+        var ediDriver = new EdiDriver(
+            fixture.DurableClient,
+            fixture.B2BClients.MeteredDataResponsible,
+            output);
         var processManagerDriver = new ProcessManagerDriver(fixture.EdiTopicClient);
         _calculationCompleted = new CalculationCompletedDsl(
             ediDriver,

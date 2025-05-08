@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using Azure.Core;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
@@ -158,6 +159,15 @@ public class SubsystemTestFixture : IAsyncLifetime
             "MARKET_PARTICIPANT_URI",
             defaultValue: "https://app-webapi-markpart-u-001.azurewebsites.net"));
 
+        EdiFunctionAppUri = new Uri(
+            GetConfigurationValue<string>(
+                root,
+                "func-edi-api-base-url"));
+
+        EdiApplicationId = GetConfigurationValue<string>(
+            root,
+            "edi-application-id-uri");
+
         EdiB2CWebApiUri = new Uri(GetConfigurationValue<string>(root, "EDI_B2C_WEB_API_URI"));
 
         var b2cUsername = GetConfigurationValue<string>(root, "B2C_USERNAME");
@@ -174,6 +184,7 @@ public class SubsystemTestFixture : IAsyncLifetime
                 GetConfigurationValue<Guid>(root, "B2C_ENERGY_SUPPLIER_ACTOR_ID"))));
 
         var credential = new DefaultAzureCredential();
+        SubsystemHttpClient = CreateLazySubsystemHttpClient(credential);
         ServiceBusClient = new ServiceBusClient(serviceBusFullyQualifiedNamespace, credential);
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new ServiceBusSenderClient(ServiceBusClient, ediInboxQueueName);
@@ -187,6 +198,8 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal B2BClients B2BClients { get; }
 
     internal B2CClients B2CClients { get; }
+
+    internal AsyncLazy<HttpClient> SubsystemHttpClient { get; }
 
     internal EbixCredentials EbixEnergySupplierCredentials { get; }
 
@@ -210,6 +223,10 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal IDurableClient? DurableClient { get; set; }
 
     internal Uri MarketParticipantUri { get; }
+
+    internal Uri EdiFunctionAppUri { get; }
+
+    internal string EdiApplicationId { get; }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
@@ -310,6 +327,23 @@ public class SubsystemTestFixture : IAsyncLifetime
                 var token = await tokenRetriever.GetB2CTokenAsync(credentials).ConfigureAwait(false);
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                return httpClient;
+            });
+    }
+
+    private AsyncLazy<HttpClient> CreateLazySubsystemHttpClient(TokenCredential credential)
+    {
+        return new AsyncLazy<HttpClient>(
+            async () =>
+            {
+                var httpClient = new HttpClient();
+
+                var token = (await credential.GetTokenAsync(
+                    new TokenRequestContext([EdiApplicationId]),
+                    CancellationToken.None)).Token;
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                httpClient.BaseAddress = EdiFunctionAppUri;
                 return httpClient;
             });
     }

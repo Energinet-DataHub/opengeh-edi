@@ -16,11 +16,13 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 using Energinet.DataHub.EDI.SubsystemTests.Logging;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.EnqueueActorMessages;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Nito.AsyncEx;
 using NodaTime;
@@ -31,13 +33,15 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 internal sealed class EdiDriver
 {
     private readonly IDurableClient _durableClient;
-    private readonly AsyncLazy<HttpClient> _httpClient;
+    private readonly AsyncLazy<HttpClient> _b2BHttpClient;
+    private readonly AsyncLazy<HttpClient>? _subsystemHttpClient;
     private readonly ITestOutputHelper _logger;
 
-    public EdiDriver(IDurableClient durableClient, AsyncLazy<HttpClient> b2bHttpClient, ITestOutputHelper logger)
+    public EdiDriver(IDurableClient durableClient, AsyncLazy<HttpClient> b2BB2BHttpClient, ITestOutputHelper logger,  AsyncLazy<HttpClient>? subsystemHttpClient = null)
     {
         _durableClient = durableClient;
-        _httpClient = b2bHttpClient;
+        _b2BHttpClient = b2BB2BHttpClient;
+        _subsystemHttpClient = subsystemHttpClient;
         _logger = logger;
     }
 
@@ -107,7 +111,7 @@ internal sealed class EdiDriver
 
     internal async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string? token = null)
     {
-        var b2bClient = await _httpClient;
+        var b2bClient = await _b2BHttpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
         if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
         request.Content = new StringContent(payload.OuterXml, Encoding.UTF8, "application/xml");
@@ -120,7 +124,7 @@ internal sealed class EdiDriver
 
     internal async Task<Guid> RequestWholesaleSettlementAsync(bool withSyncError, CancellationToken cancellationToken)
     {
-        var b2bClient = await _httpClient;
+        var b2bClient = await _b2BHttpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestwholesalesettlement");
         var contentType = "application/json";
         var requestContent = await GetRequestWholesaleSettlementContentAsync(withSyncError, cancellationToken)
@@ -146,7 +150,7 @@ internal sealed class EdiDriver
         MeteringPointId meteringPointId,
         CancellationToken cancellationToken)
     {
-        var b2bClient = await _httpClient;
+        var b2bClient = await _b2BHttpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/notifyvalidatedmeasuredata");
         var contentType = "application/json";
         var requestContent = await GetMeteredDataForMeteringPointContentAsync(meteringPointId, cancellationToken)
@@ -169,7 +173,7 @@ internal sealed class EdiDriver
 
     internal async Task<Guid> RequestAggregatedMeasureDataAsync(bool withSyncError, CancellationToken cancellationToken)
     {
-        var b2bClient = await _httpClient;
+        var b2bClient = await _b2BHttpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
         var requestContent = await GetAggregatedMeasureDataContentAsync(withSyncError, cancellationToken).ConfigureAwait(false);
         request.Content = new StringContent(requestContent.Content, Encoding.UTF8, "application/json");
@@ -196,6 +200,23 @@ internal sealed class EdiDriver
     internal async Task WaitForOrchestrationCompletedAsync(string orchestrationInstanceId)
     {
         await _durableClient.WaitForOrchestrationCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
+    }
+
+    internal async Task EnqueueActorMessagesViaHttpAsync(IEnqueueDataSyncDto data)
+    {
+        if (_subsystemHttpClient == null)
+            throw new InvalidOperationException("SubsystemHttpClient is not initialized.");
+
+        var json = JsonSerializer.Serialize(data, data.GetType());
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, data.Route);
+        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var httpClient = await _subsystemHttpClient;
+
+        var response = await httpClient.SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
@@ -259,7 +280,7 @@ internal sealed class EdiDriver
 
     private async Task<HttpResponseMessage> PeekAsync(DocumentFormat? documentFormat = null, MessageCategory? messageCategory = null)
     {
-        var b2bClient = await _httpClient;
+        var b2bClient = await _b2BHttpClient;
 
         var messageCategoryString = messageCategory switch
         {
@@ -279,7 +300,7 @@ internal sealed class EdiDriver
 
     private async Task<HttpResponseMessage> DequeueAsync(string messageId)
     {
-        var b2bClient = await _httpClient;
+        var b2bClient = await _b2BHttpClient;
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
         var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
         await dequeueResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
