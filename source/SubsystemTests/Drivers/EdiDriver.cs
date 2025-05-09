@@ -212,14 +212,12 @@ internal sealed class EdiDriver
             throw new InvalidOperationException("SubsystemHttpClient is not initialized.");
 
         var json = JsonSerializer.Serialize(data, data.GetType());
+        var httpClient = await _subsystemHttpClient;
 
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/enqueue/" + data.Route);
         request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var httpClient = await _subsystemHttpClient;
-
         var response = await httpClient.SendAsync(request);
-
         await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
     }
 

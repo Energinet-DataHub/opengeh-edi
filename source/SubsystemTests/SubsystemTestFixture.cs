@@ -164,7 +164,7 @@ public class SubsystemTestFixture : IAsyncLifetime
                 root,
                 "func-edi-api-base-url"));
 
-        EdiApplicationId = GetConfigurationValue<string>(
+        EdiApplicationIdUri = GetConfigurationValue<string>(
             root,
             "edi-application-id-uri");
 
@@ -226,7 +226,7 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     internal Uri EdiFunctionAppUri { get; }
 
-    internal string EdiApplicationId { get; }
+    internal string EdiApplicationIdUri { get; }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
@@ -341,7 +341,7 @@ public class SubsystemTestFixture : IAsyncLifetime
                 // /.default must be added when running in the CD, else we get the following error: "Client credential flows
                 // must have a scope value with /.default suffixed to the resource identifier (application ID URI)"
                 var token = (await credential.GetTokenAsync(
-                    new TokenRequestContext([EdiApplicationId + "/.default"]),
+                    new TokenRequestContext([EdiApplicationIdUri + "/.default"]),
                     CancellationToken.None)).Token;
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
