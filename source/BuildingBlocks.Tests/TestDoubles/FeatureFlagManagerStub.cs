@@ -29,7 +29,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
         { FeatureFlagName.UsePeekMessages, true },
         { FeatureFlagName.PM25CIM, true },
         { FeatureFlagName.PM25Ebix, true },
-        { FeatureFlagName.Brs021PeekMessages, true },
+        { FeatureFlagName.PeekMeasurementMessages, true },
     };
 
     public void SetFeatureFlag(string featureFlagName, bool value)
@@ -39,7 +39,7 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.UsePeekMessages]);
 
-    public Task<bool> UsePeekForwardMeteredDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.Brs021PeekMessages]);
+    public Task<bool> UsePeekForwardMeteredDataMessagesAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PeekMeasurementMessages]);
 
     public Task<bool> ReceiveForwardMeteredDataInCimAsync() => Task.FromResult(_featureFlagDictionary[FeatureFlagName.PM25CIM]);
 
