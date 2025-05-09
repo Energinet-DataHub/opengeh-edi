@@ -45,7 +45,7 @@ public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_can_peek_electrical_heating_messages()
+    public async Task Actor_can_peek_electrical_heating_message()
     {
         var meteringPointId = "1234567890123456";
 

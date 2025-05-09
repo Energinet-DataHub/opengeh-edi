@@ -159,7 +159,7 @@ public class SubsystemTestFixture : IAsyncLifetime
             "MARKET_PARTICIPANT_URI",
             defaultValue: "https://app-webapi-markpart-u-001.azurewebsites.net"));
 
-        EdiFunctionAppUri = new Uri(
+        EdiFunctionAppBaseUrl = new Uri(
             GetConfigurationValue<string>(
                 root,
                 "func-edi-api-base-url"));
@@ -224,7 +224,7 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     internal Uri MarketParticipantUri { get; }
 
-    internal Uri EdiFunctionAppUri { get; }
+    internal Uri EdiFunctionAppBaseUrl { get; }
 
     internal string EdiApplicationIdUri { get; }
 
@@ -345,7 +345,7 @@ public class SubsystemTestFixture : IAsyncLifetime
                     CancellationToken.None)).Token;
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-                httpClient.BaseAddress = EdiFunctionAppUri;
+                httpClient.BaseAddress = EdiFunctionAppBaseUrl;
                 return httpClient;
             });
     }
