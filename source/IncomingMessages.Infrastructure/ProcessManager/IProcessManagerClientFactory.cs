@@ -22,12 +22,12 @@ public interface IProcessManagerClientFactory
 {
     /// <summary>
     /// Create a process manager message client.
+    /// </summary>
     /// <remarks>
     /// If <see cref="IncomingMessagesOptions.AllowMockDependenciesForTests"/> is true, and the
     /// given <paramref name="actorMessageId"/> is a test id, a mock client will be returned. See
     /// <see cref="TestMessageIdExtensions"/> for more information about test id's.
     /// </remarks>
-    /// </summary>
     /// <param name="actorMessageId">The id of the actor message. If it is a test id, a mock will be returned.</param>
     IProcessManagerMessageClient CreateMessageClient(string actorMessageId);
 }
