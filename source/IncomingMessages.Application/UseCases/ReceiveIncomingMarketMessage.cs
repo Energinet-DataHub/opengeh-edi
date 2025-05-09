@@ -18,12 +18,12 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
@@ -39,7 +39,6 @@ public class ReceiveIncomingMarketMessage
     private readonly DelegateIncomingMessage _delegateIncomingMessage;
     private readonly IClock _clock;
     private readonly AuthenticatedActor _actorAuthenticator;
-    private readonly IFeatureFlagManager _featureFlagManager;
 
     public ReceiveIncomingMarketMessage(
         IEnumerable<IMessageParser> messageParsers,
@@ -50,8 +49,7 @@ public class ReceiveIncomingMarketMessage
         IIncomingMessageReceiver incomingMessageReceiver,
         DelegateIncomingMessage delegateIncomingMessage,
         IClock clock,
-        AuthenticatedActor actorAuthenticator,
-        IFeatureFlagManager featureFlagManager)
+        AuthenticatedActor actorAuthenticator)
     {
         _messageParsers = messageParsers
             .ToDictionary(
@@ -65,7 +63,6 @@ public class ReceiveIncomingMarketMessage
         _delegateIncomingMessage = delegateIncomingMessage;
         _clock = clock;
         _actorAuthenticator = actorAuthenticator;
-        _featureFlagManager = featureFlagManager;
     }
 
     public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(

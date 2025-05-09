@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
@@ -39,6 +38,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NodaTime;
@@ -68,7 +68,7 @@ public class OutgoingMessagesTestBase : IDisposable
 
     protected OutgoingMessagesTestFixture Fixture { get; }
 
-    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
+    protected FeatureManagerStub FeatureManagerStub { get; } = new();
 
     protected AuthenticatedActor AuthenticatedActor { get; }
 
@@ -230,7 +230,7 @@ public class OutgoingMessagesTestBase : IDisposable
             .AddDataAccessUnitOfWorkModule();
 
         // Replace the services with stub implementations.
-        _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
+        _services.AddTransient<IFeatureManager>(_ => FeatureManagerStub);
 
         _services.AddScoped<ExecutionContext>(_ =>
         {
@@ -242,7 +242,7 @@ public class OutgoingMessagesTestBase : IDisposable
         _services.AddSingleton<TelemetryClient>(x =>
         {
             return new TelemetryClient(
-                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
+                new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         ServiceProvider = _services.BuildServiceProvider();
