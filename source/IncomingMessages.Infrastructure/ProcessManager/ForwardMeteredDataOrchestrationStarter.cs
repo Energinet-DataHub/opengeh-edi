@@ -26,10 +26,10 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
     "SA1118:Parameter should not span multiple lines",
     Justification = "Needed for inline ebix exception")]
 public class ForwardMeteredDataOrchestrationStarter(
-    IProcessManagerClientFactory processManagerClientFactory,
+    IProcessManagerMessageClientFactory processManagerMessageClientFactory,
     AuthenticatedActor authenticatedActor)
 {
-    private readonly IProcessManagerClientFactory _processManagerClientFactory = processManagerClientFactory;
+    private readonly IProcessManagerMessageClientFactory _processManagerMessageClientFactory = processManagerMessageClientFactory;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
     public async Task StartForwardMeteredDataOrchestrationAsync(
@@ -37,7 +37,7 @@ public class ForwardMeteredDataOrchestrationStarter(
         CancellationToken cancellationToken)
     {
         var actorIdentityDto = GetAuthenticatedActorIdentityDto(meteredDataForMeteringPointMessageBase.MessageId);
-        var processManagerMessageClient = _processManagerClientFactory.CreateMessageClient(meteredDataForMeteringPointMessageBase.MessageId);
+        var processManagerMessageClient = _processManagerMessageClientFactory.CreateMessageClient(meteredDataForMeteringPointMessageBase.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in meteredDataForMeteringPointMessageBase.Series

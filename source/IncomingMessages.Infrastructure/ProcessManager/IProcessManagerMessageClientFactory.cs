@@ -18,7 +18,7 @@ using Energinet.DataHub.ProcessManager.Client;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
-public interface IProcessManagerClientFactory
+public interface IProcessManagerMessageClientFactory
 {
     /// <summary>
     /// Create a process manager message client.

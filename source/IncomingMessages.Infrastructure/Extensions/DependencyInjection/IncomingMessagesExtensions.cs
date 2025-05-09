@@ -170,7 +170,7 @@ public static class IncomingMessagesExtensions
          */
         services.AddTransient<IRequestProcessOrchestrationStarter, RequestProcessOrchestrationStarter>();
         services.AddTransient<ForwardMeteredDataOrchestrationStarter>();
-        services.AddTransient<IProcessManagerClientFactory, ProcessManagerClientFactory>();
+        services.AddTransient<IProcessManagerMessageClientFactory, ProcessManagerMessageClientFactory>();
         services.AddProcessManagerMessageClient();
 
         return services;

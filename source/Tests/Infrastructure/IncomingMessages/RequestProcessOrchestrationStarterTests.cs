@@ -97,7 +97,7 @@ public class RequestProcessOrchestrationStarterTests
                     It.IsAny<CancellationToken>()))
             .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedWholesaleServicesInputV1> command, CancellationToken _) => actualCommand = command);
 
-        var processManagerClientFactory = new Mock<IProcessManagerClientFactory>();
+        var processManagerClientFactory = new Mock<IProcessManagerMessageClientFactory>();
         processManagerClientFactory
             .Setup(c => c.CreateMessageClient(It.IsAny<string>()))
             .Returns(processManagerClient.Object);
@@ -223,7 +223,7 @@ public class RequestProcessOrchestrationStarterTests
                     It.IsAny<CancellationToken>()))
             .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken _) => actualCommand = command);
 
-        var processManagerClientFactory = new Mock<IProcessManagerClientFactory>();
+        var processManagerClientFactory = new Mock<IProcessManagerMessageClientFactory>();
         processManagerClientFactory
             .Setup(c => c.CreateMessageClient(It.IsAny<string>()))
             .Returns(processManagerClient.Object);
@@ -357,7 +357,7 @@ public class RequestProcessOrchestrationStarterTests
                     It.IsAny<ForwardMeteredDataCommandV1>(),
                     It.IsAny<CancellationToken>()))
             .Callback((StartOrchestrationInstanceMessageCommand<ForwardMeteredDataInputV1> command, CancellationToken _) => actualCommand = command);
-        var processManagerClientFactory = new Mock<IProcessManagerClientFactory>();
+        var processManagerClientFactory = new Mock<IProcessManagerMessageClientFactory>();
         processManagerClientFactory
             .Setup(c => c.CreateMessageClient(It.IsAny<string>()))
             .Returns(processManagerClient.Object);

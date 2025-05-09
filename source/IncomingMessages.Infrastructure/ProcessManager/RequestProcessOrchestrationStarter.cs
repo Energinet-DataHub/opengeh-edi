@@ -22,10 +22,10 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
 public class RequestProcessOrchestrationStarter(
-    IProcessManagerClientFactory processManagerClientFactory,
+    IProcessManagerMessageClientFactory processManagerMessageClientFactory,
     AuthenticatedActor authenticatedActor) : IRequestProcessOrchestrationStarter
 {
-    private readonly IProcessManagerClientFactory _processManagerClientFactory = processManagerClientFactory;
+    private readonly IProcessManagerMessageClientFactory _processManagerMessageClientFactory = processManagerMessageClientFactory;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
     public async Task StartRequestWholesaleServicesOrchestrationAsync(
@@ -33,7 +33,7 @@ public class RequestProcessOrchestrationStarter(
         CancellationToken cancellationToken)
     {
         var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
-        var processManagerMessageClient = _processManagerClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
+        var processManagerMessageClient = _processManagerMessageClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -92,7 +92,7 @@ public class RequestProcessOrchestrationStarter(
         CancellationToken cancellationToken)
     {
         var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
-        var processManagerMessageClient = _processManagerClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
+        var processManagerMessageClient = _processManagerMessageClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
