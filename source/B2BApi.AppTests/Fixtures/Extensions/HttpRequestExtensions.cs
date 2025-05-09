@@ -104,7 +104,7 @@ public static class HttpRequestExtensions
                 $"api/enqueue/{enqueueActorMessagesHttp.Route}")
             {
                 Content = new StringContent(
-                    JsonSerializer.Serialize(enqueueActorMessagesHttp),
+                    JsonSerializer.Serialize(enqueueActorMessagesHttp, enqueueActorMessagesHttp.GetType()),
                     Encoding.UTF8,
                     "application/json"),
             };
