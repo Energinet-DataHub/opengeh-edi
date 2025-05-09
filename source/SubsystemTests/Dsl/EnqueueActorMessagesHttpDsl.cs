@@ -95,8 +95,8 @@ internal class EnqueueActorMessagesHttpDsl
     private void AssertDocumentType(string content)
     {
         Assert.Contains(
-            content,
-            "NotifyValidatedMeasureData_MarketDocument");
+            "NotifyValidatedMeasureData_MarketDocument",
+            content);
     }
 
     private void AssertMeteringPointId(string content, string meteringPointId)
@@ -107,7 +107,7 @@ internal class EnqueueActorMessagesHttpDsl
                                               + $"          \"value\": \"{meteringPointId}\"\r\n"
                                               + "        },";
         Assert.Contains(
-            content,
-            expectedMeteringPointIdFormatted);
+            expectedMeteringPointIdFormatted,
+            content);
     }
 }
