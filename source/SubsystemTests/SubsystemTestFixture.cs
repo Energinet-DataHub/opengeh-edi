@@ -339,7 +339,7 @@ public class SubsystemTestFixture : IAsyncLifetime
                 var httpClient = new HttpClient();
 
                 var token = (await credential.GetTokenAsync(
-                    new TokenRequestContext([EdiApplicationId]),
+                    new TokenRequestContext([EdiApplicationId + "/.default"]),
                     CancellationToken.None)).Token;
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
