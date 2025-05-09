@@ -497,9 +497,8 @@ public static class OutgoingMessageFactory
             externalId: message.ExternalId,
             calculationId: null,
             periodStartedAt: null,
-            dataCount: message.Series.MeteringPointIds.Count,
-            // TODO: Update this, such what it may contain more than one metering point id
-            meteringPointId: message.Series.MeteringPointIds.FirstOrDefault());
+            dataCount: 1,
+            meteringPointId: message.Series.MeteringPointIds);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

@@ -22,5 +22,5 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasur
 // How do we solve this?
 public sealed record MissingMeasurementSeries(
     TransactionId TransactionId,
-    IReadOnlyCollection<MeteringPointId> MeteringPointIds,
+    MeteringPointId MeteringPointIds,
     Instant? RegistrationDateTime);
