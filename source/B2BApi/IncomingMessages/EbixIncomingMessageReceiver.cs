@@ -15,21 +15,22 @@
 using System.Net;
 using System.Text;
 using Energinet.DataHub.EDI.B2BApi.Common;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.B2BApi.IncomingMessages;
 
 public sealed class EbixIncomingMessageReceiver(
     IIncomingMessageClient incomingMessageClient,
-    IFeatureFlagManager featureFlagManager)
+    IFeatureManager featureManager)
 {
     private readonly IIncomingMessageClient _incomingMessageClient = incomingMessageClient;
-    private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
+    private readonly IFeatureManager _featureManager = featureManager;
 
     [Function(nameof(EbixIncomingMessageReceiver))]
     public async Task<HttpResponseData> RunAsync(
@@ -47,7 +48,7 @@ public sealed class EbixIncomingMessageReceiver(
 
         var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
 
-        if (!await _featureFlagManager.ReceiveForwardMeteredDataInEbixAsync().ConfigureAwait(false))
+        if (!await _featureManager.ReceiveForwardMeteredDataInEbixAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request

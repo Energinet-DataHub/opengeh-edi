@@ -16,8 +16,8 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.ApplicationInsights;
+using Microsoft.FeatureManagement;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -45,7 +46,7 @@ public class PeekMessage
     private readonly IBundleRepository _bundleRepository;
     private readonly AuthenticatedActor _actorAuthenticator;
     private readonly TelemetryClient _telemetryClient;
-    private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly IFeatureManager _featureManager;
 
     public PeekMessage(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -57,7 +58,7 @@ public class PeekMessage
         IBundleRepository bundleRepository,
         AuthenticatedActor actorAuthenticator,
         TelemetryClient telemetryClient,
-        IFeatureFlagManager featureFlagManager)
+        IFeatureManager featureManager)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
@@ -68,7 +69,7 @@ public class PeekMessage
         _bundleRepository = bundleRepository;
         _actorAuthenticator = actorAuthenticator;
         _telemetryClient = telemetryClient;
-        _featureFlagManager = featureFlagManager;
+        _featureManager = featureManager;
     }
 
     public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
@@ -76,7 +77,7 @@ public class PeekMessage
         ArgumentNullException.ThrowIfNull(request);
 
         // Prevent peek for measurement data messages if peeking measurement data is not enabled
-        if (request.MessageCategory == MessageCategory.MeasureData && !await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
+        if (request.MessageCategory == MessageCategory.MeasureData && !await _featureManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
         {
             return null;
         }
@@ -84,7 +85,7 @@ public class PeekMessage
         // Since Ebix does not support message categories, we set the category to Aggregations
         // if peeking measurement data is not enabled, which skips all measurement data messages.
         if (request.DocumentFormat == DocumentFormat.Ebix
-            && !await _featureFlagManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
+            && !await _featureManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
         {
             request = request with { MessageCategory = MessageCategory.Aggregations };
         }
