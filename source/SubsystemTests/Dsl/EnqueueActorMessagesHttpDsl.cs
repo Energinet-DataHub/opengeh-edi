@@ -38,7 +38,7 @@ internal class EnqueueActorMessagesHttpDsl
         _ediDriver = ediDriver;
     }
 
-    internal async Task EnqueueCalculatedMeasurementMessage(Actor receiver, string meteringPointId)
+    internal async Task EnqueueElectricalHeatingMessage(Actor receiver, string meteringPointId)
     {
         await _ediDriver.EmptyQueueAsync(MessageCategory.MeasureData).ConfigureAwait(false);
 
@@ -81,6 +81,7 @@ internal class EnqueueActorMessagesHttpDsl
         var numberOfRetries = 2;
         var foundExpectedMessage = false;
 
+        // TODO: Delete this loop
         for (var i = 0; i < numberOfRetries; i++)
         {
             var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(

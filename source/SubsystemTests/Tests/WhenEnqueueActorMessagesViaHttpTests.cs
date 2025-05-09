@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
 {
-    private readonly EnqueueActorMessagesHttpDsl _enqueueActorMessagesHttpDsl;
+    private readonly EnqueueActorMessagesHttpDsl _enqueueActorMessages;
     private readonly Actor _receiver = new Actor(
         actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
         actorRole: ActorRole.EnergySupplier);
@@ -36,19 +36,19 @@ public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
             output,
             fixture.SubsystemHttpClient);
 
-        _enqueueActorMessagesHttpDsl = new EnqueueActorMessagesHttpDsl(ediDriver);
+        _enqueueActorMessages = new EnqueueActorMessagesHttpDsl(ediDriver);
     }
 
     [Fact]
-    public async Task Actor_can_peek_messages_enqueued_via_http_endpoint()
+    public async Task Actor_can_peek_electrical_heating_messages()
     {
-        var meteringPointId = "TestMeteringPointId";
+        var meteringPointId = "1234567890123456";
 
-        await _enqueueActorMessagesHttpDsl
-            .EnqueueCalculatedMeasurementMessage(
+        await _enqueueActorMessages
+            .EnqueueElectricalHeatingMessage(
                 _receiver,
                 meteringPointId);
 
-        await _enqueueActorMessagesHttpDsl.ConfirmResponseIsAvailable(meteringPointId);
+        await _enqueueActorMessages.ConfirmResponseIsAvailable(meteringPointId);
     }
 }
