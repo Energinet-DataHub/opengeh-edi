@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.EnqueueActorMessages;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 
@@ -91,19 +92,19 @@ public static class HttpRequestExtensions
             $"api/dequeue/{messageId}");
     }
 
-    public static HttpRequestMessage CreateEnqueueCalculatedMeasurementsHttpV1Request(
+    public static HttpRequestMessage CreateEnqueueMessagesHttpRequest(
         this B2BApiAppFixture fixture,
-        EnqueueCalculatedMeasurementsHttpV1 enqueueCalculatedMeasurementsHttpV1)
+        IEnqueueDataSyncDto enqueueActorMessagesHttp)
     {
         HttpRequestMessage? request = null;
         try
         {
             request = new HttpRequestMessage(
                 HttpMethod.Post,
-                $"api/enqueue/{enqueueCalculatedMeasurementsHttpV1.Route}")
+                $"api/enqueue/{enqueueActorMessagesHttp.Route}")
             {
                 Content = new StringContent(
-                    JsonSerializer.Serialize(enqueueCalculatedMeasurementsHttpV1),
+                    JsonSerializer.Serialize(enqueueActorMessagesHttp, enqueueActorMessagesHttp.GetType()),
                     Encoding.UTF8,
                     "application/json"),
             };

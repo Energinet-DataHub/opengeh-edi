@@ -59,7 +59,6 @@ public class EnqueueBrs028MessageFactory
     {
         var actorMessageId = Guid.NewGuid().ToTestMessageUuid();
         var reject = new RequestCalculatedWholesaleServicesRejectedV1(
-            OriginalMessageId: actorMessageId,
             OriginalActorMessageId: actorMessageId,
             OriginalTransactionId: Guid.NewGuid().ToTestMessageUuid(),
             RequestedForActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
@@ -67,10 +66,10 @@ public class EnqueueBrs028MessageFactory
             RequestedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             RequestedByActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
-            ValidationErrors: new List<ValidationErrorDto>()
-            {
+            ValidationErrors:
+            [
                 new ValidationErrorDto(Message: "Test Rejection", ErrorCode: "888"),
-            });
+            ]);
 
         return CreateServiceBusMessage(reject, actor);
     }

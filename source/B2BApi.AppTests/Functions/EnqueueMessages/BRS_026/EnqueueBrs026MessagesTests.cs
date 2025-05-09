@@ -124,7 +124,6 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var orchestrationInstanceId = Guid.NewGuid().ToString();
         var originalActorMessageId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesRejectedV1(
-            OriginalMessageId: originalActorMessageId,
             OriginalActorMessageId: originalActorMessageId,
             OriginalTransactionId: Guid.NewGuid().ToString(),
             BusinessReason: businessReason.ToProcessManagerBusinessReason(),

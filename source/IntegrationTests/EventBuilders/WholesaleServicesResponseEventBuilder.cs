@@ -117,7 +117,6 @@ public static class WholesaleServicesResponseEventBuilder
                 errorCode),
         };
         var rejectRequest = new RequestCalculatedWholesaleServicesRejectedV1(
-            OriginalMessageId: requestCalculatedWholesaleServicesInputV1.ActorMessageId,
             OriginalActorMessageId: requestCalculatedWholesaleServicesInputV1.ActorMessageId,
             OriginalTransactionId: requestCalculatedWholesaleServicesInputV1.TransactionId,
             RequestedForActorNumber: PMActorNumber.Create(requestCalculatedWholesaleServicesInputV1.RequestedForActorNumber),

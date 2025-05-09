@@ -13,36 +13,36 @@
 // limitations under the License.
 
 using System.Net;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_045;
 
-public class EnqueueTrigger_Brs_021_CalculatedMeasurements(
-    ILogger<EnqueueTrigger_Brs_021_CalculatedMeasurements> logger,
-    EnqueueHandler_Brs_021_CalculatedMeasurements_V1 handler)
+public class EnqueueTrigger_Brs_045_MissingMeasurementsLog(
+    ILogger<EnqueueTrigger_Brs_045_MissingMeasurementsLog> logger,
+    EnqueueHandler_Brs_045_MissingMeasurementsLog enqueueHandler)
 {
-    private readonly ILogger<EnqueueTrigger_Brs_021_CalculatedMeasurements> _logger = logger;
-    private readonly EnqueueHandler_Brs_021_CalculatedMeasurements_V1 _handler = handler;
+    private readonly ILogger<EnqueueTrigger_Brs_045_MissingMeasurementsLog> _logger = logger;
+    private readonly EnqueueHandler_Brs_045_MissingMeasurementsLog _enqueueHandler = enqueueHandler;
 
     [Authorize]
-    [Function(nameof(EnqueueTrigger_Brs_021_CalculatedMeasurements))]
+    [Function(nameof(EnqueueTrigger_Brs_045_MissingMeasurementsLog))]
     public async Task<HttpResponseData> RunAsync(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
             "post",
-            Route = $"enqueue/{EnqueueCalculatedMeasurementsHttpV1.RouteName}")]
+            Route = $"enqueue/{EnqueueMissingMeasurementsLogHttpV1.RouteName}")]
         HttpRequestData request,
-        [FromBody] EnqueueCalculatedMeasurementsHttpV1 measurements,
+        [FromBody] EnqueueMissingMeasurementsLogHttpV1 missingMeasurementsLog,
         FunctionContext executionContext,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation("BRS-021 enqueue request for calculated measurements received");
+        _logger.LogInformation("BRS-045 enqueue missing measurements log received");
 
-        await _handler.HandleAsync(measurements, cancellationToken).ConfigureAwait(false);
+        await _enqueueHandler.HandleAsync(missingMeasurementsLog, cancellationToken).ConfigureAwait(false);
 
         return request.CreateResponse(HttpStatusCode.OK);
     }
