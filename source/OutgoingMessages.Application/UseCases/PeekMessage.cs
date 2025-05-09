@@ -77,7 +77,7 @@ public class PeekMessage
         ArgumentNullException.ThrowIfNull(request);
 
         // Prevent peek for measurement data messages if peeking measurement data is not enabled
-        if (request.MessageCategory == MessageCategory.MeasureData && !await _featureManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
+        if (request.MessageCategory == MessageCategory.MeasureData && !await _featureManager.UsePeekMeasurementsMessagesAsync().ConfigureAwait(false))
         {
             return null;
         }
@@ -85,7 +85,7 @@ public class PeekMessage
         // Since Ebix does not support message categories, we set the category to Aggregations
         // if peeking measurement data is not enabled, which skips all measurement data messages.
         if (request.DocumentFormat == DocumentFormat.Ebix
-            && !await _featureManager.UsePeekForwardMeteredDataMessagesAsync().ConfigureAwait(false))
+            && !await _featureManager.UsePeekMeasurementsMessagesAsync().ConfigureAwait(false))
         {
             request = request with { MessageCategory = MessageCategory.Aggregations };
         }

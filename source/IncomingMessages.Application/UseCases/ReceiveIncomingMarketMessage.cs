@@ -39,7 +39,6 @@ public class ReceiveIncomingMarketMessage
     private readonly DelegateIncomingMessage _delegateIncomingMessage;
     private readonly IClock _clock;
     private readonly AuthenticatedActor _actorAuthenticator;
-    private readonly IFeatureManager _featureManager;
 
     public ReceiveIncomingMarketMessage(
         IEnumerable<IMessageParser> messageParsers,
@@ -50,8 +49,7 @@ public class ReceiveIncomingMarketMessage
         IIncomingMessageReceiver incomingMessageReceiver,
         DelegateIncomingMessage delegateIncomingMessage,
         IClock clock,
-        AuthenticatedActor actorAuthenticator,
-        IFeatureManager featureManager)
+        AuthenticatedActor actorAuthenticator)
     {
         _messageParsers = messageParsers
             .ToDictionary(
@@ -65,7 +63,6 @@ public class ReceiveIncomingMarketMessage
         _delegateIncomingMessage = delegateIncomingMessage;
         _clock = clock;
         _actorAuthenticator = actorAuthenticator;
-        _featureManager = featureManager;
     }
 
     public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(

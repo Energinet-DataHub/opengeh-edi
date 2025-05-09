@@ -52,7 +52,7 @@ public static class FeatureManagerExtensions
     /// <summary>
     /// Whether to disallow actors to peek time series messages.
     /// </summary>
-    public static Task<bool> UsePeekForwardMeteredDataMessagesAsync(this IFeatureManager featureManager)
+    public static Task<bool> UsePeekMeasurementsMessagesAsync(this IFeatureManager featureManager)
     {
         return featureManager.IsEnabledAsync(FeatureFlagNames.PeekMeasurementMessages);
     }
