@@ -71,7 +71,7 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlagName.Brs021PeekMessages, true),
+            new(FeatureFlagName.PeekMeasurementMessages, true),
             new(FeatureFlagName.PM25CIM, true),
         ]);
 
