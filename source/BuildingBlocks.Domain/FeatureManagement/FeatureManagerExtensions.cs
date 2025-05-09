@@ -18,6 +18,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 
 /// <summary>
 /// Extensions for reading feature flags in EDI.
+/// The extension methods allows us to create an abstraction from the feature flag names,
+/// explaining the meaning of the feature flag in EDI. This is especially relevant for
+/// "Produkt Mål's" feature flags, as they might be used in multiple subsystem, but
+/// mean something different in each subsystem.
 /// </summary>
 public static class FeatureManagerExtensions
 {
