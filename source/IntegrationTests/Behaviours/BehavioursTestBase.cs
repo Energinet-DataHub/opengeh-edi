@@ -413,7 +413,7 @@ public class BehavioursTestBase : IDisposable
                 {
                     // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
-                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{IncomingMessagesOptions.SectionName}:{nameof(IncomingMessagesOptions.QueueName)}"] = MockServiceBusName,
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] = "NotEmpty",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] = "NotEmpty",
 
