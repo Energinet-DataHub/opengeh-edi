@@ -16,17 +16,16 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
-using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
 public class RequestProcessOrchestrationStarter(
-    IProcessManagerMessageClient processManagerMessageClient,
+    IProcessManagerMessageClientFactory processManagerMessageClientFactory,
     AuthenticatedActor authenticatedActor) : IRequestProcessOrchestrationStarter
 {
-    private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
+    private readonly IProcessManagerMessageClientFactory _processManagerMessageClientFactory = processManagerMessageClientFactory;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
     public async Task StartRequestWholesaleServicesOrchestrationAsync(
@@ -34,6 +33,7 @@ public class RequestProcessOrchestrationStarter(
         CancellationToken cancellationToken)
     {
         var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
+        var processManagerMessageClient = _processManagerMessageClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -80,7 +80,7 @@ public class RequestProcessOrchestrationStarter(
                 idempotencyKey: CreateIdempotencyKey(transaction.Id, transaction.RequestedByActor));
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
-            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            var startProcessTask = processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
             startProcessTasks.Add(startProcessTask);
         }
 
@@ -92,6 +92,7 @@ public class RequestProcessOrchestrationStarter(
         CancellationToken cancellationToken)
     {
         var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
+        var processManagerMessageClient = _processManagerMessageClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
 
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
@@ -129,7 +130,7 @@ public class RequestProcessOrchestrationStarter(
                 idempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.RequestedByActor));
 
             // TODO: Handle resiliency. Could use something like Polly to retry if failing?
-            var startProcessTask = _processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            var startProcessTask = processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
             startProcessTasks.Add(startProcessTask);
         }
 

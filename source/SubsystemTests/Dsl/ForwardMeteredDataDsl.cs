@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
@@ -74,7 +75,7 @@ internal sealed class ForwardMeteredDataDsl(
             actor: actor,
             start: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
             end: Instant.FromUtc(2025, 01, 31, 23, 00, 00),
-            originalActorMessageId: Guid.NewGuid().ToString(),
+            originalActorMessageId: Guid.NewGuid().ToTestMessageUuid(),
             eventId: Guid.NewGuid());
     }
 
@@ -99,7 +100,7 @@ internal sealed class ForwardMeteredDataDsl(
         await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
         await _processManagerDriver.PublishBrs021ForwardMeteredDataRejectedAsync(
             actor: actor,
-            originalActorMessageId: Guid.NewGuid().ToString(),
+            originalActorMessageId: Guid.NewGuid().ToTestMessageUuid(),
             eventId: Guid.NewGuid(),
             validationError: SubsystemTestValidationError,
             meteringPointId: meteringPointId);

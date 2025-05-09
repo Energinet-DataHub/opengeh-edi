@@ -239,7 +239,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         await ServiceBusResourceProvider
             .BuildQueue("incoming-messages")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
+                .Add($"{IncomingMessagesOptions.SectionName}__{nameof(IncomingMessagesOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (incoming-messages)");
 

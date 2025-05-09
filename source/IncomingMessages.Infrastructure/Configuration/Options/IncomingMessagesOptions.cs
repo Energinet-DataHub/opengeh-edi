@@ -16,10 +16,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 
-public class IncomingMessagesQueueOptions
+public class IncomingMessagesOptions
 {
     public const string SectionName = "IncomingMessages";
 
     [Required]
     public string QueueName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Allow using mock dependencies for tests. This is used by our subsystem tests, to avoid polluting other subsystems,
+    /// and thus must only be enabled in environments where subsystem tests are executed.
+    /// </summary>
+    [Required]
+    public bool AllowMockDependenciesForTests { get; set; } = false;
 }

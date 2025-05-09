@@ -90,7 +90,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
         await _archivedMessages.ConfirmArchivedMessageSearchAuditLogExistsForMessageId(messageId, createdAfter);
     }
 
-    [Fact(Skip = "The outgoing message created from this test is interfering with other subsystem tests.")]
+    [Fact]
     public async Task B2C_actor_can_get_the_send_forward_metering_point_archived_message()
     {
         var meteringPointId = MeteringPointId.From("9999999999");
