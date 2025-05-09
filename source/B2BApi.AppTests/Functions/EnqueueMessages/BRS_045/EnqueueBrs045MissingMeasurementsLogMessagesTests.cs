@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
-using System.Net;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
@@ -22,7 +20,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -30,10 +27,6 @@ using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
-using MeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
-using Quality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
-using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Resolution;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_045;
 
