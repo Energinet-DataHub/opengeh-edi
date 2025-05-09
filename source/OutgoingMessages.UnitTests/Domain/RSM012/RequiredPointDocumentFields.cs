@@ -12,17 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
-
-public record ExampleEnergyResultMessageForActor(
-    string GridArea,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+public readonly record struct RequiredPointDocumentFields(int Position);

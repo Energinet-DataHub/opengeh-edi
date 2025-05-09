@@ -12,17 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.NotifyWholesaleServices;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
+public enum CodeListType
+{
+    /// <summary>
+    /// Codes that is a valid number is typically from UN/CEFACT (6, 9 etc.)
+    /// </summary>
+    UnitedNations,
 
-public record ExampleEnergyResultMessageForActor(
-    string GridArea,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+    /// <summary>
+    /// ebIX codes that doesn't start with D (E03 etc.)
+    /// </summary>
+    Ebix,
+
+    /// <summary>
+    /// ebIX codes that start with D is typically danish (D01, D05 etc.)
+    /// </summary>
+    EbixDenmark,
+}
+
+public enum ActorNumberType
+{
+    Gln,
+    Eic,
+}

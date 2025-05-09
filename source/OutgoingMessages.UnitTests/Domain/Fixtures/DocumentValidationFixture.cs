@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.DocumentValidation;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Cim.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Ebix;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Fixtures;
 
-public record ExampleEnergyResultMessageForActor(
-    string GridArea,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+public class DocumentValidationFixture
+{
+    public DocumentValidator Validator { get; } = new(new[]
+    {
+        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())) as IValidator,
+        new EbixValidator(new EbixSchemaProvider()) as IValidator,
+    });
+}

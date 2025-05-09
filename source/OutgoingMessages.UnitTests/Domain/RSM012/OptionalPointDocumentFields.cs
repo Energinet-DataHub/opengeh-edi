@@ -13,16 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 
-public record ExampleEnergyResultMessageForActor(
-    string GridArea,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+public sealed record OptionalPointDocumentFields(Quality? Quality, decimal? Quantity)
+{
+    public static OptionalPointDocumentFields NoOptionalFields() => new(null, null);
+}

@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
+/// <summary>
+/// bla
+/// </summary>
+public interface ISchema
+{
+    /// <summary>
+    /// bla
+    /// </summary>
+    string SchemaPath { get; }
 
-public record ExampleEnergyResultMessageForActor(
-    string GridArea,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+    /// <summary>
+    /// bla
+    /// </summary>
+    /// <param name="businessProcessType"></param>
+    /// <param name="version"></param>
+    /// <returns><see cref="string"/></returns>
+    string? GetSchemaLocation(string businessProcessType, string version);
+}

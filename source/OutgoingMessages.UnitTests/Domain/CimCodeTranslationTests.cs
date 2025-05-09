@@ -13,16 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.TestData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain;
 
-public record ExampleEnergyResultMessageForActor(
-    string GridArea,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    ActorNumber? BalanceResponsible,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
+public class CimCodeTests
+{
+    [Theory]
+    [InlineData("1234567890123", "A10")]
+    [InlineData("1234567890123456", "A01")]
+    public void Translate_actor_number_coding_scheme(string actorNumber, string expectedCode)
+    {
+        Assert.Equal(expectedCode, CimCode.CodingSchemeOf(ActorNumber.Create(actorNumber)));
+    }
+}
