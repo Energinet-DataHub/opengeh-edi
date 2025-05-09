@@ -33,10 +33,15 @@ public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
         var ediDriver = new EdiDriver(
             fixture.DurableClient,
             fixture.B2BClients.EnergySupplier,
-            output,
-            fixture.SubsystemHttpClient);
+            output);
 
-        _enqueueActorMessages = new EnqueueActorMessagesHttpDsl(ediDriver);
+        var subsystemHttpDriver = new SubsystemDriver(
+            fixture.SubsystemHttpClient,
+            output);
+
+        _enqueueActorMessages = new EnqueueActorMessagesHttpDsl(
+            ediDriver,
+            subsystemHttpDriver);
     }
 
     [Fact]
@@ -49,6 +54,6 @@ public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
                 _receiver,
                 meteringPointId);
 
-        await _enqueueActorMessages.ConfirmResponseIsAvailable(meteringPointId);
+        await _enqueueActorMessages.ConfirmMessageIsAvailable(meteringPointId);
     }
 }

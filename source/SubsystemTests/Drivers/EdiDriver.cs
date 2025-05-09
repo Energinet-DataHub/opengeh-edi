@@ -16,14 +16,12 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 using Energinet.DataHub.EDI.SubsystemTests.Logging;
-using Energinet.DataHub.ProcessManager.Components.Abstractions.EnqueueActorMessages;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Nito.AsyncEx;
 using NodaTime;
@@ -35,18 +33,15 @@ internal sealed class EdiDriver
 {
     private readonly IDurableClient _durableClient;
     private readonly AsyncLazy<HttpClient> _b2BHttpClient;
-    private readonly AsyncLazy<HttpClient>? _subsystemHttpClient;
     private readonly ITestOutputHelper _logger;
 
     public EdiDriver(
         IDurableClient durableClient,
         AsyncLazy<HttpClient> b2BHttpClient,
-        ITestOutputHelper logger,
-        AsyncLazy<HttpClient>? subsystemHttpClient = null)
+        ITestOutputHelper logger)
     {
         _durableClient = durableClient;
         _b2BHttpClient = b2BHttpClient;
-        _subsystemHttpClient = subsystemHttpClient;
         _logger = logger;
     }
 
@@ -208,21 +203,6 @@ internal sealed class EdiDriver
     internal async Task WaitForOrchestrationCompletedAsync(string orchestrationInstanceId)
     {
         await _durableClient.WaitForOrchestrationCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
-    }
-
-    internal async Task EnqueueActorMessagesViaHttpAsync(IEnqueueDataSyncDto data)
-    {
-        if (_subsystemHttpClient == null)
-            throw new InvalidOperationException("SubsystemHttpClient is not initialized.");
-
-        var json = JsonSerializer.Serialize(data, data.GetType());
-        var httpClient = await _subsystemHttpClient;
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/enqueue/" + data.Route);
-        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        var response = await httpClient.SendAsync(request);
-        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
     }
 
     private async Task<(string MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(

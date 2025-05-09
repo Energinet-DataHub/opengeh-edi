@@ -16,7 +16,6 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
-using FluentAssertions;
 using NodaTime;
 using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
 using MeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
@@ -32,10 +31,14 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 internal class EnqueueActorMessagesHttpDsl
 {
     private readonly EdiDriver _ediDriver;
+    private readonly SubsystemDriver _subsystemDriver;
 
-    public EnqueueActorMessagesHttpDsl(EdiDriver ediDriver)
+    public EnqueueActorMessagesHttpDsl(
+        EdiDriver ediDriver,
+        SubsystemDriver subsystemDriver)
     {
         _ediDriver = ediDriver;
+        _subsystemDriver = subsystemDriver;
     }
 
     internal async Task EnqueueElectricalHeatingMessage(Actor receiver, string meteringPointId)
@@ -71,49 +74,40 @@ internal class EnqueueActorMessagesHttpDsl
             MeasureUnit: MeasurementUnit.KilowattHour,
             Data: new[] { receiversWithMeasurements });
 
-        await _ediDriver.EnqueueActorMessagesViaHttpAsync(message);
+        await _subsystemDriver.EnqueueActorMessagesViaHttpAsync(message);
     }
 
-    internal async Task ConfirmResponseIsAvailable(string meteringPointId)
+    internal async Task ConfirmMessageIsAvailable(string meteringPointId)
     {
         var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
 
-        var numberOfRetries = 2;
-        var foundExpectedMessage = false;
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
+            documentFormat: DocumentFormat.Json,
+            messageCategory: MessageCategory.MeasureData,
+            timeout: timeout);
 
-        // TODO: Delete this loop
-        for (var i = 0; i < numberOfRetries; i++)
-        {
-            var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
-                documentFormat: DocumentFormat.Json,
-                messageCategory: MessageCategory.MeasureData,
-                timeout: timeout);
+        var contentString = await peekResponse.Content.ReadAsStringAsync();
 
-            var contentString = await peekResponse.Content.ReadAsStringAsync();
-
-            if (IsCorrectDocumentType(contentString) && IsExpectedMeteringPointType(contentString, meteringPointId))
-            {
-                foundExpectedMessage = true;
-                break;
-            }
-        }
-
-        foundExpectedMessage.Should().BeTrue($"because we expected to peek the expected message within {numberOfRetries} retries");
+        AssertDocumentType(contentString);
+        AssertMeteringPointId(contentString, meteringPointId);
     }
 
-    private bool IsCorrectDocumentType(string content)
+    private void AssertDocumentType(string content)
     {
-        return content.Contains("NotifyValidatedMeasureData_MarketDocument") == true;
+        Assert.Contains(
+            content,
+            "NotifyValidatedMeasureData_MarketDocument");
     }
 
-    private bool IsExpectedMeteringPointType(string content, string meteringPointId)
+    private void AssertMeteringPointId(string content, string meteringPointId)
     {
-        var expectedMeteringPointFormated = string.Empty
-                                            + "        \"marketEvaluationPoint.mRID\": {\r\n"
-                                            + "          \"codingScheme\": \"A10\",\r\n"
-                                            + $"          \"value\": \"{meteringPointId}\"\r\n"
-                                            + "        },";
-
-        return content.Contains(expectedMeteringPointFormated) == true;
+        var expectedMeteringPointIdFormatted = string.Empty
+                                              + "        \"marketEvaluationPoint.mRID\": {\r\n"
+                                              + "          \"codingScheme\": \"A10\",\r\n"
+                                              + $"          \"value\": \"{meteringPointId}\"\r\n"
+                                              + "        },";
+        Assert.Contains(
+            content,
+            expectedMeteringPointIdFormatted);
     }
 }
