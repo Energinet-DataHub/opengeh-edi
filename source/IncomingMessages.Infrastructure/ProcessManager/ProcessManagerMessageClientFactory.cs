@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 /// Create process manager clients. Can return a mock client if
 /// <see cref="IncomingMessagesOptions.AllowMockDependenciesForTests"/> is true.
 /// </summary>
-public class ProcessManagerMessageClientFactory(
+internal class ProcessManagerMessageClientFactory(
     IOptions<IncomingMessagesOptions> options,
     IProcessManagerMessageClient processManagerMessageClient) : IProcessManagerMessageClientFactory
 {
