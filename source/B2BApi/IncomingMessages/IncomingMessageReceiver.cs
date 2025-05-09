@@ -18,13 +18,14 @@ using System.Text;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.B2BApi.IncomingMessages;
 
@@ -32,19 +33,19 @@ public class IncomingMessageReceiver
 {
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly IAuditLogger _auditLogger;
-    private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly IFeatureManager _featureManager;
     private readonly ILogger<IncomingMessageReceiver> _logger;
 
     public IncomingMessageReceiver(
         ILogger<IncomingMessageReceiver> logger,
         IIncomingMessageClient incomingMessageClient,
         IAuditLogger auditLogger,
-        IFeatureFlagManager featureFlagManager)
+        IFeatureManager featureManager)
     {
         _logger = logger;
         _incomingMessageClient = incomingMessageClient;
         _auditLogger = auditLogger;
-        _featureFlagManager = featureFlagManager;
+        _featureManager = featureManager;
     }
 
     [Function(nameof(IncomingMessageReceiver))]
@@ -61,7 +62,7 @@ public class IncomingMessageReceiver
 
         if (incomingDocumentTypeName != null &&
             incomingDocumentTypeName.Equals(IncomingDocumentType.NotifyValidatedMeasureData.Name, StringComparison.OrdinalIgnoreCase)
-            && !await _featureFlagManager.ReceiveForwardMeteredDataInCimAsync().ConfigureAwait(false))
+            && !await _featureManager.ReceiveForwardMeteredDataInCimAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request
