@@ -489,15 +489,15 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{FeatureFlags.Names.SectionName}__{FeatureFlags.Names.UsePeekMessages}",
+            $"{FeatureFlagNames.SectionName}__{FeatureFlagNames.UsePeekMessages}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{FeatureFlags.Names.SectionName}__{FeatureFlags.Names.PM25CIM}",
+            $"{FeatureFlagNames.SectionName}__{FeatureFlagNames.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{FeatureFlags.Names.SectionName}__{FeatureFlags.Names.PM25Ebix}",
+            $"{FeatureFlagNames.SectionName}__{FeatureFlagNames.PM25Ebix}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(

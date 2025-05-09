@@ -26,10 +26,10 @@ public class FeatureManagerStub : IFeatureManager
 {
     private readonly Dictionary<string, bool> _featureFlagDictionary = new()
     {
-        { FeatureFlags.Names.UsePeekMessages, true },
-        { FeatureFlags.Names.PM25CIM, true },
-        { FeatureFlags.Names.PM25Ebix, true },
-        { FeatureFlags.Names.Brs021PeekMessages, true },
+        { FeatureFlagNames.UsePeekMessages, true },
+        { FeatureFlagNames.PM25CIM, true },
+        { FeatureFlagNames.PM25Ebix, true },
+        { FeatureFlagNames.Brs021PeekMessages, true },
     };
 
     public void SetFeatureFlag(string featureFlagName, bool value)

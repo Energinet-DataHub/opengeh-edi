@@ -87,8 +87,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlags.Names.Brs021PeekMessages, true),
-            new(FeatureFlags.Names.PM25CIM, true),
+            new(FeatureFlagNames.Brs021PeekMessages, true),
+            new(FeatureFlagNames.PM25CIM, true),
         ]);
 
         // Arrange
@@ -244,8 +244,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlags.Names.Brs021PeekMessages, true),
-            new(FeatureFlags.Names.PM25CIM, true),
+            new(FeatureFlagNames.Brs021PeekMessages, true),
+            new(FeatureFlagNames.PM25CIM, true),
         ]);
 
         // Arrange

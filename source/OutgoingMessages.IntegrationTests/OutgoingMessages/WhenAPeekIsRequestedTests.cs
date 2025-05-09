@@ -367,7 +367,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     public async Task Given_EnqueuedRsm012_AndGiven_DisallowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsNothing(DocumentFormat documentFormat)
     {
         // Arrange / Given
-        FeatureManagerStub.SetFeatureFlag(FeatureFlags.Names.Brs021PeekMessages, false);
+        FeatureManagerStub.SetFeatureFlag(FeatureFlagNames.Brs021PeekMessages, false);
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()
@@ -396,7 +396,7 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     public async Task Given_EnqueuedRsm012_AndGiven_AllowedPeekingRsm012_When_MessagesArePeekedInAnyFormat_Then_PeekReturnsDocument(DocumentFormat documentFormat)
     {
         // Arrange / Given
-        FeatureManagerStub.SetFeatureFlag(FeatureFlags.Names.Brs021PeekMessages, true);
+        FeatureManagerStub.SetFeatureFlag(FeatureFlagNames.Brs021PeekMessages, true);
 
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var bundledMessage = new AcceptedForwardMeteredDataMessageDtoBuilder()
