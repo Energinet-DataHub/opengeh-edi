@@ -17,6 +17,9 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 
+// TODO: The process manager contract has a list of dates with a metering point
+// The schema for RSM-018 has a list of metering points for a date.
+// How do we solve this?
 public sealed record MissingMeasurementSeries(
     TransactionId TransactionId,
     IReadOnlyCollection<MeteringPointId> MeteringPointIds,

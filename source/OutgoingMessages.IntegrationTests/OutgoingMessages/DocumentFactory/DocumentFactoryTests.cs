@@ -25,6 +25,11 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
+    private readonly IEnumerable<DocumentType> _unSupportedDocumentTypes = new[]
+    {
+        DocumentType.ReminderOfMissingMeasureData,
+    };
+
     public DocumentFactoryTests(OutgoingMessagesTestFixture outgoingMessagesTestFixture, ITestOutputHelper testOutputHelper)
         : base(outgoingMessagesTestFixture, testOutputHelper)
     {
@@ -47,31 +52,52 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetOutgoingDocumentTypes))]
-    public void Ensure_that_all_document_support_xml(DocumentType documentType)
+    public void Xml_supports_all_document_types(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
-        writer.Should().NotBeNull();
+        if (_unSupportedDocumentTypes.Contains(documentType))
+        {
+            writer.Should().BeNull();
+        }
+        else
+        {
+            writer.Should().NotBeNull();
+        }
     }
 
     [Theory]
     [MemberData(nameof(GetOutgoingDocumentTypes))]
-    public void Ensure_that_all_document_support_json(DocumentType documentType)
+    public void Json_supports_all_document_types(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
 
-        writer.Should().NotBeNull();
+        if (_unSupportedDocumentTypes.Contains(documentType))
+        {
+            writer.Should().BeNull();
+        }
+        else
+        {
+            writer.Should().NotBeNull();
+        }
     }
 
     [Theory]
     [MemberData(nameof(GetOutgoingDocumentTypes))]
-    public void Ensure_that_all_document_support_ebix(DocumentType documentType)
+    public void Ebix_supports_all_document_types(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));
 
-        writer.Should().NotBeNull();
+        if (_unSupportedDocumentTypes.Contains(documentType))
+        {
+            writer.Should().BeNull();
+        }
+        else
+        {
+            writer.Should().NotBeNull();
+        }
     }
 }
