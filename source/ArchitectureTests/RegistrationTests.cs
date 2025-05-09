@@ -55,7 +55,7 @@ public class RegistrationTests
 
     public RegistrationTests()
     {
-        Environment.SetEnvironmentVariable($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", "FakeQueueNameIncoming");
+        Environment.SetEnvironmentVariable($"{IncomingMessagesOptions.SectionName}__{nameof(IncomingMessagesOptions.QueueName)}", "FakeQueueNameIncoming");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
         // The following declaration slows down the test execution, since creating a new Uri is a heavy operation
         Environment.SetEnvironmentVariable(

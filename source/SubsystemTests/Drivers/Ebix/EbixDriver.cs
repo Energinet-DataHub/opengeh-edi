@@ -18,22 +18,23 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Security;
 using System.Xml;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Extensions;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 
 internal sealed class EbixDriver : IDisposable
 {
-    private readonly ITestOutputHelper _output;
+    private readonly ITestOutputHelper _logger;
     private readonly marketMessagingB2BServiceV01PortTypeClient _ebixServiceClient;
     private readonly X509Certificate2? _certificate;
     private readonly HttpClient _unauthorizedHttpClient;
     private readonly HttpClient _httpClientWithCertificate;
     private readonly HttpClientHandler _certificateHttpClientHandler;
 
-    public EbixDriver(Uri dataHubUrlEbixUrl, EbixCredentials ebixCredentials, ITestOutputHelper output)
+    public EbixDriver(Uri dataHubUrlEbixUrl, EbixCredentials ebixCredentials, ITestOutputHelper logger)
     {
-        _output = output;
+        _logger = logger;
         // Create a binding using Transport and a certificate.
         var binding = new BasicHttpBinding
         {
@@ -130,11 +131,11 @@ internal sealed class EbixDriver : IDisposable
                 messageSecurityException.Message.Contains("The HTTP request is unauthorized"))
             {
                 // This is a "known" exception, no need to write it to the test output as if it was an unexpected exception.
-                _output.WriteLine("Dequeue ebIX request failed with unauthorized exception.");
+                _logger.WriteLine("Dequeue ebIX request failed with unauthorized exception.");
             }
             else
             {
-                _output.WriteLine("Encountered unknown CommunicationException while dequeuing. The exception was:\n{0}", e);
+                _logger.WriteLine("Encountered unknown CommunicationException while dequeuing. The exception was:\n{0}", e);
             }
 
             throw;
@@ -167,7 +168,7 @@ internal sealed class EbixDriver : IDisposable
 
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
-        var messageId = Guid.NewGuid().ToString("N");
+        var messageId = Guid.NewGuid().ToTestMessageUuid();
         var requestContent = await GetMeteredDataForMeteringPointRequestContentAsync(messageId, cancellationToken).ConfigureAwait(false);
         var requestXml = new XmlDocument();
         requestXml.LoadXml(requestContent);
@@ -178,6 +179,8 @@ internal sealed class EbixDriver : IDisposable
             MessageType = MessageType_Type.XML,
             Payload = requestXml.DocumentElement,
         };
+
+        _logger.WriteLine("Sending ForwardMeteredData ebIX HTTP request with messageId: {0}", messageId);
         var response = await _ebixServiceClient.sendMessageAsync(message);
 
         return response.MessageId;
@@ -204,6 +207,7 @@ internal sealed class EbixDriver : IDisposable
 
         try
         {
+            _logger.WriteLine("Sending ForwardMeteredData HTTP request with messageId: {0}", existingMessageId);
             var response = await _ebixServiceClient.sendMessageAsync(message);
             return response.MessageId;
         }
@@ -272,11 +276,18 @@ internal sealed class EbixDriver : IDisposable
 
     private async Task<string> GetMeteredDataForMeteringPointRequestContentAsync(string messageId, CancellationToken cancellationToken)
     {
+        var transactionId = Guid.NewGuid().ToTestMessageUuid();
+
         var content = await File.ReadAllTextAsync("Messages/ebix/MeteredDataForMeteringPoint.xml", cancellationToken)
             .ConfigureAwait(false);
 
         content = content.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
-        content = content.Replace("{TransactionId}", Guid.NewGuid().ToString("N"), StringComparison.InvariantCulture);
+        content = content.Replace("{TransactionId}", transactionId, StringComparison.InvariantCulture);
+
+        _logger.WriteLine(
+            "Creating ForwardMeteredData ebIX message with MessageId={0}, TransactionId={1}",
+            messageId,
+            transactionId);
 
         return content;
     }

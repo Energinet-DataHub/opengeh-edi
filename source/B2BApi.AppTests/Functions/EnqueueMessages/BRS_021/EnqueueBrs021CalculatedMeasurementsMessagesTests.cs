@@ -79,7 +79,7 @@ public class EnqueueBrs021CalculatedMeasurementsMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlagName.Brs021PeekMessages, true),
+            new(FeatureFlagName.PeekMeasurementMessages, true),
             new(FeatureFlagName.PM25CIM, true),
         ]);
 
