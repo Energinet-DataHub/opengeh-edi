@@ -63,7 +63,7 @@ public static class FeatureFlags
     ///  * In Azure App Configuration
     ///
     /// If configured locally the name of a feature flag configuration
-    /// must be prefixed with "FeatureManagement__",
+    /// must be prefixed with <see cref="Names.SectionName"/>,
     /// ie. "FeatureManagement__UsePeekMessages".
     /// </summary>
     /// <remarks>
@@ -72,6 +72,11 @@ public static class FeatureFlags
     /// </remarks>
     public static class Names
     {
+        /// <summary>
+        /// Configuration section name when configuring feature flags as App Settings.
+        /// </summary>
+        public const string SectionName = "FeatureManagement";
+
         /// <summary>
         /// Whether to disable peek messages.
         /// </summary>
