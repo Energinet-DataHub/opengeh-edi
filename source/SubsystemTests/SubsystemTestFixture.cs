@@ -69,7 +69,7 @@ public class SubsystemTestFixture : IAsyncLifetime
     public SubsystemTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("subsystemtests.dev001.settings.json", true)
+            .AddJsonFile("subsystemtests.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
@@ -338,6 +338,8 @@ public class SubsystemTestFixture : IAsyncLifetime
             {
                 var httpClient = new HttpClient();
 
+                // /.default must be added when running in the CD, else we get the following error: "Client credential flows
+                // must have a scope value with /.default suffixed to the resource identifier (application ID URI)"
                 var token = (await credential.GetTokenAsync(
                     new TokenRequestContext([EdiApplicationId + "/.default"]),
                     CancellationToken.None)).Token;
