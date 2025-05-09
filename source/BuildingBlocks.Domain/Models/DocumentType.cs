@@ -27,6 +27,8 @@ public class DocumentType : EnumerationType
     public static readonly DocumentType NotifyValidatedMeasureData = new(nameof(NotifyValidatedMeasureData), MessageCategory.MeasureData, 7);
     public static readonly DocumentType Acknowledgement = new(nameof(Acknowledgement), MessageCategory.MeasureData, 8);
 
+    public static readonly DocumentType ReminderOfMissingMeasureData = new(nameof(ReminderOfMissingMeasureData), MessageCategory.MeasureData, 9);
+
     /// <summary>
     /// Represents the document type in the Edi system.
     /// </summary>
