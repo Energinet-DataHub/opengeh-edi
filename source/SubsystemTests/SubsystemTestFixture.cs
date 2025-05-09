@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using Azure.Core;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.DurableFunctionApp.TestCommon.DurableTask;
@@ -68,7 +69,7 @@ public class SubsystemTestFixture : IAsyncLifetime
     public SubsystemTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("subsystemtests.dev001.settings.json", true)
+            .AddJsonFile("subsystemtests.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
@@ -158,6 +159,15 @@ public class SubsystemTestFixture : IAsyncLifetime
             "MARKET_PARTICIPANT_URI",
             defaultValue: "https://app-webapi-markpart-u-001.azurewebsites.net"));
 
+        EdiFunctionAppBaseUrl = new Uri(
+            GetConfigurationValue<string>(
+                root,
+                "func-edi-api-base-url"));
+
+        EdiApplicationIdUri = GetConfigurationValue<string>(
+            root,
+            "edi-application-id-uri");
+
         EdiB2CWebApiUri = new Uri(GetConfigurationValue<string>(root, "EDI_B2C_WEB_API_URI"));
 
         var b2cUsername = GetConfigurationValue<string>(root, "B2C_USERNAME");
@@ -174,6 +184,7 @@ public class SubsystemTestFixture : IAsyncLifetime
                 GetConfigurationValue<Guid>(root, "B2C_ENERGY_SUPPLIER_ACTOR_ID"))));
 
         var credential = new DefaultAzureCredential();
+        SubsystemHttpClient = CreateLazySubsystemHttpClient(credential);
         ServiceBusClient = new ServiceBusClient(serviceBusFullyQualifiedNamespace, credential);
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new ServiceBusSenderClient(ServiceBusClient, ediInboxQueueName);
@@ -187,6 +198,8 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal B2BClients B2BClients { get; }
 
     internal B2CClients B2CClients { get; }
+
+    internal AsyncLazy<HttpClient> SubsystemHttpClient { get; }
 
     internal EbixCredentials EbixEnergySupplierCredentials { get; }
 
@@ -210,6 +223,10 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal IDurableClient? DurableClient { get; set; }
 
     internal Uri MarketParticipantUri { get; }
+
+    internal Uri EdiFunctionAppBaseUrl { get; }
+
+    internal string EdiApplicationIdUri { get; }
 
     internal IntegrationEventPublisher EventPublisher { get; }
 
@@ -310,6 +327,25 @@ public class SubsystemTestFixture : IAsyncLifetime
                 var token = await tokenRetriever.GetB2CTokenAsync(credentials).ConfigureAwait(false);
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                return httpClient;
+            });
+    }
+
+    private AsyncLazy<HttpClient> CreateLazySubsystemHttpClient(TokenCredential credential)
+    {
+        return new AsyncLazy<HttpClient>(
+            async () =>
+            {
+                var httpClient = new HttpClient();
+
+                // /.default must be added when running in the CD, else we get the following error: "Client credential flows
+                // must have a scope value with /.default suffixed to the resource identifier (application ID URI)"
+                var token = (await credential.GetTokenAsync(
+                    new TokenRequestContext([EdiApplicationIdUri + "/.default"]),
+                    CancellationToken.None)).Token;
+
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                httpClient.BaseAddress = EdiFunctionAppBaseUrl;
                 return httpClient;
             });
     }
