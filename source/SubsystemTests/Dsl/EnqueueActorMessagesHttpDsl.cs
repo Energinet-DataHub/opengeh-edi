@@ -50,9 +50,9 @@ internal class EnqueueActorMessagesHttpDsl
 
         var receiversWithMeasurements = new EnqueueCalculatedMeasurementsHttpV1.ReceiversWithMeasurements(
             Receivers: new[] { processManagerReceiver },
-            RegistrationDateTime: start.ToDateTimeUtc(),
-            StartDateTime: start.ToDateTimeUtc(),
-            EndDateTime: start.Plus(Duration.FromMinutes(15)).ToDateTimeUtc(),
+            RegistrationDateTime: start.ToDateTimeOffset(),
+            StartDateTime: start.ToDateTimeOffset(),
+            EndDateTime: start.Plus(Duration.FromHours(1)).ToDateTimeOffset(),
             Measurements: new[]
             {
                 new EnqueueCalculatedMeasurementsHttpV1.Measurement(
@@ -66,8 +66,8 @@ internal class EnqueueActorMessagesHttpDsl
             OrchestrationInstanceId: Guid.NewGuid(),
             TransactionId: Guid.NewGuid(),
             MeteringPointId: meteringPointId,
-            MeteringPointType: MeteringPointType.Consumption,
-            Resolution: Resolution.QuarterHourly,
+            MeteringPointType: MeteringPointType.ElectricalHeating,
+            Resolution: Resolution.Hourly,
             MeasureUnit: MeasurementUnit.KilowattHour,
             Data: new[] { receiversWithMeasurements });
 

@@ -105,7 +105,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
             OrchestrationInstanceId: Guid.NewGuid(),
             TransactionId: Guid.NewGuid(),
             MeteringPointId: "1234567890123",
-            MeteringPointType: MeteringPointType.Consumption,
+            MeteringPointType: MeteringPointType.ElectricalHeating,
             Resolution: Resolution.QuarterHourly,
             MeasureUnit: MeasurementUnit.KilowattHour,
             Data:

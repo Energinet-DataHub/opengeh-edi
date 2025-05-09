@@ -220,7 +220,7 @@ internal sealed class EdiDriver
 
         var response = await httpClient.SendAsync(request);
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
