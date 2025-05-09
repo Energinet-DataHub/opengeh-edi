@@ -469,10 +469,10 @@ public class B2BApiAppFixture : IAsyncLifetime
             nameof(DatabricksSqlStatementOptions.WarehouseId),
             IntegrationTestConfiguration.DatabricksSettings.WarehouseId);
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}",
+            $"{EdiDatabricksOptions.SectionName}__{nameof(EdiDatabricksOptions.DatabaseName)}",
             EdiDatabricksSchemaManager.SchemaName);
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}",
+            $"{EdiDatabricksOptions.SectionName}__{nameof(EdiDatabricksOptions.CatalogName)}",
             DatabricksCatalogName);
 
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -489,15 +489,15 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlags.Names.UsePeekMessages}",
+            $"{FeatureFlags.Names.SectionName}__{FeatureFlags.Names.UsePeekMessages}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlags.Names.PM25CIM}",
+            $"{FeatureFlags.Names.SectionName}__{FeatureFlags.Names.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlags.Names.PM25Ebix}",
+            $"{FeatureFlags.Names.SectionName}__{FeatureFlags.Names.PM25Ebix}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -524,7 +524,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Management => Azure App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{AzureAppConfigurationOptions.SectionName}:{nameof(AzureAppConfigurationOptions.Endpoint)}",
+            $"{AzureAppConfigurationOptions.SectionName}__{nameof(AzureAppConfigurationOptions.Endpoint)}",
             IntegrationTestConfiguration.AppConfigurationEndpoint);
         appHostSettings.ProcessEnvironmentVariables.Add(
             AppConfigurationManager.DisableProviderSettingName,
