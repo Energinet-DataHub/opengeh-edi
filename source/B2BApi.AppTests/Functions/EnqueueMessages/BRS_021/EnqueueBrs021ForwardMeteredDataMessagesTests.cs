@@ -43,14 +43,14 @@ using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.Va
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
+public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
 {
     // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
     private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
 
     private readonly B2BApiAppFixture _fixture;
 
-    public EnqueueBrs21ForwardMeteredDataMessagesTests(
+    public EnqueueBrs021ForwardMeteredDataMessagesTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
