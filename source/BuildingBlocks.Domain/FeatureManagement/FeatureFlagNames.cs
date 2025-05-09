@@ -12,20 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 
 /// <summary>
-/// List of all Feature Flags that exists in the subsystem.
-/// The feature flags can be locally configured through app settings,
-/// or exist in Azure App Configuration.
-/// If configured locally the name of a feature flag configuration
-/// must be prefixed with "FeatureManagement__",
-/// ie. "FeatureManagement__UseMonthlyAmountPerChargeResultProduced".
+/// Names of Feature Flags that exists in EDI.
+///
+/// The "Feature Flags in EDI" documentation page in confluence should be kept
+/// up-to-date: https://energinet.atlassian.net/wiki/spaces/D3/pages/677412898/Feature+Flags+in+EDI
+///
+/// The feature flags can be configured:
+///  * Using App Settings (locally or in Azure)
+///  * In Azure App Configuration
+///
+/// If configured using App Settings, the name of a feature flag
+/// configuration must be prefixed with <see cref="SectionName"/>,
+/// ie. "FeatureManagement__UsePeekMessages".
 /// </summary>
-public static class FeatureFlagName
+/// <remarks>
+/// We use "const" for feature flags instead of a enum, because "Produkt Måls"
+/// feature flags contain "-" in their name.
+/// </remarks>
+public static class FeatureFlagNames
 {
     /// <summary>
-    /// Whether to disable peek messages
+    /// Configuration section name when configuring feature flags as App Settings.
+    /// </summary>
+    public const string SectionName = "FeatureManagement";
+
+    /// <summary>
+    /// Whether to disable peek messages.
     /// </summary>
     public const string UsePeekMessages = "UsePeekMessages";
 
