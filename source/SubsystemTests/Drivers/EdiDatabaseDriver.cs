@@ -186,7 +186,7 @@ internal sealed class EdiDatabaseDriver
                  JOIN Bundles b ON om.AssignedBundleId = b.Id
                  WHERE b.[DequeuedAt] IS NULL
                  AND om.[RelatedToMessageId] like 'perf_test_%'
-                 AND b.[DocumentType] = 'NotifyValidatedMeasureData'
+                 AND b.[DocumentTypeInBundle] = 'NotifyValidatedMeasureData'
                  """);
 
         return enqueuedMessagesCount;
