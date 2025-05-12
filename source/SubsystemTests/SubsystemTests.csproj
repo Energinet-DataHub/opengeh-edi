@@ -89,7 +89,7 @@
         <PackageReference Include="Energinet.DataHub.Core.DurableFunctionApp.TestCommon" Version="8.1.1" />
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="8.1.1" />
         <PackageReference Include="Energinet.DataHub.ProcessManager.Client" Version="5.0.1"/>
-        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Energinet.DataHub.ProcessManager.Orchestrations.Abstractions" Version="2.2.1" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
           <PrivateAssets>all</PrivateAssets>

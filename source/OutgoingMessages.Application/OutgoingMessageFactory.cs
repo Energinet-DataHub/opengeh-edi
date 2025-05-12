@@ -493,10 +493,10 @@ public static class OutgoingMessageFactory
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.MissingMeasurements,
             relatedToMessageId: message.RelatedToMessageId,
-            gridAreaCode: null,
+            gridAreaCode: message.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
-            periodStartedAt: null,
+            periodStartedAt: message.Series.Date,
             dataCount: 1,
             // TODO: RFG DELETE first or default: https://app.zenhub.com/workspaces/mosaic-60a6105157304f00119be86e/issues/gh/energinet-datahub/team-mosaic/747
             meteringPointId: message.Series.MeteringPointIds.FirstOrDefault());
