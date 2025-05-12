@@ -75,7 +75,7 @@ public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
     {
         await _enqueueActorMessagesForGridAccessProvider.EnqueueMissingMeasurementsMessage(_gridAccessProvider);
 
-        // TODO #751: Re-introduce when enqueue & document writer is complete
+        // TODO #751: Re-introduce when enqueue & JSON document writer is complete
         // await _enqueueActorMessagesForGridAccessProvider.ConfirmRsm018MessageIsAvailable();
     }
 }
