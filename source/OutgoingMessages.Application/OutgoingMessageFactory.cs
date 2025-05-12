@@ -498,7 +498,8 @@ public static class OutgoingMessageFactory
             calculationId: null,
             periodStartedAt: null,
             dataCount: 1,
-            meteringPointId: message.Series.MeteringPointIds);
+            // TODO: RFG DELETE first or default: https://app.zenhub.com/workspaces/mosaic-60a6105157304f00119be86e/issues/gh/energinet-datahub/team-mosaic/747
+            meteringPointId: message.Series.MeteringPointIds.FirstOrDefault());
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

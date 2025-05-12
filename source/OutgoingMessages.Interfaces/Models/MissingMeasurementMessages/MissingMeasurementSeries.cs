@@ -17,10 +17,13 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 
-// TODO: The process manager contract has a list of dates with a metering point
-// The schema for RSM-018 has a list of metering points for a date.
-// How do we solve this?
+/// <summary>
+/// Carries the data, which will result in a series element of a RSM-018 message.
+/// </summary>
+/// <param name="TransactionId">The Id which the series has</param>
+/// <param name="MeteringPointIds">A list of metering points ids, which are missing measurements for the given <paramref name="Date"/> </param>
+/// <param name="Date">The date which the <paramref name="MeteringPointIds"/> are missing measurements for</param>
 public sealed record MissingMeasurementSeries(
     TransactionId TransactionId,
-    MeteringPointId MeteringPointIds,
-    Instant? RegistrationDateTime);
+    ICollection<MeteringPointId> MeteringPointIds,
+    Instant Date);
