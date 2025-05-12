@@ -41,21 +41,26 @@ public class MetricNameGenerationTests
     [
         "NotifyAggregatedMeasureData",
         "NotifyAggregatedMeasureDataResponse",
-        "RejectRequestAggregatedMeasureData",
+        "RejectRequestAggregatedMeasureDataResponse",
         "NotifyWholesaleServices",
         "NotifyWholesaleServicesResponse",
-        "RejectRequestWholesaleSettlement",
+        "RejectRequestWholesaleSettlementResponse",
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",
-        "Acknowledgement",
+        "AcknowledgementResponse",
         "ReminderOfMissingMeasureData",
     ];
 
-    private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
+    private static readonly DocumentType[] _isAlwaysAResponse =
     [
         DocumentType.RejectRequestWholesaleSettlement,
         DocumentType.RejectRequestAggregatedMeasureData,
         DocumentType.Acknowledgement,
+    ];
+
+    private static readonly DocumentType[] _isNeverAResponse =
+    [
+        DocumentType.ReminderOfMissingMeasureData,
     ];
 
     private static readonly DocumentType[] _isDocumentTypeAnIncomingMessage =
@@ -99,19 +104,34 @@ public class MetricNameGenerationTests
                     continue;
                 }
 
-                // Most documents are logged as an outgoing message and as a response to a corresponding incoming message
-                names.Add(MetricNameMapper.MessageGenerationMetricName(
-                    documentType,
-                    documentFormat,
-                    false));
-
-                // Some documents are only logged as an outgoing message
-                if (!_isOnlyTriggeredByIncomingMessage.Contains(documentType))
+                if (_isAlwaysAResponse.Contains(documentType))
                 {
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
                         documentFormat,
                         true));
+                }
+                else if (_isNeverAResponse.Contains(documentType))
+                {
+                    names.Add(MetricNameMapper.MessageGenerationMetricName(
+                        documentType,
+                        documentFormat,
+                        false));
+                }
+                else
+                {
+                    // Some documents are generated as a response for a request and as a message from DataHub.
+                    // If the document type is a response for a request we have two instances of it in the dashboard, namely:
+                    // - {documentType}{documentFormat}
+                    // - {documentType}Response{documentFormat}
+                    names.Add(MetricNameMapper.MessageGenerationMetricName(
+                        documentType,
+                        documentFormat,
+                        true));
+                    names.Add(MetricNameMapper.MessageGenerationMetricName(
+                        documentType,
+                        documentFormat,
+                        false));
                 }
             }
         }
