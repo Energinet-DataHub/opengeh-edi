@@ -20,10 +20,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasur
 /// <summary>
 /// Carries the data, which will result in a series element of a RSM-018 message.
 /// </summary>
-/// <param name="TransactionId">The Id which the series has</param>
-/// <param name="MeteringPointIds">A list of metering points ids, which are missing measurements for the given <paramref name="Date"/> </param>
-/// <param name="Date">The date which the <paramref name="MeteringPointIds"/> are missing measurements for</param>
+/// <param name="TransactionId">The Id which the series has.</param>
+/// <param name="MeteringPointId">The metering point Id which as missing measurements on the given <paramref name="Date"/>. </param>
+/// <param name="Date">The date which the <paramref name="MeteringPointId"/> are missing measurements for.</param>
 public sealed record MissingMeasurementSeries(
     TransactionId TransactionId,
-    ICollection<MeteringPointId> MeteringPointIds,
+    MeteringPointId MeteringPointId,
     Instant Date);

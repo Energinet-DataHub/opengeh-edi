@@ -52,11 +52,11 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
             receiver: new Actor(
                 ActorNumber.Create(data.GridAccessProvider.Value),
                 ActorRole.MeteredDataResponsible),
-            businessReason: BusinessReason.MissingMeasurement,
+            businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
             gridAreaCode: data.GridArea,
             series: new MissingMeasurementSeries(
                 TransactionId: TransactionId.New(),
-                MeteringPointIds: data.MeteringPointsIds.Select(MeteringPointId.From).ToArray(),
+                MeteringPointId: MeteringPointId.From(data.MeteringPointId),
                 Date: data.Date.ToInstant()));
     }
 }

@@ -120,14 +120,14 @@ public interface IOutgoingMessagesClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue RSM-009 message.
+    /// Enqueues a RSM-009 message.
     /// </summary>
     Task<Guid> EnqueueAsync(
         RejectedSendMeasurementsMessageDto rejectedSendMeasurementsMessageDto,
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue RSM-018 message.
+    /// Enqueues a RSM-018 message.
     /// </summary>
     /// <returns>The Id for the created OutgoingMessage</returns>
     Task<Guid> EnqueueAsync(

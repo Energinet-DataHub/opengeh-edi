@@ -22,11 +22,11 @@ public sealed class BusinessReason : DataHubType<BusinessReason>
     public static readonly BusinessReason MoveIn = new(PMTypes.BusinessReason.MoveIn.Name, "E65", 1);
     public static readonly BusinessReason BalanceFixing = new(PMTypes.BusinessReason.BalanceFixing.Name, "D04", 2);
     public static readonly BusinessReason PreliminaryAggregation = new(PMTypes.BusinessReason.PreliminaryAggregation.Name, "D03", 3);
-    public static readonly BusinessReason WholesaleFixing = new(PMTypes.BusinessReason.WholesaleFixing.Name, "D05", 4); // Engrosfiksering
+    public static readonly BusinessReason WholesaleFixing = new(PMTypes.BusinessReason.WholesaleFixing.Name, "D05", 4);
     public static readonly BusinessReason Correction = new(PMTypes.BusinessReason.Correction.Name, "D32", 5);
     public static readonly BusinessReason PeriodicMetering = new(PMTypes.BusinessReason.PeriodicMetering.Name, "E23", 6);
     public static readonly BusinessReason PeriodicFlexMetering = new(PMTypes.BusinessReason.PeriodicFlexMetering.Name, "D42", 7);
-    public static readonly BusinessReason MissingMeasurement = new("FIX DET HER ", "D26", 8);
+    public static readonly BusinessReason ReminderOfMissingMeasurementLog = new(nameof(ReminderOfMissingMeasurementLog), "D26", 8);
 
     /// <summary>
     /// Represents the business reason in the Edi system.
