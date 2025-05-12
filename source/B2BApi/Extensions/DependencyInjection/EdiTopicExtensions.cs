@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_045;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -69,7 +70,8 @@ public static class EdiTopicExtensions
             .AddTransient<EnqueueHandler_Brs_026_V1>()
             .AddTransient<EnqueueHandler_Brs_028_V1>()
             .AddTransient<EnqueueHandler_Brs_021_ForwardMeteredData_V1>()
-            .AddTransient<EnqueueHandler_Brs_021_CalculatedMeasurements_V1>();
+            .AddTransient<EnqueueHandler_Brs_021_CalculatedMeasurements_V1>()
+            .AddTransient<EnqueueHandler_Brs_045_MissingMeasurementsLog>();
 
         return services;
     }

@@ -37,11 +37,11 @@ using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.Valu
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
+public class EnqueueBrs021CalculatedMeasurementsMessagesTests : IAsyncLifetime
 {
     private readonly B2BApiAppFixture _fixture;
 
-    public EnqueueBrs21CalculationMessagesTests(
+    public EnqueueBrs021CalculatedMeasurementsMessagesTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
@@ -150,7 +150,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
         // Act
         // => When message is received
-        var httpRequest = _fixture.CreateEnqueueCalculatedMeasurementsHttpV1Request(enqueueMessagesData);
+        var httpRequest = _fixture.CreateEnqueueMessagesHttpRequest(enqueueMessagesData);
 
         await _fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
 
