@@ -85,6 +85,10 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
             Date: Instant.FromUtc(2025, 05, 01, 22, 00).ToDateTimeOffset(),
             MeteringPointId: "1234567890123");
 
+        // TODO: This request will result in a dublicated key exception in the database
+        // The duplicate key value is (4eb31244-b513-4db9-badd-4c6c3e54fb9b, 1111111111111, MDR, 2025-05-01 22:00:00.0000000).
+        // Since the metering point id is the a part of the key.
+        // Have I done some mapping wrong?
         var enqueueMessagesData = new EnqueueMissingMeasurementsLogHttpV1(
             OrchestrationInstanceId: Guid.NewGuid(),
             Data:
