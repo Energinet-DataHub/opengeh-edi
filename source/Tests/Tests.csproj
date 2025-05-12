@@ -57,6 +57,7 @@ limitations under the License.
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
+      <ProjectReference Include="..\OutgoingMessages.UnitTests\OutgoingMessages.UnitTests.csproj" />
     </ItemGroup>
 
     <ItemGroup>

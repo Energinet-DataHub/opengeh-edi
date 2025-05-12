@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
 
-namespace Energinet.DataHub.EDI.Tests.Factories;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
 
 public class RejectedForwardMeteredDataMessageDtoBuilder
 {

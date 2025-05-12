@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Fixtures;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;

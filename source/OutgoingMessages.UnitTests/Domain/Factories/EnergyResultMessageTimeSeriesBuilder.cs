@@ -19,7 +19,7 @@ using NodaTime;
 using NodaTime.Text;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
-namespace Energinet.DataHub.EDI.Tests.Factories;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
 
 public class EnergyResultMessageTimeSeriesBuilder
 {

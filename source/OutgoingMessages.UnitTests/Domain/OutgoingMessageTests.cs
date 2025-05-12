@@ -25,14 +25,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectReques
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.Tests.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain;
 
 public class OutgoingMessageTests
 {
