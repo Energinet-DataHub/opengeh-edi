@@ -15,9 +15,8 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Application;
 
 public class MetricNameGenerationTests
 {
@@ -49,6 +48,7 @@ public class MetricNameGenerationTests
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",
         "Acknowledgement",
+        "ReminderOfMissingMeasureData",
     ];
 
     private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
