@@ -146,7 +146,7 @@ public class B2CWebApiFixture : IAsyncLifetime
             { $"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.NotifyTopicName)}", processManagerNotifyTopicName },
             { $"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataStartTopicName)}", processManagerStartTopicName }, // TODO: Do we need a separate topic for tests as well?
             { $"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.Brs021ForwardMeteredDataNotifyTopicName)}", processManagerNotifyTopicName }, // TODO: Do we need a separate topic for tests as well?
-            { $"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}", incomingMessagesQueueName },
+            { $"{IncomingMessagesOptions.SectionName}:{nameof(IncomingMessagesOptions.QueueName)}", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
             // Feature Management => Azure App Configuration settings

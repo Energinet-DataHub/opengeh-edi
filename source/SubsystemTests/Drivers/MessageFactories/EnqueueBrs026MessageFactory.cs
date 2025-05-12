@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
@@ -35,8 +36,8 @@ public static class EnqueueBrs026MessageFactory
         var energySupplier = actor.ActorRole == ActorRole.EnergySupplier ? actor.ActorNumber.ToProcessManagerActorNumber() : null;
 
         var accepted = new RequestCalculatedEnergyTimeSeriesAcceptedV1(
-            OriginalActorMessageId: Guid.NewGuid().ToString(),
-            OriginalTransactionId: Guid.NewGuid().ToString(),
+            OriginalActorMessageId: Guid.NewGuid().ToTestMessageUuid(),
+            OriginalTransactionId: Guid.NewGuid().ToTestMessageUuid(),
             RequestedForActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             RequestedForActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             RequestedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
@@ -57,20 +58,19 @@ public static class EnqueueBrs026MessageFactory
     public static ServiceBusMessage CreateReject(
         Actor actor)
     {
-        var actorMessageId = Guid.NewGuid().ToString();
+        var actorMessageId = Guid.NewGuid().ToTestMessageUuid();
         var rejected = new RequestCalculatedEnergyTimeSeriesRejectedV1(
-            OriginalMessageId: actorMessageId,
             OriginalActorMessageId: actorMessageId,
-            OriginalTransactionId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToTestMessageUuid(),
             RequestedForActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             RequestedForActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             RequestedByActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             RequestedByActorRole: actor.ActorRole.ToProcessManagerActorRole(),
             BusinessReason: ProcessManagerTypes.BusinessReason.FromName(BusinessReason.BalanceFixing.Name),
-            ValidationErrors: new List<ValidationErrorDto>()
-            {
+            ValidationErrors:
+            [
                 new ValidationErrorDto(Message: "Test Rejection", ErrorCode: "888"),
-            });
+            ]);
 
         return CreateServiceBusMessage(rejected, actor);
     }

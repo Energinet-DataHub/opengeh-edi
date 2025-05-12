@@ -21,8 +21,8 @@ using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
@@ -43,14 +43,14 @@ using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.Va
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
+public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
 {
     // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
     private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
 
     private readonly B2BApiAppFixture _fixture;
 
-    public EnqueueBrs21ForwardMeteredDataMessagesTests(
+    public EnqueueBrs021ForwardMeteredDataMessagesTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
@@ -87,8 +87,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlagName.PM25Messages, true),
-            new(FeatureFlagName.PM25CIM, true),
+            new(FeatureFlagNames.PeekMeasurementMessages, true),
+            new(FeatureFlagNames.PM25CIM, true),
         ]);
 
         // Arrange
@@ -244,8 +244,8 @@ public class EnqueueBrs21ForwardMeteredDataMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlagName.PM25Messages, true),
-            new(FeatureFlagName.PM25CIM, true),
+            new(FeatureFlagNames.PeekMeasurementMessages, true),
+            new(FeatureFlagNames.PM25CIM, true),
         ]);
 
         // Arrange

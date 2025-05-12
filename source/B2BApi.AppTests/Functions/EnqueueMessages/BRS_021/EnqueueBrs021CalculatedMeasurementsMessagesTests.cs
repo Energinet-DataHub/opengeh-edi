@@ -18,8 +18,8 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
@@ -37,11 +37,11 @@ using Resolution = Energinet.DataHub.ProcessManager.Components.Abstractions.Valu
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
+public class EnqueueBrs021CalculatedMeasurementsMessagesTests : IAsyncLifetime
 {
     private readonly B2BApiAppFixture _fixture;
 
-    public EnqueueBrs21CalculationMessagesTests(
+    public EnqueueBrs021CalculatedMeasurementsMessagesTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
@@ -79,8 +79,8 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlagName.PM25Messages, true),
-            new(FeatureFlagName.PM25CIM, true),
+            new(FeatureFlagNames.PeekMeasurementMessages, true),
+            new(FeatureFlagNames.PM25CIM, true),
         ]);
 
         // Arrange
@@ -105,7 +105,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
             OrchestrationInstanceId: Guid.NewGuid(),
             TransactionId: Guid.NewGuid(),
             MeteringPointId: "1234567890123",
-            MeteringPointType: MeteringPointType.Consumption,
+            MeteringPointType: MeteringPointType.ElectricalHeating,
             Resolution: Resolution.QuarterHourly,
             MeasureUnit: MeasurementUnit.KilowattHour,
             Data:
@@ -150,7 +150,7 @@ public class EnqueueBrs21CalculationMessagesTests : IAsyncLifetime
 
         // Act
         // => When message is received
-        var httpRequest = _fixture.CreateEnqueueCalculatedMeasurementsHttpV1Request(enqueueMessagesData);
+        var httpRequest = _fixture.CreateEnqueueMessagesHttpRequest(enqueueMessagesData);
 
         await _fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
 

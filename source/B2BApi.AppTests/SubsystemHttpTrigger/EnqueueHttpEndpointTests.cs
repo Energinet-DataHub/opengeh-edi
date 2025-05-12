@@ -113,7 +113,7 @@ public class EnqueueHttpEndpointTests : IAsyncLifetime
                             Guid.NewGuid(),
                             Guid.NewGuid(),
                             "1234567890123",
-                            MeteringPointType.Consumption,
+                            MeteringPointType.ElectricalHeating,
                             Resolution.QuarterHourly,
                             MeasurementUnit.KilowattHour,
                             [])),

@@ -53,6 +53,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.FeatureManagement;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -85,7 +86,7 @@ public class TestBase : IDisposable
 
     protected IntegrationTestFixture Fixture { get; }
 
-    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
+    protected FeatureManagerStub FeatureManagerStub { get; } = new();
 
     protected AuthenticatedActor AuthenticatedActor { get; }
 
@@ -228,7 +229,7 @@ public class TestBase : IDisposable
                 {
                     // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
-                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
+                    [$"{IncomingMessagesOptions.SectionName}:{nameof(IncomingMessagesOptions.QueueName)}"] = "Fake",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] = "NotEmpty",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] = "NotEmpty",
 
@@ -276,7 +277,7 @@ public class TestBase : IDisposable
         // Replace the services with stub implementations.
         // - Building blocks
         _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
-        _services.AddTransient<IFeatureFlagManager>((x) => FeatureFlagManagerStub);
+        _services.AddTransient<IFeatureManager>((x) => FeatureManagerStub);
 
         _services.AddScoped<ExecutionContext>((x) =>
         {
@@ -287,7 +288,7 @@ public class TestBase : IDisposable
         _services.AddSingleton<TelemetryClient>(x =>
         {
             return new TelemetryClient(
-                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
+                new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         // Add test logger

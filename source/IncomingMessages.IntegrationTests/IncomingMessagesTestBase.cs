@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
@@ -37,6 +36,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NodaTime;
@@ -73,7 +73,7 @@ public class IncomingMessagesTestBase : IDisposable
 
     protected IncomingMessagesTestFixture Fixture { get; }
 
-    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
+    protected FeatureManagerStub FeatureManagerStub { get; } = new();
 
     protected AuthenticatedActor AuthenticatedActor { get; }
 
@@ -196,7 +196,7 @@ public class IncomingMessagesTestBase : IDisposable
                     // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] =
                         "Fake",
-                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] =
+                    [$"{IncomingMessagesOptions.SectionName}:{nameof(IncomingMessagesOptions.QueueName)}"] =
                         "Fake",
                     [$"{ProcessManagerServiceBusClientOptions.SectionName}:{nameof(ProcessManagerServiceBusClientOptions.StartTopicName)}"] =
                         "Fake",
@@ -228,7 +228,7 @@ public class IncomingMessagesTestBase : IDisposable
             .AddIncomingMessagesModule(config);
 
         // Replace the services with stub implementations.
-        _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
+        _services.AddTransient<IFeatureManager>(_ => FeatureManagerStub);
         _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
         _services.AddScoped<ExecutionContext>(
             _ =>

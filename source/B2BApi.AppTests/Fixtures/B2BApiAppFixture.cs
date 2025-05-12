@@ -33,10 +33,10 @@ using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
@@ -239,7 +239,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         await ServiceBusResourceProvider
             .BuildQueue("incoming-messages")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
+                .Add($"{IncomingMessagesOptions.SectionName}__{nameof(IncomingMessagesOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (incoming-messages)");
 
@@ -469,10 +469,10 @@ public class B2BApiAppFixture : IAsyncLifetime
             nameof(DatabricksSqlStatementOptions.WarehouseId),
             IntegrationTestConfiguration.DatabricksSettings.WarehouseId);
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}",
+            $"{EdiDatabricksOptions.SectionName}__{nameof(EdiDatabricksOptions.DatabaseName)}",
             EdiDatabricksSchemaManager.SchemaName);
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}",
+            $"{EdiDatabricksOptions.SectionName}__{nameof(EdiDatabricksOptions.CatalogName)}",
             DatabricksCatalogName);
 
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -489,15 +489,15 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.UsePeekMessages}",
+            $"{FeatureFlagNames.SectionName}__{FeatureFlagNames.UsePeekMessages}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25CIM}",
+            $"{FeatureFlagNames.SectionName}__{FeatureFlagNames.PM25CIM}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"FeatureManagement__{FeatureFlagName.PM25Ebix}",
+            $"{FeatureFlagNames.SectionName}__{FeatureFlagNames.PM25Ebix}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -524,7 +524,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Management => Azure App Configuration settings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{AzureAppConfigurationOptions.SectionName}:{nameof(AzureAppConfigurationOptions.Endpoint)}",
+            $"{AzureAppConfigurationOptions.SectionName}__{nameof(AzureAppConfigurationOptions.Endpoint)}",
             IntegrationTestConfiguration.AppConfigurationEndpoint);
         appHostSettings.ProcessEnvironmentVariables.Add(
             AppConfigurationManager.DisableProviderSettingName,

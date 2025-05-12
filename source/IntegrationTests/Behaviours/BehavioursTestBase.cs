@@ -24,7 +24,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
@@ -37,7 +36,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.Marke
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
@@ -53,6 +51,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -127,7 +126,6 @@ public class BehavioursTestBase : IDisposable
         _integrationTestFixture.DatabaseManager.CleanupDatabase();
         _integrationTestFixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-        FeatureFlagManagerStub = new();
         _clockStub = new ClockStub();
         _serviceProvider = BuildServices(testOutputHelper);
 
@@ -138,7 +136,7 @@ public class BehavioursTestBase : IDisposable
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator, null, _actorId));
     }
 
-    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; }
+    protected FeatureManagerStub FeatureManagerStub { get; } = new();
 
     public void Dispose()
     {
@@ -413,7 +411,7 @@ public class BehavioursTestBase : IDisposable
                 {
                     // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
-                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{IncomingMessagesOptions.SectionName}:{nameof(IncomingMessagesOptions.QueueName)}"] = MockServiceBusName,
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] = "NotEmpty",
                     [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] = "NotEmpty",
 
@@ -465,12 +463,12 @@ public class BehavioursTestBase : IDisposable
         // Replace the services with stub implementations.
         // - Building blocks
         _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
-        _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
+        _services.AddTransient<IFeatureManager>(_ => FeatureManagerStub);
 
         _services.AddSingleton<TelemetryClient>(x =>
         {
             return new TelemetryClient(
-                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
+                new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         // Add test logger
