@@ -15,7 +15,8 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.DocumentValidation;
-using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Cim.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Ebix;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM009;
 
