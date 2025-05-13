@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasur
 /// <param name="TransactionId">The Id which the series has.</param>
 /// <param name="MeteringPointId">The metering point Id which are missing measurements on the given <paramref name="Date"/>. </param>
 /// <param name="Date">The date which the <paramref name="MeteringPointId"/> are missing measurements for.</param>
-public sealed record MissingMeasurementSeries(
+public sealed record MissingMeasurement(
     TransactionId TransactionId,
     MeteringPointId MeteringPointId,
     Instant Date);

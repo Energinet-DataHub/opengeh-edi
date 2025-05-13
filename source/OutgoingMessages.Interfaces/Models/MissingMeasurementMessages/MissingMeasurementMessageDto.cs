@@ -22,7 +22,7 @@ public sealed class MissingMeasurementMessageDto(
     Actor receiver,
     BusinessReason businessReason,
     string gridAreaCode,
-    MissingMeasurementSeries series)
+    MissingMeasurement missingMeasurement)
     : OutgoingMessageDto(DocumentType.ReminderOfMissingMeasureData,
         receiver.ActorNumber,
         null,
@@ -32,7 +32,7 @@ public sealed class MissingMeasurementMessageDto(
         externalId,
         null)
 {
-    public MissingMeasurementSeries Series { get; } = series;
+    public MissingMeasurement MissingMeasurement { get; } = missingMeasurement;
 
     public string GridAreaCode { get; } = gridAreaCode;
 }

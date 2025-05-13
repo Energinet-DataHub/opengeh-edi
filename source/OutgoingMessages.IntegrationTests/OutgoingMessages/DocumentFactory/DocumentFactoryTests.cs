@@ -52,7 +52,7 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetOutgoingDocumentTypes))]
-    public void Xml_supports_all_document_types(DocumentType documentType)
+    public void Given_Xml_AndGiven_DocumentType_When_LookingForWriter_Then_FindAllButExpectedWriters(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
@@ -69,7 +69,7 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetOutgoingDocumentTypes))]
-    public void Json_supports_all_document_types(DocumentType documentType)
+    public void Given_Json_AndGiven_DocumentType_When_LookingForWriter_Then_FindAllButExpectedWriters(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Json));
@@ -86,7 +86,7 @@ public class DocumentFactoryTests
 
     [Theory]
     [MemberData(nameof(GetOutgoingDocumentTypes))]
-    public void Ebix_supports_all_document_types(DocumentType documentType)
+    public void Given_Ebix_AndGiven_DocumentType_When_LookingForWriter_Then_FindAllButExpectedWriters(DocumentType documentType)
     {
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Ebix));

@@ -489,16 +489,16 @@ public static class OutgoingMessageFactory
             documentReceiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
             processId: message.ProcessId,
             businessReason: message.BusinessReason,
-            serializedContent: serializer.Serialize(message.Series),
+            serializedContent: serializer.Serialize(message.MissingMeasurement),
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.MissingMeasurementLog,
             relatedToMessageId: message.RelatedToMessageId,
             gridAreaCode: message.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
-            periodStartedAt: message.Series.Date,
+            periodStartedAt: message.MissingMeasurement.Date,
             dataCount: 1,
-            meteringPointId: message.Series.MeteringPointId);
+            meteringPointId: message.MissingMeasurement.MeteringPointId);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

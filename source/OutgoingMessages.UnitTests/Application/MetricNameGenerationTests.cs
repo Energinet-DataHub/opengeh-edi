@@ -51,14 +51,14 @@ public class MetricNameGenerationTests
         "ReminderOfMissingMeasureData",
     ];
 
-    private static readonly DocumentType[] _isAlwaysAResponse =
+    private static readonly DocumentType[] _IsAlwaysAResponseOfARequest =
     [
         DocumentType.RejectRequestWholesaleSettlement,
         DocumentType.RejectRequestAggregatedMeasureData,
         DocumentType.Acknowledgement,
     ];
 
-    private static readonly DocumentType[] _isNeverAResponse =
+    private static readonly DocumentType[] _IsNeverAResponseOfARequest =
     [
         DocumentType.ReminderOfMissingMeasureData,
     ];
@@ -94,48 +94,53 @@ public class MetricNameGenerationTests
         var documentFormats = EnumerationType.GetAll<DocumentFormat>().ToList();
         var names = new List<string>();
 
-        foreach (var documentFormat in documentFormats)
+        foreach (var documentType in documentTypes)
         {
-            foreach (var documentType in documentTypes)
+            if (_isDocumentTypeAnIncomingMessage.Contains(documentType))
             {
-                if (_isDocumentTypeAnIncomingMessage.Contains(documentType))
-                {
-                    // Incoming messages are not logged
-                    continue;
-                }
+                // Incoming messages are not logged
+                continue;
+            }
 
-                if (_isAlwaysAResponse.Contains(documentType))
-                {
+            if (_IsAlwaysAResponseOfARequest.Contains(documentType))
+            {
+                documentFormats.ForEach(documentFormat =>
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
                         documentFormat,
-                        true));
-                }
-                else if (_isNeverAResponse.Contains(documentType))
-                {
+                        true)));
+            }
+            else if (_IsNeverAResponseOfARequest.Contains(documentType))
+            {
+                documentFormats.ForEach(documentFormat =>
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
                         documentFormat,
-                        false));
-                }
-                else
-                {
-                    // Some documents are generated as a response for a request and as a message from DataHub.
-                    // If the document type is a response for a request we have two instances of it in the dashboard, namely:
-                    // - {documentType}{documentFormat}
-                    // - {documentType}Response{documentFormat}
-                    names.Add(MetricNameMapper.MessageGenerationMetricName(
-                        documentType,
-                        documentFormat,
-                        true));
-                    names.Add(MetricNameMapper.MessageGenerationMetricName(
-                        documentType,
-                        documentFormat,
-                        false));
-                }
+                        true)));
+            }
+            else
+            {
+                names.AddRange(DocumentTypeIsAResponseAndAStandAloneMessage(documentType, documentFormats));
             }
         }
 
         return names;
+    }
+
+    private static IEnumerable<string> DocumentTypeIsAResponseAndAStandAloneMessage(DocumentType documentType, List<DocumentFormat> documentFormats)
+    {
+        var metric = documentFormats.Select(documentFormat =>
+            MetricNameMapper.MessageGenerationMetricName(
+                documentType,
+                documentFormat,
+                true));
+
+        return metric.Concat(
+            documentFormats.Select(
+                documentFormat =>
+                    MetricNameMapper.MessageGenerationMetricName(
+                        documentType,
+                        documentFormat,
+                        false)));
     }
 }

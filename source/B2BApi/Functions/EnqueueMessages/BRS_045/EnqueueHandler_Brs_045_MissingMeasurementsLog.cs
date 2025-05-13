@@ -54,7 +54,7 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
                 ActorRole.MeteredDataResponsible),
             businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
             gridAreaCode: data.GridArea,
-            series: new MissingMeasurementSeries(
+            missingMeasurement: new MissingMeasurement(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: MeteringPointId.From(data.MeteringPointId),
                 Date: data.Date.ToInstant()));
