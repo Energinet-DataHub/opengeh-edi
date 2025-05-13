@@ -78,7 +78,7 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         if (document == DocumentType.NotifyValidatedMeasureData)
             return "DK_MeteredDataTimeSeries";
 
-        throw new InvalidOperationException("Unknown document type");
+        throw new InvalidOperationException($"Unknown document type: {document}");
     }
 
     private XmlSchema LoadSchemaWithDependentSchemas(string location)

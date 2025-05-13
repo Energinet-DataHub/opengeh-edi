@@ -66,6 +66,9 @@
       <EmbeddedResource Include="Domain\Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Domain\Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyvalidatedmeasuredata-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Domain\Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>

@@ -111,7 +111,7 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
 
     public Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
     {
-        var schema = JsonSchema.FromFile(@"Infrastructure\OutgoingMessages\Schemas\Json\Acknowledgement-assembly-model.schema.json");
+        var schema = JsonSchema.FromFile(@"Domain\Schemas\Cim\Json\Schemas\Acknowledgement-assembly-model.schema.json");
 
         schema.Should().NotBeNull("Cannot validate document without a schema");
 
