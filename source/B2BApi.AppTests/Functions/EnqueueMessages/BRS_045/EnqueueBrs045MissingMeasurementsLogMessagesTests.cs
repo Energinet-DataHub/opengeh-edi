@@ -79,22 +79,23 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         // Arrange
         // => Given enqueue BRS-045 http request
         var gridAccessProviderActorNumber = ProcessManager.Abstractions.Core.ValueObjects.ActorNumber.Create("1111111111111");
-        var dateWithMeasurement = new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointIds(
+        var dateWithMeasurement = new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
+            IdempotencyKey: Guid.NewGuid(),
             GridAccessProvider: gridAccessProviderActorNumber,
             GridArea: "123",
             Date: Instant.FromUtc(2025, 05, 01, 22, 00).ToDateTimeOffset(),
             MeteringPointId: "1234567890123");
 
-        // TODO: This request will result in a dublicated key exception in the database
-        // The duplicate key value is (4eb31244-b513-4db9-badd-4c6c3e54fb9b, 1111111111111, MDR, 2025-05-01 22:00:00.0000000).
-        // Since the metering point id is the a part of the key.
-        // Have I done some mapping wrong?
         var enqueueMessagesData = new EnqueueMissingMeasurementsLogHttpV1(
             OrchestrationInstanceId: Guid.NewGuid(),
             Data:
             [
                 dateWithMeasurement,
-                dateWithMeasurement with { MeteringPointId = dateWithMeasurement.MeteringPointId + "2" },
+                dateWithMeasurement with
+                {
+                    MeteringPointId = dateWithMeasurement.MeteringPointId + "2",
+                    IdempotencyKey = Guid.NewGuid(),
+                },
             ]);
 
         // Act
@@ -139,7 +140,7 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         peekResponse.StatusCode.Should().NotBe(HttpStatusCode.OK, "Peek should not be OK, since no document writer are registered");
         //await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
         // TODO: Verify that the enqueued messages can be peeked
-        // - Peek all messages (expect 3)
+        // - Peek all messages (expect 2)
         // - Verify that the messages has correct document type
         // - Verify that the messages has correct metering point id
         // - Verify that the messages has correct dates

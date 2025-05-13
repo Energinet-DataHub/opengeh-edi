@@ -34,7 +34,7 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
     {
         foreach (var message in missingMeasurementsLog.Data)
         {
-            var outgoingMessageDto = CreateOutgoingMessageDto(message, missingMeasurementsLog.OrchestrationInstanceId);
+            var outgoingMessageDto = CreateOutgoingMessageDto(message);
 
             await _outgoingMessagesClient.EnqueueAsync(
                 outgoingMessageDto,
@@ -44,11 +44,11 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
         await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private MissingMeasurementMessageDto CreateOutgoingMessageDto(EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointIds data, Guid orchestrationId)
+    private MissingMeasurementMessageDto CreateOutgoingMessageDto(EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId data)
     {
         return new MissingMeasurementMessageDto(
             eventId: EventId.From(Guid.CreateVersion7()),
-            externalId: new ExternalId(orchestrationId),
+            externalId: new ExternalId(data.IdempotencyKey),
             receiver: new Actor(
                 ActorNumber.Create(data.GridAccessProvider.Value),
                 ActorRole.MeteredDataResponsible),

@@ -491,7 +491,7 @@ public static class OutgoingMessageFactory
             businessReason: message.BusinessReason,
             serializedContent: serializer.Serialize(message.Series),
             createdAt: timestamp,
-            messageCreatedFromProcess: ProcessType.MissingMeasurements,
+            messageCreatedFromProcess: ProcessType.MissingMeasurementLog,
             relatedToMessageId: message.RelatedToMessageId,
             gridAreaCode: message.GridAreaCode,
             externalId: message.ExternalId,
