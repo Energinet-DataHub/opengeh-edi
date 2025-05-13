@@ -78,10 +78,10 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-045 http request
-        var gridAccessProviderActorNumber = ProcessManager.Abstractions.Core.ValueObjects.ActorNumber.Create("1111111111111");
+        var gridAccessProviderActorNumber = ActorNumber.Create("1111111111111");
         var dateWithMeasurement = new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
             IdempotencyKey: Guid.NewGuid(),
-            GridAccessProvider: gridAccessProviderActorNumber,
+            GridAccessProvider: gridAccessProviderActorNumber.ToProcessManagerActorNumber(),
             GridArea: "123",
             Date: Instant.FromUtc(2025, 05, 01, 22, 00).ToDateTimeOffset(),
             MeteringPointId: "1234567890123");
@@ -129,7 +129,7 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         enqueuedOutgoingMessages.Should().HaveCount(enqueueMessagesData.Data.Count);
 
         var receiver = new Actor(
-            ActorNumber.Create(gridAccessProviderActorNumber.Value),
+            gridAccessProviderActorNumber,
             ActorRole.MeteredDataResponsible);
 
         var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
