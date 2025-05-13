@@ -1,5 +1,3 @@
-<!--- 🙏 Thank you for your submission, we really appreciate it. Like many open source projects, we ask that you sign our [Contributor License Agreement](https://cla-assistant.io/Energinet-DataHub/geh-aggregations) before we can accept your contribution. --->
-
 <!-- TITLE
 
 Prefix with one of these:
