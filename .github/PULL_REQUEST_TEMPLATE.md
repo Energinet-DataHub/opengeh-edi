@@ -17,11 +17,12 @@ Read more at https://github.com/Mech0z/GitHubGuidelines
 
 ## Description
 
-## References
-
-This pull request is related to issue:
+This pull request is related to the issue:
 
 ## Checklist
 
+<!-- markdown-link-check-disable -->
 - [ ] Subsystem test executed [deploy to dev_002/dev_003](https://github.com/Energinet-DataHub/dh3-environments/actions/workflows/edi-cd.yml)
+<!-- markdown-link-check-enable -->
+
 - [ ] Has it been considered whether data is being delivered to the wrong actor?
