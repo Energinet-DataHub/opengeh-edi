@@ -104,6 +104,7 @@ public class MetricNameGenerationTests
 
             if (_IsAlwaysAResponseOfARequest.Contains(documentType))
             {
+                // {documentType}Response{documentFormat}
                 documentFormats.ForEach(documentFormat =>
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
@@ -112,14 +113,17 @@ public class MetricNameGenerationTests
             }
             else if (_IsNeverAResponseOfARequest.Contains(documentType))
             {
+                // {documentType}{documentFormat}
                 documentFormats.ForEach(documentFormat =>
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
                         documentFormat,
-                        true)));
+                        false)));
             }
             else
             {
+                // {documentType}{documentFormat}
+                // {documentType}Response{documentFormat}
                 names.AddRange(DocumentTypeIsAResponseAndAStandAloneMessage(documentType, documentFormats));
             }
         }
