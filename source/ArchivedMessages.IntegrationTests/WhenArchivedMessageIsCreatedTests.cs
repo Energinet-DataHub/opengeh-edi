@@ -94,6 +94,27 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
         Assert.NotNull(result);
     }
 
+    [Theory]
+    [MemberData(nameof(GetDocumentTypes))]
+    public async Task Given_DocumentType_When_Created_Then_StoredInExpectedDatabase(DocumentType documentType)
+    {
+        await CreateArchivedMessageAsync(documentType: documentType);
+
+        var numberOfArchivedMeteringPointMessages = await _fixture.GetNumberOfCreatedMeteringPointMessages();
+        var numberOfArchivedMessages = await _fixture.GetNumberOfCreatedMessagesInDatabase();
+
+        if (MeteringPointDocumentTypes.Contains(documentType))
+        {
+            numberOfArchivedMeteringPointMessages.Should().Be(1);
+            numberOfArchivedMessages.Should().Be(0);
+        }
+        else
+        {
+            numberOfArchivedMeteringPointMessages.Should().Be(0);
+            numberOfArchivedMessages.Should().Be(1);
+        }
+    }
+
     [Fact]
     public async Task Given_ArchivedDocument_When_Created_Then_RetrievedWithCorrectContent()
     {
