@@ -16,7 +16,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Ebix;
 
 public sealed class EbixSchemas : SchemaBase, ISchema
 {
-    private static readonly string _schemaPath = $"Domain{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Ebix{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}document{Path.DirectorySeparatorChar}";
+    private static readonly string _schemaPath = $"Domain{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Ebix{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}documents{Path.DirectorySeparatorChar}";
 
     public EbixSchemas()
     {
