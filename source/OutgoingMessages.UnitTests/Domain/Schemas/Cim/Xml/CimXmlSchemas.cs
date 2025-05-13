@@ -16,7 +16,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Cim.Xm
 
 public sealed class CimXmlSchemas : SchemaBase, ISchema
 {
-    private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Cim{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+    private static readonly string _schemaPath = $"Domain{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Cim{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
     public CimXmlSchemas()
     {
