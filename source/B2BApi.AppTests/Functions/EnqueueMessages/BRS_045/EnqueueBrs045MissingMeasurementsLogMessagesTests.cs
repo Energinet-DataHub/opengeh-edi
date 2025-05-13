@@ -84,7 +84,8 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
             OrchestrationInstanceId: Guid.NewGuid(),
             Data:
             [
-                new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointIds(
+                new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
+                    IdempotencyKey: Guid.NewGuid(),
                     GridAccessProvider: gridAccessProviderActorNumber.ToProcessManagerActorNumber(),
                     GridArea: "123",
                     Date: Instant.FromUtc(2025, 05, 01, 22, 00).ToDateTimeOffset(),

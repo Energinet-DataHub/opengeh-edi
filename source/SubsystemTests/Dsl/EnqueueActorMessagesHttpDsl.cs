@@ -118,7 +118,8 @@ internal class EnqueueActorMessagesHttpDsl
             OrchestrationInstanceId: Guid.NewGuid(),
             Data:
             [
-                new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointIds(
+                new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
+                    IdempotencyKey: Guid.NewGuid(),
                     GridAccessProvider: receiver.ActorNumber.ToProcessManagerActorNumber(),
                     GridArea: "001",
                     Date: _rsm018Date.ToDateTimeOffset(),
