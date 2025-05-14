@@ -22,38 +22,59 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
 {
-    private readonly EnqueueActorMessagesHttpDsl _enqueueActorMessages;
-    private readonly Actor _receiver = new Actor(
+    private readonly EnqueueActorMessagesHttpDsl _enqueueActorMessagesForEnergySupplier;
+    private readonly EnqueueActorMessagesHttpDsl _enqueueActorMessagesForGridAccessProvider;
+
+    private readonly Actor _energySupplier = new Actor(
         actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
         actorRole: ActorRole.EnergySupplier);
+
+    private readonly Actor _gridAccessProvider = new Actor(
+        actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimGridAccessProviderNumber),
+        actorRole: ActorRole.GridAccessProvider);
 
     public WhenEnqueueActorMessagesViaHttpTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
-        var ediDriver = new EdiDriver(
-            fixture.DurableClient,
-            fixture.B2BClients.EnergySupplier,
-            output);
-
         var subsystemHttpDriver = new SubsystemDriver(
             fixture.SubsystemHttpClient,
             output);
 
-        _enqueueActorMessages = new EnqueueActorMessagesHttpDsl(
-            ediDriver,
+        var ediDriverForEnergySupplier = new EdiDriver(
+            fixture.DurableClient,
+            fixture.B2BClients.EnergySupplier,
+            output);
+
+        _enqueueActorMessagesForEnergySupplier = new EnqueueActorMessagesHttpDsl(
+            ediDriverForEnergySupplier,
+            subsystemHttpDriver);
+
+        var ediDriverForGridAccessProvider = new EdiDriver(
+            fixture.DurableClient,
+            fixture.B2BClients.GridAccessProvider,
+            output);
+
+        _enqueueActorMessagesForGridAccessProvider = new EnqueueActorMessagesHttpDsl(
+            ediDriverForGridAccessProvider,
             subsystemHttpDriver);
     }
 
     [Fact]
     public async Task Actor_can_peek_electrical_heating_message()
     {
-        var meteringPointId = "1234567890123456";
+        const string meteringPointId = "1234567890123456";
 
-        await _enqueueActorMessages
-            .EnqueueElectricalHeatingMessage(
-                _receiver,
-                meteringPointId);
+        await _enqueueActorMessagesForEnergySupplier.EnqueueElectricalHeatingMessage(_energySupplier, meteringPointId);
 
-        await _enqueueActorMessages.ConfirmMessageIsAvailable(meteringPointId);
+        await _enqueueActorMessagesForEnergySupplier.ConfirmRsm012MessageIsAvailable(meteringPointId);
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_missing_measurements_log_message()
+    {
+        await _enqueueActorMessagesForGridAccessProvider.EnqueueMissingMeasurementsLogMessage(_gridAccessProvider);
+
+        // TODO #751: Re-introduce when enqueue & JSON document writer is complete
+        // await _enqueueActorMessagesForGridAccessProvider.ConfirmRsm018MessageIsAvailable();
     }
 }

@@ -16,7 +16,9 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
 using NodaTime;
+using NodaTime.Text;
 using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
 using MeteringPointType = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeteringPointType;
 using Quality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
@@ -32,6 +34,8 @@ internal class EnqueueActorMessagesHttpDsl
 {
     private readonly EdiDriver _ediDriver;
     private readonly SubsystemDriver _subsystemDriver;
+    private readonly Instant _rsm018Date = Instant.FromUtc(2025, 05, 11, 22, 00);
+    private readonly string _rsm018MeteringPointId = "1111111111111111";
 
     public EnqueueActorMessagesHttpDsl(
         EdiDriver ediDriver,
@@ -52,17 +56,17 @@ internal class EnqueueActorMessagesHttpDsl
         var start = Instant.FromUtc(2025, 01, 31, 23, 00, 00);
 
         var receiversWithMeasurements = new EnqueueCalculatedMeasurementsHttpV1.ReceiversWithMeasurements(
-            Receivers: new[] { processManagerReceiver },
+            Receivers: [processManagerReceiver],
             RegistrationDateTime: start.ToDateTimeOffset(),
             StartDateTime: start.ToDateTimeOffset(),
             EndDateTime: start.Plus(Duration.FromHours(1)).ToDateTimeOffset(),
-            Measurements: new[]
-            {
+            Measurements:
+            [
                 new EnqueueCalculatedMeasurementsHttpV1.Measurement(
                     Position: 1,
                     EnergyQuantity: 019293m,
                     QuantityQuality: Quality.AsProvided),
-            },
+            ],
             GridAreaCode: "804");
 
         var message = new EnqueueCalculatedMeasurementsHttpV1(
@@ -72,12 +76,12 @@ internal class EnqueueActorMessagesHttpDsl
             MeteringPointType: MeteringPointType.ElectricalHeating,
             Resolution: Resolution.Hourly,
             MeasureUnit: MeasurementUnit.KilowattHour,
-            Data: new[] { receiversWithMeasurements });
+            Data: [receiversWithMeasurements]);
 
         await _subsystemDriver.EnqueueActorMessagesViaHttpAsync(message);
     }
 
-    internal async Task ConfirmMessageIsAvailable(string meteringPointId)
+    internal async Task ConfirmRsm012MessageIsAvailable(string meteringPointId)
     {
         var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
 
@@ -88,24 +92,86 @@ internal class EnqueueActorMessagesHttpDsl
 
         var contentString = await peekResponse.Content.ReadAsStringAsync();
 
-        AssertDocumentType(contentString);
-        AssertMeteringPointId(contentString, meteringPointId);
+        AssertDocumentTypeIsRsm012(contentString);
+        AssertMeteringPointIdForRsm012(contentString, meteringPointId);
     }
 
-    private void AssertDocumentType(string content)
+    internal async Task EnqueueMissingMeasurementsLogMessage(Actor receiver)
+    {
+        await _ediDriver.EmptyQueueAsync(MessageCategory.MeasureData).ConfigureAwait(false);
+
+        var message = new EnqueueMissingMeasurementsLogHttpV1(
+            OrchestrationInstanceId: Guid.NewGuid(),
+            Data:
+            [
+                new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
+                    IdempotencyKey: Guid.NewGuid(),
+                    GridAccessProvider: receiver.ActorNumber.ToProcessManagerActorNumber(),
+                    GridArea: "001",
+                    Date: _rsm018Date.ToDateTimeOffset(),
+                    MeteringPointId: _rsm018MeteringPointId),
+            ]);
+
+        await _subsystemDriver.EnqueueActorMessagesViaHttpAsync(message);
+    }
+
+    internal async Task ConfirmRsm018MessageIsAvailable()
+    {
+        var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
+
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
+            documentFormat: DocumentFormat.Json,
+            messageCategory: MessageCategory.MeasureData,
+            timeout: timeout);
+
+        var contentString = await peekResponse.Content.ReadAsStringAsync();
+
+        AssertDocumentTypeIsRsm018(contentString);
+        AssertDateForRsm018(contentString, _rsm018Date);
+        AssertMeteringPointIdForRsm018(contentString, _rsm018MeteringPointId);
+    }
+
+    private void AssertDocumentTypeIsRsm012(string content)
     {
         Assert.Contains(
             "NotifyValidatedMeasureData_MarketDocument",
             content);
     }
 
-    private void AssertMeteringPointId(string content, string meteringPointId)
+    private void AssertMeteringPointIdForRsm012(string content, string meteringPointId)
     {
         var expectedMeteringPointIdFormatted = string.Empty
                                               + "        \"marketEvaluationPoint.mRID\": {\r\n"
                                               + "          \"codingScheme\": \"A10\",\r\n"
                                               + $"          \"value\": \"{meteringPointId}\"\r\n"
                                               + "        },";
+        Assert.Contains(
+            expectedMeteringPointIdFormatted,
+            content);
+    }
+
+    private void AssertDocumentTypeIsRsm018(string content)
+    {
+        Assert.Contains(
+            "ReminderOfMissingMeasureData_MarketDocument",
+            content);
+    }
+
+    private void AssertDateForRsm018(string content, Instant date)
+    {
+        Assert.Contains(
+            $"\"request_DateAndOrTime.dateTime\": \"{InstantPattern.General.Format(date)}\"",
+            content);
+    }
+
+    private void AssertMeteringPointIdForRsm018(string content, string meteringPointId)
+    {
+        var expectedMeteringPointIdFormatted = string.Empty
+           + "        \"marketEvaluationPoint.mRID\": {\r\n"
+           + "          \"codingScheme\": \"A10\",\r\n"
+           + $"          \"value\": \"{meteringPointId}\"\r\n"
+           + "        },";
+
         Assert.Contains(
             expectedMeteringPointIdFormatted,
             content);
