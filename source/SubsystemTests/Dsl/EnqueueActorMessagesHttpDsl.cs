@@ -110,7 +110,7 @@ internal class EnqueueActorMessagesHttpDsl
         AssertMeteringPointIdForRsm012(contentString, meteringPointId);
     }
 
-    internal async Task EnqueueMissingMeasurementsMessage(Actor receiver)
+    internal async Task EnqueueMissingMeasurementsLogMessage(Actor receiver)
     {
         await _ediDriver.EmptyQueueAsync(MessageCategory.MeasureData).ConfigureAwait(false);
 
@@ -180,10 +180,14 @@ internal class EnqueueActorMessagesHttpDsl
 
     private void AssertMeteringPointIdForRsm018(string content, string meteringPointId)
     {
-        var meteringPointRegexPattern = MeteringPointRegexPattern.Replace(
-            "{__MeteringPointId__}",
-            meteringPointId);
+        var expectedMeteringPointIdFormatted = string.Empty
+           + "        \"marketEvaluationPoint.mRID\": {\r\n"
+           + "          \"codingScheme\": \"A10\",\r\n"
+           + $"          \"value\": \"{meteringPointId}\"\r\n"
+           + "        },";
 
-        Assert.Matches(new Regex(meteringPointRegexPattern), content);
+        Assert.Contains(
+            expectedMeteringPointIdFormatted,
+            content);
     }
 }

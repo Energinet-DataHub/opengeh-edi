@@ -70,9 +70,9 @@ public class WhenEnqueueActorMessagesViaHttpTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Actor_can_peek_missing_measurements_message()
+    public async Task Actor_can_peek_missing_measurements_log_message()
     {
-        await _enqueueActorMessagesForGridAccessProvider.EnqueueMissingMeasurementsMessage(_gridAccessProvider);
+        await _enqueueActorMessagesForGridAccessProvider.EnqueueMissingMeasurementsLogMessage(_gridAccessProvider);
 
         // TODO #751: Re-introduce when enqueue & JSON document writer is complete
         // await _enqueueActorMessagesForGridAccessProvider.ConfirmRsm018MessageIsAvailable();
