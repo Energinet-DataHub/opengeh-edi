@@ -1,8 +1,5 @@
 BEGIN TRANSACTION
 
---     EXEC sp_rename 'dbo.OutgoingMessages.ExternalId', ExternalId_OLD, 'COLUMN'
---     GO
-
     ALTER TABLE [dbo].[OutgoingMessages]
         ADD [ExternalId_NEW] VARCHAR(36) NULL
     GO
