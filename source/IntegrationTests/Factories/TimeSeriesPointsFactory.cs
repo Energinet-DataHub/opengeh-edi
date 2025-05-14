@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;

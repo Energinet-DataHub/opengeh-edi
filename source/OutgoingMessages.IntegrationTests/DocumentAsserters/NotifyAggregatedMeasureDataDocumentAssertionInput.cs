@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 

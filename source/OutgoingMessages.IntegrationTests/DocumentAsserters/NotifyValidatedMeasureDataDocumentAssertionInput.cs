@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RSM012;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 

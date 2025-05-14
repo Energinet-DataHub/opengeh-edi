@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
 using Energinet.DataHub.EDI.Tests.Factories;
 using NodaTime;
 using Xunit.Abstractions;
