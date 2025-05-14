@@ -44,12 +44,12 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
         _now = SystemClock.Instance.GetCurrentInstant();
     }
 
-    public static TheoryData<ProcessType> GetAllDelegatedProcessTypes => new(
+    public static TheoryData<ProcessType> GetAllDelegationProcessTypes => new(
         EnumerationType.GetAll<ProcessType>()
-            .Where(x => !NotDelegatedProcessTypes().Contains(x))
+            .Where(x => !NotDelegationProcessTypes().Contains(x))
             .ToArray());
 
-    public static IEnumerable<ProcessType> NotDelegatedProcessTypes()
+    public static IEnumerable<ProcessType> NotDelegationProcessTypes()
     {
         return new List<ProcessType>
         {
@@ -59,7 +59,7 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(GetAllDelegatedProcessTypes))]
+    [MemberData(nameof(GetAllDelegationProcessTypes))]
     public async Task Given_DelegationIsSet_When_DelegateAsync_Then_MessageIsDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType);
@@ -75,7 +75,7 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(GetAllDelegatedProcessTypes))]
+    [MemberData(nameof(GetAllDelegationProcessTypes))]
     public async Task Given_DocumentTypeIsAcknowledgement_When_DelegateAsync_Then_NoMessagesAreDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType, DocumentType.Acknowledgement);
