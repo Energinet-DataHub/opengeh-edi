@@ -26,12 +26,16 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 public record ExternalId
 {
     [JsonConstructor]
-    public ExternalId(Guid value)
+    public ExternalId(string value)
     {
         Value = value;
     }
 
-    public Guid Value { get; }
+    public ExternalId(Guid value)
+        : this(value.ToString())
+    { }
 
-    public static ExternalId New() => new ExternalId(Guid.NewGuid());
+    public string Value { get; }
+
+    public static ExternalId New() => new(Guid.NewGuid().ToString());
 }
