@@ -69,7 +69,9 @@ public class DocumentTypeMapperTests
 
         // TODO - Remove this line when all DocumentTypes are supported in B2C
         supportedDocumentTypes = supportedDocumentTypes
-            .Where(x => x != IncomingDocumentType.NotifyValidatedMeasureData.Name);
+            .Where(x =>
+                x != IncomingDocumentType.NotifyValidatedMeasureData.Name
+                        && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.ReminderOfMissingMeasureData.Name);
 
         // Act & Assert
         documentTypes.Should().BeEquivalentTo(supportedDocumentTypes.ToList());
