@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
-using NodaTime;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
