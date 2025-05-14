@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
@@ -78,18 +79,23 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         // Arrange
         // => Given enqueue BRS-045 http request
         var gridAccessProviderActorNumber = ActorNumber.Create("1111111111111");
-        var gridAccessProviderRole = ActorRole.GridAccessProvider;
+        var dateWithMeasurement = new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
+            IdempotencyKey: Guid.NewGuid(),
+            GridAccessProvider: gridAccessProviderActorNumber.ToProcessManagerActorNumber(),
+            GridArea: "123",
+            Date: Instant.FromUtc(2025, 05, 01, 22, 00).ToDateTimeOffset(),
+            MeteringPointId: "1234567890123");
 
         var enqueueMessagesData = new EnqueueMissingMeasurementsLogHttpV1(
             OrchestrationInstanceId: Guid.NewGuid(),
             Data:
             [
-                new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
-                    IdempotencyKey: Guid.NewGuid(),
-                    GridAccessProvider: gridAccessProviderActorNumber.ToProcessManagerActorNumber(),
-                    GridArea: "123",
-                    Date: Instant.FromUtc(2025, 05, 01, 22, 00).ToDateTimeOffset(),
-                    MeteringPointId: "1234567890123"),
+                dateWithMeasurement,
+                dateWithMeasurement with
+                {
+                    MeteringPointId = dateWithMeasurement.MeteringPointId + "2",
+                    IdempotencyKey = Guid.NewGuid(),
+                },
             ]);
 
         // Act
@@ -117,12 +123,24 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         // => Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
         var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.DocumentType == DocumentType.NotifyValidatedMeasureData) // TODO: Update to missing measurements log
+            .Where(om => om.DocumentType == DocumentType.ReminderOfMissingMeasureData)
             .ToListAsync();
 
+        enqueuedOutgoingMessages.Should().HaveCount(enqueueMessagesData.Data.Count);
+
+        var receiver = new Actor(
+            gridAccessProviderActorNumber,
+            ActorRole.MeteredDataResponsible);
+
+        var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
+            actor: receiver,
+            category: MessageCategory.MeasureData);
+
+        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
+        peekResponse.StatusCode.Should().NotBe(HttpStatusCode.OK, "Peek should not be OK, since no document writer are registered");
+        //await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
         // TODO: Verify that the enqueued messages can be peeked
-        // - enqueuedOutgoingMessages.Should().HaveCount(3);
-        // - Peek all messages (expect 3)
+        // - Peek all messages (expect 2)
         // - Verify that the messages has correct document type
         // - Verify that the messages has correct metering point id
         // - Verify that the messages has correct dates

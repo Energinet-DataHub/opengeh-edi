@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
@@ -119,9 +120,17 @@ public interface IOutgoingMessagesClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue RSM-009 messages.
+    /// Enqueues a RSM-009 message.
     /// </summary>
     Task<Guid> EnqueueAsync(
         RejectedSendMeasurementsMessageDto rejectedSendMeasurementsMessageDto,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueues a RSM-018 message.
+    /// </summary>
+    /// <returns>The Id for the created OutgoingMessage</returns>
+    Task<Guid> EnqueueAsync(
+        MissingMeasurementMessageDto missingMeasurementMessageDto,
         CancellationToken cancellationToken);
 }

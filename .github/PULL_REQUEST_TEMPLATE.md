@@ -1,5 +1,3 @@
-<!--- 🙏 Thank you for your submission, we really appreciate it. Like many open source projects, we ask that you sign our [Contributor License Agreement](https://cla-assistant.io/Energinet-DataHub/geh-aggregations) before we can accept your contribution. --->
-
 <!-- TITLE
 
 Prefix with one of these:
@@ -19,12 +17,15 @@ Read more at https://github.com/Mech0z/GitHubGuidelines
 
 ## Description
 
-## References
+*Explain what this PR changes and why these changes are necessary. Give enough context for someone unfamiliar with the task to understand the purpose.*
+
+This pull request is related to this issue:
 
 ## Checklist
-- [ ] Should the change be behind a feature flag?
-- [ ] Can the feature be meaningfully disabled or circumvented if there are issues (e.g., database-breaking changes)?
+
+<!-- markdown-link-check-disable -->
+- [ ] Subsystem test executed [deploy to dev_002/dev_003](https://github.com/Energinet-DataHub/dh3-environments/actions/workflows/edi-cd.yml)
+<!-- markdown-link-check-enable -->
+
 - [ ] Has it been considered whether data is being delivered to the wrong actor?
-- [ ] Subsystem test executed (dev_002/dev_003)
 - [ ] Is there time to monitor state of the release to Production?
-- [ ] Reference to the task
