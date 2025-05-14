@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using NodaTime;
@@ -471,6 +472,33 @@ public static class OutgoingMessageFactory
             periodStartedAt: null,
             dataCount: message.Series.RejectReasons.Count,
             meteringPointId: message.MeteringPointId);
+    }
+
+    public static OutgoingMessage CreateMessage(
+        MissingMeasurementMessageDto message,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(message);
+
+        return new OutgoingMessage(
+            eventId: message.EventId,
+            documentType: message.DocumentType,
+            receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            processId: message.ProcessId,
+            businessReason: message.BusinessReason,
+            serializedContent: serializer.Serialize(message.MissingMeasurement),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.MissingMeasurementLog,
+            relatedToMessageId: message.RelatedToMessageId,
+            gridAreaCode: message.GridAreaCode,
+            externalId: message.ExternalId,
+            calculationId: null,
+            periodStartedAt: message.MissingMeasurement.Date,
+            dataCount: 1,
+            meteringPointId: message.MissingMeasurement.MeteringPointId);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

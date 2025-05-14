@@ -15,9 +15,8 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Mapping;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.Application.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Application;
 
 public class MetricNameGenerationTests
 {
@@ -42,20 +41,26 @@ public class MetricNameGenerationTests
     [
         "NotifyAggregatedMeasureData",
         "NotifyAggregatedMeasureDataResponse",
-        "RejectRequestAggregatedMeasureData",
+        "RejectRequestAggregatedMeasureDataResponse",
         "NotifyWholesaleServices",
         "NotifyWholesaleServicesResponse",
-        "RejectRequestWholesaleSettlement",
+        "RejectRequestWholesaleSettlementResponse",
         "NotifyValidatedMeasureData",
         "NotifyValidatedMeasureDataResponse",
-        "Acknowledgement",
+        "AcknowledgementResponse",
+        "ReminderOfMissingMeasureData",
     ];
 
-    private static readonly DocumentType[] _isOnlyTriggeredByIncomingMessage =
+    private static readonly DocumentType[] _IsAlwaysAResponseOfARequest =
     [
         DocumentType.RejectRequestWholesaleSettlement,
         DocumentType.RejectRequestAggregatedMeasureData,
         DocumentType.Acknowledgement,
+    ];
+
+    private static readonly DocumentType[] _IsNeverAResponseOfARequest =
+    [
+        DocumentType.ReminderOfMissingMeasureData,
     ];
 
     private static readonly DocumentType[] _isDocumentTypeAnIncomingMessage =
@@ -89,33 +94,57 @@ public class MetricNameGenerationTests
         var documentFormats = EnumerationType.GetAll<DocumentFormat>().ToList();
         var names = new List<string>();
 
-        foreach (var documentFormat in documentFormats)
+        foreach (var documentType in documentTypes)
         {
-            foreach (var documentType in documentTypes)
+            if (_isDocumentTypeAnIncomingMessage.Contains(documentType))
             {
-                if (_isDocumentTypeAnIncomingMessage.Contains(documentType))
-                {
-                    // Incoming messages are not logged
-                    continue;
-                }
+                // Incoming messages are not logged
+                continue;
+            }
 
-                // Most documents are logged as an outgoing message and as a response to a corresponding incoming message
-                names.Add(MetricNameMapper.MessageGenerationMetricName(
-                    documentType,
-                    documentFormat,
-                    false));
-
-                // Some documents are only logged as an outgoing message
-                if (!_isOnlyTriggeredByIncomingMessage.Contains(documentType))
-                {
+            if (_IsAlwaysAResponseOfARequest.Contains(documentType))
+            {
+                // {documentType}Response{documentFormat}
+                documentFormats.ForEach(documentFormat =>
                     names.Add(MetricNameMapper.MessageGenerationMetricName(
                         documentType,
                         documentFormat,
-                        true));
-                }
+                        true)));
+            }
+            else if (_IsNeverAResponseOfARequest.Contains(documentType))
+            {
+                // {documentType}{documentFormat}
+                documentFormats.ForEach(documentFormat =>
+                    names.Add(MetricNameMapper.MessageGenerationMetricName(
+                        documentType,
+                        documentFormat,
+                        false)));
+            }
+            else
+            {
+                // {documentType}{documentFormat}
+                // {documentType}Response{documentFormat}
+                names.AddRange(DocumentTypeIsAResponseAndAStandAloneMessage(documentType, documentFormats));
             }
         }
 
         return names;
+    }
+
+    private static IEnumerable<string> DocumentTypeIsAResponseAndAStandAloneMessage(DocumentType documentType, List<DocumentFormat> documentFormats)
+    {
+        var metric = documentFormats.Select(documentFormat =>
+            MetricNameMapper.MessageGenerationMetricName(
+                documentType,
+                documentFormat,
+                true));
+
+        return metric.Concat(
+            documentFormats.Select(
+                documentFormat =>
+                    MetricNameMapper.MessageGenerationMetricName(
+                        documentType,
+                        documentFormat,
+                        false)));
     }
 }
