@@ -44,6 +44,7 @@
         <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
         <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
         <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
+        <ProjectReference Include="..\OutgoingMessages.UnitTests\OutgoingMessages.UnitTests.csproj" />
         <ProjectReference Include="..\Tests\Tests.csproj" />
     </ItemGroup>
 

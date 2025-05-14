@@ -57,6 +57,7 @@ limitations under the License.
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
+      <ProjectReference Include="..\OutgoingMessages.UnitTests\OutgoingMessages.UnitTests.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -71,81 +72,6 @@ limitations under the License.
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Infrastructure\OutgoingMessages\Schemas\RSM009\Json\Acknowledgement-assembly-model.schema.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Json\Acknowledgement-assembly-model.schema.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\documents\RSM009\ebIX_DK_Acknowledgement-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\documents\RSM009\ebIX_BusinessDataType-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\documents\RSM009\ebIX_AggregatedBusinessInformationEntities-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000001-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000004-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000005-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000006-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000008-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000010-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000012-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000019-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000020-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000023-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000028-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000029-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000030-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000041-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000042-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000075-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000076-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000077-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_000080-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_NL0005-2.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\260_CH0002-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
@@ -202,14 +128,6 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementOneSmallOneBigSeries.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Json\urn-entsoe-eu-local-extension-types.schema.json" />
-      <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Json\urn-entsoe-eu-wgedi-codelists.schema.json" />
-      <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Xml\urn-entsoe-eu-local-extension-types.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Xml\urn-entsoe-eu-wgedi-codelists.xsd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementTwoSeries.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
@@ -258,14 +176,6 @@ limitations under the License.
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeteringPoint\ValidMeteredDataForMeteringPoint.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
-        <EmbeddedResource Include="Infrastructure\OutgoingMessages\Schemas\Xml\urn-ediel-org-general-acknowledgement-0-1.xsd">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Infrastructure\OutgoingMessages\Schemas\Ebix\documents\" />
-      <Folder Include="Infrastructure\OutgoingMessages\Schemas\Ebix\generic\" />
     </ItemGroup>
 
     <ItemDefinitionGroup>
