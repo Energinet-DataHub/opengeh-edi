@@ -17,7 +17,9 @@ Read more at https://github.com/Mech0z/GitHubGuidelines
 
 ## Description
 
-This pull request is related to the issue:
+*Explain what this PR changes and why these changes are necessary. Give enough context for someone unfamiliar with the task to understand the purpose.*
+
+This pull request is related to this issue:
 
 ## Checklist
 
