@@ -44,7 +44,8 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_document(string documentFormat)
+    public async Task Given_RejectRequestWholesaleSettlementDocument_When_CreateDocument_Then_DocumentCreated(
+        string documentFormat)
     {
         var marketDocumentStream = await CreateDocument(
             _rejectedEnergyResultMessageBuilder,

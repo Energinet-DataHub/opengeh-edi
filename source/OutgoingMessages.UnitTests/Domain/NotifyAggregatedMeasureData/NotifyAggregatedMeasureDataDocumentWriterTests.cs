@@ -49,7 +49,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Can_create_document(string documentFormat)
+    public async Task Given_NotifyAggregatedMeasureDataDocument_When_CreateDocument_Then_DocumentCreated(
+        string documentFormat)
     {
         var document = await CreateDocument(
                 _energyResultMessageTimeSeries
@@ -88,7 +89,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Point_quantity_element_is_excluded_if_no_value(string documentFormat)
+    public async Task Given_PointQuantityElementWithoutValue_When_CreateDocument_Then_PointIsExcluded(
+        string documentFormat)
     {
         _energyResultMessageTimeSeries
             .WithPoint(new EnergyResultMessagePoint(1, null, CalculatedQuantityQuality.Missing, "2022-12-12T23:00:00Z"));
@@ -103,7 +105,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Quality_element_is_excluded_if_edi_quantity_quality_is_measured(
+    public async Task Given_EdiQualityQualityIsMeasured_When_CreateDocument_Then_ElementIsExcluded(
         string documentFormat)
     {
         _energyResultMessageTimeSeries
@@ -119,7 +121,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Quality_element_has_correct_code_for_cim_formats(string documentFormat)
+    public async Task
+        Given_AllCalculatedQuantityQuality_When_CreateDocument_Then_QualityElementHasCorrectCodeForCimFormats(
+            string documentFormat)
     {
         var points = Enum.GetValues(typeof(CalculatedQuantityQuality))
             .Cast<CalculatedQuantityQuality>()
@@ -145,7 +149,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Quality_element_is_excluded_if_edi_quantity_quality_is_missing_or_not_available(
+    public async Task Given_EdiQuantityQualityOfMissingOrNotAvailable_When_CreateDocument_Then_QualityElementIsExcluded(
         string documentFormat)
     {
         _energyResultMessageTimeSeries
@@ -165,7 +169,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
     [Theory]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Quality_element_has_correct_code_for_ebix_formats(string documentFormat)
+    public async Task Given_AllCalculatedQuantityQuality_When_CreateDocument_Then_QualityElementHasCorrectCodeForEbix(
+        string documentFormat)
     {
         var points = Enum.GetValues(typeof(CalculatedQuantityQuality))
             .Cast<CalculatedQuantityQuality>()
@@ -193,7 +198,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Settlement_method_is_excluded(string documentFormat)
+    public async Task Given_NullSettlementMethod_When_CreateDocument_Then_SettlementMethodElementIsExcluded(
+        string documentFormat)
     {
         _energyResultMessageTimeSeries
             .WithMeteringPointType(MeteringPointType.Production)
@@ -210,7 +216,8 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Energy_supplier_number_is_excluded(string documentFormat)
+    public async Task Given_NullEnergySupplierNumber_When_CreateDocument_Then_EnergySupplierNumberElementIsExcluded(
+        string documentFormat)
     {
         _energyResultMessageTimeSeries
             .WithEnergySupplierNumber(null);
@@ -226,7 +233,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(DocumentFormat.Ebix))]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Balance_responsible_number_is_excluded(string documentFormat)
+    public async Task
+        Given_NullBalanceResponsibleNumber_When_CreateDocument_Then_BalanceResponsibleNumberElementIsExcluded(
+            string documentFormat)
     {
         _energyResultMessageTimeSeries
             .WithBalanceResponsibleNumber(null);
@@ -245,7 +254,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.BalanceFixing))]
     [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.BalanceFixing))]
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.BalanceFixing))]
-    public async Task Business_reason_is_translated(string documentFormat, string processType)
+    public async Task Given_BusinessReason_When_CreateDocument_Then_BusinessReasonIsTranslated(
+        string documentFormat,
+        string processType)
     {
         _energyResultMessageTimeSeries.WithBusinessReason(BusinessReason.FromName(processType));
 
@@ -261,7 +272,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     [InlineData(nameof(DocumentFormat.Ebix), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
     [InlineData(nameof(DocumentFormat.Xml), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
     [InlineData(nameof(DocumentFormat.Json), nameof(BusinessReason.Correction), nameof(SettlementVersion.FirstCorrection))]
-    public async Task Business_reason_and_settlement_version_is_translated(string documentFormat, string processType, string settlementVersion)
+    public async Task Given_BusinessReasonAndSettlementVersion_When_CreateDocument_Then_IsTranslated(
+        string documentFormat,
+        string processType,
+        string settlementVersion)
     {
         _energyResultMessageTimeSeries
             .WithMessageId(SampleData.MessageId)
@@ -280,7 +294,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     }
 
     [Fact]
-    public async Task Can_support_existing_ebix_documents_with_36_char_ids()
+    public async Task Given_36CharIds_When_CreateDocumentForEbix_Then_DocumentCreated()
     {
         // Arrange
         var messageId = MessageId.Create("26be9856-db4c-451b-a275-18d5fa364285");

@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using FluentAssertions;
 using Xunit;
@@ -41,7 +43,7 @@ public sealed class CimCodeTests
 
     [Theory]
     [MemberData(nameof(ExpectedCalculatedQuantityQualityCimCodeValues))]
-    public void Verify_edi_quality_to_cim_quality_conversion(
+    public void Given_EdiQuality_When_ForEnergyResultOf_Then_CorrectCimValue(
         CalculatedQuantityQuality calculatedQuantityQuality,
         string expectedCimCode)
     {
@@ -52,6 +54,7 @@ public sealed class CimCodeTests
 
     [Theory]
     [MemberData(nameof(CalculatedQualityValues))]
+    [ExcludeFromNameConventionCheck]
     public void Can_handle_all_edi_qualities(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         // Act
@@ -59,6 +62,7 @@ public sealed class CimCodeTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void All_Calculated_Quality_Qualities_are_considered_in_mapping()
     {
         ExpectedCalculatedQuantityQualityCimCodeValues()

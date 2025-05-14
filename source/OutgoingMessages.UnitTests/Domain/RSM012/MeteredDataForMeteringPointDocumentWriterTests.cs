@@ -40,7 +40,8 @@ public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFi
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_maximal_notifyValidatedMeasureData_document(string documentFormat)
+    public async Task Given_MaximalNotifyValidatedMeasureData_When_WriteDocument_Then_DocumentIsCreated(
+        string documentFormat)
     {
         // Arrange
         var messageBuilder = _meteredDateForMeteringPointBuilder;
@@ -88,7 +89,8 @@ public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFi
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Can_create_minimal_series_notifyValidatedMeasureData_document(string documentFormat)
+    public async Task Given_MinimalNotifyValidatedMeasureDataWithSeries_When_WriteDocument_Then_DocumentIsCreated(
+        string documentFormat)
     {
         // Arrange
         var messageBuilder = _meteredDateForMeteringPointBuilder;
@@ -141,7 +143,8 @@ public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFi
      * but in case something goes wrong, we need to be able to create them,
      * in order for the actors to empty their queues
      */
-    public async Task Can_create_no_series_notifyValidatedMeasureData_document(string documentFormat)
+    public async Task Given_MinimalNotifyValidatedMeasureDataWithoutAnySeries_When_WriteDocument_Then_DocumentIsCreated(
+        string documentFormat)
     {
         // Arrange
         var messageBuilder = _meteredDateForMeteringPointBuilder;
@@ -168,7 +171,8 @@ public class MeteredDataForMeteringPointDocumentWriterTests(DocumentValidationFi
     [Theory]
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    public async Task Can_create_multiple_series_notifyValidatedMeasureData_document(string documentFormat)
+    public async Task Given_NotifyValidatedMeasureDataWithMultipleSeries_When_WriteDocument_Then_DocumentIsCreated(
+        string documentFormat)
     {
         // Arrange
         var messageBuilder = _meteredDateForMeteringPointBuilder;

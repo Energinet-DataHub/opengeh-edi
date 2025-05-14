@@ -16,6 +16,7 @@ using System.Text.Encodings.Web;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Tests;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
@@ -86,6 +87,7 @@ public class OutgoingMessageTests
 
     [Theory]
     [MemberData(nameof(EnqueuedQueuedSerializedContents))]
+    [ExcludeFromNameConventionCheck]
     public async Task Ensure_we_can_write_all_enqueued_messages(DocumentType documentType, string serializedContent)
     {
         // Arrange
@@ -106,6 +108,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Ensure_all_document_writer_is_represented()
     {
         // Arrange
@@ -116,6 +119,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Ensure_energy_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
@@ -140,6 +144,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Ensure_accepted_energy_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
@@ -164,6 +169,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Ensure_rejected_energy_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
@@ -187,6 +193,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Ensure_wholesale_services_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
@@ -218,6 +225,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Ensure_accepted_wholesale_services_result_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
@@ -241,6 +249,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void Ensure_rejected_wholesale_services_can_be_deserialized_to_market_activity_record()
     {
         // Arrange
@@ -264,7 +273,7 @@ public class OutgoingMessageTests
     }
 
     [Fact]
-    public void Creates_two_outgoing_message_for_wholesale_services()
+    public void Given_WholesaleAmountPrChargeMessage_When_CreateMessages_Then_TwoOutgoingMessages()
     {
         // Arrange
         var serializer = new Serializer();
@@ -288,6 +297,7 @@ public class OutgoingMessageTests
     /// This means that a NotifyAggregatedMeasureData document with a MDR receiver should be added to the DDM ActorMessageQueue
     /// </summary>
     [Fact]
+    [ExcludeFromNameConventionCheck]
     public void ActorMessageQueueMetadata_is_DDM_when_document_is_NotifyAggregatedMeasureData_and_role_is_MDR()
     {
         // Arrange

@@ -55,7 +55,8 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
+    public async Task Given_NotifyWholesaleServicesDocument_When_CreateDocument_Then_DocumentCreated(
+        string documentFormat)
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
@@ -118,7 +119,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_optional_values_as_null(string documentFormat)
+    public async Task Given_NullValuesInOptionalFields_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         // Arrange
         // This is the wholesale series with most nullable fields.
@@ -190,7 +191,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_without_energySum_quantity(string documentFormat)
+    public async Task Given_NoEnergySumQuantity_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
@@ -213,7 +214,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_settlement_version(string documentFormat)
+    public async Task Given_SettlementVersion_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
@@ -236,7 +237,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_measurement_unit_pieces(string documentFormat)
+    public async Task Given_MeasurementUnitPieces_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
@@ -258,7 +259,8 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_flex_consumption(string documentFormat)
+    public async Task Given_CalculatedHourlyTariffAmountsForFlexConsumption_When_CreateDocument_Then_DocumentCreated(
+        string documentFormat)
     {
         // Arrange
         var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
@@ -294,7 +296,8 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_production(string documentFormat)
+    public async Task Given_CalculatedHourlyTariffAmountsForProduction_When_CreateDocument_Then_DocumentCreated(
+        string documentFormat)
     {
         // Arrange
         var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
@@ -330,7 +333,8 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_consumption(string documentFormat)
+    public async Task Given_CalculatedHourlyTariffAmountsForConsumption_When_CreateDocument_Then_DocumentCreated(
+        string documentFormat)
     {
         // Arrange
         var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
@@ -366,7 +370,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_hourly_resolution(string documentFormat)
+    public async Task Given_HourlyResolution_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
@@ -388,7 +392,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_notifyWholesaleServices_document_with_daily_resolution(string documentFormat)
+    public async Task Given_DailyResolution_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
@@ -449,7 +453,9 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
 
     [Theory]
     [MemberData(nameof(AllDocumentFormatsWithMeteringPointTypes))]
-    public async Task Can_create_notifyWholesaleServices_document_with_all_metering_point_types(DocumentFormat documentFormat, MeteringPointType meteringPointType)
+    public async Task Given_AllMeteringPointTypes_When_CreateDocument_Then_DocumentCreated(
+        DocumentFormat documentFormat,
+        MeteringPointType meteringPointType)
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
@@ -468,7 +474,7 @@ public class NotifyWholesaleServicesDocumentWriterTests(DocumentValidationFixtur
     }
 
     [Fact]
-    public async Task Can_support_existing_ebix_documents_with_36_char_ids()
+    public async Task Given_36CharIdsForEbix_When_CreateDocument_Then_DocumentCreated()
     {
         // Arrange
         var messageId = MessageId.Create("26be9856-db4c-451b-a275-18d5fa364285");

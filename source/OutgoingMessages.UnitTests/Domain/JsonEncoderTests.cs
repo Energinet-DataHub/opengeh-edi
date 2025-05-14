@@ -28,7 +28,7 @@ public sealed class JsonEncoderTests
     private const string TestString = "ÅØÆÄÖÜåøæäöüáÁéÉíÍóÓúÚýÝþðÐ";
 
     [Fact]
-    public void DefaultEncoder_DoesNotHandleScandinavianCharacters()
+    public void Given_DefaultEncoder_When_WriteStringValue_Then_DoesNotHandleScandinavianCharacters()
     {
         // Arrange
         var options = new JsonWriterOptions { Indented = true, Encoder = JavaScriptEncoder.Default };
@@ -45,7 +45,7 @@ public sealed class JsonEncoderTests
     }
 
     [Fact]
-    public void CustomEncoder_HandlesScandinavianCharacters()
+    public void Given_CustomEncoder_When_WriteStringValue_Then_HandlesScandinavianCharacters()
     {
         // Arrange
         var options = new JsonWriterOptions
@@ -69,7 +69,7 @@ public sealed class JsonEncoderTests
     }
 
     [Fact]
-    public void JsonDocumentParse_HandlesScandinavianCharacters()
+    public void Given_DefaultJsonDocument_When_Parse_Then_HandlesScandinavianCharacters()
     {
         const string jsonPropertyName = "ÅBigMøøseØnceÅteMyÆppleTrææ";
 
@@ -96,7 +96,7 @@ public sealed class JsonEncoderTests
     }
 
     [Fact]
-    public void ProtoBuff_HandlesScandinavianCharacters()
+    public void Given_DefaultProtoBuffWriter_When_WriteTo_Then_HandlesScandinavianCharacters()
     {
         // Arrange
         var message = new ActorActivated();
@@ -121,7 +121,7 @@ public sealed class JsonEncoderTests
     }
 
     [Fact]
-    public void DataHubSerializer_HandlesScandinavianCharacters()
+    public void Given_DataHubSerializer_When_Serialize_Then_HandlesScandinavianCharacters()
     {
         // Arrange
         var serializer = new Serializer();
@@ -147,7 +147,7 @@ public sealed class JsonEncoderTests
      *   Content-Type: application/json; charset=utf-8.
      * Never allow the raw UnsafeRelaxedJsonEscaping output to be emitted into an HTML page or a <script> element.
      */
-    public void CustomEncoder_DoesNotHandlesCertainEscapedCharacters()
+    public void Given_CustomEncoder_When_WriteStringValue_Then_DoesNotHandlesCertainEscapedCharacters()
     {
         // Arrange
         var options = new JsonWriterOptions

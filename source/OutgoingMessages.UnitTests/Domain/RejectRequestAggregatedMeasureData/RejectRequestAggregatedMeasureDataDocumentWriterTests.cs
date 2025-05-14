@@ -44,7 +44,8 @@ public class RejectRequestAggregatedMeasureDataDocumentWriterTests : IClassFixtu
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_document(string documentFormat)
+    public async Task Given_RejectRequestAggregatedMeasureDataDocument_When_CreateDocument_Then_DocumentCreated(
+        string documentFormat)
     {
         var marketDocumentStream = await CreateDocument(
                 _rejectedEnergyResultMessageSerie,

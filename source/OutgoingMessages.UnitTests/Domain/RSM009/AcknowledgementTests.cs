@@ -40,7 +40,7 @@ public class AcknowledgementTests : IClassFixture<DocumentValidationFixture>
     [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
-    public async Task Can_create_document(string documentFormat)
+    public async Task Given_Acknowledgement_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         var rejectMessageBuilder = new RejectedForwardMeteredDataMessageBuilder(
             messageId: MessageId.New(),
