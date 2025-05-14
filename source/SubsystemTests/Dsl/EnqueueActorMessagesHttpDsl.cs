@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
@@ -33,19 +32,6 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
     Justification = "Dsl classes uses a naming convention based on the business domain")]
 internal class EnqueueActorMessagesHttpDsl
 {
-    /// <summary>
-    /// Matches the following json (see https://regex101.com/r/hZebNT/1):
-    /// "MarketEvaluationPoint": [
-    ///     {
-    ///         "mRID": {
-    ///             "codingScheme": "A10",
-    ///             "value": "{__MeteringPointId__}"
-    ///         }
-    ///     }
-    /// ]
-    /// </summary>
-    private const string MeteringPointRegexPattern = "/MarketEvaluationPoint\":\\s*\\[\\X*\"mRID\":\\s{\\X*\"value\":\\s*\"{__MeteringPointId__}\"/gm";
-
     private readonly EdiDriver _ediDriver;
     private readonly SubsystemDriver _subsystemDriver;
     private readonly Instant _rsm018Date = Instant.FromUtc(2025, 05, 11, 22, 00);
