@@ -205,6 +205,19 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         return archivedMessages.ToList().AsReadOnly();
     }
 
+    public async Task<int> GetNumberOfCreatedMessagesInDatabase()
+    {
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>()!;
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var rowCount =
+            await connection.QuerySingleAsync<int>(
+                    "SELECT COUNT(*) FROM dbo.[ArchivedMessages]")
+                .ConfigureAwait(false);
+
+        return rowCount;
+    }
+
     public async Task<IReadOnlyCollection<MeteringPointArchivedMessageFromDb>> GetAllMeteringPointMessagesInDatabase()
     {
         var connectionFactory = Services.GetService<IDatabaseConnectionFactory>()!;
