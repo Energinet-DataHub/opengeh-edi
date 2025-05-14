@@ -62,7 +62,7 @@ public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProces
             DelegatedProcess.ProcessRequestMeteringpointData => ProcessType.RequestMeteredDataForMeteringPoint,
             DelegatedProcess.ProcessReceiveMeteringpointData => ProcessType.IncomingMeteredDataForMeteringPoint,
             DelegatedProcess.ProcessSendMeteringpointData => ProcessType.OutgoingMeteredDataForMeteringPoint,
-            DelegatedProcess.ProcessReceiveGapData => ProcessType.OutgoingReminderOfMissingMeasureData,
+            DelegatedProcess.ProcessReceiveGapData => ProcessType.MissingMeasurementLog,
             _ => throw new ArgumentOutOfRangeException(nameof(delegatedProcess), delegatedProcess, null),
         };
     }
