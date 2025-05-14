@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
@@ -245,6 +246,20 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var message = OutgoingMessageFactory.CreateMessage(
             rejectedSendMeasurementsMessageDto,
+            _serializer,
+            _clock.GetCurrentInstant());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+
+        return messageId.Value;
+    }
+
+    public async Task<Guid> EnqueueAsync(
+        MissingMeasurementMessageDto missingMeasurementMessageDto,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessageFactory.CreateMessage(
+            missingMeasurementMessageDto,
             _serializer,
             _clock.GetCurrentInstant());
 

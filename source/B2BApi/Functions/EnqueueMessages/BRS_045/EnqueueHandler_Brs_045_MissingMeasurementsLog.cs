@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_045;
 
@@ -25,11 +28,35 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public Task HandleAsync(
+    public async Task HandleAsync(
         EnqueueMissingMeasurementsLogHttpV1 missingMeasurementsLog,
         CancellationToken cancellationToken)
     {
-        // TODO: Implement enqueueing outgoing RSM-018 message.
-        return Task.CompletedTask;
+        foreach (var message in missingMeasurementsLog.Data)
+        {
+            var outgoingMessageDto = CreateOutgoingMessageDto(message);
+
+            await _outgoingMessagesClient.EnqueueAsync(
+                outgoingMessageDto,
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private MissingMeasurementMessageDto CreateOutgoingMessageDto(EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId data)
+    {
+        return new MissingMeasurementMessageDto(
+            eventId: EventId.From(Guid.CreateVersion7()),
+            externalId: new ExternalId(data.IdempotencyKey),
+            receiver: new Actor(
+                ActorNumber.Create(data.GridAccessProvider.Value),
+                ActorRole.MeteredDataResponsible),
+            businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
+            gridAreaCode: data.GridArea,
+            missingMeasurement: new MissingMeasurement(
+                TransactionId: TransactionId.New(),
+                MeteringPointId: MeteringPointId.From(data.MeteringPointId),
+                Date: data.Date.ToInstant()));
     }
 }

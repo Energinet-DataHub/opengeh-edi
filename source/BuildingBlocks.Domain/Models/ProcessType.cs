@@ -23,7 +23,7 @@ public class ProcessType : EnumerationType
     public static readonly ProcessType IncomingMeteredDataForMeteringPoint = new(nameof(IncomingMeteredDataForMeteringPoint));
     public static readonly ProcessType OutgoingMeteredDataForMeteringPoint = new(nameof(OutgoingMeteredDataForMeteringPoint));
     public static readonly ProcessType RequestMeteredDataForMeteringPoint = new(nameof(RequestMeteredDataForMeteringPoint));
-    public static readonly ProcessType OutgoingReminderOfMissingMeasureData = new(nameof(OutgoingReminderOfMissingMeasureData));
+    public static readonly ProcessType MissingMeasurementLog = new(nameof(MissingMeasurementLog));
 
     private ProcessType(string name)
         : base(name)
