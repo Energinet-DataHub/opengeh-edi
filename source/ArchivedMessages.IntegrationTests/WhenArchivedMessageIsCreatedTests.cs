@@ -96,7 +96,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
 
     [Theory]
     [MemberData(nameof(GetDocumentTypes))]
-    public async Task Given_DocumentType_When_Created_Then_StoredInExpectedDatabase(DocumentType documentType)
+    public async Task Given_DocumentType_When_Created_Then_StoredInExpectedTable(DocumentType documentType)
     {
         await CreateArchivedMessageAsync(documentType: documentType);
 
