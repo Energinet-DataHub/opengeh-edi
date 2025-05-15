@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectReques
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM018;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -86,6 +87,7 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IDocumentWriter, AcknowledgementJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, AcknowledgementXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, AcknowledgementEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, MissingMeasurementJsonDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         // MessageEnqueueingConfiguration
