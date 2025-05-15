@@ -32,10 +32,10 @@ public record ExternalId
     }
 
     public ExternalId(Guid value)
-        : this(value.ToString())
+        : this(value.ToString().ToLower())
     { }
 
     public string Value { get; }
 
-    public static ExternalId New() => new(Guid.NewGuid().ToString());
+    public static ExternalId New() => new(Guid.NewGuid());
 }
