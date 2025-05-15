@@ -54,7 +54,6 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
         return new MissingMeasurementMessageDto(
             eventId: EventId.From(Guid.CreateVersion7()),
             orchestrationInstanceId: orchestrationInstanceId,
-            meteringPointId: data.MeteringPointId,
             receiver: new Actor(
                 ActorNumber.Create(data.GridAccessProvider.Value),
                 ActorRole.MeteredDataResponsible),

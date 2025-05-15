@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -379,8 +381,11 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             meteringPointId.Value);
 
         var message = CreateMissingMeasurementsLogMessage(
-            orchestrationInstanceId,
-            meteringPointId);
+            orchestrationInstanceId: orchestrationInstanceId,
+            meteringPointId: meteringPointId,
+            date: Instant.FromUtc(2024, 12, 31, 23, 00),
+            receiverActorNumber: ActorNumber.Create("1234567890123"),
+            receiverActorRole: ActorRole.GridAccessProvider);
 
         // Act
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
@@ -403,27 +408,61 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         Assert.Equal(expectedExternalId, outgoingMessage.ExternalId);
     }
 
-    [Fact]
-    public async Task Given_TwoMessagesWithDifferentOrchestrationInstanceIds_When_EnqueueingMissingMeasurementsLog_Then_BothMessagesAreEnqueued()
+    [Theory]
+    [InlineData(MissingMeasurementsIdempotencyKey.OrchestrationInstanceId)]
+    [InlineData(MissingMeasurementsIdempotencyKey.MeteringPointId)]
+    [InlineData(MissingMeasurementsIdempotencyKey.Date)]
+    [InlineData(MissingMeasurementsIdempotencyKey.ReceiverActorNumber)]
+    [InlineData(MissingMeasurementsIdempotencyKey.ReceiverActorRole)]
+    public async Task Given_TwoMessagesWithDifferentIdempotencyData_When_EnqueueingMissingMeasurementsLog_Then_BothMessagesAreEnqueued(
+        MissingMeasurementsIdempotencyKey differentIdempotencyKey)
     {
         var orchestrationInstanceId1 = Guid.NewGuid();
-        var orchestrationInstanceId2 = Guid.NewGuid();
-        var meteringPointId = MeteringPointId.From("1234567890123");
+        var orchestrationInstanceId2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.OrchestrationInstanceId
+            ? Guid.NewGuid()
+            : orchestrationInstanceId1;
+
+        var meteringPointId1 = MeteringPointId.From("1111111111111");
+        var meteringPointId2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.MeteringPointId
+            ? MeteringPointId.From("2222222222222")
+            : meteringPointId1;
+
+        var date1 = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var date2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.Date
+            ? Instant.FromUtc(2025, 01, 31, 23, 00)
+            : date1;
+
+        const string receiverActorNumber1 = "1234567890123";
+        var receiverActorNumber2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.ReceiverActorNumber
+            ? "1234567890123456"
+            : receiverActorNumber1;
+
+        var receiverActorRole1 = ActorRole.GridAccessProvider;
+        var receiverActorRole2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.ReceiverActorRole
+            ? ActorRole.EnergySupplier
+            : receiverActorRole1;
+
         var expectedExternalId1 = ExternalId.HashValuesWithMaxLength(
             orchestrationInstanceId1.ToString("N"),
-            meteringPointId.Value);
+            meteringPointId1.Value);
         var expectedExternalId2 = ExternalId.HashValuesWithMaxLength(
             orchestrationInstanceId2.ToString("N"),
-            meteringPointId.Value);
+            meteringPointId2.Value);
 
         // Given multiple messages with the same idempotency data except for the receiver actor number
         var message1 = CreateMissingMeasurementsLogMessage(
             orchestrationInstanceId1,
-            meteringPointId);
+            meteringPointId1,
+            date1,
+            ActorNumber.Create(receiverActorNumber1),
+            receiverActorRole1);
 
         var message2 = CreateMissingMeasurementsLogMessage(
             orchestrationInstanceId2,
-            meteringPointId);
+            meteringPointId2,
+            date2,
+            ActorNumber.Create(receiverActorNumber2),
+            receiverActorRole2);
 
         // Act
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
@@ -479,21 +518,23 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
     private MissingMeasurementMessageDto CreateMissingMeasurementsLogMessage(
         Guid orchestrationInstanceId,
-        MeteringPointId meteringPointId)
+        MeteringPointId meteringPointId,
+        Instant date,
+        ActorNumber receiverActorNumber,
+        ActorRole receiverActorRole)
     {
         return new MissingMeasurementMessageDto(
             eventId: EventId.From(Guid.NewGuid()),
             orchestrationInstanceId: orchestrationInstanceId,
-            meteringPointId: "1234567890123",
             receiver: new Actor(
-                ActorNumber.Create("1234567890123"),
-                ActorRole.GridAccessProvider),
+                receiverActorNumber,
+                receiverActorRole),
             businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
             gridAreaCode: "804",
             missingMeasurement: new MissingMeasurement(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: meteringPointId,
-                Date: Instant.FromUtc(2024, 12, 31, 23, 00)));
+                Date: date));
     }
 
     private IReadOnlyCollection<MeasurementDto> GenerateEnergyObservations(
@@ -518,5 +559,15 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
                     Quantity: 7,
                     Quality: Quality.Measured))
             .ToList();
+    }
+
+    [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test")]
+    public enum MissingMeasurementsIdempotencyKey
+    {
+        OrchestrationInstanceId,
+        MeteringPointId,
+        Date,
+        ReceiverActorNumber,
+        ReceiverActorRole,
     }
 }
