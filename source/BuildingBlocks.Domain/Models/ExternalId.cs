@@ -32,7 +32,7 @@ public record ExternalId
     }
 
     public ExternalId(Guid value)
-        : this(value.ToString().ToLower())
+        : this(value.ToString())
     { }
 
     public string Value { get; }
