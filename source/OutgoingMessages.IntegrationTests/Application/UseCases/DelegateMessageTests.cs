@@ -44,12 +44,12 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
         _now = SystemClock.Instance.GetCurrentInstant();
     }
 
-    public static TheoryData<ProcessType> DelegationIsHandledByEdi => new(
+    public static TheoryData<ProcessType> SupportedProcessTypesForDelegation => new(
         EnumerationType.GetAll<ProcessType>()
-            .Where(x => !DelegationIsNotHandledByEdi().Contains(x))
+            .Where(x => !UnsupportedProcessTypesForDelegation().Contains(x))
             .ToArray());
 
-    public static TheoryData<ProcessType> DelegationIsNotHandledByEdi()
+    public static TheoryData<ProcessType> UnsupportedProcessTypesForDelegation()
     {
         return new TheoryData<ProcessType>
         {
@@ -59,8 +59,8 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(DelegationIsHandledByEdi))]
-    public async Task Given_DelegationIsSet_When_DelegateAsync_Then_MessageIsDelegated(ProcessType processType)
+    [MemberData(nameof(SupportedProcessTypesForDelegation))]
+    public async Task Given_SupportedProcessType_When_DelegateAsync_Then_MessageIsDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, processType);
@@ -75,8 +75,8 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(DelegationIsHandledByEdi))]
-    public async Task Given_DocumentTypeIsAcknowledgement_When_DelegateAsync_Then_NoMessagesAreDelegated(ProcessType processType)
+    [MemberData(nameof(SupportedProcessTypesForDelegation))]
+    public async Task Given_DocumentTypeIsAcknowledgement_When_DelegateAsync_Then_MessageIsNotDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType, DocumentType.Acknowledgement);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, processType);
@@ -91,8 +91,8 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(DelegationIsNotHandledByEdi))]
-    public async Task Given_DelegationIsSet_When_DelegateAsync_Then_NoMessagesAreDelegated(ProcessType processType)
+    [MemberData(nameof(UnsupportedProcessTypesForDelegation))]
+    public async Task Given_UnsupportedProcessType_When_DelegateAsync_Then_MessageIsNotDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, processType);
