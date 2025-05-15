@@ -174,7 +174,7 @@ public abstract class JsonMessageParserBase(
         }
         catch (JsonException exception)
         {
-            marketMessage.Stream.Seek(0, SeekOrigin.Begin); 
+            marketMessage.Stream.Seek(0, SeekOrigin.Begin);
             using var reader = new StreamReader(marketMessage.Stream);
             var buffer = new char[1500];
             var charsRead = await reader.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
