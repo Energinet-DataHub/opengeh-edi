@@ -174,7 +174,13 @@ public abstract class JsonMessageParserBase(
         }
         catch (JsonException exception)
         {
-            _logger.LogError(exception, "Failed to parse JSON document.");
+            marketMessage.Stream.Seek(0, SeekOrigin.Begin); 
+            using var reader = new StreamReader(marketMessage.Stream);
+            var buffer = new char[1500];
+            var charsRead = await reader.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+            var first1500Chars = new string(buffer, 0, charsRead);
+
+            _logger.LogError(exception, "Failed to parse JSON document. First 1500 chars: {First1500Chars}", first1500Chars);
             return null;
         }
     }
