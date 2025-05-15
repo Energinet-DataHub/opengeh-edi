@@ -47,7 +47,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     }
 
     [Fact]
-    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataSeparately_Then_OnlyOneMessageIsEnqueued()
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataSeparately_Then_OneMessageIsEnqueued()
     {
         // Given multiple messages with the same idempotency data
         var externalId = ExternalId.New();
