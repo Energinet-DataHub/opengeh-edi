@@ -235,11 +235,6 @@ public class OutgoingMessage
         FileStorageReference = CreateFileStorageReference(Receiver.Number, CreatedAt, Id);
     }
 
-    private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)
-    {
-        return documentType == DocumentType.NotifyAggregatedMeasureData || documentType == DocumentType.RejectRequestAggregatedMeasureData;
-    }
-
     private static FileStorageReference CreateFileStorageReference(ActorNumber receiverActorNumber, Instant timestamp, OutgoingMessageId outgoingMessageId)
     {
         return FileStorageReference.Create(FileStorageCategory, receiverActorNumber.Value, timestamp, outgoingMessageId.Value);
