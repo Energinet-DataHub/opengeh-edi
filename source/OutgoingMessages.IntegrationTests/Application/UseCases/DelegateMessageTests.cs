@@ -44,14 +44,14 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
         _now = SystemClock.Instance.GetCurrentInstant();
     }
 
-    public static TheoryData<ProcessType> GetAllDelegationProcessTypes => new(
+    public static TheoryData<ProcessType> DelegationIsHandledByEdi => new(
         EnumerationType.GetAll<ProcessType>()
-            .Where(x => !NotDelegationProcessTypes().Contains(x))
+            .Where(x => !DelegationIsNotHandledByEdi().Contains(x))
             .ToArray());
 
-    public static IEnumerable<ProcessType> NotDelegationProcessTypes()
+    public static TheoryData<ProcessType> DelegationIsNotHandledByEdi()
     {
-        return new List<ProcessType>
+        return new TheoryData<ProcessType>
         {
             ProcessType.RequestEnergyResults,
             ProcessType.RequestWholesaleResults,
@@ -59,7 +59,7 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(GetAllDelegationProcessTypes))]
+    [MemberData(nameof(DelegationIsHandledByEdi))]
     public async Task Given_DelegationIsSet_When_DelegateAsync_Then_MessageIsDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType);
@@ -75,10 +75,26 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(GetAllDelegationProcessTypes))]
+    [MemberData(nameof(DelegationIsHandledByEdi))]
     public async Task Given_DocumentTypeIsAcknowledgement_When_DelegateAsync_Then_NoMessagesAreDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType, DocumentType.Acknowledgement);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, processType);
+
+        var result = await _sut.DelegateAsync(message, CancellationToken.None);
+
+        Assert.Equal(_delegatedBy.ActorNumber, result.DocumentReceiver.Number);
+        Assert.Equal(_delegatedBy.ActorRole, result.DocumentReceiver.ActorRole);
+
+        Assert.Equal(_delegatedBy.ActorNumber, result.Receiver.Number);
+        Assert.Equal(_delegatedBy.ActorRole, result.Receiver.ActorRole);
+    }
+
+    [Theory]
+    [MemberData(nameof(DelegationIsNotHandledByEdi))]
+    public async Task Given_DelegationIsSet_When_DelegateAsync_Then_NoMessagesAreDelegated(ProcessType processType)
+    {
+        var message = CreateOutgoingMessage(_delegatedBy, processType);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, processType);
 
         var result = await _sut.DelegateAsync(message, CancellationToken.None);
@@ -97,18 +113,18 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     {
         var receiver = Receiver.Create(actor.ActorNumber, actorRole: actor.ActorRole);
         return new OutgoingMessage(
-            eventId: EventId.From(Guid.NewGuid()),
-            documentType: documentType ?? DocumentType.NotifyAggregatedMeasureData,
+            eventId: null!,
+            documentType: documentType ?? null!,
             receiver: receiver,
             documentReceiver: receiver,
-            processId: Guid.NewGuid(),
-            businessReason: BusinessReason.BalanceFixing.Name,
-            serializedContent: "dummy",
+            processId: null,
+            businessReason: null!,
+            serializedContent: null!,
             createdAt: _now,
             messageCreatedFromProcess: processType,
             relatedToMessageId: null,
             gridAreaCode: GridAreaCode,
-            externalId: ExternalId.New(),
+            externalId: null!,
             calculationId: null,
             periodStartedAt: null,
             dataCount: 1,
