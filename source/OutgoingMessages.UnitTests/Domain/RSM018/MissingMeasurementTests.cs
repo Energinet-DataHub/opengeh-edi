@@ -36,10 +36,10 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
         _parser = new MessageRecordParser(new Serializer());
     }
 
-    [Theory(Skip = "Skipped for now")]
+    [Theory]
     //[InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
-    //[InlineData(nameof(DocumentFormat.Ebix))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Given_MissingMeasurement_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         var missingMeasurementBuilder = new MissingMeasurementMessageBuilder(
