@@ -75,6 +75,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
 
+        // We need to save changes between enqueues to not fail on idempotency unique constraint in database
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
         await unitOfWork.SaveChangesAsync(CancellationToken.None);
 
@@ -163,10 +164,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -213,10 +211,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -263,10 +258,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -315,10 +307,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -363,7 +352,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
+        // We need to save changes between enqueues to not fail on idempotency unique constraint in database
         await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -381,7 +370,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     }
 
     [Fact]
-    public async Task Given_TwoMessagesWithSameData_When_EnqueueingMissingMeasurementsLog_Then_OneMessageIsEnqueued()
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingMissingMeasurementsLog_Then_OneMessageIsEnqueued()
     {
         var orchestrationInstanceId = Guid.NewGuid();
         var meteringPointId = MeteringPointId.From("1234567890123");
@@ -397,7 +386,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
+        // We need to save changes between enqueues to not fail on idempotency unique constraint in database
         await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
