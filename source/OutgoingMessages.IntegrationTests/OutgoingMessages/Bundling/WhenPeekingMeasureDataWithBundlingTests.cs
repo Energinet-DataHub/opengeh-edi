@@ -87,7 +87,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
             .Select(
                 i => new AcceptedSendMeasurementsMessageDto(
                     eventId: eventId,
-                    externalId: new ExternalId(Guid.NewGuid()),
+                    externalId: ExternalId.New(),
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
@@ -234,7 +234,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
             .Select(
                 i => new RejectedSendMeasurementsMessageDto(
                     eventId: eventId,
-                    externalId: new ExternalId(Guid.NewGuid()),
+                    externalId: ExternalId.New(),
                     receiverNumber: receiver.Number,
                     receiverRole: receiver.ActorRole,
                     businessReason: BusinessReason.PeriodicMetering,

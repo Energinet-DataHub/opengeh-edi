@@ -106,15 +106,18 @@ public class OutgoingMessageRepository(
             cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt)
+    public Task<OutgoingMessageId?> GetIdIfExistsAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt)
     {
-        return await _context.OutgoingMessages
-            .FirstOrDefaultAsync(x =>
+        // Query should always match the UQ_OutgoingMessages_ReceiverNumber_PeriodStartedAt_ReceiverRole_ExternalId
+        // unique index, to ensure performant idempotency checks.
+        return _context.OutgoingMessages
+            .Where(x =>
                 x.Receiver.Number == receiver.Number &&
+                x.PeriodStartedAt == periodStartedAt &&
                 x.Receiver.ActorRole == receiver.ActorRole &&
-                x.ExternalId == externalId &&
-                x.PeriodStartedAt == periodStartedAt)
-            .ConfigureAwait(false);
+                x.ExternalId == externalId)
+            .Select(x => x.Id)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken)
