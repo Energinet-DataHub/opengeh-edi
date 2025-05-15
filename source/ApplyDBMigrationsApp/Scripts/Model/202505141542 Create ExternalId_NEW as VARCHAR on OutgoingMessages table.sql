@@ -5,7 +5,7 @@ BEGIN TRANSACTION
     GO
 
     UPDATE [dbo].[OutgoingMessages]
-        SET [ExternalId_NEW] = CONVERT(VARCHAR(36), [ExternalId])
+        SET [ExternalId_NEW] = LOWER(CONVERT(VARCHAR(36), [ExternalId]))
 
     ALTER TABLE [dbo].[OutgoingMessages]
         ALTER COLUMN [ExternalId_NEW] VARCHAR(36) NOT NULL
