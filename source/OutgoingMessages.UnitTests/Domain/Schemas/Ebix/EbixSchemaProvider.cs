@@ -79,6 +79,8 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
             return "DK_MeteredDataTimeSeries";
         if (document == DocumentType.Acknowledgement)
             return "DK_Acknowledgement";
+        if (document == DocumentType.ReminderOfMissingMeasureData)
+            return "DK_NotifyMissingDataType";
 
         throw new InvalidOperationException($"Unknown document type: {document}");
     }
