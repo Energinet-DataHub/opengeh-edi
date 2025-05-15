@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -118,24 +117,6 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             start: start,
             end: end,
             relatedToMessageId: relatedToMessageId2);
-
-        // Need to create a bundle up front, else an exception will be thrown when trying to create the same bundle for both messages.
-        // The easiest way to do that, is just to enqueue another message, to the same receiver, before running the tests
-        using (var setupScope = ServiceProvider.CreateScope())
-        {
-            var existingMessage = CreateAcceptedForwardMeteredDataMessage(
-                externalId: ExternalId.New(), // Using a new external id, so the messages are not the same (idempotency check)
-                receiver: receiver,
-                start: start,
-                end: end,
-                relatedToMessageId: MessageId.New());
-
-            var setupOutgoingMessagesClient = setupScope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-            var setupDbContext = setupScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
-
-            await setupOutgoingMessagesClient.EnqueueAsync(existingMessage, CancellationToken.None);
-            await setupDbContext.SaveChangesAsync(CancellationToken.None);
-        }
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();

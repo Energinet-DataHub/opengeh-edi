@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Security.Cryptography;
+using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -34,7 +36,7 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
     {
         foreach (var message in missingMeasurementsLog.Data)
         {
-            var outgoingMessageDto = CreateOutgoingMessageDto(message);
+            var outgoingMessageDto = CreateOutgoingMessageDto(missingMeasurementsLog.OrchestrationInstanceId, message);
 
             await _outgoingMessagesClient.EnqueueAsync(
                 outgoingMessageDto,
@@ -45,11 +47,15 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
         // await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private MissingMeasurementMessageDto CreateOutgoingMessageDto(EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId data)
+    private MissingMeasurementMessageDto CreateOutgoingMessageDto(
+        Guid orchestrationInstanceId,
+        EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId data)
     {
         return new MissingMeasurementMessageDto(
             eventId: EventId.From(Guid.CreateVersion7()),
-            externalId: new ExternalId(data.IdempotencyKey),
+            externalId: ExternalId.HashValuesWithMaxLength(
+                orchestrationInstanceId.ToString("N"),
+                data.MeteringPointId),
             receiver: new Actor(
                 ActorNumber.Create(data.GridAccessProvider.Value),
                 ActorRole.MeteredDataResponsible),
