@@ -44,12 +44,12 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
         _now = SystemClock.Instance.GetCurrentInstant();
     }
 
-    public static TheoryData<ProcessType> SupportedProcessTypesForDelegation => new(
+    public static TheoryData<ProcessType> SupportedProcessTypes => new(
         EnumerationType.GetAll<ProcessType>()
-            .Where(x => !UnsupportedProcessTypesForDelegation().Contains(x))
+            .Where(x => !IgnoredProcessTypes().Contains(x))
             .ToArray());
 
-    public static TheoryData<ProcessType> UnsupportedProcessTypesForDelegation()
+    public static TheoryData<ProcessType> IgnoredProcessTypes()
     {
         return new TheoryData<ProcessType>
         {
@@ -59,7 +59,7 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(SupportedProcessTypesForDelegation))]
+    [MemberData(nameof(SupportedProcessTypes))]
     public async Task Given_SupportedProcessType_When_DelegateAsync_Then_MessageIsDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType);
@@ -75,7 +75,7 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(SupportedProcessTypesForDelegation))]
+    [MemberData(nameof(SupportedProcessTypes))]
     public async Task Given_DocumentTypeIsAcknowledgement_When_DelegateAsync_Then_MessageIsNotDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType, DocumentType.Acknowledgement);
@@ -91,8 +91,8 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
     }
 
     [Theory]
-    [MemberData(nameof(UnsupportedProcessTypesForDelegation))]
-    public async Task Given_UnsupportedProcessType_When_DelegateAsync_Then_MessageIsNotDelegated(ProcessType processType)
+    [MemberData(nameof(IgnoredProcessTypes))]
+    public async Task Given_IgnoredProcessType_When_DelegateAsync_Then_MessageIsNotDelegated(ProcessType processType)
     {
         var message = CreateOutgoingMessage(_delegatedBy, processType);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, processType);
