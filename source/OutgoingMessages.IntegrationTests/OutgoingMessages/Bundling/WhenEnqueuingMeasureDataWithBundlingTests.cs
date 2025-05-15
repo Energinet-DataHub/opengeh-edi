@@ -422,7 +422,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
                     var time = startTime.Plus(i * resolutionDuration); // Start every message 15 minutes later
                     return new AcceptedSendMeasurementsMessageDto(
                         eventId: eventId,
-                        externalId: new ExternalId(Guid.NewGuid()),
+                        externalId: ExternalId.New(),
                         receiver: receiver.ToActor(),
                         businessReason: BusinessReason.PeriodicMetering,
                         relatedToMessageId: MessageId.New(),
@@ -595,7 +595,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             .Select(
                 i => new AcceptedSendMeasurementsMessageDto(
                     eventId: EventId.From(Guid.NewGuid()),
-                    externalId: new ExternalId(Guid.NewGuid()),
+                    externalId: ExternalId.New(),
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
@@ -703,7 +703,7 @@ public class WhenEnqueuingMeasureDataWithBundlingTests : OutgoingMessagesTestBas
             .Select(
                 _ => new AcceptedSendMeasurementsMessageDto(
                     eventId: EventId.From(Guid.NewGuid()),
-                    externalId: new ExternalId(Guid.NewGuid()),
+                    externalId: ExternalId.New(),
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),

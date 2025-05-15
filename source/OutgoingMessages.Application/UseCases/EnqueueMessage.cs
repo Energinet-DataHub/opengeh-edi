@@ -63,14 +63,14 @@ public class EnqueueMessage
         messageToEnqueue = await _delegateMessage.DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);
 
-        var existingMessage = await _outgoingMessageRepository.GetAsync(
+        var existingMessageId = await _outgoingMessageRepository.GetIdIfExistsAsync(
                 messageToEnqueue.Receiver,
                 messageToEnqueue.ExternalId,
                 messageToEnqueue.PeriodStartedAt)
             .ConfigureAwait(false);
 
-        if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
-            return existingMessage.Id;
+        if (existingMessageId != null) // Message is already enqueued, do nothing (idempotency check)
+            return existingMessageId;
 
         if (!IsBundlingEnabled(messageToEnqueue.DocumentType))
         {
