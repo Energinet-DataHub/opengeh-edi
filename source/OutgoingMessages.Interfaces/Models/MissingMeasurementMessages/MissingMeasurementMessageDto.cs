@@ -18,19 +18,21 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasur
 
 public sealed class MissingMeasurementMessageDto(
     EventId eventId,
-    ExternalId externalId,
+    Guid orchestrationInstanceId,
+    string meteringPointId,
     Actor receiver,
     BusinessReason businessReason,
     string gridAreaCode,
     MissingMeasurement missingMeasurement)
-    : OutgoingMessageDto(DocumentType.ReminderOfMissingMeasureData,
-        receiver.ActorNumber,
-        null,
-        eventId,
-        businessReason.Name,
-        receiver.ActorRole,
-        externalId,
-        null)
+    : OutgoingMessageDto(
+        documentType: DocumentType.ReminderOfMissingMeasureData,
+        receiverNumber: receiver.ActorNumber,
+        processId: null,
+        eventId: eventId,
+        businessReasonName: businessReason.Name,
+        receiverRole: receiver.ActorRole,
+        externalId: ExternalId.HashValuesWithMaxLength(orchestrationInstanceId.ToString("N"), meteringPointId),
+        relatedToMessageId: null)
 {
     public MissingMeasurement MissingMeasurement { get; } = missingMeasurement;
 

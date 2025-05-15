@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -379,6 +380,85 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         Assert.Equal(serviceBusMessageId.ToString(), outgoingMessage.ExternalId.Value);
     }
 
+    [Fact]
+    public async Task Given_TwoMessagesWithSameData_When_EnqueueingMissingMeasurementsLog_Then_OneMessageIsEnqueued()
+    {
+        var orchestrationInstanceId = Guid.NewGuid();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var expectedExternalId = ExternalId.HashValuesWithMaxLength(
+            orchestrationInstanceId.ToString("N"),
+            meteringPointId.Value);
+
+        var message = CreateMissingMeasurementsLogMessage(
+            orchestrationInstanceId,
+            meteringPointId);
+
+        // Act
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // We need to save changes between enqueues to not fail on unique index for bundling
+        await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        // Assert
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        var outgoingMessage = Assert.Single(outgoingMessages);
+        Assert.Equal(expectedExternalId, outgoingMessage.ExternalId);
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithDifferentOrchestrationInstanceIds_When_EnqueueingMissingMeasurementsLog_Then_BothMessagesAreEnqueued()
+    {
+        var orchestrationInstanceId1 = Guid.NewGuid();
+        var orchestrationInstanceId2 = Guid.NewGuid();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var expectedExternalId1 = ExternalId.HashValuesWithMaxLength(
+            orchestrationInstanceId1.ToString("N"),
+            meteringPointId.Value);
+        var expectedExternalId2 = ExternalId.HashValuesWithMaxLength(
+            orchestrationInstanceId2.ToString("N"),
+            meteringPointId.Value);
+
+        // Given multiple messages with the same idempotency data except for the receiver actor number
+        var message1 = CreateMissingMeasurementsLogMessage(
+            orchestrationInstanceId1,
+            meteringPointId);
+
+        var message2 = CreateMissingMeasurementsLogMessage(
+            orchestrationInstanceId2,
+            meteringPointId);
+
+        // Act
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        // Then both messages are enqueued
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
+        Assert.Collection(
+            outgoingMessages.OrderBy(om => om.CreatedAt),
+            [
+                om => Assert.Equal(expectedExternalId1, om.ExternalId),
+                om => Assert.Equal(expectedExternalId2, om.ExternalId),
+            ]);
+    }
+
     private AcceptedSendMeasurementsMessageDto CreateAcceptedForwardMeteredDataMessage(
         ExternalId externalId,
         Actor receiver,
@@ -406,6 +486,25 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
                 Resolution: Resolution.QuarterHourly,
                 Period: new Period(start, end),
                 Measurements: GenerateEnergyObservations(start, end, resolution)));
+    }
+
+    private MissingMeasurementMessageDto CreateMissingMeasurementsLogMessage(
+        Guid orchestrationInstanceId,
+        MeteringPointId meteringPointId)
+    {
+        return new MissingMeasurementMessageDto(
+            eventId: EventId.From(Guid.NewGuid()),
+            orchestrationInstanceId: orchestrationInstanceId,
+            meteringPointId: "1234567890123",
+            receiver: new Actor(
+                ActorNumber.Create("1234567890123"),
+                ActorRole.GridAccessProvider),
+            businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
+            gridAreaCode: "804",
+            missingMeasurement: new MissingMeasurement(
+                TransactionId: TransactionId.New(),
+                MeteringPointId: meteringPointId,
+                Date: Instant.FromUtc(2024, 12, 31, 23, 00)));
     }
 
     private IReadOnlyCollection<MeasurementDto> GenerateEnergyObservations(
