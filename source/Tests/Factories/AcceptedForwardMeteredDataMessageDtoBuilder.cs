@@ -40,7 +40,7 @@ public class AcceptedForwardMeteredDataMessageDtoBuilder
         _endTime = _startTime.Plus(_resolution.ToDuration());
         _points.Add((1, 1.04m, Quality.Calculated));
         _eventId = EventId.From(Guid.NewGuid());
-        _externalId = new ExternalId(Guid.NewGuid());
+        _externalId = ExternalId.New();
         _receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         _businessReason = BusinessReason.PeriodicMetering;
         _relatedToMessageId = MessageId.New();

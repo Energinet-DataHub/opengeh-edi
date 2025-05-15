@@ -36,7 +36,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole,
-            new ExternalId(Guid.NewGuid()),
+            ExternalId.New(),
             relatedToMessageId)
     {
         ChargeOwnerId = chargeOwnerId;

@@ -23,7 +23,7 @@ public class RejectedForwardMeteredDataMessageBuilder
 {
     private readonly List<RejectReason> _rejectReasons;
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
-    private readonly ExternalId _externalId = new ExternalId(Guid.NewGuid());
+    private readonly ExternalId _externalId = ExternalId.New();
 
     public RejectedForwardMeteredDataMessageBuilder(
         MessageId messageId,

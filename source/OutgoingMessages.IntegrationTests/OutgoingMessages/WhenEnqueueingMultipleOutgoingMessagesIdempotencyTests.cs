@@ -50,7 +50,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataSeparately_Then_OnlyOneMessageIsEnqueued()
     {
         // Given multiple messages with the same idempotency data
-        var externalId = new ExternalId(Guid.NewGuid());
+        var externalId = ExternalId.New();
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
         var start = Instant.FromUtc(2024, 12, 31, 23, 00);
         var end = Instant.FromUtc(2025, 01, 31, 23, 00);
@@ -98,7 +98,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataAtTheSameTime_Then_UniqueDatabaseIndexThrowsException()
     {
         // Given multiple messages with the same idempotency data
-        var externalId = new ExternalId(Guid.NewGuid());
+        var externalId = ExternalId.New();
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
         var start = Instant.FromUtc(2024, 12, 31, 23, 00);
         var end = Instant.FromUtc(2025, 01, 31, 23, 00);
@@ -124,7 +124,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         using (var setupScope = ServiceProvider.CreateScope())
         {
             var existingMessage = CreateAcceptedForwardMeteredDataMessage(
-                externalId: new ExternalId(Guid.NewGuid()), // Using a new external id, so the messages are not the same (idempotency check)
+                externalId: ExternalId.New(), // Using a new external id, so the messages are not the same (idempotency check)
                 receiver: receiver,
                 start: start,
                 end: end,
@@ -150,14 +150,14 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             .ThrowExactlyAsync<DbUpdateException>()
             .WithInnerException(typeof(SqlException))
             .WithMessage(
-                "Cannot insert duplicate key row in object 'dbo.OutgoingMessages' with unique index 'UQ_OutgoingMessages_ExternalId_ReceiverNumber_ReceiverRole_PeriodStartedAt'*");
+                "Cannot insert duplicate key row in object 'dbo.OutgoingMessages' with unique index 'UQ_OutgoingMessages_ReceiverNumber_PeriodStartedAt_ReceiverRole_ExternalId'*");
     }
 
     [Fact]
     public async Task Given_TwoMessagesWithDifferentReceiverActorNumbers_When_EnqueueingForwardMeteredData_Then_BothMessagesAreEnqueued()
     {
         // Given multiple messages with the same idempotency data except for the receiver actor number
-        var externalId = new ExternalId(Guid.NewGuid());
+        var externalId = ExternalId.New();
         var start = Instant.FromUtc(2024, 12, 31, 23, 00);
         var end = Instant.FromUtc(2025, 01, 31, 23, 00);
 
@@ -207,7 +207,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     public async Task Given_TwoMessagesWithDifferentReceiverActorRoles_When_EnqueueingForwardMeteredData_Then_BothMessagesAreEnqueued()
     {
         // Given multiple messages with the same idempotency data except for the receiver actor number
-        var externalId = new ExternalId(Guid.NewGuid());
+        var externalId = ExternalId.New();
         var start = Instant.FromUtc(2024, 12, 31, 23, 00);
         var end = Instant.FromUtc(2025, 01, 31, 23, 00);
 
@@ -263,7 +263,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         var relatedToMessageId1 = MessageId.New();
         var message1 = CreateAcceptedForwardMeteredDataMessage(
-            externalId: new ExternalId(Guid.NewGuid()),
+            externalId: ExternalId.New(),
             receiver: receiver,
             start: start,
             end: end,
@@ -271,7 +271,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         var relatedToMessageId2 = MessageId.New();
         var message2 = CreateAcceptedForwardMeteredDataMessage(
-            externalId: new ExternalId(Guid.NewGuid()),
+            externalId: ExternalId.New(),
             receiver: receiver,
             start: start,
             end: end,
@@ -307,7 +307,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     public async Task Given_TwoMessagesWithDifferentStartPeriods_When_EnqueueingForwardMeteredData_Then_BothMessagesAreEnqueued()
     {
         // Given multiple messages with the same idempotency data except for the receiver actor number
-        var externalId = new ExternalId(Guid.NewGuid());
+        var externalId = ExternalId.New();
         var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.GridAccessProvider);
         var end = Instant.FromUtc(2025, 01, 31, 23, 00);
 
@@ -395,7 +395,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
 
         var outgoingMessage = Assert.Single(outgoingMessages);
-        Assert.Equal(serviceBusMessageId, outgoingMessage.ExternalId.Value);
+        Assert.Equal(serviceBusMessageId.ToString(), outgoingMessage.ExternalId.Value);
     }
 
     private AcceptedSendMeasurementsMessageDto CreateAcceptedForwardMeteredDataMessage(

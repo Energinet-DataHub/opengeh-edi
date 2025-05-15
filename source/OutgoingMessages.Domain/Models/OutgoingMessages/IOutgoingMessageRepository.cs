@@ -40,10 +40,10 @@ public interface IOutgoingMessageRepository
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Get message in the database for the given receiver number and role, external id and period started at.
+    /// Get existing message id in the database for the given receiver number and role, external id and period started at.
     /// <remarks>This is used as the idempotency check (coupled with a unique index in the database on the same 4 columns)</remarks>
     /// </summary>
-    Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt);
+    Task<OutgoingMessageId?> GetIdIfExistsAsync(Receiver receiver, ExternalId externalId, Instant? periodStartedAt);
 
     Task<HashSet<BundleMetadata>> GetBundleMetadataForMessagesReadyToBeBundledAsync(CancellationToken cancellationToken);
 
