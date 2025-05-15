@@ -5,7 +5,7 @@ BEGIN TRANSACTION
     GO
 
     UPDATE [dbo].[OutgoingMessages]
-        SET [ExternalId_NEW] = LOWER(CONVERT(VARCHAR(36), [ExternalId])) -- We must use LOWER() to match Guid.ToString() C# method.
+        SET [ExternalId_NEW] = LOWER(CONVERT(VARCHAR(36), [ExternalId])) -- We use LOWER() to match the Guid.ToString() method.
 
     ALTER TABLE [dbo].[OutgoingMessages]
         ALTER COLUMN [ExternalId_NEW] VARCHAR(36) NOT NULL
