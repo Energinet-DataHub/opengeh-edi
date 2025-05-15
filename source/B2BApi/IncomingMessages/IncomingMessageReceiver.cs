@@ -115,6 +115,14 @@ public class IncomingMessageReceiver
             ? HttpStatusCode.BadRequest
             : HttpStatusCode.Accepted;
 
+        if (responseMessage.IsErrorResponse)
+        {
+            _logger.LogError(
+                "Error occurred while processing incoming message. Error code: {ErrorCode}, Error message: {ErrorMessage}",
+                httpStatusCode,
+                responseMessage.MessageBody);
+        }
+
         var httpResponseData = await CreateResponseAsync(request, httpStatusCode, documentFormat, responseMessage)
             .ConfigureAwait(false);
 
