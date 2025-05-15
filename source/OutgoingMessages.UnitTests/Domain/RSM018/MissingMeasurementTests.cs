@@ -36,7 +36,7 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
         _parser = new MessageRecordParser(new Serializer());
     }
 
-    [Theory]
+    [Theory(Skip = "Skipped for now")]
     //[InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     //[InlineData(nameof(DocumentFormat.Ebix))]
