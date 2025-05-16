@@ -33,7 +33,7 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
 
     [Theory]
     //[InlineData(nameof(DocumentFormat.Xml))]
-    //[InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Given_MissingMeasurement_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
