@@ -114,9 +114,9 @@ public class OutgoingMessageRepository(
             .AsNoTracking()
             .Where(x =>
                 x.Receiver.Number == receiver.Number &&
+                x.ExternalId == externalId &&
                 x.PeriodStartedAt == periodStartedAt &&
-                x.Receiver.ActorRole == receiver.ActorRole &&
-                x.ExternalId == externalId)
+                x.Receiver.ActorRole == receiver.ActorRole)
             .Select(x => x.Id)
             .FirstOrDefaultAsync();
     }

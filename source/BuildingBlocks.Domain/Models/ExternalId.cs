@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// So a message can only be delivered once for a given external id. (Unless additional logic is provided to check for idempotency)
 /// </summary>
 [Serializable]
-public record ExternalId
+public class ExternalId
 {
     /// <summary>
     /// Must fit the BINARY(16) ExternalId column in the OutgoingMessages table.
