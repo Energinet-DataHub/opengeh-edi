@@ -30,7 +30,7 @@ public class ExternalId
     /// <summary>
     /// Must fit the BINARY(16) ExternalId column in the OutgoingMessages table.
     /// </summary>
-    private const int BinaryMaxLength = 15;
+    private const int BinaryMaxLength = 16;
 
     [JsonConstructor]
     public ExternalId(byte[] value)
