@@ -73,12 +73,15 @@ public class ExternalId
             throw new ArgumentException("At least one value must be provided.", nameof(values));
 
         // Combine all values into a single string.
-        var combinedInputString = string.Join(string.Empty, values);
+        var combinedInputString = string.Concat(values);
 
         // Hash the combined input string using SHA256 (low collision chance).
         var inputAsHash = SHA256.HashData(Encoding.UTF8.GetBytes(combinedInputString));
 
         // Truncate the hash to 16 bytes.
+        // This means the entropy is now reduced to 2^128 (128 bits), which is still an astronomically large number,
+        // so the chance of collision is negligible in practice. We would need to generate over 20 quintillion values
+        // to reach a 50% chance of a collision (the birthday paradox).
         var truncatedHash = new byte[BinaryMaxLength];
         Array.Copy(
             sourceArray: inputAsHash,
