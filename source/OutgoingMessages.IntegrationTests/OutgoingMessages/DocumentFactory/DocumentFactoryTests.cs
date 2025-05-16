@@ -25,11 +25,6 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
-    private readonly IEnumerable<DocumentType> _unSupportedDocumentTypes = new[]
-    {
-        DocumentType.ReminderOfMissingMeasureData,
-    };
-
     public DocumentFactoryTests(OutgoingMessagesTestFixture outgoingMessagesTestFixture, ITestOutputHelper testOutputHelper)
         : base(outgoingMessagesTestFixture, testOutputHelper)
     {
@@ -57,14 +52,7 @@ public class DocumentFactoryTests
         var writer = _documentWriters.FirstOrDefault(writer =>
             writer.HandlesType(documentType) && writer.HandlesFormat(DocumentFormat.Xml));
 
-        if (_unSupportedDocumentTypes.Contains(documentType))
-        {
-            writer.Should().BeNull();
-        }
-        else
-        {
-            writer.Should().NotBeNull();
-        }
+        writer.Should().NotBeNull();
     }
 
     [Theory]
