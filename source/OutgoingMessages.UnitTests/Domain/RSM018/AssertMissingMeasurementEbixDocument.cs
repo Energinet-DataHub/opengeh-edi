@@ -36,7 +36,7 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
 
     public async Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyValidatedMeasureData, "3").ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.ReminderOfMissingMeasureData, "3").ConfigureAwait(false);
         return this;
     }
 

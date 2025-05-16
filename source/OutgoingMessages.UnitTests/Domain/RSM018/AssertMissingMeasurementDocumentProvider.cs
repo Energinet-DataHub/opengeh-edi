@@ -36,10 +36,10 @@ public static class AssertMissingMeasurementDocumentProvider
                 document,
                 "ns0",
                 new DocumentValidator(
-                new[]
-                {
-                    new EbixValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
-                }));
+                    new[]
+                    {
+                        new EbixValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
+                    }));
             return new AssertMissingMeasurementEbixDocument(assertXmlDocument);
         }
 
