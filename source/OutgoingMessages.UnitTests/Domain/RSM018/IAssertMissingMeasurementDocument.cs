@@ -50,7 +50,7 @@ public interface IAssertMissingMeasurementDocument
     /// <param name="meteringPointNumber"></param>
     IAssertMissingMeasurementDocument HasMeteringPointNumber(
         int seriesIndex,
-        string meteringPointNumber);
+        MeteringPointId meteringPointNumber);
 
     IAssertMissingMeasurementDocument HasMissingDate(
         int seriesIndex,

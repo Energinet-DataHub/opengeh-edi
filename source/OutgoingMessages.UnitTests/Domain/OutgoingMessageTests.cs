@@ -65,6 +65,7 @@ public class OutgoingMessageTests
         new AcknowledgementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new MissingMeasurementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
+        new MissingMeasurementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
     ];
 
     /// <summary>

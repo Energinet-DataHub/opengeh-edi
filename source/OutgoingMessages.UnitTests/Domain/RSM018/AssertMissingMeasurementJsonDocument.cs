@@ -62,51 +62,112 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasMessageId(MessageId messageId)
     {
-        throw new NotImplementedException();
+        _root.GetProperty("mRID").GetString().Should().Be(messageId.Value);
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasBusinessReason(BusinessReason businessReason)
     {
-        throw new NotImplementedException();
+        _root.GetProperty("process.processType")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(businessReason.Code);
+
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber)
     {
-        throw new NotImplementedException();
+        _root.GetProperty("sender_MarketParticipant.mRID")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(actorNumber.Value);
+
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasSenderRole(ActorRole actorRole)
     {
-        throw new NotImplementedException();
+        _root.GetProperty("sender_MarketParticipant.marketRole.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(actorRole.Code);
+
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber)
     {
-        throw new NotImplementedException();
+        _root.GetProperty("receiver_MarketParticipant.mRID")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(actorNumber.Value);
+
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasReceiverRole(ActorRole actorRole)
     {
-        throw new NotImplementedException();
+        _root.GetProperty("receiver_MarketParticipant.marketRole.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(actorRole.Code);
+
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasTimestamp(Instant timestamp)
     {
-        throw new NotImplementedException();
+        _root.GetProperty("createdDateTime")
+            .GetString()
+            .Should()
+            .Be(timestamp.ToString());
+
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
     {
-        throw new NotImplementedException();
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("mRID")
+            .GetString()
+            .Should()
+            .Be(expectedTransactionId.Value);
+
+        return this;
     }
 
-    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
+    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, MeteringPointId meteringPointNumber)
     {
-        throw new NotImplementedException();
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("MarketEvaluationPoint")
+            .EnumerateArray()
+            .Single()
+            .GetProperty("mRID")
+            .GetProperty("value")
+            .ToString()
+            .Should()
+            .Be(meteringPointNumber.Value);
+
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasMissingDate(int seriesIndex, Instant missingDate)
     {
-        throw new NotImplementedException();
+        GetTimeSeriesElement(seriesIndex)
+            .GetProperty("request_DateAndOrTime.dateTime")
+            .GetString()
+            .Should()
+            .Be(missingDate.ToString());
+
+        return this;
     }
+
+    private JsonElement GetTimeSeriesElement(int seriesIndex) =>
+        _root.GetProperty("Series").EnumerateArray().ToList()[seriesIndex - 1];
 }
