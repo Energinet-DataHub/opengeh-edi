@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +49,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
     }
 
     [Fact]
-    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataSeparately_Then_OnlyOneMessageIsEnqueued()
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingForwardMeteredDataSeparately_Then_OneMessageIsEnqueued()
     {
         // Given multiple messages with the same idempotency data
         var externalId = ExternalId.New();
@@ -75,6 +77,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
 
+        // We need to save changes between enqueues to not fail on idempotency unique constraint in database
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
         await unitOfWork.SaveChangesAsync(CancellationToken.None);
 
@@ -118,24 +121,6 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             start: start,
             end: end,
             relatedToMessageId: relatedToMessageId2);
-
-        // Need to create a bundle up front, else an exception will be thrown when trying to create the same bundle for both messages.
-        // The easiest way to do that, is just to enqueue another message, to the same receiver, before running the tests
-        using (var setupScope = ServiceProvider.CreateScope())
-        {
-            var existingMessage = CreateAcceptedForwardMeteredDataMessage(
-                externalId: ExternalId.New(), // Using a new external id, so the messages are not the same (idempotency check)
-                receiver: receiver,
-                start: start,
-                end: end,
-                relatedToMessageId: MessageId.New());
-
-            var setupOutgoingMessagesClient = setupScope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-            var setupDbContext = setupScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
-
-            await setupOutgoingMessagesClient.EnqueueAsync(existingMessage, CancellationToken.None);
-            await setupDbContext.SaveChangesAsync(CancellationToken.None);
-        }
 
         // When enqueueing the messages
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
@@ -181,10 +166,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -231,10 +213,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -281,10 +260,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -333,10 +309,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
         await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
-        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
-
         await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -381,7 +354,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-        // We need to save changes between enqueues to not fail on unique index for bundling
+        // We need to save changes between enqueues to not fail on idempotency unique constraint in database
         await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         await unitOfWork.CommitTransactionAsync(CancellationToken.None);
 
@@ -396,6 +369,122 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
 
         var outgoingMessage = Assert.Single(outgoingMessages);
         Assert.Equal(serviceBusMessageId.ToString(), outgoingMessage.ExternalId.Value);
+    }
+
+    [Fact]
+    public async Task Given_TwoMessagesWithSameIdempotencyData_When_EnqueueingMissingMeasurementsLog_Then_OneMessageIsEnqueued()
+    {
+        var orchestrationInstanceId = Guid.NewGuid();
+        var meteringPointId = MeteringPointId.From("1234567890123");
+        var expectedExternalId = ExternalId.HashValuesWithMaxLength(
+            orchestrationInstanceId.ToString("N"),
+            meteringPointId.Value);
+
+        var message = CreateMissingMeasurementsLogMessage(
+            orchestrationInstanceId: orchestrationInstanceId,
+            meteringPointId: meteringPointId,
+            date: Instant.FromUtc(2024, 12, 31, 23, 00),
+            receiverActorNumber: ActorNumber.Create("1234567890123"),
+            receiverActorRole: ActorRole.GridAccessProvider);
+
+        // Act
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        // We need to save changes between enqueues to not fail on idempotency unique constraint in database
+        await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        await outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        // Assert
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        var outgoingMessage = Assert.Single(outgoingMessages);
+        Assert.Equal(expectedExternalId, outgoingMessage.ExternalId);
+    }
+
+    [Theory]
+    [InlineData(MissingMeasurementsIdempotencyKey.OrchestrationInstanceId)]
+    [InlineData(MissingMeasurementsIdempotencyKey.MeteringPointId)]
+    [InlineData(MissingMeasurementsIdempotencyKey.Date)]
+    [InlineData(MissingMeasurementsIdempotencyKey.ReceiverActorNumber)]
+    [InlineData(MissingMeasurementsIdempotencyKey.ReceiverActorRole)]
+    public async Task Given_TwoMessagesWithDifferentIdempotencyData_When_EnqueueingMissingMeasurementsLog_Then_BothMessagesAreEnqueued(
+        MissingMeasurementsIdempotencyKey differentIdempotencyKey)
+    {
+        var orchestrationInstanceId1 = Guid.NewGuid();
+        var orchestrationInstanceId2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.OrchestrationInstanceId
+            ? Guid.NewGuid()
+            : orchestrationInstanceId1;
+
+        var meteringPointId1 = MeteringPointId.From("1111111111111");
+        var meteringPointId2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.MeteringPointId
+            ? MeteringPointId.From("2222222222222")
+            : meteringPointId1;
+
+        var date1 = Instant.FromUtc(2024, 12, 31, 23, 00);
+        var date2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.Date
+            ? Instant.FromUtc(2025, 01, 31, 23, 00)
+            : date1;
+
+        const string receiverActorNumber1 = "1234567890123";
+        var receiverActorNumber2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.ReceiverActorNumber
+            ? "1234567890123456"
+            : receiverActorNumber1;
+
+        var receiverActorRole1 = ActorRole.GridAccessProvider;
+        var receiverActorRole2 = differentIdempotencyKey == MissingMeasurementsIdempotencyKey.ReceiverActorRole
+            ? ActorRole.EnergySupplier
+            : receiverActorRole1;
+
+        var expectedExternalId1 = ExternalId.HashValuesWithMaxLength(
+            orchestrationInstanceId1.ToString("N"),
+            meteringPointId1.Value);
+        var expectedExternalId2 = ExternalId.HashValuesWithMaxLength(
+            orchestrationInstanceId2.ToString("N"),
+            meteringPointId2.Value);
+
+        // Given multiple messages with the same idempotency data except for the receiver actor number
+        var message1 = CreateMissingMeasurementsLogMessage(
+            orchestrationInstanceId1,
+            meteringPointId1,
+            date1,
+            ActorNumber.Create(receiverActorNumber1),
+            receiverActorRole1);
+
+        var message2 = CreateMissingMeasurementsLogMessage(
+            orchestrationInstanceId2,
+            meteringPointId2,
+            date2,
+            ActorNumber.Create(receiverActorNumber2),
+            receiverActorRole2);
+
+        // Act
+        var outgoingMessagesClient = ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var unitOfWork = ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        await outgoingMessagesClient.EnqueueAsync(message1, CancellationToken.None);
+        await outgoingMessagesClient.EnqueueAsync(message2, CancellationToken.None);
+        await unitOfWork.CommitTransactionAsync(CancellationToken.None);
+
+        // Then both messages are enqueued
+        using var queryScope = ServiceProvider.CreateScope();
+        var outgoingMessagesContext = queryScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+        var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
+
+        // Asserts that the collection contains exactly 2 elements, with the expected RelatedToMessageId's
+        Assert.Collection(
+            outgoingMessages.OrderBy(om => om.CreatedAt),
+            [
+                om => Assert.Equal(expectedExternalId1, om.ExternalId),
+                om => Assert.Equal(expectedExternalId2, om.ExternalId),
+            ]);
     }
 
     private AcceptedSendMeasurementsMessageDto CreateAcceptedForwardMeteredDataMessage(
@@ -427,6 +516,27 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
                 Measurements: GenerateEnergyObservations(start, end, resolution)));
     }
 
+    private MissingMeasurementMessageDto CreateMissingMeasurementsLogMessage(
+        Guid orchestrationInstanceId,
+        MeteringPointId meteringPointId,
+        Instant date,
+        ActorNumber receiverActorNumber,
+        ActorRole receiverActorRole)
+    {
+        return new MissingMeasurementMessageDto(
+            eventId: EventId.From(Guid.NewGuid()),
+            orchestrationInstanceId: orchestrationInstanceId,
+            receiver: new Actor(
+                receiverActorNumber,
+                receiverActorRole),
+            businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
+            gridAreaCode: "804",
+            missingMeasurement: new MissingMeasurement(
+                TransactionId: TransactionId.New(),
+                MeteringPointId: meteringPointId,
+                Date: date));
+    }
+
     private IReadOnlyCollection<MeasurementDto> GenerateEnergyObservations(
         Instant start,
         Instant end,
@@ -449,5 +559,15 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
                     Quantity: 7,
                     Quality: Quality.Measured))
             .ToList();
+    }
+
+    [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test")]
+    public enum MissingMeasurementsIdempotencyKey
+    {
+        OrchestrationInstanceId,
+        MeteringPointId,
+        Date,
+        ReceiverActorNumber,
+        ReceiverActorRole,
     }
 }
