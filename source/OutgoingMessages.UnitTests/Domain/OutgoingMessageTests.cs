@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectReques
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM018;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
 using FluentAssertions;
@@ -62,6 +63,8 @@ public class OutgoingMessageTests
         new AcknowledgementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new AcknowledgementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
         new AcknowledgementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
+
+        new MissingMeasurementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
     ];
 
     /// <summary>
