@@ -78,13 +78,13 @@ public sealed class MissingMeasurementJsonDocumentWriter(IMessageRecordParser pa
     {
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
 
-        var marketActivityRecords = new List<MissingMeasurementMarketActivityRecord>();
+        var missingMeasurementLogs = new List<MissingMeasurementMarketActivityRecord>();
         foreach (var missingMeasurementLog in marketActivityPayloads)
         {
-            marketActivityRecords.Add(_parser.From<MissingMeasurementMarketActivityRecord>(missingMeasurementLog));
+            missingMeasurementLogs.Add(_parser.From<MissingMeasurementMarketActivityRecord>(missingMeasurementLog));
         }
 
-        return marketActivityRecords;
+        return missingMeasurementLogs;
     }
 }
 

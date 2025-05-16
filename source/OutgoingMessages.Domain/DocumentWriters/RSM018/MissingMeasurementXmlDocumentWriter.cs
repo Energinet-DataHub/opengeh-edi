@@ -77,10 +77,7 @@ public class MissingMeasurementXmlDocumentWriter(
             "MarketEvaluationPoint",
             null).ConfigureAwait(false);
         {
-            await writer.WriteStartElementAsync(
-                DocumentDetails.Prefix,
-                "mRID",
-                null).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
             await writer.WriteStringAsync(missingMeasurementLog.MeteringPointId.Value).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
