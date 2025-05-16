@@ -99,7 +99,7 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
         throw new NotImplementedException();
     }
 
-    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
+    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, MeteringPointId meteringPointNumber)
     {
         throw new NotImplementedException();
     }

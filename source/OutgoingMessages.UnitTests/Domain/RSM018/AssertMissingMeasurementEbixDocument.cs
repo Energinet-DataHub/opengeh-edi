@@ -24,6 +24,7 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
 {
     private const string HeaderEnergyDocument = "HeaderEnergyDocument";
     private const string ProcessEnergyContext = "ProcessEnergyContext";
+    private const string PayloadMissingDataRequest = "PayloadMissingDataRequest";
 
     private readonly AssertEbixDocument _documentAsserter;
 
@@ -94,17 +95,20 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
     {
-        throw new NotImplementedException();
+        _documentAsserter.HasValue($"{PayloadMissingDataRequest}[{seriesIndex}]/Identification", expectedTransactionId.Value);
+        return this;
     }
 
-    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
+    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, MeteringPointId meteringPointNumber)
     {
-        throw new NotImplementedException();
+        _documentAsserter.HasValue($"{PayloadMissingDataRequest}[{seriesIndex}]/MeteringPointDomainLocation/Identification", meteringPointNumber.Value);
+        return this;
     }
 
     public IAssertMissingMeasurementDocument HasMissingDate(int seriesIndex, Instant missingDate)
     {
-        throw new NotImplementedException();
+        _documentAsserter.HasValue($"{PayloadMissingDataRequest}[{seriesIndex}]/RequestPeriod", missingDate.ToString());
+        return this;
     }
 
     private static AttributeNameAndValue[] CreateRequiredListAttributes(CodeListType codeListType)
