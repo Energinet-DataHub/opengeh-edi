@@ -14,7 +14,6 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
 using Azure.Core;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.App.Common.Extensions.Options;
