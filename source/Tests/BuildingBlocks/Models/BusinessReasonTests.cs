@@ -49,7 +49,7 @@ public class BusinessReasonTests
             (BusinessReason.WholesaleFixing, "WholesaleFixing", "D05", 4),
             (BusinessReason.PeriodicMetering, "PeriodicMetering", "E23", 6),
             (BusinessReason.PeriodicFlexMetering, "PeriodicFlexMetering", "D42", 7),
-            (BusinessReason.ReminderOfMissingMeasurementLog, "ReminderOfMissingMeasurementLog", "D26", 8),
+            (BusinessReason.ReminderOfMissingMeasurementLog, "ReminderOfMissingMeasurementLog", "D24", 8),
         };
 
         using var scope = new AssertionScope();

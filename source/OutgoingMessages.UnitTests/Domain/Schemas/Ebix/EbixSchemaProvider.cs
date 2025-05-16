@@ -80,7 +80,7 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         if (document == DocumentType.Acknowledgement)
             return "DK_Acknowledgement";
         if (document == DocumentType.ReminderOfMissingMeasureData)
-            return "DK_NotifyMissingDataType";
+            return "DK_NotifyMissingData";
 
         throw new InvalidOperationException($"Unknown document type: {document}");
     }

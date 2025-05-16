@@ -15,6 +15,7 @@
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Cim.Json;
 using FluentAssertions;
 using Json.Schema;
 using NodaTime;
@@ -23,6 +24,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM009;
 
 public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
 {
+    private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
     private readonly JsonElement _root;
 
@@ -109,11 +111,11 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
         return this;
     }
 
-    public Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
+    public async Task<IAssertAcknowledgementDocument> DocumentIsValidAsync()
     {
-        var schema = JsonSchema.FromFile(@"Domain\Schemas\Cim\Json\Schemas\Acknowledgement-assembly-model.schema.json");
-
-        schema.Should().NotBeNull("Cannot validate document without a schema");
+        var schema = await _schemas
+            .GetSchemaAsync<JsonSchema>("ACKNOWLEDGEMENT", "0", CancellationToken.None)
+            .ConfigureAwait(false);
 
         var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
         var validationResult = schema!.Evaluate(_document, validationOptions);
@@ -125,7 +127,7 @@ public class AssertAcknowledgementJsonDocument : IAssertAcknowledgementDocument
 
         validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", errors));
 
-        return Task.FromResult(this as IAssertAcknowledgementDocument);
+        return this;
     }
 
     public IAssertAcknowledgementDocument HasOriginalTransactionId(TransactionId originalTransactionId)
