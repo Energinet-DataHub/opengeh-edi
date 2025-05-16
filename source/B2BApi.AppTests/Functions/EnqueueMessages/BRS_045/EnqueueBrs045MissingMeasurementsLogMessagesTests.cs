@@ -123,27 +123,22 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         // => Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
 
-        // TODO #751: Verify that the enqueued messages are saved as outgoing messages, and can be peeked
-        // var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-        //     .Where(om => om.DocumentType == DocumentType.ReminderOfMissingMeasureData)
-        //     .ToListAsync();
-        //
-        // enqueuedOutgoingMessages.Should().HaveCount(enqueueMessagesData.Data.Count);
-        //
-        // var receiver = new Actor(
-        //     gridAccessProviderActorNumber,
-        //     ActorRole.MeteredDataResponsible);
-        //
-        // var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
-        //     actor: receiver,
-        //     category: MessageCategory.MeasureData);
-        //
-        // var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
-        // peekResponse.StatusCode.Should().NotBe(HttpStatusCode.OK, "Peek should not be OK, since no document writer are registered");
-        //await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
-        // - Peek all messages (expect 2)
-        // - Verify that the messages has correct document type
-        // - Verify that the messages has correct metering point id
-        // - Verify that the messages has correct dates
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+             .Where(om => om.DocumentType == DocumentType.ReminderOfMissingMeasureData)
+             .ToListAsync();
+
+        enqueuedOutgoingMessages.Should().HaveCount(enqueueMessagesData.Data.Count);
+
+        var receiver = new Actor(
+            gridAccessProviderActorNumber,
+            ActorRole.MeteredDataResponsible);
+
+        var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
+            actor: receiver,
+            category: MessageCategory.MeasureData);
+
+        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
+        peekResponse.StatusCode.Should().Be(HttpStatusCode.OK, "Peek should be OK, since no there should be a message with two series");
+        await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
     }
 }
