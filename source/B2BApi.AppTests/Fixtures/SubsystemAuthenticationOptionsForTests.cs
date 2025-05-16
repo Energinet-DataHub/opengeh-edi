@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 
-public static class AuthenticationOptionsForTests
+public static class SubsystemAuthenticationOptionsForTests
 {
     /// <summary>
     /// Uri (scope) for which the client must request a token and send as part of the http request.

@@ -324,7 +324,7 @@ public class B2BApiAppFixture : IAsyncLifetime
                 elementSelector: (element) => element.Value.ToString().ToLower()));
     }
 
-    public string CreateSubsystemToken(string applicationIdUri = AuthenticationOptionsForTests.ApplicationIdUri)
+    public string CreateSubsystemToken(string applicationIdUri = SubsystemAuthenticationOptionsForTests.ApplicationIdUri)
     {
         var tokenResponse = IntegrationTestConfiguration.Credential.GetToken(
             new TokenRequestContext([applicationIdUri]), CancellationToken.None);
@@ -530,10 +530,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         // Subsystem authentication
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.ApplicationIdUri)}",
-            AuthenticationOptionsForTests.ApplicationIdUri);
+            SubsystemAuthenticationOptionsForTests.ApplicationIdUri);
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.Issuer)}",
-            AuthenticationOptionsForTests.Issuer);
+            SubsystemAuthenticationOptionsForTests.Issuer);
         return appHostSettings;
     }
 
