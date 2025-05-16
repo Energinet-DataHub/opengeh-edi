@@ -22,21 +22,23 @@ public interface IAssertMissingMeasurementDocument
     #region Header assertions
     Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync();
 
-    Task<IAssertMissingMeasurementDocument> HasBusinessReason(BusinessReason businessReason);
+    IAssertMissingMeasurementDocument HasMessageId(MessageId messageId);
 
-    Task<IAssertMissingMeasurementDocument> HasSenderId(ActorNumber actorNumber);
+    IAssertMissingMeasurementDocument HasBusinessReason(BusinessReason businessReason);
 
-    Task<IAssertMissingMeasurementDocument> HasSenderRole(ActorRole actorRole);
+    IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber);
 
-    Task<IAssertMissingMeasurementDocument> HasReceiverId(ActorNumber actorNumber);
+    IAssertMissingMeasurementDocument HasSenderRole(ActorRole actorRole);
 
-    Task<IAssertMissingMeasurementDocument> HasReceiverRole(ActorRole actorRole);
+    IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber);
 
-    Task<IAssertMissingMeasurementDocument> HasTimestamp(Instant timestamp);
+    IAssertMissingMeasurementDocument HasReceiverRole(ActorRole actorRole);
+
+    IAssertMissingMeasurementDocument HasTimestamp(Instant timestamp);
     #endregion
 
     #region Series assertions
-    Task<IAssertMissingMeasurementDocument> HasTransactionId(
+    IAssertMissingMeasurementDocument HasTransactionId(
         int seriesIndex,
         TransactionId expectedTransactionId);
 
@@ -46,11 +48,11 @@ public interface IAssertMissingMeasurementDocument
     /// </summary>
     /// <param name="seriesIndex"></param>
     /// <param name="meteringPointNumber"></param>
-    Task<IAssertMissingMeasurementDocument> HasMeteringPointNumber(
+    IAssertMissingMeasurementDocument HasMeteringPointNumber(
         int seriesIndex,
         string meteringPointNumber);
 
-    Task<IAssertMissingMeasurementDocument> HasMissingDate(
+    IAssertMissingMeasurementDocument HasMissingDate(
         int seriesIndex,
         Instant missingDate);
     #endregion
