@@ -26,7 +26,7 @@ public sealed class MissingMeasurementJsonDocumentWriter(IMessageRecordParser pa
     : IDocumentWriter
 {
     private const string DocumentTypeName = "ReminderOfMissingMeasureData_MarketDocument";
-    private const string TypeCode = "D26";
+    private const string TypeCode = "D24";
 
     private readonly IMessageRecordParser _parser = parser;
     private readonly JsonWriterOptions _options = new() { Indented = true, Encoder = encoder };
@@ -55,7 +55,13 @@ public sealed class MissingMeasurementJsonDocumentWriter(IMessageRecordParser pa
                 header.SenderId,
                 header.SenderRole,
                 TypeCode,
-                [.. missingMeasurements.Select(mm => new IndividualMissingMeasurements(mm.TransactionId.Value))]));
+                [
+                    .. missingMeasurements.Select(mm =>
+                        new IndividualMissingMeasurements(
+                            mm.TransactionId.Value,
+                            mm.Date.ToString(),
+                            mm.MeteringPointId.Value)),
+                ]));
 
         var stream = new MarketDocumentWriterMemoryStream();
         using var writer = new Utf8JsonWriter(stream, _options);
@@ -132,10 +138,31 @@ internal class MissingMeasurements(
         individualMissingMeasurements;
 }
 
-internal class IndividualMissingMeasurements(string transactionId)
+internal class IndividualMissingMeasurements(
+    string transactionId,
+    string? requestDateAndOrTime,
+    string? marketEvaluationPoint)
 {
     [JsonPropertyName("mRID")]
     public string TransactionId { get; init; } = transactionId;
+
+    [JsonPropertyName("request_DateAndOrTime.dateTime")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RequestDateAndOrTime { get; init; } = requestDateAndOrTime;
+
+    [JsonPropertyName("MarketEvaluationPoint")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyCollection<MeasurementPointReference>? MarketEvaluationPoint { get; init; } =
+        marketEvaluationPoint is null
+            ? null
+            : [new MeasurementPointReference(marketEvaluationPoint)];
+}
+
+internal class MeasurementPointReference(string measurementPointId)
+{
+    [JsonPropertyName("mRID")]
+    public ValueObjectWithScheme MeasurementPointId { get; init; } =
+        ValueObjectWithScheme.Create("A10", measurementPointId);
 }
 
 internal class ValueObject<T>(T value)
