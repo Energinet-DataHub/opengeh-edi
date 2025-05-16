@@ -111,6 +111,7 @@ public class OutgoingMessageRepository(
         // Query should always match the UQ_OutgoingMessages_ReceiverNumber_PeriodStartedAt_ReceiverRole_ExternalId
         // unique index, to ensure performant idempotency checks.
         return _context.OutgoingMessages
+            .AsNoTracking()
             .Where(x =>
                 x.Receiver.Number == receiver.Number &&
                 x.PeriodStartedAt == periodStartedAt &&
