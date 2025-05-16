@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.DocumentValidation;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
 
@@ -25,6 +28,19 @@ public static class AssertMissingMeasurementDocumentProvider
         if (documentFormat == DocumentFormat.Json)
         {
             return new AssertMissingMeasurementJsonDocument(document);
+        }
+
+        if (DocumentFormat.Ebix == documentFormat)
+        {
+            var assertXmlDocument = AssertEbixDocument.Document(
+                document,
+                "ns0",
+                new DocumentValidator(
+                new[]
+                {
+                    new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
+                }));
+            return new AssertMissingMeasurementEbixDocument(assertXmlDocument);
         }
 
         throw new Exception("No asserter for the given format");
