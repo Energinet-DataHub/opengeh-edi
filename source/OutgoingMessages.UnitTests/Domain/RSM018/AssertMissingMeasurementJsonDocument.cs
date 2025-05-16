@@ -59,47 +59,52 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
         return Task.FromResult<IAssertMissingMeasurementDocument>(this);
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasBusinessReason(BusinessReason businessReason)
+    public IAssertMissingMeasurementDocument HasMessageId(MessageId messageId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasSenderId(ActorNumber actorNumber)
+    public IAssertMissingMeasurementDocument HasBusinessReason(BusinessReason businessReason)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasSenderRole(ActorRole actorRole)
+    public IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasReceiverId(ActorNumber actorNumber)
+    public IAssertMissingMeasurementDocument HasSenderRole(ActorRole actorRole)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasReceiverRole(ActorRole actorRole)
+    public IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasTimestamp(Instant timestamp)
+    public IAssertMissingMeasurementDocument HasReceiverRole(ActorRole actorRole)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
+    public IAssertMissingMeasurementDocument HasTimestamp(Instant timestamp)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
+    public IAssertMissingMeasurementDocument HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasMissingDate(int seriesIndex, Instant missingDate)
+    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertMissingMeasurementDocument HasMissingDate(int seriesIndex, Instant missingDate)
     {
         throw new NotImplementedException();
     }
