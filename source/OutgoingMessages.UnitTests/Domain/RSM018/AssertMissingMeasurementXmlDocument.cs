@@ -25,7 +25,7 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
     public AssertMissingMeasurementXmlDocument(AssertXmlDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
-        _documentAsserter.HasValue("type", "D26");
+        _documentAsserter.HasValue("type", "D24");
     }
 
     public async Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
@@ -87,7 +87,7 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
 
     public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, MeteringPointId meteringPointNumber)
     {
-        _documentAsserter.HasValue($"Series[{seriesIndex}]/marketEvaluationPoint.mRID", meteringPointNumber.Value);
+        _documentAsserter.HasValue($"Series[{seriesIndex}]/MarketEvaluationPoint/mRID", meteringPointNumber.Value);
         return this;
     }
 

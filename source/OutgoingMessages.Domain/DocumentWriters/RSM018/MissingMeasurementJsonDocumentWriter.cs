@@ -79,9 +79,9 @@ public sealed class MissingMeasurementJsonDocumentWriter(IMessageRecordParser pa
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
 
         var marketActivityRecords = new List<MissingMeasurementMarketActivityRecord>();
-        foreach (var acknowledgementRecord in marketActivityPayloads)
+        foreach (var missingMeasurementLog in marketActivityPayloads)
         {
-            marketActivityRecords.Add(_parser.From<MissingMeasurementMarketActivityRecord>(acknowledgementRecord));
+            marketActivityRecords.Add(_parser.From<MissingMeasurementMarketActivityRecord>(missingMeasurementLog));
         }
 
         return marketActivityRecords;
