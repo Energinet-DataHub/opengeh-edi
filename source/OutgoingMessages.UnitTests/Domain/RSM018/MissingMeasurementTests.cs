@@ -31,7 +31,7 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly MessageRecordParser _parser = new(new Serializer());
 
-    [Theory(Skip = "Skipped for now")]
+    [Theory]
     //[InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     //[InlineData(nameof(DocumentFormat.Ebix))]
@@ -50,13 +50,13 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
         missingMeasurementBuilder.AddMissingMeasurement(
             new MissingMeasurement(
                 TransactionId: TransactionId.New(),
-                MeteringPointId: MeteringPointId.From("1234567890123"),
+                MeteringPointId: MeteringPointId.From("579999993331812345"),
                 Date: InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value));
 
         missingMeasurementBuilder.AddMissingMeasurement(
             new MissingMeasurement(
                 TransactionId: TransactionId.New(),
-                MeteringPointId: MeteringPointId.From("1234567890123"),
+                MeteringPointId: MeteringPointId.From("579999993331812345"),
                 Date: InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value));
 
         var marketDocumentStream = await CreateDocument(

@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Cim.Json;
 using FluentAssertions;
 using Json.Schema;
 using NodaTime;
@@ -22,6 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
 
 public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDocument
 {
+    private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
     private readonly JsonElement _root;
 
@@ -37,12 +39,11 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
             .Be("23");
     }
 
-    public Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
+    public async Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
     {
-        var schema = JsonSchema.FromFile(
-            @"Domain\Schemas\Cim\Json\Schemas\Reminder-of-missing-measure-data-assembly-model.schema.json");
-
-        schema.Should().NotBeNull("Cannot validate document without a schema");
+        var schema = await _schemas
+            .GetSchemaAsync<JsonSchema>("REMINDEROFMISSINGMEASUREDATA", "0", CancellationToken.None)
+            .ConfigureAwait(false);
 
         var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
         var validationResult = schema!.Evaluate(_document, validationOptions);
@@ -56,7 +57,7 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
                 $"because document should be valid. Validation errors:{Environment.NewLine}{{0}}",
                 string.Join("\n", errors));
 
-        return Task.FromResult<IAssertMissingMeasurementDocument>(this);
+        return this;
     }
 
     public Task<IAssertMissingMeasurementDocument> HasBusinessReason(BusinessReason businessReason)
