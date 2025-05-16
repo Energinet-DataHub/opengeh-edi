@@ -31,10 +31,10 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
 {
     private readonly MessageRecordParser _parser = new(new Serializer());
 
-    [Theory(Skip = "Skipped for now")]
+    [Theory]
     //[InlineData(nameof(DocumentFormat.Xml))]
-    [InlineData(nameof(DocumentFormat.Json))]
-    //[InlineData(nameof(DocumentFormat.Ebix))]
+    //[InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Given_MissingMeasurement_When_CreateDocument_Then_DocumentCreated(string documentFormat)
     {
         var missingMeasurementBuilder = new MissingMeasurementMessageBuilder(
@@ -43,20 +43,20 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
             senderRole: ActorRole.DanishEnergyAgency,
             receiverId: ActorNumber.Create("1234567890123"),
             receiverRole: ActorRole.EnergySupplier,
-            businessReason: BusinessReason.PeriodicFlexMetering,
+            businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
             transactionId: TransactionId.New(),
             timestamp: InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value);
 
         missingMeasurementBuilder.AddMissingMeasurement(
             new MissingMeasurement(
                 TransactionId: TransactionId.New(),
-                MeteringPointId: MeteringPointId.From("1234567890123"),
+                MeteringPointId: MeteringPointId.From("579999993331812345"),
                 Date: InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value));
 
         missingMeasurementBuilder.AddMissingMeasurement(
             new MissingMeasurement(
                 TransactionId: TransactionId.New(),
-                MeteringPointId: MeteringPointId.From("1234567890123"),
+                MeteringPointId: MeteringPointId.From("579999993331812345"),
                 Date: InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value));
 
         var marketDocumentStream = await CreateDocument(
@@ -66,16 +66,26 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
         await AssertMissingMeasurementDocumentProvider.AssertDocument(
                 marketDocumentStream.Stream,
                 DocumentFormat.FromName(documentFormat))
-            //.HasMessageId(missingMeasurementBuilder.MessageId)
-            //.HasSenderId(missingMeasurementBuilder.SenderId)
-            //.HasSenderRole(missingMeasurementBuilder.SenderRole)
-            //.HasReceiverId(missingMeasurementBuilder.ReceiverId)
-            //.HasReceiverRole(missingMeasurementBuilder.ReceiverRole)
-            //.HasCreationDate(missingMeasurementBuilder.Timestamp)
-            //.HasReceivedBusinessReasonCode(missingMeasurementBuilder.BusinessReason)
-            //.HasTransactionId(missingMeasurementBuilder.TransactionId) // Only ebix has this property
-            //.SeriesHasReasons(rejectMessageBuilder.GetSeries().RejectReasons.ToArray())
+            .HasMessageId(missingMeasurementBuilder.MessageId)
+            .HasSenderId(missingMeasurementBuilder.SenderId)
+            .HasSenderRole(missingMeasurementBuilder.SenderRole)
+            .HasReceiverId(missingMeasurementBuilder.ReceiverId)
+            .HasReceiverRole(missingMeasurementBuilder.ReceiverRole)
+            .HasTimestamp(missingMeasurementBuilder.Timestamp)
+            .HasBusinessReason(missingMeasurementBuilder.BusinessReason)
             .DocumentIsValidAsync();
+
+        var series = missingMeasurementBuilder.GetSeries().ToList();
+        for (int i = 1; i < series.Count + 1; i++)
+        {
+            var element = series[i - 1];
+            AssertMissingMeasurementDocumentProvider.AssertDocument(
+                    marketDocumentStream.Stream,
+                    DocumentFormat.FromName(documentFormat))
+                .HasTransactionId(i, element.TransactionId)
+                .HasMeteringPointNumber(i, element.MeteringPointId)
+                .HasMissingDate(i, element.Date);
+        }
     }
 
     private Task<MarketDocumentStream> CreateDocument(
@@ -92,6 +102,12 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
                     _parser,
                     serviceProvider.GetRequiredService<JavaScriptEncoder>())
                 .WriteAsync(documentHeader, records, CancellationToken.None);
+        }
+
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            return new MissingMeasurementEbixDocumentWriter(_parser)
+                .WriteAsync(documentHeader, records);
         }
 
         throw new Exception("No writer for the given format");
