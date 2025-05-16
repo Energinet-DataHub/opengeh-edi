@@ -27,33 +27,39 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public record ExternalId
 {
-    private const int MaxLength = 36;
+    /// <summary>
+    /// Must fit the BINARY(16) ExternalId column in the OutgoingMessages table.
+    /// </summary>
+    private const int BinaryMaxLength = 16;
 
     [JsonConstructor]
-    public ExternalId(string value)
+    public ExternalId(byte[] value)
     {
-        if (value.Length > MaxLength)
+        if (value.Length > BinaryMaxLength)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(value),
-                value,
-                $"ExternalId must be {MaxLength} characters or less");
+                value.Length,
+                $"ExternalId must be {BinaryMaxLength} characters or less");
         }
 
         Value = value;
     }
 
     public ExternalId(Guid value)
-        : this(value.ToString())
+        : this(value.ToByteArray())
     { }
 
-    public string Value { get; }
+    /// <summary>
+    /// Store the external id as a binary. This is done to increase performance, instead of using VARCHAR(36) or similar.
+    /// </summary>
+    public byte[] Value { get; }
 
     public static ExternalId New() => new(Guid.NewGuid());
 
     /// <summary>
     /// Hashes the given <paramref name="values"/> input to create a string, and ensures that the length is less than
-    /// or equal to the <see cref="MaxLength"/>.
+    /// or equal to the <see cref="BinaryMaxLength"/>.
     /// </summary>
     /// <remarks>
     /// The hashing algorithm used is SHA256, which has a low chance of collision. The hashing algorithm ensures
@@ -72,14 +78,13 @@ public record ExternalId
         // Hash the combined input string using SHA256 (low collision chance).
         var inputAsHash = SHA256.HashData(Encoding.UTF8.GetBytes(combinedInputString));
 
-        // Use standard Base64 and trim padding ('==' characters) if present.
-        var asBase64String = Convert.ToBase64String(inputAsHash).TrimEnd('=');
+        // Truncate the hash to 16 bytes.
+        var truncatedHash = new byte[BinaryMaxLength];
+        Array.Copy(
+            sourceArray: inputAsHash,
+            destinationArray: truncatedHash,
+            length: BinaryMaxLength);
 
-        // Truncate to maximum MaxLength characters.
-        var hashedValue = asBase64String.Length <= MaxLength
-            ? asBase64String
-            : asBase64String.Substring(0, MaxLength);
-
-        return new ExternalId(hashedValue);
+        return new ExternalId(truncatedHash);
     }
 }

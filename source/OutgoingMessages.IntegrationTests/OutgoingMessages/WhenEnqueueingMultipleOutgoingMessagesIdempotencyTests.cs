@@ -368,7 +368,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
 
         var outgoingMessage = Assert.Single(outgoingMessages);
-        Assert.Equal(serviceBusMessageId.ToString(), outgoingMessage.ExternalId.Value);
+        Assert.Equal(serviceBusMessageId.ToByteArray(), outgoingMessage.ExternalId.Value);
     }
 
     [Fact]
