@@ -29,12 +29,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
 
 public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
 {
-    private readonly MessageRecordParser _parser;
-
-    public MissingMeasurementTests(DocumentValidationFixture documentValidation)
-    {
-        _parser = new MessageRecordParser(new Serializer());
-    }
+    private readonly MessageRecordParser _parser = new(new Serializer());
 
     [Theory(Skip = "Skipped for now")]
     //[InlineData(nameof(DocumentFormat.Xml))]

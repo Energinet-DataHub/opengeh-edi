@@ -12,51 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using FluentAssertions;
-using Json.Schema;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.NotifyWholesaleServices;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
 
-public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDocument
+public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDocument
 {
-    private readonly JsonDocument _document;
-    private readonly JsonElement _root;
+    private readonly AssertEbixDocument _documentAsserter;
 
-    public AssertMissingMeasurementJsonDocument(Stream stream)
+    public AssertMissingMeasurementEbixDocument(AssertEbixDocument documentAsserter)
     {
-        _document = JsonDocument.Parse(stream);
-        _root = _document.RootElement.GetProperty("ReminderOfMissingMeasureData_MarketDocument");
-        _root.TryGetProperty("type", out _).Should().BeTrue();
-        _root.GetProperty("businessSector.type")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be("23");
+        _documentAsserter = documentAsserter;
+        _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "D24");
+        _documentAsserter.HasValueWithAttributes(
+            "ProcessEnergyContext/EnergyIndustryClassification",
+            "23",
+            CreateRequiredListAttributes(CodeListType.UnitedNations));
     }
 
-    public Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
+    public async Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
     {
-        var schema = JsonSchema.FromFile(
-            @"Domain\Schemas\Cim\Json\Schemas\Reminder-of-missing-measure-data-assembly-model.schema.json");
-
-        schema.Should().NotBeNull("Cannot validate document without a schema");
-
-        var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
-        var validationResult = schema!.Evaluate(_document, validationOptions);
-        var errors = validationResult.Details.Where(detail => detail.HasErrors)
-            .Select(x => (x.InstanceLocation, x.EvaluationPath, x.Errors))
-            .SelectMany(p => p.Errors!.Values.Select(e =>
-                $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"));
-
-        validationResult.IsValid.Should()
-            .BeTrue(
-                $"because document should be valid. Validation errors:{Environment.NewLine}{{0}}",
-                string.Join("\n", errors));
-
-        return Task.FromResult<IAssertMissingMeasurementDocument>(this);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.ReminderOfMissingMeasureData, "3").ConfigureAwait(false);
+        return this;
     }
 
     public Task<IAssertMissingMeasurementDocument> HasBusinessReason(BusinessReason businessReason)
@@ -103,4 +84,25 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
     {
         throw new NotImplementedException();
     }
+
+    private static AttributeNameAndValue[] CreateRequiredListAttributes(CodeListType codeListType)
+    {
+        var (codeList, countryCode) = GetCodeListConstant(codeListType);
+
+        var requiredAttributes = new List<AttributeNameAndValue> { new("listAgencyIdentifier", codeList), };
+
+        if (!string.IsNullOrEmpty(countryCode))
+            requiredAttributes.Add(new("listIdentifier", countryCode));
+
+        return [.. requiredAttributes];
+    }
+
+    private static (string CodeList, string? CountryCode) GetCodeListConstant(CodeListType codeListType) =>
+        codeListType switch
+        {
+            CodeListType.UnitedNations => (EbixDocumentWriter.UnitedNationsCodeList, null),
+            CodeListType.Ebix => (EbixDocumentWriter.EbixCodeList, null),
+            CodeListType.EbixDenmark => (EbixDocumentWriter.EbixCodeList, EbixDocumentWriter.CountryCodeDenmark),
+            _ => throw new ArgumentOutOfRangeException(nameof(codeListType), codeListType, "Invalid CodeListType"),
+        };
 }

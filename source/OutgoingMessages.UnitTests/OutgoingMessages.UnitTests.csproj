@@ -84,31 +84,31 @@
       <EmbeddedResource Include="Domain\Schemas\Cim\Xml\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_AggregatedMeteredDataTimeSeries\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM014\ebIX_AggregatedBusinessInformationEntities-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_AggregatedMeteredDataTimeSeries\ebIX_BusinessDataType-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM014\ebIX_BusinessDataType-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_AggregatedMeteredDataTimeSeries\ebIX_DK_AggregatedMeteredDataTimeSeries-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM014\ebIX_DK_AggregatedMeteredDataTimeSeries-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM017\ebIX_AggregatedBusinessInformationEntities-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM017\ebIX_BusinessDataType-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM017\ebIX_DK_RejectAggregatedBillingInformation-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_RejectRequestMeteredDataAggregated\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM016\ebIX_AggregatedBusinessInformationEntities-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_RejectRequestMeteredDataAggregated\ebIX_BusinessDataType-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM016\ebIX_BusinessDataType-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_RejectRequestMeteredDataAggregated\ebIX_DK_RejectRequestMeteredDataAggregated-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM016\ebIX_DK_RejectRequestMeteredDataAggregated-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\generic\260_-2.xsd">
@@ -691,13 +691,13 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Remove="Domain\Schemas\Ebix\Schemas\documents\RSM009\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM019\ebIX_AggregatedBusinessInformationEntities-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM019\ebIX_BusinessDataType-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices-2.xsd">
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM019\ebIX_DK_NotifyAggregatedWholesaleServices-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM009\ebIX_AggregatedBusinessInformationEntities-2.xsd">
@@ -747,6 +747,18 @@
       </EmbeddedResource>
       <None Remove="Domain\Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-reminderofmissingmeasuredata-0-1.xsd" />
       <EmbeddedResource Include="Domain\Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-reminderofmissingmeasuredata-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Domain\Schemas\Ebix\Schemas\documents\RSM018\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM018\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Domain\Schemas\Ebix\Schemas\documents\RSM018\ebIX_BusinessDataType-2.xsd" />
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM018\ebIX_BusinessDataType-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Domain\Schemas\Ebix\Schemas\documents\RSM018\ebIX_DK_NotifyMissingData-2.xsd" />
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM018\ebIX_DK_NotifyMissingData-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
