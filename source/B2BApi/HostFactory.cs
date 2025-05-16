@@ -67,7 +67,7 @@ public static class HostFactory
 
                     // Security
                     .AddB2BAuthentication(tokenValidationParameters)
-                    .AddSubsystemAuthentication(context.Configuration)
+                    .AddSubsystemAuthenticationForIsolatedWorker(context.Configuration)
 
                     // System timer
                     .AddNodaTimeForApplication()
