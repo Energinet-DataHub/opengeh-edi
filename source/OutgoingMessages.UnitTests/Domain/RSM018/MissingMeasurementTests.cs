@@ -43,7 +43,7 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
             senderRole: ActorRole.DanishEnergyAgency,
             receiverId: ActorNumber.Create("1234567890123"),
             receiverRole: ActorRole.EnergySupplier,
-            businessReason: BusinessReason.PeriodicFlexMetering,
+            businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
             transactionId: TransactionId.New(),
             timestamp: InstantPattern.General.Parse("2022-02-13T23:00:00Z").Value);
 
