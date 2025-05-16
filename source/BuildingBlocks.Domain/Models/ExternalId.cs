@@ -30,7 +30,7 @@ public class ExternalId
     /// <summary>
     /// Must fit the BINARY(16) ExternalId column in the OutgoingMessages table.
     /// </summary>
-    private const int BinaryMaxLength = 16;
+    private const int BinaryMaxLength = 15;
 
     [JsonConstructor]
     public ExternalId(byte[] value)
@@ -40,7 +40,7 @@ public class ExternalId
             throw new ArgumentOutOfRangeException(
                 nameof(value),
                 value.Length,
-                $"ExternalId must be {BinaryMaxLength} characters or less");
+                $"ExternalId (string value: \"{Encoding.UTF8.GetString(value)}\", guid value: \"{new Guid(value)}\") must be {BinaryMaxLength} bytes or less");
         }
 
         Value = value;
