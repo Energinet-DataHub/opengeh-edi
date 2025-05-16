@@ -135,7 +135,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             .ThrowExactlyAsync<DbUpdateException>()
             .WithInnerException(typeof(SqlException))
             .WithMessage(
-                "Cannot insert duplicate key row in object 'dbo.OutgoingMessages' with unique index 'UQ_OutgoingMessages_ReceiverNumber_PeriodStartedAt_ReceiverRole_ExternalId'*");
+                "Cannot insert duplicate key row in object 'dbo.OutgoingMessages' with unique index 'UQ_OutgoingMessages_ReceiverNumber_ExternalId_PeriodStartedAt_ReceiverRole'*");
     }
 
     [Fact]
@@ -368,7 +368,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
 
         var outgoingMessage = Assert.Single(outgoingMessages);
-        Assert.Equal(serviceBusMessageId.ToString(), outgoingMessage.ExternalId.Value);
+        Assert.Equal(serviceBusMessageId.ToByteArray(), outgoingMessage.ExternalId.Value);
     }
 
     [Fact]
@@ -405,7 +405,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         var outgoingMessages = await outgoingMessagesContext.OutgoingMessages.ToListAsync();
 
         var outgoingMessage = Assert.Single(outgoingMessages);
-        Assert.Equal(expectedExternalId, outgoingMessage.ExternalId);
+        Assert.Equal(expectedExternalId.Value, outgoingMessage.ExternalId.Value);
     }
 
     [Theory]
@@ -482,8 +482,8 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
         Assert.Collection(
             outgoingMessages.OrderBy(om => om.CreatedAt),
             [
-                om => Assert.Equal(expectedExternalId1, om.ExternalId),
-                om => Assert.Equal(expectedExternalId2, om.ExternalId),
+                om => Assert.Equal(expectedExternalId1.Value, om.ExternalId.Value),
+                om => Assert.Equal(expectedExternalId2.Value, om.ExternalId.Value),
             ]);
     }
 

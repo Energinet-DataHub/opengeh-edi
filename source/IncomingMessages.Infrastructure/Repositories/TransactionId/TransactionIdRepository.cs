@@ -70,6 +70,7 @@ public class TransactionIdRepository : ITransactionIdRepository
         CancellationToken cancellationToken)
     {
         return await _incomingMessagesContext.TransactionIdForSenders
+            .AsNoTracking()
             .Where(transactionIdForSender => transactionIds.Contains(transactionIdForSender.TransactionId)
                                              && transactionIdForSender.SenderId == senderId)
             .ToListAsync(cancellationToken)

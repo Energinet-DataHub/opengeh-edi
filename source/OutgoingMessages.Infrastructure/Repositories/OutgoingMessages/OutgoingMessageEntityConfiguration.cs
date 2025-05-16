@@ -53,6 +53,7 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
                 dbValue => EventId.From(dbValue));
 
         builder.Property(x => x.ExternalId)
+            .HasColumnType("BINARY(16)")
             .HasConversion(
                 externalId => externalId.Value,
                 dbValue => new ExternalId(dbValue));

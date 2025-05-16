@@ -49,7 +49,7 @@ public class ExternalIdTests
 
         // Create a million external ids from the same orchestration instance id and metering point id
         var externalIds = Enumerable.Range(0, 1000000)
-            .Select(_ => ExternalId.HashValuesWithMaxLength(orchestrationInstanceId.ToString("N"), meteringPointId))
+            .Select(_ => ExternalId.HashValuesWithMaxLength(orchestrationInstanceId.ToString("N"), meteringPointId).Value)
             .ToList();
 
         // Ensure all values are equal
