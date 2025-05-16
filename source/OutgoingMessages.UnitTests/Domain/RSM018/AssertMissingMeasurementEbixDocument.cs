@@ -22,12 +22,15 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
 
 public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDocument
 {
+    private const string HeaderEnergyDocument = "HeaderEnergyDocument";
+    private const string ProcessEnergyContext = "ProcessEnergyContext";
+
     private readonly AssertEbixDocument _documentAsserter;
 
     public AssertMissingMeasurementEbixDocument(AssertEbixDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
-        _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "D24");
+        _documentAsserter.HasValue($"{HeaderEnergyDocument}/DocumentType", "D24");
         _documentAsserter.HasValueWithAttributes(
             "ProcessEnergyContext/EnergyIndustryClassification",
             "23",
@@ -40,47 +43,66 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
         return this;
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasBusinessReason(BusinessReason businessReason)
+    public IAssertMissingMeasurementDocument HasMessageId(MessageId messageId)
+    {
+        _documentAsserter.HasValue($"{HeaderEnergyDocument}/Identification", messageId.Value);
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasBusinessReason(BusinessReason businessReason)
+    {
+        _documentAsserter.HasValueWithAttributes(
+            $"{ProcessEnergyContext}/EnergyBusinessProcess",
+            EbixCode.Of(businessReason),
+            CreateRequiredListAttributes(CodeListType.EbixDenmark));
+
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber)
+    {
+        _documentAsserter.HasValue($"{HeaderEnergyDocument}/SenderEnergyParty/Identification", actorNumber.Value);
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasSenderRole(ActorRole actorRole)
+    {
+        // Ebix doesn't have a sender role
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber)
+    {
+        _documentAsserter.HasValue($"{HeaderEnergyDocument}/RecipientEnergyParty/Identification", actorNumber.Value);
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasReceiverRole(ActorRole actorRole)
+    {
+        _documentAsserter.HasValueWithAttributes(
+            "ProcessEnergyContext/EnergyBusinessProcessRole",
+            EbixCode.Of(actorRole),
+            CreateRequiredListAttributes(CodeListType.Ebix));
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasTimestamp(Instant timestamp)
+    {
+        _documentAsserter.HasValue($"{HeaderEnergyDocument}/Creation", timestamp.ToString());
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasSenderId(ActorNumber actorNumber)
+    public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAssertMissingMeasurementDocument> HasSenderRole(ActorRole actorRole)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IAssertMissingMeasurementDocument> HasReceiverId(ActorNumber actorNumber)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IAssertMissingMeasurementDocument> HasReceiverRole(ActorRole actorRole)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IAssertMissingMeasurementDocument> HasTimestamp(Instant timestamp)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IAssertMissingMeasurementDocument> HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IAssertMissingMeasurementDocument> HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IAssertMissingMeasurementDocument> HasMissingDate(int seriesIndex, Instant missingDate)
+    public IAssertMissingMeasurementDocument HasMissingDate(int seriesIndex, Instant missingDate)
     {
         throw new NotImplementedException();
     }
