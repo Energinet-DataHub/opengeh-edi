@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.NotifyWholesaleServices;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
 
@@ -23,9 +24,7 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
 {
     private readonly AssertEbixDocument _documentAsserter;
 
-    public AssertMissingMeasurementEbixDocument(
-        AssertEbixDocument documentAsserter,
-        bool skipIdentificationLengthValdation = false)
+    public AssertMissingMeasurementEbixDocument(AssertEbixDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "D24");
@@ -39,6 +38,51 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyValidatedMeasureData, "3").ConfigureAwait(false);
         return this;
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasBusinessReason(BusinessReason businessReason)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasSenderId(ActorNumber actorNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasSenderRole(ActorRole actorRole)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasReceiverId(ActorNumber actorNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasReceiverRole(ActorRole actorRole)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasTimestamp(Instant timestamp)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasMissingDate(int seriesIndex, Instant missingDate)
+    {
+        throw new NotImplementedException();
     }
 
     private static AttributeNameAndValue[] CreateRequiredListAttributes(CodeListType codeListType)

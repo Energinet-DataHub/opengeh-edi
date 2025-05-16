@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System.Text.Json;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using Json.Schema;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
 
@@ -55,5 +57,50 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
                 string.Join("\n", errors));
 
         return Task.FromResult<IAssertMissingMeasurementDocument>(this);
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasBusinessReason(BusinessReason businessReason)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasSenderId(ActorNumber actorNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasSenderRole(ActorRole actorRole)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasReceiverId(ActorNumber actorNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasReceiverRole(ActorRole actorRole)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasTimestamp(Instant timestamp)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasTransactionId(int seriesIndex, TransactionId expectedTransactionId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasMeteringPointNumber(int seriesIndex, string meteringPointNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IAssertMissingMeasurementDocument> HasMissingDate(int seriesIndex, Instant missingDate)
+    {
+        throw new NotImplementedException();
     }
 }
