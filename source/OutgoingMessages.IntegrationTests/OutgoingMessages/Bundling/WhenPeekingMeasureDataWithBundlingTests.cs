@@ -362,7 +362,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         var relatedToMessageId = MessageId.New();
 
         var maxBundleSize = bundlingOptions.MaxBundleMessageCount;
-        var documentFormat = DocumentFormat.Json;
+        var documentFormat = DocumentFormat.Ebix;
 
         var missingMeasurement = new MissingMeasurement(
             TransactionId.New(),
