@@ -26,7 +26,9 @@ public class TransactionIdEntityConfiguration : IEntityTypeConfiguration<Transac
 
         builder.ToTable("TransactionRegistry", "dbo");
         builder.HasKey(entity => entity.TransactionId);
-        builder.Property(entity => entity.TransactionId);
-        builder.Property(entity => entity.SenderId);
+        builder.Property(entity => entity.TransactionId)
+            .HasColumnType("varchar(50)");
+        builder.Property(entity => entity.SenderId)
+            .HasColumnType("varchar(255)");
     }
 }
