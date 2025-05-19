@@ -89,6 +89,7 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IDocumentWriter, AcknowledgementEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, MissingMeasurementJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, MissingMeasurementEbixDocumentWriter>()
+            .AddScoped<IDocumentWriter, MissingMeasurementXmlDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         // MessageEnqueueingConfiguration
