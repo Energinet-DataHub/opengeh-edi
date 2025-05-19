@@ -12,7 +12,7 @@
       "storeInputsInOrchestrationHistory": true
     },
     "serviceBus": {
-      "maxConcurrentCalls": 80
+      "maxConcurrentCalls": 64
     }
   },
   "logging": {
