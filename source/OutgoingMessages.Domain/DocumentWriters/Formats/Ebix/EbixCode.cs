@@ -73,16 +73,35 @@ public static class EbixCode
     {
         ArgumentNullException.ThrowIfNull(meteringPointType);
 
-        if (meteringPointType == MeteringPointType.Consumption)
-            return "E17";
-
-        if (meteringPointType == MeteringPointType.Production)
-            return "E18";
-
-        if (meteringPointType == MeteringPointType.Exchange)
-            return "E20";
-
-        throw NoCodeFoundFor(meteringPointType.Name);
+        return meteringPointType switch
+        {
+            var mpt when mpt == MeteringPointType.Consumption => "E17",
+            var mpt when mpt == MeteringPointType.Production => "E18",
+            var mpt when mpt == MeteringPointType.Exchange => "E20",
+            var mpt when mpt == MeteringPointType.VeProduction => "D01",
+            var mpt when mpt == MeteringPointType.Analysis => "D02",
+            var mpt when mpt == MeteringPointType.NotUsed => "D03",
+            var mpt when mpt == MeteringPointType.SurplusProductionGroup6 => "D04",
+            var mpt when mpt == MeteringPointType.NetProduction => "D05",
+            var mpt when mpt == MeteringPointType.SupplyToGrid => "D06",
+            var mpt when mpt == MeteringPointType.ConsumptionFromGrid => "D07",
+            var mpt when mpt == MeteringPointType.WholesaleServicesInformation => "D08",
+            var mpt when mpt == MeteringPointType.OwnProduction => "D09",
+            var mpt when mpt == MeteringPointType.NetFromGrid => "D10",
+            var mpt when mpt == MeteringPointType.NetToGrid => "D11",
+            var mpt when mpt == MeteringPointType.TotalConsumption => "D12",
+            var mpt when mpt == MeteringPointType.NetLossCorrection => "D13",
+            var mpt when mpt == MeteringPointType.ElectricalHeating => "D14",
+            var mpt when mpt == MeteringPointType.NetConsumption => "D15",
+            var mpt when mpt == MeteringPointType.OtherConsumption => "D17",
+            var mpt when mpt == MeteringPointType.OtherProduction => "D18",
+            var mpt when mpt == MeteringPointType.CapacitySettlement => "D19",
+            var mpt when mpt == MeteringPointType.ExchangeReactiveEnergy => "D20",
+            var mpt when mpt == MeteringPointType.CollectiveNetProduction => "D21",
+            var mpt when mpt == MeteringPointType.CollectiveNetConsumption => "D22",
+            var mpt when mpt == MeteringPointType.InternalUse => "D99",
+            _ => throw NoCodeFoundFor(meteringPointType.Name),
+        };
     }
 
     public static string Of(ActorRole actorRole)
