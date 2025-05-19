@@ -364,7 +364,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         var maxBundleSize = bundlingOptions.MaxBundleMessageCount;
         var documentFormat = DocumentFormat.Json;
 
-        var rejectReasonsForEachMessage = new MissingMeasurement(
+        var missingMeasurement = new MissingMeasurement(
             TransactionId.New(),
             MeteringPointId.From("1234567890123"),
             SystemClock.Instance.GetCurrentInstant());
@@ -376,7 +376,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                 receiver: new Actor(receiver.Number, receiver.ActorRole),
                 businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
                 gridAreaCode: "804",
-                missingMeasurement: rejectReasonsForEachMessage))
+                missingMeasurement: missingMeasurement))
             .Cast<OutgoingMessageDto>()
             .ToList();
 
