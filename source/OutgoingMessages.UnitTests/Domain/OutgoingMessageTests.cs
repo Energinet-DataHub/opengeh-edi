@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
 using System.Text.Encodings.Web;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
@@ -87,6 +88,12 @@ public class OutgoingMessageTests
             // After MeasureUnit.Kwh have been changed to MeasureUnit.KilowattHour
             new object?[] { DocumentType.NotifyAggregatedMeasureData, "{\"TransactionId\":\"b114111b-ee09-4a0a-8399-ddca6a7edeca\",\"GridAreaCode\":\"804\",\"MeteringPointType\":\"Consumption\",\"MeasureUnitType\":\"KilowattHour\",\"Resolution\":\"QuarterHourly\",\"EnergySupplierNumber\":\"1234567890123\",\"BalanceResponsibleNumber\":\"1234567890124\",\"Period\":{\"Start\":\"2024-02-02T02:02:02Z\",\"End\":\"2024-02-02T02:02:02Z\"},\"Point\":[{\"Position\":1,\"Quantity\":2,\"QuantityQuality\":4,\"SampleTime\":\"2024-02-02T02:02:02Z\"}],\"CalculationResultVersion\":1,\"OriginalTransactionIdReference\":null,\"SettlementVersion\":\"FirstCorrection\"}" },
             new object?[] { DocumentType.NotifyWholesaleServices, "{\"TransactionId\":\"39843d03-d5e3-4695-b3a4-2d05a93373dc\",\"CalculationVersion\":1,\"GridAreaCode\":\"870\",\"ChargeCode\":\"123\",\"IsTax\":false,\"Points\":[{\"Position\":1,\"Quantity\":100,\"Price\":100,\"Amount\":100,\"QuantityQuality\":null}],\"EnergySupplier\":{\"Value\":\"1234567894444\"},\"ChargeOwner\":{\"Value\":\"1234567897777\"},\"Period\":{\"Start\":\"2023-11-01T00:00:00Z\",\"End\":\"2023-12-01T00:00:00Z\"},\"SettlementVersion\":null,\"QuantityMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"KilowattHour\"},\"QuantityUnit\":null,\"PriceMeasureUnit\":{\"Code\":\"KWH\",\"Name\":\"KilowattHour\"},\"Currency\":{\"Code\":\"DKK\",\"Name\":\"DanishCrowns\"},\"ChargeType\":{\"Code\":\"D02\",\"Name\":\"Fee\"},\"Resolution\":{\"Code\":\"P1M\",\"Name\":\"Monthly\"},\"MeteringPointType\":{\"Code\":\"E17\",\"Name\":\"Consumption\"},\"SettlementMethod\":{\"Code\":\"D01\",\"Name\":\"Flex\"}}" },
+
+            new object?[] { DocumentType.NotifyValidatedMeasureData, "{\"TransactionId\":\"3646fa9bb38b40a7b119bd099d67cc89\",\"MeteringPointId\":\"1234567890123456\",\"MeteringPointType\":{\"Code\":\"D14\",\"Name\":\"ElectricalHeating\"},\"OriginalTransactionIdReference\":null,\"Product\":\"8716867000030\",\"MeasurementUnit\":{\"Code\":\"KWH\",\"Name\":\"KilowattHour\"},\"RegistrationDateTime\":\"2025-01-31T23:00:00Z\",\"Resolution\":{\"Code\":\"PT1H\",\"Name\":\"Hourly\"},\"Period\":{\"Start\":\"2025-01-31T23:00:00Z\",\"End\":\"2025-02-01T00:00:00Z\"},\"Measurements\":[{\"Position\":1,\"Quantity\":19293,\"Quality\":{\"Code\":\"A04\",\"Name\":\"AsProvided\"}}]}" },
+            new object?[] { DocumentType.Acknowledgement, "{\"RejectReasons\":[{\"ErrorCode\":\"E10\",\"ErrorMessage\":\"Målepunktet findes ikke / The metering point does not exist\"}],\"TransactionId\":\"cf261feb494a429a990f14322e3f2dee\",\"OriginalTransactionIdReference\":\"d4778e5347ea458c887593026613e845\"}" },
+
+            // TODO: Update the data, when it comes from the system and not our subsystem tests, as thi does
+            new object?[] { DocumentType.ReminderOfMissingMeasureData, "{\"TransactionId\":\"5b139240044c4fde8295971a354d3fb9\",\"MeteringPointId\":{\"Value\":\"1111111111111111\"},\"Date\":\"2025-05-11T22:00:00Z\"}" },
         };
     }
 
@@ -121,6 +128,19 @@ public class OutgoingMessageTests
 
         // Act & Assert
         documentWriters.Should().AllSatisfy(x => _documentWriters.Should().Contain(d => d.GetType() == x));
+    }
+
+    [Fact]
+    public void Given_AllDocumentTypes_When_CheckingDocumentTypesForSerializedData_Then_AllDocumentTypesAreRepresented()
+    {
+        // Arrange
+        var allDocumentTypesNotReminder = GetAllOutgoingDocumentType();
+
+        // Act
+        var documentTypeOfSerializedData = EnqueuedQueuedSerializedContents().Select(x => x[0]).Cast<DocumentType>().ToList();
+
+        // Assert
+        allDocumentTypesNotReminder.Should().AllSatisfy(documentType => documentTypeOfSerializedData.Should().Contain(documentType));
     }
 
     [Fact]
@@ -215,11 +235,11 @@ public class OutgoingMessageTests
         // Assert
         outgoingMessages.Should()
             .AllSatisfy(
-                outgoingMesssage =>
+                outgoingMessage =>
                 {
                     var deserializedContent =
                         serializer.Deserialize<WholesaleCalculationMarketActivityRecord>(
-                            outgoingMesssage.GetSerializedContent());
+                            outgoingMessage.GetSerializedContent());
                     wholesaleServicesMessageDto.Series.Should().BeEquivalentTo(
                         deserializedContent,
                         "because the series should be the same. If one is changed, the other should be changed as well. Remember to add the enqueuedQueuedSerializedContents with the new serialized content");
@@ -339,5 +359,19 @@ public class OutgoingMessageTests
     {
         return typeof(NotifyWholesaleServicesCimJsonDocumentWriter).Assembly.GetTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(IDocumentWriter)) && !t.IsAbstract);
+    }
+
+    private static IEnumerable<DocumentType> GetAllOutgoingDocumentType()
+    {
+        var notOutgoingDocumentTypes = new List<DocumentType>()
+        {
+            DocumentType.RequestWholesaleSettlement,
+            DocumentType.RequestAggregatedMeasureData,
+        };
+
+        var fields = typeof(DocumentType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
+        return fields.Select(f => f.GetValue(null)).Cast<DocumentType>()
+            .Where(documentType => !notOutgoingDocumentTypes.Contains(documentType));
     }
 }
