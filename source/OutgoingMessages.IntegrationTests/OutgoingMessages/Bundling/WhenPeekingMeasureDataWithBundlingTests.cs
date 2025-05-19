@@ -374,7 +374,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                 eventId: eventId,
                 orchestrationInstanceId: Guid.NewGuid(),
                 receiver: new Actor(receiver.Number, receiver.ActorRole),
-                businessReason: BusinessReason.PeriodicMetering,
+                businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
                 gridAreaCode: "804",
                 missingMeasurement: rejectReasonsForEachMessage))
             .Cast<OutgoingMessageDto>()
