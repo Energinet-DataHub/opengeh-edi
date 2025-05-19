@@ -4,5 +4,4 @@ CREATE INDEX IX_OutgoingMessages_MessagesReadyToBeBundled
     ON [dbo].[OutgoingMessages] (
         CreatedAt)
     WHERE AssignedBundleId IS NULL
-    WITH (ONLINE = ON)
 GO
