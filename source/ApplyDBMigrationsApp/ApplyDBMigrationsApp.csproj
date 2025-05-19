@@ -226,6 +226,11 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202505141543 Rename ExternalId_NEW to ExternalId on OutgoingMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202505141544 Update idempotency unique constraint on OutgoingMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202505141545 Delete ExternalId_OLD on OutgoingMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202505161238 Rename ExternalId columns on OutgoingMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202505161237 Change ExternalId to BINARY on OutgoingMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202505161239 Update idempotency unique constraint on OutgoingMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202505161240 Delete ExternalId_OLD on OutgoingMessages table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202505190917 Create index IX_OutgoingMessages_MessagesReadyToBeBundled.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
