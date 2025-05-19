@@ -185,6 +185,9 @@
       <EmbeddedResource Include="Messages\json\rsm-012-bundle-json-96points-2150transactions.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Messages\ebix\rsm-012-bundle-ebix-96points-1666transactions.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemDefinitionGroup>
