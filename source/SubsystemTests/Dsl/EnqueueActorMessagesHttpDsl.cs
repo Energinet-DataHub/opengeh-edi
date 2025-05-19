@@ -167,13 +167,13 @@ internal class EnqueueActorMessagesHttpDsl
     private void AssertMeteringPointIdForRsm018(string content, string meteringPointId)
     {
         var expectedMeteringPointIdFormatted = string.Empty
-                                               + "        \"MarketEvaluationPoint\": [\n"
-                                               + "          {\n"
-                                               + "            \"mRID\": {\n"
-                                               + "              \"codingScheme\": \"A10\",\n"
-                                               + $"              \"value\": \"{meteringPointId}\"\n"
-                                               + "            }\n"
-                                               + "          }\n"
+                                               + "        \"MarketEvaluationPoint\": [\r\n"
+                                               + "          {\r\n"
+                                               + "            \"mRID\": {\r\n"
+                                               + "              \"codingScheme\": \"A10\",\r\n"
+                                               + $"              \"value\": \"{meteringPointId}\"\r\n"
+                                               + "            }\r\n"
+                                               + "          }\r\n"
                                                + "        ]";
         Assert.Contains(
             expectedMeteringPointIdFormatted,
