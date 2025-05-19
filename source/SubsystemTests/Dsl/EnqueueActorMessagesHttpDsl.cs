@@ -98,7 +98,7 @@ internal class EnqueueActorMessagesHttpDsl
 
     internal async Task EnqueueMissingMeasurementsLogMessage(Actor receiver)
     {
-        await _ediDriver.EmptyQueueAsync(MessageCategory.Aggregations).ConfigureAwait(false);
+        await _ediDriver.EmptyQueueAsync(MessageCategory.MeasureData).ConfigureAwait(false);
 
         var message = new EnqueueMissingMeasurementsLogHttpV1(
             OrchestrationInstanceId: Guid.NewGuid(),
