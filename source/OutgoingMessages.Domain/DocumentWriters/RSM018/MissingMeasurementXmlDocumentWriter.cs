@@ -13,54 +13,37 @@
 // limitations under the License.
 
 using System.Xml;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Xml;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM018;
 
-public class MissingMeasurementEbixDocumentWriter(IMessageRecordParser parser)
-    : EbixDocumentWriter(new DocumentDetails(
-        type: "DK_NotifyMissingData",
-        schemaLocation: string.Empty,
-        xmlNamespace: "un:unece:260:data:EEM-DK_NotifyMissingData:v3",
-        prefix: "ns0",
-        typeCode: "D24"),
-    parser)
+public class MissingMeasurementXmlDocumentWriter(
+    IMessageRecordParser parser)
+    : CimXmlDocumentWriter(
+        new DocumentDetails(
+            "ReminderOfMissingMeasureData_MarketDocument",
+            "urn:ediel.org:measure:reminderofmissingmeasuredata:0:1 urn-ediel-org-measure-reminderofmissingmeasuredata-0-1.xsd",
+            "urn:ediel.org:measure:reminderofmissingmeasuredata:0:1",
+            "cim",
+            "D24"),
+        parser)
 {
-    public override bool HandlesType(DocumentType documentType) => documentType == DocumentType.ReminderOfMissingMeasureData;
-
     protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
     {
-        ArgumentNullException.ThrowIfNull(marketActivityPayloads);
-
         foreach (var missingMeasurementLog in ParseFrom<MissingMeasurementMarketActivityRecord>(marketActivityPayloads))
         {
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadMissingDataRequest", null)
-                .ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
             {
                 await WriteTransactionIdAsync(writer, missingMeasurementLog).ConfigureAwait(false);
 
                 await WriteMissingDateAsync(writer, missingMeasurementLog).ConfigureAwait(false);
 
                 await WriteMeteringPointAsync(writer, missingMeasurementLog).ConfigureAwait(false);
-
-                await WriteNumberOfRemindersAsync(writer).ConfigureAwait(false);
             }
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
-    }
-
-    private async Task WriteMissingDateAsync(
-        XmlWriter writer,
-        MissingMeasurementMarketActivityRecord missingMeasurementLog)
-    {
-        await writer.WriteElementStringAsync(
-            DocumentDetails.Prefix,
-            "RequestPeriod",
-            null,
-            missingMeasurementLog.Date.ToString()).ConfigureAwait(false);
     }
 
     private async Task WriteTransactionIdAsync(
@@ -69,9 +52,20 @@ public class MissingMeasurementEbixDocumentWriter(IMessageRecordParser parser)
     {
         await writer.WriteElementStringAsync(
             DocumentDetails.Prefix,
-            "Identification",
+            "mRID",
             null,
             missingMeasurementLog.TransactionId.Value).ConfigureAwait(false);
+    }
+
+    private async Task WriteMissingDateAsync(
+        XmlWriter writer,
+        MissingMeasurementMarketActivityRecord missingMeasurementLog)
+    {
+        await writer.WriteElementStringAsync(
+            DocumentDetails.Prefix,
+            "request_DateAndOrTime.dateTime",
+            null,
+            missingMeasurementLog.Date.ToString()).ConfigureAwait(false);
     }
 
     private async Task WriteMeteringPointAsync(
@@ -80,27 +74,15 @@ public class MissingMeasurementEbixDocumentWriter(IMessageRecordParser parser)
     {
         await writer.WriteStartElementAsync(
             DocumentDetails.Prefix,
-            "MeteringPointDomainLocation",
+            "MarketEvaluationPoint",
             null).ConfigureAwait(false);
         {
-            await WriteGlnOrEicCodeWithAttributesAsync(
-                    "Identification",
-                    missingMeasurementLog.MeteringPointId.Value,
-                    writer)
-                .ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "mRID", null).ConfigureAwait(false);
+            await writer.WriteAttributeStringAsync(null, "codingScheme", null, "A10").ConfigureAwait(false);
+            await writer.WriteStringAsync(missingMeasurementLog.MeteringPointId.Value).ConfigureAwait(false);
+            await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);
-    }
-
-    private async Task WriteNumberOfRemindersAsync(
-        XmlWriter writer)
-    {
-        // Number of Reminders is always 0: https://app.zenhub.com/workspaces/mosaic-60a6105157304f00119be86e/issues/gh/energinet-datahub/team-mosaic/677
-        await writer.WriteElementStringAsync(
-            DocumentDetails.Prefix,
-            "NumberOfReminders",
-            null,
-            "0").ConfigureAwait(false);
     }
 }
