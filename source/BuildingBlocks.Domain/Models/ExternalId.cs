@@ -25,35 +25,41 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// So a message can only be delivered once for a given external id. (Unless additional logic is provided to check for idempotency)
 /// </summary>
 [Serializable]
-public record ExternalId
+public class ExternalId
 {
-    private const int MaxLength = 36;
+    /// <summary>
+    /// Must fit the BINARY(16) ExternalId column in the OutgoingMessages table.
+    /// </summary>
+    private const int BinaryMaxLength = 16;
 
     [JsonConstructor]
-    public ExternalId(string value)
+    public ExternalId(byte[] value)
     {
-        if (value.Length > MaxLength)
+        if (value.Length > BinaryMaxLength)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(value),
-                value,
-                $"ExternalId must be {MaxLength} characters or less");
+                value.Length,
+                $"ExternalId (string value: \"{Encoding.UTF8.GetString(value)}\", guid value: \"{new Guid(value)}\") must be {BinaryMaxLength} bytes or less");
         }
 
         Value = value;
     }
 
     public ExternalId(Guid value)
-        : this(value.ToString())
+        : this(value.ToByteArray())
     { }
 
-    public string Value { get; }
+    /// <summary>
+    /// Store the external id as a binary. This is done to increase performance, instead of using VARCHAR(36) or similar.
+    /// </summary>
+    public byte[] Value { get; }
 
     public static ExternalId New() => new(Guid.NewGuid());
 
     /// <summary>
     /// Hashes the given <paramref name="values"/> input to create a string, and ensures that the length is less than
-    /// or equal to the <see cref="MaxLength"/>.
+    /// or equal to the <see cref="BinaryMaxLength"/>.
     /// </summary>
     /// <remarks>
     /// The hashing algorithm used is SHA256, which has a low chance of collision. The hashing algorithm ensures
@@ -67,19 +73,21 @@ public record ExternalId
             throw new ArgumentException("At least one value must be provided.", nameof(values));
 
         // Combine all values into a single string.
-        var combinedInputString = string.Join(string.Empty, values);
+        var combinedInputString = string.Concat(values);
 
         // Hash the combined input string using SHA256 (low collision chance).
         var inputAsHash = SHA256.HashData(Encoding.UTF8.GetBytes(combinedInputString));
 
-        // Use standard Base64 and trim padding ('==' characters) if present.
-        var asBase64String = Convert.ToBase64String(inputAsHash).TrimEnd('=');
+        // Truncate the hash to 16 bytes.
+        // This means the entropy is now reduced to 2^128 (128 bits), which is still an astronomically large number,
+        // so the chance of collision is negligible in practice. We would need to generate over 20 quintillion values
+        // to reach a 50% chance of a collision (the birthday paradox).
+        var truncatedHash = new byte[BinaryMaxLength];
+        Array.Copy(
+            sourceArray: inputAsHash,
+            destinationArray: truncatedHash,
+            length: BinaryMaxLength);
 
-        // Truncate to maximum MaxLength characters.
-        var hashedValue = asBase64String.Length <= MaxLength
-            ? asBase64String
-            : asBase64String.Substring(0, MaxLength);
-
-        return new ExternalId(hashedValue);
+        return new ExternalId(truncatedHash);
     }
 }

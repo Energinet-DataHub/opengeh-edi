@@ -32,7 +32,7 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
     private readonly MessageRecordParser _parser = new(new Serializer());
 
     [Theory]
-    //[InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Xml))]
     [InlineData(nameof(DocumentFormat.Json))]
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Given_MissingMeasurement_When_CreateDocument_Then_DocumentCreated(string documentFormat)
@@ -107,6 +107,12 @@ public class MissingMeasurementTests : IClassFixture<DocumentValidationFixture>
         if (documentFormat == DocumentFormat.Ebix)
         {
             return new MissingMeasurementEbixDocumentWriter(_parser)
+                .WriteAsync(documentHeader, records);
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            return new MissingMeasurementXmlDocumentWriter(_parser)
                 .WriteAsync(documentHeader, records);
         }
 

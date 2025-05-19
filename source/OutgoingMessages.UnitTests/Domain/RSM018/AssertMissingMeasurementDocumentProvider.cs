@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.DocumentValidation;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Schemas.Ebix;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
@@ -28,6 +29,18 @@ public static class AssertMissingMeasurementDocumentProvider
         if (documentFormat == DocumentFormat.Json)
         {
             return new AssertMissingMeasurementJsonDocument(document);
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            return new AssertMissingMeasurementXmlDocument(AssertXmlDocument.Document(
+                document,
+                "cim",
+                new DocumentValidator(
+                    new[]
+                    {
+                        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
+                    })));
         }
 
         if (DocumentFormat.Ebix == documentFormat)
