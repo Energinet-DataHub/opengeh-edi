@@ -151,6 +151,7 @@ public class EnqueueMessage
         {
             var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleMessageCount,
             var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleMessageCount,
+            var dt when dt == DocumentType.ReminderOfMissingMeasureData => _bundlingOptions.MaxBundleMessageCount,
             _ => 1,
         };
 
