@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -349,6 +350,148 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
         // }
     }
 
+    [Fact]
+    public async Task Given_EnqueuedRsm018BundleWithMaximumSize_When_PeekMessages_Then_BundleSizeIsBelow50MB()
+    {
+        var bundlingOptions = ServiceProvider.GetRequiredService<IOptions<BundlingOptions>>().Value;
+
+        var receiver = Receiver.Create(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+
+        var eventId = EventId.From(Guid.NewGuid());
+        var relatedToMessageId = MessageId.New();
+
+        var maxBundleSize = bundlingOptions.MaxBundleMessageCount;
+        var documentFormat = DocumentFormat.Ebix;
+
+        var missingMeasurement = new MissingMeasurement(
+            TransactionId.New(),
+            MeteringPointId.From("1234567890123"),
+            SystemClock.Instance.GetCurrentInstant());
+
+        var messagesToEnqueue = Enumerable.Range(0, maxBundleSize)
+            .Select(i => new MissingMeasurementMessageDto(
+                eventId: eventId,
+                orchestrationInstanceId: Guid.NewGuid(),
+                receiver: new Actor(receiver.Number, receiver.ActorRole),
+                businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
+                gridAreaCode: "804",
+                missingMeasurement: missingMeasurement))
+            .Cast<OutgoingMessageDto>()
+            .ToList();
+
+        // - Set messages created at to "now"
+        var now = Instant.FromUtc(2025, 03, 26, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        // - Create actor message queue for receiver
+        await using (var arrangeScope = ServiceProvider.CreateAsyncScope())
+        {
+            var arrangeDbContext = arrangeScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            arrangeDbContext.ActorMessageQueues.Add(actorMessageQueue);
+            await arrangeDbContext.SaveChangesAsync();
+        }
+
+        // - Enqueue messages for receivers
+        var enqueueStopwatch = Stopwatch.StartNew();
+        _testOutputHelper.WriteLine("Enqueueing {0} messages", messagesToEnqueue.Count);
+        var enqueuedMessagesCount = await EnqueueAndCommitMessages(
+            messagesToEnqueue: messagesToEnqueue);
+        enqueueStopwatch.Stop();
+        _testOutputHelper.WriteLine(
+            "Enqueued {0} messages in {1:F} seconds",
+            enqueuedMessagesCount,
+            enqueueStopwatch.Elapsed.TotalSeconds);
+
+        Bundle biggestPossibleBundle;
+        await using (var arrangeScope = ServiceProvider.CreateAsyncScope())
+        {
+            var arrangeDbContext = arrangeScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+
+            biggestPossibleBundle = new Bundle(
+                actorMessageQueueId: actorMessageQueue.Id,
+                businessReason: BusinessReason.ReminderOfMissingMeasurementLog,
+                documentTypeInBundle: DocumentType.ReminderOfMissingMeasureData,
+                maxNumberOfMessagesInABundle: maxBundleSize,
+                created: now,
+                relatedToMessageId: relatedToMessageId);
+
+            var outgoingMessagesForBundle = await arrangeDbContext.OutgoingMessages.ToListAsync();
+            foreach (var outgoingMessageForBundle in outgoingMessagesForBundle)
+            {
+                biggestPossibleBundle.Add(outgoingMessageForBundle);
+            }
+
+            biggestPossibleBundle.Close(now);
+
+            arrangeDbContext.Bundles.Add(biggestPossibleBundle);
+
+            await arrangeDbContext.SaveChangesAsync();
+        }
+
+        // When peeking
+        PeekResultDto? peekResult;
+        var peekStopwatch = new Stopwatch();
+        await using (var actScope = ServiceProvider.CreateAsyncScope())
+        {
+            var authenticatedActor = actScope.ServiceProvider.GetRequiredService<AuthenticatedActor>();
+            authenticatedActor.SetAuthenticatedActor(
+                new ActorIdentity(
+                    actorNumber: receiver.Number,
+                    restriction: Restriction.None,
+                    actorRole: receiver.ActorRole,
+                    actorClientId: Guid.NewGuid(),
+                    actorId: Guid.NewGuid()));
+
+            var peekMessages = actScope.ServiceProvider.GetRequiredService<PeekMessage>();
+
+            _testOutputHelper.WriteLine("Peeking biggest possible bundle");
+            peekStopwatch.Start();
+            peekResult = await peekMessages.PeekAsync(
+                new PeekRequestDto(
+                    receiver.Number,
+                    MessageCategory.MeasureData,
+                    receiver.ActorRole,
+                    documentFormat),
+                CancellationToken.None);
+            peekStopwatch.Stop();
+        }
+
+        _testOutputHelper.WriteLine(
+            "Peeked biggest possible bundle in {0:F} seconds",
+            peekStopwatch.Elapsed.TotalSeconds);
+
+        // Then message is below 50MB
+        Assert.NotNull(peekResult);
+        Assert.Equal(biggestPossibleBundle.MessageId, peekResult.MessageId);
+
+        peekResult.Bundle.Seek(0, SeekOrigin.Begin);
+
+        var messageSizeAsBytes = peekResult.Bundle.Length;
+        var sizeInMegabytes = messageSizeAsBytes / (1024.0 * 1024.0);
+
+        _testOutputHelper.WriteLine("Bundle size was {0:F}MB", sizeInMegabytes);
+
+        Assert.True(
+            sizeInMegabytes <= 50.0,
+            $"The peeked message size should be below 50MB, but was {sizeInMegabytes:F1}MB");
+
+        // Uncomment below to save the peeked bundle to c://temp, if you need to inspect it.
+        // peekResult.Bundle.Seek(0, SeekOrigin.Begin);
+        // var filePath = Path.Combine(
+        //     "C://",
+        //     "temp",
+        //     $"rsm-018-bundle-{documentFormat.Name.ToLower()}-{maxBundleSize}transactions.{(documentFormat == DocumentFormat.Json ? "json" : "xml")}");
+        // var directoryPath = Path.GetDirectoryName(filePath)!;
+        // if (!Directory.Exists(directoryPath))
+        //     Directory.CreateDirectory(directoryPath);
+        //
+        // await using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+        // {
+        //     await peekResult.Bundle.CopyToAsync(fs);
+        // }
+    }
+
     private async Task<int> EnqueueAndCommitMessages(List<OutgoingMessageDto> messagesToEnqueue)
     {
         using var scope = ServiceProvider.CreateScope();
@@ -362,6 +505,7 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
             {
                 AcceptedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
                 RejectedSendMeasurementsMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
+                MissingMeasurementMessageDto m => await outgoingMessagesClient.EnqueueAsync(m, CancellationToken.None),
                 _ => throw new NotImplementedException($"Enqueueing outgoing message of type {messageDto.GetType()} is not implemented."),
             };
             enqueuedMessagesCount++;
