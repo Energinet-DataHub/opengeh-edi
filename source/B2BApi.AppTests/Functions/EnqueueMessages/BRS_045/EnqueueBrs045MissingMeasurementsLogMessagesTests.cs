@@ -78,6 +78,7 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-045 http request
+        var expectedMarketDocumentType = "ReminderOfMissingMeasureData_MarketDocument";
         var gridAccessProviderActorNumber = ActorNumber.Create("1111111111111");
         var dateWithMeasurement = new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
             IdempotencyKey: Guid.NewGuid(),
@@ -141,6 +142,8 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
 
         var content = await peekResponse.Content.ReadAsStringAsync(cancellationToken: CancellationToken.None);
-        content.Should().Contain("ReminderOfMissingMeasureData_MarketDocument", "because the peek response should contain MissingMeasurementsLog documents");
+        content.Should().Contain(
+            expectedMarketDocumentType,
+            $"because the peek response should contain the market document of type: {expectedMarketDocumentType}");
     }
 }
