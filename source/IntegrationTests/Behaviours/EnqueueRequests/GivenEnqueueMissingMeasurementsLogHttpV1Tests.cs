@@ -23,7 +23,6 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Options;
 using NodaTime;
-using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -38,12 +37,16 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
 {
     protected BundlingOptions BundlingOptions => GetService<IOptions<BundlingOptions>>().Value;
 
+    // Ebix currently fails due to the actor number being an eic code,
+    // https://github.com/Energinet-DataHub/opengeh-edi/pull/1638/files vill resolve this issue
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_ValidRequest_When_GridAccessProviderPeeksMessages_Then_ReceivesCorrectReminderOfMissingMeasureDataDocuments(DocumentFormat documentFormat)
+    public async Task AndGiven_ThreeMissingDates_When_GridAccessProviderPeeksMessages_Then_ReceivesCorrectReminderOfMissingMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var gridAccessProvider = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
+        var gridAccessProvider = new Actor(
+            ActorNumber.Create("10X123456723432S"), // This is an Eic code
+            ActorRole.GridAccessProvider);
         var meteringPointIdWithMissingData = MeteringPointId.From("123456789012345678");
         var missingDates = new List<DateTimeOffset>
         {

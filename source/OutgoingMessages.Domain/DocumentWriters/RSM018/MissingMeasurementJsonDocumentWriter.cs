@@ -25,7 +25,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM018;
 public sealed class MissingMeasurementJsonDocumentWriter(IMessageRecordParser parser, JavaScriptEncoder encoder)
     : IDocumentWriter
 {
-    private const string DocumentTypeName = "ReminderOfMissingMeasureData_MarketDocument";
     private const string TypeCode = "D24";
 
     private readonly IMessageRecordParser _parser = parser;
@@ -119,13 +118,13 @@ internal class MissingMeasurements(
     public ValueObject<string> BusinessReasonCode { get; init; } = ValueObject<string>.Create(businessReasonCode);
 
     [JsonPropertyName("receiver_MarketParticipant.mRID")]
-    public ValueObjectWithScheme ReceiverNumber { get; init; } = ValueObjectWithScheme.Create("A10", receiverId);
+    public ValueObjectWithScheme ReceiverNumber { get; init; } = ValueObjectWithScheme.Create(ActorNumber.IsEic(receiverId) ? "A01" : "A10", receiverId);
 
     [JsonPropertyName("receiver_MarketParticipant.marketRole.type")]
     public ValueObject<string> ReceiverRole { get; init; } = ValueObject<string>.Create(receiverRole);
 
     [JsonPropertyName("sender_MarketParticipant.mRID")]
-    public ValueObjectWithScheme SenderNumber { get; init; } = ValueObjectWithScheme.Create("A10", senderId);
+    public ValueObjectWithScheme SenderNumber { get; init; } = ValueObjectWithScheme.Create(ActorNumber.IsEic(senderId) ? "A01" : "A10", senderId);
 
     [JsonPropertyName("sender_MarketParticipant.marketRole.type")]
     public ValueObject<string> SenderRole { get; init; } = ValueObject<string>.Create(senderRole);
