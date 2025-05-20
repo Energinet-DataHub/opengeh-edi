@@ -10,6 +10,9 @@
         "traceInputsAndOutputs": true
       },
       "storeInputsInOrchestrationHistory": true
+    },
+    "serviceBus": {
+      "maxConcurrentCalls": 64
     }
   },
   "logging": {

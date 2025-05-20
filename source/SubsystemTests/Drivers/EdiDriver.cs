@@ -149,13 +149,24 @@ internal sealed class EdiDriver
 
     internal async Task<string> SendForwardMeteredDataAsync(
         MeteringPointId meteringPointId,
+        DocumentFormat documentFormat,
         CancellationToken cancellationToken)
     {
         var b2bClient = await _b2BHttpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/notifyvalidatedmeasuredata");
-        const string contentType = "application/json";
-        var requestContent = await GetMeteredDataForMeteringPointContentAsync(meteringPointId, cancellationToken)
+        var contentType = documentFormat switch
+        {
+            var df when df == DocumentFormat.Json => "application/json",
+            var df when df == DocumentFormat.Xml => "application/xml",
+            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unhandled document format"),
+        };
+
+        var requestContent = await GetMeteredDataForMeteringPointContentAsync(
+                meteringPointId,
+                documentFormat,
+                cancellationToken)
             .ConfigureAwait(false);
+
         request.Content = new StringContent(
             requestContent.Content,
             Encoding.UTF8,
@@ -234,24 +245,33 @@ internal sealed class EdiDriver
 
     private async Task<(string MessageId, string Content)> GetMeteredDataForMeteringPointContentAsync(
         MeteringPointId meteringPointId,
+        DocumentFormat documentFormat,
         CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid().ToTestMessageUuid();
         var transactionId = Guid.NewGuid().ToTestMessageUuid();
-        var jsonContent = await File.ReadAllTextAsync("Messages/json/MeteredDataForMeteringPoint.json", cancellationToken)
-            .ConfigureAwait(false);
 
-        jsonContent = jsonContent.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
-        jsonContent = jsonContent.Replace("{TransactionId}", transactionId, StringComparison.InvariantCulture);
-        jsonContent = jsonContent.Replace("{MeteringPointId}", meteringPointId.Value, StringComparison.InvariantCulture);
+        var filePath = documentFormat switch
+        {
+            var df when df == DocumentFormat.Json => "Messages/json/rsm-012-bundle-json-96points-2150transactions.json",
+            var df when df == DocumentFormat.Xml => "Messages/xml/rsm-012-bundle-xml-96points-2750transactions.xml",
+            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unhandled document format"),
+        };
+
+        var content = await File.ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
+
+        content = content.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
+        content = content.Replace("{TransactionId}", transactionId, StringComparison.InvariantCulture);
+        content = content.Replace("{MeteringPointId}", meteringPointId.Value, StringComparison.InvariantCulture);
 
         _logger.WriteLine(
-            "Creating ForwardMeteredData message with MessageId={0}, TransactionId={1}, MeteringPointId={2}",
+            "Creating ForwardMeteredData message with MessageId={0}, TransactionId={1}, MeteringPointId={2}, DocumentFormat={3}",
             messageId,
             transactionId,
-            meteringPointId.Value);
+            meteringPointId.Value,
+            documentFormat.Name);
 
-        return (messageId, jsonContent);
+        return (messageId, content);
     }
 
     private async Task<(string MessageId, string Content)> GetAggregatedMeasureDataContentAsync(bool withSyncError, CancellationToken cancellationToken)

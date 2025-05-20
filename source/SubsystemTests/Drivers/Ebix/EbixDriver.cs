@@ -278,7 +278,11 @@ internal sealed class EbixDriver : IDisposable
     {
         var transactionId = Guid.NewGuid().ToTestMessageUuid();
 
-        var content = await File.ReadAllTextAsync("Messages/ebix/MeteredDataForMeteringPoint.xml", cancellationToken)
+        // Remove last 5 characters to avoid exceeding 35 characters, since "_XXXX" is post-fixed to the result.
+        if (transactionId.Length > 30)
+            transactionId = transactionId.Substring(0, 30);
+
+        var content = await File.ReadAllTextAsync("Messages/ebix/rsm-012-bundle-ebix-96points-1666transactions.xml", cancellationToken)
             .ConfigureAwait(false);
 
         content = content.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);

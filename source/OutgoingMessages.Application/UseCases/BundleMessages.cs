@@ -280,6 +280,7 @@ public class BundleMessages(
         {
             var dt when dt == DocumentType.NotifyValidatedMeasureData => _bundlingOptions.MaxBundleMessageCount,
             var dt when dt == DocumentType.Acknowledgement => _bundlingOptions.MaxBundleMessageCount,
+            var dt when dt == DocumentType.ReminderOfMissingMeasureData => _bundlingOptions.MaxBundleMessageCount,
             _ => throw new ArgumentOutOfRangeException(nameof(documentType), documentType, "Document type doesn't support bundling."),
         };
 

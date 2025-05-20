@@ -34,17 +34,16 @@ public class MissingMeasurementEbixDocumentWriter(IMessageRecordParser parser)
     {
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
 
-        foreach (var forwardMeteredDataRecord in ParseFrom<MissingMeasurementMarketActivityRecord>(
-                     marketActivityPayloads))
+        foreach (var missingMeasurementLog in ParseFrom<MissingMeasurementMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadMissingDataRequest", null)
                 .ConfigureAwait(false);
             {
-                await WriteTransactionIdAsync(writer, forwardMeteredDataRecord).ConfigureAwait(false);
+                await WriteTransactionIdAsync(writer, missingMeasurementLog).ConfigureAwait(false);
 
-                await WriteMissingDateAsync(writer, forwardMeteredDataRecord).ConfigureAwait(false);
+                await WriteMissingDateAsync(writer, missingMeasurementLog).ConfigureAwait(false);
 
-                await WriteMeteringPointAsync(writer, forwardMeteredDataRecord).ConfigureAwait(false);
+                await WriteMeteringPointAsync(writer, missingMeasurementLog).ConfigureAwait(false);
 
                 await WriteNumberOfRemindersAsync(writer).ConfigureAwait(false);
             }
@@ -55,29 +54,29 @@ public class MissingMeasurementEbixDocumentWriter(IMessageRecordParser parser)
 
     private async Task WriteMissingDateAsync(
         XmlWriter writer,
-        MissingMeasurementMarketActivityRecord forwardMeteredDataRecord)
+        MissingMeasurementMarketActivityRecord missingMeasurementLog)
     {
         await writer.WriteElementStringAsync(
             DocumentDetails.Prefix,
             "RequestPeriod",
             null,
-            forwardMeteredDataRecord.Date.ToString()).ConfigureAwait(false);
+            missingMeasurementLog.Date.ToString()).ConfigureAwait(false);
     }
 
     private async Task WriteTransactionIdAsync(
         XmlWriter writer,
-        MissingMeasurementMarketActivityRecord forwardMeteredDataRecord)
+        MissingMeasurementMarketActivityRecord missingMeasurementLog)
     {
         await writer.WriteElementStringAsync(
             DocumentDetails.Prefix,
             "Identification",
             null,
-            forwardMeteredDataRecord.TransactionId.Value).ConfigureAwait(false);
+            missingMeasurementLog.TransactionId.Value).ConfigureAwait(false);
     }
 
     private async Task WriteMeteringPointAsync(
         XmlWriter writer,
-        MissingMeasurementMarketActivityRecord forwardMeteredDataRecord)
+        MissingMeasurementMarketActivityRecord missingMeasurementLog)
     {
         await writer.WriteStartElementAsync(
             DocumentDetails.Prefix,
@@ -86,7 +85,7 @@ public class MissingMeasurementEbixDocumentWriter(IMessageRecordParser parser)
         {
             await WriteGlnOrEicCodeWithAttributesAsync(
                     "Identification",
-                    forwardMeteredDataRecord.MeteringPointId.Value,
+                    missingMeasurementLog.MeteringPointId.Value,
                     writer)
                 .ConfigureAwait(false);
         }
