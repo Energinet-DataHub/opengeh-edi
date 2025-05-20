@@ -97,7 +97,7 @@ public sealed class WhenArchivedMessageIsRequestedTests : BaseTestClass
     {
         var meteringPointId = MeteringPointId.From("9999999999");
         await _forwardMeteredDataAsGridAccessProvider
-            .SendForwardMeteredDataInCimAsync(meteringPointId, CancellationToken.None);
+            .SendForwardMeteredDataInCimAsync(meteringPointId, DocumentFormat.Json, CancellationToken.None);
 
         await _archivedMessages.ConfirmMeteringPointArchivedMessageSearch(meteringPointId);
     }
