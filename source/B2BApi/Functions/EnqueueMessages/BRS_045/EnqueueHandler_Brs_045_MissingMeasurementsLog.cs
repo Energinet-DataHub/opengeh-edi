@@ -43,8 +43,7 @@ public class EnqueueHandler_Brs_045_MissingMeasurementsLog(
                 cancellationToken).ConfigureAwait(false);
         }
 
-        // TODO #751: Update once the document writers are implemented, so the RSM-018 messages can be peeked.
-        // await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private MissingMeasurementMessageDto CreateOutgoingMessageDto(
