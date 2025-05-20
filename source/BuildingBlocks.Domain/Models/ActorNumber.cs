@@ -59,7 +59,7 @@ public class ActorNumber : ValueObject
     public static bool IsGlnNumber(string actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Length == 13;
+        return actorNumber.Length == 13 && long.TryParse(actorNumber, out _);
     }
 
     public ProcessManager.Abstractions.Core.ValueObjects.ActorNumber ToProcessManagerActorNumber()

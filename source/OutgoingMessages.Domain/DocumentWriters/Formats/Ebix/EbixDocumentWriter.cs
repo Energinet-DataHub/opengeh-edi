@@ -139,24 +139,23 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         ArgumentNullException.ThrowIfNull(writer);
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
-        if (long.TryParse(glnOrEicCode, out _))
+
+        var isGsrnNumber = glnOrEicCode.Length == 18 && long.TryParse(glnOrEicCode, out _);
+
+        if (ActorNumber.IsGlnNumber(glnOrEicCode))
         {
-            var isGlnNumber = glnOrEicCode.Length == 13 || glnOrEicCode.Length == 18;
-            var isEicCode = glnOrEicCode.Length == 16;
-            if (isGlnNumber)
-            {
-                // GLN or GSNR number from GS1
-                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
-            }
-            else if (isEicCode)
-            {
-                // EIC code
-                await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, EicCode).ConfigureAwait(false);
-            }
-            else
-            {
-                throw new InvalidOperationException($"Invalid schemecode '{glnOrEicCode}'");
-            }
+            // GLN number from GS1
+            await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
+        }
+        else if (isGsrnNumber)
+        {
+            // GSRN number from GS1
+            await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
+        }
+        else if (ActorNumber.IsEic(glnOrEicCode))
+        {
+            // EIC code
+            await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, EicCode).ConfigureAwait(false);
         }
         else
         {
