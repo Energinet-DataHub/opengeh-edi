@@ -63,11 +63,12 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
 
     [Fact]
     [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
-    public async Task Actor_can_send_forward_metered_data_in_cim_to_datahub()
+    public async Task Actor_can_send_50MB_forward_metered_data_in_cim_xml_to_datahub()
     {
         var messageId = await _forwardMeteredDataAsGridAccessProvider
             .SendForwardMeteredDataInCimAsync(
                 meteringPointId: null,
+                DocumentFormat.Xml,
                 cancellationToken: CancellationToken.None);
 
         await _forwardMeteredDataAsGridAccessProvider.ConfirmRequestIsReceivedAsync(
@@ -77,7 +78,22 @@ public class WhenForwardMeteredDataIsReceivedTests : BaseTestClass
 
     [Fact]
     [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
-    public async Task Actor_can_send_forward_metered_data_in_ebix_to_datahub()
+    public async Task Actor_can_send_50MB_forward_metered_data_in_cim_json_to_datahub()
+    {
+        var messageId = await _forwardMeteredDataAsGridAccessProvider
+            .SendForwardMeteredDataInCimAsync(
+                meteringPointId: null,
+                DocumentFormat.Json,
+                cancellationToken: CancellationToken.None);
+
+        await _forwardMeteredDataAsGridAccessProvider.ConfirmRequestIsReceivedAsync(
+            messageId,
+            CancellationToken.None);
+    }
+
+    [Fact]
+    [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
+    public async Task Actor_can_send_50MB_forward_metered_data_in_ebix_to_datahub()
     {
         var messageId = await _forwardMeteredDataAsGridAccessProvider
             .SendForwardMeteredDataInEbixAsync(CancellationToken.None);
