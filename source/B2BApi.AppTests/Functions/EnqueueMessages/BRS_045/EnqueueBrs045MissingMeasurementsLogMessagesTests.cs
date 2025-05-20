@@ -78,6 +78,7 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
 
         // Arrange
         // => Given enqueue BRS-045 http request
+        var expectedMarketDocumentType = "ReminderOfMissingMeasureData_MarketDocument";
         var gridAccessProviderActorNumber = ActorNumber.Create("1111111111111");
         var dateWithMeasurement = new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
             IdempotencyKey: Guid.NewGuid(),
@@ -123,27 +124,26 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         // => Verify that outgoing messages were enqueued
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
 
-        // TODO #751: Verify that the enqueued messages are saved as outgoing messages, and can be peeked
-        // var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-        //     .Where(om => om.DocumentType == DocumentType.ReminderOfMissingMeasureData)
-        //     .ToListAsync();
-        //
-        // enqueuedOutgoingMessages.Should().HaveCount(enqueueMessagesData.Data.Count);
-        //
-        // var receiver = new Actor(
-        //     gridAccessProviderActorNumber,
-        //     ActorRole.MeteredDataResponsible);
-        //
-        // var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
-        //     actor: receiver,
-        //     category: MessageCategory.MeasureData);
-        //
-        // var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
-        // peekResponse.StatusCode.Should().NotBe(HttpStatusCode.OK, "Peek should not be OK, since no document writer are registered");
-        //await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
-        // - Peek all messages (expect 2)
-        // - Verify that the messages has correct document type
-        // - Verify that the messages has correct metering point id
-        // - Verify that the messages has correct dates
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+             .Where(om => om.DocumentType == DocumentType.ReminderOfMissingMeasureData)
+             .ToListAsync();
+
+        enqueuedOutgoingMessages.Should().HaveCount(enqueueMessagesData.Data.Count);
+
+        var receiver = new Actor(
+            gridAccessProviderActorNumber,
+            ActorRole.GridAccessProvider);
+
+        var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
+            actor: receiver,
+            category: MessageCategory.MeasureData);
+
+        var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
+        await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+
+        var content = await peekResponse.Content.ReadAsStringAsync(cancellationToken: CancellationToken.None);
+        content.Should().Contain(
+            expectedMarketDocumentType,
+            $"because the peek response should contain the market document of type: {expectedMarketDocumentType}");
     }
 }
