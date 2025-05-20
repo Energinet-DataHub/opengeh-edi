@@ -14,7 +14,6 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
 using Azure.Core;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.App.Common.Extensions.Options;
@@ -30,12 +29,10 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
-using Energinet.DataHub.EDI.B2BApi.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
@@ -327,7 +324,7 @@ public class B2BApiAppFixture : IAsyncLifetime
                 elementSelector: (element) => element.Value.ToString().ToLower()));
     }
 
-    public string CreateSubsystemToken(string applicationIdUri = AuthenticationOptionsForTests.ApplicationIdUri)
+    public string CreateSubsystemToken(string applicationIdUri = SubsystemAuthenticationOptionsForTests.ApplicationIdUri)
     {
         var tokenResponse = IntegrationTestConfiguration.Credential.GetToken(
             new TokenRequestContext([applicationIdUri]), CancellationToken.None);
@@ -533,10 +530,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         // Subsystem authentication
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.ApplicationIdUri)}",
-            AuthenticationOptionsForTests.ApplicationIdUri);
+            SubsystemAuthenticationOptionsForTests.ApplicationIdUri);
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{SubsystemAuthenticationOptions.SectionName}__{nameof(SubsystemAuthenticationOptions.Issuer)}",
-            AuthenticationOptionsForTests.Issuer);
+            SubsystemAuthenticationOptionsForTests.Issuer);
         return appHostSettings;
     }
 
