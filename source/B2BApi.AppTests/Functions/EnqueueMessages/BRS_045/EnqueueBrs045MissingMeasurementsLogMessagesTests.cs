@@ -131,14 +131,16 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
 
         var receiver = new Actor(
             gridAccessProviderActorNumber,
-            ActorRole.MeteredDataResponsible);
+            ActorRole.GridAccessProvider);
 
         var peekHttpRequest = await _fixture.CreatePeekHttpRequestAsync(
             actor: receiver,
             category: MessageCategory.MeasureData);
 
         var peekResponse = await _fixture.AppHostManager.HttpClient.SendAsync(peekHttpRequest);
-        peekResponse.StatusCode.Should().Be(HttpStatusCode.OK, "Peek should be OK, since no there should be a message with two series");
         await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+
+        var content = await peekResponse.Content.ReadAsStringAsync(cancellationToken: CancellationToken.None);
+        content.Should().Contain("ReminderOfMissingMeasureData_MarketDocument", "because the peek response should contain MissingMeasurementsLog documents");
     }
 }
