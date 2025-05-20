@@ -25,6 +25,7 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
     private const string HeaderEnergyDocument = "HeaderEnergyDocument";
     private const string ProcessEnergyContext = "ProcessEnergyContext";
     private const string PayloadMissingDataRequest = "PayloadMissingDataRequest";
+    private const string Gs1Code = "9";
 
     private readonly AssertEbixDocument _documentAsserter;
 
@@ -36,6 +37,10 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
             "ProcessEnergyContext/EnergyIndustryClassification",
             "23",
             CreateRequiredListAttributes(CodeListType.UnitedNations));
+        // Number of reminders are hardcoded to 0.
+        _documentAsserter.HasValue(
+            $"{PayloadMissingDataRequest}[{1}]/NumberOfReminders",
+            "0");
     }
 
     public async Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
@@ -101,7 +106,10 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, MeteringPointId meteringPointNumber)
     {
-        _documentAsserter.HasValue($"{PayloadMissingDataRequest}[{seriesIndex}]/MeteringPointDomainLocation/Identification", meteringPointNumber.Value);
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadMissingDataRequest}[{seriesIndex}]/MeteringPointDomainLocation/Identification",
+            meteringPointNumber.Value,
+            new AttributeNameAndValue("schemeAgencyIdentifier", Gs1Code));
         return this;
     }
 

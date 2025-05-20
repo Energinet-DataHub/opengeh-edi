@@ -49,7 +49,12 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
 
     public IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber)
     {
-        _documentAsserter.HasValue("sender_MarketParticipant.mRID", actorNumber.Value);
+        var attribute = "sender_MarketParticipant.mRID";
+        _documentAsserter.HasValue(attribute, actorNumber.Value);
+        _documentAsserter.HasAttribute(
+            attribute,
+            "codingScheme",
+            ActorNumber.IsEic(actorNumber.Value) ? "A01" : "A10");
         return this;
     }
 
@@ -61,7 +66,12 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
 
     public IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber)
     {
-        _documentAsserter.HasValue("receiver_MarketParticipant.mRID", actorNumber.Value);
+        var attribute = "receiver_MarketParticipant.mRID";
+        _documentAsserter.HasValue(attribute, actorNumber.Value);
+        _documentAsserter.HasAttribute(
+            attribute,
+            "codingScheme",
+            ActorNumber.IsEic(actorNumber.Value) ? "A01" : "A10");
         return this;
     }
 
@@ -97,4 +107,8 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
         return this;
     }
     #endregion
+
+    private void AssertActorNumber(string attribute, ActorNumber actorNumber)
+    {
+    }
 }

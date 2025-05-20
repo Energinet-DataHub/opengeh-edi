@@ -79,11 +79,17 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber)
     {
-        _root.GetProperty("sender_MarketParticipant.mRID")
+        var sender = _root.GetProperty("sender_MarketParticipant.mRID");
+        sender
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(actorNumber.Value);
+        sender
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(ActorNumber.IsEic(actorNumber.Value) ? "A01" : "A10");
 
         return this;
     }
@@ -101,11 +107,17 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber)
     {
-        _root.GetProperty("receiver_MarketParticipant.mRID")
+        var receiver = _root.GetProperty("receiver_MarketParticipant.mRID");
+        receiver
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(actorNumber.Value);
+        receiver
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(ActorNumber.IsEic(actorNumber.Value) ? "A01" : "A10");
 
         return this;
     }
