@@ -21,6 +21,8 @@ public class RuntimeEnvironment
 {
     public static RuntimeEnvironment Default => new();
 
+    public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
+
     public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
         GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
 
