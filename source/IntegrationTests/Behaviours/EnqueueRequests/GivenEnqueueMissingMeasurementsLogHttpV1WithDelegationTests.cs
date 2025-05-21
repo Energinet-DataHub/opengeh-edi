@@ -44,7 +44,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
     public async Task AndGiven_ThreeMissingDates_When_GridAccessProviderPeeksMessages_Then_ReceivesCorrectReminderOfMissingMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var gridAccessProviderWitchDelegates = new Actor(
+        var gridAccessProviderWhichDelegates = new Actor(
             ActorNumber.Create("10X123456723432S"), // This is an Eic code
             ActorRole.GridAccessProvider);
         var delegatedActor = new Actor(
@@ -61,7 +61,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
         var delegationStartsAt = Instant.FromUtc(2024, 6, 1, 14, 57, 09);
 
         await GivenDelegation(
-            delegatedBy: gridAccessProviderWitchDelegates,
+            delegatedBy: gridAccessProviderWhichDelegates,
             delegatedTo: delegatedActor,
             gridAreaCode,
             processType: ProcessType.MissingMeasurementLog,
@@ -70,7 +70,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
         // Enqueue the missing measurements
         var whenMessagesAreEnqueued = delegationStartsAt.PlusDays(2);
         GivenNowIs(whenMessagesAreEnqueued);
-        await EnqueueMissingMeasurement(gridAccessProviderWitchDelegates, meteringPointIdWithMissingData, gridAreaCode);
+        await EnqueueMissingMeasurement(gridAccessProviderWhichDelegates, meteringPointIdWithMissingData, gridAreaCode);
 
         // Trigger the bundling
         var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(
@@ -80,8 +80,8 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
 
         // When (act)
         var peekResultsForDelegatingActor = await WhenActorPeeksAllMessages(
-            gridAccessProviderWitchDelegates.ActorNumber,
-            gridAccessProviderWitchDelegates.ActorRole,
+            gridAccessProviderWhichDelegates.ActorNumber,
+            gridAccessProviderWhichDelegates.ActorRole,
             documentFormat);
 
         var peekResultsForDelegatedActor = await WhenActorPeeksAllMessages(
@@ -113,7 +113,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
     private async Task EnqueueMissingMeasurement(
         Actor gridAccessProvider,
         List<(MeteringPointId MeteringPointId, Instant Date)> meteringPointIdWithMissingData,
-        string gridAreCode = "001")
+        string gridAreaCode = "001")
     {
         var enqueueBrs045RequestFromProcessManager = new EnqueueMissingMeasurementsLogHttpV1(
             OrchestrationInstanceId: Guid.NewGuid(),
@@ -121,7 +121,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
                 new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
                 IdempotencyKey: Guid.NewGuid(),
                 GridAccessProvider: gridAccessProvider.ActorNumber.ToProcessManagerActorNumber(),
-                GridArea: gridAreCode,
+                GridArea: gridAreaCode,
                 Date: date.Date.ToDateTimeOffset(),
                 MeteringPointId: date.MeteringPointId.Value)).ToList());
 
