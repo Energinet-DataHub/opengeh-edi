@@ -285,14 +285,6 @@ public class RegistrationTests
 
     private sealed class TestEnvironment : RuntimeEnvironment
     {
-        public override string? ServiceBus__SendConnectionString =>
-            CreateFakeServiceBusFullyQualifiedNamespace();
-
-        public override string? DB_CONNECTION_STRING =>
-            CreateConnectionString();
-
-        public override Uri? AZURE_STORAGE_ACCOUNT_URL => new(CreateFakeStorageUrl());
-
         public override string AZURE_FUNCTIONS_ENVIRONMENT => "Development";
 
         public static string CreateFakeServiceBusFullyQualifiedNamespace()
@@ -311,11 +303,6 @@ public class RegistrationTests
         public static string CreateFakeStorageUrl()
         {
             return "https://dummy.url";
-        }
-
-        public override bool IsRunningLocally()
-        {
-            return true;
         }
 
         protected override string? GetEnvironmentVariable(string variable)
