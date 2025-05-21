@@ -23,6 +23,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Options;
 using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -45,18 +46,17 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
         var gridAccessProvider = new Actor(
             ActorNumber.Create("10X123456723432S"), // This is an Eic code
             ActorRole.GridAccessProvider);
-        var meteringPointIdWithMissingData = MeteringPointId.From("123456789012345678");
-        var missingDates = new List<DateTimeOffset>
+        var meteringPointIdWithMissingData = new List<(MeteringPointId MeteringPointId, Instant Date)>
         {
-            DateTimeOffset.Parse("2023-01-01T00:00:00Z"),
-            DateTimeOffset.Parse("2023-01-02T00:00:00Z"),
-            DateTimeOffset.Parse("2023-01-03T00:00:00Z"),
+            (MeteringPointId.From("123456789012345671"), DateTimeOffset.Parse("2023-01-01T00:00:00Z").ToInstant()),
+            (MeteringPointId.From("123456789012345672"), DateTimeOffset.Parse("2023-01-02T00:00:00Z").ToInstant()),
+            (MeteringPointId.From("123456789012345673"), DateTimeOffset.Parse("2023-01-03T00:00:00Z").ToInstant()),
         };
 
         // Enqueue the missing measurements
         var whenMessagesAreEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
         GivenNowIs(whenMessagesAreEnqueued);
-        await EnqueueMissingMeasurement(gridAccessProvider, missingDates, meteringPointIdWithMissingData);
+        await EnqueueMissingMeasurement(gridAccessProvider, meteringPointIdWithMissingData);
 
         // Trigger the bundling
         var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(
@@ -72,6 +72,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
 
         var peekResult = peekResults.Should().ContainSingle().Subject;
 
+        // Assert
         using var assertionScope = new AssertionScope();
         var assertMissingMeasurementProvider = AssertMissingMeasurementDocumentProvider.AssertDocument(
             peekResult.Bundle,
@@ -85,32 +86,23 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
             .HasReceiverId(gridAccessProvider.ActorNumber)
             .HasReceiverRole(ActorRole.MeteredDataResponsible)
             .HasTimestamp(whenBundleShouldBeClosed)
+            .HasMissingData(meteringPointIdWithMissingData)
             .DocumentIsValidAsync();
-
-        // The order of how the series are bundles seems random..
-        // TODO: Nothing in computers are random.
-        // for (int i = 0; i < missingDates.Count; i++)
-        // {
-        //     assertMissingMeasurementProvider
-        //         .HasMeteringPointNumber(i + 1, meteringPointIdWithMissingData)
-        //         .HasMissingDate(i + 1, missingDates[i].ToInstant());
-        // }
     }
 
     private async Task EnqueueMissingMeasurement(
         Actor gridAccessProvider,
-        List<DateTimeOffset> missingDates,
-        MeteringPointId meteringPointIdWithMissingData)
+        List<(MeteringPointId MeteringPointId, Instant Date)> meteringPointIdWithMissingData)
     {
         var enqueueBrs045RequestFromProcessManager = new EnqueueMissingMeasurementsLogHttpV1(
             OrchestrationInstanceId: Guid.NewGuid(),
-            Data: missingDates.Select(date =>
+            Data: meteringPointIdWithMissingData.Select(date =>
                 new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
                 IdempotencyKey: Guid.NewGuid(),
                 GridAccessProvider: gridAccessProvider.ActorNumber.ToProcessManagerActorNumber(),
                 GridArea: "001",
-                Date: date,
-                MeteringPointId: meteringPointIdWithMissingData.Value)).ToList());
+                Date: date.Date.ToDateTimeOffset(),
+                MeteringPointId: date.MeteringPointId.Value)).ToList());
 
         var handler = GetService<EnqueueHandler_Brs_045_MissingMeasurementsLog>();
 

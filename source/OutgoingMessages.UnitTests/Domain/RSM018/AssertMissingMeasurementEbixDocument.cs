@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.NotifyWholesaleServices;
+using FluentAssertions;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
@@ -116,6 +117,22 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
     public IAssertMissingMeasurementDocument HasMissingDate(int seriesIndex, Instant missingDate)
     {
         _documentAsserter.HasValue($"{PayloadMissingDataRequest}[{seriesIndex}]/RequestPeriod", missingDate.ToString());
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasMissingData(
+        IReadOnlyCollection<(MeteringPointId MeteringPointId, Instant Date)> missingData)
+    {
+        for (int i = 0; i < missingData.Count; i++)
+        {
+            missingData.Should()
+                .ContainSingle(
+                    data =>
+                        data.MeteringPointId.Value == _documentAsserter.GetElement($"{PayloadMissingDataRequest}[{i + 1}]/MeteringPointDomainLocation/Identification")!.Value
+                        && data.Date.ToString() == _documentAsserter.GetElement($"{PayloadMissingDataRequest}[{i + 1}]/RequestPeriod")!.Value);
+        }
+
+        _documentAsserter.GetElements($"{PayloadMissingDataRequest}").Should().HaveCount(missingData.Count);
         return this;
     }
 

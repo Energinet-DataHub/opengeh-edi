@@ -180,6 +180,31 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
         return this;
     }
 
+    public IAssertMissingMeasurementDocument HasMissingData(
+        IReadOnlyCollection<(MeteringPointId MeteringPointId, Instant Date)> missingData)
+    {
+        _root.GetProperty("Series").EnumerateArray().ToList().ForEach(
+            seriesElement =>
+            {
+                missingData.Should()
+                    .ContainSingle(
+                        data =>
+                            data.Date.ToString() == seriesElement
+                                .GetProperty("request_DateAndOrTime.dateTime")
+                                .GetString()
+                            && data.MeteringPointId.Value == seriesElement
+                                .GetProperty("MarketEvaluationPoint")
+                                .EnumerateArray()
+                                .Single()
+                                .GetProperty("mRID")
+                                .GetProperty("value")
+                                .ToString());
+            });
+
+        _root.GetProperty("Series").EnumerateArray().Should().HaveCount(missingData.Count);
+        return this;
+    }
+
     private JsonElement GetTimeSeriesElement(int seriesIndex) =>
         _root.GetProperty("Series").EnumerateArray().ToList()[seriesIndex - 1];
 }
