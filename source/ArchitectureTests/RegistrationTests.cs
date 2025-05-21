@@ -19,8 +19,6 @@ using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi;
-using Energinet.DataHub.EDI.B2BApi.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
@@ -287,17 +285,6 @@ public class RegistrationTests
 
     private sealed class TestEnvironment : RuntimeEnvironment
     {
-        public override string? ServiceBus__SendConnectionString =>
-            CreateFakeServiceBusFullyQualifiedNamespace();
-
-        public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
-            CreateFakeServiceBusFullyQualifiedNamespace();
-
-        public override string? DB_CONNECTION_STRING =>
-            CreateConnectionString();
-
-        public override Uri? AZURE_STORAGE_ACCOUNT_URL => new(CreateFakeStorageUrl());
-
         public override string AZURE_FUNCTIONS_ENVIRONMENT => "Development";
 
         public static string CreateFakeServiceBusFullyQualifiedNamespace()
@@ -316,11 +303,6 @@ public class RegistrationTests
         public static string CreateFakeStorageUrl()
         {
             return "https://dummy.url";
-        }
-
-        public override bool IsRunningLocally()
-        {
-            return true;
         }
 
         protected override string? GetEnvironmentVariable(string variable)
