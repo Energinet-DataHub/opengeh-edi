@@ -26,17 +26,7 @@ public class RuntimeEnvironment
     public virtual string? ServiceBus__SendConnectionString =>
         GetEnvironmentVariable(nameof(ServiceBus__SendConnectionString));
 
-    public virtual string? EdiInbox__QueueName => GetEnvironmentVariable(nameof(EdiInbox__QueueName));
-
     public virtual string? IncomingMessage_QueueName => GetEnvironmentVariable(nameof(IncomingMessage_QueueName));
-
-    public virtual string? WholesaleInbox__QueueName => GetEnvironmentVariable(nameof(WholesaleInbox__QueueName));
-
-    public virtual string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
-        GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONNECTION_STRING));
-
-    public virtual string? REQUEST_RESPONSE_LOGGING_CONTAINER_NAME =>
-        GetEnvironmentVariable(nameof(REQUEST_RESPONSE_LOGGING_CONTAINER_NAME));
 
     public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
         GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));

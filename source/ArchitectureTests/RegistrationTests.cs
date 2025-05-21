@@ -288,9 +288,6 @@ public class RegistrationTests
         public override string? ServiceBus__SendConnectionString =>
             CreateFakeServiceBusFullyQualifiedNamespace();
 
-        public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
-            CreateFakeServiceBusFullyQualifiedNamespace();
-
         public override string? DB_CONNECTION_STRING =>
             CreateConnectionString();
 
