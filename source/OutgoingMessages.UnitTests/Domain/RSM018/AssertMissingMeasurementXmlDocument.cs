@@ -107,8 +107,4 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
         return this;
     }
     #endregion
-
-    private void AssertActorNumber(string attribute, ActorNumber actorNumber)
-    {
-    }
 }

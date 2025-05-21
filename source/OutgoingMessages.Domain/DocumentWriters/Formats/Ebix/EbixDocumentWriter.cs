@@ -127,7 +127,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     }
 
     /// <summary>
-    /// Will write the ebIX node <Identification/> with the schemeAgencyIdentifier attribute for actor number
+    /// Will write the ebIX xml node <Identification/> with the schemeAgencyIdentifier attribute for the actor number
     /// </summary>
     /// <param name="actorNumber">The actor number witch will be the value of the xml node</param>
     /// <param name="writer">The XmlWriter</param>
@@ -158,7 +158,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     }
 
     /// <summary>
-    /// Will write the ebIX node <Identification/> with the schemeAgencyIdentifier attribute for a metering point id
+    /// Will write the ebIX xml node <Identification/> with the schemeAgencyIdentifier attribute for a metering point id
     /// </summary>
     /// <param name="meteringPointId">The metering point id witch will be the value of the xml node</param>
     /// <param name="writer"></param>

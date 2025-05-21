@@ -37,8 +37,6 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
 {
     protected BundlingOptions BundlingOptions => GetService<IOptions<BundlingOptions>>().Value;
 
-    // Ebix currently fails due to the actor number being an eic code,
-    // https://github.com/Energinet-DataHub/opengeh-edi/pull/1638/files vill resolve this issue
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
     public async Task AndGiven_ThreeMissingDates_When_GridAccessProviderPeeksMessages_Then_ReceivesCorrectReminderOfMissingMeasureDataDocuments(DocumentFormat documentFormat)
