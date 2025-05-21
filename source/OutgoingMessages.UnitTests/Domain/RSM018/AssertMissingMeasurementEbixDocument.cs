@@ -40,7 +40,7 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
             CreateRequiredListAttributes(CodeListType.UnitedNations));
         // Number of reminders are hardcoded to 0.
         _documentAsserter.HasValue(
-            $"{PayloadMissingDataRequest}[{1}]/NumberOfReminders",
+            $"{PayloadMissingDataRequest}[1]/NumberOfReminders",
             "0");
     }
 
