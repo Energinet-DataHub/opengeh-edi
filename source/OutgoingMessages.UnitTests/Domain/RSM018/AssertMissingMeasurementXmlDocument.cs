@@ -100,7 +100,7 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
     {
         _documentAsserter.HasValue($"Series[{seriesIndex}]/MarketEvaluationPoint/mRID", meteringPointNumber.Value);
         _documentAsserter.HasAttribute(
-            $"\"Series[{seriesIndex}]/MarketEvaluationPoint/mRID",
+            $"Series[{seriesIndex}]/MarketEvaluationPoint/mRID",
             "codingScheme",
             "A10");
         return this;
