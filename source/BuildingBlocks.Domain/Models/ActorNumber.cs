@@ -52,6 +52,8 @@ public class ActorNumber : ValueObject
 
     public static bool IsEic(string actorNumber)
     {
+        // There is more to a valid EIC than just the length. https://en.wikipedia.org/wiki/Energy_Identification_Code
+        // The responsible for validating that is not for EDI.
         ArgumentNullException.ThrowIfNull(actorNumber);
         return actorNumber.Length == 16;
     }
@@ -59,7 +61,7 @@ public class ActorNumber : ValueObject
     public static bool IsGlnNumber(string actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Length == 13;
+        return actorNumber.Length == 13 && long.TryParse(actorNumber, out _);
     }
 
     public ProcessManager.Abstractions.Core.ValueObjects.ActorNumber ToProcessManagerActorNumber()

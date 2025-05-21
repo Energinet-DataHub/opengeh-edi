@@ -21,30 +21,8 @@ public class RuntimeEnvironment
 {
     public static RuntimeEnvironment Default => new();
 
-    public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
-
     public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
         GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
-
-    public string? AzureWebJobsStorage =>
-        GetEnvironmentVariable(nameof(AzureWebJobsStorage));
-
-    public virtual Uri? AZURE_STORAGE_ACCOUNT_URL
-    {
-        get
-        {
-            var url = GetEnvironmentVariable(nameof(AZURE_STORAGE_ACCOUNT_URL));
-            if (!string.IsNullOrEmpty(url))
-                return new Uri(url);
-
-            return null;
-        }
-    }
-
-    public virtual bool IsRunningLocally()
-    {
-        return AZURE_FUNCTIONS_ENVIRONMENT == "Development";
-    }
 
     protected virtual string? GetEnvironmentVariable(string variable)
         => Environment.GetEnvironmentVariable(variable);
