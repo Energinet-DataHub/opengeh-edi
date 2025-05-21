@@ -546,7 +546,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     private static AttributeNameAndValue CreateRequiredSchemeAttribute(ActorNumber actorNumber)
     {
         var codeOwner = GetActorNumberOwner(
-            ActorNumber.IsGlnNumber(actorNumber.Value) ? ActorNumberType.Gln : ActorNumberType.Eic);
+            ActorNumber.IsGlnNumber(actorNumber) ? ActorNumberType.Gln : ActorNumberType.Eic);
         var requiredAttribute = new AttributeNameAndValue("schemeAgencyIdentifier", codeOwner);
 
         return requiredAttribute;
