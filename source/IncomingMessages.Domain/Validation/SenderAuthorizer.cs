@@ -22,7 +22,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 
 public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAuthorizer
 {
-    private readonly List<ValidationError> _validationErrors = new();
+    private readonly List<ValidationError> _validationErrors = [];
+    private readonly AuthenticatedActor _actorAuthenticator = actorAuthenticator;
 
     public Task<Result> AuthorizeAsync(IIncomingMessage message, bool allSeriesAreDelegated)
     {
@@ -56,7 +57,7 @@ public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAu
             return;
         }
 
-        if (!actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(message.SenderRoleCode)))
+        if (!_actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(message.SenderRoleCode)))
         {
             _validationErrors.Add(new AuthenticatedUserDoesNotHoldRequiredRoleType());
         }
@@ -65,7 +66,7 @@ public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAu
     private bool AllowDelegatedAuthorizedActorForMeteredDataForMeteringPointMessage(IIncomingMessage message)
     {
         return message is MeteredDataForMeteringPointMessageBase
-               && actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.Delegated);
+               && _actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.Delegated);
     }
 
     private void EnsureSenderRoleCode(IIncomingMessage message, bool allSeriesAreDelegated)
@@ -89,12 +90,12 @@ public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAu
 
     private bool AllSeriesAreDelegatedToSender(bool allSeriesAreDelegated)
     {
-        return allSeriesAreDelegated && actorAuthenticator.CurrentActorIdentity.HasAnyOfRoles(ActorRole.Delegated, ActorRole.GridAccessProvider);
+        return allSeriesAreDelegated && _actorAuthenticator.CurrentActorIdentity.HasAnyOfRoles(ActorRole.Delegated, ActorRole.GridAccessProvider);
     }
 
     private void EnsureSenderIdMatches(string senderNumber)
     {
-        if (actorAuthenticator.CurrentActorIdentity.ActorNumber.Value.Equals(
+        if (_actorAuthenticator.CurrentActorIdentity.ActorNumber.Value.Equals(
                 senderNumber,
                 StringComparison.OrdinalIgnoreCase) == false)
         {
@@ -106,6 +107,6 @@ public class SenderAuthorizer(AuthenticatedActor actorAuthenticator) : ISenderAu
     {
         return WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
                && senderRole == ActorRole.MeteredDataResponsible.Code
-               && actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.GridAccessProvider);
+               && _actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.GridAccessProvider);
     }
 }
