@@ -43,6 +43,7 @@ public class DocumentTypeTests
             (DocumentType.NotifyValidatedMeasureData, "NotifyValidatedMeasureData", 7),
             (DocumentType.Acknowledgement, "Acknowledgement", 8),
             (DocumentType.ReminderOfMissingMeasureData, "ReminderOfMissingMeasureData", 9),
+            (DocumentType.RequestValidatedMeasurements, "RequestValidatedMeasurements", 10),
         };
 
         using var scope = new AssertionScope();

@@ -71,7 +71,8 @@ public class DocumentTypeMapperTests
         supportedDocumentTypes = supportedDocumentTypes
             .Where(x =>
                 x != IncomingDocumentType.NotifyValidatedMeasureData.Name
-                        && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.ReminderOfMissingMeasureData.Name);
+                        && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.ReminderOfMissingMeasureData.Name
+                        && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.RequestValidatedMeasurements.Name);
 
         // Act & Assert
         documentTypes.Should().BeEquivalentTo(supportedDocumentTypes.ToList());

@@ -87,7 +87,9 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
-    public async Task Successfully_parsed(DocumentFormat format, Stream message)
+    public async Task Given_ValidateMeasurementsJsonStream_When_ParseAsync_Then_SuccessfullyParsed(
+        DocumentFormat format,
+        Stream message)
     {
         var result = await _marketMessageParser.GetValueOrDefault(format)!.ParseAsync(
             new IncomingMarketMessageStream(message),
@@ -124,7 +126,11 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateBadMessages))]
-    public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedErrorType, string expectedErrorMessageContains)
+    public async Task Given_InvalidateMeasurementsJsonStream_When_ParseAsync_Then_ResultsContainsExpectedErrorMessage(
+        DocumentFormat format,
+        Stream message,
+        string expectedErrorType,
+        string expectedErrorMessageContains)
     {
         var result = await _marketMessageParser.GetValueOrDefault(format)!.ParseAsync(
             new IncomingMarketMessageStream(message),
