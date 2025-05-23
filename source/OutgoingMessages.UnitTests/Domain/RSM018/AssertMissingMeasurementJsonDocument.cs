@@ -79,11 +79,17 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber)
     {
-        _root.GetProperty("sender_MarketParticipant.mRID")
+        var sender = _root.GetProperty("sender_MarketParticipant.mRID");
+        sender
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(actorNumber.Value);
+        sender
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(actorNumber.IsEic() ? "A01" : "A10");
 
         return this;
     }
@@ -101,11 +107,17 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber)
     {
-        _root.GetProperty("receiver_MarketParticipant.mRID")
+        var receiver = _root.GetProperty("receiver_MarketParticipant.mRID");
+        receiver
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(actorNumber.Value);
+        receiver
+            .GetProperty("codingScheme")
+            .GetString()
+            .Should()
+            .Be(actorNumber.IsEic() ? "A01" : "A10");
 
         return this;
     }
@@ -165,6 +177,31 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
             .Should()
             .Be(missingDate.ToString());
 
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasMissingData(
+        IReadOnlyCollection<(MeteringPointId MeteringPointId, Instant Date)> missingData)
+    {
+        _root.GetProperty("Series").EnumerateArray().ToList().ForEach(
+            seriesElement =>
+            {
+                missingData.Should()
+                    .ContainSingle(
+                        data =>
+                            data.Date.ToString() == seriesElement
+                                .GetProperty("request_DateAndOrTime.dateTime")
+                                .GetString()
+                            && data.MeteringPointId.Value == seriesElement
+                                .GetProperty("MarketEvaluationPoint")
+                                .EnumerateArray()
+                                .Single()
+                                .GetProperty("mRID")
+                                .GetProperty("value")
+                                .ToString());
+            });
+
+        _root.GetProperty("Series").EnumerateArray().Should().HaveCount(missingData.Count);
         return this;
     }
 

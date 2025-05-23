@@ -83,10 +83,9 @@ public class MissingMeasurementEbixDocumentWriter(IMessageRecordParser parser)
             "MeteringPointDomainLocation",
             null).ConfigureAwait(false);
         {
-            await WriteGlnOrEicCodeWithAttributesAsync(
-                    "Identification",
-                    missingMeasurementLog.MeteringPointId.Value,
-                    writer)
+            await WriteMeteringPointIdAsync(
+                missingMeasurementLog.MeteringPointId,
+                writer)
                 .ConfigureAwait(false);
         }
 

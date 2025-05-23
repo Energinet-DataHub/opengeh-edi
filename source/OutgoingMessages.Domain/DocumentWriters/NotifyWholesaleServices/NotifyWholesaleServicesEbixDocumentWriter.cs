@@ -103,7 +103,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "BalanceSupplierEnergyParty", null).ConfigureAwait(false);
                 {
                     // <Identification />
-                    await WriteGlnOrEicCodeWithAttributesAsync("Identification", series.EnergySupplier.Value, writer).ConfigureAwait(false);
+                    await WriteActorNumberWithAttributeAsync(series.EnergySupplier, writer).ConfigureAwait(false);
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </BalanceSupplierEnergyParty>
@@ -238,7 +238,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                         .ConfigureAwait(false);
                     {
                         // <Identification />
-                        await WriteGlnOrEicCodeWithAttributesAsync("Identification", series.ChargeOwner.Value, writer)
+                        await WriteActorNumberWithAttributeAsync(series.ChargeOwner, writer)
                             .ConfigureAwait(false);
 
                         await writer.WriteEndElementAsync().ConfigureAwait(false);

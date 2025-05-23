@@ -106,7 +106,7 @@ public class MeteredDataForMeteringPointEbixDocumentWriter(IMessageRecordParser 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "MeteringPointDomainLocation", null).ConfigureAwait(false);
-            await WriteGlnOrEicCodeWithAttributesAsync("Identification", forwardMeteredDataRecord.MeteringPointId, writer).ConfigureAwait(false);
+            await WriteMeteringPointIdAsync(MeteringPointId.From(forwardMeteredDataRecord.MeteringPointId), writer).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
             foreach (var energyObservation in forwardMeteredDataRecord.Measurements)
