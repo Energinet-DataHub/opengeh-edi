@@ -159,7 +159,7 @@ public class RequestProcessOrchestrationStarter(
                     BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),
                     PeriodStart: transaction.StartDateTime,
                     PeriodEnd: transaction.EndDateTime,
-                    MeteringPointId: transaction.MeteringPointId),
+                    MeteringPointId: transaction.MeteringPointId.Value),
                 IdempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.RequestedByActor));
 
             var startProcessTask = processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
