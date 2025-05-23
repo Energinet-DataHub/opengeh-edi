@@ -50,24 +50,8 @@ public class ActorNumber : ValueObject
             : null;
     }
 
-    public static bool IsEic(ActorNumber actorNumber)
-    {
-        // There is more to a valid EIC than just the length. https://en.wikipedia.org/wiki/Energy_Identification_Code
-        // The responsible for validating that is not for EDI.
-        ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Value.Length == 16;
-    }
-
-    public static bool IsGlnNumber(ActorNumber actorNumber)
-    {
-        ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Value.Length == 13 && long.TryParse(actorNumber.Value, out _);
-    }
-
     public static bool IsEic(string actorNumber)
     {
-        // There is more to a valid EIC than just the length. https://en.wikipedia.org/wiki/Energy_Identification_Code
-        // The responsible for validating that is not for EDI.
         ArgumentNullException.ThrowIfNull(actorNumber);
         return actorNumber.Length == 16;
     }
@@ -76,6 +60,16 @@ public class ActorNumber : ValueObject
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         return actorNumber.Length == 13 && long.TryParse(actorNumber, out _);
+    }
+
+    public bool IsEic()
+    {
+        return IsEic(Value);
+    }
+
+    public bool IsGlnNumber()
+    {
+        return IsGlnNumber(Value);
     }
 
     public ProcessManager.Abstractions.Core.ValueObjects.ActorNumber ToProcessManagerActorNumber()

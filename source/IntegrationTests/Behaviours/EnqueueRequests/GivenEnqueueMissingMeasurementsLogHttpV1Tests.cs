@@ -53,10 +53,10 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
             (MeteringPointId.From("123456789012345673"), DateTimeOffset.Parse("2023-01-03T00:00:00Z").ToInstant()),
         };
 
-        // Enqueue the missing measurements
+        // Enqueue the missing measurements messages
         var whenMessagesAreEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
         GivenNowIs(whenMessagesAreEnqueued);
-        await EnqueueMissingMeasurement(gridAccessProvider, meteringPointIdWithMissingData);
+        await EnqueueMissingMeasurements(gridAccessProvider, meteringPointIdWithMissingData);
 
         // Trigger the bundling
         var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(
@@ -70,9 +70,9 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
             gridAccessProvider.ActorRole,
             documentFormat);
 
+        // Assert
         var peekResult = peekResults.Should().ContainSingle().Subject;
 
-        // Assert
         using var assertionScope = new AssertionScope();
         var assertMissingMeasurementProvider = AssertMissingMeasurementDocumentProvider.AssertDocument(
             peekResult.Bundle,
@@ -90,7 +90,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1Tests(
             .DocumentIsValidAsync();
     }
 
-    private async Task EnqueueMissingMeasurement(
+    private async Task EnqueueMissingMeasurements(
         Actor gridAccessProvider,
         List<(MeteringPointId MeteringPointId, Instant Date)> meteringPointIdWithMissingData)
     {

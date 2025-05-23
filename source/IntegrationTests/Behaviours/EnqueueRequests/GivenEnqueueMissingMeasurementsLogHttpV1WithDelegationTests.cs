@@ -67,10 +67,10 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
             processType: ProcessType.MissingMeasurementLog,
             startsAt: delegationStartsAt);
 
-        // Enqueue the missing measurements
+        // Enqueue the missing measurements messages
         var whenMessagesAreEnqueued = delegationStartsAt.PlusDays(2);
         GivenNowIs(whenMessagesAreEnqueued);
-        await EnqueueMissingMeasurement(gridAccessProviderWhichDelegates, meteringPointIdWithMissingData, gridAreaCode);
+        await EnqueueMissingMeasurements(gridAccessProviderWhichDelegates, meteringPointIdWithMissingData, gridAreaCode);
 
         // Trigger the bundling
         var whenBundleShouldBeClosed = whenMessagesAreEnqueued.Plus(
@@ -89,10 +89,10 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
             delegatedActor.ActorRole,
             documentFormat);
 
+        // Assert
         peekResultsForDelegatingActor.Should().BeEmpty();
         var peekResult = peekResultsForDelegatedActor.Should().ContainSingle().Subject;
 
-        // Assert
         using var assertionScope = new AssertionScope();
         var assertMissingMeasurementProvider = AssertMissingMeasurementDocumentProvider.AssertDocument(
             peekResult.Bundle,
@@ -110,7 +110,7 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
             .DocumentIsValidAsync();
     }
 
-    private async Task EnqueueMissingMeasurement(
+    private async Task EnqueueMissingMeasurements(
         Actor gridAccessProvider,
         List<(MeteringPointId MeteringPointId, Instant Date)> meteringPointIdWithMissingData,
         string gridAreaCode = "001")

@@ -55,7 +55,7 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
         _documentAsserter.HasAttribute(
             attribute,
             "codingScheme",
-            ActorNumber.IsEic(actorNumber) ? "A01" : "A10");
+            actorNumber.IsEic() ? "A01" : "A10");
         return this;
     }
 
@@ -72,7 +72,7 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
         _documentAsserter.HasAttribute(
             attribute,
             "codingScheme",
-            ActorNumber.IsEic(actorNumber) ? "A01" : "A10");
+            actorNumber.IsEic() ? "A01" : "A10");
         return this;
     }
 

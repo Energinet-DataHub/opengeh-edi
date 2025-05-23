@@ -30,6 +30,5 @@ public record MeteringPointId
 
     public string Value { get; }
 
-    // TODO: A metering point id is a GSRN number, which is a 18 digit number. We should validate this.
     public static MeteringPointId From(string meteringPointId) => new(meteringPointId);
 }

@@ -138,12 +138,12 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
         await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
 
-        if (ActorNumber.IsGlnNumber(actorNumber))
+        if (actorNumber.IsGlnNumber())
         {
             // GLN number from GS1
             await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
         }
-        else if (ActorNumber.IsEic(actorNumber))
+        else if (actorNumber.IsEic())
         {
             // EIC code
             await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, EicCode).ConfigureAwait(false);

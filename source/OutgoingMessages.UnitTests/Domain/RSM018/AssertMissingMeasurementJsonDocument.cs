@@ -89,7 +89,7 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
             .GetProperty("codingScheme")
             .GetString()
             .Should()
-            .Be(ActorNumber.IsEic(actorNumber) ? "A01" : "A10");
+            .Be(actorNumber.IsEic() ? "A01" : "A10");
 
         return this;
     }
@@ -117,7 +117,7 @@ public class AssertMissingMeasurementJsonDocument : IAssertMissingMeasurementDoc
             .GetProperty("codingScheme")
             .GetString()
             .Should()
-            .Be(ActorNumber.IsEic(actorNumber) ? "A01" : "A10");
+            .Be(actorNumber.IsEic() ? "A01" : "A10");
 
         return this;
     }
