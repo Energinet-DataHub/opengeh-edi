@@ -50,18 +50,6 @@ public class ActorNumber : ValueObject
             : null;
     }
 
-    public static bool IsEic(string actorNumber)
-    {
-        ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Length == 16;
-    }
-
-    public static bool IsGlnNumber(string actorNumber)
-    {
-        ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Length == 13 && long.TryParse(actorNumber, out _);
-    }
-
     public bool IsEic()
     {
         return IsEic(Value);
@@ -75,5 +63,17 @@ public class ActorNumber : ValueObject
     public ProcessManager.Abstractions.Core.ValueObjects.ActorNumber ToProcessManagerActorNumber()
     {
         return ProcessManager.Abstractions.Core.ValueObjects.ActorNumber.Create(Value);
+    }
+
+    private static bool IsEic(string actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        return actorNumber.Length == 16;
+    }
+
+    private static bool IsGlnNumber(string actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        return actorNumber.Length == 13 && long.TryParse(actorNumber, out _);
     }
 }
