@@ -42,7 +42,7 @@ public class ActorRequestsClient(
 
     private static readonly RejectedEnergyResultMessageRejectReason _noEnergyDataForRequestedGridArea = new(
         ErrorMessage: "D46",
-        ErrorCode: "Forkert netområde / invalid grid area");
+        ErrorCode: "Ingen data i dette netområde / No data in the requested grid area");
 
     private static readonly RejectedWholesaleServicesMessageRejectReason _noWholesaleDataAvailable = new(
         ErrorMessage: "E0H",
@@ -50,7 +50,7 @@ public class ActorRequestsClient(
 
     private static readonly RejectedWholesaleServicesMessageRejectReason _noWholesaleDataForRequestedGridArea = new(
         ErrorMessage: "D46",
-        ErrorCode: "Forkert netområde / invalid grid area");
+        ErrorCode: "Ingen data i dette netområde / No data in the requested grid area");
 
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IAggregatedTimeSeriesQueries _aggregatedTimeSeriesQueries = aggregatedTimeSeriesQueries;
