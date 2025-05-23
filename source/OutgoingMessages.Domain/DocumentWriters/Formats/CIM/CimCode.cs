@@ -55,9 +55,9 @@ public static class CimCode
     public static string CodingSchemeOf(ActorNumber actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
-        if (ActorNumber.IsGlnNumber(actorNumber.Value))
+        if (actorNumber.IsGlnNumber())
             return "A10";
-        if (ActorNumber.IsEic(actorNumber.Value))
+        if (actorNumber.IsEic())
             return "A01";
 
         throw NoCodeFoundFor(actorNumber.Value);

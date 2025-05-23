@@ -127,42 +127,46 @@ public abstract class EbixDocumentWriter : IDocumentWriter
     }
 
     /// <summary>
-    /// Will write the ebIX xmlnode with the schemeAgencyIdentifier attribute for a GLN number, EIC code or a GSRN number
+    /// Will write the ebIX xml node <Identification/> with the schemeAgencyIdentifier attribute for the actor number
     /// </summary>
-    /// <param name="name">Name of the xmlnode</param>
-    /// <param name="glnOrEicCode">GLN number, EIC code or a GSRN number</param>
+    /// <param name="actorNumber">The actor number witch will be the value of the xml node</param>
     /// <param name="writer">The XmlWriter</param>
-    protected async Task WriteGlnOrEicCodeWithAttributesAsync(string name, string glnOrEicCode, XmlWriter writer)
+    protected async Task WriteActorNumberWithAttributeAsync(ActorNumber actorNumber, XmlWriter writer)
     {
-        ArgumentNullException.ThrowIfNull(name);
-        ArgumentNullException.ThrowIfNull(glnOrEicCode);
+        ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(writer);
 
-        await writer.WriteStartElementAsync(DocumentDetails.Prefix, name, null).ConfigureAwait(false);
+        await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
 
-        var isGsrnNumber = glnOrEicCode.Length == 18 && long.TryParse(glnOrEicCode, out _);
-
-        if (ActorNumber.IsGlnNumber(glnOrEicCode))
+        if (actorNumber.IsGlnNumber())
         {
             // GLN number from GS1
             await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
         }
-        else if (isGsrnNumber)
-        {
-            // GSRN number from GS1
-            await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
-        }
-        else if (ActorNumber.IsEic(glnOrEicCode))
+        else if (actorNumber.IsEic())
         {
             // EIC code
             await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, EicCode).ConfigureAwait(false);
         }
         else
         {
-            throw new InvalidOperationException($"Invalid schemecode '{glnOrEicCode}'");
+            throw new InvalidOperationException($"Invalid schemecode '{actorNumber}'");
         }
 
-        await writer.WriteStringAsync(glnOrEicCode).ConfigureAwait(false);
+        await writer.WriteStringAsync(actorNumber.Value).ConfigureAwait(false);
+        await writer.WriteEndElementAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Will write the ebIX xml node <Identification/> with the schemeAgencyIdentifier attribute for a metering point id
+    /// </summary>
+    /// <param name="meteringPointId">The metering point id witch will be the value of the xml node</param>
+    /// <param name="writer"></param>
+    protected async Task WriteMeteringPointIdAsync(MeteringPointId meteringPointId, XmlWriter writer)
+    {
+        await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Identification", null).ConfigureAwait(false);
+        await writer.WriteAttributeStringAsync(null, "schemeAgencyIdentifier", null, Gs1Code).ConfigureAwait(false);
+        await writer.WriteStringAsync(meteringPointId.Value).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
     }
 
@@ -232,7 +236,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "RecipientEnergyParty", null).ConfigureAwait(false);
-        await WriteGlnOrEicCodeWithAttributesAsync("Identification", header.ReceiverId, writer).ConfigureAwait(false);
+        await WriteActorNumberWithAttributeAsync(ActorNumber.Create(header.ReceiverId), writer).ConfigureAwait(false);
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 

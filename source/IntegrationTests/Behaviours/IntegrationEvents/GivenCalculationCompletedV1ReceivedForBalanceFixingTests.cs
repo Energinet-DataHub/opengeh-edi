@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Immutable;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -21,11 +20,9 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.NotifyAggregatedMeasureData;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -265,37 +265,6 @@ public class BehavioursTestBase : IDisposable
         return serviceBusSenderSpy;
     }
 
-    protected IList<(TServiceBusMessage Message, Guid ProcessId)> AssertServiceBusMessages<TServiceBusMessage>(
-        ServiceBusSenderSpy senderSpy,
-        int expectedCount,
-        Func<BinaryData, TServiceBusMessage> parser)
-        where TServiceBusMessage : IMessage
-    {
-        var sentMessages = senderSpy.MessagesSent
-            .Where(m => m.Subject == typeof(TServiceBusMessage).Name)
-            .ToList();
-
-        sentMessages.Should().HaveCount(expectedCount);
-
-        List<(TServiceBusMessage Message, Guid ProcessId)> messages = [];
-        using var scope = new AssertionScope();
-        foreach (var message in sentMessages)
-        {
-            message.Subject.Should().Be(typeof(TServiceBusMessage).Name);
-            message.Body.Should().NotBeNull();
-            message.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
-            referenceId.Should().NotBeNull();
-            Guid.TryParse(referenceId!.ToString()!, out var processId).Should().BeTrue();
-
-            var parsedMessage = parser(message.Body);
-            parsedMessage.Should().NotBeNull();
-
-            messages.Add((parsedMessage, processId));
-        }
-
-        return messages;
-    }
-
     protected IList<TServiceBusMessage> AssertProcessManagerServiceBusMessages<TServiceBusMessage>(
         ServiceBusSenderSpy senderSpy,
         int expectedCount,

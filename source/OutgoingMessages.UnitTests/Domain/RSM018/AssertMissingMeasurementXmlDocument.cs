@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
+using FluentAssertions;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
@@ -49,7 +50,12 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
 
     public IAssertMissingMeasurementDocument HasSenderId(ActorNumber actorNumber)
     {
-        _documentAsserter.HasValue("sender_MarketParticipant.mRID", actorNumber.Value);
+        var attribute = "sender_MarketParticipant.mRID";
+        _documentAsserter.HasValue(attribute, actorNumber.Value);
+        _documentAsserter.HasAttribute(
+            attribute,
+            "codingScheme",
+            actorNumber.IsEic() ? "A01" : "A10");
         return this;
     }
 
@@ -61,7 +67,12 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
 
     public IAssertMissingMeasurementDocument HasReceiverId(ActorNumber actorNumber)
     {
-        _documentAsserter.HasValue("receiver_MarketParticipant.mRID", actorNumber.Value);
+        var attribute = "receiver_MarketParticipant.mRID";
+        _documentAsserter.HasValue(attribute, actorNumber.Value);
+        _documentAsserter.HasAttribute(
+            attribute,
+            "codingScheme",
+            actorNumber.IsEic() ? "A01" : "A10");
         return this;
     }
 
@@ -88,12 +99,32 @@ public class AssertMissingMeasurementXmlDocument : IAssertMissingMeasurementDocu
     public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, MeteringPointId meteringPointNumber)
     {
         _documentAsserter.HasValue($"Series[{seriesIndex}]/MarketEvaluationPoint/mRID", meteringPointNumber.Value);
+        _documentAsserter.HasAttribute(
+            $"Series[{seriesIndex}]/MarketEvaluationPoint/mRID",
+            "codingScheme",
+            "A10");
         return this;
     }
 
     public IAssertMissingMeasurementDocument HasMissingDate(int seriesIndex, Instant missingDate)
     {
         _documentAsserter.HasValue($"Series[{seriesIndex}]/request_DateAndOrTime.dateTime", missingDate.ToString());
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasMissingData(
+        IReadOnlyCollection<(MeteringPointId MeteringPointId, Instant Date)> missingData)
+    {
+        for (int i = 0; i < missingData.Count; i++)
+        {
+            missingData.Should()
+                .ContainSingle(
+                    data =>
+                        data.MeteringPointId.Value == _documentAsserter.GetElement($"Series[{i + 1}]/MarketEvaluationPoint/mRID")!.Value
+                        && data.Date.ToString() == _documentAsserter.GetElement($"Series[{i + 1}]/request_DateAndOrTime.dateTime")!.Value);
+        }
+
+        _documentAsserter.GetElements("Series").Should().HaveCount(missingData.Count);
         return this;
     }
     #endregion

@@ -50,22 +50,30 @@ public class ActorNumber : ValueObject
             : null;
     }
 
-    public static bool IsEic(string actorNumber)
+    public bool IsEic()
     {
-        // There is more to a valid EIC than just the length. https://en.wikipedia.org/wiki/Energy_Identification_Code
-        // The responsible for validating that is not for EDI.
-        ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Length == 16;
+        return IsEic(Value);
     }
 
-    public static bool IsGlnNumber(string actorNumber)
+    public bool IsGlnNumber()
     {
-        ArgumentNullException.ThrowIfNull(actorNumber);
-        return actorNumber.Length == 13 && long.TryParse(actorNumber, out _);
+        return IsGlnNumber(Value);
     }
 
     public ProcessManager.Abstractions.Core.ValueObjects.ActorNumber ToProcessManagerActorNumber()
     {
         return ProcessManager.Abstractions.Core.ValueObjects.ActorNumber.Create(Value);
+    }
+
+    private static bool IsEic(string actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        return actorNumber.Length == 16;
+    }
+
+    private static bool IsGlnNumber(string actorNumber)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        return actorNumber.Length == 13 && long.TryParse(actorNumber, out _);
     }
 }

@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Asserts;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.NotifyWholesaleServices;
+using FluentAssertions;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
@@ -25,6 +26,7 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
     private const string HeaderEnergyDocument = "HeaderEnergyDocument";
     private const string ProcessEnergyContext = "ProcessEnergyContext";
     private const string PayloadMissingDataRequest = "PayloadMissingDataRequest";
+    private const string Gs1Code = "9";
 
     private readonly AssertEbixDocument _documentAsserter;
 
@@ -36,6 +38,10 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
             "ProcessEnergyContext/EnergyIndustryClassification",
             "23",
             CreateRequiredListAttributes(CodeListType.UnitedNations));
+        // Number of reminders are hardcoded to 0.
+        _documentAsserter.HasValue(
+            $"{PayloadMissingDataRequest}[1]/NumberOfReminders",
+            "0");
     }
 
     public async Task<IAssertMissingMeasurementDocument> DocumentIsValidAsync()
@@ -101,13 +107,32 @@ public class AssertMissingMeasurementEbixDocument : IAssertMissingMeasurementDoc
 
     public IAssertMissingMeasurementDocument HasMeteringPointNumber(int seriesIndex, MeteringPointId meteringPointNumber)
     {
-        _documentAsserter.HasValue($"{PayloadMissingDataRequest}[{seriesIndex}]/MeteringPointDomainLocation/Identification", meteringPointNumber.Value);
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadMissingDataRequest}[{seriesIndex}]/MeteringPointDomainLocation/Identification",
+            meteringPointNumber.Value,
+            new AttributeNameAndValue("schemeAgencyIdentifier", Gs1Code));
         return this;
     }
 
     public IAssertMissingMeasurementDocument HasMissingDate(int seriesIndex, Instant missingDate)
     {
         _documentAsserter.HasValue($"{PayloadMissingDataRequest}[{seriesIndex}]/RequestPeriod", missingDate.ToString());
+        return this;
+    }
+
+    public IAssertMissingMeasurementDocument HasMissingData(
+        IReadOnlyCollection<(MeteringPointId MeteringPointId, Instant Date)> missingData)
+    {
+        for (int i = 0; i < missingData.Count; i++)
+        {
+            missingData.Should()
+                .ContainSingle(
+                    data =>
+                        data.MeteringPointId.Value == _documentAsserter.GetElement($"{PayloadMissingDataRequest}[{i + 1}]/MeteringPointDomainLocation/Identification")!.Value
+                        && data.Date.ToString() == _documentAsserter.GetElement($"{PayloadMissingDataRequest}[{i + 1}]/RequestPeriod")!.Value);
+        }
+
+        _documentAsserter.GetElements($"{PayloadMissingDataRequest}").Should().HaveCount(missingData.Count);
         return this;
     }
 
