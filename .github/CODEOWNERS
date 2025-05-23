@@ -2,6 +2,6 @@
 
 /.github/actions @Energinet-DataHub/TeamFusion @Energinet-DataHub/team-mosaic
 /.github/workflows @Energinet-DataHub/TeamFusion @Energinet-DataHub/team-mosaic
-/.github/workflows/CODEOWNERS @Energinet-DataHub/TeamFusion
+/.github/CODEOWNERS @Energinet-DataHub/TeamFusion
 /.github/workflows/ci-orchestrator.yml @Energinet-DataHub/TeamFusion
 /.github/workflows/cd.yml @Energinet-DataHub/TeamFusion
