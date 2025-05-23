@@ -92,18 +92,6 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\MeteredDataForMeteringPoint\ValidMeteredDataForMeteringPointWithTwoTransactions.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\RequestValidatedMeasurements\InvalidRequestValidatedMeasurements.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\RequestValidatedMeasurements\InvalidRequestValidatedMeasurementsMarketEvaluationPointValue.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\RequestValidatedMeasurements\ValidRequestValidatedMeasurementsWithTwoTransactions.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\EmptyJsonObject.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
