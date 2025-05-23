@@ -398,7 +398,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3
 
         Acknowledgement = 8,
 
-        ReminderOfMissingMeasureData = 9,
+        ReminderOfMissingMeasurements = 9,
 
     }
 
