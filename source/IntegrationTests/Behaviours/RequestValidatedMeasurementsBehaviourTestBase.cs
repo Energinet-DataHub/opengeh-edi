@@ -99,7 +99,7 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
         using var assertionScope = new AssertionScope();
 
         var assertionMethods = assertionInputs
-            .Select(x => GetAssertServiceBusMessage(x, documentFormat));
+            .Select(GetAssertServiceBusMessage);
 
         messages
             .Select(x => x.ParseInput<RequestValidatedMeasurementsInputV1>())
@@ -110,8 +110,7 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
     }
 
     private static Action<RequestValidatedMeasurementsInputV1> GetAssertServiceBusMessage(
-        RequestValidatedMeasurementsInputV1AssertionInput input,
-        DocumentFormat documentFormat)
+        RequestValidatedMeasurementsInputV1AssertionInput input)
     {
         return (message) =>
         {
