@@ -65,13 +65,20 @@ public class DocumentTypeMapperTests
                         .Where(dt => dt != null)
                         .Select(dt => dt!.Name));
 
-        supportedDocumentTypes = supportedDocumentTypes.Distinct();
+        supportedDocumentTypes = supportedDocumentTypes.Distinct().ToList();
 
-        // TODO - Remove this line when all DocumentTypes are supported in B2C
+        if (supportedDocumentTypes.Contains(
+                Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.ReminderOfMissingMeasureData.Name))
+        {
+            // The b2c document type has another name than the b2b document type
+            supportedDocumentTypes = supportedDocumentTypes.Append(DocumentType.ReminderOfMissingMeasurements.ToString());
+            supportedDocumentTypes = supportedDocumentTypes.Where(documentType =>
+                documentType != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.ReminderOfMissingMeasureData.Name);
+        }
+
         supportedDocumentTypes = supportedDocumentTypes
             .Where(x =>
-                x != IncomingDocumentType.NotifyValidatedMeasureData.Name
-                        && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.ReminderOfMissingMeasureData.Name);
+                x != IncomingDocumentType.NotifyValidatedMeasureData.Name);
 
         // Act & Assert
         documentTypes.Should().BeEquivalentTo(supportedDocumentTypes.ToList());
