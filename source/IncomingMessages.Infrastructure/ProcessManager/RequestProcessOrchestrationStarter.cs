@@ -137,6 +137,38 @@ public class RequestProcessOrchestrationStarter(
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
+    public async Task StartRequestValidatedMeasurementsOrchestrationAsync(
+        InitializeRequestValidatedMeasurementsProcessDto initializeProcessDto,
+        CancellationToken cancellationToken)
+    {
+        var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
+        var processManagerMessageClient = _processManagerMessageClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
+
+        var startProcessTasks = new List<Task>();
+        foreach (var transaction in initializeProcessDto.Series)
+        {
+            var startCommand = new RequestValidatedMeasurementsCommandV1(
+                OperatingIdentity: actorIdentity,
+                InputParameter: new RequestValidatedMeasurementsInputV1(
+                    ActorMessageId: initializeProcessDto.MessageId,
+                    TransactionId: transaction.Id.Value,
+                    RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
+                    RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
+                    RequestedByActorNumber: transaction.RequestedByActor.ActorNumber.Value,
+                    RequestedByActorRole: transaction.RequestedByActor.ActorRole.Name,
+                    BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),
+                    PeriodStart: transaction.StartDateTime,
+                    PeriodEnd: transaction.EndDateTime,
+                    MeteringPointId: transaction.MeteringPointId),
+                IdempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.RequestedByActor));
+
+            var startProcessTask = processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            startProcessTasks.Add(startProcessTask);
+        }
+
+        await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
+    }
+
     private ActorIdentityDto GetAuthenticatedActorIdentityDto(string messageId)
     {
         if (!_authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity))

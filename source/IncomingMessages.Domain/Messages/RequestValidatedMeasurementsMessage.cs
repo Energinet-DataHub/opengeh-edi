@@ -53,7 +53,7 @@ public class RequestValidatedMeasurementsMessageBase(
     public IReadOnlyCollection<IIncomingMessageSeries> Series { get; } = series;
 
     public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
-        BuildingBlocks.Domain.Models.MessageType.ValidatedMeteredData,
+        BuildingBlocks.Domain.Models.MessageType.RequestValidatedMeasurements,
     ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons => [
@@ -61,7 +61,11 @@ public class RequestValidatedMeasurementsMessageBase(
     ];
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [
+        ActorRole.EnergySupplier,
+        ActorRole.GridAccessProvider,
         ActorRole.MeteredDataResponsible,
+        ActorRole.SystemOperator,
+        ActorRole.DanishEnergyAgency,
     ];
 
     public IReadOnlyList<MeteringPointId> MeteringPointIds => Series
