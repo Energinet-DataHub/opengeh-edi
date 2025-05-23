@@ -134,7 +134,8 @@
               "B2CRequestAggregatedMeasureData",
               "RequestWholesaleSettlement",
               "B2CRequestWholesaleSettlement",
-              "Acknowledgement"
+              "Acknowledgement",
+              "ReminderOfMissingMeasurements"
             ],
             "allOf": [
               {
@@ -215,7 +216,8 @@
           "B2CRequestAggregatedMeasureData",
           "RequestWholesaleSettlement",
           "B2CRequestWholesaleSettlement",
-          "Acknowledgement"
+          "Acknowledgement",
+          "ReminderOfMissingMeasurements"
         ],
         "enum": [
           0,
@@ -226,7 +228,8 @@
           5,
           6,
           7,
-          8
+          8,
+          9
         ]
       },
       "Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy": {
