@@ -397,7 +397,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3
         B2CRequestWholesaleSettlement = 7,
 
         Acknowledgement = 8,
-        
+
         ReminderOfMissingMeasurements = 9,
 
     }
