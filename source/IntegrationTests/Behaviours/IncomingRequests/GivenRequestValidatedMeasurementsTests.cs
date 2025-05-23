@@ -86,6 +86,6 @@ public class GivenRequestValidatedMeasurementsTests(
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
          */
-        // TODO: Implement this part when the Process Manager is ready to send data to the EDI
+        // TODO: Implement this part when the Process Manager is ready to send data to the EDI, issue #700
     }
 }

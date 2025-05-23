@@ -17,7 +17,7 @@ using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidatio
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
-//TODO: Move to ProcessManager package
+//TODO: Move to ProcessManager package, issue #700
 public record RequestValidatedMeasurementsInputV1(
     string ActorMessageId,
     string TransactionId,

@@ -18,7 +18,7 @@ using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInsta
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
-//TODO: Move to ProcessManager package
+//TODO: Move to ProcessManager package, issue #700
 public sealed record RequestValidatedMeasurementsCommandV1(
     ActorIdentityDto OperatingIdentity,
     RequestValidatedMeasurementsInputV1 InputParameter,
