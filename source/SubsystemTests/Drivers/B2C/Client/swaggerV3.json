@@ -135,7 +135,7 @@
               "RequestWholesaleSettlement",
               "B2CRequestWholesaleSettlement",
               "Acknowledgement",
-              "ReminderOfMissingMeasureData"
+              "ReminderOfMissingMeasurements"
             ],
             "allOf": [
               {
@@ -217,7 +217,7 @@
           "RequestWholesaleSettlement",
           "B2CRequestWholesaleSettlement",
           "Acknowledgement",
-          "ReminderOfMissingMeasureData"
+          "ReminderOfMissingMeasurements"
         ],
         "enum": [
           0,

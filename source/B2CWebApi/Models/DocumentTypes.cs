@@ -26,5 +26,5 @@ public enum DocumentType
     RequestWholesaleSettlement = 6,
     B2CRequestWholesaleSettlement = 7,
     Acknowledgement = 8,
-    ReminderOfMissingMeasureData = 9,
+    ReminderOfMissingMeasurements = 9,
 }
