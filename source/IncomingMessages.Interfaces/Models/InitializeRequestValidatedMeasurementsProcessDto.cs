@@ -25,7 +25,6 @@ public record InitializeRequestValidatedMeasurementsProcessSeries(
     TransactionId Id,
     string StartDateTime,
     string? EndDateTime,
-    //TODO: Is this optional?
-    string? MeteringPointId,
+    MeteringPointId MeteringPointId,
     RequestedByActor RequestedByActor,
     OriginalActor OriginalActor);

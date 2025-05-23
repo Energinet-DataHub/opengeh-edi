@@ -34,7 +34,7 @@ public static class InitializeRequestValidatedMeasurementsProcessDtoFactory
                     Id: TransactionId.From(series.TransactionId),
                     StartDateTime: series.StartDateTime,
                     EndDateTime: series.EndDateTime,
-                    MeteringPointId: series.MeteringPointLocationId,
+                    MeteringPointId: series.MeteringPointId,
                     RequestedByActor: RequestedByActor.From(
                         senderActorNumber,
                         series.RequestedByActorRole ?? senderActorRole),

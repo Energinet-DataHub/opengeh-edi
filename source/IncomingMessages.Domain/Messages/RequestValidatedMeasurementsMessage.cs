@@ -70,8 +70,7 @@ public class RequestValidatedMeasurementsMessageBase(
 
     public IReadOnlyList<MeteringPointId> MeteringPointIds => Series
         .Cast<RequestValidatedMeasurementsSeries>()
-        .Where(x => x.MeteringPointLocationId != null)
-        .Select(x => MeteringPointId.From(x.MeteringPointLocationId!))
+        .Select(x => x.MeteringPointId)
         .ToList();
 }
 
@@ -79,7 +78,7 @@ public record RequestValidatedMeasurementsSeries(
     string TransactionId,
     string StartDateTime,
     string? EndDateTime,
-    string? MeteringPointLocationId,
+    MeteringPointId MeteringPointId,
     string SenderNumber) : IIncomingMessageSeries
 {
     public string? GridArea => null;

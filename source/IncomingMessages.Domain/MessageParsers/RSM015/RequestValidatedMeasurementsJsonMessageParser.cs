@@ -55,7 +55,7 @@ public class RequestValidatedMeasurementsJsonMessageParser(
             id,
             startDateAndOrTimeDateTime!,
             endDateAndOrTimeDateTime,
-            meteringPointLocationId,
+            MeteringPointId.From(meteringPointLocationId!),
             senderNumber);
     }
 

@@ -119,7 +119,7 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
                 .Match(startDate => startDate == "2022-07-17T22:00:00Z" || startDate == "2022-07-17T22:00:00Z");
             series.EndDateTime.Should()
                 .Match(endDate => endDate == "2022-08-17T22:00:00Z" || endDate == "2022-08-17T22:00:00Z");
-            series.MeteringPointLocationId.Should().Be("579999993331812345");
+            series.MeteringPointId.Should().Be("579999993331812345");
             series.GridArea.Should().BeNull();
         }
     }
