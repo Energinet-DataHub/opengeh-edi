@@ -87,7 +87,7 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
-    public async Task Given_ValidateMeasurementsJsonStream_When_ParseAsync_Then_SuccessfullyParsed(
+    public async Task Given_ValidateRequestMeasurementsJsonStream_When_ParseAsync_Then_SuccessfullyParsed(
         DocumentFormat format,
         Stream message)
     {
@@ -119,14 +119,14 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
                 .Match(startDate => startDate == "2022-07-17T22:00:00Z" || startDate == "2022-07-17T22:00:00Z");
             series.EndDateTime.Should()
                 .Match(endDate => endDate == "2022-08-17T22:00:00Z" || endDate == "2022-08-17T22:00:00Z");
-            series.MeteringPointId.Should().Be("579999993331812345");
+            series.MeteringPointId.Value.Should().Be("579999993331812345");
             series.GridArea.Should().BeNull();
         }
     }
 
     [Theory]
     [MemberData(nameof(CreateBadMessages))]
-    public async Task Given_InvalidateMeasurementsJsonStream_When_ParseAsync_Then_ResultsContainsExpectedErrorMessage(
+    public async Task Given_InvalidateRequestMeasurementsJsonStream_When_ParseAsync_Then_ResultsContainsExpectedErrorMessage(
         DocumentFormat format,
         Stream message,
         string expectedErrorType,
