@@ -16,12 +16,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.EnqueueActorMessages;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 
