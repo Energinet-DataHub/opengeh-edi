@@ -32,6 +32,7 @@ public class ArchivedMessagesClient(
     {
         DocumentType.NotifyValidatedMeasureData,
         DocumentType.Acknowledgement,
+        DocumentType.RequestValidatedMeasurements,
     };
 
     public async Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken)
