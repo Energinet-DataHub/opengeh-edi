@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Identity;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
