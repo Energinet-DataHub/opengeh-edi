@@ -16,6 +16,7 @@ using Azure.Identity;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,25 +36,25 @@ public static class HealthCheckExtensions
         ArgumentNullException.ThrowIfNull(serviceBusFullyQualifiedNamespace);
         ArgumentNullException.ThrowIfNull(queueNames);
 
+        services.AddTokenCredentialProvider();
+
         foreach (var name in queueNames)
         {
             services.TryAddHealthChecks(
                 registrationKey: name,
                 (key, builder) =>
                 {
-                    var defaultAzureCredential = new DefaultAzureCredential();
-
                     builder.AddAzureServiceBusQueue(
-                        name: key,
-                        fullyQualifiedNamespace: serviceBusFullyQualifiedNamespace,
-                        queueName: key,
-                        tokenCredential: defaultAzureCredential);
+                        fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
+                        queueNameFactory: _ => key,
+                        tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
+                        name: key);
 
                     builder.AddServiceBusQueueDeadLetter(
                         fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
                         queueNameFactory: _ => key,
-                        tokenCredentialFactory: _ => defaultAzureCredential,
-                        $"Dead-letter ({key})",
+                        tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
+                        name: $"Dead-letter ({key})",
                         [HealthChecksConstants.StatusHealthCheckTag]);
                 });
         }

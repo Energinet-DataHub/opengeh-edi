@@ -48,7 +48,6 @@ public static class HostFactory
     {
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
-        var defaultAzureCredential = new DefaultAzureCredential();
         return new HostBuilder()
             .ConfigureServices((context, services) =>
             {
@@ -97,7 +96,7 @@ public static class HostFactory
                     .AddOutboxRetention()
 
                     // Enqueue messages from PM (using Edi Topic)
-                    .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential)
+                    .AddEnqueueActorMessagesFromProcessManager()
 
                         // Configure Kestrel options
                         .Configure<KestrelServerOptions>(options =>
@@ -132,7 +131,7 @@ public static class HostFactory
             {
                 // Feature management
                 //  * Configure load/refresh from Azure App Configuration
-                configBuilder.AddAzureAppConfigurationForIsolatedWorker(defaultAzureCredential);
+                configBuilder.AddAzureAppConfigurationForIsolatedWorker();
             })
             .ConfigureLogging((hostingContext, logging) =>
             {

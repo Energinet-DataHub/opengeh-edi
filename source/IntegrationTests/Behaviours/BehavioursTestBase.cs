@@ -411,7 +411,7 @@ public class BehavioursTestBase : IDisposable
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule()
-            .AddEnqueueActorMessagesFromProcessManager(new DefaultAzureCredential());
+            .AddEnqueueActorMessagesFromProcessManager();
 
         _services
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)

@@ -15,6 +15,8 @@
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -107,40 +109,39 @@ public static class IncomingMessagesExtensions
         });
 
         // => Health checks
-        var defaultAzureCredential = new DefaultAzureCredential();
-
         services
+            .AddTokenCredentialProvider()
             .AddHealthChecks()
             .AddAzureServiceBusQueue(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<IncomingMessagesOptions>>().Value.QueueName,
-                _ => defaultAzureCredential,
+                sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 name: incomingMessagesQueueOptions.QueueName)
             .AddServiceBusQueueDeadLetter(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<IncomingMessagesOptions>>().Value.QueueName,
-                _ => defaultAzureCredential,
+                sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 "Dead-letter (incoming messages)",
                 [HealthChecksConstants.StatusHealthCheckTag])
             .AddAzureServiceBusTopic(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.StartTopicName,
-                tokenCredentialFactory: _ => defaultAzureCredential,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 name: "Process Manager Start Topic")
             .AddAzureServiceBusTopic(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.NotifyTopicName,
-                tokenCredentialFactory: _ => defaultAzureCredential,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 name: "Process Manager Notify Topic")
             .AddAzureServiceBusTopic(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.Brs021ForwardMeteredDataStartTopicName,
-                tokenCredentialFactory: _ => defaultAzureCredential,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 name: "Process Manager BRS-021 Start Topic")
             .AddAzureServiceBusTopic(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<ProcessManagerServiceBusClientOptions>>().Value.Brs021ForwardMeteredDataNotifyTopicName,
-                tokenCredentialFactory: _ => defaultAzureCredential,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 name: "Process Manager BRS-021 Notify Topic");
 
         /*
