@@ -56,7 +56,7 @@ public class DelegateIncomingMessage
         }
 
         // Delegation for request metered data is skipped in EDI and handled in Electricity Market
-        if (processType == ProcessType.RequestMeteredDataForMeteringPoint)
+        if (processType == ProcessType.RequestMeasurements)
         {
             return;
         }
@@ -161,7 +161,7 @@ public class DelegateIncomingMessage
             { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeteringPoint },
-            { IncomingDocumentType.RequestValidatedMeasurements, ProcessType.RequestMeteredDataForMeteringPoint },
+            { IncomingDocumentType.RequestMeasurements, ProcessType.RequestMeasurements },
         };
 
         if (documentTypeToProcessTypeMap.TryGetValue(incomingDocumentType, out var processType))

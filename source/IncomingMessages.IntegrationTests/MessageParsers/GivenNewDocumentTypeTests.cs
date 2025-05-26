@@ -70,14 +70,14 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
         DocumentFormat documentFormat)
     {
         // TODO: this will be removed in story #693
-        if (incomingDocumentType == IncomingDocumentType.RequestValidatedMeasurements
+        if (incomingDocumentType == IncomingDocumentType.RequestMeasurements
             && documentFormat == DocumentFormat.Ebix)
         {
             return;
         }
 
         // TODO: this will be removed in story #691
-        if (incomingDocumentType == IncomingDocumentType.RequestValidatedMeasurements
+        if (incomingDocumentType == IncomingDocumentType.RequestMeasurements
             && documentFormat == DocumentFormat.Xml)
         {
             return;

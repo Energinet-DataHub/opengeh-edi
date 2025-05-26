@@ -31,7 +31,7 @@ public class RequestValidatedMeasurementsJsonMessageParser(
     private const string StartElementName = "start_DateAndOrTime.dateTime";
     private const string MeteringPointIdentificationElementName = "marketEvaluationPoint.mRID";
 
-    public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestValidatedMeasurements;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestMeasurements;
 
     public override DocumentFormat DocumentFormat => DocumentFormat.Json;
 

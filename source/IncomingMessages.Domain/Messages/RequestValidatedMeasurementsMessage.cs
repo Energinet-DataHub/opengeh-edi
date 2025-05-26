@@ -102,11 +102,6 @@ public record RequestValidatedMeasurementsSeries(
 
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
-        return actorRole.Name switch
-        {
-            var name when name == PMCoreTypes.ActorRole.GridAccessProvider.Name => ActorNumber.TryCreate(SenderNumber),
-            var name when name == PMCoreTypes.ActorRole.Delegated.Name => ActorNumber.TryCreate(SenderNumber),
-            _ => null,
-        };
+        throw new NotImplementedException($"Delegation for {typeof(RequestValidatedMeasurementsSeries)} is not handled in EDI.");
     }
 }

@@ -67,7 +67,7 @@ public class MetricNameGenerationTests
     [
         DocumentType.RequestAggregatedMeasureData,
         DocumentType.RequestWholesaleSettlement,
-        DocumentType.RequestValidatedMeasurements,
+        DocumentType.RequestMeasurements,
     ];
 
     private readonly string[] _loggedMessageGenerationMetric = _formats.Select(

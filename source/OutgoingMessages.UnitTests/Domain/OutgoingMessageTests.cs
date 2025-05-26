@@ -367,7 +367,7 @@ public class OutgoingMessageTests
         {
             DocumentType.RequestWholesaleSettlement,
             DocumentType.RequestAggregatedMeasureData,
-            DocumentType.RequestValidatedMeasurements,
+            DocumentType.RequestMeasurements,
         };
 
         var fields = typeof(DocumentType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);

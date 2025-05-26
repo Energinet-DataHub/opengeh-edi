@@ -57,7 +57,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
     {
         DocumentType.NotifyValidatedMeasureData,
         DocumentType.Acknowledgement,
-        DocumentType.RequestValidatedMeasurements,
+        DocumentType.RequestMeasurements,
     };
 
     public static TheoryData<DocumentType> GetDocumentTypes()

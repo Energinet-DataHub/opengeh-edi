@@ -53,7 +53,7 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
             incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 incomingMessageStream,
                 documentFormat,
-                IncomingDocumentType.RequestValidatedMeasurements,
+                IncomingDocumentType.RequestMeasurements,
                 documentFormat,
                 CancellationToken.None);
 
@@ -118,9 +118,9 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
             message.RequestedForActorRole.Should().Be(input.RequestedForActor.ActorRole.Name);
             message.BusinessReason.Should().Be(input.BusinessReason.Name);
             message.TransactionId.Should().Be(input.TransactionId.Value);
-            message.MeteringPointId.Should().BeEquivalentTo(input.MeteringPointId.Value);
-            message.PeriodStart.Should().BeEquivalentTo(input.StartDateTime.ToString());
-            message.PeriodEnd.Should().BeEquivalentTo(input.EndDateTime?.ToString());
+            message.MeteringPointId.Should().Be(input.MeteringPointId.Value);
+            message.PeriodStart.Should().Be(input.StartDateTime.ToString());
+            message.PeriodEnd.Should().Be(input.EndDateTime?.ToString());
         };
     }
 }
