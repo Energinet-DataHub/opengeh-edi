@@ -84,11 +84,11 @@ public class AcknowledgementEbixDocumentWriter(IMessageRecordParser parser)
             .ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "SenderEnergyParty", null).ConfigureAwait(false);
-        await WriteGlnOrEicCodeWithAttributesAsync("Identification", header.SenderId, writer).ConfigureAwait(false);
+        await WriteActorNumberWithAttributeAsync(ActorNumber.Create(header.SenderId), writer).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteStartElementAsync(documentDetails.Prefix, "RecipientEnergyParty", null).ConfigureAwait(false);
-        await WriteGlnOrEicCodeWithAttributesAsync("Identification", header.ReceiverId, writer).ConfigureAwait(false);
+        await WriteActorNumberWithAttributeAsync(ActorNumber.Create(header.ReceiverId), writer).ConfigureAwait(false);
         await writer.WriteEndElementAsync().ConfigureAwait(false);
 
         await writer.WriteEndElementAsync().ConfigureAwait(false);

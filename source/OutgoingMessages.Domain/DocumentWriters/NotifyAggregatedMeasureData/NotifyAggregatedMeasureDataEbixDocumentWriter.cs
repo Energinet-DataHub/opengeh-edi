@@ -89,7 +89,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             {
                 // Begin BalanceResponsibleEnergyParty
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "BalanceResponsibleEnergyParty", null).ConfigureAwait(false);
-                await WriteGlnOrEicCodeWithAttributesAsync("Identification", timeSeries.BalanceResponsibleNumber, writer).ConfigureAwait(false);
+                await WriteActorNumberWithAttributeAsync(ActorNumber.Create(timeSeries.BalanceResponsibleNumber), writer).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
                 // End BalanceResponsibleEnergyParty
             }
@@ -98,7 +98,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             {
                 // Begin BalanceSupplierEnergyParty
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "BalanceSupplierEnergyParty", null).ConfigureAwait(false);
-                await WriteGlnOrEicCodeWithAttributesAsync("Identification", timeSeries.EnergySupplierNumber, writer).ConfigureAwait(false);
+                await WriteActorNumberWithAttributeAsync(ActorNumber.Create(timeSeries.EnergySupplierNumber), writer).ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
                 // End BalanceSupplierEnergyParty
             }

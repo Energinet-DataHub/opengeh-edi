@@ -55,6 +55,9 @@ public interface IAssertMissingMeasurementDocument
     IAssertMissingMeasurementDocument HasMissingDate(
         int seriesIndex,
         Instant missingDate);
+
+    IAssertMissingMeasurementDocument HasMissingData(
+        IReadOnlyCollection<(MeteringPointId MeteringPointId, Instant Date)> missingData);
     #endregion
 
 }
