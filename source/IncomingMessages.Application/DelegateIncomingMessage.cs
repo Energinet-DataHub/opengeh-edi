@@ -55,6 +55,12 @@ public class DelegateIncomingMessage
             return;
         }
 
+        // Delegation for request measurements is skipped in EDI and handled in Electricity Market
+        if (processType == ProcessType.RequestMeasurements)
+        {
+            return;
+        }
+
         // Incoming message has current actor as sender, but uses the role of the original actor. This means:
         // - message.SenderNumber is the delegated TO actor number (requested by actor number)
         // - AuthenticatedActor has the delegated TO actor role (requested by actor role)
@@ -155,6 +161,7 @@ public class DelegateIncomingMessage
             { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeteringPoint },
+            { IncomingDocumentType.RequestMeasurements, ProcessType.RequestMeasurements },
         };
 
         if (documentTypeToProcessTypeMap.TryGetValue(incomingDocumentType, out var processType))

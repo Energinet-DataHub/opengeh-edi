@@ -59,7 +59,7 @@ public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProces
             DelegatedProcess.ProcessRequestEnergyResults => ProcessType.RequestEnergyResults,
             DelegatedProcess.ProcessRequestWholesaleResults => ProcessType.RequestWholesaleResults,
             DelegatedProcess.ProcessReceiveWholesaleResults => ProcessType.ReceiveWholesaleResults,
-            DelegatedProcess.ProcessRequestMeteringpointData => ProcessType.RequestMeteredDataForMeteringPoint,
+            DelegatedProcess.ProcessRequestMeteringpointData => ProcessType.RequestMeasurements,
             DelegatedProcess.ProcessReceiveMeteringpointData => ProcessType.IncomingMeteredDataForMeteringPoint,
             DelegatedProcess.ProcessSendMeteringpointData => ProcessType.OutgoingMeteredDataForMeteringPoint,
             DelegatedProcess.ProcessReceiveGapData => ProcessType.MissingMeasurementLog,
