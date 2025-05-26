@@ -55,6 +55,12 @@ public class DelegateIncomingMessage
             return;
         }
 
+        // Delegation for request metered data is skipped in EDI and handled in Electricity Market
+        if (processType == ProcessType.RequestMeteredDataForMeteringPoint)
+        {
+            return;
+        }
+
         // Incoming message has current actor as sender, but uses the role of the original actor. This means:
         // - message.SenderNumber is the delegated TO actor number (requested by actor number)
         // - AuthenticatedActor has the delegated TO actor role (requested by actor role)
