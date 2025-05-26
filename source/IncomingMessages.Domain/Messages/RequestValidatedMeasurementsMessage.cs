@@ -53,7 +53,7 @@ public class RequestMeasurementsMessageBase(
     public IReadOnlyCollection<IIncomingMessageSeries> Series { get; } = series;
 
     public IReadOnlyCollection<MessageType> AllowedMessageTypes => [
-        BuildingBlocks.Domain.Models.MessageType.RequestValidatedMeasurements,
+        BuildingBlocks.Domain.Models.MessageType.RequestMeasurements,
     ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons => [

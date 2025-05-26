@@ -27,7 +27,7 @@ public sealed class MessageType : DataHubType<MessageType>
     public static readonly MessageType ValidatedMeteredData = new(nameof(ValidatedMeteredData), "E66");
     public static readonly MessageType RequestAggregatedMeteredData = new(nameof(RequestAggregatedMeteredData), "E74");
     public static readonly MessageType RequestForAggregatedBillingInformation = new(nameof(RequestForAggregatedBillingInformation), "D21");
-    public static readonly MessageType RequestValidatedMeasurements = new(nameof(RequestValidatedMeasurements), "E73");
+    public static readonly MessageType RequestMeasurements = new(nameof(RequestMeasurements), "E73");
 
     [JsonConstructor]
     private MessageType(string name, string code)
