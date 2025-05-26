@@ -24,7 +24,7 @@ public class RequestValidatedMeasurementsXmlMessageParser(CimXmlSchemaProvider s
 {
     public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestValidatedMeasurements;
 
-    protected override string RootPayloadElementName => "RequestValidatedMeasurements_MarketDocument";
+    protected override string RootPayloadElementName => "RequestValidatedMeasureData_MarketDocument";
 
     protected override IIncomingMessageSeries ParseTransaction(
         XElement seriesElement,
