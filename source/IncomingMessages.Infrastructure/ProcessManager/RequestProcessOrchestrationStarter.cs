@@ -140,7 +140,7 @@ public class RequestProcessOrchestrationStarter(
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    public async Task StartRequestValidatedMeasurementsOrchestrationAsync(
+    public async Task StartRequestMeasurementsOrchestrationAsync(
         InitializeRequestMeasurementsProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {

@@ -72,12 +72,12 @@ public class RequestMeasurementsBehaviourTestBase(
         }
     }
 
-    internal StartOrchestrationInstanceV1 ThenRequestValidatedMeasurementsInputV1ServiceBusMessageIsCorrect(
+    internal StartOrchestrationInstanceV1 ThenRequestMeasurementsInputV1ServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
         DocumentFormat documentFormat,
         RequestMeasurementsInputV1AssertionInput assertionInput)
     {
-        var assertionResult = ThenRequestValidatedMeasurementsInputV1ServiceBusMessagesIsCorrect(
+        var assertionResult = ThenRequestMeasurementsInputV1ServiceBusMessagesIsCorrect(
             senderSpy,
             [assertionInput],
             documentFormat);
@@ -85,7 +85,7 @@ public class RequestMeasurementsBehaviourTestBase(
         return assertionResult.Single();
     }
 
-    internal IList<StartOrchestrationInstanceV1> ThenRequestValidatedMeasurementsInputV1ServiceBusMessagesIsCorrect(
+    internal IList<StartOrchestrationInstanceV1> ThenRequestMeasurementsInputV1ServiceBusMessagesIsCorrect(
         ServiceBusSenderSpy senderSpy,
         IList<RequestMeasurementsInputV1AssertionInput> assertionInputs,
         DocumentFormat documentFormat)
