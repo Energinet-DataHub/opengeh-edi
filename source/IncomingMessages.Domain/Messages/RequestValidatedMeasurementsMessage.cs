@@ -62,6 +62,7 @@ public class RequestValidatedMeasurementsMessageBase(
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [
         ActorRole.EnergySupplier,
+        ActorRole.Delegated,
         ActorRole.GridAccessProvider,
         ActorRole.MeteredDataResponsible,
         ActorRole.SystemOperator,
