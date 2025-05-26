@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM015;
 public class RequestValidatedMeasurementsXmlMessageParser(CimXmlSchemaProvider schemaProvider)
     : XmlMessageParserBase(schemaProvider)
 {
-    public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestValidatedMeasurements;
 
     protected override string RootPayloadElementName => "RequestValidatedMeasurements_MarketDocument";
 
