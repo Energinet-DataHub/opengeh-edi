@@ -87,7 +87,7 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
-    public async Task Given_ValidateRequestMeasurementsJsonStream_When_ParseAsync_Then_SuccessfullyParsed(
+    public async Task Given_RequestMeasurementsStream_When_ParseAsync_Then_SuccessfullyParsed(
         DocumentFormat format,
         Stream message)
     {
