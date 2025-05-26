@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageId;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM015;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM016;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM017;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
@@ -169,6 +170,8 @@ public static class IncomingMessagesExtensions
         services.AddTransient<IMessageParser, AggregatedMeasureDataXmlMessageParser>();
         services.AddTransient<IMessageParser, AggregatedMeasureDataJsonMessageParser>();
         services.AddTransient<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>();
+
+        services.AddTransient<IMessageParser, RequestMeasurementsJsonMessageParser>();
 
         /*
          * Process Manager
