@@ -37,9 +37,9 @@ public static class InitializeRequestValidatedMeasurementsProcessDtoFactory
                     MeteringPointId: series.MeteringPointId,
                     RequestedByActor: RequestedByActor.From(
                         senderActorNumber,
-                        series.RequestedByActorRole ?? senderActorRole),
+                        senderActorRole),
                     OriginalActor: OriginalActor.From(
-                        series.OriginalActorNumber ?? senderActorNumber,
+                        senderActorNumber,
                         senderActorRole)))
             .ToList().AsReadOnly();
 

@@ -41,7 +41,7 @@ public class RequestValidatedMeasurementsJsonMessageParser(
 
     protected override IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber)
     {
-        var id = transactionElement.GetProperty(MridElementName).GetString() ?? string.Empty;
+        var id = transactionElement.GetProperty(MridElementName).GetString();
         var meteringPointLocationId = transactionElement.GetProperty(MeteringPointIdentificationElementName)
             .GetProperty(ValueElementName)
             .GetString();
@@ -52,7 +52,7 @@ public class RequestValidatedMeasurementsJsonMessageParser(
             .GetString();
 
         return new RequestValidatedMeasurementsSeries(
-            id,
+            id!,
             startDateAndOrTimeDateTime!,
             endDateAndOrTimeDateTime,
             MeteringPointId.From(meteringPointLocationId!),

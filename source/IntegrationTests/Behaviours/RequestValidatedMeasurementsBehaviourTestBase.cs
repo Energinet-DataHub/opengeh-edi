@@ -117,7 +117,7 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
             message.RequestedForActorNumber.Should().Be(input.RequestedForActor.ActorNumber.Value);
             message.RequestedForActorRole.Should().Be(input.RequestedForActor.ActorRole.Name);
             message.BusinessReason.Should().Be(input.BusinessReason.Name);
-            message.TransactionId.Should().BeEquivalentTo(input.TransactionId.Value);
+            message.TransactionId.Should().Be(input.TransactionId.Value);
             message.MeteringPointId.Should().BeEquivalentTo(input.MeteringPointId.Value);
             message.PeriodStart.Should().BeEquivalentTo(input.StartDateTime.ToString());
             message.PeriodEnd.Should().BeEquivalentTo(input.EndDateTime?.ToString());

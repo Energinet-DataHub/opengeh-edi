@@ -18,7 +18,7 @@ using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObje
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 /// <summary>
-/// Represents the message for requesting measurements for metering point known as RSM-015.
+/// Represents the message for requesting measurements for metering points known as RSM-015.
 /// </summary>
 public class RequestValidatedMeasurementsMessageBase(
     string messageId,
