@@ -21,6 +21,7 @@ public class IncomingDocumentType : EnumerationType
     public static readonly IncomingDocumentType RequestWholesaleSettlement = new(nameof(RequestWholesaleSettlement));
     public static readonly IncomingDocumentType B2CRequestWholesaleSettlement = new(nameof(B2CRequestWholesaleSettlement));
     public static readonly IncomingDocumentType NotifyValidatedMeasureData = new(nameof(NotifyValidatedMeasureData));
+    public static readonly IncomingDocumentType RequestValidatedMeasurements = new(nameof(RequestValidatedMeasurements));
 
     private IncomingDocumentType(string name)
         : base(name)
@@ -29,7 +30,9 @@ public class IncomingDocumentType : EnumerationType
 
     public static IncomingDocumentType? FromName(string? name)
     {
-        if (name == null) return null;
+        if (name == null)
+            return null;
+
         return GetAll<IncomingDocumentType>()
                    .FirstOrDefault(document => document.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException(
