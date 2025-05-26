@@ -20,7 +20,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 
-public static class RequestValidatedMeasurementsBuilder
+public static class RequestMeasurementsBuilder
 {
     public static IncomingMarketMessageStream CreateIncomingMessage(
         string messageId,

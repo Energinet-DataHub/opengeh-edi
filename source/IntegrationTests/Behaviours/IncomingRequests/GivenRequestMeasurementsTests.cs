@@ -60,7 +60,7 @@ public class GivenRequestMeasurementsTests(
         var meteringPointId = MeteringPointId.From("579999993331812345");
 
         // Act
-        await GivenRequestValidatedMeasurements(
+        await GivenRequestMeasurements(
             documentFormat: documentFormat,
             senderActor: senderActor,
             MessageId.New(),

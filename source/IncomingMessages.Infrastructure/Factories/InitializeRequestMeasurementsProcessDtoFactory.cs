@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
-public static class InitializeRequestValidatedMeasurementsProcessDtoFactory
+public static class InitializeRequestMeasurementsProcessDtoFactory
 {
     public static InitializeRequestMeasurementsProcessDto Create(RequestMeasurementsMessageBase requestMeasurementsMessageBase)
     {
@@ -28,7 +28,7 @@ public static class InitializeRequestValidatedMeasurementsProcessDtoFactory
         var senderActorRole = ActorRole.FromCode(requestMeasurementsMessageBase.SenderRoleCode);
 
         var series = requestMeasurementsMessageBase.Series
-            .Cast<RequestValidatedMeasurementsSeries>()
+            .Cast<RequestMeasurementsSeries>()
             .Select(
                 series => new InitializeRequestMeasurementsProcessSeries(
                     Id: TransactionId.From(series.TransactionId),

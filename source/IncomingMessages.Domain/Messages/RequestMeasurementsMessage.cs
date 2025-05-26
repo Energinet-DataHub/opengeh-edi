@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using PMCoreTypes = Energinet.DataHub.ProcessManager.Abstractions.Core.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
@@ -70,12 +69,12 @@ public class RequestMeasurementsMessageBase(
     ];
 
     public IReadOnlyList<MeteringPointId> MeteringPointIds => Series
-        .Cast<RequestValidatedMeasurementsSeries>()
+        .Cast<RequestMeasurementsSeries>()
         .Select(x => x.MeteringPointId)
         .ToList();
 }
 
-public record RequestValidatedMeasurementsSeries(
+public record RequestMeasurementsSeries(
     string TransactionId,
     string StartDateTime,
     string? EndDateTime,
@@ -97,11 +96,11 @@ public record RequestValidatedMeasurementsSeries(
         ActorRole requestedByActorRole,
         IReadOnlyCollection<string> delegatedGridAreas)
     {
-        throw new NotImplementedException($"Delegation for {typeof(RequestValidatedMeasurementsSeries)} is not handled in EDI.");
+        throw new NotImplementedException($"Delegation for {typeof(RequestMeasurementsSeries)} is not handled in EDI.");
     }
 
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
-        throw new NotImplementedException($"Delegation for {typeof(RequestValidatedMeasurementsSeries)} is not handled in EDI.");
+        throw new NotImplementedException($"Delegation for {typeof(RequestMeasurementsSeries)} is not handled in EDI.");
     }
 }

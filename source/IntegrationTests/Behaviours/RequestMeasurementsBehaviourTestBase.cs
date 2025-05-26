@@ -33,7 +33,7 @@ public class RequestMeasurementsBehaviourTestBase(
     ITestOutputHelper testOutputHelper)
     : BehavioursTestBase(integrationTestFixture, testOutputHelper)
 {
-    internal async Task GivenRequestValidatedMeasurements(
+    internal async Task GivenRequestMeasurements(
         DocumentFormat documentFormat,
         Actor senderActor,
         MessageId messageId,
@@ -42,7 +42,7 @@ public class RequestMeasurementsBehaviourTestBase(
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
-        var incomingMessageStream = RequestValidatedMeasurementsBuilder.CreateIncomingMessage(
+        var incomingMessageStream = RequestMeasurementsBuilder.CreateIncomingMessage(
             messageId: messageId.Value,
             format: documentFormat,
             senderActor: senderActor,

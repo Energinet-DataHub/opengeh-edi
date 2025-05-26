@@ -26,7 +26,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.MessageParsers;
 
-public sealed class RequestValidatedMeasurementsJsonMessageParserTests
+public sealed class RequestMeasurementsJsonMessageParserTests
 {
     private static readonly string PathToMessages =
         $"MessageParsers{Path.DirectorySeparatorChar}";
@@ -46,10 +46,10 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
         // },
         {
             DocumentFormat.Json,
-            new RequestValidatedMeasurementsJsonMessageParser(
+            new RequestMeasurementsJsonMessageParser(
                 new JsonSchemaProvider(
                     new CimJsonSchemas()),
-                new Logger<RequestValidatedMeasurementsJsonMessageParser>(new LoggerFactory()))
+                new Logger<RequestMeasurementsJsonMessageParser>(new LoggerFactory()))
         },
     };
 
@@ -110,7 +110,7 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
         marketMessage.ReceiverRoleCode.Should().Be("DGL");
         marketMessage.BusinessType.Should().Be("23");
 
-        foreach (var series in marketMessage.Series.Cast<RequestValidatedMeasurementsSeries>())
+        foreach (var series in marketMessage.Series.Cast<RequestMeasurementsSeries>())
         {
             series.Should().NotBeNull();
             series.TransactionId.Should()

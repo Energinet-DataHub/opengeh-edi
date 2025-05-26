@@ -20,9 +20,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM015;
 
-public class RequestValidatedMeasurementsJsonMessageParser(
+public class RequestMeasurementsJsonMessageParser(
     JsonSchemaProvider schemaProvider,
-    ILogger<RequestValidatedMeasurementsJsonMessageParser> logger)
+    ILogger<RequestMeasurementsJsonMessageParser> logger)
     : JsonMessageParserBase(schemaProvider, logger)
 {
     private const string ValueElementName = "value";
@@ -51,7 +51,7 @@ public class RequestValidatedMeasurementsJsonMessageParser(
         var endDateAndOrTimeDateTime = transactionElement.GetProperty(EndElementName)
             .GetString();
 
-        return new RequestValidatedMeasurementsSeries(
+        return new RequestMeasurementsSeries(
             id!,
             startDateAndOrTimeDateTime!,
             endDateAndOrTimeDateTime,

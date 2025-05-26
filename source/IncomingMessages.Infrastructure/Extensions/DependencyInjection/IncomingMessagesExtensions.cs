@@ -166,7 +166,7 @@ public static class IncomingMessagesExtensions
         services.AddTransient<IMessageParser, AggregatedMeasureDataJsonMessageParser>();
         services.AddTransient<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>();
 
-        services.AddTransient<IMessageParser, RequestValidatedMeasurementsJsonMessageParser>();
+        services.AddTransient<IMessageParser, RequestMeasurementsJsonMessageParser>();
 
         /*
          * Process Manager
