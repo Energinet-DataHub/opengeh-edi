@@ -27,7 +27,7 @@ public static class FileStorageExtensions
     private const string HealthCheckName = "EDI blob file storage";
 
     /// <summary>
-    /// Register servies and health checks for file storage.
+    /// Register services and health checks for file storage.
     /// </summary>
     /// <remarks>
     /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
