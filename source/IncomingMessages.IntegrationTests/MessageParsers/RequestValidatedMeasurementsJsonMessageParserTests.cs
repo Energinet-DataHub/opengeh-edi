@@ -126,7 +126,7 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateBadMessages))]
-    public async Task Given_InvalidateRequestMeasurementsJsonStream_When_ParseAsync_Then_ResultsContainsExpectedErrorMessage(
+    public async Task Given_InvalidRequestMeasurements_When_ParseAsync_Then_ResultsContainsExpectedErrorMessage(
         DocumentFormat format,
         Stream message,
         string expectedErrorType,
