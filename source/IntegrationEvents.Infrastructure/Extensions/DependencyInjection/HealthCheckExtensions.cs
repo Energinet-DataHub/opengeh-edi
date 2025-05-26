@@ -24,10 +24,15 @@ namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions.Depe
 
 public static class HealthCheckExtensions
 {
+    /// <summary>
+    /// Register health checks for integration events.
+    /// </summary>
+    /// <remarks>
+    /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
+    /// </remarks>
     public static IServiceCollection AddIntegrationEventsHealthChecks(this IServiceCollection services)
     {
         services
-            .AddTokenCredentialProvider()
             .TryAddHealthChecks(
                 "EdiIntegrationEvents",
                 (_, builder) =>

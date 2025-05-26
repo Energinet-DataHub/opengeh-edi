@@ -53,6 +53,12 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.Depen
 
 public static class IncomingMessagesExtensions
 {
+    /// <summary>
+    /// Register services and health checks for incoming message module.
+    /// </summary>
+    /// <remarks>
+    /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
+    /// </remarks>
     public static IServiceCollection AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
@@ -109,7 +115,6 @@ public static class IncomingMessagesExtensions
 
         // => Health checks
         services
-            .AddTokenCredentialProvider()
             .AddHealthChecks()
             .AddAzureServiceBusQueue(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,

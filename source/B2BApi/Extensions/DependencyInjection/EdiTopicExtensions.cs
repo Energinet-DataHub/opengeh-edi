@@ -28,6 +28,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 
 public static class EdiTopicExtensions
 {
+    /// <summary>
+    /// Register services and health checks for enqueue actor message from process manager.
+    /// </summary>
+    /// <remarks>
+    /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
+    /// </remarks>
     public static IServiceCollection AddEnqueueActorMessagesFromProcessManager(this IServiceCollection services)
     {
         services
@@ -36,7 +42,6 @@ public static class EdiTopicExtensions
             .ValidateDataAnnotations();
 
         services
-            .AddTokenCredentialProvider()
             .AddHealthChecks()
             .AddAzureServiceBusTopic(
                 fullyQualifiedNamespaceFactory: sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,

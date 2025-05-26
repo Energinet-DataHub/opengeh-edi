@@ -57,6 +57,9 @@ public static class HostFactory
                     // Health checks
                     .AddHealthChecksForIsolatedWorker()
 
+                    // Token credential
+                    .AddTokenCredentialProvider()
+
                     // Azure App Configuration
                     .AddAzureAppConfiguration()
 

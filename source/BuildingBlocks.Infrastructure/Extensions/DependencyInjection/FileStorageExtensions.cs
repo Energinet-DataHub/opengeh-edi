@@ -26,6 +26,12 @@ public static class FileStorageExtensions
 {
     private const string HealthCheckName = "EDI blob file storage";
 
+    /// <summary>
+    /// Register servies and health checks for file storage.
+    /// </summary>
+    /// <remarks>
+    /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
+    /// </remarks>
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
@@ -42,7 +48,6 @@ public static class FileStorageExtensions
             ?? throw new InvalidOperationException("Missing Blob Service Client Connection configuration.");
 
         services
-            .AddTokenCredentialProvider()
             .AddAzureClients(builder =>
             {
                 builder.UseCredential(sp => sp.GetRequiredService<TokenCredentialProvider>().Credential);

@@ -27,6 +27,9 @@ public static class HealthCheckExtensions
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
+    /// <remarks>
+    /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
+    /// </remarks>
     public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(
         this IServiceCollection services,
         string serviceBusFullyQualifiedNamespace,
@@ -34,8 +37,6 @@ public static class HealthCheckExtensions
     {
         ArgumentNullException.ThrowIfNull(serviceBusFullyQualifiedNamespace);
         ArgumentNullException.ThrowIfNull(queueNames);
-
-        services.AddTokenCredentialProvider();
 
         foreach (var name in queueNames)
         {
