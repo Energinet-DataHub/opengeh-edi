@@ -54,7 +54,7 @@ public class RequestValidatedMeasurementsMessageBase(
 
     public IReadOnlyCollection<MessageType> AllowedMessageTypes =>
     [
-        //BuildingBlocks.Domain.Models.MessageType.RequestValidatedMeasurements,
+        BuildingBlocks.Domain.Models.MessageType.RequestValidatedMeasurements,
     ];
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons =>
