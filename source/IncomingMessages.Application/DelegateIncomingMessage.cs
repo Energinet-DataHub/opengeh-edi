@@ -55,7 +55,7 @@ public class DelegateIncomingMessage
             return;
         }
 
-        // Delegation for request metered data is skipped in EDI and handled in Electricity Market
+        // Delegation for request measurements is skipped in EDI and handled in Electricity Market
         if (processType == ProcessType.RequestMeasurements)
         {
             return;
