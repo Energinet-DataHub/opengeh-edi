@@ -120,12 +120,12 @@ public static class IncomingMessagesExtensions
             .AddAzureServiceBusQueue(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<IncomingMessagesOptions>>().Value.QueueName,
-                sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 name: incomingMessagesQueueOptions.QueueName)
             .AddServiceBusQueueDeadLetter(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<IncomingMessagesOptions>>().Value.QueueName,
-                sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
                 "Dead-letter (incoming messages)",
                 [HealthChecksConstants.StatusHealthCheckTag])
             .AddAzureServiceBusTopic(
