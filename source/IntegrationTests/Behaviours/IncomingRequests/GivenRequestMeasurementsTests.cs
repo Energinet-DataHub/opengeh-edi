@@ -72,7 +72,7 @@ public class GivenRequestMeasurementsTests(
             ]);
 
         // Assert
-        var message = ThenRequestValidatedMeasurementsInputV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestMeasurementsInputV1ServiceBusMessageIsCorrect(
             senderSpy,
             documentFormat,
             new RequestMeasurementsInputV1AssertionInput(
