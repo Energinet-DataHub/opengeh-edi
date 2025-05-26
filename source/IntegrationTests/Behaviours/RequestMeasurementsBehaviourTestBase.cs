@@ -118,7 +118,7 @@ public class RequestMeasurementsBehaviourTestBase(
             message.BusinessReason.Should().Be(input.BusinessReason.Name);
             message.TransactionId.Should().Be(input.TransactionId.Value);
             message.MeteringPointId.Should().Be(input.MeteringPointId.Value);
-            message.ReceivedAt.Should().Be(input.ReceivedAt);
+            message.ReceivedAt.Should().Be(input.ReceivedAt.ToString());
         };
     }
 }
