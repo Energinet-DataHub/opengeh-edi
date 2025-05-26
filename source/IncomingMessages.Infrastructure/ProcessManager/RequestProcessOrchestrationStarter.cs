@@ -156,7 +156,7 @@ public class RequestProcessOrchestrationStarter(
                     RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
                     RequestedByActorNumber: transaction.RequestedByActor.ActorNumber.Value,
                     RequestedByActorRole: transaction.RequestedByActor.ActorRole.Name,
-                    BusinessReason: BusinessReason.TryGetNameFromCode(initializeProcessDto.BusinessReason, fallbackValue: initializeProcessDto.BusinessReason),
+                    BusinessReason: BusinessReason.FromCode(initializeProcessDto.BusinessReason).Name,
                     PeriodStart: transaction.StartDateTime,
                     PeriodEnd: transaction.EndDateTime,
                     MeteringPointId: transaction.MeteringPointId.Value),
