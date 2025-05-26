@@ -18,15 +18,18 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ProcessManager;
 
 public class RequestProcessOrchestrationStarter(
     IProcessManagerMessageClientFactory processManagerMessageClientFactory,
-    AuthenticatedActor authenticatedActor) : IRequestProcessOrchestrationStarter
+    AuthenticatedActor authenticatedActor,
+    IClock clock) : IRequestProcessOrchestrationStarter
 {
     private readonly IProcessManagerMessageClientFactory _processManagerMessageClientFactory = processManagerMessageClientFactory;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
+    private readonly IClock _clock = clock;
 
     public async Task StartRequestWholesaleServicesOrchestrationAsync(
         InitializeWholesaleServicesProcessDto initializeProcessDto,
@@ -138,7 +141,7 @@ public class RequestProcessOrchestrationStarter(
     }
 
     public async Task StartRequestValidatedMeasurementsOrchestrationAsync(
-        InitializeRequestValidatedMeasurementsProcessDto initializeProcessDto,
+        InitializeRequestMeasurementsProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
         var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
@@ -147,20 +150,17 @@ public class RequestProcessOrchestrationStarter(
         var startProcessTasks = new List<Task>();
         foreach (var transaction in initializeProcessDto.Series)
         {
-            var startCommand = new RequestValidatedMeasurementsCommandV1(
+            var startCommand = new RequestYearlyMeasurementsCommandV1(
                 OperatingIdentity: actorIdentity,
-                InputParameter: new RequestValidatedMeasurementsInputV1(
+                InputParameter: new RequestYearlyMeasurementsInputV1(
                     ActorMessageId: initializeProcessDto.MessageId,
                     TransactionId: transaction.Id.Value,
-                    RequestedForActorNumber: transaction.OriginalActor.ActorNumber.Value,
-                    RequestedForActorRole: transaction.OriginalActor.ActorRole.Name,
-                    RequestedByActorNumber: transaction.RequestedByActor.ActorNumber.Value,
-                    RequestedByActorRole: transaction.RequestedByActor.ActorRole.Name,
+                    ActorNumber: transaction.OriginalActor.ActorNumber.Value,
+                    ActorRole: transaction.OriginalActor.ActorRole.Name,
                     BusinessReason: BusinessReason.FromCode(initializeProcessDto.BusinessReason).Name,
-                    PeriodStart: transaction.StartDateTime,
-                    PeriodEnd: transaction.EndDateTime,
+                    ReceivedAt: _clock.GetCurrentInstant(),
                     MeteringPointId: transaction.MeteringPointId.Value),
-                IdempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.RequestedByActor));
+                IdempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.OriginalActor));
 
             var startProcessTask = processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
             startProcessTasks.Add(startProcessTask);
@@ -183,4 +183,6 @@ public class RequestProcessOrchestrationStarter(
     }
 
     private string CreateIdempotencyKey(string transactionId, RequestedByActor actor) => $"{transactionId}_{actor.ActorNumber.Value}_{actor.ActorRole.Code}";
+
+    private string CreateIdempotencyKey(string transactionId, OriginalActor actor) => $"{transactionId}_{actor.ActorNumber.Value}_{actor.ActorRole.Code}";
 }

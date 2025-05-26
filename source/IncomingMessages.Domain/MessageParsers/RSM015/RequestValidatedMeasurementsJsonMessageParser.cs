@@ -61,7 +61,7 @@ public class RequestValidatedMeasurementsJsonMessageParser(
 
     protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
-        return new IncomingMarketMessageParserResult(new RequestValidatedMeasurementsMessageBase(
+        return new IncomingMarketMessageParserResult(new RequestMeasurementsMessageBase(
             header.MessageId,
             header.MessageType,
             header.CreatedAt,

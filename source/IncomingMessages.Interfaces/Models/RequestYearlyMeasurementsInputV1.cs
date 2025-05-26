@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
-public record RequestValidatedMeasurementsInputV1AssertionInput(
-    Actor RequestedForActor,
-    BusinessReason BusinessReason,
-    TransactionId TransactionId,
-    MeteringPointId MeteringPointId,
-    Instant StartDateTime,
-    Instant? EndDateTime);
+//TODO: Move to ProcessManager package, issue #700
+public record RequestYearlyMeasurementsInputV1(
+    string ActorMessageId,
+    string TransactionId,
+    string ActorNumber,
+    string ActorRole,
+    string BusinessReason,
+    Instant ReceivedAt,
+    string? MeteringPointId) : IInputParameterDto, IBusinessValidatedDto;

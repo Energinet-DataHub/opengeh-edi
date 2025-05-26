@@ -13,18 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
-public record InitializeRequestValidatedMeasurementsProcessDto(
-    string BusinessReason,
-    string MessageId,
-    IReadOnlyCollection<InitializeRequestValidatedMeasurementsProcessSeries> Series);
-
-public record InitializeRequestValidatedMeasurementsProcessSeries(
-    TransactionId Id,
-    string StartDateTime,
-    string? EndDateTime,
+public record RequestMeasurementsInputV1AssertionInput(
+    Actor RequestedForActor,
+    BusinessReason BusinessReason,
+    TransactionId TransactionId,
     MeteringPointId MeteringPointId,
-    RequestedByActor RequestedByActor,
-    OriginalActor OriginalActor);
+    Instant ReceivedAt);

@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
-using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
-//TODO: Move to ProcessManager package, issue #700
-public record RequestValidatedMeasurementsInputV1(
-    string ActorMessageId,
-    string TransactionId,
-    string RequestedForActorNumber,
-    string RequestedForActorRole,
-    string RequestedByActorNumber,
-    string RequestedByActorRole,
+public record InitializeRequestMeasurementsProcessDto(
     string BusinessReason,
-    string PeriodStart,
-    string? PeriodEnd,
-    string? MeteringPointId) : IInputParameterDto, IBusinessValidatedDto;
+    string MessageId,
+    IReadOnlyCollection<InitializeRequestMeasurementsProcessSeries> Series);
+
+public record InitializeRequestMeasurementsProcessSeries(
+    TransactionId Id,
+    string StartDateTime,
+    string? EndDateTime,
+    MeteringPointId MeteringPointId,
+    OriginalActor OriginalActor);

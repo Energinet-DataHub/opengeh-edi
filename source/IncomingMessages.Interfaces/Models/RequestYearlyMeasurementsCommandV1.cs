@@ -19,8 +19,8 @@ using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInsta
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 //TODO: Move to ProcessManager package, issue #700
-public sealed record RequestValidatedMeasurementsCommandV1(
+public sealed record RequestYearlyMeasurementsCommandV1(
     ActorIdentityDto OperatingIdentity,
-    RequestValidatedMeasurementsInputV1 InputParameter,
+    RequestYearlyMeasurementsInputV1 InputParameter,
     string IdempotencyKey) :
-    StartOrchestrationInstanceMessageCommand<RequestValidatedMeasurementsInputV1>(OperatingIdentity, new OrchestrationDescriptionUniqueNameDto("Brs_024", 1), InputParameter, IdempotencyKey, InputParameter.ActorMessageId, InputParameter.TransactionId, InputParameter.MeteringPointId);
+    StartOrchestrationInstanceMessageCommand<RequestYearlyMeasurementsInputV1>(OperatingIdentity, new OrchestrationDescriptionUniqueNameDto("Brs_024", 1), InputParameter, IdempotencyKey, InputParameter.ActorMessageId, InputParameter.TransactionId, InputParameter.MeteringPointId);

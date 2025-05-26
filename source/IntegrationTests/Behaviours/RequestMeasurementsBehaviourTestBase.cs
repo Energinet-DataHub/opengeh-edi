@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
@@ -29,7 +28,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test methods")]
-public class RequestValidatedMeasurementsBehaviourTestBase(
+public class RequestMeasurementsBehaviourTestBase(
     IntegrationTestFixture integrationTestFixture,
     ITestOutputHelper testOutputHelper)
     : BehavioursTestBase(integrationTestFixture, testOutputHelper)
@@ -76,7 +75,7 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
     internal StartOrchestrationInstanceV1 ThenRequestValidatedMeasurementsInputV1ServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
         DocumentFormat documentFormat,
-        RequestValidatedMeasurementsInputV1AssertionInput assertionInput)
+        RequestMeasurementsInputV1AssertionInput assertionInput)
     {
         var assertionResult = ThenRequestValidatedMeasurementsInputV1ServiceBusMessagesIsCorrect(
             senderSpy,
@@ -88,7 +87,7 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
 
     internal IList<StartOrchestrationInstanceV1> ThenRequestValidatedMeasurementsInputV1ServiceBusMessagesIsCorrect(
         ServiceBusSenderSpy senderSpy,
-        IList<RequestValidatedMeasurementsInputV1AssertionInput> assertionInputs,
+        IList<RequestMeasurementsInputV1AssertionInput> assertionInputs,
         DocumentFormat documentFormat)
     {
         var messages = AssertProcessManagerServiceBusMessages(
@@ -102,25 +101,24 @@ public class RequestValidatedMeasurementsBehaviourTestBase(
             .Select(GetAssertServiceBusMessage);
 
         messages
-            .Select(x => x.ParseInput<RequestValidatedMeasurementsInputV1>())
+            .Select(x => x.ParseInput<RequestYearlyMeasurementsInputV1>())
             .Should()
             .SatisfyRespectively(assertionMethods);
 
         return messages;
     }
 
-    private static Action<RequestValidatedMeasurementsInputV1> GetAssertServiceBusMessage(
-        RequestValidatedMeasurementsInputV1AssertionInput input)
+    private static Action<RequestYearlyMeasurementsInputV1> GetAssertServiceBusMessage(
+        RequestMeasurementsInputV1AssertionInput input)
     {
         return (message) =>
         {
-            message.RequestedForActorNumber.Should().Be(input.RequestedForActor.ActorNumber.Value);
-            message.RequestedForActorRole.Should().Be(input.RequestedForActor.ActorRole.Name);
+            message.ActorNumber.Should().Be(input.RequestedForActor.ActorNumber.Value);
+            message.ActorRole.Should().Be(input.RequestedForActor.ActorRole.Name);
             message.BusinessReason.Should().Be(input.BusinessReason.Name);
             message.TransactionId.Should().Be(input.TransactionId.Value);
             message.MeteringPointId.Should().Be(input.MeteringPointId.Value);
-            message.PeriodStart.Should().Be(input.StartDateTime.ToString());
-            message.PeriodEnd.Should().Be(input.EndDateTime?.ToString());
+            message.ReceivedAt.Should().Be(input.ReceivedAt);
         };
     }
 }

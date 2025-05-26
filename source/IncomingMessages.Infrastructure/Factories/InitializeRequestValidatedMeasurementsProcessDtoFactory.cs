@@ -20,32 +20,29 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
 public static class InitializeRequestValidatedMeasurementsProcessDtoFactory
 {
-    public static InitializeRequestValidatedMeasurementsProcessDto Create(RequestValidatedMeasurementsMessageBase requestValidatedMeasurementsMessageBase)
+    public static InitializeRequestMeasurementsProcessDto Create(RequestMeasurementsMessageBase requestMeasurementsMessageBase)
     {
-        ArgumentNullException.ThrowIfNull(requestValidatedMeasurementsMessageBase);
+        ArgumentNullException.ThrowIfNull(requestMeasurementsMessageBase);
 
-        var senderActorNumber = ActorNumber.Create(requestValidatedMeasurementsMessageBase.SenderNumber);
-        var senderActorRole = ActorRole.FromCode(requestValidatedMeasurementsMessageBase.SenderRoleCode);
+        var senderActorNumber = ActorNumber.Create(requestMeasurementsMessageBase.SenderNumber);
+        var senderActorRole = ActorRole.FromCode(requestMeasurementsMessageBase.SenderRoleCode);
 
-        var series = requestValidatedMeasurementsMessageBase.Series
+        var series = requestMeasurementsMessageBase.Series
             .Cast<RequestValidatedMeasurementsSeries>()
             .Select(
-                series => new InitializeRequestValidatedMeasurementsProcessSeries(
+                series => new InitializeRequestMeasurementsProcessSeries(
                     Id: TransactionId.From(series.TransactionId),
                     StartDateTime: series.StartDateTime,
                     EndDateTime: series.EndDateTime,
                     MeteringPointId: series.MeteringPointId,
-                    RequestedByActor: RequestedByActor.From(
-                        senderActorNumber,
-                        senderActorRole),
                     OriginalActor: OriginalActor.From(
                         senderActorNumber,
                         senderActorRole)))
             .ToList().AsReadOnly();
 
-        return new InitializeRequestValidatedMeasurementsProcessDto(
-            BusinessReason: requestValidatedMeasurementsMessageBase.BusinessReason,
-            MessageId: requestValidatedMeasurementsMessageBase.MessageId,
+        return new InitializeRequestMeasurementsProcessDto(
+            BusinessReason: requestMeasurementsMessageBase.BusinessReason,
+            MessageId: requestMeasurementsMessageBase.MessageId,
             Series: series);
     }
 }

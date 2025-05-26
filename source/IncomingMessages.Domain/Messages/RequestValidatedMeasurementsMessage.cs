@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 /// <summary>
 /// Represents the message for requesting measurements for metering points known as RSM-015.
 /// </summary>
-public class RequestValidatedMeasurementsMessageBase(
+public class RequestMeasurementsMessageBase(
     string messageId,
     string messageType,
     string createdAt,

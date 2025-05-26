@@ -60,7 +60,7 @@ public class IncomingMessagePublisher
             case MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessage:
                 await SendInitializeMeteredDataForMeteringPointMessageProcessAsync(meteredDataForMeteringPointMessage, cancellationToken).ConfigureAwait(false);
                 break;
-            case RequestValidatedMeasurementsMessageBase requestValidatedMeasurementsMessageBase:
+            case RequestMeasurementsMessageBase requestValidatedMeasurementsMessageBase:
                 await SendInitializeRequestValidatedMeasurementsMessageProcessAsync(InitializeRequestValidatedMeasurementsProcessDtoFactory.Create(requestValidatedMeasurementsMessageBase), cancellationToken).ConfigureAwait(false);
                 break;
             default:
@@ -104,12 +104,12 @@ public class IncomingMessagePublisher
             .ConfigureAwait(false);
     }
 
-    private async Task SendInitializeRequestValidatedMeasurementsMessageProcessAsync(InitializeRequestValidatedMeasurementsProcessDto initializeRequestValidatedMeasurementsProcessDto, CancellationToken cancellationToken)
+    private async Task SendInitializeRequestValidatedMeasurementsMessageProcessAsync(InitializeRequestMeasurementsProcessDto initializeRequestMeasurementsProcessDto, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(initializeRequestValidatedMeasurementsProcessDto);
+        ArgumentNullException.ThrowIfNull(initializeRequestMeasurementsProcessDto);
 
         await _requestProcessOrchestrationStarter.StartRequestValidatedMeasurementsOrchestrationAsync(
-                initializeRequestValidatedMeasurementsProcessDto,
+                initializeRequestMeasurementsProcessDto,
                 cancellationToken)
             .ConfigureAwait(false);
     }

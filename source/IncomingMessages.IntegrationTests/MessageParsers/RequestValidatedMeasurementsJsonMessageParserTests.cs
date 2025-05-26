@@ -98,7 +98,7 @@ public sealed class RequestValidatedMeasurementsJsonMessageParserTests
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
-        var marketMessage = (RequestValidatedMeasurementsMessageBase)result.IncomingMessage!;
+        var marketMessage = (RequestMeasurementsMessageBase)result.IncomingMessage!;
         marketMessage.Should().NotBeNull();
         marketMessage.MessageId.Should().Be("111131835");
         marketMessage.MessageType.Should().Be("E73");

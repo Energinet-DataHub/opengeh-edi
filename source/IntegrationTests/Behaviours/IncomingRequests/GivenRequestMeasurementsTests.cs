@@ -23,10 +23,10 @@ using Period = NodaTime.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
-public class GivenRequestValidatedMeasurementsTests(
+public class GivenRequestMeasurementsTests(
     IntegrationTestFixture integrationTestFixture,
     ITestOutputHelper testOutputHelper)
-    : RequestValidatedMeasurementsBehaviourTestBase(integrationTestFixture, testOutputHelper)
+    : RequestMeasurementsBehaviourTestBase(integrationTestFixture, testOutputHelper)
 {
     public static TheoryData<DocumentFormat> SupportedDocumentFormats =>
     [
@@ -75,13 +75,12 @@ public class GivenRequestValidatedMeasurementsTests(
         var message = ThenRequestValidatedMeasurementsInputV1ServiceBusMessageIsCorrect(
             senderSpy,
             documentFormat,
-            new RequestValidatedMeasurementsInputV1AssertionInput(
+            new RequestMeasurementsInputV1AssertionInput(
                 RequestedForActor: senderActor,
                 BusinessReason: BusinessReason.PeriodicMetering,
                 TransactionId: transactionId,
                 MeteringPointId: meteringPointId,
-                StartDateTime: periodStart,
-                EndDateTime: periodEnd));
+                ReceivedAt: periodEnd));
 
         /*
          *  --- PART 2: Receive data from Process Manager and create RSM document ---
