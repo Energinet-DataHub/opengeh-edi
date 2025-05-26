@@ -37,6 +37,7 @@ public class DocumentFactoryTests
         {
             DocumentType.RequestAggregatedMeasureData,
             DocumentType.RequestWholesaleSettlement,
+            DocumentType.RequestMeasurements,
         };
         var documentTypes = EnumerationType.GetAll<DocumentType>()
             .Where(x => !notOutGoingMessagesDocumentTypes.Contains(x))

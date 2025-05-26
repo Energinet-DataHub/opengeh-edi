@@ -25,6 +25,8 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using FluentAssertions;
 using Moq;
+using NodaTime;
+using NodaTime.Text;
 using Xunit;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 
@@ -112,9 +114,15 @@ public class RequestProcessOrchestrationStarterTests
             null,
             Guid.NewGuid()));
 
+        var clockMock = new Mock<IClock>();
+        clockMock
+            .Setup(c => c.GetCurrentInstant())
+            .Returns(InstantPattern.General.Parse("2023-05-31T22:00:00Z").Value);
+
         var sut = new RequestProcessOrchestrationStarter(
             processManagerClientFactory.Object,
-            authenticatedActor);
+            authenticatedActor,
+            clockMock.Object);
 
         // Act
         await sut.StartRequestWholesaleServicesOrchestrationAsync(
@@ -223,10 +231,15 @@ public class RequestProcessOrchestrationStarterTests
                     It.IsAny<CancellationToken>()))
             .Callback((StartOrchestrationInstanceMessageCommand<RequestCalculatedEnergyTimeSeriesInputV1> command, CancellationToken _) => actualCommand = command);
 
-        var processManagerClientFactory = new Mock<IProcessManagerMessageClientFactory>();
-        processManagerClientFactory
+        var processManagerClientFactoryMock = new Mock<IProcessManagerMessageClientFactory>();
+        processManagerClientFactoryMock
             .Setup(c => c.CreateMessageClient(It.IsAny<string>()))
             .Returns(processManagerClient.Object);
+
+        var clockMock = new Mock<IClock>();
+        clockMock
+            .Setup(c => c.GetCurrentInstant())
+            .Returns(InstantPattern.General.Parse("2023-05-31T22:00:00Z").Value);
 
         // => Setup authenticated actor
         var expectedActor = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
@@ -239,8 +252,9 @@ public class RequestProcessOrchestrationStarterTests
             Guid.NewGuid()));
 
         var sut = new RequestProcessOrchestrationStarter(
-            processManagerClientFactory.Object,
-            authenticatedActor);
+            processManagerClientFactoryMock.Object,
+            authenticatedActor,
+            clockMock.Object);
 
         // Act
         await sut.StartRequestAggregatedMeasureDataOrchestrationAsync(

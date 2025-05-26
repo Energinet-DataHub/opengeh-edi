@@ -25,4 +25,8 @@ public interface IRequestProcessOrchestrationStarter
     Task StartRequestAggregatedMeasureDataOrchestrationAsync(
         InitializeAggregatedMeasureDataProcessDto initializeProcessDto,
         CancellationToken cancellationToken);
+
+    Task StartRequestMeasurementsOrchestrationAsync(
+        InitializeRequestMeasurementsProcessDto initializeProcessDto,
+        CancellationToken cancellationToken);
 }
