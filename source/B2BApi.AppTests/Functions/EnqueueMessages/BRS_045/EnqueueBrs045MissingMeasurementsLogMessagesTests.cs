@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
@@ -21,7 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.Shared;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
@@ -81,7 +80,6 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
         var expectedMarketDocumentType = "ReminderOfMissingMeasureData_MarketDocument";
         var gridAccessProviderActorNumber = ActorNumber.Create("1111111111111");
         var dateWithMeasurement = new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
-            IdempotencyKey: Guid.NewGuid(),
             GridAccessProvider: gridAccessProviderActorNumber.ToProcessManagerActorNumber(),
             GridArea: "123",
             Date: Instant.FromUtc(2025, 05, 01, 22, 00).ToDateTimeOffset(),
@@ -95,7 +93,6 @@ public class EnqueueBrs045MissingMeasurementsLogMessagesTests : IAsyncLifetime
                 dateWithMeasurement with
                 {
                     MeteringPointId = dateWithMeasurement.MeteringPointId + "2",
-                    IdempotencyKey = Guid.NewGuid(),
                 },
             ]);
 

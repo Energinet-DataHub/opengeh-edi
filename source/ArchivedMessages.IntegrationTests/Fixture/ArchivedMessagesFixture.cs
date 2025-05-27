@@ -14,6 +14,7 @@
 
 using Azure.Storage.Blobs;
 using Dapper;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
@@ -131,6 +132,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         ServiceCollection
             .AddScoped<IClock>(_ => new ClockStub())
             .AddScoped<AuthenticatedActor>()
+            .AddTokenCredentialProvider()
             .AddArchivedMessagesModule(configuration);
 
         return ServiceCollection.BuildServiceProvider();

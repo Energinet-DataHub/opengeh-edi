@@ -46,6 +46,9 @@ builder.Services
     // Health checks
     .AddHealthChecksForWebApp()
 
+    // Token credential
+    .AddTokenCredentialProvider()
+
     // System timer
     .AddNodaTimeForApplication()
 

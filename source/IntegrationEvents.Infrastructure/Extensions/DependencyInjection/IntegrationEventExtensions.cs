@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Storage.Blobs;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -56,7 +57,9 @@ public static class IntegrationEventExtensions
             ProcessDelegationConfigured.Descriptor,
         ]);
         // Dead-letter logging
-        services.AddDeadLetterHandlerForIsolatedWorker(configuration);
+        services.AddDeadLetterHandlerForIsolatedWorker(
+            configuration,
+            tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential);
         services
             .AddHealthChecks()
             .AddAzureBlobStorage(

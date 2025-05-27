@@ -16,6 +16,7 @@ using System.Text;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Dapper;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
@@ -251,6 +252,8 @@ public class TestBase : IDisposable
 
         _services = [];
         _services.AddScoped<IConfiguration>(_ => config);
+
+        _services.AddTokenCredentialProvider();
 
         _services
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
