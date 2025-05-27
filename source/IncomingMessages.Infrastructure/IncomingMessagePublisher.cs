@@ -60,6 +60,9 @@ public class IncomingMessagePublisher
             case MeteredDataForMeteringPointMessageBase meteredDataForMeteringPointMessage:
                 await SendInitializeMeteredDataForMeteringPointMessageProcessAsync(meteredDataForMeteringPointMessage, cancellationToken).ConfigureAwait(false);
                 break;
+            case RequestMeasurementsMessageBase requestMeasurementsMessageBase:
+                await SendInitializeRequestMeasurementsMessageProcessAsync(InitializeRequestMeasurementsProcessDtoFactory.Create(requestMeasurementsMessageBase), cancellationToken).ConfigureAwait(false);
+                break;
             default:
                 throw new InvalidOperationException($"Unknown message type {incomingMessage.GetType().Name}");
         }
@@ -97,6 +100,16 @@ public class IncomingMessagePublisher
 
         await _forwardMeteredDataOrchestrationStarter.StartForwardMeteredDataOrchestrationAsync(
                 meteredDataForMeteringPointMessageBase,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private async Task SendInitializeRequestMeasurementsMessageProcessAsync(InitializeRequestMeasurementsProcessDto initializeRequestMeasurementsProcessDto, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(initializeRequestMeasurementsProcessDto);
+
+        await _requestProcessOrchestrationStarter.StartRequestMeasurementsOrchestrationAsync(
+                initializeRequestMeasurementsProcessDto,
                 cancellationToken)
             .ConfigureAwait(false);
     }
