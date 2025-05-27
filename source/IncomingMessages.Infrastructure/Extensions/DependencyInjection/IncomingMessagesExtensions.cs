@@ -66,7 +66,9 @@ public static class IncomingMessagesExtensions
 
         services
             .AddFeatureFlags()
-            .AddServiceBusClientForApplication(configuration)
+            .AddServiceBusClientForApplication(
+                configuration,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
