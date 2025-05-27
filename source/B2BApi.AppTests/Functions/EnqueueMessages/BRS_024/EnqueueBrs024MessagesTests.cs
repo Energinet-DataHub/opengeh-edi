@@ -64,7 +64,8 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
-            new(FeatureFlagNames.PeekMeasurementMessages, true)
+            new(FeatureFlagNames.PeekMeasurementMessages, true),
+            new(FeatureFlagNames.PM28Enqueue, true)
         ]);
 
         // Arrange

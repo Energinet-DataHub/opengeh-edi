@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -19,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMet
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 using NodaTime.Extensions;
 using Polly;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
@@ -34,13 +36,15 @@ public class EnqueueHandler_Brs_024_V1(
     ILogger<EnqueueHandler_Brs_024_V1> logger,
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    IFeatureManager featureManager)
     : EnqueueActorMessagesValidatedHandlerBase<RequestMeasurementsAcceptedV1, RequestMeasurementsRejectedV1>(logger)
 {
     private readonly ILogger _logger = logger;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IFeatureManager _featureManager = featureManager;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
@@ -80,9 +84,13 @@ public class EnqueueHandler_Brs_024_V1(
                 Period: new Period(acceptedData.StartDateTime.ToInstant(), acceptedData.EndDateTime.ToInstant()),
                 Measurements: energyObservations));
 
-        await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
+        if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
+        {
+            await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None)
+                .ConfigureAwait(false);
 
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        }
 
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)

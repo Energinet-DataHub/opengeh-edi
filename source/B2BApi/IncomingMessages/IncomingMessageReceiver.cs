@@ -73,6 +73,19 @@ public class IncomingMessageReceiver
             return request.CreateResponse(HttpStatusCode.Forbidden);
         }
 
+        if (incomingDocumentTypeName != null &&
+            incomingDocumentTypeName.Equals(IncomingDocumentType.RequestMeasurements.Name, StringComparison.OrdinalIgnoreCase)
+            && !await _featureManager.ReceiveRequestMeasurementsMessagesAsync().ConfigureAwait(false))
+        {
+            /*
+             * The HTTP 403 Forbidden client error response status code indicates that the server understood the request
+             * but refused to process it. This status is similar to 401, except that for 403 Forbidden responses,
+             * authenticating or re-authenticating makes no difference. The request failure is tied to application logic,
+             * such as insufficient permissions to a resource or action.
+             */
+            return request.CreateResponse(HttpStatusCode.Forbidden);
+        }
+
         using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync(cancellationToken).ConfigureAwait(false);
         var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
         await AuditLogAsync(request, incomingDocumentTypeName, incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);

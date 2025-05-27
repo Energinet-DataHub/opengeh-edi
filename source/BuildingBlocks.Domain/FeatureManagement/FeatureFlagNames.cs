@@ -58,4 +58,14 @@ public static class FeatureFlagNames
     /// Whether to allow actors to peek measurements messages.
     /// </summary>
     public const string PeekMeasurementMessages = "PEEK-MEASUREMENT-MESSAGES";
+
+    /// <summary>
+    /// Whether to allow enqueuing messages for PM28 (Enqueue).
+    /// </summary>
+    public const string PM28Enqueue = "PM28-ENQUEUE";
+
+    /// <summary>
+    /// Whether to allow enqueuing messages for PM28 (Enqueue).
+    /// </summary>
+    public const string PM28ReceiveMessages = "PM28-RECEIVE-MESSAGES";
 }

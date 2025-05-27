@@ -56,4 +56,20 @@ public static class FeatureManagerExtensions
     {
         return featureManager.IsEnabledAsync(FeatureFlagNames.PeekMeasurementMessages);
     }
+
+    /// <summary>
+    /// Whether to disallow actors to peek request measurements response messages.
+    /// </summary>
+    public static Task<bool> EnqueueRequestMeasurementsResponseMessagesAsync(this IFeatureManager featureManager)
+    {
+        return featureManager.IsEnabledAsync(FeatureFlagNames.PM28Enqueue);
+    }
+
+    /// <summary>
+    /// Whether to disallow actors to peek request measurements response messages.
+    /// </summary>
+    public static Task<bool> ReceiveRequestMeasurementsMessagesAsync(this IFeatureManager featureManager)
+    {
+        return featureManager.IsEnabledAsync(FeatureFlagNames.PM28ReceiveMessages);
+    }
 }
