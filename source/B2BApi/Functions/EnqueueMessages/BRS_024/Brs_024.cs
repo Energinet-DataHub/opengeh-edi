@@ -16,10 +16,10 @@ using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationDescr
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 
-// TODO: Move to PM packages in Task #XXX
+// TODO: Move to PM packages in Task #790
 public static class Brs_024
 {
     public const string Name = "Brs_024";
 
-    public static OrchestrationDescriptionUniqueNameDto V1 { get; } = new OrchestrationDescriptionUniqueNameDto(nameof(Brs_024), 1);
+    public static OrchestrationDescriptionUniqueNameDto V1 { get; } = new(nameof(Brs_024), 1);
 }

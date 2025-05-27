@@ -19,7 +19,7 @@ using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 
-// TODO: Move to PM packages in Task #XXX
+// TODO: Move to PM packages in Task #790
 public record RequestMeasurementsAcceptedV1(
     string OriginalActorMessageId,
     string MeteringPointId,

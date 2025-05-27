@@ -82,6 +82,8 @@ public class EnqueueHandler_Brs_024_V1(
 
         await _outgoingMessagesClient.EnqueueAsync(acceptedForwardMeteredDataMessageDto, CancellationToken.None).ConfigureAwait(false);
 
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)
             .WaitAndRetryAsync(

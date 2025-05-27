@@ -17,7 +17,7 @@ using Energinet.DataHub.ProcessManager.Components.Abstractions.EnqueueActorMessa
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 
-// TODO: Move to PM packages in Task #XXX
+// TODO: Move to PM packages in Task #790
 public record RequestMeasurementsRejectedV1(
     string OriginalActorMessageId,
     string OriginalTransactionId) : IEnqueueRejectedDataDto, IEnqueueDataDto;

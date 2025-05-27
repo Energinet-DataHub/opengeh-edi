@@ -34,8 +34,6 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_02
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
 {
-    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
-    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
     private readonly B2BApiAppFixture _fixture;
 
     public EnqueueBrs024MessagesTests(
@@ -101,7 +99,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
         var orchestrationInstanceId = Guid.NewGuid();
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = "Brs_024_RequestMeasurements", // Brs_024_RequestMeasurements.Name,
+            OrchestrationName = Brs_024.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
