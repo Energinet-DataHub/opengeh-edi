@@ -176,6 +176,9 @@
       <EmbeddedResource Include="Messages\json\RequestWholesaleSettlementWithWrongDateFormat.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestValidatedMeasurements.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Messages\xml\RequestWholesaleSettlementWithBadPeriod.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>

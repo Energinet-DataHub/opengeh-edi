@@ -52,7 +52,7 @@ public class RequestMeasurementsBehaviourTestBase(
             incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 incomingMessageStream,
                 documentFormat,
-                IncomingDocumentType.RequestMeasurements,
+                IncomingDocumentType.RequestValidatedMeasurements,
                 documentFormat,
                 CancellationToken.None);
 

@@ -74,7 +74,7 @@ public class IncomingMessageReceiver
         }
 
         if (incomingDocumentTypeName != null &&
-            incomingDocumentTypeName.Equals(IncomingDocumentType.RequestMeasurements.Name, StringComparison.OrdinalIgnoreCase)
+            incomingDocumentTypeName.Equals(IncomingDocumentType.RequestValidatedMeasurements.Name, StringComparison.OrdinalIgnoreCase)
             && !await _featureManager.ReceiveRequestMeasurementsMessagesInCimAsync().ConfigureAwait(false))
         {
             /*
