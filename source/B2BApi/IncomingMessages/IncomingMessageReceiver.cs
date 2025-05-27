@@ -75,7 +75,7 @@ public class IncomingMessageReceiver
 
         if (incomingDocumentTypeName != null &&
             incomingDocumentTypeName.Equals(IncomingDocumentType.RequestMeasurements.Name, StringComparison.OrdinalIgnoreCase)
-            && !await _featureManager.ReceiveRequestMeasurementsMessagesAsync().ConfigureAwait(false))
+            && !await _featureManager.ReceiveRequestMeasurementsMessagesInCimAsync().ConfigureAwait(false))
         {
             /*
              * The HTTP 403 Forbidden client error response status code indicates that the server understood the request

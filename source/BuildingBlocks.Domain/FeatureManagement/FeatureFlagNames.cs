@@ -65,7 +65,7 @@ public static class FeatureFlagNames
     public const string PM28Enqueue = "PM28-ENQUEUE";
 
     /// <summary>
-    /// Whether to allow enqueuing messages for PM28 (Enqueue).
+    /// Whether to allow receiving CIM request messages for PM28.
     /// </summary>
-    public const string PM28ReceiveMessages = "PM28-RECEIVE-MESSAGES";
+    public const string PM28ReceiveCIMMessages = "PM28-CIM";
 }
