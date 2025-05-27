@@ -62,7 +62,7 @@ public static class FeatureManagerExtensions
     /// </summary>
     public static Task<bool> EnqueueRequestMeasurementsResponseMessagesAsync(this IFeatureManager featureManager)
     {
-        return featureManager.IsEnabledAsync(FeatureFlagNames.PM28Enqueue);
+        return featureManager.IsEnabledAsync(FeatureFlagNames.UsePM28Enqueue);
     }
 
     /// <summary>
