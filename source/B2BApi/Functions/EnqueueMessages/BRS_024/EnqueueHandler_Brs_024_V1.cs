@@ -70,7 +70,6 @@ public class EnqueueHandler_Brs_024_V1(
             receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
             businessReason: BusinessReason.PeriodicMetering,
             relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-            // TODO GridAreaCode???
             gridAreaCode: acceptedData.GridAreaCode,
             series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
