@@ -38,7 +38,7 @@ public class EnqueueBrs021ForwardMeteredDataFactory
         string originalActorMessageId,
         Guid eventId)
     {
-        var resolution = BuildingBlocks.Domain.Models.Resolution.QuarterHourly;
+        var resolution = Resolution.QuarterHourly;
         var resolutionDuration = resolution.ToDuration();
 
         var meteredData = new List<ReceiversWithMeteredDataV1.AcceptedMeteredData>();

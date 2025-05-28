@@ -56,4 +56,20 @@ public static class FeatureManagerExtensions
     {
         return featureManager.IsEnabledAsync(FeatureFlagNames.PeekMeasurementMessages);
     }
+
+    /// <summary>
+    /// Whether to disable enqueuement of request measurements messages.
+    /// </summary>
+    public static Task<bool> EnqueueRequestMeasurementsResponseMessagesAsync(this IFeatureManager featureManager)
+    {
+        return featureManager.IsEnabledAsync(FeatureFlagNames.UsePM28Enqueue);
+    }
+
+    /// <summary>
+    /// Whether to disallow actors to request measurements messages in CIM.
+    /// </summary>
+    public static Task<bool> ReceiveRequestMeasurementsMessagesInCimAsync(this IFeatureManager featureManager)
+    {
+        return featureManager.IsEnabledAsync(FeatureFlagNames.PM28ReceiveCIMMessages);
+    }
 }

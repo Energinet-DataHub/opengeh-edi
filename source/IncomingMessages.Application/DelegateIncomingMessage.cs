@@ -161,7 +161,7 @@ public class DelegateIncomingMessage
             { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeteringPoint },
-            { IncomingDocumentType.RequestMeasurements, ProcessType.RequestMeasurements },
+            { IncomingDocumentType.RequestValidatedMeasurements, ProcessType.RequestMeasurements },
         };
 
         if (documentTypeToProcessTypeMap.TryGetValue(incomingDocumentType, out var processType))
