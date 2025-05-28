@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.Shared.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.Shared;
 using NodaTime;
 using NodaTime.Text;
 using MeasurementUnit = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.MeasurementUnit;
@@ -105,7 +106,6 @@ internal class EnqueueActorMessagesHttpDsl
             Data:
             [
                 new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
-                    IdempotencyKey: Guid.NewGuid(),
                     GridAccessProvider: receiver.ActorNumber.ToProcessManagerActorNumber(),
                     GridArea: "001",
                     Date: _rsm018Date.ToDateTimeOffset(),

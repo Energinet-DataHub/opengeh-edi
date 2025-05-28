@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Identity;
 using DurableFunctionsMonitor.DotNetIsolated;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
@@ -48,7 +47,6 @@ public static class HostFactory
     {
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
-        var defaultAzureCredential = new DefaultAzureCredential();
         return new HostBuilder()
             .ConfigureServices((context, services) =>
             {
@@ -58,6 +56,9 @@ public static class HostFactory
 
                     // Health checks
                     .AddHealthChecksForIsolatedWorker()
+
+                    // Token credential
+                    .AddTokenCredentialProvider()
 
                     // Azure App Configuration
                     .AddAzureAppConfiguration()
@@ -97,7 +98,7 @@ public static class HostFactory
                     .AddOutboxRetention()
 
                     // Enqueue messages from PM (using Edi Topic)
-                    .AddEnqueueActorMessagesFromProcessManager(defaultAzureCredential)
+                    .AddEnqueueActorMessagesFromProcessManager()
 
                         // Configure Kestrel options
                         .Configure<KestrelServerOptions>(options =>
@@ -132,7 +133,7 @@ public static class HostFactory
             {
                 // Feature management
                 //  * Configure load/refresh from Azure App Configuration
-                configBuilder.AddAzureAppConfigurationForIsolatedWorker(defaultAzureCredential);
+                configBuilder.AddAzureAppConfigurationForIsolatedWorker();
             })
             .ConfigureLogging((hostingContext, logging) =>
             {
