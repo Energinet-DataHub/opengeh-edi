@@ -13,12 +13,15 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using FluentAssertions;
@@ -109,6 +112,39 @@ public class RequestMeasurementsBehaviourTestBase(
         return messages;
     }
 
+    protected async Task GivenRequestMeasurementsAcceptedIsReceived(ServiceBusMessage acceptedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(acceptedMessage);
+    }
+
+    protected async Task ThenNotifyValidatedMeasureDataDocumentIsCorrect(
+        Stream? peekResultDocumentStream,
+        DocumentFormat documentFormat,
+        NotifyValidatedMeasureDataDocumentAssertionInput assertionInput)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
+        using var assertionScope = new AssertionScope();
+
+        await NotifyValidatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
+    }
+
+    protected NotifyOrchestrationInstanceV1 AssertCorrectProcessManagerNotification(
+        ServiceBusMessage serviceBusMessage,
+        NotifyOrchestrationInstanceEventV1AssertionInput assertionInput)
+    {
+        var message = NotifyOrchestrationInstanceV1.Parser.ParseJson(serviceBusMessage.Body.ToString());
+
+        message.OrchestrationInstanceId.Should().BeEquivalentTo(assertionInput.InstanceId.ToString());
+        message.EventName.Should().BeEquivalentTo(assertionInput.EventName);
+
+        return message;
+    }
+
     private static Action<RequestYearlyMeasurementsInputV1> GetAssertServiceBusMessage(
         RequestMeasurementsInputV1AssertionInput input)
     {
@@ -121,5 +157,16 @@ public class RequestMeasurementsBehaviourTestBase(
             message.MeteringPointId.Should().Be(input.MeteringPointId.Value);
             message.ReceivedAt.Should().Be(input.ReceivedAt.ToString());
         };
+    }
+
+    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage message)
+    {
+        var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
+            messageId: Guid.NewGuid().ToString(),
+            subject: message.Subject,
+            body: message.Body,
+            properties: message.ApplicationProperties);
+        var enqueueHandler = GetService<EnqueueHandler_Brs_024_V1>();
+        await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
     }
 }
