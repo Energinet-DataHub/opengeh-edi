@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Globalization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -105,7 +106,7 @@ public class GivenRequestMeasurementsTests(
         var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
         var endDate = Instant.FromUtc(2024, 11, 29, 9, 15);
 
-        var expectedEnergyObservations = new List<(int Position, string QualityName, decimal Quantity)>
+        var expectedEnergyObservations = new List<(int Position, string QualityCode, decimal Quantity)>
         {
             (1, "A04", 1), (2, "A04", 2), (3, "A04", 3), (4, "A04", 4), (5, "A04", 5), (6, "A04", 6), (7, "A04", 7),
             (8, "A04", 8), (9, "A04", 9), (10, "A04", 10), (11, "A04", 11), (12, "A04", 12), (13, "A04", 13),
@@ -151,46 +152,35 @@ public class GivenRequestMeasurementsTests(
                 .Subject;
         }
 
-        await ThenNotifyValidatedMeasureDataDocumentIsCorrect(
-                peekResultDocumentStream: peekResult.Bundle,
-                documentFormat: documentFormat,
-                assertionInput: new NotifyValidatedMeasureDataDocumentAssertionInput(
-                    RequiredHeaderDocumentFields: new RequiredHeaderDocumentFields(
-                        BusinessReasonCode: "E23",
-                        ReceiverId: receiverActor.ActorNumber.Value,
-                        ReceiverScheme: "A10",
-                        SenderId: "5790001330552",
-                        SenderScheme: "A10",
-                        SenderRole: "DGL",
-                        ReceiverRole: "DDQ",
-                        Timestamp: InstantPattern.General.Format(whenBundleShouldBeClosed)),
-                    OptionalHeaderDocumentFields: new OptionalHeaderDocumentFields(
-                        BusinessSectorType: "23",
-                        AssertSeriesDocumentFieldsInput: [
-                            new AssertSeriesDocumentFieldsInput(
-                                1,
-                                RequiredSeriesFields: new RequiredSeriesFields(
-                                    MeteringPointNumber: meteringPointId.Value,
-                                    MeteringPointScheme: "A10",
-                                    MeteringPointType: MeteringPointType.FromCode("E17"),
-                                    QuantityMeasureUnit: "KWH",
-                                    RequiredPeriodDocumentFields: new RequiredPeriodDocumentFields(
-                                        Resolution: Resolution.QuarterHourly.Code,
-                                        StartedDateTime: startDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture),
-                                        EndedDateTime: endDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture),
-                                        Points: expectedEnergyObservations
-                                            .Select(eo => new AssertPointDocumentFieldsInput(
-                                                new RequiredPointDocumentFields(eo.Position),
-                                                new OptionalPointDocumentFields(
-                                                    Quantity: eo.Quantity,
-                                                    Quality: Quality.FromCode(eo.QualityName!))))
-                                            .ToList())),
-                                OptionalSeriesFields: new OptionalSeriesFields(
-                                    OriginalTransactionIdReferenceId: transactionId.Value,
-                                    RegistrationDateTime: endDate.ToString(),
-                                    InDomain: null,
-                                    OutDomain: null,
-                                    Product: "8716867000030")),
-                        ])));
+        await AssertMeasurementsDocumentProvider.AssertDocument(peekResult.Bundle, documentFormat)
+            .MessageIdExists()
+            .HasBusinessReason(BusinessReason.PeriodicMetering.Code)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value, "A10")
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasReceiverId(receiverActor.ActorNumber.Value, "A10")
+            .HasReceiverRole(receiverActor.ActorRole.Code)
+            .HasTimestamp(InstantPattern.General.Format(whenBundleShouldBeClosed))
+            .TransactionIdExists(1)
+            .HasMeteringPointNumber(1, meteringPointId.Value, "A10")
+            .HasMeteringPointType(1, MeteringPointType.Consumption)
+            .HasOriginalTransactionIdReferenceId(1, transactionId.Value)
+            .HasProduct(1, "8716867000030")
+            .HasQuantityMeasureUnit(1, MeasurementUnit.KilowattHour.Code)
+            .HasRegistrationDateTime(1, endDate.ToString())
+            .HasResolution(1, Resolution.QuarterHourly.Code)
+            .HasStartedDateTime(
+                1,
+                startDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasEndedDateTime(
+                1,
+                endDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasPoints(
+                1,
+                expectedEnergyObservations.Select(
+                        p => new AssertPointDocumentFieldsInput(
+                            new RequiredPointDocumentFields(p.Position),
+                            new OptionalPointDocumentFields(Quality.FromCode(p.QualityCode), p.Quantity)))
+                    .ToList())
+            .DocumentIsValidAsync();
     }
 }
