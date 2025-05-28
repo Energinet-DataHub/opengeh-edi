@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,10 @@ public static class BuildingBlockExtensions
 {
     public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddServiceBusClientForApplication(configuration)
+        services
+            .AddServiceBusClientForApplication(
+                configuration,
+                tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential)
             .AddFileStorage(configuration)
             .AddFeatureFlags();
         return services;
