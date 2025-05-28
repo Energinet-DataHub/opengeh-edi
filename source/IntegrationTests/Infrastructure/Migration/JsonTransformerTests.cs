@@ -230,7 +230,14 @@ public class JsonTransformerTests
                 header.Creation.ToInstant(),
                 Resolution.FromCode(timeSeries.TimeSeriesPeriod.ResolutionDuration),
                 new Period(timeSeries.TimeSeriesPeriod.Start.ToInstant(), timeSeries.TimeSeriesPeriod.End.ToInstant()),
-                timeSeries.Observation.Select(x => new PointActivityRecord(x.Position, Quality.Measured /*Quality.FromCode(x.QuantityQuality)*/, x.EnergyQuantity)).ToList()))
+                timeSeries.Observation.Select(x =>
+                {
+                    var tryGetNameFromEbixCode = Quality.TryGetNameFromEbixCode(x.QuantityQuality, x.QuantityQuality);
+                    return new PointActivityRecord(
+                        x.Position,
+                        Quality.FromName(tryGetNameFromEbixCode!),
+                        x.EnergyQuantity);
+                }).ToList()))
             .ToList();
 
         // Create the outgoing message header using the deserialized header data
@@ -277,7 +284,7 @@ public class JsonTransformerTests
                                                 new RequiredPointDocumentFields(eo.Position),
                                                 new OptionalPointDocumentFields(
                                                     Quantity: eo.EnergyQuantity,
-                                                    Quality: eo.QuantityQuality != null ? Quality.Measured : null))) //TODO: E01 is not a valid Quality code
+                                                    Quality: eo.QuantityQuality != null ? Quality.Measured : null)))
                                             .ToList())),
                                 OptionalSeriesFields: new OptionalSeriesFields(
                                     OriginalTransactionIdReferenceId: null,
