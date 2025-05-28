@@ -28,6 +28,8 @@ public class JsonTransformer : IJsonTransformer
         var timeSeries = sourceObject
             .GetProperty(Dh2TimeSeriesSyncConstants.MeteredDataTimeSeriesDh3)
             .GetProperty(Dh2TimeSeriesSyncConstants.TimeSeries);
+        var timeSeries2 = sourceObject
+            .GetProperty("MeteredDataTimeSeriesDH3");
 
         if (timeSeries.ValueKind == JsonValueKind.Null)
         {
@@ -49,7 +51,7 @@ public class JsonTransformer : IJsonTransformer
         var masterData = new JsonArray();
         var masterDataItem = new JsonObject
         {
-            { Dh3TimeSeriesSyncConstant.GridArea, "000" },
+            { Dh3TimeSeriesSyncConstant.GridArea, "000" }, // TODO: LRN, is this enriched from somewhere else?
             { Dh3TimeSeriesSyncConstant.TypeOfMp, timeSeries.GetProperty(Dh2TimeSeriesSyncConstants.TypeOfMp).ToString() },
             { Dh3TimeSeriesSyncConstant.MasterDataStartDate, DateTime.UnixEpoch.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture) },
             { Dh3TimeSeriesSyncConstant.MasterDataEndDate, null },
@@ -117,7 +119,7 @@ public class JsonTransformer : IJsonTransformer
         var quantityMissingIndicator = GetQuantityMissingIndicator(observation);
         observation.TryGetProperty(Dh2TimeSeriesSyncConstants.QuantityQuality, out var quality);
         return quantityMissingIndicator || quality.ValueKind.Equals(JsonValueKind.Null)
-            ? "QM"
+            ? "QM" // TODO: LRN what QQ is this? Proberly QualityMissing?
             : observation.GetProperty(Dh2TimeSeriesSyncConstants.QuantityQuality).ToString();
     }
 
@@ -126,7 +128,7 @@ public class JsonTransformer : IJsonTransformer
         var quantityMissingIndicator = GetQuantityMissingIndicator(observation);
         var isQuantityPresent = observation.TryGetProperty(Dh2TimeSeriesSyncConstants.EnergyQuantity, out var quantity);
         return quantityMissingIndicator && !isQuantityPresent
-            ? 0
+            ? 0 // TODO: LRN is nullable not supported?
             : Convert.ToDouble(quantity.ToString(), CultureInfo.InvariantCulture);
     }
 
