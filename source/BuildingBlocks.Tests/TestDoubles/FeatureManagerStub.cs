@@ -30,6 +30,7 @@ public class FeatureManagerStub : IFeatureManager
         { FeatureFlagNames.PM25CIM, true },
         { FeatureFlagNames.PM25Ebix, true },
         { FeatureFlagNames.PeekMeasurementMessages, true },
+        { FeatureFlagNames.UsePM28Enqueue, true },
     };
 
     public void SetFeatureFlag(string featureFlagName, bool value)
