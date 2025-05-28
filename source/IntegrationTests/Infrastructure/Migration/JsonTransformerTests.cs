@@ -200,6 +200,7 @@ public class JsonTransformerTests
     [Fact]
     public async Task Transform_ValidJson_ReturnsTransformedJson()
     {
+        // Arrange
         var serializer = new Serializer();
         var writer = new MeteredDataForMeteringPointEbixDocumentWriter(new MessageRecordParser(serializer));
 
@@ -208,14 +209,17 @@ public class JsonTransformerTests
             PropertyNameCaseInsensitive = true,
         };
 
+        // Deserialize the JSON into the Root object for processing
         var root = JsonSerializer.Deserialize<Root>(TestJson, options);
 
         if (root == null)
             throw new Exception("Root is null.");
 
+        // Extract the header and time series data
         var header = root.MeteredDataTimeSeriesDH3.Header;
         var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
 
+        // Transform the time series data into MeteredDataForMeteringPointMarketActivityRecord objects which are used for writing the document
         var meteredDataForMeteringPointMarketActivityRecords = series.Select(timeSeries => new MeteredDataForMeteringPointMarketActivityRecord(
                 TransactionId.From(timeSeries.OriginalTimeSeriesId),
                 timeSeries.AggregationCriteria.MeteringPointId,
@@ -229,6 +233,7 @@ public class JsonTransformerTests
                 timeSeries.Observation.Select(x => new PointActivityRecord(x.Position, Quality.Measured /*Quality.FromCode(x.QuantityQuality)*/, x.EnergyQuantity)).ToList()))
             .ToList();
 
+        // Create the outgoing message header using the deserialized header data
         var outgoingMessageHeader = new OutgoingMessageHeader(
             BusinessReason.FromCode(header.EnergyBusinessProcess).Name,
             header.SenderIdentification.Content,
@@ -239,8 +244,10 @@ public class JsonTransformerTests
             null,
             header.Creation.ToInstant());
 
+        // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
         var stream = await writer.WriteAsync(outgoingMessageHeader, meteredDataForMeteringPointMarketActivityRecords.Select(serializer.Serialize).ToList(), CancellationToken.None);
 
+        // Assert the correctness of the written document
         await NotifyValidatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(DocumentFormat.Ebix, stream.Stream, new NotifyValidatedMeasureDataDocumentAssertionInput(
                     RequiredHeaderDocumentFields: new RequiredHeaderDocumentFields(
                         BusinessReasonCode: "D42",
