@@ -25,13 +25,9 @@ using Xunit;
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.DapperAndEf;
 
 [Collection("IntegrationTest")]
-public class DapperAndEfTests(IntegrationTestFixture fixture) : IAsyncLifetime
+public class DapperAndEfTests(IntegrationTestFixture fixture)
 {
     private readonly IntegrationTestFixture _fixture = fixture;
-
-    public Task InitializeAsync() => _fixture.InitializeAsync();
-
-    public Task DisposeAsync() => _fixture.DisposeAsync();
 
     [Fact]
     public async Task Ef_SaveChangesAsync_will_commit_immediately_without_transaction()
