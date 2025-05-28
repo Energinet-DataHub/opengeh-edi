@@ -36,28 +36,27 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_026;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueBrs026MessagesTests : IAsyncLifetime
+public class EnqueueBrs026MessagesTests : EnqueueMessagesTestBase
 {
-    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
-    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
     private readonly B2BApiAppFixture _fixture;
 
     public EnqueueBrs026MessagesTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
+        : base(fixture, testOutputHelper)
     {
         _fixture = fixture;
         _fixture.SetTestOutputHelper(testOutputHelper);
     }
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
         _fixture.AppHostManager.ClearHostLog();
         _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         await Task.CompletedTask;
     }
 
-    public async Task DisposeAsync()
+    public override async Task DisposeAsync()
     {
         _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         _fixture.SetTestOutputHelper(null!);
@@ -107,7 +106,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
                     om.Receiver.ActorRole.Name.Should().Be(enqueueData.RequestedByActorRole.Name);
                 });
 
-        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
+        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
             orchestrationInstanceId,
             RequestCalculatedEnergyTimeSeriesNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
@@ -121,7 +120,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         var requestedForActorNumber = ActorNumber.Create("1111111111111");
         var requestedForActorRole = ActorRole.EnergySupplier;
         var businessReason = BusinessReason.BalanceFixing;
-        var orchestrationInstanceId = Guid.NewGuid().ToString();
+        var orchestrationInstanceId = Guid.NewGuid();
         var originalActorMessageId = Guid.NewGuid().ToString();
         var enqueueMessagesData = new RequestCalculatedEnergyTimeSeriesRejectedV1(
             OriginalActorMessageId: originalActorMessageId,
@@ -148,7 +147,7 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
                 ActorNumber = enqueueMessagesData.RequestedByActorNumber.Value,
                 ActorRole = enqueueMessagesData.RequestedByActorRole.ToActorRoleV1(),
             },
-            OrchestrationInstanceId = orchestrationInstanceId,
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
         enqueueActorMessages.SetData(enqueueMessagesData);
 
@@ -180,26 +179,10 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
         actualOutgoingMessage.Receiver.ActorRole.Name.Should().Be(requestedForActorRole.Name);
 
         // => Verify that the expected message was sent on the ServiceBus
-        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
-            .When(msg =>
-            {
-                if (msg.Subject != NotifyOrchestrationInstanceSubject)
-                {
-                    return false;
-                }
-
-                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
-                    msg.Body.ToString());
-
-                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
-                var matchingEvent = parsedNotification.EventName == RequestCalculatedEnergyTimeSeriesNotifyEventV1.OrchestrationInstanceEventName;
-
-                return matchingOrchestrationId && matchingEvent;
-            })
-            .VerifyCountAsync(1);
-
-        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
+        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
+            orchestrationInstanceId,
+            RequestCalculatedEnergyTimeSeriesNotifyEventV1.OrchestrationInstanceEventName);
+        notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
     }
 
     private (RequestCalculatedEnergyTimeSeriesAcceptedV1 EnqueueData, ServiceBusMessage ServiceBusMessage)
@@ -246,29 +229,5 @@ public class EnqueueBrs026MessagesTests : IAsyncLifetime
             idempotencyKey: eventId.Value);
 
         return (enqueueMessagesData, serviceBusMessage);
-    }
-
-    private async Task<bool> ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
-        Guid orchestrationInstanceId,
-        string eventName)
-    {
-        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
-            .When(msg =>
-            {
-                if (msg.Subject != NotifyOrchestrationInstanceSubject)
-                    return false;
-
-                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
-                    msg.Body.ToString());
-
-                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId.ToString();
-                var matchingEvent = parsedNotification.EventName == eventName;
-
-                return matchingOrchestrationId && matchingEvent;
-            })
-            .VerifyCountAsync(1);
-
-        var wasSent = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-        return wasSent;
     }
 }

@@ -18,7 +18,6 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
-using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
@@ -43,22 +42,20 @@ using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.Va
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.BRS_021;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
+public class EnqueueBrs021ForwardMeteredDataMessagesTests : EnqueueMessagesTestBase
 {
-    // This string must match the subject defined in the "ProcessManagerMessageClient" from the process manager
-    private const string NotifyOrchestrationInstanceSubject = "NotifyOrchestration";
-
     private readonly B2BApiAppFixture _fixture;
 
     public EnqueueBrs021ForwardMeteredDataMessagesTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
+        : base(fixture, testOutputHelper)
     {
         _fixture = fixture;
         _fixture.SetTestOutputHelper(testOutputHelper);
     }
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
         _fixture.AppHostManager.ClearHostLog();
 
@@ -76,7 +73,7 @@ public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
         await Task.CompletedTask;
     }
 
-    public async Task DisposeAsync()
+    public override async Task DisposeAsync()
     {
         _fixture.SetTestOutputHelper(null!);
         await Task.CompletedTask;
@@ -160,7 +157,7 @@ public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
             ],
             "804");
 
-        var orchestrationInstanceId = Guid.NewGuid().ToString();
+        var orchestrationInstanceId = Guid.NewGuid();
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_021_ForwardedMeteredData.Name,
@@ -170,7 +167,7 @@ public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
                 ActorNumber = senderActorNumber,
                 ActorRole = senderActorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
-            OrchestrationInstanceId = orchestrationInstanceId,
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
         enqueueActorMessages.SetData(enqueueMessagesData);
 
@@ -233,7 +230,7 @@ public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
         }
 
         // => Verify that the expected notify message was sent on the ServiceBus
-        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
+        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
             orchestrationInstanceId,
             ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
@@ -264,7 +261,7 @@ public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
             ],
             MeteringPointId: "1234567890123");
 
-        var orchestrationInstanceId = Guid.NewGuid().ToString();
+        var orchestrationInstanceId = Guid.NewGuid();
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_021_ForwardedMeteredData.Name,
@@ -274,7 +271,7 @@ public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
                 ActorNumber = actorNumber,
                 ActorRole = actorRole.ToProcessManagerActorRole().ToActorRoleV1(),
             },
-            OrchestrationInstanceId = orchestrationInstanceId,
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
         enqueueActorMessages.SetData(enqueueMessagesData);
 
@@ -326,33 +323,9 @@ public class EnqueueBrs021ForwardMeteredDataMessagesTests : IAsyncLifetime
             .And.Contain("Acknowledgement");
 
         // Verify that the expected notify message was sent on the ServiceBus
-        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
+        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
             orchestrationInstanceId,
             ForwardMeteredDataNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
-    }
-
-    private async Task<bool> ThenNotifyOrchestrationInstanceWasSentOnServiceBus(
-        string orchestrationInstanceId,
-        string eventName)
-    {
-        var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
-            .When(msg =>
-            {
-                if (msg.Subject != NotifyOrchestrationInstanceSubject)
-                    return false;
-
-                var parsedNotification = NotifyOrchestrationInstanceV1.Parser.ParseJson(
-                    msg.Body.ToString());
-
-                var matchingOrchestrationId = parsedNotification.OrchestrationInstanceId == orchestrationInstanceId;
-                var matchingEvent = parsedNotification.EventName == eventName;
-
-                return matchingOrchestrationId && matchingEvent;
-            })
-            .VerifyCountAsync(1);
-
-        var wasSent = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-        return wasSent;
     }
 }

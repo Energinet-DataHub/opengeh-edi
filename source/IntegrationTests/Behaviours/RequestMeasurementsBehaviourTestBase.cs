@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -52,7 +53,7 @@ public class RequestMeasurementsBehaviourTestBase(
             incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 incomingMessageStream,
                 documentFormat,
-                IncomingDocumentType.RequestMeasurements,
+                IncomingDocumentType.RequestValidatedMeasurements,
                 documentFormat,
                 CancellationToken.None);
 

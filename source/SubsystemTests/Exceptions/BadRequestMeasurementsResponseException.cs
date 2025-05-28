@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
-using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
-using NodaTime;
+namespace Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+public class BadRequestMeasurementsResponseException : Exception
+{
+    public BadRequestMeasurementsResponseException(string message)
+        : base(message)
+    {
+    }
 
-//TODO: Move to ProcessManager package, issue #700
-public record RequestYearlyMeasurementsInputV1(
-    string ActorMessageId,
-    string TransactionId,
-    string ActorNumber,
-    string ActorRole,
-    string BusinessReason,
-    string ReceivedAt,
-    string? MeteringPointId) : IInputParameterDto, IBusinessValidatedDto;
+    public BadRequestMeasurementsResponseException()
+    {
+    }
+
+    public BadRequestMeasurementsResponseException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+}
