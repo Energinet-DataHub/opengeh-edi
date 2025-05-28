@@ -106,8 +106,7 @@ public class MeteringPointArchivedMessageRepository(
         await _fileStorageClient.UploadAsync(message.FileStorageReference, message.ArchivedMessageStream.Stream)
             .ConfigureAwait(false);
 
-        using var connection =
-            await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+        var connection = transaction.Connection!;
 
         var sql = @"INSERT INTO [dbo].[MeteringPointArchivedMessages]
                         ([Id],
