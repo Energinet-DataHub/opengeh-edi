@@ -58,7 +58,7 @@ public static class FeatureManagerExtensions
     }
 
     /// <summary>
-    /// Whether to disallow actors to peek request measurements response messages.
+    /// Whether to disable enqueuement of request measurements messages.
     /// </summary>
     public static Task<bool> EnqueueRequestMeasurementsResponseMessagesAsync(this IFeatureManager featureManager)
     {
@@ -66,7 +66,7 @@ public static class FeatureManagerExtensions
     }
 
     /// <summary>
-    /// Whether to disallow actors to request measurements response messages in CIM.
+    /// Whether to disallow actors to request measurements messages in CIM.
     /// </summary>
     public static Task<bool> ReceiveRequestMeasurementsMessagesInCimAsync(this IFeatureManager featureManager)
     {

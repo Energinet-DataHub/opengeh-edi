@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
-using Energinet.DataHub.ProcessManager.Components.Abstractions.EnqueueActorMessages;
+namespace Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
+public class BadRequestMeasurementsResponseException : Exception
+{
+    public BadRequestMeasurementsResponseException(string message)
+        : base(message)
+    {
+    }
 
-// TODO: Move to PM packages in Task #790
-public record RequestMeasurementsRejectedV1(
-    string OriginalActorMessageId,
-    string OriginalTransactionId) : IEnqueueRejectedDataDto, IEnqueueDataDto;
+    public BadRequestMeasurementsResponseException()
+    {
+    }
+
+    public BadRequestMeasurementsResponseException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+}

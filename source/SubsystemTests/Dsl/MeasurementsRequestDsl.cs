@@ -23,7 +23,7 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Dsl shouldn't contain technical terms")]
-internal sealed class RequestMeasurementsDsl(
+internal sealed class MeasurementsRequestDsl(
     EbixDriver ebix,
     EdiDriver ediDriver,
     EdiDatabaseDriver ediDatabaseDriver,
@@ -36,11 +36,6 @@ internal sealed class RequestMeasurementsDsl(
     private readonly EdiDatabaseDriver _ediDatabaseDriver = ediDatabaseDriver;
     private readonly ProcessManagerDriver _processManagerDriver = processManagerDriver;
 
-    public async Task<string> SendForwardMeteredDataInEbixAsync(CancellationToken cancellationToken)
-    {
-        return await _ebix.SendForwardMeteredDataAsync(cancellationToken);
-    }
-
     public async Task ConfirmRequestIsReceivedAsync(string messageId, CancellationToken cancellationToken)
     {
         var messageIdFromRegistry = await _ediDatabaseDriver
@@ -49,42 +44,9 @@ internal sealed class RequestMeasurementsDsl(
         messageIdFromRegistry.Should().NotBeNull("because the forward metering data process should be initialized");
     }
 
-    public async Task<string> SendForwardMeteredDataInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
-    {
-        return await _ebix
-            .SendForwardMeteredDataWithAlreadyUsedMessageIdAsync(cancellationToken);
-    }
-
-    public void ConfirmResponseContainsValidationError(string response, string errorMessage, CancellationToken none)
-    {
-        response.Should().BeEquivalentTo(errorMessage);
-    }
-
-    public async Task<string> SendForwardMeteredDataInCimAsync(
-        MeteringPointId? meteringPointId,
-        DocumentFormat documentFormat,
-        CancellationToken cancellationToken)
-    {
-        return await _ediDriver.SendForwardMeteredDataAsync(
-            meteringPointId ?? MeteringPointId.From("571313000000002000"),
-            documentFormat,
-            cancellationToken);
-    }
-
     public async Task<string> SendRequestMeasurementsInCimAsync()
     {
         return await _ediDriver.SendRequestMeasurementsAsync(documentFormat: DocumentFormat.Json);
-    }
-
-    public async Task PublishEnqueueBrs021ForwardMeteredData(Actor actor)
-    {
-        await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
-        await _processManagerDriver.PublishEnqueueBrs021AcceptedForwardMeteredDataAsync(
-            actor: actor,
-            start: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
-            end: Instant.FromUtc(2025, 01, 31, 23, 00, 00),
-            originalActorMessageId: Guid.NewGuid().ToTestMessageUuid(),
-            eventId: Guid.NewGuid());
     }
 
     public async Task PublishEnqueueBrs024AcceptedMeasurements(Actor actor)
@@ -95,6 +57,7 @@ internal sealed class RequestMeasurementsDsl(
             start: Instant.FromUtc(2024, 12, 31, 23, 00, 00),
             end: Instant.FromUtc(2025, 01, 31, 23, 00, 00),
             originalActorMessageId: Guid.NewGuid().ToTestMessageUuid(),
+            originalActorTransactionId: Guid.NewGuid().ToTestMessageUuid(),
             eventId: Guid.NewGuid());
     }
 
@@ -110,35 +73,6 @@ internal sealed class RequestMeasurementsDsl(
         messageId.Should().NotBeNull();
         contentString.Should().NotBeNull();
         contentString.Should().Contain("NotifyValidatedMeasureData_MarketDocument");
-
-        return messageId!;
-    }
-
-    public async Task PublishEnqueueBrs021ForwardMeteredDataRejected(Actor actor, MeteringPointId? meteringPointId = null)
-    {
-        await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
-        await _processManagerDriver.PublishBrs021ForwardMeteredDataRejectedAsync(
-            actor: actor,
-            originalActorMessageId: Guid.NewGuid().ToTestMessageUuid(),
-            eventId: Guid.NewGuid(),
-            validationError: SubsystemTestValidationError,
-            meteringPointId: meteringPointId);
-    }
-
-    public async Task<string> ConfirmRejectedResponseIsAvailable()
-    {
-        var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
-        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
-            messageCategory: MessageCategory.MeasureData,
-            timeout: timeout);
-        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
-        var contentString = await peekResponse.Content.ReadAsStringAsync();
-
-        messageId.Should().NotBeNull();
-        contentString.Should().NotBeNull();
-        contentString.Should()
-            .Contain("Acknowledgement_MarketDocument")
-            .And.Contain(SubsystemTestValidationError);
 
         return messageId!;
     }

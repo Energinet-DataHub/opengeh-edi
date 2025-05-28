@@ -30,12 +30,12 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public class WhenRequestMeasurementsIsReceivedTests : BaseTestClass
 {
-    private readonly RequestMeasurementsDsl _forwardMeteredDataAsEnergySupplier;
+    private readonly MeasurementsRequestDsl _measurementsRequestAsEnergySupplier;
 
     public WhenRequestMeasurementsIsReceivedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
     {
-        _forwardMeteredDataAsEnergySupplier = new RequestMeasurementsDsl(
+        _measurementsRequestAsEnergySupplier = new MeasurementsRequestDsl(
             new EbixDriver(
                 fixture.EbixUri,
                 fixture.EbixEnergySupplierCredentials,
@@ -52,22 +52,22 @@ public class WhenRequestMeasurementsIsReceivedTests : BaseTestClass
     [Order(100)] // Default is 0, hence we assign this a higher number => it will run last, and therefor not interfere with the other tests
     public async Task Actor_sends_request_measurements_in_cim_json_to_datahub()
     {
-        var messageId = await _forwardMeteredDataAsEnergySupplier
+        var messageId = await _measurementsRequestAsEnergySupplier
             .SendRequestMeasurementsInCimAsync();
 
-        await _forwardMeteredDataAsEnergySupplier.ConfirmRequestIsReceivedAsync(
+        await _measurementsRequestAsEnergySupplier.ConfirmRequestIsReceivedAsync(
             messageId,
             CancellationToken.None);
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_forward_metered_data_response()
+    public async Task Actor_can_peek_and_dequeue_requested_measurements_response()
     {
-        await _forwardMeteredDataAsEnergySupplier.PublishEnqueueBrs024AcceptedMeasurements(
+        await _measurementsRequestAsEnergySupplier.PublishEnqueueBrs024AcceptedMeasurements(
             new Actor(
                 actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
                 actorRole: ActorRole.EnergySupplier));
 
-        await _forwardMeteredDataAsEnergySupplier.ConfirmResponseIsAvailable();
+        await _measurementsRequestAsEnergySupplier.ConfirmResponseIsAvailable();
     }
 }

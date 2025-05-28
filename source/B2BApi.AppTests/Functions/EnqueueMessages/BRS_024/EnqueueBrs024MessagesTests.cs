@@ -20,6 +20,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -82,8 +84,9 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
         var eventId = EventId.From(Guid.NewGuid());
 
         var resolution = PMValueTypes.Resolution.QuarterHourly;
-        var enqueueMessagesData = new RequestMeasurementsAcceptedV1(
+        var enqueueMessagesData = new RequestYearlyMeasurementsAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
@@ -143,7 +146,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
 
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
             orchestrationInstanceId,
-            RequestMeasurementsNotifyEventV1.OrchestrationInstanceEventName);
+            RequestYearlyMeasurementsNotifyEventV1.OrchestrationInstanceEventName);
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
     }
 

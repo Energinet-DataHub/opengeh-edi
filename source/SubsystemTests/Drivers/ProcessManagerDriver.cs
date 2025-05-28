@@ -94,6 +94,7 @@ internal class ProcessManagerDriver(
         Instant start,
         Instant end,
         string originalActorMessageId,
+        string originalActorTransactionId,
         Guid eventId)
     {
         var serviceBusMessage = EnqueueBrs024AcceptedMeasurementsFactory.CreateAcceptedV1(
@@ -101,6 +102,7 @@ internal class ProcessManagerDriver(
             start,
             end,
             originalActorMessageId,
+            originalActorTransactionId,
             eventId);
 
         await _client.SendAsync(serviceBusMessage, CancellationToken.None);

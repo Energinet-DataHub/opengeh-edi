@@ -204,11 +204,11 @@ internal sealed class EdiDriver
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
         _logger.WriteLine("Sending RequestMeasurements HTTP request with messageId: {0}", requestContent.MessageId);
-        var meteredDataForMeteringPointResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
-        if (meteredDataForMeteringPointResponse.StatusCode == HttpStatusCode.BadRequest)
+        var response = await b2bClient.SendAsync(request).ConfigureAwait(false);
+        if (response.StatusCode == HttpStatusCode.BadRequest)
         {
-            var responseContent = await meteredDataForMeteringPointResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new BadMeteredDataForMeteringPointException($"responseContent: {responseContent}");
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new BadRequestMeasurementsResponseException($"responseContent: {responseContent}");
         }
 
         return requestContent.MessageId;

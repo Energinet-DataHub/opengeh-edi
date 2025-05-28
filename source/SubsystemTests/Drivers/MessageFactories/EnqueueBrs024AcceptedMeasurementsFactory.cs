@@ -16,6 +16,8 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
@@ -29,12 +31,14 @@ public class EnqueueBrs024AcceptedMeasurementsFactory
         Instant start,
         Instant end,
         string originalActorMessageId,
+        string originalActorTransactionId,
         Guid eventId)
     {
         var resolution = PMValueTypes.Resolution.QuarterHourly;
-        var accepted = new RequestMeasurementsAcceptedV1(
+        var accepted = new RequestYearlyMeasurementsAcceptedV1(
             OriginalActorMessageId: originalActorMessageId,
-            MeteringPointId: "1234567890123",
+            OriginalTransactionId: originalActorTransactionId,
+            MeteringPointId: "123456789012345678",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
             RegistrationDateTime: end.ToDateTimeOffset(),
