@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.Common;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Domain;
@@ -27,6 +28,14 @@ public interface IArchivedMessageRepository
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
     Task AddAsync(ArchivedMessage message, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Archiving a message.
+    /// </summary>
+    Task AddAsync(
+        ArchivedMessage mappedArchivedMessage,
+        DbTransaction cancellationToken,
+        CancellationToken cancellationToken1);
 
     /// <summary>
     /// Get document.

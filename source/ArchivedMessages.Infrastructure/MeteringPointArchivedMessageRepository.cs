@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.Common;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
@@ -92,6 +93,71 @@ public class MeteringPointArchivedMessageRepository(
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
+    }
+
+    public async Task AddAsync(
+        MeteringPointArchivedMessage message,
+        DbTransaction transaction,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        // Must upload to file storage before adding to database, to ensure the file cannot be added to the db without the file existing in file storage
+        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.ArchivedMessageStream.Stream)
+            .ConfigureAwait(false);
+
+        using var connection =
+            await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var sql = @"INSERT INTO [dbo].[MeteringPointArchivedMessages]
+                        ([Id],
+                         [EventIds],
+                         [DocumentType],
+                         [ReceiverNumber],
+                         [ReceiverRole],
+                         [SenderNumber],
+                         [SenderRole],
+                         [CreatedAt],
+                         [BusinessReason],
+                         [FileStorageReference],
+                         [MessageId],
+                         [RelatedToMessageId],
+                         [MeteringPointIds])
+                       VALUES
+                        (@Id,
+                         @EventIds,
+                         @DocumentType,
+                         @ReceiverNumber,
+                         @ReceiverRole,
+                         @SenderNumber,
+                         @SenderRole,
+                         @CreatedAt,
+                         @BusinessReason,
+                         @FileStorageReference,
+                         @MessageId,
+                         @RelatedToMessageId,
+                         @MeteringPointIds)";
+
+        var parameters = new
+        {
+            Id = message.Id.Value.ToString(),
+            EventIds = message.EventIds.Count > 0 ? string.Join("::", message.EventIds.Select(id => id.Value)) : null,
+            DocumentType = message.DocumentType.DatabaseValue,
+            ReceiverNumber = message.ReceiverNumber.Value,
+            ReceiverRole = message.ReceiverRole.DatabaseValue,
+            SenderNumber = message.SenderNumber.Value,
+            SenderRole = message.SenderRole.DatabaseValue,
+            message.CreatedAt,
+            BusinessReason = message.BusinessReason?.DatabaseValue,
+            FileStorageReference = message.FileStorageReference.Path,
+            message.MessageId,
+            RelatedToMessageId = message.RelatedToMessageId?.Value,
+            MeteringPointIds = message.MeteringPointIds.Count > 0
+                ? System.Text.Json.JsonSerializer.Serialize(message.MeteringPointIds.Select(id => id.Value))
+                : System.Text.Json.JsonSerializer.Serialize(new List<string>()),
+        };
+
+        await connection.ExecuteAsync(sql, parameters, transaction: transaction).ConfigureAwait(false);
     }
 
     public async Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)

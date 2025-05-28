@@ -167,6 +167,8 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                 actorId: Guid.NewGuid()));
 
             var peekMessages = actScope.ServiceProvider.GetRequiredService<PeekMessage>();
+            var actorMessageQueueContext = actScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            var transaction = await actorMessageQueueContext.BeginTransactionAsync(CancellationToken.None);
 
             _testOutputHelper.WriteLine("Peeking biggest possible bundle");
             peekStopwatch.Start();
@@ -176,7 +178,10 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     MessageCategory.MeasureData,
                     receiver.ActorRole,
                     documentFormat),
+                transaction,
                 CancellationToken.None);
+
+            await actorMessageQueueContext.CommitTransactionAsync(transaction, CancellationToken.None);
             peekStopwatch.Stop();
         }
 
@@ -309,6 +314,8 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                 actorId: Guid.NewGuid()));
 
             var peekMessages = actScope.ServiceProvider.GetRequiredService<PeekMessage>();
+            var actorMessageQueueContext = actScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            var transaction = await actorMessageQueueContext.BeginTransactionAsync(CancellationToken.None);
 
             _testOutputHelper.WriteLine("Peeking biggest possible bundle");
             peekStopwatch.Start();
@@ -318,7 +325,11 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     MessageCategory.MeasureData,
                     receiver.ActorRole,
                     documentFormat),
+                transaction,
                 CancellationToken.None);
+
+            await actorMessageQueueContext.CommitTransactionAsync(transaction, CancellationToken.None);
+
             peekStopwatch.Stop();
         }
 
@@ -444,6 +455,8 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     actorId: Guid.NewGuid()));
 
             var peekMessages = actScope.ServiceProvider.GetRequiredService<PeekMessage>();
+            var actorMessageQueueContext = actScope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
+            var transaction = await actorMessageQueueContext.BeginTransactionAsync(CancellationToken.None);
 
             _testOutputHelper.WriteLine("Peeking biggest possible bundle");
             peekStopwatch.Start();
@@ -453,7 +466,11 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     MessageCategory.MeasureData,
                     receiver.ActorRole,
                     documentFormat),
+                transaction,
                 CancellationToken.None);
+
+            await actorMessageQueueContext.CommitTransactionAsync(transaction, CancellationToken.None);
+
             peekStopwatch.Stop();
         }
 

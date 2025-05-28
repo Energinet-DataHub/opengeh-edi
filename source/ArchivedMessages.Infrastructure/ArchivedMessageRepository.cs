@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.Common;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
@@ -69,6 +70,41 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         };
 
         await connection.ExecuteAsync(sql, parameters).ConfigureAwait(false);
+    }
+
+    public async Task AddAsync(ArchivedMessage message, DbTransaction transaction, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        // Must upload to file storage before adding to database, to ensure the file cannot be added to the db without the file existing in file storage
+        await _fileStorageClient.UploadAsync(message.FileStorageReference, message.ArchivedMessageStream.Stream)
+            .ConfigureAwait(false);
+
+        using var connection =
+            await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+
+        var sql = @"INSERT INTO [dbo].[ArchivedMessages]
+                       ([Id], [EventIds], [DocumentType], [ReceiverNumber], [ReceiverRoleCode], [SenderNumber], [SenderRoleCode], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId])
+                       VALUES
+                       (@Id, @EventIds, @DocumentType, @ReceiverNumber, @ReceiverRoleCode, @SenderNumber, @SenderRoleCode, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId)";
+
+        var parameters = new
+        {
+            Id = message.Id.Value.ToString(),
+            EventIds = message.EventIds.Count > 0 ? string.Join("::", message.EventIds.Select(id => id.Value)) : null,
+            DocumentType = message.DocumentType.Name,
+            ReceiverNumber = message.ReceiverNumber.Value,
+            ReceiverRoleCode = message.ReceiverRole.Code,
+            SenderNumber = message.SenderNumber.Value,
+            SenderRoleCode = message.SenderRole.Code,
+            message.CreatedAt,
+            BusinessReason = message.BusinessReason?.Code,
+            FileStorageReference = message.FileStorageReference.Path,
+            message.MessageId,
+            RelatedToMessageId = message.RelatedToMessageId?.Value,
+        };
+
+        await connection.ExecuteAsync(sql, parameters, transaction: transaction).ConfigureAwait(false);
     }
 
     public async Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken)

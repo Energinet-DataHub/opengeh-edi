@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.Common;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Domain;
@@ -25,6 +26,14 @@ public interface IMeteringPointArchivedMessageRepository
     /// Archiving metering point messages.
     /// </summary>
     Task AddAsync(MeteringPointArchivedMessage message, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Archiving metering point messages.
+    /// </summary>
+    Task AddAsync(
+        MeteringPointArchivedMessage meteringPointArchivedMessage,
+        DbTransaction cancellationToken,
+        CancellationToken cancellationToken1);
 
     /// <summary>
     /// Get document.
