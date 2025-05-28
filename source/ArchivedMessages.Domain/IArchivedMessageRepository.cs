@@ -34,8 +34,8 @@ public interface IArchivedMessageRepository
     /// </summary>
     Task AddAsync(
         ArchivedMessage mappedArchivedMessage,
-        DbTransaction cancellationToken,
-        CancellationToken cancellationToken1);
+        DbTransaction transaction,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Get document.

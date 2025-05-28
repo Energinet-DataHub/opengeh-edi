@@ -32,8 +32,8 @@ public interface IMeteringPointArchivedMessageRepository
     /// </summary>
     Task AddAsync(
         MeteringPointArchivedMessage meteringPointArchivedMessage,
-        DbTransaction cancellationToken,
-        CancellationToken cancellationToken1);
+        DbTransaction transaction,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Get document.
