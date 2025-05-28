@@ -61,9 +61,24 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
 
     public async Task<PeekResultDto?> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
-        var peekResult = await _peekMessage.PeekAsync(request, cancellationToken).ConfigureAwait(false);
-        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        return peekResult;
+        var transaction =
+            await _actorMessageQueueContext.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+
+        try
+        {
+            var peekResult =
+                await _peekMessage.PeekAsync(request, transaction, cancellationToken).ConfigureAwait(false);
+            await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await _actorMessageQueueContext.CommitTransactionAsync(transaction, cancellationToken)
+                .ConfigureAwait(false);
+
+            return peekResult;
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+            throw;
+        }
     }
 
     public async Task<Guid> EnqueueAsync(

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.EntityFrameworkCore.Storage;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 /// <summary>
@@ -24,4 +26,10 @@ public interface IActorMessageQueueContext
     /// </summary>
     /// <param name="cancellationToken"></param>
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+
+    Task CommitTransactionAsync(
+        IDbContextTransaction transaction,
+        CancellationToken cancellationToken = default);
 }

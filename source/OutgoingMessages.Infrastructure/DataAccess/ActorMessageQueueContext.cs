@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -26,6 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
@@ -90,6 +92,13 @@ public class ActorMessageQueueContext : DbContext, IEdiDbContext, IActorMessageQ
         this.UpdateAuditFields(_executionContext, _authenticatedActor, _clock);
         return base.SaveChangesAsync(cancellationToken);
     }
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default) =>
+        Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+
+    public Task CommitTransactionAsync(
+        IDbContextTransaction transaction,
+        CancellationToken cancellationToken = default) => transaction.CommitAsync(cancellationToken);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

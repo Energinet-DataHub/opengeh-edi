@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.Common;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
@@ -49,6 +50,36 @@ public class ArchivedMessagesClient(
         var mappedArchivedMessage = ArchivedMessageMapper.Map(message);
         await _archivedMessageRepository.AddAsync(mappedArchivedMessage, cancellationToken).ConfigureAwait(false);
         return new ArchivedFile(mappedArchivedMessage.FileStorageReference, mappedArchivedMessage.ArchivedMessageStream);
+    }
+
+    public async Task<IArchivedFile> CreateAsync(
+        ArchivedMessageDto message,
+        DbTransaction transaction,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        if (IsMeteringPointMessage(message.DocumentType))
+        {
+            var meteringPointArchivedMessage = MeteringPointArchivedMessageMapper.Map(message);
+            await _meteringPointArchivedMessageRepository.AddAsync(
+                    meteringPointArchivedMessage,
+                    transaction,
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ArchivedFile(
+                meteringPointArchivedMessage.FileStorageReference,
+                meteringPointArchivedMessage.ArchivedMessageStream);
+        }
+
+        var mappedArchivedMessage = ArchivedMessageMapper.Map(message);
+        await _archivedMessageRepository.AddAsync(mappedArchivedMessage, transaction, cancellationToken)
+            .ConfigureAwait(false);
+
+        return new ArchivedFile(
+            mappedArchivedMessage.FileStorageReference,
+            mappedArchivedMessage.ArchivedMessageStream);
     }
 
     public async Task<ArchivedMessageStreamDto?> GetAsync(ArchivedMessageIdDto id, CancellationToken cancellationToken)

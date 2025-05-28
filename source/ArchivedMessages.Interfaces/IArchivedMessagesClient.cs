@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.Common;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -28,6 +29,14 @@ public interface IArchivedMessagesClient
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
     Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Create a new archived message directly in the database
+    /// </summary>
+    Task<IArchivedFile> CreateAsync(
+        ArchivedMessageDto archivedMessageToCreate,
+        DbTransaction transaction,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Get a document from the database

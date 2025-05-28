@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.ApplicationInsights;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.FeatureManagement;
 using NodaTime;
 
@@ -72,7 +73,10 @@ public class PeekMessage
         _featureManager = featureManager;
     }
 
-    public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
+    public async Task<PeekResultDto?> PeekAsync(
+        PeekRequestDto request,
+        IDbContextTransaction transaction,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -114,15 +118,17 @@ public class PeekMessage
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId, cancellationToken).ConfigureAwait(false);
 
-        marketDocument ??= await GenerateMarketDocumentAsync(request, cancellationToken, peekResult).ConfigureAwait(false);
+        marketDocument ??= await GenerateMarketDocumentAsync(request, peekResult, transaction, cancellationToken)
+            .ConfigureAwait(false);
 
         return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, peekResult.MessageId);
     }
 
     private async Task<MarketDocument> GenerateMarketDocumentAsync(
         PeekRequestDto request,
-        CancellationToken cancellationToken,
-        PeekResult peekResult)
+        PeekResult peekResult,
+        IDbContextTransaction transaction,
+        CancellationToken cancellationToken)
     {
         MarketDocument marketDocument;
         var timestamp = _clock.GetCurrentInstant();
@@ -146,7 +152,11 @@ public class PeekMessage
             meteringPointIds: outgoingMessageBundle.MeteringPointIds.ToList(),
             relatedToMessageId: outgoingMessageBundle.RelatedToMessageId);
 
-        var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
+        var archivedFile = await _archivedMessageClient.CreateAsync(
+                archivedMessageToCreate,
+                transaction.GetDbTransaction(),
+                cancellationToken)
+            .ConfigureAwait(false);
 
         marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
         _marketDocumentRepository.Add(marketDocument);
