@@ -16,7 +16,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
 
 public static class JsonPayloadConstants
 {
-    public const string OneTimeSeries = """
+    public const string SingleTimeSeriesWithSingleObservation = """
        {
            "MeteredDataTimeSeriesDH3": {
                "Header": {
@@ -51,121 +51,6 @@ public static class JsonPayloadConstants
                        "Observation": [
                            {
                                "Position": 1,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 2,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 3,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 4,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 5,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 6,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 7,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 8,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 9,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 10,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 11,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 12,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 13,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 14,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 15,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 16,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 17,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 18,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 19,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 20,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 21,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 22,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 23,
-                               "QuantityQuality": "E01",
-                               "EnergyQuantity": 2.0
-                           },
-                           {
-                               "Position": 24,
                                "QuantityQuality": "E01",
                                "EnergyQuantity": 2.0
                            }

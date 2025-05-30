@@ -24,47 +24,23 @@ using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 using NodaTime.Extensions;
 using NodaTime.Text;
 using Xunit;
+using Quality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
 
-public class JsonTransformerTests
+public class TimeSeriesJsonToEbixStreamWriterTests
 {
     [Fact]
-    public async Task TransformJsonMessage_ValidJson_ReturnsMeteredDataForMeteringPointMarketActivityRecords()
+    public async Task WriteStreamAsync_ValidJson_ReturnsValidMarketDocumentStream()
     {
         // Arrange
-        var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
-        var serializer = new Serializer();
-        var writer = new MeteredDataForMeteringPointEbixDocumentWriter(new MessageRecordParser(serializer));
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-        // Deserialize the JSON into the Root object for processing
-        var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.OneTimeSeries, options) ?? throw new Exception("Root is null.");
-
-        // Extract the header and time series data
-        var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
-        var header = root.MeteredDataTimeSeriesDH3.Header;
-        var creationTime = header.Creation.ToInstant();
-
-        // Create the outgoing message header using the deserialized header data
-        var outgoingMessageHeader = new OutgoingMessageHeader(
-            BusinessReason.FromCode(header.EnergyBusinessProcess).Name,
-            header.SenderIdentification.Content,
-            ActorRole.GridAccessProvider.Code,
-            header.RecipientIdentification.Content,
-            ActorRole.MeteredDataResponsible.Code,
-            header.MessageId,
-            null,
-            creationTime);
+        var timeSeriesJsonToEbixStreamWriter = new TimeSeriesJsonToEbixStreamWriter(
+            new Serializer(),
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
+            new TimeSeriesJsonToMarketActivityRecordTransformer());
 
         // Act
-        var meteredDataForMeteringPointMarketActivityRecords = transformer.TransformJsonMessage(creationTime, series);
-
-        // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
-        var stream = await writer.WriteAsync(
-            outgoingMessageHeader,
-            meteredDataForMeteringPointMarketActivityRecords.Select(serializer.Serialize).ToList(),
-            CancellationToken.None);
+        var stream = await timeSeriesJsonToEbixStreamWriter.WriteStreamAsync(JsonPayloadConstants.SingleTimeSeriesWithSingleObservation);
 
         // Assert
 
@@ -79,7 +55,7 @@ public class JsonTransformerTests
                         SenderScheme: "A10",
                         SenderRole: "DGL",
                         ReceiverRole: "MDR",
-                        Timestamp: InstantPattern.General.Format(header.Creation.ToInstant())),
+                        Timestamp: "2024-01-16T07:55:33Z"),
                     OptionalHeaderDocumentFields: new OptionalHeaderDocumentFields(
                         BusinessSectorType: "23",
                         AssertSeriesDocumentFieldsInput: [
@@ -94,13 +70,12 @@ public class JsonTransformerTests
                                         Resolution: "PT1H",
                                         StartedDateTime: "2023-12-25T23:00:00Z",
                                         EndedDateTime: "2023-12-26T23:00:00Z",
-                                        Points: series.First().Observation
-                                            .Select(eo => new AssertPointDocumentFieldsInput(
-                                                new RequiredPointDocumentFields(eo.Position),
-                                                new OptionalPointDocumentFields(
-                                                    Quantity: eo.EnergyQuantity,
-                                                    Quality: eo.QuantityQuality != null ? Quality.Measured : null)))
-                                            .ToList())),
+                                        Points: new List<AssertPointDocumentFieldsInput>
+                                        {
+                                            new(
+                                                new RequiredPointDocumentFields(1),
+                                                new OptionalPointDocumentFields(BuildingBlocks.Domain.Models.Quality.Measured, 2.0M)),
+                                        })),
                                 OptionalSeriesFields: new OptionalSeriesFields(
                                     OriginalTransactionIdReferenceId: null,
                                     RegistrationDateTime: "2022-12-17T09:30:00Z",

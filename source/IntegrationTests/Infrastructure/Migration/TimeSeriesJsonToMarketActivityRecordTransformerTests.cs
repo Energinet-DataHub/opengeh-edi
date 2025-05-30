@@ -1,0 +1,65 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Text.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
+using FluentAssertions;
+using NodaTime.Extensions;
+using NodaTime.Text;
+using Xunit;
+
+namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
+
+public class TimeSeriesJsonToMarketActivityRecordTransformerTests
+{
+    [Fact]
+    public void TransformJsonMessage_ValidJson_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
+    {
+        // Arrange
+        var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        // Deserialize the JSON into the Root object for processing
+        var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.SingleTimeSeriesWithSingleObservation, options) ?? throw new Exception("Root is null.");
+
+        // Extract the header and time series data
+        var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var header = root.MeteredDataTimeSeriesDH3.Header;
+        var creationTime = header.Creation.ToInstant();
+
+        // Act
+        var actual = transformer.TransformJsonMessage(creationTime, series);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().ContainSingle();
+        var record = actual[0];
+        record.Should().BeOfType<MeteredDataForMeteringPointMarketActivityRecord>();
+        record.MeteringPointId.Should().Be("571051839308770693");
+        record.MeasurementUnit.Name.Should().Be(MeasurementUnit.KilowattHour.Name);
+        record.MeteringPointType.Name.Should().Be(MeteringPointType.Consumption.Name);
+        record.OriginalTransactionIdReference.Should().Be(null); // TODO: LRN is this right?
+        record.Period.Start.Should().Be(InstantPattern.ExtendedIso.Parse("2023-12-25T23:00:00Z").Value);
+        record.Period.End.Should().Be(InstantPattern.ExtendedIso.Parse("2023-12-26T23:00:00Z").Value);
+        record.Product.Should().Be("8716867000030");
+        record.RegistrationDateTime.Should().Be(InstantPattern.ExtendedIso.Parse("2024-01-16T07:55:33Z").Value);
+        record.Resolution.Name.Should().Be(Resolution.Hourly.Name);
+        record.TransactionId.Value.Should().Be("e1f06dee48d842c1a48b187065e710ff");
+        record.Measurements.Single().Position.Should().Be(1);
+        record.Measurements.Single().Quantity.Should().Be(2.0m);
+        record.Measurements.Single().Quality!.Name.Should().Be(Quality.AsProvided.Name);
+    }
+}
