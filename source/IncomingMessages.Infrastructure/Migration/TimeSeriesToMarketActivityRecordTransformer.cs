@@ -20,9 +20,9 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
 
-public class TimeSeriesJsonToMarketActivityRecordTransformer : ITimeSeriesJsonToMarketActivityRecordTransformer
+public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketActivityRecordTransformer
 {
-    public List<MeteredDataForMeteringPointMarketActivityRecord> TransformJsonMessage(Instant creationTime, List<TimeSeries> timeSeries)
+    public List<MeteredDataForMeteringPointMarketActivityRecord> Transform(Instant creationTime, List<TimeSeries> timeSeries)
     {
         var internallyGeneratedId = 0;
         var meteredDataForMeteringPointMarketActivityRecords = timeSeries.Select(ts =>

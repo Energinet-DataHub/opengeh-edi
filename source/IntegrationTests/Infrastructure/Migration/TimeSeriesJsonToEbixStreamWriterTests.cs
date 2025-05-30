@@ -37,7 +37,7 @@ public class TimeSeriesJsonToEbixStreamWriterTests
         var timeSeriesJsonToEbixStreamWriter = new TimeSeriesJsonToEbixStreamWriter(
             new Serializer(),
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
-            new TimeSeriesJsonToMarketActivityRecordTransformer());
+            new TimeSeriesToMarketActivityRecordTransformer());
 
         // Act
         var stream = await timeSeriesJsonToEbixStreamWriter.WriteStreamAsync(JsonPayloadConstants.SingleTimeSeriesWithSingleObservation);
@@ -92,7 +92,7 @@ public class TimeSeriesJsonToEbixStreamWriterTests
         var timeSeriesJsonToEbixStreamWriter = new TimeSeriesJsonToEbixStreamWriter(
             new Serializer(),
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
-            new TimeSeriesJsonToMarketActivityRecordTransformer());
+            new TimeSeriesToMarketActivityRecordTransformer());
 
         // Act
         var stream = await timeSeriesJsonToEbixStreamWriter.WriteStreamAsync(JsonPayloadConstants.InvalidJsonNoOriginalMessageAndTimeSeriesId);

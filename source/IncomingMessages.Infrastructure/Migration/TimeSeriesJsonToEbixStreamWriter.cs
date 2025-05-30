@@ -26,12 +26,12 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
 public class TimeSeriesJsonToEbixStreamWriter(
     Serializer serializer,
     JsonSerializerOptions jsonSerializerOptions,
-    TimeSeriesJsonToMarketActivityRecordTransformer timeSeriesJsonToMarketActivityRecordTransformer)
+    TimeSeriesToMarketActivityRecordTransformer timeSeriesToMarketActivityRecordTransformer)
     : ITimeSeriesJsonToEbixStreamWriter
 {
     private readonly Serializer _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
     private readonly JsonSerializerOptions _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
-    private readonly TimeSeriesJsonToMarketActivityRecordTransformer _timeSeriesJsonToMarketActivityRecordTransformer = timeSeriesJsonToMarketActivityRecordTransformer ?? throw new ArgumentNullException(nameof(timeSeriesJsonToMarketActivityRecordTransformer));
+    private readonly TimeSeriesToMarketActivityRecordTransformer _timeSeriesToMarketActivityRecordTransformer = timeSeriesToMarketActivityRecordTransformer ?? throw new ArgumentNullException(nameof(timeSeriesToMarketActivityRecordTransformer));
     private readonly MeteredDataForMeteringPointEbixDocumentWriter _writer = new(new MessageRecordParser(serializer));
 
     public async Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload)
@@ -55,7 +55,7 @@ public class TimeSeriesJsonToEbixStreamWriter(
             null,
             creationTime);
 
-        var meteredDataForMeteringPointMarketActivityRecords = _timeSeriesJsonToMarketActivityRecordTransformer.TransformJsonMessage(creationTime, series);
+        var meteredDataForMeteringPointMarketActivityRecords = _timeSeriesToMarketActivityRecordTransformer.Transform(creationTime, series);
 
         // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
         var stream = await _writer.WriteAsync(
