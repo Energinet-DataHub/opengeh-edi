@@ -61,9 +61,9 @@ public class TimeSeries
 {
     public string TimeSeriesId { get; set; }
 
-    public string OriginalMessageId { get; set; }
+    public string? OriginalMessageId { get; set; }
 
-    public string OriginalTimeSeriesId { get; set; }
+    public string? OriginalTimeSeriesId { get; set; }
 
     public string EnergyTimeSeriesFunction { get; set; }
 
@@ -97,7 +97,9 @@ public class Observation
 
     public string QuantityQuality { get; set; }
 
-    public decimal EnergyQuantity { get; set; }
+    public decimal? EnergyQuantity { get; set; }
+
+    public bool? QuantityMissingIndicator { get; set; }
 }
 
 public class TimeSeriesPeriod

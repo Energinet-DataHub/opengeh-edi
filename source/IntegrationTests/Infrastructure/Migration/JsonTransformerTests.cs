@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Text.Json;
-using AutoFixture.Xunit2;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
@@ -25,7 +24,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 using NodaTime.Extensions;
 using NodaTime.Text;
 using Xunit;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
 
@@ -214,6 +212,8 @@ public class JsonTransformerTests
         var header = root.MeteredDataTimeSeriesDH3.Header;
         var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
 
+        var creationTime = header.Creation.ToInstant();
+
         // Create the outgoing message header using the deserialized header data
         var outgoingMessageHeader = new OutgoingMessageHeader(
             BusinessReason.FromCode(header.EnergyBusinessProcess).Name,
@@ -223,10 +223,10 @@ public class JsonTransformerTests
             ActorRole.MeteredDataResponsible.Code,
             header.MessageId,
             null,
-            header.Creation.ToInstant());
+            creationTime);
 
         // Act
-        var meteredDataForMeteringPointMarketActivityRecords = transformer.TransformJsonMessage(header.Creation.ToInstant(), series);
+        var meteredDataForMeteringPointMarketActivityRecords = transformer.TransformJsonMessage(creationTime, series);
 
         // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
         var stream = await writer.WriteAsync(
@@ -235,104 +235,6 @@ public class JsonTransformerTests
             CancellationToken.None);
 
         // Assert
-
-        // Assert the correctness of the written document
-        await NotifyValidatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(DocumentFormat.Ebix, stream.Stream, new NotifyValidatedMeasureDataDocumentAssertionInput(
-                    RequiredHeaderDocumentFields: new RequiredHeaderDocumentFields(
-                        BusinessReasonCode: "D42",
-                        ReceiverId: "5790001330595",
-                        ReceiverScheme: "A10",
-                        SenderId: "5790001330552",
-                        SenderScheme: "A10",
-                        SenderRole: "DGL",
-                        ReceiverRole: "MDR",
-                        Timestamp: InstantPattern.General.Format(header.Creation.ToInstant())),
-                    OptionalHeaderDocumentFields: new OptionalHeaderDocumentFields(
-                        BusinessSectorType: "23",
-                        AssertSeriesDocumentFieldsInput: [
-                            new AssertSeriesDocumentFieldsInput(
-                                1,
-                                RequiredSeriesFields: new RequiredSeriesFields(
-                                    MeteringPointNumber: "571051839308770693",
-                                    MeteringPointScheme: "A10",
-                                    MeteringPointType: MeteringPointType.FromCode("E17"),
-                                    QuantityMeasureUnit: "KWH",
-                                    RequiredPeriodDocumentFields: new RequiredPeriodDocumentFields(
-                                        Resolution: "PT1H",
-                                        StartedDateTime: "2023-12-25T23:00:00Z",
-                                        EndedDateTime: "2023-12-26T23:00:00Z",
-                                        Points: series.First().Observation
-                                            .Select(eo => new AssertPointDocumentFieldsInput(
-                                                new RequiredPointDocumentFields(eo.Position),
-                                                new OptionalPointDocumentFields(
-                                                    Quantity: eo.EnergyQuantity,
-                                                    Quality: eo.QuantityQuality != null ? Quality.Measured : null)))
-                                            .ToList())),
-                                OptionalSeriesFields: new OptionalSeriesFields(
-                                    OriginalTransactionIdReferenceId: null,
-                                    RegistrationDateTime: "2022-12-17T09:30:00Z",
-                                    InDomain: null,
-                                    OutDomain: null,
-                                    Product: "8716867000030")),
-                        ])));
-    }
-
-    [Fact]
-    public async Task Transform_ValidJson_ReturnsTransformedJson()
-    {
-        // Arrange
-        var serializer = new Serializer();
-        var writer = new MeteredDataForMeteringPointEbixDocumentWriter(new MessageRecordParser(serializer));
-
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-        };
-
-        // Deserialize the JSON into the Root object for processing
-        var root = JsonSerializer.Deserialize<Root>(TestJson, options);
-
-        if (root == null)
-            throw new Exception("Root is null.");
-
-        // Extract the header and time series data
-        var header = root.MeteredDataTimeSeriesDH3.Header;
-        var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
-
-        // Transform the time series data into MeteredDataForMeteringPointMarketActivityRecord objects which are used for writing the document
-        var meteredDataForMeteringPointMarketActivityRecords = series.Select(timeSeries => new MeteredDataForMeteringPointMarketActivityRecord(
-                TransactionId.From(timeSeries.OriginalTimeSeriesId),
-                timeSeries.AggregationCriteria.MeteringPointId,
-                MeteringPointType.FromCode(timeSeries.TypeOfMP),
-                null,
-                timeSeries.EnergyTimeSeriesProduct,
-                MeasurementUnit.FromCode(timeSeries.EnergyTimeSeriesMeasureUnit),
-                header.Creation.ToInstant(),
-                Resolution.FromCode(timeSeries.TimeSeriesPeriod.ResolutionDuration),
-                new Period(timeSeries.TimeSeriesPeriod.Start.ToInstant(), timeSeries.TimeSeriesPeriod.End.ToInstant()),
-                timeSeries.Observation.Select(x =>
-                {
-                    var tryGetNameFromEbixCode = Quality.TryGetNameFromEbixCode(x.QuantityQuality, x.QuantityQuality);
-                    return new PointActivityRecord(
-                        x.Position,
-                        Quality.FromName(tryGetNameFromEbixCode!),
-                        x.EnergyQuantity);
-                }).ToList()))
-            .ToList();
-
-        // Create the outgoing message header using the deserialized header data
-        var outgoingMessageHeader = new OutgoingMessageHeader(
-            BusinessReason.FromCode(header.EnergyBusinessProcess).Name,
-            header.SenderIdentification.Content,
-            ActorRole.GridAccessProvider.Code,
-            header.RecipientIdentification.Content,
-            ActorRole.MeteredDataResponsible.Code,
-            header.MessageId,
-            null,
-            header.Creation.ToInstant());
-
-        // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
-        var stream = await writer.WriteAsync(outgoingMessageHeader, meteredDataForMeteringPointMarketActivityRecords.Select(serializer.Serialize).ToList(), CancellationToken.None);
 
         // Assert the correctness of the written document
         await NotifyValidatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(DocumentFormat.Ebix, stream.Stream, new NotifyValidatedMeasureDataDocumentAssertionInput(

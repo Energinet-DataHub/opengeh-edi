@@ -23,8 +23,8 @@ public interface ITimeSeriesJsonToEbixTransformer
     /// <summary>
     /// Transform imported JSON TimeSeries message to a list of MeteredDataForMeteringPointMarketActivityRecord
     /// </summary>
-    /// <param name="creation"></param>
+    /// <param name="creationTime"></param>
     /// <param name="timeSeries">List containing all time series in message.</param>
     /// <returns>List of time series containing all quantity observations.</returns>
-    List<MeteredDataForMeteringPointMarketActivityRecord> TransformJsonMessage(Instant creation, List<TimeSeries> timeSeries);
+    List<MeteredDataForMeteringPointMarketActivityRecord> TransformJsonMessage(Instant creationTime, List<TimeSeries> timeSeries);
 }
