@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
 
 public interface ITimeSeriesJsonToEbixStreamWriter
 {
     /// <summary>
-    /// Transform imported JSON TimeSeries message to an EbiX stream writer format.
+    /// Transform imported JSON TimeSeries message to an ebiX stream writer format.
     /// </summary>
-    /// <param name="timeSeriesPayload">List containing all time series in message.</param>
+    /// <param name="timeSeriesPayload">Json payload containing all time series in message.</param>
     /// <returns>MarketDocumentStream containing all quantity observations.</returns>
     Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload);
 }

@@ -25,6 +25,6 @@ public interface ITimeSeriesJsonToMarketActivityRecordTransformer
     /// </summary>
     /// <param name="creationTime"></param>
     /// <param name="timeSeries">List containing all time series in message.</param>
-    /// <returns>List of time series containing all quantity observations.</returns>
+    /// <returns>List MeteredDataForMeteringPointMarketActivityRecords containing all quantity observations.</returns>
     List<MeteredDataForMeteringPointMarketActivityRecord> TransformJsonMessage(Instant creationTime, List<TimeSeries> timeSeries);
 }
