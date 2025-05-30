@@ -378,27 +378,27 @@ public static class JsonPayloadConstants
         """;
 
     public const string NoTimeSeries = """
-                                      {
-                                          "MeteredDataTimeSeriesDH3": {
-                                              "Header": {
-                                                  "MessageId": "13255042",
-                                                  "DocumentType": "E66",
-                                                  "Creation": "2024-01-16T07:55:33Z",
-                                                  "EnergyBusinessProcess": "D42",
-                                                  "EnergyIndustryClassification": "23",
-                                                  "SenderIdentification": {
-                                                      "SchemeAgencyIdentifier": "9",
-                                                      "_content_": "5790001330552"
-                                                  },
-                                                  "RecipientIdentification": {
-                                                      "SchemeAgencyIdentifier": "9",
-                                                      "_content_": "5790001330595"
-                                                  },
-                                                  "EnergyBusinessProcessRole": "D3M"
-                                              }
-                                          }
-                                      }
-                                      """;
+        {
+          "MeteredDataTimeSeriesDH3": {
+              "Header": {
+                  "MessageId": "13255042",
+                  "DocumentType": "E66",
+                  "Creation": "2024-01-16T07:55:33Z",
+                  "EnergyBusinessProcess": "D42",
+                  "EnergyIndustryClassification": "23",
+                  "SenderIdentification": {
+                      "SchemeAgencyIdentifier": "9",
+                      "_content_": "5790001330552"
+                  },
+                  "RecipientIdentification": {
+                      "SchemeAgencyIdentifier": "9",
+                      "_content_": "5790001330595"
+                  },
+                  "EnergyBusinessProcessRole": "D3M"
+              }
+          }
+        }
+        """;
 
     public const string QuantityMissingIndicatorTrueAndQualityNull = """
         {

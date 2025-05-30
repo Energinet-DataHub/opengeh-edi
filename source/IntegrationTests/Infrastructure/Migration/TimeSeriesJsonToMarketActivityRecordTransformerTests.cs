@@ -122,4 +122,27 @@ public class TimeSeriesJsonToMarketActivityRecordTransformerTests
         actual[0].TransactionId.Value.Should().Be("mig-00000001");
         actual[1].TransactionId.Value.Should().Be("mig-00000002");
     }
+
+    [Fact]
+    public void TransformJsonMessage_WhenCalledWithQuantityMissingIndicatorTrueAndQualityNull_ReturnsValidMeteredDataForMeteringPointMarketActivityRecord()
+    {
+        // Arrange
+        var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var root = JsonSerializer.Deserialize<Root>(
+                       JsonPayloadConstants.QuantityMissingIndicatorTrueAndQualityNull, options) ?? throw new Exception("Root is null.");
+        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var header = root.MeteredDataTimeSeriesDH3.Header;
+        var creationTime = header.Creation.ToInstant();
+
+        // Act
+        var actual = transformer.TransformJsonMessage(creationTime, timeSeries);
+
+        // Assert
+        var actualRecord = actual[0];
+        actualRecord.Measurements[0].Position.Should().Be(1);
+        actualRecord.Measurements[0].Quantity.Should().Be(null);
+        actualRecord.Measurements[0].Quality!.Name.Should().Be(Quality.NotAvailable.Name); // TODO: Is Quality.NotAvailable equivalent to Quality.Missing in Migration?
+    }
 }

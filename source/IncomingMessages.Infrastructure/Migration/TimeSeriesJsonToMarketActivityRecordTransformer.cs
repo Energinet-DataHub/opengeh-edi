@@ -39,16 +39,10 @@ public class TimeSeriesJsonToMarketActivityRecordTransformer : ITimeSeriesJsonTo
                     Resolution.FromCode(ts.TimeSeriesPeriod.ResolutionDuration),
                     new Period(ts.TimeSeriesPeriod.Start.ToInstant(), ts.TimeSeriesPeriod.End.ToInstant()),
                     ts.Observation.Select(
-                            obs =>
-                            {
-                                var tryGetNameFromEbixCode = Quality.TryGetNameFromEbixCode(
-                                    obs.QuantityQuality,
-                                    obs.QuantityQuality); // TODO: LRN, same value as fallback?
-                                return new PointActivityRecord(
-                                    obs.Position,
-                                    Quality.FromName(tryGetNameFromEbixCode!),
-                                    obs.EnergyQuantity);
-                            })
+                            obs => new PointActivityRecord(
+                                obs.Position,
+                                Quality.FromName(TryGetQualityFromEbixCode(obs)),
+                                obs.EnergyQuantity))
                         .ToList());
             })
             .ToList();
@@ -59,5 +53,12 @@ public class TimeSeriesJsonToMarketActivityRecordTransformer : ITimeSeriesJsonTo
     private static string GetOriginalTimeSeriesId(string? originalTimeSeriesId, int internallyGeneratedId)
     {
         return originalTimeSeriesId ?? $"mig-{internallyGeneratedId:D8}";
+    }
+
+    private static string TryGetQualityFromEbixCode(Observation obs)
+    {
+        var quantityMissingIndicator = obs.QuantityMissingIndicator ?? false;
+        var fallbackQuality = quantityMissingIndicator ? Quality.NotAvailable.Name : "Invalid_Quality";
+        return Quality.TryGetNameFromEbixCode(obs.QuantityQuality, fallbackQuality)!;
     }
 }
