@@ -23,23 +23,16 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
 
-public class TimeSeriesJsonToEbixStreamWriter : ITimeSeriesJsonToEbixStreamWriter
+public class TimeSeriesJsonToEbixStreamWriter(
+    Serializer serializer,
+    JsonSerializerOptions jsonSerializerOptions,
+    TimeSeriesJsonToMarketActivityRecordTransformer timeSeriesJsonToMarketActivityRecordTransformer)
+    : ITimeSeriesJsonToEbixStreamWriter
 {
-    private readonly Serializer _serializer;
-    private readonly JsonSerializerOptions _jsonSerializerOptions;
-    private readonly TimeSeriesJsonToMarketActivityRecordTransformer _timeSeriesJsonToMarketActivityRecordTransformer;
-    private readonly MeteredDataForMeteringPointEbixDocumentWriter _writer;
-
-    public TimeSeriesJsonToEbixStreamWriter(
-        Serializer serializer,
-        JsonSerializerOptions jsonSerializerOptions,
-        TimeSeriesJsonToMarketActivityRecordTransformer timeSeriesJsonToMarketActivityRecordTransformer)
-    {
-        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-        _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
-        _timeSeriesJsonToMarketActivityRecordTransformer = timeSeriesJsonToMarketActivityRecordTransformer ?? throw new ArgumentNullException(nameof(timeSeriesJsonToMarketActivityRecordTransformer));
-        _writer = new MeteredDataForMeteringPointEbixDocumentWriter(new MessageRecordParser(serializer));
-    }
+    private readonly Serializer _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+    private readonly JsonSerializerOptions _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
+    private readonly TimeSeriesJsonToMarketActivityRecordTransformer _timeSeriesJsonToMarketActivityRecordTransformer = timeSeriesJsonToMarketActivityRecordTransformer ?? throw new ArgumentNullException(nameof(timeSeriesJsonToMarketActivityRecordTransformer));
+    private readonly MeteredDataForMeteringPointEbixDocumentWriter _writer = new(new MessageRecordParser(serializer));
 
     public async Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload)
     {
