@@ -29,189 +29,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
 
 public class JsonTransformerTests
 {
-    private static readonly string TestJson = """
-    {
-    "MeteredDataTimeSeriesDH3": {
-    "Header": {
-    "MessageId": "13255042",
-    "DocumentType": "E66",
-    "Creation": "2024-01-16T07:55:33Z",
-    "EnergyBusinessProcess": "D42",
-    "EnergyIndustryClassification": "23",
-    "SenderIdentification": {
-    "SchemeAgencyIdentifier": "9",
-    "content": "5790001330552"
-    },
-    "RecipientIdentification": {
-    "SchemeAgencyIdentifier": "9",
-    "content": "5790001330595"
-    },
-    "EnergyBusinessProcessRole": "D3M"
-    },
-    "TimeSeries": [
-    {
-    "TimeSeriesId": "74634301_86192545",
-    "OriginalMessageId": "bc8897bc5d5b4d8a9e7f72efe4b0d4c5",
-    "OriginalTimeSeriesId": "e1f06dee48d842c1a48b187065e710ff",
-    "EnergyTimeSeriesFunction": "9",
-    "EnergyTimeSeriesProduct": "8716867000030",
-    "EnergyTimeSeriesMeasureUnit": "KWH",
-    "TypeOfMP": "E17",
-    "SettlementMethod": "D01",
-    "AggregationCriteria": {
-    "MeteringPointId": "571051839308770693"
-    },
-    "Observation": [
-    {
-    "Position": 1,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 2,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 3,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 4,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 5,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 6,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 7,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 8,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 9,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 10,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 11,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 12,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 13,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 14,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 15,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 16,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 17,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 18,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 19,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 20,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 21,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 22,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 23,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    },
-    {
-    "Position": 24,
-    "QuantityQuality": "E01",
-    "EnergyQuantity": 2.0
-    }
-    ],
-    "TimeSeriesPeriod": {
-    "ResolutionDuration": "PT1H",
-    "Start": "2023-12-25T23:00:00Z",
-    "End": "2023-12-26T23:00:00Z"
-    },
-    "TransactionInsertDate": "2024-01-16T08:55:14Z",
-    "TimeSeriesStatus": "2"
-    }
-    ]
-    }
-    }
-    """;
-
     [Fact]
     public async Task TransformJsonMessage_ValidJson_ReturnsMeteredDataForMeteringPointMarketActivityRecords()
     {
         // Arrange
-        var transformer = new TimeSeriesJsonToEbixTransformer();
+        var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
         var serializer = new Serializer();
         var writer = new MeteredDataForMeteringPointEbixDocumentWriter(new MessageRecordParser(serializer));
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         // Deserialize the JSON into the Root object for processing
-        var root = JsonSerializer.Deserialize<Root>(TestJson, options) ?? throw new Exception("Root is null.");
+        var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.OneTimeSeries, options) ?? throw new Exception("Root is null.");
 
         // Extract the header and time series data
-        var header = root.MeteredDataTimeSeriesDH3.Header;
         var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
-
+        var header = root.MeteredDataTimeSeriesDH3.Header;
         var creationTime = header.Creation.ToInstant();
 
         // Create the outgoing message header using the deserialized header data
@@ -237,7 +69,8 @@ public class JsonTransformerTests
         // Assert
 
         // Assert the correctness of the written document
-        await NotifyValidatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(DocumentFormat.Ebix, stream.Stream, new NotifyValidatedMeasureDataDocumentAssertionInput(
+        await NotifyValidatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(
+            DocumentFormat.Ebix, stream.Stream, new NotifyValidatedMeasureDataDocumentAssertionInput(
                     RequiredHeaderDocumentFields: new RequiredHeaderDocumentFields(
                         BusinessReasonCode: "D42",
                         ReceiverId: "5790001330595",
