@@ -84,7 +84,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Transform_WhenCalledWithJsonContainingNoTs_ShouldThrowInvalidOperationException()
+    public void Transform_WhenCalledWithJsonContainingNoTs_ShouldThrowArgumentNullException()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
