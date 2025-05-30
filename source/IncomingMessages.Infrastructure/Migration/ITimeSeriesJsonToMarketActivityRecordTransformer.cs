@@ -12,31 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
+using System.Text.Json;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
 
-public class TimeSeriesJsonPayload
+public interface ITimeSeriesJsonToMarketActivityRecordTransformer
 {
-    public TimeSeriesJsonPayload(
-        string messageId,
-        string meteringPointId,
-        string originalTimeSeriesId,
-        string transactionInsertDate,
-        string jsonString)
-    {
-        Id = $"{messageId}_{meteringPointId}_{originalTimeSeriesId}_{transactionInsertDate}.json";
-        Json = jsonString;
-    }
-
-    [JsonConstructor]
-    public TimeSeriesJsonPayload(string id, string json)
-    {
-        Id = id;
-        Json = json;
-    }
-
-    public string Id { get; private set; }
-
-    public string Json { get; private set; }
+    /// <summary>
+    /// Transform imported JSON TimeSeries message to a list of MeteredDataForMeteringPointMarketActivityRecord
+    /// </summary>
+    /// <param name="creationTime"></param>
+    /// <param name="timeSeries">List containing all time series in message.</param>
+    /// <returns>List of time series containing all quantity observations.</returns>
+    List<MeteredDataForMeteringPointMarketActivityRecord> TransformJsonMessage(Instant creationTime, List<TimeSeries> timeSeries);
 }
