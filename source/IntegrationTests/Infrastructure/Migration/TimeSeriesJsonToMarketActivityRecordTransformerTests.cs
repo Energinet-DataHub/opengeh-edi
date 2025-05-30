@@ -32,16 +32,13 @@ public class TimeSeriesJsonToMarketActivityRecordTransformerTests
         var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-        // Deserialize the JSON into the Root object for processing
         var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.SingleTimeSeriesWithSingleObservation, options) ?? throw new Exception("Root is null.");
-
-        // Extract the header and time series data
-        var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
         var header = root.MeteredDataTimeSeriesDH3.Header;
         var creationTime = header.Creation.ToInstant();
 
         // Act
-        var actual = transformer.TransformJsonMessage(creationTime, series);
+        var actual = transformer.TransformJsonMessage(creationTime, timeSeries);
 
         // Assert
         actual.Should().NotBeNull();
@@ -61,5 +58,68 @@ public class TimeSeriesJsonToMarketActivityRecordTransformerTests
         record.Measurements.Single().Position.Should().Be(1);
         record.Measurements.Single().Quantity.Should().Be(2.0m);
         record.Measurements.Single().Quality!.Name.Should().Be(Quality.AsProvided.Name);
+    }
+
+    [Fact]
+    public void TransformJsonMessage_ValidJsonWithMultipleTimeSeries_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
+    {
+        // Arrange
+        var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.TwoTimeSeries, options) ?? throw new Exception("Root is null.");
+        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var header = root.MeteredDataTimeSeriesDH3.Header;
+        var creationTime = header.Creation.ToInstant();
+
+        // Act
+        var actual = transformer.TransformJsonMessage(creationTime, timeSeries);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().HaveCount(2);
+        var firstRecord = actual[0];
+        firstRecord.TransactionId.Value.Should().Be("83521745ef4f4ada83f2115dda402e30");
+        firstRecord.Measurements.Should().HaveCount(24);
+    }
+
+    [Fact]
+    public void TransformJsonMessage_WhenCalledWithJsonContainingNoTs_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.NoTimeSeries, options) ?? throw new Exception("Root is null.");
+        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var header = root.MeteredDataTimeSeriesDH3.Header;
+        var creationTime = header.Creation.ToInstant();
+
+        // Act
+        var act = () => transformer.TransformJsonMessage(creationTime, timeSeries);
+
+        // Assert
+        act.Should().ThrowExactly<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void TransformJsonMessage_WhenCalledWithNoOriginalTimeSeriesId_ReturnsPrefixedMigrationTimeSeriesId()
+    {
+        // Arrange
+        var transformer = new TimeSeriesJsonToMarketActivityRecordTransformer();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var root = JsonSerializer.Deserialize<Root>(
+                       JsonPayloadConstants.InvalidJsonNoOriginalMessageAndTimeSeriesId, options) ?? throw new Exception("Root is null.");
+        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var header = root.MeteredDataTimeSeriesDH3.Header;
+        var creationTime = header.Creation.ToInstant();
+
+        // Act
+        var actual = transformer.TransformJsonMessage(creationTime, timeSeries);
+
+        // Assert
+        actual[0].TransactionId.Value.Should().Be("mig-00000001");
+        actual[1].TransactionId.Value.Should().Be("mig-00000002");
     }
 }
