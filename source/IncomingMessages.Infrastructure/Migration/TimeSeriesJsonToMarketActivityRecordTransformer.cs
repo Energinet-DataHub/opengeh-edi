@@ -20,19 +20,9 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
 
-public class TimeSeriesJsonToEbixTransformer : ITimeSeriesJsonToEbixTransformer
+public class TimeSeriesJsonToMarketActivityRecordTransformer : ITimeSeriesJsonToMarketActivityRecordTransformer
 {
     public List<MeteredDataForMeteringPointMarketActivityRecord> TransformJsonMessage(Instant creationTime, List<TimeSeries> timeSeries)
-    {
-        return CreateMeteredDataForMeteringPointMarketActivityRecords(creationTime, timeSeries);
-    }
-
-    private static string GetOriginalTimeSeriesId(string? originalTimeSeriesId, int internallyGeneratedId)
-    {
-        return originalTimeSeriesId ?? $"mig-{internallyGeneratedId:D8}";
-    }
-
-    private List<MeteredDataForMeteringPointMarketActivityRecord> CreateMeteredDataForMeteringPointMarketActivityRecords(Instant creation, List<TimeSeries> timeSeries)
     {
         var internallyGeneratedId = 0;
         var meteredDataForMeteringPointMarketActivityRecords = timeSeries.Select(ts =>
@@ -45,7 +35,7 @@ public class TimeSeriesJsonToEbixTransformer : ITimeSeriesJsonToEbixTransformer
                     null, // TODO: LRN, is this right?
                     ts.EnergyTimeSeriesProduct,
                     MeasurementUnit.FromCode(ts.EnergyTimeSeriesMeasureUnit),
-                    creation,
+                    creationTime,
                     Resolution.FromCode(ts.TimeSeriesPeriod.ResolutionDuration),
                     new Period(ts.TimeSeriesPeriod.Start.ToInstant(), ts.TimeSeriesPeriod.End.ToInstant()),
                     ts.Observation.Select(
@@ -64,5 +54,10 @@ public class TimeSeriesJsonToEbixTransformer : ITimeSeriesJsonToEbixTransformer
             .ToList();
 
         return meteredDataForMeteringPointMarketActivityRecords;
+    }
+
+    private static string GetOriginalTimeSeriesId(string? originalTimeSeriesId, int internallyGeneratedId)
+    {
+        return originalTimeSeriesId ?? $"mig-{internallyGeneratedId:D8}";
     }
 }
