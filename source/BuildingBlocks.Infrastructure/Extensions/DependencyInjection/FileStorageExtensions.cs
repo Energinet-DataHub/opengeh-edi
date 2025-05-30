@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Identity;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Azure;
@@ -25,6 +25,12 @@ public static class FileStorageExtensions
 {
     private const string HealthCheckName = "EDI blob file storage";
 
+    /// <summary>
+    /// Register services and health checks for file storage.
+    /// </summary>
+    /// <remarks>
+    /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
+    /// </remarks>
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
@@ -40,10 +46,10 @@ public static class FileStorageExtensions
                 .Get<BlobServiceClientConnectionOptions>()
             ?? throw new InvalidOperationException("Missing Blob Service Client Connection configuration.");
 
-        services.AddAzureClients(
-            builder =>
+        services
+            .AddAzureClients(builder =>
             {
-                builder.UseCredential(new DefaultAzureCredential());
+                builder.UseCredential(sp => sp.GetRequiredService<TokenCredentialProvider>().Credential);
 
                 builder
                     .AddBlobServiceClient(new Uri(blobServiceClientConnectionOptions.StorageAccountUrl))

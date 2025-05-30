@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
@@ -265,37 +266,6 @@ public class BehavioursTestBase : IDisposable
         return serviceBusSenderSpy;
     }
 
-    protected IList<(TServiceBusMessage Message, Guid ProcessId)> AssertServiceBusMessages<TServiceBusMessage>(
-        ServiceBusSenderSpy senderSpy,
-        int expectedCount,
-        Func<BinaryData, TServiceBusMessage> parser)
-        where TServiceBusMessage : IMessage
-    {
-        var sentMessages = senderSpy.MessagesSent
-            .Where(m => m.Subject == typeof(TServiceBusMessage).Name)
-            .ToList();
-
-        sentMessages.Should().HaveCount(expectedCount);
-
-        List<(TServiceBusMessage Message, Guid ProcessId)> messages = [];
-        using var scope = new AssertionScope();
-        foreach (var message in sentMessages)
-        {
-            message.Subject.Should().Be(typeof(TServiceBusMessage).Name);
-            message.Body.Should().NotBeNull();
-            message.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
-            referenceId.Should().NotBeNull();
-            Guid.TryParse(referenceId!.ToString()!, out var processId).Should().BeTrue();
-
-            var parsedMessage = parser(message.Body);
-            parsedMessage.Should().NotBeNull();
-
-            messages.Add((parsedMessage, processId));
-        }
-
-        return messages;
-    }
-
     protected IList<TServiceBusMessage> AssertProcessManagerServiceBusMessages<TServiceBusMessage>(
         ServiceBusSenderSpy senderSpy,
         int expectedCount,
@@ -435,6 +405,8 @@ public class BehavioursTestBase : IDisposable
         _services = [];
         _services.AddScoped<IConfiguration>(_ => config);
 
+        _services.AddTokenCredentialProvider();
+
         _services.AddTransient<ExecuteDataRetentionJobs>()
             .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)
@@ -442,7 +414,7 @@ public class BehavioursTestBase : IDisposable
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule()
-            .AddEnqueueActorMessagesFromProcessManager(new DefaultAzureCredential());
+            .AddEnqueueActorMessagesFromProcessManager();
 
         _services
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)

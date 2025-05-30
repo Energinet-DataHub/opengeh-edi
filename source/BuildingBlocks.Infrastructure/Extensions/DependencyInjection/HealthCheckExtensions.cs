@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Identity;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +27,9 @@ public static class HealthCheckExtensions
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
+    /// <remarks>
+    /// Expects "AddTokenCredentialProvider" has been called to register <see cref="TokenCredentialProvider"/>.
+    /// </remarks>
     public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(
         this IServiceCollection services,
         string serviceBusFullyQualifiedNamespace,
@@ -41,19 +44,17 @@ public static class HealthCheckExtensions
                 registrationKey: name,
                 (key, builder) =>
                 {
-                    var defaultAzureCredential = new DefaultAzureCredential();
-
                     builder.AddAzureServiceBusQueue(
-                        name: key,
-                        fullyQualifiedNamespace: serviceBusFullyQualifiedNamespace,
-                        queueName: key,
-                        tokenCredential: defaultAzureCredential);
+                        fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
+                        queueNameFactory: _ => key,
+                        tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
+                        name: key);
 
                     builder.AddServiceBusQueueDeadLetter(
                         fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
                         queueNameFactory: _ => key,
-                        tokenCredentialFactory: _ => defaultAzureCredential,
-                        $"Dead-letter ({key})",
+                        tokenCredentialFactory: sp => sp.GetRequiredService<TokenCredentialProvider>().Credential,
+                        name: $"Dead-letter ({key})",
                         [HealthChecksConstants.StatusHealthCheckTag]);
                 });
         }

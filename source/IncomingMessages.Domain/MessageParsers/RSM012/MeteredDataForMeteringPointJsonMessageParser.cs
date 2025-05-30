@@ -52,7 +52,7 @@ public class MeteredDataForMeteringPointJsonMessageParser(
 
     protected override IIncomingMessageSeries ParseTransaction(JsonElement transactionElement, string senderNumber)
     {
-        var id = transactionElement.GetProperty(MridElementName).GetString() ?? string.Empty;
+        var id = transactionElement.GetProperty(MridElementName).GetString();
         var meteringPointLocationId = transactionElement.GetProperty(MeteringPointIdentificationElementName)
             .GetProperty(ValueElementName)
             .GetString();
@@ -98,7 +98,7 @@ public class MeteredDataForMeteringPointJsonMessageParser(
         }
 
         return new MeteredDataForMeteringPointSeries(
-            id,
+            id!,
             resolution,
             startDateAndOrTimeDateTime!,
             endDateAndOrTimeDateTime,

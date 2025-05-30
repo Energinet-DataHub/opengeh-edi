@@ -16,6 +16,7 @@ using System.Text;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using Dapper;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -211,6 +212,7 @@ public class IncomingMessagesTestBase : IDisposable
         _services = [];
         _services
             .AddScoped<IConfiguration>(_ => config)
+            .AddTokenCredentialProvider()
             .AddB2BAuthentication(
                 new TokenValidationParameters
                 {

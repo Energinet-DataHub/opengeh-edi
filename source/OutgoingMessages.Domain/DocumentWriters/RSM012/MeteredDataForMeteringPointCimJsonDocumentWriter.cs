@@ -175,7 +175,7 @@ internal class MeteredDataForMeasurementSeries(
 
     [JsonPropertyName("originalTransactionIDReference_Series.mRID")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? OriginalTransactionIdReferenceId { get; init; } = originalTransactionIdReferenceId; //TODO: what does this field represent?
+    public string? OriginalTransactionIdReferenceId { get; init; } = originalTransactionIdReferenceId;
 
     [JsonPropertyName("product")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

@@ -58,6 +58,8 @@ public class MasterDataTestBase
         var services = new ServiceCollection();
         var configuration = builder.Build();
 
+        services.AddTokenCredentialProvider();
+
         services
             .AddB2BAuthentication(new()
             {

@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.BuildingBlocks.Models;
 
 public class ActorNumberTests
 {
-    public static TheoryData<string> GetInvalidGlnNumbers() =>
+    public static TheoryData<string> GetInvalidActorNumbers() =>
         new TheoryData<string>()
         {
             "12345678901234", // 14 digits
             "123456789012a",  // 12 digits + 1 letter
+            "10X-----------J", // 15 characters
         };
 
     public static TheoryData<string> GetValidEicCodes() =>
@@ -43,21 +46,11 @@ public class ActorNumberTests
         const string actorNumber = "5790001234567";
 
         // Act
-        var result = ActorNumber.IsGlnNumber(actorNumber);
+        var result = ActorNumber.Create(actorNumber);
 
         // Assert
-        Assert.True(result);
-    }
-
-    [Theory]
-    [MemberData(nameof(GetInvalidGlnNumbers))]
-    public void Given_InvalidGlnNumbers_When_IsGlnNumber_Then_ReturnFalse(string actorNumber)
-    {
-        // Act
-        var result = ActorNumber.IsGlnNumber(actorNumber);
-
-        // Assert
-        Assert.False(result);
+        Assert.True(result.IsGlnNumber());
+        Assert.False(result.IsEic());
     }
 
     [Theory]
@@ -65,22 +58,21 @@ public class ActorNumberTests
     public void Given_ValidEicCode_When_IsEic_Then_ReturnTrue(string actorNumber)
     {
         // Act
-        var result = ActorNumber.IsEic(actorNumber);
+        var result = ActorNumber.Create(actorNumber);
 
         // Assert
-        Assert.True(result);
+        Assert.False(result.IsGlnNumber());
+        Assert.True(result.IsEic());
     }
 
-    [Fact]
-    public void Given_InValidEicNumber_When_IsEic_Then_ReturnFalse()
+    [Theory]
+    [MemberData(nameof(GetInvalidActorNumbers))]
+    public void Given_InvalidActorNumber_When_Create_Then_Throws(string actorNumber)
     {
-        // Arrange
-        const string actorNumber = "10X12345678901234"; // Length 17
-
         // Act
-        var result = ActorNumber.IsEic(actorNumber);
+        var createActor = () => ActorNumber.Create(actorNumber);
 
         // Assert
-        Assert.False(result);
+        createActor.Should().ThrowExactly<InvalidActorNumberException>();
     }
 }
