@@ -123,13 +123,13 @@ public class TimeSeriesJsonToEbixStreamWriterTests
                                     QuantityMeasureUnit: "KWH",
                                     RequiredPeriodDocumentFields: new RequiredPeriodDocumentFields(
                                         Resolution: "PT1H",
-                                        StartedDateTime: "2023-12-25T23:00:00Z",
-                                        EndedDateTime: "2023-12-26T23:00:00Z",
+                                        StartedDateTime: "2023-12-31T23:00:00Z",
+                                        EndedDateTime: "2024-01-01T23:00:00Z",
                                         Points: new List<AssertPointDocumentFieldsInput>
                                         {
                                             new(
                                                 new RequiredPointDocumentFields(1),
-                                                new OptionalPointDocumentFields(BuildingBlocks.Domain.Models.Quality.Measured, 2.0M)),
+                                                new OptionalPointDocumentFields(BuildingBlocks.Domain.Models.Quality.Measured, 1.0M)),
                                         })),
                                 OptionalSeriesFields: new OptionalSeriesFields(
                                     OriginalTransactionIdReferenceId: null,
