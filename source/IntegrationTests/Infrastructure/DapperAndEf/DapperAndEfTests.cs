@@ -258,6 +258,65 @@ public class DapperAndEfTests(IntegrationTestFixture fixture)
     }
 
     [Fact]
+    public async Task Can_rollback_shared_transaction()
+    {
+        // Arrange
+        await using var connectionUsedForWriting = new SqlConnection(_fixture.DatabaseManager.ConnectionString);
+        await using var connectionUsedForReading = new SqlConnection(_fixture.DatabaseManager.ConnectionString);
+        await connectionUsedForWriting.OpenAsync();
+        await connectionUsedForReading.OpenAsync();
+
+        var options = new DbContextOptionsBuilder<SomeDomainEntityDbContext>()
+            .UseSqlServer(connectionUsedForWriting)
+            .Options;
+
+        // Check if the table exists and create it if necessary
+        var tableExists = await connectionUsedForWriting.ExecuteScalarAsync<int>(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SomeDomainEntities'");
+
+        if (tableExists == 0)
+        {
+            await connectionUsedForWriting.ExecuteAsync(
+                "CREATE TABLE SomeDomainEntities (Id INT PRIMARY KEY, SomeTimeStamp DATETIMEOFFSET NULL)");
+        }
+
+        await connectionUsedForWriting.ExecuteAsync("TRUNCATE TABLE SomeDomainEntities");
+
+        // Pre-condition: Ensure the table is empty before the test
+        var preInsertionResult = await connectionUsedForReading.QueryAsync("SELECT * FROM SomeDomainEntities");
+        Assert.Empty(preInsertionResult);
+
+        // Act: Insert using EF using a transaction
+        await using var context = new SomeDomainEntityDbContext(options);
+        var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+        var entity = new SomeDomainEntity { Id = 1 };
+        context.SomeDomainEntities.Add(entity);
+        await context.SaveChangesAsync();
+
+        // Act: Insert using Dapper with the same transaction
+        await connectionUsedForWriting.ExecuteScalarAsync(
+            "INSERT INTO SomeDomainEntities (Id) VALUES (@Id)",
+            new { Id = 2 },
+            transaction: transaction.GetDbTransaction());
+
+        // Act: Query using Dapper
+        var dapperResult =
+            await connectionUsedForReading.QueryAsync<SomeDomainEntity>("SELECT * FROM SomeDomainEntities");
+
+        Assert.Empty(dapperResult);
+
+        // Rollback the transaction
+        await transaction.RollbackAsync();
+
+        // Re-query using Dapper after committing the transaction
+        dapperResult = await connectionUsedForReading.QueryAsync<SomeDomainEntity>("SELECT * FROM SomeDomainEntities");
+
+        // Assert
+        Assert.Empty(dapperResult);
+    }
+
+    [Fact]
     public async Task ReadCommitted_transactions_prevents_duplicate_insertions_from_outside_of_the_transaction()
     {
         // Arrange
