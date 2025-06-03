@@ -58,6 +58,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
     {
         _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         _fixture.SetTestOutputHelper(null!);
+        _fixture.DatabaseManager.CleanupDatabase();
         await Task.CompletedTask;
     }
 
