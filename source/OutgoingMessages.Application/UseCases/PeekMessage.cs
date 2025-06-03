@@ -146,7 +146,11 @@ public class PeekMessage
             meteringPointIds: outgoingMessageBundle.MeteringPointIds.ToList(),
             relatedToMessageId: outgoingMessageBundle.RelatedToMessageId);
 
-        var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
+        var archivedFile = await _archivedMessageClient.CreateAsync(
+                archivedMessageToCreate,
+                peekResult.BundleId.Id,
+                cancellationToken)
+            .ConfigureAwait(false);
 
         marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
         _marketDocumentRepository.Add(marketDocument);

@@ -40,4 +40,22 @@ public static class MeteringPointArchivedMessageMapper
                 relatedToMessageId: dto.RelatedToMessageId,
                 meteringPointIds: dto.MeteringPointIds);
     }
+
+    public static MeteringPointArchivedMessage Map(ArchivedMessageDto dto, Guid bundleId) =>
+        !EnumCompatibilityChecker.AreEnumsCompatible<ArchivedMessageType, ArchivedMessageTypeDto>()
+            ? throw new InvalidEnumMappingException(
+                $"Enum of type {nameof(ArchivedMessageType)} cannot be mapped to type {nameof(ArchivedMessageTypeDto)}.")
+            : new MeteringPointArchivedMessage(
+                id: new ArchivedMessageId(bundleId),
+                messageId: dto.MessageId,
+                eventIds: dto.EventIds,
+                documentType: dto.DocumentType,
+                sender: new Actor(dto.SenderNumber, dto.SenderRole),
+                receiver: new Actor(dto.ReceiverNumber, dto.ReceiverRole),
+                createdAt: dto.CreatedAt,
+                businessReason: dto.BusinessReason,
+                archivedMessageType: (ArchivedMessageType)dto.ArchivedMessageType,
+                archivedMessageStream: new ArchivedMessageStream(dto.ArchivedMessageStream.Stream),
+                relatedToMessageId: dto.RelatedToMessageId,
+                meteringPointIds: dto.MeteringPointIds);
 }

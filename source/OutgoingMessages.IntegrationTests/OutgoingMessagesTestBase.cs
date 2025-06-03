@@ -295,9 +295,19 @@ public class OutgoingMessagesTestBase : IDisposable
 
         public async Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken)
         {
-            Console.WriteLine("Creating archived message");
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken).ConfigureAwait(false);
             return await _base.CreateAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<IArchivedFile> CreateAsync(
+            ArchivedMessageDto message,
+            Guid bundleId,
+            CancellationToken cancellationToken)
+        {
+            {
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken).ConfigureAwait(false);
+                return await _base.CreateAsync(message, bundleId, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         public Task<ArchivedMessageStreamDto?> GetAsync(ArchivedMessageIdDto id, CancellationToken cancellationToken) =>

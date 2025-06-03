@@ -51,6 +51,32 @@ public class ArchivedMessagesClient(
         return new ArchivedFile(mappedArchivedMessage.FileStorageReference, mappedArchivedMessage.ArchivedMessageStream);
     }
 
+    public async Task<IArchivedFile> CreateAsync(
+        ArchivedMessageDto message,
+        Guid bundleId,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+
+        if (IsMeteringPointMessage(message.DocumentType))
+        {
+            var meteringPointArchivedMessage = MeteringPointArchivedMessageMapper.Map(message, bundleId);
+            await _meteringPointArchivedMessageRepository
+                .AddAsync(meteringPointArchivedMessage, cancellationToken)
+                .ConfigureAwait(false);
+
+            return new ArchivedFile(
+                meteringPointArchivedMessage.FileStorageReference,
+                meteringPointArchivedMessage.ArchivedMessageStream);
+        }
+
+        var mappedArchivedMessage = ArchivedMessageMapper.Map(message);
+        await _archivedMessageRepository.AddAsync(mappedArchivedMessage, cancellationToken).ConfigureAwait(false);
+        return new ArchivedFile(
+            mappedArchivedMessage.FileStorageReference,
+            mappedArchivedMessage.ArchivedMessageStream);
+    }
+
     public async Task<ArchivedMessageStreamDto?> GetAsync(ArchivedMessageIdDto id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);

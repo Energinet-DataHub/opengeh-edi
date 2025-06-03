@@ -460,7 +460,12 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    // Ignore exceptions to allow all tasks to complete
+                    // Cannot update the bundle because it has been modified by another peek
+                    return null;
+                }
+                catch (Azure.RequestFailedException)
+                {
+                    // Cannot store the blob because it has been added by another peek
                     return null;
                 }
             });
