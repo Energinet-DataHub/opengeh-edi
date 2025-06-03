@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
@@ -103,7 +104,7 @@ public class EnqueueHandler_Brs_024_V1(
                 CancellationToken.None)).ConfigureAwait(false);
     }
 
-    protected override Task EnqueueRejectedMessagesAsync(
+    protected override async Task EnqueueRejectedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
         EnqueueActorMessagesActorV1 orchestrationStartedByActor,
@@ -114,6 +115,44 @@ public class EnqueueHandler_Brs_024_V1(
             "Received enqueue rejected message(s) for BRS 024. Data: {0}",
             rejectedData);
 
-        throw new NotImplementedException();
+        var rejectReasons = rejectedData.ValidationErrors.Select(
+                e => new RejectRequestMeasurementsMessageRejectReason(
+                    ErrorCode: e.ErrorCode,
+                    ErrorMessage: e.Message))
+            .ToList();
+
+        var rejectedTimeSeries = new RejectRequestMeasurementsMessageSerie(
+            TransactionId: TransactionId.New(),
+            RejectReasons: rejectReasons,
+            OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId));
+
+        var rejectRequestMeasurementsMessageDto = new RejectRequestMeasurementsMessageDto(
+            relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
+            receiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
+            receiverRole: ActorRole.FromName(rejectedData.ActorRole.Name),
+            documentReceiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
+            documentReceiverRole: ActorRole.FromName(rejectedData.ActorRole.Name),
+            processId: orchestrationInstanceId,
+            eventId: EventId.From(serviceBusMessageId),
+            businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,
+            series: rejectedTimeSeries);
+
+        if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
+        {
+            await _outgoingMessagesClient.EnqueueAsync(rejectRequestMeasurementsMessageDto, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        var executionPolicy = Policy
+            .Handle<Exception>(ex => ex is not OperationCanceledException)
+            .WaitAndRetryAsync(
+                [TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)]);
+
+        await executionPolicy.ExecuteAsync(
+            () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
+                new RequestYearlyMeasurementsNotifyEventV1(orchestrationInstanceId.ToString()),
+                CancellationToken.None)).ConfigureAwait(false);
     }
 }
