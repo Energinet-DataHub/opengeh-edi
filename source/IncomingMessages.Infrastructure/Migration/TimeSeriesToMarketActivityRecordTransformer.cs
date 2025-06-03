@@ -36,7 +36,7 @@ public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketAc
                     TransactionId.From(GetOriginalTimeSeriesId(ts.OriginalTimeSeriesId, internallyGeneratedId)),
                     ts.AggregationCriteria.MeteringPointId,
                     MeteringPointType.FromCode(ts.TypeOfMP),
-                    null, // TODO: LRN, is this right (RSM-15 related?)?
+                    null,
                     ts.EnergyTimeSeriesProduct,
                     MeasurementUnit.FromCode(ts.EnergyTimeSeriesMeasureUnit),
                     creationTime,

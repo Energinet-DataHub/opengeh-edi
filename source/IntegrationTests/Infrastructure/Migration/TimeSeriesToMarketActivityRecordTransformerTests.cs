@@ -48,7 +48,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
         record.MeteringPointId.Should().Be("571051839308770693");
         record.MeasurementUnit.Name.Should().Be(MeasurementUnit.KilowattHour.Name);
         record.MeteringPointType.Name.Should().Be(MeteringPointType.Consumption.Name);
-        record.OriginalTransactionIdReference.Should().Be(null); // TODO: LRN is this right?
+        record.OriginalTransactionIdReference.Should().Be(null);
         record.Period.Start.Should().Be(InstantPattern.ExtendedIso.Parse("2023-12-25T23:00:00Z").Value);
         record.Period.End.Should().Be(InstantPattern.ExtendedIso.Parse("2023-12-26T23:00:00Z").Value);
         record.Product.Should().Be("8716867000030");
