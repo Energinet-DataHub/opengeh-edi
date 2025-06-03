@@ -61,6 +61,26 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
+    public void Transform_DeletedTimeSeries_ReturnsEmptyList()
+    {
+        // Arrange
+        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.SingleDeletedTimeSeriesWithSingleObservation, options) ?? throw new Exception("Root is null.");
+        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var header = root.MeteredDataTimeSeriesDH3.Header;
+        var creationTime = header.Creation.ToInstant();
+
+        // Act
+        var actual = transformer.Transform(creationTime, timeSeries);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEmpty();
+    }
+
+    [Fact]
     public void Transform_ValidJsonWithMultipleTimeSeries_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
     {
         // Arrange
@@ -143,6 +163,27 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
         var actualRecord = actual[0];
         actualRecord.Measurements[0].Position.Should().Be(1);
         actualRecord.Measurements[0].Quantity.Should().Be(null);
-        actualRecord.Measurements[0].Quality!.Name.Should().Be(Quality.NotAvailable.Name); // TODO: Is Quality.NotAvailable equivalent to Quality.Missing in Migration?
+        actualRecord.Measurements[0].Quality!.Name.Should().Be(Quality.NotAvailable.Name);
+    }
+
+    [Fact]
+    public void Transform_WhenAllObservationsHaveQuantityMissingIndicatorTrue_ReturnsEmptyList()
+    {
+        // Arrange
+        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var root = JsonSerializer.Deserialize<Root>(
+                       JsonPayloadConstants.QuantityMissingIndicatorTrueForAllObservations, options) ?? throw new Exception("Root is null.");
+        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
+        var header = root.MeteredDataTimeSeriesDH3.Header;
+        var creationTime = header.Creation.ToInstant();
+
+        // Act
+        var actual = transformer.Transform(creationTime, timeSeries);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEmpty();
     }
 }

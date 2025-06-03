@@ -25,14 +25,18 @@ public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketAc
     public List<MeteredDataForMeteringPointMarketActivityRecord> Transform(Instant creationTime, List<TimeSeries> timeSeries)
     {
         var internallyGeneratedId = 0;
-        var meteredDataForMeteringPointMarketActivityRecords = timeSeries.Select(ts =>
+
+        var nonDeletedTimeSeries = GetNonDeletedTimeSeries(timeSeries);
+        var validTimeSeries = GetNonCancelledTimeSeries(nonDeletedTimeSeries);
+
+        var meteredDataForMeteringPointMarketActivityRecords = validTimeSeries.Select(ts =>
             {
                 internallyGeneratedId++;
                 return new MeteredDataForMeteringPointMarketActivityRecord(
                     TransactionId.From(GetOriginalTimeSeriesId(ts.OriginalTimeSeriesId, internallyGeneratedId)),
                     ts.AggregationCriteria.MeteringPointId,
                     MeteringPointType.FromCode(ts.TypeOfMP),
-                    null, // TODO: LRN, is this right?
+                    null, // TODO: LRN, is this right (RSM-15 related?)?
                     ts.EnergyTimeSeriesProduct,
                     MeasurementUnit.FromCode(ts.EnergyTimeSeriesMeasureUnit),
                     creationTime,
@@ -48,6 +52,16 @@ public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketAc
             .ToList();
 
         return meteredDataForMeteringPointMarketActivityRecords;
+    }
+
+    private static IEnumerable<TimeSeries> GetNonDeletedTimeSeries(List<TimeSeries> timeSeries)
+    {
+        return timeSeries.Where(ts => ts.TimeSeriesStatus != "9");
+    }
+
+    private static IEnumerable<TimeSeries> GetNonCancelledTimeSeries(IEnumerable<TimeSeries> timeSeries)
+    {
+        return timeSeries.Where(x => x.Observation.Any(o => o.QuantityMissingIndicator is not true));
     }
 
     private static string GetOriginalTimeSeriesId(string? originalTimeSeriesId, int internallyGeneratedId)

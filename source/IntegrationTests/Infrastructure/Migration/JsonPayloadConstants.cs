@@ -68,6 +68,58 @@ public static class JsonPayloadConstants
        }
        """;
 
+    public const string SingleDeletedTimeSeriesWithSingleObservation = """
+       {
+           "MeteredDataTimeSeriesDH3": {
+               "Header": {
+                   "MessageId": "13255042",
+                   "DocumentType": "E66",
+                   "Creation": "2024-01-16T07:55:33Z",
+                   "EnergyBusinessProcess": "D42",
+                   "EnergyIndustryClassification": "23",
+                   "SenderIdentification": {
+                       "SchemeAgencyIdentifier": "9",
+                       "content": "5790001330552"
+                   },
+                   "RecipientIdentification": {
+                       "SchemeAgencyIdentifier": "9",
+                       "content": "5790001330595"
+                   },
+                   "EnergyBusinessProcessRole": "D3M"
+               },
+               "TimeSeries": [
+                   {
+                       "TimeSeriesId": "74634301_86192545",
+                       "OriginalMessageId": "bc8897bc5d5b4d8a9e7f72efe4b0d4c5",
+                       "OriginalTimeSeriesId": "e1f06dee48d842c1a48b187065e710ff",
+                       "EnergyTimeSeriesFunction": "9",
+                       "EnergyTimeSeriesProduct": "8716867000030",
+                       "EnergyTimeSeriesMeasureUnit": "KWH",
+                       "TypeOfMP": "E17",
+                       "SettlementMethod": "D01",
+                       "AggregationCriteria": {
+                           "MeteringPointId": "571051839308770693"
+                       },
+                       "Observation": [
+                           {
+                               "Position": 1,
+                               "QuantityQuality": "E01",
+                               "EnergyQuantity": 2.0
+                           }
+                       ],
+                       "TimeSeriesPeriod": {
+                           "ResolutionDuration": "PT1H",
+                           "Start": "2023-12-25T23:00:00Z",
+                           "End": "2023-12-26T23:00:00Z"
+                       },
+                       "TransactionInsertDate": "2024-01-16T08:55:14Z",
+                       "TimeSeriesStatus": "9"
+                   }
+               ]
+           }
+       }
+       """;
+
     public const string TwoTimeSeries = """
         {
             "MeteredDataTimeSeriesDH3": {
@@ -435,6 +487,68 @@ public static class JsonPayloadConstants
                         "Observation": [
                             {
                                 "Position": 1,
+                                "QuantityQuality": null,
+                                "QuantityMissingIndicator": true
+                            },
+                            {
+                                "Position": 2,
+                                "QuantityQuality": "E01",
+                                "Quantity": 2.0
+                            }
+                        ],
+                        "TimeSeriesPeriod": {
+                            "ResolutionDuration": "PT1H",
+                            "Start": "2023-12-25T23:00:00Z",
+                            "End": "2023-12-26T23:00:00Z"
+                        },
+                        "TransactionInsertDate": "2024-01-16T08:55:14Z",
+                        "TimeSeriesStatus": "2"
+                    }
+                ]
+            }
+        }
+        """;
+
+    public const string QuantityMissingIndicatorTrueForAllObservations = """
+        {
+            "MeteredDataTimeSeriesDH3": {
+                "Header": {
+                    "MessageId": "13255042",
+                    "DocumentType": "E66",
+                    "Creation": "2024-01-16T07:55:33Z",
+                    "EnergyBusinessProcess": "D42",
+                    "EnergyIndustryClassification": "23",
+                    "SenderIdentification": {
+                        "SchemeAgencyIdentifier": "9",
+                        "_content_": "5790001330552"
+                    },
+                    "RecipientIdentification": {
+                        "SchemeAgencyIdentifier": "9",
+                        "_content_": "5790001330595"
+                    },
+                    "EnergyBusinessProcessRole": "D3M"
+                },
+                "TimeSeries": [
+                    {
+                        "TimeSeriesId": "74634299_86192542",
+                        "OriginalMessageId": "d221605be3744015aed832614accb579",
+                        "OriginalTimeSeriesId": "83521745ef4f4ada83f2115dda402e30",
+                        "EnergyTimeSeriesFunction": "9",
+                        "EnergyTimeSeriesProduct": "8716867000030",
+                        "EnergyTimeSeriesMeasureUnit": "KWH",
+                        "TypeOfMP": "E17",
+                        "SettlementMethod": "D01",
+                        "AggregationCriteria": {
+                            "MeteringPointId": "571051839308770693"
+                        },
+                        "Observation": [
+                            {
+                                "Position": 1,
+                                "QuantityQuality": null,
+                                "QuantityMissingIndicator": true
+                            },
+                            {
+                                "Position": 2,
                                 "QuantityQuality": null,
                                 "QuantityMissingIndicator": true
                             }
