@@ -13,18 +13,12 @@
 // limitations under the License.
 
 using System.Text.Json;
+using Energinet.DataHub.EDI.B2BApi.Migration;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
-using NodaTime.Extensions;
-using NodaTime.Text;
 using Xunit;
-using Quality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
 

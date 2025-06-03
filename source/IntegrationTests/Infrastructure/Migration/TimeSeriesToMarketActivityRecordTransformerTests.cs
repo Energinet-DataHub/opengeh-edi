@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
+using Energinet.DataHub.EDI.B2BApi.Migration;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;

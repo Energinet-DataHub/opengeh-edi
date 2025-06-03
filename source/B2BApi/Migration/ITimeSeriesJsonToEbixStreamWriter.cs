@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
 public interface ITimeSeriesJsonToEbixStreamWriter
 {

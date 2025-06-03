@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime.Extensions;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
 public class TimeSeriesJsonToEbixStreamWriter(
     Serializer serializer,

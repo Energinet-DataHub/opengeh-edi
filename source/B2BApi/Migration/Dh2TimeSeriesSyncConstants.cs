@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
 public static class Dh2TimeSeriesSyncConstants
 {
