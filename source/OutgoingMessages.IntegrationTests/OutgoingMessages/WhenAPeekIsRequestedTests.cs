@@ -27,10 +27,12 @@ using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -419,6 +421,71 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
 
         // Assert / Then
         peekResult.Should().NotBeNull("because the messages is allowed to be peeked.");
+    }
+
+    [Fact]
+    public async Task When_MultipleConcurrentPeeks_Then_OnlyOneArchivedMessageAndOnlyOnePeekSucceeds()
+    {
+        // Arrange
+        FeatureManagerStub.SetFeatureFlag(FeatureFlagNames.PeekMeasurementMessages, true);
+
+        var receiver = new Actor(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var message1 = new AcceptedForwardMeteredDataMessageDtoBuilder()
+            .WithReceiver(receiver)
+            .Build();
+
+        var message2 = new AcceptedForwardMeteredDataMessageDtoBuilder()
+            .WithReceiver(receiver)
+            .Build();
+
+        var whenMessageIsEnqueued = Instant.FromUtc(2024, 7, 1, 14, 57, 09);
+        _clockStub.SetCurrentInstant(whenMessageIsEnqueued);
+
+        await EnqueueAndCommitMessage(message1);
+        await EnqueueAndCommitMessage(message2);
+
+        await GivenBundleMessagesHasBeenTriggered(whenMessageIsEnqueued);
+
+        // Act / When
+        var tasks = Enumerable.Range(1, 3)
+            .Select(async _ =>
+            {
+                try
+                {
+                    return await PeekMessageWithDelayAsync(
+                        MessageCategory.MeasureData,
+                        actorNumber: receiver.ActorNumber,
+                        actorRole: receiver.ActorRole,
+                        documentFormat: DocumentFormat.Xml);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    // Ignore exceptions to allow all tasks to complete
+                    return null;
+                }
+            });
+
+        var peekResultDtos = await Task.WhenAll(tasks);
+
+        // Assert
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var archivedMessages =
+            (await connection.QueryAsync("SELECT * FROM [dbo].[MeteringPointArchivedMessages]")).ToList();
+
+        using var assertScope = new AssertionScope();
+        peekResultDtos.Should().NotBeNull();
+        peekResultDtos.Should().HaveCount(3, "three peeks should be performed concurrently");
+        peekResultDtos.Where(pr => pr is null)
+            .Should()
+            .HaveCount(2, "two peeks should return null because only one peek can succeed");
+
+        peekResultDtos.Where(pr => pr is not null).Should().HaveCount(1, "only one peek should return a result");
+
+        archivedMessages.Should().NotBeNull();
+        archivedMessages.Should()
+            .HaveCount(1, "only one message should be archived when multiple peeks are performed concurrently");
     }
 
     private async Task GivenBundleMessagesHasBeenTriggered(Instant whenMessageIsEnqueued)
