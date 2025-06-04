@@ -30,14 +30,6 @@ public interface IArchivedMessagesClient
     Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Create a new archived message directly in the database
-    /// </summary>
-    Task<IArchivedFile> CreateAsync(
-        ArchivedMessageDto message,
-        Guid bundleId,
-        CancellationToken cancellationToken);
-
-    /// <summary>
     /// Get a document from the database
     /// </summary>
     /// <param name="id"></param>
