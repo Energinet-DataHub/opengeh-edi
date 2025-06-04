@@ -176,8 +176,9 @@ public class OutgoingMessagesTestBase : IDisposable
 
         var serviceProvider = new ServiceCollection()
             .Add(_services!)
-            .AddScoped<IArchivedMessagesClient, DelayingArchivedMessagesClient>(sp =>
-                new DelayingArchivedMessagesClient(ServiceProvider.GetRequiredService<IArchivedMessagesClient>()))
+            .Replace(
+                ServiceDescriptor.Scoped<IArchivedMessagesClient>(_ =>
+                    new DelayingArchivedMessagesClient(ServiceProvider.GetRequiredService<IArchivedMessagesClient>())))
             .BuildServiceProvider();
 
         var outgoingMessagesClient = serviceProvider.GetService<IOutgoingMessagesClient>();
