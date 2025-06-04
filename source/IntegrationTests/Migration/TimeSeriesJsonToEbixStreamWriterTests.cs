@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
+namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
 
 public class TimeSeriesJsonToEbixStreamWriterTests
 {

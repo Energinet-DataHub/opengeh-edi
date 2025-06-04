@@ -21,7 +21,7 @@ using NodaTime.Extensions;
 using NodaTime.Text;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Migration;
+namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
 
 public class TimeSeriesToMarketActivityRecordTransformerTests
 {
