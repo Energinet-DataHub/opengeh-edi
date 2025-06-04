@@ -70,4 +70,15 @@ public class WhenRequestMeasurementsIsReceivedTests : BaseTestClass
 
         await _measurementsRequestAsEnergySupplier.ConfirmResponseIsAvailable();
     }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_rejected_response_from_requested_measurements_response()
+    {
+        await _measurementsRequestAsEnergySupplier.PublishEnqueueBrs024RejectedMeasurements(
+            new Actor(
+                actorNumber: ActorNumber.Create(SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber),
+                actorRole: ActorRole.EnergySupplier));
+
+        await _measurementsRequestAsEnergySupplier.ConfirmRejectedResponseIsAvailable();
+    }
 }

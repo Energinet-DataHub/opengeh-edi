@@ -19,37 +19,33 @@ using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
-using NodaTime;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
-public static class EnqueueBrs024AcceptedMeasurementsFactory
+public static class EnqueueBrs024RejectedMeasurementsFactory
 {
-    public static ServiceBusMessage CreateAcceptedV1(
+    public static ServiceBusMessage CreateRejectedV1(
         Actor actor,
-        Instant start,
-        Instant end,
         string originalActorMessageId,
         string originalActorTransactionId,
         Guid eventId)
     {
-        var resolution = PMValueTypes.Resolution.QuarterHourly;
-        var accepted = new RequestYearlyMeasurementsAcceptedV1(
+        var accepted = new RequestYearlyMeasurementsRejectV1(
             OriginalActorMessageId: originalActorMessageId,
             OriginalTransactionId: originalActorTransactionId,
-            MeteringPointId: "123456789012345678",
-            MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
-            ProductNumber: "test-product-number",
-            RegistrationDateTime: end.ToDateTimeOffset(),
-            StartDateTime: start.ToDateTimeOffset(),
-            EndDateTime: end.ToDateTimeOffset(),
             ActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: actor.ActorRole.ToProcessManagerActorRole(),
-            Resolution: resolution,
-            MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-            Measurements: GetMeasurements(start, end, resolution),
-            GridAreaCode: "804");
+            BusinessReason: PMValueTypes.BusinessReason.PeriodicMetering,
+            ValidationErrors:
+            [
+                new(
+                    Message:
+                    "I forbindelse med anmodning om årssum kan der kun anmodes om data for forbrug og produktion/When"
+                    + " requesting yearly amount then it is only possible to request for production and consumption",
+                    ErrorCode: "D18"),
+
+            ]);
 
         return CreateServiceBusMessage(accepted, actor, eventId);
     }
@@ -77,40 +73,5 @@ public static class EnqueueBrs024AcceptedMeasurementsFactory
         return enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
             idempotencyKey: eventId.ToString());
-    }
-
-    private static IReadOnlyCollection<AcceptedMeteredData> GetMeasurements(
-        Instant startDateTime,
-        Instant endDateTime,
-        PMValueTypes.Resolution resolution)
-    {
-        var measurements = new List<AcceptedMeteredData>();
-        var interval = resolution switch
-        {
-            var res when res == PMValueTypes.Resolution.QuarterHourly => Duration.FromMinutes(15),
-            var res when res == PMValueTypes.Resolution.Hourly => Duration.FromHours(1),
-            var res when res == PMValueTypes.Resolution.Daily => Duration.FromDays(1),
-            _ => throw new ArgumentOutOfRangeException(nameof(resolution), "Unsupported resolution"),
-        };
-
-        var position = 1;
-        for (var timestamp = startDateTime; timestamp < endDateTime; timestamp += interval)
-        {
-            measurements.Add(
-                new AcceptedMeteredData(
-                    Position: position,
-                    EnergyQuantity: GenerateRandomMeasurementValue(),
-                    QuantityQuality: PMValueTypes.Quality.AsProvided));
-            position++;
-        }
-
-        return measurements;
-    }
-
-    private static decimal GenerateRandomMeasurementValue()
-    {
-        // Example: Generate a random value for demonstration purposes
-        var random = new Random();
-        return (decimal)(random.Next(0, 10000) / 100.0); // Random decimal value between 0.00 and 100.00
     }
 }
