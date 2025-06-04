@@ -37,7 +37,6 @@ public class AssertRejectRequestRequestMeasurementsXmlDocument : IAssertRejectRe
 
     public IAssertRejectRequestMeasurementsDocument HasBusinessReason(BusinessReason businessReason)
     {
-        ArgumentNullException.ThrowIfNull(businessReason);
         _documentAsserter.HasValue("process.processType", businessReason.Code);
         return this;
     }
@@ -94,7 +93,6 @@ public class AssertRejectRequestRequestMeasurementsXmlDocument : IAssertRejectRe
 
     public IAssertRejectRequestMeasurementsDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        ArgumentNullException.ThrowIfNull(expectedTransactionId);
         _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.Value);
         return this;
     }
@@ -108,7 +106,6 @@ public class AssertRejectRequestRequestMeasurementsXmlDocument : IAssertRejectRe
     public IAssertRejectRequestMeasurementsDocument HasOriginalTransactionId(
         TransactionId expectedOriginalTransactionId)
     {
-        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
         _documentAsserter.HasValue(
             "Series[1]/originalTransactionIDReference_Series.mRID",
             expectedOriginalTransactionId.Value);

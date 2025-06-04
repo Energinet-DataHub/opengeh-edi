@@ -23,14 +23,11 @@ public class AssertRejectRequestRequestMeasurementsEbixDocument
     : IAssertRejectRequestMeasurementsDocument
 {
     private readonly AssertEbixDocument _documentAsserter;
-    private readonly bool _skipMaxLengthValidation;
 
     public AssertRejectRequestRequestMeasurementsEbixDocument(
-        AssertEbixDocument documentAsserter,
-        bool skipMaxLengthValidation = false)
+        AssertEbixDocument documentAsserter)
     {
         _documentAsserter = documentAsserter;
-        _skipMaxLengthValidation = skipMaxLengthValidation;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "ERR");
     }
 
@@ -38,8 +35,7 @@ public class AssertRejectRequestRequestMeasurementsEbixDocument
     {
         await _documentAsserter.HasValidStructureAsync(
             DocumentType.RejectRequestMeasurements,
-            "3",
-            _skipMaxLengthValidation).ConfigureAwait(false);
+            "3").ConfigureAwait(false);
         return this;
     }
 
@@ -53,7 +49,6 @@ public class AssertRejectRequestRequestMeasurementsEbixDocument
 
     public IAssertRejectRequestMeasurementsDocument HasReasonCode(ReasonCode reasonCode)
     {
-        //<ns0:StatusType listAgencyIdentifier="6">41</ns0:StatusType>
         _documentAsserter.HasValue(
             "PayloadResponseEvent[1]/StatusType",
             EbixCode.Of(ReasonCode.FromCode(reasonCode.Code)));
@@ -110,7 +105,6 @@ public class AssertRejectRequestRequestMeasurementsEbixDocument
 
     public IAssertRejectRequestMeasurementsDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        ArgumentNullException.ThrowIfNull(expectedTransactionId);
         _documentAsserter.HasValue("PayloadResponseEvent[1]/Identification", expectedTransactionId.Value);
         return this;
     }
@@ -123,7 +117,6 @@ public class AssertRejectRequestRequestMeasurementsEbixDocument
 
     public IAssertRejectRequestMeasurementsDocument HasOriginalTransactionId(TransactionId expectedOriginalTransactionId)
     {
-        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
         _documentAsserter.HasValue(
             "PayloadResponseEvent[1]/OriginalBusinessDocument",
             expectedOriginalTransactionId.Value);

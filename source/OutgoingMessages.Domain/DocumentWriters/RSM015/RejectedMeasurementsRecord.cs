@@ -16,7 +16,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM015;
 
-// This is a copy of RejectRequestMeasurementsMessageSerie defined in the process module
 public record RejectedMeasurementsRecord(
     TransactionId TransactionId,
     MeteringPointId MeteringPointId,

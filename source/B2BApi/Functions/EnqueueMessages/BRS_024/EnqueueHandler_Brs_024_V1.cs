@@ -58,7 +58,10 @@ public class EnqueueHandler_Brs_024_V1(
             "Received enqueue accepted message(s) for BRS 024. Data: {0}.",
             acceptedData);
 
-        var acceptedRequestMeasurementsMessageDto = GetAcceptedRequestMeasurementsMessageDto(serviceBusMessageId, orchestrationInstanceId, acceptedData);
+        var acceptedRequestMeasurementsMessageDto = GetAcceptedRequestMeasurementsMessageDto(
+            serviceBusMessageId,
+            orchestrationInstanceId,
+            acceptedData);
 
         if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
         {
@@ -82,6 +85,7 @@ public class EnqueueHandler_Brs_024_V1(
         var rejectRequestMeasurementsMessageDto = GetRejectRequestMeasurementsMessageDto(
             serviceBusMessageId,
             orchestrationInstanceId,
+            orchestrationStartedByActor,
             rejectedData);
 
         if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
@@ -129,6 +133,7 @@ public class EnqueueHandler_Brs_024_V1(
     private static RejectRequestMeasurementsMessageDto GetRejectRequestMeasurementsMessageDto(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
+        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
         RequestYearlyMeasurementsRejectV1 rejectedData)
     {
         var rejectReasons = rejectedData.ValidationErrors.Select(
@@ -137,7 +142,7 @@ public class EnqueueHandler_Brs_024_V1(
                     ErrorMessage: e.Message))
             .ToList();
 
-        var rejectedTimeSeries = new RejectRequestMeasurementsMessageSerie(
+        var rejectedTimeSeries = new RejectRequestMeasurementsMessageSeries(
             TransactionId: TransactionId.New(),
             MeteringPointId: MeteringPointId.From(rejectedData.MeteringPointId),
             RejectReasons: rejectReasons,
@@ -145,10 +150,10 @@ public class EnqueueHandler_Brs_024_V1(
 
         return new RejectRequestMeasurementsMessageDto(
             relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
-            receiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
-            receiverRole: ActorRole.FromName(rejectedData.ActorRole.Name),
-            documentReceiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
+            receiverNumber: ActorNumber.Create(orchestrationStartedByActor.ActorNumber),
+            receiverRole: ActorRole.FromName(orchestrationStartedByActor.ActorRole.ToString()),
             documentReceiverRole: ActorRole.FromName(rejectedData.ActorRole.Name),
+            documentReceiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
             processId: orchestrationInstanceId,
             eventId: EventId.From(serviceBusMessageId),
             businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,

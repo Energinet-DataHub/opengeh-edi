@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
+using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM015;
 using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using FluentAssertions;
@@ -299,19 +300,22 @@ public class GivenRequestMeasurementsTests(
                 .Subject;
         }
 
-        await RejectRequestMeasurementsDocumentAsserter
-            .AssertCorrectDocumentAsync(
-                documentFormat,
-                peekResult.Bundle,
-                new RejectRequestMeasurementsDocumentAssertionInput(
-                    BusinessReason.PeriodicMetering,
-                    new Actor(DataHubDetails.DataHubActorNumber, ActorRole.MeteredDataAdministrator),
-                    new Actor(receiverActor.ActorNumber, receiverActor.ActorRole),
-                    whenBundleShouldBeClosed,
-                    ReasonCode.FullyRejected,
-                    transactionId,
-                    meteringPointId,
-                    expectedValidationErrorCode,
-                    expectedValidationErrorMessage));
+        await AssertRejectRequestMeasurementsDocumentProvider.AssertDocument(
+            peekResult.Bundle,
+            documentFormat)
+            .MessageIdExists()
+            .HasBusinessReason(BusinessReason.PeriodicMetering)
+            .HasSenderId(DataHubDetails.DataHubActorNumber)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator)
+            .HasReceiverId(receiverActor.ActorNumber)
+            .HasReceiverRole(receiverActor.ActorRole)
+            .HasTimestamp(whenBundleShouldBeClosed)
+            .HasReasonCode(ReasonCode.FullyRejected)
+            .TransactionIdExists()
+            .HasMeteringPointId(meteringPointId)
+            .HasOriginalTransactionId(transactionId)
+            .HasSerieReasonCode(expectedValidationErrorCode)
+            .HasSerieReasonMessage(expectedValidationErrorMessage)
+            .DocumentIsValidAsync();
     }
 }

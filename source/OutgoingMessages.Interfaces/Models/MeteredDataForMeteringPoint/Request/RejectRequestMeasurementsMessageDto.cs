@@ -25,7 +25,7 @@ public class RejectRequestMeasurementsMessageDto : OutgoingMessageDto
         string businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,
-        RejectRequestMeasurementsMessageSerie series,
+        RejectRequestMeasurementsMessageSeries series,
         ActorNumber documentReceiverNumber,
         ActorRole documentReceiverRole)
         : base(
@@ -43,14 +43,14 @@ public class RejectRequestMeasurementsMessageDto : OutgoingMessageDto
         DocumentReceiverRole = documentReceiverRole;
     }
 
-    public RejectRequestMeasurementsMessageSerie Series { get; }
+    public RejectRequestMeasurementsMessageSeries Series { get; }
 
     public ActorNumber DocumentReceiverNumber { get; }
 
     public ActorRole DocumentReceiverRole { get; }
 }
 
-public record RejectRequestMeasurementsMessageSerie(
+public record RejectRequestMeasurementsMessageSeries(
     TransactionId TransactionId,
     MeteringPointId MeteringPointId,
     IReadOnlyCollection<RejectRequestMeasurementsMessageRejectReason> RejectReasons,

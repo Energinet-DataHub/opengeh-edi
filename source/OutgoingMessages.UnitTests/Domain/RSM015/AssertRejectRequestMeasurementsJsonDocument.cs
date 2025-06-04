@@ -112,14 +112,12 @@ public sealed class AssertRejectRequestRequestMeasurementsJsonDocument : IAssert
 
     public IAssertRejectRequestMeasurementsDocument HasBusinessReason(BusinessReason businessReason)
     {
-        ArgumentNullException.ThrowIfNull(businessReason);
         Assert.Equal(businessReason.Code, _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
 
     public IAssertRejectRequestMeasurementsDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        ArgumentNullException.ThrowIfNull(expectedTransactionId);
         Assert.Equal(expectedTransactionId.Value, FirstSeriesElement().GetProperty("mRID").ToString());
         return this;
     }
@@ -145,7 +143,6 @@ public sealed class AssertRejectRequestRequestMeasurementsJsonDocument : IAssert
     public IAssertRejectRequestMeasurementsDocument HasOriginalTransactionId(
         TransactionId expectedOriginalTransactionId)
     {
-        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
         Assert.Equal(
             expectedOriginalTransactionId.Value,
             FirstSeriesElement().GetProperty("originalTransactionIDReference_Series.mRID").ToString());
