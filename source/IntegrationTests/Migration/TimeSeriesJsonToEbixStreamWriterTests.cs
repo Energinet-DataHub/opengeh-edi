@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
 public class TimeSeriesJsonToEbixStreamWriterTests
 {
     [Fact]
-    public async Task WriteStreamAsync_ValidJson_ReturnsValidMarketDocumentStream()
+    public async Task Given_WriteStreamAsync_When_ValidJson_Then_ReturnsValidMarketDocumentStream()
     {
         // Arrange
         var timeSeriesJsonToEbixStreamWriter = new TimeSeriesJsonToEbixStreamWriter(
@@ -80,7 +80,7 @@ public class TimeSeriesJsonToEbixStreamWriterTests
     }
 
     [Fact]
-    public async Task WriteStreamAsync_JsonMissingOriginalTimeSeriesIdAndOriginalMessageId_ReturnsValidMarketDocumentStream()
+    public async Task Given_WriteStreamAsync_When_JsonMissingOriginalTimeSeriesIdAndOriginalMessageId_Then_ReturnsValidMarketDocumentStream()
     {
         // Arrange
         var timeSeriesJsonToEbixStreamWriter = new TimeSeriesJsonToEbixStreamWriter(

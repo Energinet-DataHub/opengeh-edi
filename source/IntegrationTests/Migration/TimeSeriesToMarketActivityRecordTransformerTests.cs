@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
 public class TimeSeriesToMarketActivityRecordTransformerTests
 {
     [Fact]
-    public void Transform_ValidJson_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
+    public void Given_Transform_When_ValidJson_Then_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
@@ -61,7 +61,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Transform_DeletedTimeSeries_ReturnsEmptyList()
+    public void Given_Transform_When_DeletedTimeSeries_Then_ReturnsEmptyList()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
@@ -81,7 +81,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Transform_ValidJsonWithMultipleTimeSeries_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
+    public void Given_Transform_When_ValidJsonWithMultipleTimeSeries_Then_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
@@ -104,7 +104,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Transform_WhenCalledWithJsonContainingNoTs_ShouldThrowArgumentNullException()
+    public void Given_Transform_When_CalledWithJsonContainingNoTs_Then_ShouldThrowArgumentNullException()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
@@ -123,7 +123,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Transform_WhenCalledWithNoOriginalTimeSeriesId_ReturnsPrefixedMigrationTimeSeriesId()
+    public void Given_Transform_When_CalledWithNoOriginalTimeSeriesId_Then_ReturnsPrefixedMigrationTimeSeriesId()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
@@ -144,7 +144,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Transform_WhenCalledWithQuantityMissingIndicatorTrueAndQualityNull_ReturnsValidMeteredDataForMeteringPointMarketActivityRecord()
+    public void Given_Transform_When_CalledWithQuantityMissingIndicatorTrueAndQualityNull_Then_ReturnsValidMeteredDataForMeteringPointMarketActivityRecord()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
@@ -167,7 +167,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Transform_WhenAllObservationsHaveQuantityMissingIndicatorTrue_ReturnsEmptyList()
+    public void Given_Transform_When_AllObservationsHaveQuantityMissingIndicatorTrue_Then_ReturnsEmptyList()
     {
         // Arrange
         var transformer = new TimeSeriesToMarketActivityRecordTransformer();
