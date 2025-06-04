@@ -1,7 +1,7 @@
 -- Should match the query in BundlesRepository.GetNextBundleToPeekAsync()
 
 -- Drop existing index
-DROP INDEX IX_Bundles_NextBundleToPeek
+DROP INDEX IX_Bundles_NextBundleToPeek ON [dbo].[Bundles]
 GO
 
 -- DequeuedAt does not need to be included in the key columns since the index is filtered on DequeuedAt IS NULL
