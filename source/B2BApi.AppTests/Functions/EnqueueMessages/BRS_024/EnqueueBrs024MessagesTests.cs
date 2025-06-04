@@ -173,6 +173,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
             ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
             ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole(),
             BusinessReason: PMValueTypes.BusinessReason.PeriodicMetering,
+            MeteringPointId: "1234567890123",
             ValidationErrors:
             [
                 new(
