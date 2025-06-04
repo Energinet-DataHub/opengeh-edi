@@ -139,7 +139,7 @@ public class EnqueueHandler_Brs_024_V1(
 
         var rejectedTimeSeries = new RejectRequestMeasurementsMessageSerie(
             TransactionId: TransactionId.New(),
-            MeteringPointId: MeteringPointId.From("00"), // rejectedData.MeteringPointId,
+            MeteringPointId: MeteringPointId.From(rejectedData.MeteringPointId),
             RejectReasons: rejectReasons,
             OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId));
 
