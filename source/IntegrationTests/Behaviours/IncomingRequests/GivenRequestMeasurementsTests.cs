@@ -42,7 +42,7 @@ public class GivenRequestMeasurementsTests(
     public static TheoryData<DocumentFormat> SupportedDocumentFormats =>
     [
         DocumentFormat.Json,
-        // DocumentFormat.Xml,
+        DocumentFormat.Xml,
         // DocumentFormat.Ebix
     ];
 

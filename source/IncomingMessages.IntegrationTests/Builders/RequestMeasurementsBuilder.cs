@@ -36,6 +36,13 @@ public static class RequestMeasurementsBuilder
                 senderActor,
                 series);
         }
+        else if (format == DocumentFormat.Xml)
+        {
+            content = GetXml(
+                messageId,
+                senderActor,
+                series);
+        }
         else
         {
             throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported document format");
@@ -93,4 +100,32 @@ public static class RequestMeasurementsBuilder
         }
       }
       """;
+
+    private static string GetXml(
+        string messageId,
+        Actor sender,
+        IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId
+            MeteringPointId)> series) =>
+        $$"""
+          <cim:RequestValidatedMeasureData_MarketDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cim="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1" xsi:schemaLocation="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1 urn-ediel-org-measure-requestvalidatedmeasuredata-0-1.xsd">
+          	<cim:mRID>{{messageId}}</cim:mRID>
+          	<cim:type>E73</cim:type>
+          	<cim:process.processType>E23</cim:process.processType>
+          	<cim:businessSector.type>23</cim:businessSector.type>
+          	<cim:sender_MarketParticipant.mRID codingScheme="A10">{{sender.ActorNumber.Value}}</cim:sender_MarketParticipant.mRID>
+          	<cim:sender_MarketParticipant.marketRole.type>{{sender.ActorRole.Code}}</cim:sender_MarketParticipant.marketRole.type>
+          	<cim:receiver_MarketParticipant.mRID codingScheme="A10">5790001330552</cim:receiver_MarketParticipant.mRID>
+          	<cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
+          	<cim:createdDateTime>2001-12-17T09:30:47Z</cim:createdDateTime>
+          	{{string.Join("\n", series.Select(s =>
+                  $$"""
+                    <cim:Series>
+                    	<cim:mRID>{{s.TransactionId.Value}}</cim:mRID>
+                    	<cim:start_DateAndOrTime.dateTime>{{s.PeriodStart}}</cim:start_DateAndOrTime.dateTime>
+                    	<cim:end_DateAndOrTime.dateTime>{{s.PeriodEnd}}</cim:end_DateAndOrTime.dateTime>
+                    	<cim:marketEvaluationPoint.mRID codingScheme="A10">{{s.MeteringPointId.Value}}</cim:marketEvaluationPoint.mRID>
+                    </cim:Series>
+                    """))}}
+          </cim:RequestValidatedMeasureData_MarketDocument>
+          """;
 }
