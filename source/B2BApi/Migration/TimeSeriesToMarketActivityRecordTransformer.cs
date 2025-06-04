@@ -24,16 +24,14 @@ public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketAc
 {
     public List<MeteredDataForMeteringPointMarketActivityRecord> Transform(Instant creationTime, List<TimeSeries> timeSeries)
     {
-        var internallyGeneratedId = 0;
-
-        var nonDeletedTimeSeries = GetNonDeletedTimeSeries(timeSeries);
+        var series = GetNonNullOriginalTransactionIdTimeSeries(timeSeries);
+        var nonDeletedTimeSeries = GetNonDeletedTimeSeries(series);
         var validTimeSeries = GetNonCancelledTimeSeries(nonDeletedTimeSeries);
 
         var meteredDataForMeteringPointMarketActivityRecords = validTimeSeries.Select(ts =>
             {
-                internallyGeneratedId++;
                 return new MeteredDataForMeteringPointMarketActivityRecord(
-                    TransactionId.From(GetOriginalTimeSeriesId(ts.OriginalTimeSeriesId, internallyGeneratedId)),
+                    TransactionId.From(ts.OriginalTimeSeriesId!),
                     ts.AggregationCriteria.MeteringPointId,
                     MeteringPointType.FromCode(ts.TypeOfMP),
                     null,
@@ -54,7 +52,12 @@ public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketAc
         return meteredDataForMeteringPointMarketActivityRecords;
     }
 
-    private static IEnumerable<TimeSeries> GetNonDeletedTimeSeries(List<TimeSeries> timeSeries)
+    private static IEnumerable<TimeSeries> GetNonNullOriginalTransactionIdTimeSeries(IEnumerable<TimeSeries> timeSeries)
+    {
+        return timeSeries.Where(ts => ts.OriginalTimeSeriesId != null);
+    }
+
+    private static IEnumerable<TimeSeries> GetNonDeletedTimeSeries(IEnumerable<TimeSeries> timeSeries)
     {
         return timeSeries.Where(ts => ts.TimeSeriesStatus != "9");
     }
@@ -62,11 +65,6 @@ public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketAc
     private static IEnumerable<TimeSeries> GetNonCancelledTimeSeries(IEnumerable<TimeSeries> timeSeries)
     {
         return timeSeries.Where(x => x.Observation.Any(o => o.QuantityMissingIndicator is not true));
-    }
-
-    private static string GetOriginalTimeSeriesId(string? originalTimeSeriesId, int internallyGeneratedId)
-    {
-        return originalTimeSeriesId ?? $"mig-{internallyGeneratedId:D8}";
     }
 
     private static string TryGetQualityFromEbixCode(Observation obs)
