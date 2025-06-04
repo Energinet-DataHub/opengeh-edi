@@ -14,7 +14,7 @@ CREATE INDEX IX_Bundles_NextBundleToPeek
     WHERE DequeuedAt IS NULL;
 GO
 
--- ebIX index doesn't include the message category, since ebIX queries messages for all categories
+-- ebIX index doesn't include the message category, since the ebIX query is for all categories
 CREATE INDEX IX_Bundles_NextBundleToPeek_ebIX
     ON [dbo].[Bundles] (
         ActorMessageQueueId,
