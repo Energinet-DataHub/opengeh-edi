@@ -77,8 +77,8 @@ public sealed class RequestMeasurementsMessageParserTests
     {
         var data = new TheoryData<DocumentFormat, Stream, string, string>
         {
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad-version" },
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad-version" },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad" },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestValidatedMeasurementsMissingRegistration.xml"), nameof(InvalidMessageStructure), "elements expected: 'registration_DateAndOrTime.dateTime'" },
