@@ -41,14 +41,14 @@ public class RequestValidatedMeasurementsXmlMessageParser(CimXmlSchemaProvider s
         MessageHeader header,
         IReadOnlyCollection<IIncomingMessageSeries> transactions) => new(
         new RequestMeasurementsMessageBase(
-            header.SenderId,
-            header.SenderRole,
-            header.ReceiverId,
-            header.ReceiverRole,
-            header.BusinessReason,
-            header.MessageType,
             header.MessageId,
+            header.MessageType,
             header.CreatedAt,
+            header.SenderId,
+            header.ReceiverId,
+            header.SenderRole,
+            header.BusinessReason,
+            header.ReceiverRole,
             header.BusinessType,
             transactions));
 }
