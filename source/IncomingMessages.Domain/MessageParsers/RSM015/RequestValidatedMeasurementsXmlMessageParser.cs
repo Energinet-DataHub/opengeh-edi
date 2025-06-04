@@ -30,17 +30,17 @@ public class RequestValidatedMeasurementsXmlMessageParser(CimXmlSchemaProvider s
         XElement seriesElement,
         XNamespace ns,
         string senderNumber) =>
-        new RequestValidatedMeasurementsSeries(
+        new RequestMeasurementsSeries(
             seriesElement.Element(ns + "mRID")?.Value ?? string.Empty,
             seriesElement.Element(ns + "start_DateAndOrTime.dateTime")?.Value ?? string.Empty,
             seriesElement.Element(ns + "end_DateAndOrTime.dateTime")?.Value,
-            seriesElement.Element(ns + "marketEvaluationPoint.mRID")?.Value,
+            MeteringPointId.From(seriesElement.Element(ns + "marketEvaluationPoint.mRID")!.Value),
             senderNumber);
 
     protected override IncomingMarketMessageParserResult CreateResult(
         MessageHeader header,
         IReadOnlyCollection<IIncomingMessageSeries> transactions) => new(
-        new RequestValidatedMeasurementsMessageBase(
+        new RequestMeasurementsMessageBase(
             header.SenderId,
             header.SenderRole,
             header.ReceiverId,
