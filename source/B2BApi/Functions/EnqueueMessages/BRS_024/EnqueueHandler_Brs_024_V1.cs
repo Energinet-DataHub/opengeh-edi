@@ -84,13 +84,13 @@ public class EnqueueHandler_Brs_024_V1(
                     Period: new Period(aggregatedMeasurement.StartDateTime.ToInstant(), aggregatedMeasurement.EndDateTime.ToInstant()),
                     Measurements: [energyObservations]));
 
-            if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
-            {
-                await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, CancellationToken.None)
-                    .ConfigureAwait(false);
+            await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, CancellationToken.None)
+                .ConfigureAwait(false);
+        }
 
-                await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
-            }
+        if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
+        {
+            await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
         }
 
         var executionPolicy = Policy

@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 using Energinet.DataHub.ProcessManager.Abstractions.Client;
@@ -160,7 +159,7 @@ public class GivenRequestMeasurementsTests(
             .HasOriginalTransactionIdReferenceId(1, transactionId.Value)
             .HasProduct(1, "8716867000030")
             .HasQuantityMeasureUnit(1, MeasurementUnit.KilowattHour.Code)
-            .HasRegistrationDateTime(1, endDate.ToString())
+            .HasRegistrationDateTime(1, default(Instant).ToString())
             .HasResolution(1, Resolution.QuarterHourly.Code)
             .HasStartedDateTime(
                 1,
