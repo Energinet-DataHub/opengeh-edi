@@ -201,7 +201,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
         // Act
         await GivenEnqueueRejectedBrs024Message(enqueueActorMessages, eventId);
 
-        // => Then accepted message is enqueued
+        // => Then reject message is enqueued
         // Verify the function was executed
         var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
             functionName: nameof(EnqueueTrigger_Brs_024));
