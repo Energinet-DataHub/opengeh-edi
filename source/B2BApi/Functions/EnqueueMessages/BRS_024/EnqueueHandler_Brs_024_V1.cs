@@ -26,6 +26,7 @@ using NodaTime.Extensions;
 using Polly;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 
@@ -57,39 +58,39 @@ public class EnqueueHandler_Brs_024_V1(
             "Received enqueue accepted message(s) for BRS 024. Data: {0}",
             acceptedData);
 
-        var energyObservations = acceptedData.Measurements
-            .Select(x =>
-                new MeasurementDto(
-                    Position: x.Position,
-                    Quantity: x.EnergyQuantity,
-                    Quality: Quality.FromName(x.QuantityQuality.Name)))
-            .ToList();
-
-        var acceptedRequestMeasurementsMessageDto = new AcceptedSendMeasurementsMessageDto(
-            eventId: EventId.From(serviceBusMessageId),
-            externalId: new ExternalId(orchestrationInstanceId),
-            receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
-            businessReason: BusinessReason.PeriodicMetering,
-            relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-            gridAreaCode: acceptedData.GridAreaCode,
-            series: new MeasurementsDto(
-                TransactionId: TransactionId.New(),
-                MeteringPointId: acceptedData.MeteringPointId,
-                MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                OriginalTransactionIdReference: TransactionId.From(acceptedData.OriginalTransactionId),
-                Product: acceptedData.ProductNumber,
-                MeasurementUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
-                RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
-                Resolution: Resolution.FromName(acceptedData.Resolution.Name),
-                Period: new Period(acceptedData.StartDateTime.ToInstant(), acceptedData.EndDateTime.ToInstant()),
-                Measurements: energyObservations));
-
-        if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
+        foreach (var aggregatedMeasurement in acceptedData.AggregatedMeasurements)
         {
-            await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, CancellationToken.None)
-                .ConfigureAwait(false);
+            var energyObservations = new MeasurementDto(
+                Position: 1,
+                Quantity: aggregatedMeasurement.EnergyQuantity,
+                Quality: Quality.FromName(aggregatedMeasurement.QuantityQuality.Name));
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+            var acceptedRequestMeasurementsMessageDto = new AcceptedSendMeasurementsMessageDto(
+                eventId: EventId.From(serviceBusMessageId),
+                externalId: new ExternalId(orchestrationInstanceId),
+                receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
+                businessReason: BusinessReason.PeriodicMetering,
+                relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
+                gridAreaCode: acceptedData.GridAreaCode,
+                series: new MeasurementsDto(
+                    TransactionId: TransactionId.New(),
+                    MeteringPointId: acceptedData.MeteringPointId,
+                    MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
+                    OriginalTransactionIdReference: TransactionId.From(acceptedData.OriginalTransactionId),
+                    Product: acceptedData.ProductNumber,
+                    MeasurementUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
+                    RegistrationDateTime: default,
+                    Resolution: Resolution.FromName(aggregatedMeasurement.Resolution.Name),
+                    Period: new Period(aggregatedMeasurement.StartDateTime.ToInstant(), aggregatedMeasurement.EndDateTime.ToInstant()),
+                    Measurements: [energyObservations]));
+
+            if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
+            {
+                await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, CancellationToken.None)
+                    .ConfigureAwait(false);
+
+                await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
 
         var executionPolicy = Policy
