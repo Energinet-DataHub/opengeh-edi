@@ -132,6 +132,7 @@ public class PeekMessage
 
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         var archivedMessageToCreate = new ArchivedMessageDto(
+            peekResult.BundleId.Id,
             messageId: outgoingMessageBundle.MessageId.Value,
             eventIds: outgoingMessageBundle.EventIds.ToList(),
             documentType: outgoingMessageBundle.DocumentType,
@@ -146,7 +147,9 @@ public class PeekMessage
             meteringPointIds: outgoingMessageBundle.MeteringPointIds.ToList(),
             relatedToMessageId: outgoingMessageBundle.RelatedToMessageId);
 
-        var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
+        var archivedFile = await _archivedMessageClient
+            .CreateAsync(archivedMessageToCreate, cancellationToken)
+            .ConfigureAwait(false);
 
         marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
         _marketDocumentRepository.Add(marketDocument);
