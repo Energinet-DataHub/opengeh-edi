@@ -159,7 +159,7 @@ public class GivenRequestMeasurementsTests(
             .HasOriginalTransactionIdReferenceId(1, transactionId.Value)
             .HasProduct(1, "8716867000030")
             .HasQuantityMeasureUnit(1, MeasurementUnit.KilowattHour.Code)
-            .HasRegistrationDateTime(1, default(Instant).ToString())
+            .HasRegistrationDateTime(1, now.ToString())
             .HasResolution(1, Resolution.QuarterHourly.Code)
             .HasStartedDateTime(
                 1,
