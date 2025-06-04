@@ -17,19 +17,20 @@ using Energinet.DataHub.EDI.B2BApi.Migration;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using NodaTime.Extensions;
 using NodaTime.Text;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
 
-public class TimeSeriesToMarketActivityRecordTransformerTests
+public class MeasurementsToMarketActivityRecordTransformerTests
 {
     [Fact]
     public void Given_Transform_When_ValidJson_Then_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
     {
         // Arrange
-        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var transformer = new MeasurementsToMarketActivityRecordTransformer();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.SingleTimeSeriesWithSingleObservation, options) ?? throw new Exception("Root is null.");
@@ -41,6 +42,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
         var actual = transformer.Transform(creationTime, timeSeries);
 
         // Assert
+        using var assertionScope = new AssertionScope();
         actual.Should().NotBeNull();
         actual.Should().ContainSingle();
         var record = actual[0];
@@ -64,7 +66,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     public void Given_Transform_When_DeletedTimeSeries_Then_ReturnsEmptyList()
     {
         // Arrange
-        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var transformer = new MeasurementsToMarketActivityRecordTransformer();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.SingleDeletedTimeSeriesWithSingleObservation, options) ?? throw new Exception("Root is null.");
@@ -84,7 +86,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     public void Given_Transform_When_ValidJsonWithMultipleTimeSeries_Then_ReturnsValidMeteredDataForMeteringPointMarketActivityRecords()
     {
         // Arrange
-        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var transformer = new MeasurementsToMarketActivityRecordTransformer();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.TwoTimeSeries, options) ?? throw new Exception("Root is null.");
@@ -96,6 +98,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
         var actual = transformer.Transform(creationTime, timeSeries);
 
         // Assert
+        using var assertionScope = new AssertionScope();
         actual.Should().NotBeNull();
         actual.Should().HaveCount(2);
         var firstRecord = actual[0];
@@ -107,7 +110,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     public void Given_Transform_When_CalledWithJsonContainingNoTs_Then_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var transformer = new MeasurementsToMarketActivityRecordTransformer();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         var root = JsonSerializer.Deserialize<Root>(JsonPayloadConstants.NoTimeSeries, options) ?? throw new Exception("Root is null.");
@@ -126,7 +129,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     public void Given_Transform_When_CalledWithQuantityMissingIndicatorTrueAndQualityNull_Then_ReturnsValidMeteredDataForMeteringPointMarketActivityRecord()
     {
         // Arrange
-        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var transformer = new MeasurementsToMarketActivityRecordTransformer();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         var root = JsonSerializer.Deserialize<Root>(
@@ -139,6 +142,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
         var actual = transformer.Transform(creationTime, timeSeries);
 
         // Assert
+        using var assertionScope = new AssertionScope();
         var actualRecord = actual[0];
         actualRecord.Measurements[0].Position.Should().Be(1);
         actualRecord.Measurements[0].Quantity.Should().Be(null);
@@ -149,7 +153,7 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     public void Given_Transform_When_AllObservationsHaveQuantityMissingIndicatorTrue_Then_ReturnsEmptyList()
     {
         // Arrange
-        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
+        var transformer = new MeasurementsToMarketActivityRecordTransformer();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         var root = JsonSerializer.Deserialize<Root>(

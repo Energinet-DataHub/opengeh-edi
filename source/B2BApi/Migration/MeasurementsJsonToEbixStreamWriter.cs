@@ -23,15 +23,15 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
-public class TimeSeriesJsonToEbixStreamWriter(
+public class MeasurementsJsonToEbixStreamWriter(
     Serializer serializer,
     JsonSerializerOptions jsonSerializerOptions,
-    TimeSeriesToMarketActivityRecordTransformer timeSeriesToMarketActivityRecordTransformer)
-    : ITimeSeriesJsonToEbixStreamWriter
+    MeasurementsToMarketActivityRecordTransformer measurementsToMarketActivityRecordTransformer)
+    : IMeasurementsJsonToEbixStreamWriter
 {
     private readonly Serializer _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
     private readonly JsonSerializerOptions _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
-    private readonly TimeSeriesToMarketActivityRecordTransformer _timeSeriesToMarketActivityRecordTransformer = timeSeriesToMarketActivityRecordTransformer ?? throw new ArgumentNullException(nameof(timeSeriesToMarketActivityRecordTransformer));
+    private readonly MeasurementsToMarketActivityRecordTransformer _measurementsToMarketActivityRecordTransformer = measurementsToMarketActivityRecordTransformer ?? throw new ArgumentNullException(nameof(measurementsToMarketActivityRecordTransformer));
     private readonly MeteredDataForMeteringPointEbixDocumentWriter _writer = new(new MessageRecordParser(serializer));
 
     public async Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload)
@@ -55,7 +55,7 @@ public class TimeSeriesJsonToEbixStreamWriter(
             null,
             creationTime);
 
-        var meteredDataForMeteringPointMarketActivityRecords = _timeSeriesToMarketActivityRecordTransformer.Transform(creationTime, series);
+        var meteredDataForMeteringPointMarketActivityRecords = _measurementsToMarketActivityRecordTransformer.Transform(creationTime, series);
 
         // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
         var stream = await _writer.WriteAsync(

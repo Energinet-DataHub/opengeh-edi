@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
-using NodaTime;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 
 namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
-public interface ITimeSeriesToMarketActivityRecordTransformer
+public interface IMeasurementsJsonToEbixStreamWriter
 {
     /// <summary>
-    /// Transform imported JSON TimeSeries message to a list of MeteredDataForMeteringPointMarketActivityRecord
+    /// Transform imported JSON TimeSeries message to an ebiX stream writer format.
     /// </summary>
-    /// <param name="creationTime"></param>
-    /// <param name="timeSeries">List containing all time series in message.</param>
-    /// <returns>List MeteredDataForMeteringPointMarketActivityRecords containing all quantity observations.</returns>
-    List<MeteredDataForMeteringPointMarketActivityRecord> Transform(Instant creationTime, List<TimeSeries> timeSeries);
+    /// <param name="timeSeriesPayload">Json payload containing all time series in message.</param>
+    /// <returns>MarketDocumentStream containing all quantity observations.</returns>
+    Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload);
 }

@@ -22,16 +22,16 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
 
-public class TimeSeriesJsonToEbixStreamWriterTests
+public class MeasurementsJsonToEbixStreamWriterTests
 {
     [Fact]
-    public async Task Given_WriteStreamAsync_When_ValidJson_Then_ReturnsValidMarketDocumentStream()
+    public async Task Given_ValidJson_When_WriteStreamAsync_Then_ReturnsValidMarketDocumentStream()
     {
         // Arrange
-        var timeSeriesJsonToEbixStreamWriter = new TimeSeriesJsonToEbixStreamWriter(
+        var timeSeriesJsonToEbixStreamWriter = new MeasurementsJsonToEbixStreamWriter(
             new Serializer(),
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
-            new TimeSeriesToMarketActivityRecordTransformer());
+            new MeasurementsToMarketActivityRecordTransformer());
 
         // Act
         var stream = await timeSeriesJsonToEbixStreamWriter.WriteStreamAsync(JsonPayloadConstants.SingleTimeSeriesWithSingleObservation);

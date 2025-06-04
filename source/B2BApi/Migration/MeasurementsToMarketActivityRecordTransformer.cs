@@ -20,7 +20,7 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
-public class TimeSeriesToMarketActivityRecordTransformer : ITimeSeriesToMarketActivityRecordTransformer
+public class MeasurementsToMarketActivityRecordTransformer : IMeasurementsToMarketActivityRecordTransformer
 {
     public List<MeteredDataForMeteringPointMarketActivityRecord> Transform(Instant creationTime, List<TimeSeries> timeSeries)
     {
