@@ -55,7 +55,7 @@ public class EnqueueHandler_Brs_024_V1(
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
-            "Received enqueue accepted message(s) for BRS 024. Data: {0}",
+            "Received enqueue accepted message(s) for BRS 024. Data: {0}.",
             acceptedData);
 
         var acceptedRequestMeasurementsMessageDto = GetAcceptedRequestMeasurementsMessageDto(serviceBusMessageId, orchestrationInstanceId, acceptedData);
@@ -76,7 +76,7 @@ public class EnqueueHandler_Brs_024_V1(
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
-            "Received enqueue rejected message(s) for BRS 024. Data: {0}",
+            "Received enqueue rejected message(s) for BRS 024. Data: {0}.",
             rejectedData);
 
         var rejectRequestMeasurementsMessageDto = GetRejectRequestMeasurementsMessageDto(
