@@ -203,7 +203,7 @@ public class GivenRequestMeasurementsTests(
     [Theory]
     [MemberData(nameof(SupportedDocumentFormats))]
     public async Task
-        AndGiven_InvalidMeteringPointTypeInMasterData_When_ActorPeeksMessages_Then_ReceivesOneRejectDocumentWithCorrectContent(
+        AndGiven_RequestIsRejectedByProcessManager_When_ActorPeeksMessages_Then_ReceivesOneRejectDocumentWithCorrectContent(
             DocumentFormat documentFormat)
     {
         /*
