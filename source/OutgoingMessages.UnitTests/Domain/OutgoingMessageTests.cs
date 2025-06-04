@@ -134,9 +134,7 @@ public class OutgoingMessageTests
     public void Given_AllDocumentTypes_When_CheckingDocumentTypesForSerializedData_Then_AllDocumentTypesAreRepresented()
     {
         // Arrange
-        var allDocumentTypesNotReminder = GetAllOutgoingDocumentType()
-            // TODO: Remove when document writer is created TASK: #814
-            .Except([DocumentType.RejectRequestMeasurements]);
+        var allDocumentTypesNotReminder = GetAllOutgoingDocumentType();
 
         // Act
         var documentTypeOfSerializedData = EnqueuedQueuedSerializedContents().Select(x => x[0]).Cast<DocumentType>().ToList();

@@ -52,6 +52,7 @@ public class RejectRequestMeasurementsMessageDto : OutgoingMessageDto
 
 public record RejectRequestMeasurementsMessageSerie(
     TransactionId TransactionId,
+    MeteringPointId MeteringPointId,
     IReadOnlyCollection<RejectRequestMeasurementsMessageRejectReason> RejectReasons,
     TransactionId OriginalTransactionIdReference);
 

@@ -41,8 +41,6 @@ public class DocumentFactoryTests
         };
         var documentTypes = EnumerationType.GetAll<DocumentType>()
             .Where(x => !notOutGoingMessagesDocumentTypes.Contains(x))
-            // TODO: Remove when document writer is created TASK: #814
-            .Except([DocumentType.RejectRequestMeasurements])
             .ToArray();
 
         return new TheoryData<DocumentType>(documentTypes);
