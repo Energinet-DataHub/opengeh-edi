@@ -40,8 +40,7 @@ public class RequestMeasurementsResponseBuilder
         var startDateTimeInDateTimeOffset = startDateTime.ToDateTimeOffset();
         var resolution = PMValueTypes.Resolution.QuarterHourly;
         var measurements = energyObservations
-            .Select(
-                eo => new AcceptedMeteredData(
+            .Select(eo => new AcceptedMeteredData(
                     Position: eo.Position,
                     EnergyQuantity: eo.EnergyQuantity,
                     QuantityQuality: PMQuality.FromName(Quality.FromCode(eo.QuantityQuality).Name)))
@@ -78,7 +77,7 @@ public class RequestMeasurementsResponseBuilder
             ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
             BusinessReason: PMValueTypes.BusinessReason.FromName(requestYearlyMeasurementsInputV1.BusinessReason),
-            //TODO: MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
+            MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
             ValidationErrors: [new ValidationErrorDto(validationErrorMessage, validationErrorCode)]);
 
         return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, rejected);

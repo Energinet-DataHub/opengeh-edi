@@ -310,7 +310,7 @@ public class GivenRequestMeasurementsTests(
                     whenBundleShouldBeClosed,
                     ReasonCode.FullyRejected,
                     transactionId,
-                    MeteringPointId.From("00"), //TODO meteringPointId,
+                    meteringPointId,
                     expectedValidationErrorCode,
                     expectedValidationErrorMessage));
     }
