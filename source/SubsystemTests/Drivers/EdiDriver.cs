@@ -184,6 +184,36 @@ internal sealed class EdiDriver
         return requestContent.MessageId;
     }
 
+    internal async Task<string> SendRequestMeasurementsAsync(DocumentFormat documentFormat)
+    {
+        var b2bClient = await _b2BHttpClient;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestvalidatedmeasurements");
+        var contentType = documentFormat switch
+        {
+            var df when df == DocumentFormat.Json => "application/json",
+            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unhandled document format"),
+        };
+
+        var requestContent = await GetRequestMeasurementsContentAsync(documentFormat)
+            .ConfigureAwait(false);
+
+        request.Content = new StringContent(
+            requestContent.Content,
+            Encoding.UTF8,
+            contentType);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+        _logger.WriteLine("Sending RequestMeasurements HTTP request with messageId: {0}", requestContent.MessageId);
+        var response = await b2bClient.SendAsync(request).ConfigureAwait(false);
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new BadRequestMeasurementsResponseException($"responseContent: {responseContent}");
+        }
+
+        return requestContent.MessageId;
+    }
+
     internal async Task<string> RequestAggregatedMeasureDataAsync(bool withSyncError, CancellationToken cancellationToken)
     {
         var b2bClient = await _b2BHttpClient;
@@ -269,6 +299,31 @@ internal sealed class EdiDriver
             messageId,
             transactionId,
             meteringPointId.Value,
+            documentFormat.Name);
+
+        return (messageId, content);
+    }
+
+    private async Task<(string MessageId, string Content)> GetRequestMeasurementsContentAsync(DocumentFormat documentFormat)
+    {
+        var messageId = Guid.NewGuid().ToTestMessageUuid();
+        var transactionId = Guid.NewGuid().ToTestMessageUuid();
+
+        var filePath = documentFormat switch
+        {
+            var df when df == DocumentFormat.Json => "Messages/json/RequestValidatedMeasurements.json",
+            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unhandled document format"),
+        };
+
+        var content = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
+
+        content = content.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
+        content = content.Replace("{TransactionId}", transactionId, StringComparison.InvariantCulture);
+
+        _logger.WriteLine(
+            "Creating ForwardMeteredData message with MessageId={0}, TransactionId={1}, DocumentFormat={2}",
+            messageId,
+            transactionId,
             documentFormat.Name);
 
         return (messageId, content);

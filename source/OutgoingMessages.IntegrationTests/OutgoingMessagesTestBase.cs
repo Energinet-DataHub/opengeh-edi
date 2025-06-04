@@ -15,8 +15,11 @@
 using System.Text;
 using Azure.Storage.Blobs;
 using Dapper;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -27,6 +30,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -37,6 +42,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -160,6 +166,41 @@ public class OutgoingMessagesTestBase : IDisposable
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 
+    protected Task<PeekResultDto?> PeekMessageWithDelayAsync(
+        MessageCategory category,
+        ActorNumber? actorNumber = null,
+        ActorRole? actorRole = null,
+        DocumentFormat? documentFormat = null)
+    {
+        ClearDbContextCaches();
+
+        var serviceProvider = new ServiceCollection()
+            .Add(_services!)
+            .Replace(
+                ServiceDescriptor.Scoped<IArchivedMessagesClient>(_ =>
+                    new DelayingArchivedMessagesClient(ServiceProvider.GetRequiredService<IArchivedMessagesClient>())))
+            .BuildServiceProvider();
+
+        var outgoingMessagesClient = serviceProvider.GetService<IOutgoingMessagesClient>();
+
+        var authenticatedActor = serviceProvider.GetRequiredService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(
+                actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                restriction: Restriction.Owned,
+                actorRole ?? ActorRole.EnergySupplier,
+                null,
+                _actorId));
+
+        return outgoingMessagesClient!.PeekAndCommitAsync(
+            new PeekRequestDto(
+                actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                category,
+                actorRole ?? ActorRole.EnergySupplier,
+                documentFormat ?? DocumentFormat.Xml),
+            CancellationToken.None);
+    }
+
     protected T GetService<T>()
         where T : notnull
     {
@@ -212,6 +253,7 @@ public class OutgoingMessagesTestBase : IDisposable
         _services = [];
         _services
             .AddScoped<IConfiguration>(_ => config)
+            .AddTokenCredentialProvider()
             .AddB2BAuthentication(
                 new TokenValidationParameters
                 {
@@ -246,5 +288,27 @@ public class OutgoingMessagesTestBase : IDisposable
         });
 
         ServiceProvider = _services.BuildServiceProvider();
+    }
+
+    private class DelayingArchivedMessagesClient(IArchivedMessagesClient @base) : IArchivedMessagesClient
+    {
+        private readonly IArchivedMessagesClient _base = @base;
+
+        public async Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken).ConfigureAwait(false);
+            return await _base.CreateAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+
+        public Task<ArchivedMessageStreamDto?> GetAsync(ArchivedMessageIdDto id, CancellationToken cancellationToken) =>
+            throw new NotImplementedException();
+
+        public Task<MessageSearchResultDto> SearchAsync(
+            GetMessagesQueryDto queryInput,
+            CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        public Task<MessageSearchResultDto> SearchAsync(
+            GetMeteringPointMessagesQueryDto queryInput,
+            CancellationToken cancellationToken) => throw new NotImplementedException();
     }
 }

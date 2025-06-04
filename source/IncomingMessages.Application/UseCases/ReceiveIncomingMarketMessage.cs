@@ -206,6 +206,8 @@ public class ReceiveIncomingMarketMessage
                 return DocumentType.RequestWholesaleSettlement;
             case var incomingDocType when incomingDocType == IncomingDocumentType.NotifyValidatedMeasureData:
                 return DocumentType.NotifyValidatedMeasureData;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.RequestValidatedMeasurements:
+                return DocumentType.RequestMeasurements;
             default:
                 throw new NotSupportedException($"Document type '{incomingDocumentType}' is not supported.");
         }

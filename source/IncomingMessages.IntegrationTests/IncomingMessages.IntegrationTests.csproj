@@ -26,8 +26,8 @@ limitations under the License.
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="8.2.1" />
-        <PackageReference Include="Energinet.DataHub.Core.TestCommon" Version="8.2.1" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="8.3.0" />
+        <PackageReference Include="Energinet.DataHub.Core.TestCommon" Version="8.3.0" />
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
@@ -68,6 +68,22 @@ limitations under the License.
         </EmbeddedResource>
         <None Remove="IncomingMessages\MeteredDataForMeteringPoint.xml" />
         <EmbeddedResource Include="IncomingMessages\MeteredDataForMeteringPoint.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="MessageParsers\Json\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.json" />
+        <EmbeddedResource Include="MessageParsers\Json\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="MessageParsers\Json\RequestValidatedMeasurements\ValidRequestValidatedMeasurementsWithTwoTransactions.json" />
+        <EmbeddedResource Include="MessageParsers\Json\RequestValidatedMeasurements\ValidRequestValidatedMeasurementsWithTwoTransactions.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="MessageParsers\Json\RequestValidatedMeasurements\InvalidRequestValidatedMeasurementsMarketEvaluationPointValue.json" />
+        <EmbeddedResource Include="MessageParsers\Json\RequestValidatedMeasurements\InvalidRequestValidatedMeasurementsMarketEvaluationPointValue.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="MessageParsers\Json\RequestValidatedMeasurements\InvalidRequestValidatedMeasurements.json" />
+        <EmbeddedResource Include="MessageParsers\Json\RequestValidatedMeasurements\InvalidRequestValidatedMeasurements.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>

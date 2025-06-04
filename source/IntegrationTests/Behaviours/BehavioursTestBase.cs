@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
@@ -404,6 +405,8 @@ public class BehavioursTestBase : IDisposable
         _services = [];
         _services.AddScoped<IConfiguration>(_ => config);
 
+        _services.AddTokenCredentialProvider();
+
         _services.AddTransient<ExecuteDataRetentionJobs>()
             .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)
@@ -411,7 +414,7 @@ public class BehavioursTestBase : IDisposable
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule()
-            .AddEnqueueActorMessagesFromProcessManager(new DefaultAzureCredential());
+            .AddEnqueueActorMessagesFromProcessManager();
 
         _services
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)

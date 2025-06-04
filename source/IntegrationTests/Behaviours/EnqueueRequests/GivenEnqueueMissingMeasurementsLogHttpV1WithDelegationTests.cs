@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM018;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.MissingMeasurementsLogCalculation.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_045.Shared;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
@@ -119,7 +119,6 @@ public class GivenEnqueueMissingMeasurementsLogHttpV1WithDelegationTests(
             OrchestrationInstanceId: Guid.NewGuid(),
             Data: meteringPointIdWithMissingData.Select(date =>
                 new EnqueueMissingMeasurementsLogHttpV1.DateWithMeteringPointId(
-                IdempotencyKey: Guid.NewGuid(),
                 GridAccessProvider: gridAccessProvider.ActorNumber.ToProcessManagerActorNumber(),
                 GridArea: gridAreaCode,
                 Date: date.Date.ToDateTimeOffset(),
