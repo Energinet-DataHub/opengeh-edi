@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 using NodaTime.Extensions;
+using NodaTime.Text;
 using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 using BusinessReason = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.BusinessReason;
 using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.V1.MeteringPointType;
@@ -45,8 +46,8 @@ public static class RequestAggregatedMeasureDataDtoFactoryV1
             Id: TransactionId.New().Value,
             MarketEvaluationPointType: MapEvaluationPointTypeCode(request),
             MarketEvaluationSettlementMethod: MapSettlementMethodCode(request),
-            StartDateAndOrTimeDateTime: request.StartDate.ToInstant().ToString(),
-            EndDateAndOrTimeDateTime: request.EndDate.ToInstant().ToString(),
+            StartDateAndOrTimeDateTime: InstantPattern.General.Format(request.StartDate.ToInstant()),
+            EndDateAndOrTimeDateTime: InstantPattern.General.Format(request.EndDate.ToInstant()),
             MeteringGridAreaDomainId: request.GridAreaCode,
             EnergySupplierMarketParticipantId: request.EnergySupplierId,
             BalanceResponsiblePartyMarketParticipantId: request.BalanceResponsibleId,
