@@ -22,6 +22,7 @@ public class ArchivedMessageDto
     public static readonly FileStorageCategory FileStorageCategory = ArchivedFile.FileStorageCategory;
 
     public ArchivedMessageDto(
+        Guid bundleId,
         string? messageId,
         IReadOnlyList<EventId> eventIds,
         DocumentType documentType,
@@ -34,7 +35,23 @@ public class ArchivedMessageDto
         IMarketDocumentStream marketDocumentStream,
         IReadOnlyList<MeteringPointId> meteringPointIds,
         MessageId? relatedToMessageId = null)
-        : this(messageId, eventIds, documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, ArchivedMessageTypeDto.OutgoingMessage, new ArchivedMessageStreamDto(marketDocumentStream), meteringPointIds, relatedToMessageId) { }
+        : this(
+            bundleId,
+            messageId,
+            eventIds,
+            documentType,
+            senderNumber,
+            senderRole,
+            receiverNumber,
+            receiverRole,
+            createdAt,
+            businessReason,
+            ArchivedMessageTypeDto.OutgoingMessage,
+            new ArchivedMessageStreamDto(marketDocumentStream),
+            meteringPointIds,
+            relatedToMessageId)
+    {
+    }
 
     public ArchivedMessageDto(
         string? messageId,
@@ -63,8 +80,41 @@ public class ArchivedMessageDto
         ArchivedMessageStreamDto archivedMessageStream,
         IReadOnlyList<MeteringPointId> meteringPointIds,
         MessageId? relatedToMessageId = null)
+        : this(
+            null,
+            messageId,
+            eventIds,
+            documentType,
+            senderNumber,
+            senderRole,
+            receiverNumber,
+            receiverRole,
+            createdAt,
+            businessReason,
+            archivedMessageType,
+            archivedMessageStream,
+            meteringPointIds,
+            relatedToMessageId)
     {
-        Id = ArchivedMessageIdDto.Create();
+    }
+
+    private ArchivedMessageDto(
+        Guid? bundleId,
+        string? messageId,
+        IReadOnlyList<EventId> eventIds,
+        DocumentType documentType,
+        ActorNumber senderNumber,
+        ActorRole senderRole,
+        ActorNumber receiverNumber,
+        ActorRole receiverRole,
+        Instant createdAt,
+        BusinessReason? businessReason,
+        ArchivedMessageTypeDto archivedMessageType,
+        ArchivedMessageStreamDto archivedMessageStream,
+        IReadOnlyList<MeteringPointId> meteringPointIds,
+        MessageId? relatedToMessageId = null)
+    {
+        Id = bundleId is not null ? new ArchivedMessageIdDto(bundleId.Value) : ArchivedMessageIdDto.Create();
         MessageId = messageId;
         EventIds = eventIds;
         DocumentType = documentType;
