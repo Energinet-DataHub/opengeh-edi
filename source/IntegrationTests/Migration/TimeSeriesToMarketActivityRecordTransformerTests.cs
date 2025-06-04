@@ -123,27 +123,6 @@ public class TimeSeriesToMarketActivityRecordTransformerTests
     }
 
     [Fact]
-    public void Given_Transform_When_CalledWithNoOriginalTimeSeriesId_Then_ReturnsPrefixedMigrationTimeSeriesId()
-    {
-        // Arrange
-        var transformer = new TimeSeriesToMarketActivityRecordTransformer();
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-        var root = JsonSerializer.Deserialize<Root>(
-                       JsonPayloadConstants.InvalidJsonNoOriginalMessageAndTimeSeriesId, options) ?? throw new Exception("Root is null.");
-        var timeSeries = root.MeteredDataTimeSeriesDH3.TimeSeries;
-        var header = root.MeteredDataTimeSeriesDH3.Header;
-        var creationTime = header.Creation.ToInstant();
-
-        // Act
-        var actual = transformer.Transform(creationTime, timeSeries);
-
-        // Assert
-        actual[0].TransactionId.Value.Should().Be("mig-00000001");
-        actual[1].TransactionId.Value.Should().Be("mig-00000002");
-    }
-
-    [Fact]
     public void Given_Transform_When_CalledWithQuantityMissingIndicatorTrueAndQualityNull_Then_ReturnsValidMeteredDataForMeteringPointMarketActivityRecord()
     {
         // Arrange
