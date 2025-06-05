@@ -63,7 +63,7 @@ public class BundleRepository(
         MessageCategory messageCategory,
         CancellationToken cancellationToken = default)
     {
-        // This query should be covered by the "IX_Bundles_NextBundleToPeek" index
+        // This query should be covered by the "IX_Bundles_NextBundleToPeek" or "IX_Bundles_NextBundleToPeek_ebIX" index
         // Get the oldest bundle that is:
         // - In the given actor message queue & category
         // - Not dequeued
