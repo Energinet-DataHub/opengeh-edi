@@ -49,12 +49,14 @@ public class MetricNameGenerationTests
         "NotifyValidatedMeasureDataResponse",
         "AcknowledgementResponse",
         "ReminderOfMissingMeasureData",
+        "RejectRequestMeasurementsResponse",
     ];
 
     private static readonly DocumentType[] _IsAlwaysAResponseOfARequest =
     [
         DocumentType.RejectRequestWholesaleSettlement,
         DocumentType.RejectRequestAggregatedMeasureData,
+        DocumentType.RejectRequestMeasurements,
         DocumentType.Acknowledgement,
     ];
 
