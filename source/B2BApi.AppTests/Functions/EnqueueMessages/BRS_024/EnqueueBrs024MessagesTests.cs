@@ -91,14 +91,18 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
-            RegistrationDateTime: startDateTime.ToDateTimeOffset(),
-            StartDateTime: startDateTime.ToDateTimeOffset(),
-            EndDateTime: endDateTime.ToDateTimeOffset(),
+            AggregatedMeasurements: new List<AggregatedMeasurement>
+            {
+               new(
+                    StartDateTime: startDateTime.ToDateTimeOffset(),
+                    EndDateTime: endDateTime.ToDateTimeOffset(),
+                    Resolution: resolution,
+                    EnergyQuantity: 1023.45m,
+                    QuantityQuality: PMValueTypes.Quality.AsProvided),
+            },
             ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
             ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole(),
-            Resolution: resolution,
             MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-            Measurements: GetMeasurements(startDateTime, endDateTime, resolution),
             GridAreaCode: "804");
 
         var orchestrationInstanceId = Guid.NewGuid();
@@ -249,40 +253,5 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
             idempotencyKey: eventId.Value);
 
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
-    }
-
-    private IReadOnlyCollection<AcceptedMeteredData> GetMeasurements(
-        Instant startDateTime,
-        Instant endDateTime,
-        PMValueTypes.Resolution resolution)
-    {
-        var measurements = new List<AcceptedMeteredData>();
-        var interval = resolution switch
-        {
-            var res when res == PMValueTypes.Resolution.QuarterHourly => Duration.FromMinutes(15),
-            var res when res == PMValueTypes.Resolution.Hourly => Duration.FromHours(1),
-            var res when res == PMValueTypes.Resolution.Daily => Duration.FromDays(1),
-            _ => throw new ArgumentOutOfRangeException(nameof(resolution), "Unsupported resolution"),
-        };
-
-        var position = 1;
-        for (var timestamp = startDateTime; timestamp < endDateTime; timestamp += interval)
-        {
-            measurements.Add(
-                new AcceptedMeteredData(
-                    Position: position,
-                    EnergyQuantity: GenerateRandomMeasurementValue(),
-                    QuantityQuality: PMValueTypes.Quality.AsProvided));
-            position++;
-        }
-
-        return measurements;
-    }
-
-    private decimal GenerateRandomMeasurementValue()
-    {
-        // Example: Generate a random value for demonstration purposes
-        var random = new Random();
-        return (decimal)(random.Next(0, 10000) / 100.0); // Random decimal value between 0.00 and 100.00
     }
 }

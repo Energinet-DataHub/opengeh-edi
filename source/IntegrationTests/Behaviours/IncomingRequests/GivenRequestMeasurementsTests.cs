@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM015;
@@ -107,29 +106,7 @@ public class GivenRequestMeasurementsTests(
         var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
         var endDate = Instant.FromUtc(2024, 11, 29, 9, 15);
 
-        var expectedEnergyObservations = new List<(int Position, string QualityCode, decimal Quantity)>
-        {
-            (1, "A04", 1),
-            (2, "A04", 2),
-            (3, "A04", 3),
-            (4, "A04", 4),
-            (5, "A04", 5),
-            (6, "A04", 6),
-            (7, "A04", 7),
-            (8, "A04", 8),
-            (9, "A04", 9),
-            (10, "A04", 10),
-            (11, "A04", 11),
-            (12, "A04", 12),
-            (13, "A04", 13),
-            (14, "A04", 14),
-            (15, "A04", 15),
-            (16, "A04", 16),
-            (17, "A04", 17),
-            (18, "A04", 18),
-            (19, "A04", 19),
-            (20, "A04", 20),
-        };
+        (int Position, string QualityCode, decimal Quantity) expectedYearlyAggregatedMeasurement = (1, "A04", 1000);
 
         var requestYearlyMeasurementsInputV1 = message.ParseInput<RequestYearlyMeasurementsInputV1>();
         var requestMeasurementsAcceptedServiceBusMessage = RequestMeasurementsResponseBuilder
@@ -139,7 +116,7 @@ public class GivenRequestMeasurementsTests(
                 startDate,
                 endDate,
                 orchestrationInstanceId,
-                expectedEnergyObservations);
+                expectedYearlyAggregatedMeasurement);
 
         await GivenRequestMeasurementsAcceptedIsReceived(requestMeasurementsAcceptedServiceBusMessage);
 
@@ -183,7 +160,7 @@ public class GivenRequestMeasurementsTests(
             .HasOriginalTransactionIdReferenceId(1, transactionId.Value)
             .HasProduct(1, "8716867000030")
             .HasQuantityMeasureUnit(1, MeasurementUnit.KilowattHour.Code)
-            .HasRegistrationDateTime(1, endDate.ToString())
+            .HasRegistrationDateTime(1, now.ToString())
             .HasResolution(1, Resolution.QuarterHourly.Code)
             .HasStartedDateTime(
                 1,
@@ -193,11 +170,11 @@ public class GivenRequestMeasurementsTests(
                 endDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
             .HasPoints(
                 1,
-                expectedEnergyObservations.Select(
-                        p => new AssertPointDocumentFieldsInput(
-                            new RequiredPointDocumentFields(p.Position),
-                            new OptionalPointDocumentFields(Quality.FromCode(p.QualityCode), p.Quantity)))
-                    .ToList())
+                [new AssertPointDocumentFieldsInput(
+                            new RequiredPointDocumentFields(1),
+                            new OptionalPointDocumentFields(
+                                Quality.FromCode(expectedYearlyAggregatedMeasurement.QualityCode),
+                                expectedYearlyAggregatedMeasurement.Quantity))])
             .DocumentIsValidAsync();
     }
 
