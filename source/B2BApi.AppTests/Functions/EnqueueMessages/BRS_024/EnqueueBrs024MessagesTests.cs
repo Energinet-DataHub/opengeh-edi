@@ -58,11 +58,12 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
     {
         _fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
         _fixture.SetTestOutputHelper(null!);
+        _fixture.DatabaseManager.CleanupDatabase();
         await Task.CompletedTask;
     }
 
     [Fact]
-    public async Task Given_EnqueueAcceptedBrs024Message_When_MessageIsReceived_Then_AcceptedMessagesIsEnqueued()
+    public async Task Given_EnqueueAcceptedBrs024Message_When_MessageIsReceived_Then_AcceptedMessageIsEnqueued()
     {
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
@@ -90,14 +91,18 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "test-product-number",
-            RegistrationDateTime: startDateTime.ToDateTimeOffset(),
-            StartDateTime: startDateTime.ToDateTimeOffset(),
-            EndDateTime: endDateTime.ToDateTimeOffset(),
+            AggregatedMeasurements: new List<AggregatedMeasurement>
+            {
+               new(
+                    StartDateTime: startDateTime.ToDateTimeOffset(),
+                    EndDateTime: endDateTime.ToDateTimeOffset(),
+                    Resolution: resolution,
+                    EnergyQuantity: 1023.45m,
+                    QuantityQuality: PMValueTypes.Quality.AsProvided),
+            },
             ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
             ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole(),
-            Resolution: resolution,
             MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-            Measurements: GetMeasurements(startDateTime, endDateTime, resolution),
             GridAreaCode: "804");
 
         var orchestrationInstanceId = Guid.NewGuid();
@@ -150,6 +155,88 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
         notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
     }
 
+    [Fact]
+    public async Task Given_EnqueueRejectedBrs024Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued()
+    {
+        _fixture.EnsureAppHostUsesFeatureFlagValue(
+        [
+            new(FeatureFlagNames.PeekMeasurementMessages, true),
+            new(FeatureFlagNames.UsePM28Enqueue, true)
+        ]);
+
+        // Arrange
+        // => Given enqueue BRS-024 rejected service bus message
+        const string receiverEnergySupplier = "1111111111111";
+        var receiverEnergySupplierRole = ActorRole.EnergySupplier;
+
+        var eventId = EventId.From(Guid.NewGuid());
+
+        var rejectedMessage = new RequestYearlyMeasurementsRejectV1(
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
+            ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole(),
+            BusinessReason: PMValueTypes.BusinessReason.PeriodicMetering,
+            MeteringPointId: "1234567890123",
+            ValidationErrors:
+            [
+                new(
+                    Message:
+                    "I forbindelse med anmodning om årssum kan der kun anmodes om data for forbrug og produktion/When"
+                    + " requesting yearly amount then it is only possible to request for production and consumption",
+                    ErrorCode: "D18"),
+
+            ]);
+
+        var orchestrationInstanceId = Guid.NewGuid();
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_024.Name,
+            OrchestrationVersion = 1,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = receiverEnergySupplier,
+                ActorRole = receiverEnergySupplierRole.ToProcessManagerActorRole().ToActorRoleV1(),
+            },
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
+        };
+        enqueueActorMessages.SetData(rejectedMessage);
+
+        // Act
+        await GivenEnqueueRejectedBrs024Message(enqueueActorMessages, eventId);
+
+        // => Then reject message is enqueued
+        // Verify the function was executed
+        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: nameof(EnqueueTrigger_Brs_024));
+
+        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
+
+        // Verify that outgoing messages were enqueued
+        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+            .Where(om => om.EventId == eventId)
+            .ToListAsync();
+
+        using var assertionScope = new AssertionScope();
+        enqueuedOutgoingMessages.Should()
+            .HaveCount(1)
+            .And.AllSatisfy(
+                (om) =>
+                {
+                    om.DocumentType.Should().Be(DocumentType.RejectRequestMeasurements);
+                    om.BusinessReason.Should().Be(BusinessReason.PeriodicMetering.Name);
+                    om.RelatedToMessageId!.Value.Value.Should().Be(rejectedMessage.OriginalActorMessageId);
+                    om.Receiver.Number.Value.Should().Be(rejectedMessage.ActorNumber.Value);
+                    om.Receiver.ActorRole.Name.Should().Be(rejectedMessage.ActorRole.Name);
+                });
+
+        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
+            orchestrationInstanceId,
+            RequestYearlyMeasurementsNotifyEventV1.OrchestrationInstanceEventName);
+        notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
+    }
+
     private async Task GivenEnqueueAcceptedBrs024Message(EnqueueActorMessagesV1 enqueueActorMessages, EventId eventId)
     {
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
@@ -159,38 +246,12 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
     }
 
-    private IReadOnlyCollection<AcceptedMeteredData> GetMeasurements(
-        Instant startDateTime,
-        Instant endDateTime,
-        PMValueTypes.Resolution resolution)
+    private async Task GivenEnqueueRejectedBrs024Message(EnqueueActorMessagesV1 enqueueActorMessages, EventId eventId)
     {
-        var measurements = new List<AcceptedMeteredData>();
-        var interval = resolution switch
-        {
-            var res when res == PMValueTypes.Resolution.QuarterHourly => Duration.FromMinutes(15),
-            var res when res == PMValueTypes.Resolution.Hourly => Duration.FromHours(1),
-            var res when res == PMValueTypes.Resolution.Daily => Duration.FromDays(1),
-            _ => throw new ArgumentOutOfRangeException(nameof(resolution), "Unsupported resolution"),
-        };
+        var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
+            subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
+            idempotencyKey: eventId.Value);
 
-        var position = 1;
-        for (var timestamp = startDateTime; timestamp < endDateTime; timestamp += interval)
-        {
-            measurements.Add(
-                new AcceptedMeteredData(
-                    Position: position,
-                    EnergyQuantity: GenerateRandomMeasurementValue(),
-                    QuantityQuality: PMValueTypes.Quality.AsProvided));
-            position++;
-        }
-
-        return measurements;
-    }
-
-    private decimal GenerateRandomMeasurementValue()
-    {
-        // Example: Generate a random value for demonstration purposes
-        var random = new Random();
-        return (decimal)(random.Next(0, 10000) / 100.0); // Random decimal value between 0.00 and 100.00
+        await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
     }
 }

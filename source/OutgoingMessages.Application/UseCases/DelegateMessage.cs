@@ -47,6 +47,7 @@ public class DelegateMessage
         // because the receiver must be the same as the one who made the request
         if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults
             || messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestEnergyResults
+            || messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestMeasurements
             // Acknowledgement messages are not delegated
             || messageToEnqueue.DocumentType == DocumentType.Acknowledgement)
         {

@@ -761,6 +761,26 @@
       <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM018\ebIX_DK_NotifyMissingData-2.xsd">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="Domain\Schemas\Cim\Json\Schemas\Reject-request-validated-measure-data-assembly-model.schema.json" />
+      <EmbeddedResource Include="Domain\Schemas\Cim\Json\Schemas\Reject-request-validated-measure-data-assembly-model.schema.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Domain\Schemas\Ebix\Schemas\documents\RSM015\ebIX_DK_RejectRequestMeteredDataValidated-2.xsd" />
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM015\ebIX_DK_RejectRequestMeteredDataValidated-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Domain\Schemas\Ebix\Schemas\documents\RSM015\ebIX_BusinessDataType-2.xsd" />
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM015\ebIX_BusinessDataType-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Domain\Schemas\Ebix\Schemas\documents\RSM015\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+      <EmbeddedResource Include="Domain\Schemas\Ebix\Schemas\documents\RSM015\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Domain\Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-rejectrequestvalidatedmeasuredata-0-1.xsd" />
+      <EmbeddedResource Include="Domain\Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-rejectrequestvalidatedmeasuredata-0-1.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

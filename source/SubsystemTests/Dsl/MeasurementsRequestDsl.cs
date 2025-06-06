@@ -61,6 +61,16 @@ internal sealed class MeasurementsRequestDsl(
             eventId: Guid.NewGuid());
     }
 
+    public async Task PublishEnqueueBrs024RejectedMeasurements(Actor actor)
+    {
+        await _ediDriver.EmptyQueueAsync(messageCategory: MessageCategory.MeasureData);
+        await _processManagerDriver.PublishEnqueueBrs024RejectedMeasurementsAsync(
+            actor: actor,
+            originalActorMessageId: Guid.NewGuid().ToTestMessageUuid(),
+            originalActorTransactionId: Guid.NewGuid().ToTestMessageUuid(),
+            eventId: Guid.NewGuid());
+    }
+
     public async Task<string> ConfirmResponseIsAvailable()
     {
         var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
@@ -75,5 +85,19 @@ internal sealed class MeasurementsRequestDsl(
         contentString.Should().Contain("NotifyValidatedMeasureData_MarketDocument");
 
         return messageId!;
+    }
+
+    public async Task ConfirmRejectedResponseIsAvailable()
+    {
+        var timeout = TimeSpan.FromMinutes(2); // Timeout must be above 1 minute, since bundling "duration" is set to 1 minute on dev/test.
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync(
+            messageCategory: MessageCategory.MeasureData,
+            timeout: timeout);
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
+        var contentString = await peekResponse.Content.ReadAsStringAsync();
+
+        messageId.Should().NotBeNull();
+        contentString.Should().NotBeNull();
+        contentString.Should().Contain("RejectRequestValidatedMeasureData_MarketDocument");
     }
 }
