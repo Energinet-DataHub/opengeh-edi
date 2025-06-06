@@ -36,7 +36,7 @@ public class RequestMeasurementsEbixMessageParser(
 
     public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestValidatedMeasurements;
 
-    public override DocumentFormat DocumentFormat => DocumentFormat.Json;
+    public override DocumentFormat DocumentFormat => DocumentFormat.Ebix;
 
     protected override string RootPayloadElementName => "DK_RequestMeteredDataValidated";
 
