@@ -14,7 +14,9 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
@@ -55,6 +57,34 @@ public class RequestMeasurementsResponseBuilder
             },
             GridAreaCode: "804");
 
+        return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, accepted);
+    }
+
+    public static ServiceBusMessage GenerateRejectedFrom(
+        RequestYearlyMeasurementsInputV1 requestYearlyMeasurementsInputV1,
+        Actor receiverActor,
+        string validationErrorMessage,
+        string validationErrorCode,
+        Guid orchestrationInstanceId)
+    {
+        var rejected = new RequestYearlyMeasurementsRejectV1(
+            OriginalActorMessageId: requestYearlyMeasurementsInputV1.ActorMessageId,
+            OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
+            ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
+            ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
+            BusinessReason: PMValueTypes.BusinessReason.FromName(requestYearlyMeasurementsInputV1.BusinessReason),
+            MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
+            ValidationErrors: [new ValidationErrorDto(validationErrorMessage, validationErrorCode)]);
+
+        return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, rejected);
+    }
+
+    private static ServiceBusMessage CreateServiceBusMessage<TData>(
+        Actor receiverActor,
+        Guid orchestrationInstanceId,
+        TData data)
+        where TData : IEnqueueDataDto
+    {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_024.Name,
@@ -67,7 +97,7 @@ public class RequestMeasurementsResponseBuilder
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
 
-        enqueueActorMessages.SetData(accepted);
+        enqueueActorMessages.SetData(data);
 
         return enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),

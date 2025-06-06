@@ -80,7 +80,8 @@ public class DocumentTypeMapperTests
             .Where(x =>
                 x != IncomingDocumentType.NotifyValidatedMeasureData.Name
                 && x != IncomingDocumentType.RequestValidatedMeasurements.Name
-                && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.RequestMeasurements.Name);
+                && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.RequestMeasurements.Name
+                && x != Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.DocumentType.RejectRequestMeasurements.Name);
 
         // Act & Assert
         documentTypes.Should().BeEquivalentTo(supportedDocumentTypes.ToList());

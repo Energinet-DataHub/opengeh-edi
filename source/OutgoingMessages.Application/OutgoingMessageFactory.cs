@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MissingMeasurementMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
@@ -499,6 +500,35 @@ public static class OutgoingMessageFactory
             periodStartedAt: message.MissingMeasurement.Date,
             dataCount: 1,
             meteringPointId: message.MissingMeasurement.MeteringPointId);
+    }
+
+    /// <summary>
+    /// This method create a single outgoing message, for the receiver, based on the rejected energyResultMessage.
+    /// </summary>
+    public static OutgoingMessage CreateMessage(
+        RejectRequestMeasurementsMessageDto rejectedMessage,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(rejectedMessage);
+
+        return new OutgoingMessage(
+            eventId: rejectedMessage.EventId,
+            documentType: rejectedMessage.DocumentType,
+            receiver: Receiver.Create(rejectedMessage.ReceiverNumber, rejectedMessage.ReceiverRole),
+            documentReceiver: Receiver.Create(rejectedMessage.DocumentReceiverNumber, rejectedMessage.DocumentReceiverRole),
+            processId: rejectedMessage.ProcessId,
+            businessReason: rejectedMessage.BusinessReason,
+            serializedContent: serializer.Serialize(rejectedMessage.Series),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.RequestMeasurements,
+            relatedToMessageId: rejectedMessage.RelatedToMessageId,
+            gridAreaCode: null,
+            externalId: rejectedMessage.ExternalId,
+            calculationId: null,
+            periodStartedAt: null,
+            dataCount: rejectedMessage.Series.RejectReasons.Count);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

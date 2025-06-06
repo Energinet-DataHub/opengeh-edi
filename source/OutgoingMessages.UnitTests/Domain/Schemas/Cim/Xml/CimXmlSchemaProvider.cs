@@ -26,7 +26,14 @@ public class CimXmlSchemaProvider(CimXmlSchemas schemas) : SchemaProvider, ISche
     {
         ArgumentNullException.ThrowIfNull(type, nameof(type));
 
-        var schemaName = _schema.GetSchemaLocation(type.Name, version);
+        var businessProcessType = type.Name;
+
+        if (type == DocumentType.RejectRequestMeasurements)
+        {
+            businessProcessType = "rejectrequestvalidatedmeasuredata";
+        }
+
+        var schemaName = _schema.GetSchemaLocation(businessProcessType, version);
 
         if (schemaName == null)
         {
