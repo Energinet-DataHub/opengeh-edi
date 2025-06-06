@@ -55,6 +55,7 @@ public class DelegateMessageTests : OutgoingMessagesTestBase
         {
             ProcessType.RequestEnergyResults,
             ProcessType.RequestWholesaleResults,
+            ProcessType.RequestMeasurements,
         };
     }
 

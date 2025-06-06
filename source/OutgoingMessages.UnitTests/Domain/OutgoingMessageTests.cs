@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectReques
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM009;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM015;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM018;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.Factories;
@@ -68,6 +69,10 @@ public class OutgoingMessageTests
         new MissingMeasurementJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new MissingMeasurementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new MissingMeasurementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+
+        new RejectedMeasurementsCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
+        new RejectedMeasurementsEbixDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectedMeasurementsCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     ];
 
     /// <summary>
@@ -91,6 +96,7 @@ public class OutgoingMessageTests
 
             new object?[] { DocumentType.NotifyValidatedMeasureData, "{\"TransactionId\":\"3646fa9bb38b40a7b119bd099d67cc89\",\"MeteringPointId\":\"1234567890123456\",\"MeteringPointType\":{\"Code\":\"D14\",\"Name\":\"ElectricalHeating\"},\"OriginalTransactionIdReference\":null,\"Product\":\"8716867000030\",\"MeasurementUnit\":{\"Code\":\"KWH\",\"Name\":\"KilowattHour\"},\"RegistrationDateTime\":\"2025-01-31T23:00:00Z\",\"Resolution\":{\"Code\":\"PT1H\",\"Name\":\"Hourly\"},\"Period\":{\"Start\":\"2025-01-31T23:00:00Z\",\"End\":\"2025-02-01T00:00:00Z\"},\"Measurements\":[{\"Position\":1,\"Quantity\":19293,\"Quality\":{\"Code\":\"A04\",\"Name\":\"AsProvided\"}}]}" },
             new object?[] { DocumentType.Acknowledgement, "{\"RejectReasons\":[{\"ErrorCode\":\"E10\",\"ErrorMessage\":\"Målepunktet findes ikke / The metering point does not exist\"}],\"TransactionId\":\"cf261feb494a429a990f14322e3f2dee\",\"OriginalTransactionIdReference\":\"d4778e5347ea458c887593026613e845\"}" },
+            new object?[] { DocumentType.RejectRequestMeasurements, "{\"TransactionId\":\"4e85a732-85fd-4d92-8ff3-72c052802716\",\"RejectReasons\":[{\"ErrorCode\":\"E18\",\"ErrorMessage\":\"Det virker ikke!\"}],\"OriginalTransactionIdReference\":\"4E85A73285FD4D928FF372C052802717\",\"MeteringPointId\":{\"Value\":\"1111111111111111\"}}" },
 
             // TODO: Update the data, when it comes from the system and not our subsystem tests, as thi does
             new object?[] { DocumentType.ReminderOfMissingMeasureData, "{\"TransactionId\":\"5b139240044c4fde8295971a354d3fb9\",\"MeteringPointId\":{\"Value\":\"1111111111111111\"},\"Date\":\"2025-05-11T22:00:00Z\"}" },
