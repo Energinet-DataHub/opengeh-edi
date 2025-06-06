@@ -985,6 +985,18 @@
       <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Request-validated-measure-data-assembly-model.schema.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <None Remove="Schemas\Ebix\Schemas\document\DK_RequestMeteredDataValidated\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+      <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RequestMeteredDataValidated\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Schemas\Ebix\Schemas\document\DK_RequestMeteredDataValidated\ebIX_BusinessDataType-2.xsd" />
+      <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RequestMeteredDataValidated\ebIX_BusinessDataType-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Schemas\Ebix\Schemas\document\DK_RequestMeteredDataValidated\ebIX_DK_RequestMeteredDataValidated-2.xsd" />
+      <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RequestMeteredDataValidated\ebIX_DK_RequestMeteredDataValidated-2.xsd">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
