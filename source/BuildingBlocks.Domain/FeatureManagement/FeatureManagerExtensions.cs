@@ -72,4 +72,12 @@ public static class FeatureManagerExtensions
     {
         return featureManager.IsEnabledAsync(FeatureFlagNames.PM28ReceiveCIMMessages);
     }
+
+    /// <summary>
+    /// Whether to disallow actors to request measurements messages in CIM.
+    /// </summary>
+    public static Task<bool> SyncMeasurementsAsync(this IFeatureManager featureManager)
+    {
+        return featureManager.IsEnabledAsync(FeatureFlagNames.PeekMeasurementMessages);
+    }
 }

@@ -15,13 +15,15 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions;
 
 /// <summary>
-/// Service Bus Trigger to process time series synchronization messages from DataHub 2.
+/// Service Bus Trigger to process measurements synchronization from DataHub 2.
 /// </summary>
 public class TimeSeriesSync(ILogger<TimeSeriesSync> logger)
 {
@@ -34,10 +36,12 @@ public class TimeSeriesSync(ILogger<TimeSeriesSync> logger)
             $"%{MigrationOptions.SectionName}:{nameof(MigrationOptions.TimeSeriesSync_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        IFeatureManager featureManager)
     {
-        _logger.LogInformation("Enqueue BRS-026 messages service bus message received");
-
-        return await Task.CompletedTask;
+        _logger.LogInformation("Received message for measurements synchronization: {MessageId}", message.MessageId);
+        if (await featureManager.SyncMeasurementsAsync().ConfigureAwait(false))
+        {
+        }
     }
 }
