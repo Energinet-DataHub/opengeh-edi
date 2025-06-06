@@ -22,10 +22,12 @@ using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
+using NodaTime;
 using NodaTime.Extensions;
 using Polly;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 
@@ -38,7 +40,8 @@ public class EnqueueHandler_Brs_024_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
     IUnitOfWork unitOfWork,
-    IFeatureManager featureManager)
+    IFeatureManager featureManager,
+    IClock clock)
     : EnqueueActorMessagesValidatedHandlerBase<RequestYearlyMeasurementsAcceptedV1, RequestYearlyMeasurementsRejectV1>(logger)
 {
     private readonly ILogger _logger = logger;
@@ -46,6 +49,7 @@ public class EnqueueHandler_Brs_024_V1(
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IFeatureManager _featureManager = featureManager;
+    private readonly IClock _clock = clock;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
@@ -57,38 +61,38 @@ public class EnqueueHandler_Brs_024_V1(
             "Received enqueue accepted message(s) for BRS 024. Data: {0}",
             acceptedData);
 
-        var energyObservations = acceptedData.Measurements
-            .Select(x =>
-                new MeasurementDto(
-                    Position: x.Position,
-                    Quantity: x.EnergyQuantity,
-                    Quality: Quality.FromName(x.QuantityQuality.Name)))
-            .ToList();
+        foreach (var aggregatedMeasurement in acceptedData.AggregatedMeasurements)
+        {
+            var energyObservations = new MeasurementDto(
+                Position: 1,
+                Quantity: aggregatedMeasurement.EnergyQuantity,
+                Quality: Quality.FromName(aggregatedMeasurement.QuantityQuality.Name));
 
-        var acceptedRequestMeasurementsMessageDto = new AcceptedSendMeasurementsMessageDto(
-            eventId: EventId.From(serviceBusMessageId),
-            externalId: new ExternalId(orchestrationInstanceId),
-            receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
-            businessReason: BusinessReason.PeriodicMetering,
-            relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-            gridAreaCode: acceptedData.GridAreaCode,
-            series: new MeasurementsDto(
-                TransactionId: TransactionId.New(),
-                MeteringPointId: acceptedData.MeteringPointId,
-                MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
-                OriginalTransactionIdReference: TransactionId.From(acceptedData.OriginalTransactionId),
-                Product: acceptedData.ProductNumber,
-                MeasurementUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
-                RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
-                Resolution: Resolution.FromName(acceptedData.Resolution.Name),
-                Period: new Period(acceptedData.StartDateTime.ToInstant(), acceptedData.EndDateTime.ToInstant()),
-                Measurements: energyObservations));
+            var acceptedRequestMeasurementsMessageDto = new AcceptedSendMeasurementsMessageDto(
+                eventId: EventId.From(serviceBusMessageId),
+                externalId: new ExternalId(orchestrationInstanceId),
+                receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
+                businessReason: BusinessReason.PeriodicMetering,
+                relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
+                gridAreaCode: acceptedData.GridAreaCode,
+                series: new MeasurementsDto(
+                    TransactionId: TransactionId.New(),
+                    MeteringPointId: acceptedData.MeteringPointId,
+                    MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
+                    OriginalTransactionIdReference: TransactionId.From(acceptedData.OriginalTransactionId),
+                    Product: acceptedData.ProductNumber,
+                    MeasurementUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
+                    RegistrationDateTime: _clock.GetCurrentInstant(),
+                    Resolution: Resolution.FromName(aggregatedMeasurement.Resolution.Name),
+                    Period: new Period(aggregatedMeasurement.StartDateTime.ToInstant(), aggregatedMeasurement.EndDateTime.ToInstant()),
+                    Measurements: [energyObservations]));
+
+            await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, CancellationToken.None)
+                .ConfigureAwait(false);
+        }
 
         if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
         {
-            await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, CancellationToken.None)
-                .ConfigureAwait(false);
-
             await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
         }
 

@@ -32,31 +32,27 @@ public class RequestMeasurementsResponseBuilder
         Instant startDateTime,
         Instant endDateTime,
         Guid orchestrationInstanceId,
-        List<(int Position, string QuantityQuality, decimal EnergyQuantity)> energyObservations)
+        (int Position, string QuantityQuality, decimal EnergyQuantity) aggregatedMeasurement)
     {
-        var endDateTimeInDateTimeOffset = endDateTime.ToDateTimeOffset();
-        var startDateTimeInDateTimeOffset = startDateTime.ToDateTimeOffset();
         var resolution = PMValueTypes.Resolution.QuarterHourly;
-        var measurements = energyObservations
-            .Select(eo => new AcceptedMeteredData(
-                Position: eo.Position,
-                EnergyQuantity: eo.EnergyQuantity,
-                QuantityQuality: PMQuality.FromName(Quality.FromCode(eo.QuantityQuality).Name)))
-            .ToList();
         var accepted = new RequestYearlyMeasurementsAcceptedV1(
             OriginalActorMessageId: requestYearlyMeasurementsInputV1.ActorMessageId,
             OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
             MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ProductNumber: "8716867000030",
-            RegistrationDateTime: endDateTimeInDateTimeOffset,
-            StartDateTime: startDateTimeInDateTimeOffset,
-            EndDateTime: endDateTimeInDateTimeOffset,
             ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
-            Resolution: resolution,
             MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-            Measurements: measurements,
+            AggregatedMeasurements: new List<AggregatedMeasurement>
+            {
+                new(
+                    StartDateTime: startDateTime.ToDateTimeOffset(),
+                    EndDateTime: endDateTime.ToDateTimeOffset(),
+                    Resolution: resolution,
+                    EnergyQuantity: aggregatedMeasurement.EnergyQuantity,
+                    QuantityQuality: PMValueTypes.Quality.AsProvided),
+            },
             GridAreaCode: "804");
 
         var enqueueActorMessages = new EnqueueActorMessagesV1
