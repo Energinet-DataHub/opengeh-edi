@@ -80,7 +80,7 @@ public class GivenRequestMeasurementsTests(
         var incomingDocumentFormat = documentFormat;
         if (documentFormat == DocumentFormat.Xml)
         {
-            documentFormat = DocumentFormat.Json;
+            incomingDocumentFormat = DocumentFormat.Json;
         }
 
         // Act
