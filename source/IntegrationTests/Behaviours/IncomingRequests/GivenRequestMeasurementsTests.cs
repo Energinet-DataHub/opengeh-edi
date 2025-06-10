@@ -76,9 +76,16 @@ public class GivenRequestMeasurementsTests(
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
         var meteringPointId = MeteringPointId.From("579999993331812345");
 
+        // TODO: Xml is not yet supported #691
+        var incomingDocumentFormat = documentFormat;
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            incomingDocumentFormat = DocumentFormat.Json;
+        }
+
         // Act
         await GivenRequestMeasurements(
-            documentFormat: DocumentFormat.Json, // Currently only Json is supported for this test
+            documentFormat: incomingDocumentFormat,
             senderActor: senderActor,
             MessageId.New(),
             [

@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM015;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -26,7 +27,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.MessageParsers;
 
-public sealed class RequestMeasurementsJsonMessageParserTests
+public sealed class RequestMeasurementsMessageParserTests
 {
     private static readonly string PathToMessages =
         $"MessageParsers{Path.DirectorySeparatorChar}";
@@ -36,10 +37,13 @@ public sealed class RequestMeasurementsJsonMessageParserTests
 
     private readonly Dictionary<DocumentFormat, IMessageParser> _marketMessageParser = new()
     {
-        // {
-        //     DocumentFormat.Ebix,
-        //     new RequestValidatedMeasurementsEbixMessageParser(new EbixSchemaProvider(), new Logger<RequestValidatedMeasurementsEbixMessageParser>(new LoggerFactory()))
-        // },
+        {
+            DocumentFormat.Ebix,
+            new RequestMeasurementsEbixMessageParser(
+                new EbixSchemaProvider(),
+                new Logger<RequestMeasurementsEbixMessageParser>(
+                    new LoggerFactory()))
+        },
         // {
         //     DocumentFormat.Xml,
         //     new RequestValidatedMeasurementsXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas()))
@@ -57,9 +61,8 @@ public sealed class RequestMeasurementsJsonMessageParserTests
     {
         var data = new TheoryData<DocumentFormat, Stream>
         {
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurements.xml") },
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HRequestValidatedMeasurements.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurements.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurements.xml") },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
             { DocumentFormat.Json, CreateBaseJsonMessage("ValidRequestValidatedMeasurements.json") },
@@ -73,8 +76,8 @@ public sealed class RequestMeasurementsJsonMessageParserTests
     {
         var data = new TheoryData<DocumentFormat, Stream, string, string>
         {
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad-version" },
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad-version" },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad" },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestValidatedMeasurementsMissingRegistration.xml"), nameof(InvalidMessageStructure), "elements expected: 'registration_DateAndOrTime.dateTime'" },

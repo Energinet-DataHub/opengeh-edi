@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
-using Json.Schema;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.MessageParsers;
@@ -69,13 +68,6 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
         IncomingDocumentType incomingDocumentType,
         DocumentFormat documentFormat)
     {
-        // TODO: this will be removed in story #693
-        if (incomingDocumentType == IncomingDocumentType.RequestValidatedMeasurements
-            && documentFormat == DocumentFormat.Ebix)
-        {
-            return;
-        }
-
         // TODO: this will be removed in story #691
         if (incomingDocumentType == IncomingDocumentType.RequestValidatedMeasurements
             && documentFormat == DocumentFormat.Xml)

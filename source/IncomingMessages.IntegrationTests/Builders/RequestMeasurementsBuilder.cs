@@ -36,6 +36,13 @@ public static class RequestMeasurementsBuilder
                 senderActor,
                 series);
         }
+        else if (format == DocumentFormat.Ebix)
+        {
+            content = GetEbix(
+                messageId,
+                senderActor,
+                series);
+        }
         else
         {
             throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported document format");
@@ -44,11 +51,51 @@ public static class RequestMeasurementsBuilder
         return new IncomingMarketMessageStream(new MemoryStream(Encoding.UTF8.GetBytes(content)));
     }
 
-    private static string GetJson(
+    private static string GetEbix(
         string messageId,
         Actor sender,
-        IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId MeteringPointId)> series) =>
-    $$"""
+        IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId
+            MeteringPointId)> series) =>
+        $$"""
+          <?xml version="1.0" encoding="UTF-8"?>
+          <ns0:DK_RequestMeteredDataValidated xmlns:ns0="un:unece:260:data:EEM-DK_RequestMeteredDataValidated:v3">
+              <ns0:HeaderEnergyDocument>
+                  <ns0:Identification>{{messageId}}</ns0:Identification>
+                  <ns0:DocumentType listAgencyIdentifier="260">E73</ns0:DocumentType>
+                  <ns0:Creation>2022-12-17T09:30:47Z</ns0:Creation>
+                  <ns0:SenderEnergyParty>
+                      <ns0:Identification schemeAgencyIdentifier="9">{{sender.ActorNumber.Value}}</ns0:Identification>
+                  </ns0:SenderEnergyParty>
+                  <ns0:RecipientEnergyParty>
+                      <ns0:Identification schemeAgencyIdentifier="9">5790001330552</ns0:Identification>
+                  </ns0:RecipientEnergyParty>
+              </ns0:HeaderEnergyDocument>
+              <ns0:ProcessEnergyContext>
+                  <ns0:EnergyBusinessProcess listAgencyIdentifier="260">E23</ns0:EnergyBusinessProcess>
+                  <ns0:EnergyBusinessProcessRole listAgencyIdentifier="260">DDQ</ns0:EnergyBusinessProcessRole>
+                  <ns0:EnergyIndustryClassification listAgencyIdentifier="6">23</ns0:EnergyIndustryClassification>
+              </ns0:ProcessEnergyContext>
+              {{string.Join(",\n", series.Select(s =>
+                  $$"""
+                    <ns0:PayloadMeasuredDataRequest>
+                        <ns0:Identification>{{s.TransactionId.Value}}</ns0:Identification>
+                        <ns0:ObservationTimeSeriesPeriod>
+                            <ns0:Start>{{s.PeriodStart}}</ns0:Start>
+                            <ns0:End>{{s.PeriodEnd}}</ns0:End>
+                        </ns0:ObservationTimeSeriesPeriod>
+                        <ns0:MeteringPointDomainLocation>
+                            <ns0:Identification schemeAgencyIdentifier="9">{{s.MeteringPointId.Value}}</ns0:Identification>
+                        </ns0:MeteringPointDomainLocation>
+                    </ns0:PayloadMeasuredDataRequest>
+                    """))}}
+          </ns0:DK_RequestMeteredDataValidated>
+          """;
+
+    private static string GetJson(
+          string messageId,
+          Actor sender,
+          IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId MeteringPointId)> series) =>
+      $$"""
       {
         "RequestValidatedMeasureData_MarketDocument": {
           "mRID": "{{messageId}}",
