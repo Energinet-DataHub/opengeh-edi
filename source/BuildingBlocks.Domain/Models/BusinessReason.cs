@@ -32,6 +32,8 @@ public sealed class BusinessReason : DataHubType<BusinessReason>
         "D26",
         8);
 
+    public static readonly BusinessReason YearlyMetering = new(PMTypes.BusinessReason.YearlyMetering.Name, "E30", 9);
+
     /// <summary>
     /// Represents the business reason in the Edi system.
     /// </summary>

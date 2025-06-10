@@ -41,6 +41,7 @@ public class RequestMeasurementsBehaviourTestBase(
         DocumentFormat documentFormat,
         Actor senderActor,
         MessageId messageId,
+        BusinessReason businessReason,
         IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId MeteringPointId)>
             series)
     {
@@ -50,6 +51,7 @@ public class RequestMeasurementsBehaviourTestBase(
             messageId: messageId.Value,
             format: documentFormat,
             senderActor: senderActor,
+            businessReason,
             series: series);
 
         var response = await

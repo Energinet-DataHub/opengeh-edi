@@ -50,6 +50,7 @@ public class BusinessReasonTests
             (BusinessReason.PeriodicMetering, "PeriodicMetering", "E23", 6),
             (BusinessReason.PeriodicFlexMetering, "PeriodicFlexMetering", "D42", 7),
             (BusinessReason.ReminderOfMissingMeasurementLog, "ReminderOfMissingMeasurementLog", "D26", 8),
+            (BusinessReason.YearlyMetering, "YearlyMetering", "E30", 9),
         };
 
         using var scope = new AssertionScope();

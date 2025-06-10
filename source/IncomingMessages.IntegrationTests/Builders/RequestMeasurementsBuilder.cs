@@ -26,6 +26,7 @@ public static class RequestMeasurementsBuilder
         string messageId,
         DocumentFormat format,
         Actor senderActor,
+        BusinessReason businessReason,
         IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId MeteringPointId)> series)
     {
         string content;
@@ -34,6 +35,7 @@ public static class RequestMeasurementsBuilder
             content = GetJson(
                 messageId,
                 senderActor,
+                businessReason,
                 series);
         }
         else if (format == DocumentFormat.Ebix)
@@ -41,6 +43,7 @@ public static class RequestMeasurementsBuilder
             content = GetEbix(
                 messageId,
                 senderActor,
+                businessReason,
                 series);
         }
         else if (format == DocumentFormat.Xml)
@@ -48,6 +51,7 @@ public static class RequestMeasurementsBuilder
             content = GetXml(
                 messageId,
                 senderActor,
+                businessReason,
                 series);
         }
         else
@@ -61,6 +65,7 @@ public static class RequestMeasurementsBuilder
     private static string GetEbix(
         string messageId,
         Actor sender,
+        BusinessReason businessReason,
         IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId
             MeteringPointId)> series) =>
         $$"""
@@ -78,7 +83,7 @@ public static class RequestMeasurementsBuilder
                   </ns0:RecipientEnergyParty>
               </ns0:HeaderEnergyDocument>
               <ns0:ProcessEnergyContext>
-                  <ns0:EnergyBusinessProcess listAgencyIdentifier="260">E23</ns0:EnergyBusinessProcess>
+                  <ns0:EnergyBusinessProcess listAgencyIdentifier="260">{{businessReason.Code}}</ns0:EnergyBusinessProcess>
                   <ns0:EnergyBusinessProcessRole listAgencyIdentifier="260">DDQ</ns0:EnergyBusinessProcessRole>
                   <ns0:EnergyIndustryClassification listAgencyIdentifier="6">23</ns0:EnergyIndustryClassification>
               </ns0:ProcessEnergyContext>
@@ -101,6 +106,7 @@ public static class RequestMeasurementsBuilder
     private static string GetJson(
           string messageId,
           Actor sender,
+          BusinessReason businessReason,
           IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId MeteringPointId)> series) =>
       $$"""
       {
@@ -111,7 +117,7 @@ public static class RequestMeasurementsBuilder
           },
           "createdDateTime": "2022-12-17T09:30:47Z",
           "process.processType": {
-            "value": "E23"
+            "value": "{{businessReason.Code}}"
           },
           "receiver_MarketParticipant.mRID": {
             "codingScheme": "A10",
@@ -151,13 +157,14 @@ public static class RequestMeasurementsBuilder
     private static string GetXml(
         string messageId,
         Actor sender,
+        BusinessReason businessReason,
         IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId
             MeteringPointId)> series) =>
         $$"""
           <cim:RequestValidatedMeasureData_MarketDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cim="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1" xsi:schemaLocation="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1 urn-ediel-org-measure-requestvalidatedmeasuredata-0-1.xsd">
           	<cim:mRID>{{messageId}}</cim:mRID>
           	<cim:type>E73</cim:type>
-          	<cim:process.processType>E23</cim:process.processType>
+          	<cim:process.processType>{{businessReason.Code}}</cim:process.processType>
           	<cim:businessSector.type>23</cim:businessSector.type>
           	<cim:sender_MarketParticipant.mRID codingScheme="A10">{{sender.ActorNumber.Value}}</cim:sender_MarketParticipant.mRID>
           	<cim:sender_MarketParticipant.marketRole.type>{{sender.ActorRole.Code}}</cim:sender_MarketParticipant.marketRole.type>

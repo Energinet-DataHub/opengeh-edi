@@ -151,7 +151,7 @@ public class EnqueueHandler_Brs_024_V1(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(orchestrationInstanceId),
             receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
-            businessReason: BusinessReason.PeriodicMetering,
+            businessReason: BusinessReason.YearlyMetering,
             relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
             gridAreaCode: acceptedData.GridAreaCode,
             series: new MeasurementsDto(
