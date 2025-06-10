@@ -64,8 +64,8 @@ public sealed class RequestMeasurementsMessageParserTests
         {
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurements.xml") },
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
-            // { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurements.xml") },
-            // { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurements.xml") },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
             { DocumentFormat.Json, CreateBaseJsonMessage("ValidRequestValidatedMeasurements.json") },
             { DocumentFormat.Json, CreateBaseJsonMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.json") },
         };
@@ -79,9 +79,8 @@ public sealed class RequestMeasurementsMessageParserTests
         {
             { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad-version" },
             { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
-            // { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad" },
-            // { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
-            // { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestValidatedMeasurementsMissingRegistration.xml"), nameof(InvalidMessageStructure), "elements expected: 'registration_DateAndOrTime.dateTime'" },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("BadVersionRequestValidatedMeasurements.xml"), nameof(InvalidBusinessReasonOrVersion), "Schema version bad" },
+            { DocumentFormat.Xml, CreateBaseXmlMessage("InvalidRequestValidatedMeasurements.xml"), nameof(InvalidMessageStructure), "invalid child element" },
             { DocumentFormat.Json, CreateBaseJsonMessage("InvalidRequestValidatedMeasurements.json"), nameof(InvalidMessageStructure), "[required, Required properties [\"sender_MarketParticipant.mRID\"] are not present]" },
             { DocumentFormat.Json, CreateBaseJsonMessage("InvalidRequestValidatedMeasurementsMarketEvaluationPointValue.json"), nameof(InvalidMessageStructure), "[required, Required properties [\"value\"] are not present]" },
         };

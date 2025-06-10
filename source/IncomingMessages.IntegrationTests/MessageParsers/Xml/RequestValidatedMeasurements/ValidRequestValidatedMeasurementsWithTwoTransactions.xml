@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<cim:RequestValidatedMeasureData_MarketDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                xmlns:cim="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1"
+                                                xsi:schemaLocation="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1 urn-ediel-org-measure-requestvalidatedmeasuredata-0-1.xsd">
+    <cim:mRID>111131835</cim:mRID>
+    <cim:type>E73</cim:type>
+    <cim:process.processType>E23</cim:process.processType>
+    <cim:businessSector.type>23</cim:businessSector.type>
+    <cim:sender_MarketParticipant.mRID codingScheme="A10">5799999933318</cim:sender_MarketParticipant.mRID>
+    <cim:sender_MarketParticipant.marketRole.type>DDQ</cim:sender_MarketParticipant.marketRole.type>
+    <cim:receiver_MarketParticipant.mRID codingScheme="A10">5790001330552</cim:receiver_MarketParticipant.mRID>
+    <cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
+    <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
+    <cim:Series>
+        <cim:mRID>1568914</cim:mRID>
+        <cim:start_DateAndOrTime.dateTime>2022-07-17T22:00:00Z</cim:start_DateAndOrTime.dateTime>
+        <cim:end_DateAndOrTime.dateTime>2022-08-17T22:00:00Z</cim:end_DateAndOrTime.dateTime>
+        <cim:marketEvaluationPoint.mRID codingScheme="A10">579999993331812345</cim:marketEvaluationPoint.mRID>
+    </cim:Series>
+    <cim:Series>
+        <cim:mRID>1568915</cim:mRID>
+        <cim:start_DateAndOrTime.dateTime>2022-07-17T22:00:00Z</cim:start_DateAndOrTime.dateTime>
+        <cim:end_DateAndOrTime.dateTime>2022-08-17T22:00:00Z</cim:end_DateAndOrTime.dateTime>
+        <cim:marketEvaluationPoint.mRID codingScheme="A10">579999993331812345</cim:marketEvaluationPoint.mRID>
+    </cim:Series>
+</cim:RequestValidatedMeasureData_MarketDocument>
