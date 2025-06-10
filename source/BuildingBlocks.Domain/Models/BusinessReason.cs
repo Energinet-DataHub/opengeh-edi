@@ -26,6 +26,7 @@ public sealed class BusinessReason : DataHubType<BusinessReason>
     public static readonly BusinessReason Correction = new(PMTypes.BusinessReason.Correction.Name, "D32", 5);
     public static readonly BusinessReason PeriodicMetering = new(PMTypes.BusinessReason.PeriodicMetering.Name, "E23", 6);
     public static readonly BusinessReason PeriodicFlexMetering = new(PMTypes.BusinessReason.PeriodicFlexMetering.Name, "D42", 7);
+    public static readonly BusinessReason YearlyMetering = new(PMTypes.BusinessReason.YearlyMetering.Name, "E30", 6);
 
     public static readonly BusinessReason ReminderOfMissingMeasurementLog = new(
         nameof(ReminderOfMissingMeasurementLog),

@@ -44,6 +44,9 @@ public static class EbixCode
         if (businessReason == BusinessReason.PeriodicMetering)
             return "E23";
 
+        if (businessReason == BusinessReason.YearlyMetering)
+            return "E30";
+
         if (businessReason == BusinessReason.PeriodicFlexMetering)
             return "D42";
 
