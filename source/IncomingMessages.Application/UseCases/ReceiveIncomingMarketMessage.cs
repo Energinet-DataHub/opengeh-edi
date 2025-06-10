@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.FeatureManagement;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
