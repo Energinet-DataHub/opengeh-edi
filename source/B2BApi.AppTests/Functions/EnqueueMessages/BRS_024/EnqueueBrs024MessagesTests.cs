@@ -142,7 +142,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
                 (om) =>
                 {
                     om.DocumentType.Should().Be(DocumentType.NotifyValidatedMeasureData);
-                    om.BusinessReason.Should().Be(BusinessReason.PeriodicMetering.Name);
+                    om.BusinessReason.Should().Be(BusinessReason.YearlyMetering.Name);
                     om.RelatedToMessageId.Should().NotBeNull();
                     om.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
                     om.Receiver.Number.Value.Should().Be(enqueueMessagesData.ActorNumber.Value);
