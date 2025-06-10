@@ -117,6 +117,11 @@ public class RequestMeasurementsBehaviourTestBase(
         await GivenProcessManagerResponseIsReceived(acceptedMessage);
     }
 
+    protected async Task GivenRequestMeasurementsRejectedIsReceived(ServiceBusMessage rejectedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(rejectedMessage);
+    }
+
     protected async Task ThenNotifyValidatedMeasureDataDocumentIsCorrect(
         Stream? peekResultDocumentStream,
         DocumentFormat documentFormat,

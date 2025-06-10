@@ -17,15 +17,18 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
+using NodaTime;
 using NodaTime.Extensions;
 using Polly;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 
@@ -38,7 +41,8 @@ public class EnqueueHandler_Brs_024_V1(
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
     IUnitOfWork unitOfWork,
-    IFeatureManager featureManager)
+    IFeatureManager featureManager,
+    IClock clock)
     : EnqueueActorMessagesValidatedHandlerBase<RequestYearlyMeasurementsAcceptedV1, RequestYearlyMeasurementsRejectV1>(logger)
 {
     private readonly ILogger _logger = logger;
@@ -46,6 +50,7 @@ public class EnqueueHandler_Brs_024_V1(
     private readonly IProcessManagerMessageClient _processManagerMessageClient = processManagerMessageClient;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IFeatureManager _featureManager = featureManager;
+    private readonly IClock _clock = clock;
 
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
@@ -54,16 +59,93 @@ public class EnqueueHandler_Brs_024_V1(
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
-            "Received enqueue accepted message(s) for BRS 024. Data: {0}",
+            "Received enqueue accepted message(s) for BRS 024. Data: {0}.",
             acceptedData);
 
-        var energyObservations = acceptedData.Measurements
-            .Select(x =>
-                new MeasurementDto(
-                    Position: x.Position,
-                    Quantity: x.EnergyQuantity,
-                    Quality: Quality.FromName(x.QuantityQuality.Name)))
+        foreach (var aggregatedMeasurement in acceptedData.AggregatedMeasurements)
+        {
+            var acceptedRequestMeasurementsMessageDto = GetAcceptedRequestMeasurementsMessageDto(
+                serviceBusMessageId,
+                orchestrationInstanceId,
+                acceptedData,
+                aggregatedMeasurement);
+
+            await EnqueueAcceptMessageAsync(acceptedRequestMeasurementsMessageDto, cancellationToken).ConfigureAwait(false);
+        }
+
+        if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
+        {
+            await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        await NotifyProcessManagerAsync(orchestrationInstanceId).ConfigureAwait(false);
+    }
+
+    protected override async Task EnqueueRejectedMessagesAsync(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
+        RequestYearlyMeasurementsRejectV1 rejectedData,
+        CancellationToken cancellationToken)
+    {
+        _logger.LogInformation(
+            "Received enqueue rejected message(s) for BRS 024. Data: {0}.",
+            rejectedData);
+
+        var rejectRequestMeasurementsMessageDto = GetRejectRequestMeasurementsMessageDto(
+            serviceBusMessageId,
+            orchestrationInstanceId,
+            orchestrationStartedByActor,
+            rejectedData);
+
+        if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
+        {
+            await EnqueueRejectMessageAsync(rejectRequestMeasurementsMessageDto, cancellationToken).ConfigureAwait(false);
+        }
+
+        await NotifyProcessManagerAsync(orchestrationInstanceId).ConfigureAwait(false);
+    }
+
+    private static RejectRequestMeasurementsMessageDto GetRejectRequestMeasurementsMessageDto(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
+        RequestYearlyMeasurementsRejectV1 rejectedData)
+    {
+        var rejectReasons = rejectedData.ValidationErrors.Select(
+                e => new RejectRequestMeasurementsMessageRejectReason(
+                    ErrorCode: e.ErrorCode,
+                    ErrorMessage: e.Message))
             .ToList();
+
+        var rejectedTimeSeries = new RejectRequestMeasurementsMessageSeries(
+            TransactionId: TransactionId.New(),
+            MeteringPointId: MeteringPointId.From(rejectedData.MeteringPointId),
+            RejectReasons: rejectReasons,
+            OriginalTransactionIdReference: TransactionId.From(rejectedData.OriginalTransactionId));
+
+        return new RejectRequestMeasurementsMessageDto(
+            relatedToMessageId: MessageId.Create(rejectedData.OriginalActorMessageId),
+            receiverNumber: ActorNumber.Create(orchestrationStartedByActor.ActorNumber),
+            receiverRole: ActorRole.FromName(orchestrationStartedByActor.ActorRole.ToString()),
+            documentReceiverRole: ActorRole.FromName(rejectedData.ActorRole.Name),
+            documentReceiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
+            processId: orchestrationInstanceId,
+            eventId: EventId.From(serviceBusMessageId),
+            businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,
+            series: rejectedTimeSeries);
+    }
+
+    private AcceptedSendMeasurementsMessageDto GetAcceptedRequestMeasurementsMessageDto(
+        Guid serviceBusMessageId,
+        Guid orchestrationInstanceId,
+        RequestYearlyMeasurementsAcceptedV1 acceptedData,
+        AggregatedMeasurement aggregatedMeasurement)
+    {
+        var energyObservation = new MeasurementDto(
+            Position: 1,
+            Quantity: aggregatedMeasurement.EnergyQuantity,
+            Quality: Quality.FromName(aggregatedMeasurement.QuantityQuality.Name));
 
         var acceptedRequestMeasurementsMessageDto = new AcceptedSendMeasurementsMessageDto(
             eventId: EventId.From(serviceBusMessageId),
@@ -79,19 +161,23 @@ public class EnqueueHandler_Brs_024_V1(
                 OriginalTransactionIdReference: TransactionId.From(acceptedData.OriginalTransactionId),
                 Product: acceptedData.ProductNumber,
                 MeasurementUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
-                RegistrationDateTime: acceptedData.RegistrationDateTime.ToInstant(),
-                Resolution: Resolution.FromName(acceptedData.Resolution.Name),
-                Period: new Period(acceptedData.StartDateTime.ToInstant(), acceptedData.EndDateTime.ToInstant()),
-                Measurements: energyObservations));
+                RegistrationDateTime: _clock.GetCurrentInstant(),
+                Resolution: Resolution.FromName(aggregatedMeasurement.Resolution.Name),
+                Period: new Period(aggregatedMeasurement.StartDateTime.ToInstant(), aggregatedMeasurement.EndDateTime.ToInstant()),
+                Measurements: [energyObservation]));
+        return acceptedRequestMeasurementsMessageDto;
+    }
 
-        if (await _featureManager.EnqueueRequestMeasurementsResponseMessagesAsync().ConfigureAwait(false))
-        {
-            await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, CancellationToken.None)
-                .ConfigureAwait(false);
+    private async Task EnqueueAcceptMessageAsync(
+        AcceptedSendMeasurementsMessageDto acceptedRequestMeasurementsMessageDto,
+        CancellationToken cancellationToken)
+    {
+        await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, cancellationToken)
+            .ConfigureAwait(false);
+    }
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
-        }
-
+    private async Task NotifyProcessManagerAsync(Guid orchestrationInstanceId)
+    {
         var executionPolicy = Policy
             .Handle<Exception>(ex => ex is not OperationCanceledException)
             .WaitAndRetryAsync(
@@ -103,17 +189,13 @@ public class EnqueueHandler_Brs_024_V1(
                 CancellationToken.None)).ConfigureAwait(false);
     }
 
-    protected override Task EnqueueRejectedMessagesAsync(
-        Guid serviceBusMessageId,
-        Guid orchestrationInstanceId,
-        EnqueueActorMessagesActorV1 orchestrationStartedByActor,
-        RequestYearlyMeasurementsRejectV1 rejectedData,
+    private async Task EnqueueRejectMessageAsync(
+        RejectRequestMeasurementsMessageDto rejectRequestMeasurementsMessageDto,
         CancellationToken cancellationToken)
     {
-        _logger.LogInformation(
-            "Received enqueue rejected message(s) for BRS 024. Data: {0}",
-            rejectedData);
+        await _outgoingMessagesClient.EnqueueAsync(rejectRequestMeasurementsMessageDto, CancellationToken.None)
+            .ConfigureAwait(false);
 
-        throw new NotImplementedException();
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 }

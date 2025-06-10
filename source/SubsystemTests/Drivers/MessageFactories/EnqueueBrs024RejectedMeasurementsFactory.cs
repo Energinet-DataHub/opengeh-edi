@@ -19,41 +19,34 @@ using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
-using NodaTime;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
-public static class EnqueueBrs024AcceptedMeasurementsFactory
+public static class EnqueueBrs024RejectedMeasurementsFactory
 {
-    public static ServiceBusMessage CreateAcceptedV1(
+    public static ServiceBusMessage CreateRejectedV1(
         Actor actor,
-        Instant start,
-        Instant end,
         string originalActorMessageId,
         string originalActorTransactionId,
         Guid eventId)
     {
-        var resolution = PMValueTypes.Resolution.QuarterHourly;
-        var accepted = new RequestYearlyMeasurementsAcceptedV1(
+        var accepted = new RequestYearlyMeasurementsRejectV1(
             OriginalActorMessageId: originalActorMessageId,
             OriginalTransactionId: originalActorTransactionId,
-            MeteringPointId: "123456789012345678",
-            MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
-            ProductNumber: "test-product-number",
             ActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: actor.ActorRole.ToProcessManagerActorRole(),
-            MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-            AggregatedMeasurements: new List<AggregatedMeasurement>
-            {
+            BusinessReason: PMValueTypes.BusinessReason.PeriodicMetering,
+            MeteringPointId: "12345678912346",
+            ValidationErrors:
+            [
                 new(
-                    StartDateTime: start.ToDateTimeOffset(),
-                    EndDateTime: end.ToDateTimeOffset(),
-                    Resolution: resolution,
-                    EnergyQuantity: 10000,
-                    QuantityQuality: PMValueTypes.Quality.AsProvided),
-            },
-            GridAreaCode: "804");
+                    Message:
+                    "I forbindelse med anmodning om årssum kan der kun anmodes om data for forbrug og produktion/When"
+                    + " requesting yearly amount then it is only possible to request for production and consumption",
+                    ErrorCode: "D18"),
+
+            ]);
 
         return CreateServiceBusMessage(accepted, actor, eventId);
     }
