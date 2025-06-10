@@ -99,6 +99,18 @@ limitations under the License.
         <EmbeddedResource Include="MessageParsers\Ebix\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.xml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\ValidRequestValidatedMeasurementsWithTwoTransactions.xml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\BadVersionRequestValidatedMeasurements.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\InvalidRequestValidatedMeasurements.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
