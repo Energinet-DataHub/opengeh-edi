@@ -51,6 +51,7 @@ public static class RequestMeasurementsBuilder
             content = GetXml(
                 messageId,
                 senderActor,
+                businessReason,
                 series);
         }
         else
@@ -156,13 +157,14 @@ public static class RequestMeasurementsBuilder
     private static string GetXml(
         string messageId,
         Actor sender,
+        BusinessReason businessReason,
         IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId
             MeteringPointId)> series) =>
         $$"""
           <cim:RequestValidatedMeasureData_MarketDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cim="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1" xsi:schemaLocation="urn:ediel.org:measure:requestvalidatedmeasuredata:0:1 urn-ediel-org-measure-requestvalidatedmeasuredata-0-1.xsd">
           	<cim:mRID>{{messageId}}</cim:mRID>
           	<cim:type>E73</cim:type>
-          	<cim:process.processType>E23</cim:process.processType>
+          	<cim:process.processType>{{businessReason.Code}}</cim:process.processType>
           	<cim:businessSector.type>23</cim:businessSector.type>
           	<cim:sender_MarketParticipant.mRID codingScheme="A10">{{sender.ActorNumber.Value}}</cim:sender_MarketParticipant.mRID>
           	<cim:sender_MarketParticipant.marketRole.type>{{sender.ActorRole.Code}}</cim:sender_MarketParticipant.marketRole.type>
