@@ -32,7 +32,7 @@ public class RequestValidatedMeasurementsXmlMessageParser(CimXmlSchemaProvider s
         string senderNumber) =>
         new RequestMeasurementsSeries(
             seriesElement.Element(ns + "mRID")!.Value,
-            seriesElement.Element(ns + "start_DateAndOrTime.dateTime")?.Value ?? string.Empty,
+            seriesElement.Element(ns + "start_DateAndOrTime.dateTime")!.Value,
             seriesElement.Element(ns + "end_DateAndOrTime.dateTime")?.Value,
             MeteringPointId.From(seriesElement.Element(ns + "marketEvaluationPoint.mRID")!.Value),
             senderNumber);
