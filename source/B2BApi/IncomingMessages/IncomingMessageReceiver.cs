@@ -73,8 +73,10 @@ public class IncomingMessageReceiver
             return request.CreateResponse(HttpStatusCode.Forbidden);
         }
 
-        if (incomingDocumentTypeName != null &&
-            incomingDocumentTypeName.Equals(IncomingDocumentType.RequestValidatedMeasurements.Name, StringComparison.OrdinalIgnoreCase)
+        if (incomingDocumentTypeName != null
+            && incomingDocumentTypeName.Equals(
+                IncomingDocumentType.RequestValidatedMeasurements.Name,
+                StringComparison.OrdinalIgnoreCase)
             && !await _featureManager.ReceiveRequestMeasurementsMessagesInCimAsync().ConfigureAwait(false))
         {
             /*
