@@ -78,7 +78,9 @@ public class GivenRequestMeasurementsTests(
 
         // Act
         await GivenRequestMeasurements(
-            documentFormat: DocumentFormat.Json, // Currently only Json is supported for this test
+            documentFormat: new[] { DocumentFormat.Json, DocumentFormat.Xml }.Contains(documentFormat)
+                ? documentFormat
+                : DocumentFormat.Json, // Currently only Json and Xml are supported for this test
             senderActor: senderActor,
             MessageId.New(),
             [

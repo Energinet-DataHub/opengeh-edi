@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM015;
 
-public class RequestValidatedMeasurementsXmlMessageParser(CimXmlSchemaProvider schemaProvider)
+public class RequestMeasurementsXmlMessageParser(CimXmlSchemaProvider schemaProvider)
     : XmlMessageParserBase(schemaProvider)
 {
     public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestValidatedMeasurements;

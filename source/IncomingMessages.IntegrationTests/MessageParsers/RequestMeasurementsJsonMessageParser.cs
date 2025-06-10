@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM015;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Json;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -40,10 +41,10 @@ public sealed class RequestMeasurementsJsonMessageParserTests
         //     DocumentFormat.Ebix,
         //     new RequestValidatedMeasurementsEbixMessageParser(new EbixSchemaProvider(), new Logger<RequestValidatedMeasurementsEbixMessageParser>(new LoggerFactory()))
         // },
-        // {
-        //     DocumentFormat.Xml,
-        //     new RequestValidatedMeasurementsXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas()))
-        // },
+        {
+            DocumentFormat.Xml,
+            new RequestMeasurementsXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas()))
+        },
         {
             DocumentFormat.Json,
             new RequestMeasurementsJsonMessageParser(

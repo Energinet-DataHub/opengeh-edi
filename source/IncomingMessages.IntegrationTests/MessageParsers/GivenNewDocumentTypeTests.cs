@@ -76,13 +76,6 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
             return;
         }
 
-        // TODO: this will be removed in story #691
-        if (incomingDocumentType == IncomingDocumentType.RequestValidatedMeasurements
-            && documentFormat == DocumentFormat.Xml)
-        {
-            return;
-        }
-
         // Arrange
         var messageParsers = GetService<IEnumerable<IMessageParser>>().ToDictionary(
             parser => (parser.DocumentType, parser.DocumentFormat),
