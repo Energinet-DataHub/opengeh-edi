@@ -63,7 +63,6 @@ public sealed class RequestMeasurementsMessageParserTests
         {
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurements.xml") },
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
-            // { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HRequestValidatedMeasurements.xml") },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurements.xml") },
             // { DocumentFormat.Xml, CreateBaseXmlMessage("ValidRequestValidatedMeasurementsWithTwoTransactions.xml") },
             { DocumentFormat.Json, CreateBaseJsonMessage("ValidRequestValidatedMeasurements.json") },
