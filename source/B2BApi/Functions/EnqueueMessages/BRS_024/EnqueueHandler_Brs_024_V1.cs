@@ -153,6 +153,7 @@ public class EnqueueHandler_Brs_024_V1(
             receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
             businessReason: BusinessReason.YearlyMetering,
             relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
+            gridAreaCode: null,
             series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: acceptedData.MeteringPointId,

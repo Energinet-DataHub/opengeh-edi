@@ -502,6 +502,7 @@ public class WhenEnqueueingMultipleOutgoingMessagesIdempotencyTests : OutgoingMe
             receiver: receiver,
             businessReason: BusinessReason.PeriodicMetering,
             relatedToMessageId: relatedToMessageId,
+            gridAreaCode: "804",
             series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: "1234567890123",

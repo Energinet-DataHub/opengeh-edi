@@ -221,7 +221,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
                 (om) =>
                 {
                     om.DocumentType.Should().Be(DocumentType.RejectRequestMeasurements);
-                    om.BusinessReason.Should().Be(BusinessReason.PeriodicMetering.Name);
+                    om.BusinessReason.Should().Be(BusinessReason.YearlyMetering.Name);
                     om.RelatedToMessageId!.Value.Value.Should().Be(rejectedMessage.OriginalActorMessageId);
                     om.Receiver.Number.Value.Should().Be(rejectedMessage.ActorNumber.Value);
                     om.Receiver.ActorRole.Name.Should().Be(rejectedMessage.ActorRole.Name);
