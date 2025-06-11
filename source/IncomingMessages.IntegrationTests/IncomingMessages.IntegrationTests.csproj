@@ -71,6 +71,15 @@ limitations under the License.
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
         <None Remove="MessageParsers\Json\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.json" />
+        <EmbeddedResource Include="MessageParsers\Ebix\RequestValidatedMeasurements\BadVersionRequestValidatedMeasurements.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="MessageParsers\Ebix\RequestValidatedMeasurements\InvalidRequestValidatedMeasurements.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="MessageParsers\Ebix\RequestValidatedMeasurements\ValidRequestValidatedMeasurementsWithTwoTransactions.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
         <EmbeddedResource Include="MessageParsers\Json\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
@@ -86,6 +95,22 @@ limitations under the License.
         <EmbeddedResource Include="MessageParsers\Json\RequestValidatedMeasurements\InvalidRequestValidatedMeasurements.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
+        <None Remove="MessageParsers\Ebix\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.xml" />
+        <EmbeddedResource Include="MessageParsers\Ebix\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\ValidRequestValidatedMeasurements.xml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\ValidRequestValidatedMeasurementsWithTwoTransactions.xml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\BadVersionRequestValidatedMeasurements.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="MessageParsers\Xml\RequestValidatedMeasurements\InvalidRequestValidatedMeasurements.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

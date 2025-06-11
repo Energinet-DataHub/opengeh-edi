@@ -531,6 +531,33 @@ public static class OutgoingMessageFactory
             dataCount: rejectedMessage.Series.RejectReasons.Count);
     }
 
+    public static OutgoingMessage CreateMessage(
+        AcceptedRequestMeasurementsMessageDto message,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(message);
+
+        return new OutgoingMessage(
+            eventId: message.EventId,
+            documentType: message.DocumentType,
+            receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            processId: message.ProcessId,
+            businessReason: message.BusinessReason,
+            serializedContent: serializer.Serialize(message.Series),
+            createdAt: timestamp,
+            messageCreatedFromProcess: ProcessType.RequestMeasurements,
+            relatedToMessageId: message.RelatedToMessageId,
+            gridAreaCode: message.GridAreaCode,
+            externalId: message.ExternalId,
+            calculationId: null,
+            message.Series.Period.Start,
+            dataCount: message.Series.Measurements.Count,
+            meteringPointId: MeteringPointId.From(message.Series.MeteringPointId));
+    }
+
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
     {
         return chargeOwnerId == DataHubDetails.SystemOperatorActorNumber

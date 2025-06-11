@@ -51,7 +51,7 @@ public class GivenRequestMeasurementsTests(
     [Theory]
     [MemberData(nameof(SupportedDocumentFormats))]
     public async Task
-        When_ActorPeeksMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
+        AndGiven_BusinessReasonIsYearlyMetering_When_ActorPeeksMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
     {
         /*
          *  --- PART 1: Receive request and send message to Process Manager ---
@@ -69,6 +69,7 @@ public class GivenRequestMeasurementsTests(
         var now = CreateDateInstant(localNow.Year, localNow.Month, localNow.Day);
         var oneYearAgo = localNow.Minus(Period.FromYears(1));
         var periodStart = CreateDateInstant(oneYearAgo.Year, oneYearAgo.Month, oneYearAgo.Day);
+        var businessReason = BusinessReason.YearlyMetering;
 
         GivenNowIs(now);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
@@ -78,9 +79,10 @@ public class GivenRequestMeasurementsTests(
 
         // Act
         await GivenRequestMeasurements(
-            documentFormat: DocumentFormat.Json, // Currently only Json is supported for this test
+            documentFormat: documentFormat,
             senderActor: senderActor,
             MessageId.New(),
+            businessReason,
             [
                 (TransactionId: transactionId,
                     PeriodStart: periodStart,
@@ -94,7 +96,7 @@ public class GivenRequestMeasurementsTests(
             documentFormat,
             new RequestMeasurementsInputV1AssertionInput(
                 RequestedForActor: senderActor,
-                BusinessReason: BusinessReason.PeriodicMetering,
+                BusinessReason: businessReason,
                 TransactionId: transactionId,
                 MeteringPointId: meteringPointId,
                 ReceivedAt: now));
@@ -148,7 +150,146 @@ public class GivenRequestMeasurementsTests(
 
         await AssertMeasurementsDocumentProvider.AssertDocument(peekResult.Bundle, documentFormat)
             .MessageIdExists()
-            .HasBusinessReason(BusinessReason.PeriodicMetering.Code)
+            .HasBusinessReason(businessReason.Code)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value, "A10")
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasReceiverId(receiverActor.ActorNumber.Value, "A10")
+            .HasReceiverRole(receiverActor.ActorRole.Code)
+            .HasTimestamp(InstantPattern.General.Format(whenBundleShouldBeClosed))
+            .TransactionIdExists(1)
+            .HasMeteringPointNumber(1, meteringPointId.Value, "A10")
+            .HasMeteringPointType(1, MeteringPointType.Consumption)
+            .HasOriginalTransactionIdReferenceId(1, transactionId.Value)
+            .HasProduct(1, "8716867000030")
+            .HasQuantityMeasureUnit(1, MeasurementUnit.KilowattHour.Code)
+            .HasRegistrationDateTime(1, now.ToString())
+            .HasResolution(1, Resolution.QuarterHourly.Code)
+            .HasStartedDateTime(
+                1,
+                startDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasEndedDateTime(
+                1,
+                endDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
+            .HasPoints(
+                1,
+                [new AssertPointDocumentFieldsInput(
+                            new RequiredPointDocumentFields(1),
+                            new OptionalPointDocumentFields(
+                                Quality.FromCode(expectedYearlyAggregatedMeasurement.QualityCode),
+                                expectedYearlyAggregatedMeasurement.Quantity))])
+            .DocumentIsValidAsync();
+    }
+
+    [Theory(Skip = "BRS025 is not yet supported")]
+    [MemberData(nameof(SupportedDocumentFormats))]
+    public async Task
+        AndGiven_BusinessReasonIsPeriodicMetering_When_ActorPeeksMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
+    {
+        /*
+         *  --- PART 1: Receive request and send message to Process Manager ---
+         */
+
+        // Arrange
+        var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
+        var senderSpyNotify = CreateServiceBusSenderSpy(NotifySenderClientNames.ProcessManagerNotifySender);
+        const string notifyEventName = RequestYearlyMeasurementsNotifyEventV1.OrchestrationInstanceEventName;
+        var senderActor = new Actor(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier);
+        var receiverActor = senderActor;
+        var orchestrationInstanceId = Guid.NewGuid();
+
+        var localNow = new LocalDate(2025, 5, 23);
+        var now = CreateDateInstant(localNow.Year, localNow.Month, localNow.Day);
+        var oneYearAgo = localNow.Minus(Period.FromYears(1));
+        var periodStart = CreateDateInstant(oneYearAgo.Year, oneYearAgo.Month, oneYearAgo.Day);
+        var businessReason = BusinessReason.PeriodicMetering;
+
+        GivenNowIs(now);
+        GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
+
+        var transactionId = TransactionId.From("12356478912356478912356478912356478");
+        var meteringPointId = MeteringPointId.From("579999993331812345");
+
+        // TODO: Xml is not yet supported #691
+        var incomingDocumentFormat = documentFormat;
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            incomingDocumentFormat = DocumentFormat.Json;
+        }
+
+        // Act
+        await GivenRequestMeasurements(
+            documentFormat: incomingDocumentFormat,
+            senderActor: senderActor,
+            MessageId.New(),
+            businessReason,
+            [
+                (TransactionId: transactionId,
+                    PeriodStart: periodStart,
+                    PeriodEnd: now,
+                    MeteringPointId: meteringPointId),
+            ]);
+
+        // Assert
+        var message = ThenRequestMeasurementsInputV1ServiceBusMessageIsCorrect(
+            senderSpy,
+            documentFormat,
+            new RequestMeasurementsInputV1AssertionInput(
+                RequestedForActor: senderActor,
+                BusinessReason: businessReason,
+                TransactionId: transactionId,
+                MeteringPointId: meteringPointId,
+                ReceivedAt: now));
+
+        /*
+         *  --- PART 2: Receive data from Process Manager and create RSM document ---
+         */
+        // Arrange
+        var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
+        var endDate = Instant.FromUtc(2024, 11, 29, 9, 15);
+
+        (int Position, string QualityCode, decimal Quantity) expectedYearlyAggregatedMeasurement = (1, "A04", 1000);
+
+        var requestYearlyMeasurementsInputV1 = message.ParseInput<RequestYearlyMeasurementsInputV1>();
+        var requestMeasurementsAcceptedServiceBusMessage = RequestMeasurementsResponseBuilder
+            .GenerateAcceptedFrom(
+                requestYearlyMeasurementsInputV1,
+                receiverActor,
+                startDate,
+                endDate,
+                orchestrationInstanceId,
+                expectedYearlyAggregatedMeasurement);
+
+        await GivenRequestMeasurementsAcceptedIsReceived(requestMeasurementsAcceptedServiceBusMessage);
+
+        AssertCorrectProcessManagerNotification(
+            senderSpyNotify.LatestMessage!,
+            new NotifyOrchestrationInstanceEventV1AssertionInput(
+                orchestrationInstanceId,
+                notifyEventName));
+
+        // Act
+        var whenBundleShouldBeClosed = now.Plus(Duration.FromSeconds(BundlingOptions.BundleMessagesOlderThanSeconds));
+        GivenNowIs(whenBundleShouldBeClosed);
+        await GivenBundleMessagesHasBeenTriggered();
+
+        var peekResults = await WhenActorPeeksAllMessages(
+            receiverActor.ActorNumber,
+            receiverActor.ActorRole,
+            documentFormat);
+
+        // Assert
+        PeekResultDto peekResult;
+        using (new AssertionScope())
+        {
+            peekResult = peekResults
+                .Should()
+                .ContainSingle()
+                .Subject;
+        }
+
+        await AssertMeasurementsDocumentProvider.AssertDocument(peekResult.Bundle, documentFormat)
+            .MessageIdExists()
+            .HasBusinessReason(businessReason.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value, "A10")
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasReceiverId(receiverActor.ActorNumber.Value, "A10")
@@ -200,6 +341,7 @@ public class GivenRequestMeasurementsTests(
         var now = CreateDateInstant(localNow.Year, localNow.Month, localNow.Day);
         var oneYearAgo = localNow.Minus(Period.FromYears(1));
         var periodStart = CreateDateInstant(oneYearAgo.Year, oneYearAgo.Month, oneYearAgo.Day);
+        var businessReason = BusinessReason.YearlyMetering;
 
         GivenNowIs(now);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
@@ -212,6 +354,7 @@ public class GivenRequestMeasurementsTests(
             documentFormat: DocumentFormat.Json, // Currently only Json is supported for this test
             senderActor: senderActor,
             MessageId.New(),
+            businessReason,
             [
                 (TransactionId: transactionId,
                     PeriodStart: periodStart,
@@ -225,7 +368,7 @@ public class GivenRequestMeasurementsTests(
             documentFormat,
             new RequestMeasurementsInputV1AssertionInput(
                 RequestedForActor: senderActor,
-                BusinessReason: BusinessReason.PeriodicMetering,
+                BusinessReason: businessReason,
                 TransactionId: transactionId,
                 MeteringPointId: meteringPointId,
                 ReceivedAt: now));
@@ -281,7 +424,7 @@ public class GivenRequestMeasurementsTests(
             peekResult.Bundle,
             documentFormat)
             .MessageIdExists()
-            .HasBusinessReason(BusinessReason.PeriodicMetering)
+            .HasBusinessReason(businessReason)
             .HasSenderId(DataHubDetails.DataHubActorNumber)
             .HasSenderRole(ActorRole.MeteredDataAdministrator)
             .HasReceiverId(receiverActor.ActorNumber)

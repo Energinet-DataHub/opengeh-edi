@@ -41,6 +41,7 @@ public class RequestMeasurementsBehaviourTestBase(
         DocumentFormat documentFormat,
         Actor senderActor,
         MessageId messageId,
+        BusinessReason businessReason,
         IReadOnlyCollection<(TransactionId TransactionId, Instant PeriodStart, Instant PeriodEnd, MeteringPointId MeteringPointId)>
             series)
     {
@@ -50,6 +51,7 @@ public class RequestMeasurementsBehaviourTestBase(
             messageId: messageId.Value,
             format: documentFormat,
             senderActor: senderActor,
+            businessReason,
             series: series);
 
         var response = await
@@ -157,7 +159,6 @@ public class RequestMeasurementsBehaviourTestBase(
         {
             message.ActorNumber.Should().Be(input.RequestedForActor.ActorNumber.Value);
             message.ActorRole.Should().Be(input.RequestedForActor.ActorRole.Name);
-            message.BusinessReason.Should().Be(input.BusinessReason.Name);
             message.TransactionId.Should().Be(input.TransactionId.Value);
             message.MeteringPointId.Should().Be(input.MeteringPointId.Value);
             message.ReceivedAt.Should().Be(input.ReceivedAt.ToString());

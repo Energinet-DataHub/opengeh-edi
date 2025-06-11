@@ -132,11 +132,11 @@ public class EnqueueHandler_Brs_024_V1(
             documentReceiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
             processId: orchestrationInstanceId,
             eventId: EventId.From(serviceBusMessageId),
-            businessReason: BusinessReason.FromName(rejectedData.BusinessReason.Name).Name,
+            businessReason: BusinessReason.YearlyMetering,
             series: rejectedTimeSeries);
     }
 
-    private AcceptedSendMeasurementsMessageDto GetAcceptedRequestMeasurementsMessageDto(
+    private AcceptedRequestMeasurementsMessageDto GetAcceptedRequestMeasurementsMessageDto(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
         RequestYearlyMeasurementsAcceptedV1 acceptedData,
@@ -147,20 +147,20 @@ public class EnqueueHandler_Brs_024_V1(
             Quantity: aggregatedMeasurement.EnergyQuantity,
             Quality: Quality.FromName(aggregatedMeasurement.QuantityQuality.Name));
 
-        var acceptedRequestMeasurementsMessageDto = new AcceptedSendMeasurementsMessageDto(
+        var acceptedRequestMeasurementsMessageDto = new AcceptedRequestMeasurementsMessageDto(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(orchestrationInstanceId),
             receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
-            businessReason: BusinessReason.PeriodicMetering,
+            businessReason: BusinessReason.YearlyMetering,
             relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
-            gridAreaCode: acceptedData.GridAreaCode,
+            gridAreaCode: null,
             series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: acceptedData.MeteringPointId,
                 MeteringPointType: MeteringPointType.FromName(acceptedData.MeteringPointType.Name),
                 OriginalTransactionIdReference: TransactionId.From(acceptedData.OriginalTransactionId),
-                Product: acceptedData.ProductNumber,
-                MeasurementUnit: MeasurementUnit.FromName(acceptedData.MeasureUnit.Name),
+                Product: ProductType.EnergyActive.Code,
+                MeasurementUnit: MeasurementUnit.KilowattHour,
                 RegistrationDateTime: _clock.GetCurrentInstant(),
                 Resolution: Resolution.FromName(aggregatedMeasurement.Resolution.Name),
                 Period: new Period(aggregatedMeasurement.StartDateTime.ToInstant(), aggregatedMeasurement.EndDateTime.ToInstant()),
@@ -169,7 +169,7 @@ public class EnqueueHandler_Brs_024_V1(
     }
 
     private async Task EnqueueAcceptMessageAsync(
-        AcceptedSendMeasurementsMessageDto acceptedRequestMeasurementsMessageDto,
+        AcceptedRequestMeasurementsMessageDto acceptedRequestMeasurementsMessageDto,
         CancellationToken cancellationToken)
     {
         await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, cancellationToken)

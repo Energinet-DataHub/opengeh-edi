@@ -57,6 +57,7 @@ public class RequestMeasurementsMessageBase(
 
     public IReadOnlyCollection<BusinessReason> AllowedBusinessReasons => [
         BuildingBlocks.Domain.Models.BusinessReason.PeriodicMetering,
+        BuildingBlocks.Domain.Models.BusinessReason.YearlyMetering,
     ];
 
     public IReadOnlyCollection<ActorRole> AllowedSenderRoles => [

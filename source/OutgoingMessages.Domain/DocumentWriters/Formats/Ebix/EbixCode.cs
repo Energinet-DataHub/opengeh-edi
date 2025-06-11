@@ -44,11 +44,14 @@ public static class EbixCode
         if (businessReason == BusinessReason.PeriodicMetering)
             return "E23";
 
+        if (businessReason == BusinessReason.YearlyMetering)
+            return "E30";
+
         if (businessReason == BusinessReason.PeriodicFlexMetering)
             return "D42";
 
         if (businessReason == BusinessReason.ReminderOfMissingMeasurementLog)
-            return "D25"; // D25, D26, D27 are possible.
+            return "D24";
 
         throw NoCodeFoundFor(businessReason.Name);
     }

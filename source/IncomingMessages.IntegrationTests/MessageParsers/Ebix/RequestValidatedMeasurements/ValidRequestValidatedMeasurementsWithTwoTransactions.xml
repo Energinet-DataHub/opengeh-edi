@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:DK_RequestMeteredDataValidated xmlns:ns0="un:unece:260:data:EEM-DK_RequestMeteredDataValidated:v3">
+    <ns0:HeaderEnergyDocument>
+        <ns0:Identification>111131835</ns0:Identification>
+        <ns0:DocumentType listAgencyIdentifier="260">E73</ns0:DocumentType>
+        <ns0:Creation>2022-12-17T09:30:47Z</ns0:Creation>
+        <ns0:SenderEnergyParty>
+            <ns0:Identification schemeAgencyIdentifier="9">5799999933318</ns0:Identification>
+        </ns0:SenderEnergyParty>
+        <ns0:RecipientEnergyParty>
+            <ns0:Identification schemeAgencyIdentifier="9">5790001330552</ns0:Identification>
+        </ns0:RecipientEnergyParty>
+    </ns0:HeaderEnergyDocument>
+    <ns0:ProcessEnergyContext>
+        <ns0:EnergyBusinessProcess listAgencyIdentifier="260">E23</ns0:EnergyBusinessProcess>
+        <ns0:EnergyBusinessProcessRole listAgencyIdentifier="260">DDQ</ns0:EnergyBusinessProcessRole>
+        <ns0:EnergyIndustryClassification listAgencyIdentifier="6">23</ns0:EnergyIndustryClassification>
+    </ns0:ProcessEnergyContext>
+    <ns0:PayloadMeasuredDataRequest>
+        <ns0:Identification>1568914</ns0:Identification>
+        <ns0:ObservationTimeSeriesPeriod>
+            <ns0:Start>2022-07-17T22:00:00Z</ns0:Start>
+            <ns0:End>2022-08-17T22:00:00Z</ns0:End>
+        </ns0:ObservationTimeSeriesPeriod>
+        <ns0:MeteringPointDomainLocation>
+            <ns0:Identification schemeAgencyIdentifier="9">579999993331812345</ns0:Identification>
+        </ns0:MeteringPointDomainLocation>
+    </ns0:PayloadMeasuredDataRequest>
+    <ns0:PayloadMeasuredDataRequest>
+        <ns0:Identification>1568915</ns0:Identification>
+        <ns0:ObservationTimeSeriesPeriod>
+            <ns0:Start>2022-07-17T22:00:00Z</ns0:Start>
+            <ns0:End>2022-08-17T22:00:00Z</ns0:End>
+        </ns0:ObservationTimeSeriesPeriod>
+        <ns0:MeteringPointDomainLocation>
+            <ns0:Identification schemeAgencyIdentifier="9">579999993331812345</ns0:Identification>
+        </ns0:MeteringPointDomainLocation>
+    </ns0:PayloadMeasuredDataRequest>
+</ns0:DK_RequestMeteredDataValidated>
