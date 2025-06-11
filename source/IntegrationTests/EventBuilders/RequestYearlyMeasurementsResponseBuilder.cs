@@ -16,54 +16,63 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime;
+using PMQuality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
-public class RequestMeasurementsResponseBuilder
+public class RequestYearlyMeasurementsResponseBuilder
 {
     public static ServiceBusMessage GenerateAcceptedFrom(
-        RequestMeasurementsInputV1 requestMeasurementsInputV1,
+        RequestYearlyMeasurementsInputV1 requestYearlyMeasurementsInputV1,
         Actor receiverActor,
         Instant startDateTime,
         Instant endDateTime,
         Guid orchestrationInstanceId,
-        IList<(int Position, string QuantityQuality, decimal EnergyQuantity)> measurements)
+        (int Position, string QuantityQuality, decimal EnergyQuantity) aggregatedMeasurement)
     {
         var resolution = PMValueTypes.Resolution.QuarterHourly;
-        var accepted = new RequestMeasurementsAcceptedV1(
-            OriginalActorMessageId: requestMeasurementsInputV1.ActorMessageId,
-            OriginalTransactionId: requestMeasurementsInputV1.TransactionId,
-            MeteringPointId: requestMeasurementsInputV1.MeteringPointId,
+        var accepted = new RequestYearlyMeasurementsAcceptedV1(
+            OriginalActorMessageId: requestYearlyMeasurementsInputV1.ActorMessageId,
+            OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
+            MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
             ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
-            Measurements: new List<Measurement>
+            AggregatedMeasurements: new List<AggregatedMeasurement>
             {
                 new(
                     StartDateTime: startDateTime.ToDateTimeOffset(),
                     EndDateTime: endDateTime.ToDateTimeOffset(),
                     Resolution: resolution,
-                    MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-                    MeasurementPoints: GetMeasurements(measurements)),
+                    EnergyQuantity: aggregatedMeasurement.EnergyQuantity,
+                    QuantityQuality: PMValueTypes.Quality.AsProvided),
             });
 
         return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, accepted);
     }
 
-    private static IReadOnlyCollection<MeasurementPoint> GetMeasurements(
-        IList<(int Position, string QuantityQuality, decimal EnergyQuantity)> measurements)
+    public static ServiceBusMessage GenerateRejectedFrom(
+        RequestYearlyMeasurementsInputV1 requestYearlyMeasurementsInputV1,
+        Actor receiverActor,
+        string validationErrorMessage,
+        string validationErrorCode,
+        Guid orchestrationInstanceId)
     {
-        return measurements.Select(x =>
-            new MeasurementPoint(
-                Position: x.Position,
-                QuantityQuality: PMValueTypes.Quality.FromName(Quality.FromCode(x.QuantityQuality).Name),
-                EnergyQuantity: x.EnergyQuantity))
-            .ToList();
+        var rejected = new RequestYearlyMeasurementsRejectV1(
+            OriginalActorMessageId: requestYearlyMeasurementsInputV1.ActorMessageId,
+            OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
+            ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
+            ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
+            MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
+            ValidationErrors: [new ValidationErrorDto(validationErrorMessage, validationErrorCode)]);
+
+        return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, rejected);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage<TData>(

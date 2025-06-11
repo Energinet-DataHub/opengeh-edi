@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 public record InitializeRequestMeasurementsProcessDto(
-    string BusinessReason,
+    BusinessReason BusinessReason,
     string MessageId,
     IReadOnlyCollection<InitializeRequestMeasurementsProcessSeries> Series);
 

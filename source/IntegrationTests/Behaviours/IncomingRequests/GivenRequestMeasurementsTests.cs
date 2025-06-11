@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM012;
 using Energinet.DataHub.EDI.OutgoingMessages.UnitTests.Domain.RSM015;
 using Energinet.DataHub.ProcessManager.Abstractions.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Options;
@@ -91,7 +92,7 @@ public class GivenRequestMeasurementsTests(
             ]);
 
         // Assert
-        var message = ThenRequestMeasurementsInputV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestYearlyMeasurementsInputV1ServiceBusMessageIsCorrect(
             senderSpy,
             documentFormat,
             new RequestMeasurementsInputV1AssertionInput(
@@ -111,7 +112,7 @@ public class GivenRequestMeasurementsTests(
         (int Position, string QualityCode, decimal Quantity) expectedYearlyAggregatedMeasurement = (1, "A04", 1000);
 
         var requestYearlyMeasurementsInputV1 = message.ParseInput<RequestYearlyMeasurementsInputV1>();
-        var requestMeasurementsAcceptedServiceBusMessage = RequestMeasurementsResponseBuilder
+        var requestMeasurementsAcceptedServiceBusMessage = RequestYearlyMeasurementsResponseBuilder
             .GenerateAcceptedFrom(
                 requestYearlyMeasurementsInputV1,
                 receiverActor,
@@ -120,7 +121,7 @@ public class GivenRequestMeasurementsTests(
                 orchestrationInstanceId,
                 expectedYearlyAggregatedMeasurement);
 
-        await GivenRequestMeasurementsAcceptedIsReceived(requestMeasurementsAcceptedServiceBusMessage);
+        await GivenRequestYearlyMeasurementsAcceptedIsReceived(requestMeasurementsAcceptedServiceBusMessage);
 
         AssertCorrectProcessManagerNotification(
             senderSpyNotify.LatestMessage!,
@@ -180,7 +181,7 @@ public class GivenRequestMeasurementsTests(
             .DocumentIsValidAsync();
     }
 
-    [Theory(Skip = "BRS025 is not yet supported")]
+    [Theory]
     [MemberData(nameof(SupportedDocumentFormats))]
     public async Task
         AndGiven_BusinessReasonIsPeriodicMetering_When_ActorPeeksMessages_Then_ReceivesOneDocumentWithCorrectContent(DocumentFormat documentFormat)
@@ -247,17 +248,25 @@ public class GivenRequestMeasurementsTests(
         var startDate = Instant.FromUtc(2024, 11, 28, 13, 51);
         var endDate = Instant.FromUtc(2024, 11, 29, 9, 15);
 
-        (int Position, string QualityCode, decimal Quantity) expectedYearlyAggregatedMeasurement = (1, "A04", 1000);
+        IList<(int Position, string QualityCode, decimal Quantity)> expectedAggregatedMeasurement = new List<(int Position, string QualityCode, decimal Quantity)>()
+        {
+            (1, "A04", 1000),
+            (2, "A04", 1100),
+            (3, "A04", 1200),
+            (4, "A04", 1300),
+            (5, "A04", 1400),
+            (6, "A04", 1500),
+        };
 
-        var requestYearlyMeasurementsInputV1 = message.ParseInput<RequestYearlyMeasurementsInputV1>();
+        var requestMeasurementsInputV1 = message.ParseInput<RequestMeasurementsInputV1>();
         var requestMeasurementsAcceptedServiceBusMessage = RequestMeasurementsResponseBuilder
             .GenerateAcceptedFrom(
-                requestYearlyMeasurementsInputV1,
+                requestMeasurementsInputV1,
                 receiverActor,
                 startDate,
                 endDate,
                 orchestrationInstanceId,
-                expectedYearlyAggregatedMeasurement);
+                expectedAggregatedMeasurement);
 
         await GivenRequestMeasurementsAcceptedIsReceived(requestMeasurementsAcceptedServiceBusMessage);
 
@@ -311,11 +320,12 @@ public class GivenRequestMeasurementsTests(
                 endDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
             .HasPoints(
                 1,
-                [new AssertPointDocumentFieldsInput(
-                            new RequiredPointDocumentFields(1),
-                            new OptionalPointDocumentFields(
-                                Quality.FromCode(expectedYearlyAggregatedMeasurement.QualityCode),
-                                expectedYearlyAggregatedMeasurement.Quantity))])
+                expectedAggregatedMeasurement.Select(
+                    x => new AssertPointDocumentFieldsInput(
+                        new RequiredPointDocumentFields(x.Position),
+                        new OptionalPointDocumentFields(
+                            Quality.FromCode(x.QualityCode),
+                            x.Quantity))).ToList().AsReadOnly())
             .DocumentIsValidAsync();
     }
 
@@ -363,7 +373,7 @@ public class GivenRequestMeasurementsTests(
             ]);
 
         // Assert
-        var message = ThenRequestMeasurementsInputV1ServiceBusMessageIsCorrect(
+        var message = ThenRequestYearlyMeasurementsInputV1ServiceBusMessageIsCorrect(
             senderSpy,
             documentFormat,
             new RequestMeasurementsInputV1AssertionInput(
@@ -384,7 +394,7 @@ public class GivenRequestMeasurementsTests(
         var expectedValidationErrorCode = "D18";
 
         var requestYearlyMeasurementsInputV1 = message.ParseInput<RequestYearlyMeasurementsInputV1>();
-        var requestMeasurementsAcceptedServiceBusMessage = RequestMeasurementsResponseBuilder
+        var requestMeasurementsAcceptedServiceBusMessage = RequestYearlyMeasurementsResponseBuilder
             .GenerateRejectedFrom(
                 requestYearlyMeasurementsInputV1,
                 receiverActor,

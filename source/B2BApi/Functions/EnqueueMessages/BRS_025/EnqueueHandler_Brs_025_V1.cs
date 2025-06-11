@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMet
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025.V1.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 using NodaTime;
@@ -30,20 +31,20 @@ using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using MeteringPointType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.MeteringPointType;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_025;
 
 /// <summary>
 /// Enqueue accepted/rejected messages for BRS-024 (RequestMeasurements).
 /// </summary>
 /// <param name="logger"></param>
-public class EnqueueHandler_Brs_024_V1(
-    ILogger<EnqueueHandler_Brs_024_V1> logger,
+public class EnqueueHandler_Brs_025_V1(
+    ILogger<EnqueueHandler_Brs_025_V1> logger,
     IOutgoingMessagesClient outgoingMessagesClient,
     IProcessManagerMessageClient processManagerMessageClient,
     IUnitOfWork unitOfWork,
     IFeatureManager featureManager,
     IClock clock)
-    : EnqueueActorMessagesValidatedHandlerBase<RequestYearlyMeasurementsAcceptedV1, RequestYearlyMeasurementsRejectV1>(logger)
+    : EnqueueActorMessagesValidatedHandlerBase<RequestMeasurementsAcceptedV1, RequestMeasurementsRejectV1>(logger)
 {
     private readonly ILogger _logger = logger;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
@@ -55,20 +56,20 @@ public class EnqueueHandler_Brs_024_V1(
     protected override async Task EnqueueAcceptedMessagesAsync(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
-        RequestYearlyMeasurementsAcceptedV1 acceptedData,
+        RequestMeasurementsAcceptedV1 acceptedData,
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Received enqueue accepted message(s) for BRS 024. Data: {0}.",
             acceptedData);
 
-        foreach (var aggregatedMeasurement in acceptedData.AggregatedMeasurements)
+        foreach (var measurement in acceptedData.Measurements)
         {
             var acceptedRequestMeasurementsMessageDto = GetAcceptedRequestMeasurementsMessageDto(
                 serviceBusMessageId,
                 orchestrationInstanceId,
                 acceptedData,
-                aggregatedMeasurement);
+                measurement);
 
             await EnqueueAcceptMessageAsync(acceptedRequestMeasurementsMessageDto, cancellationToken).ConfigureAwait(false);
         }
@@ -85,7 +86,7 @@ public class EnqueueHandler_Brs_024_V1(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
         EnqueueActorMessagesActorV1 orchestrationStartedByActor,
-        RequestYearlyMeasurementsRejectV1 rejectedData,
+        RequestMeasurementsRejectV1 rejectedData,
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
@@ -110,7 +111,7 @@ public class EnqueueHandler_Brs_024_V1(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
         EnqueueActorMessagesActorV1 orchestrationStartedByActor,
-        RequestYearlyMeasurementsRejectV1 rejectedData)
+        RequestMeasurementsRejectV1 rejectedData)
     {
         var rejectReasons = rejectedData.ValidationErrors.Select(
                 e => new RejectRequestMeasurementsMessageRejectReason(
@@ -132,26 +133,32 @@ public class EnqueueHandler_Brs_024_V1(
             documentReceiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
             processId: orchestrationInstanceId,
             eventId: EventId.From(serviceBusMessageId),
-            businessReason: BusinessReason.YearlyMetering,
+            businessReason: BusinessReason.PeriodicMetering,
             series: rejectedTimeSeries);
     }
 
     private AcceptedRequestMeasurementsMessageDto GetAcceptedRequestMeasurementsMessageDto(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
-        RequestYearlyMeasurementsAcceptedV1 acceptedData,
-        AggregatedMeasurement aggregatedMeasurement)
+        RequestMeasurementsAcceptedV1 acceptedData,
+        Measurement measurement)
     {
-        var energyObservation = new MeasurementDto(
-            Position: 1,
-            Quantity: aggregatedMeasurement.EnergyQuantity,
-            Quality: Quality.FromName(aggregatedMeasurement.QuantityQuality.Name));
+        var measurementDtos = new List<MeasurementDto>();
+        foreach (var measurementPoint in measurement.MeasurementPoints)
+        {
+            var measurementDto = new MeasurementDto(
+                Position: measurementPoint.Position,
+                Quantity: measurementPoint.EnergyQuantity,
+                Quality: Quality.FromName(measurementPoint.QuantityQuality.Name));
 
-        var acceptedRequestMeasurementsMessageDto = new AcceptedRequestMeasurementsMessageDto(
+            measurementDtos.Add(measurementDto);
+        }
+
+        return new AcceptedRequestMeasurementsMessageDto(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(orchestrationInstanceId),
             receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
-            businessReason: BusinessReason.YearlyMetering,
+            businessReason: BusinessReason.PeriodicMetering,
             relatedToMessageId: MessageId.Create(acceptedData.OriginalActorMessageId),
             series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
@@ -161,10 +168,9 @@ public class EnqueueHandler_Brs_024_V1(
                 Product: ProductType.EnergyActive.Code,
                 MeasurementUnit: MeasurementUnit.KilowattHour,
                 RegistrationDateTime: _clock.GetCurrentInstant(),
-                Resolution: Resolution.FromName(aggregatedMeasurement.Resolution.Name),
-                Period: new Period(aggregatedMeasurement.StartDateTime.ToInstant(), aggregatedMeasurement.EndDateTime.ToInstant()),
-                Measurements: [energyObservation]));
-        return acceptedRequestMeasurementsMessageDto;
+                Resolution: Resolution.FromName(measurement.Resolution.Name),
+                Period: new Period(measurement.StartDateTime.ToInstant(), measurement.EndDateTime.ToInstant()),
+                Measurements: measurementDtos));
     }
 
     private async Task EnqueueAcceptMessageAsync(
