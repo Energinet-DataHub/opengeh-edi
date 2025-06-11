@@ -158,7 +158,6 @@ public class RequestProcessOrchestrationStarter(
                     TransactionId: transaction.Id.Value,
                     ActorNumber: transaction.OriginalActor.ActorNumber.Value,
                     ActorRole: transaction.OriginalActor.ActorRole.Name,
-                    BusinessReason: BusinessReason.FromCode(initializeProcessDto.BusinessReason).Name,
                     ReceivedAt: _clock.GetCurrentInstant().ToString(),
                     MeteringPointId: transaction.MeteringPointId.Value),
                 IdempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.OriginalActor));

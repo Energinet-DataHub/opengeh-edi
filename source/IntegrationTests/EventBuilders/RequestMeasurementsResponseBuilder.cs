@@ -42,10 +42,8 @@ public class RequestMeasurementsResponseBuilder
             OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
             MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
-            ProductNumber: "8716867000030",
             ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
-            MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
             AggregatedMeasurements: new List<AggregatedMeasurement>
             {
                 new(
@@ -54,8 +52,7 @@ public class RequestMeasurementsResponseBuilder
                     Resolution: resolution,
                     EnergyQuantity: aggregatedMeasurement.EnergyQuantity,
                     QuantityQuality: PMValueTypes.Quality.AsProvided),
-            },
-            GridAreaCode: "804");
+            });
 
         return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, accepted);
     }
@@ -72,7 +69,6 @@ public class RequestMeasurementsResponseBuilder
             OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
             ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
-            BusinessReason: PMValueTypes.BusinessReason.FromName(requestYearlyMeasurementsInputV1.BusinessReason),
             MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
             ValidationErrors: [new ValidationErrorDto(validationErrorMessage, validationErrorCode)]);
 

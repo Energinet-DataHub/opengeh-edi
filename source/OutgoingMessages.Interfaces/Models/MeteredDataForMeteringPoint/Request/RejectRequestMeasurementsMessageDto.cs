@@ -22,7 +22,7 @@ public class RejectRequestMeasurementsMessageDto : OutgoingMessageDto
         ActorNumber receiverNumber,
         Guid processId,
         EventId eventId,
-        string businessReason,
+        BusinessReason businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,
         RejectRequestMeasurementsMessageSeries series,
@@ -33,7 +33,7 @@ public class RejectRequestMeasurementsMessageDto : OutgoingMessageDto
             receiverNumber,
             processId,
             eventId,
-            businessReason,
+            businessReason.Name,
             receiverRole,
             ExternalId.New(),
             relatedToMessageId)

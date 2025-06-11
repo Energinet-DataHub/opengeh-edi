@@ -142,4 +142,12 @@ public interface IOutgoingMessagesClient
     Task<Guid> EnqueueAsync(
         RejectRequestMeasurementsMessageDto rejectRequestMeasurementsMessageDto,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue a accepted measurements message, no commit.
+    /// <returns>The Id for the created OutgoingMessage</returns>
+    /// </summary>
+    Task<Guid> EnqueueAsync(
+        AcceptedRequestMeasurementsMessageDto acceptedSendMeasurementsMessageDto,
+        CancellationToken cancellationToken);
 }
