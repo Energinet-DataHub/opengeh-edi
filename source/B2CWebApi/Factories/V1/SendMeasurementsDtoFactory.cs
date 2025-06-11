@@ -52,6 +52,7 @@ public class SendMeasurementsDtoFactory(
 
     private static Resolution MapResolution(Models.V1.Resolution resolution) => resolution switch
     {
+        // TODO #1670: What are the valid resolutions?
         Models.V1.Resolution.Hourly => Resolution.Hourly,
         Models.V1.Resolution.QuarterHourly => Resolution.QuarterHourly,
         _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Invalid resolution."),
@@ -59,6 +60,7 @@ public class SendMeasurementsDtoFactory(
 
     private static MeteringPointType MapMeteringPointType(Models.V1.MeteringPointType type) => type switch
     {
+        // TODO #1670: What are the valid metering point types?
         Models.V1.MeteringPointType.Production => MeteringPointType.Production,
         Models.V1.MeteringPointType.Consumption => MeteringPointType.Consumption,
         Models.V1.MeteringPointType.Exchange => MeteringPointType.Exchange,
@@ -68,6 +70,7 @@ public class SendMeasurementsDtoFactory(
 
     private static Quality MapQuality(Models.V1.Quality quality) => quality switch
     {
+        // TODO #1670: What are the valid qualities?
         Models.V1.Quality.Calculated => Quality.Calculated,
         Models.V1.Quality.Measured => Quality.Measured,
         _ => throw new ArgumentOutOfRangeException(nameof(quality), quality, "Invalid quality."),

@@ -42,7 +42,7 @@ public class SendMeasurementsController(
 
     [ApiVersion("1.0")]
     [HttpPost]
-    [Authorize(Roles = RequiredRole)] // TODO #1670: Update with correct role?
+    [Authorize(Roles = RequiredRole)]
     public async Task<ActionResult> RequestAsync(
         SendMeasurementsRequestV1 request,
         CancellationToken cancellationToken)

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
