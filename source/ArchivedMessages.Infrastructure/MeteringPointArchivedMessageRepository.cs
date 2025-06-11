@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
-public class MeteringPointArchivedMessageRepository(
+internal class MeteringPointArchivedMessageRepository(
     IDatabaseConnectionFactory connectionFactory,
     AuthenticatedActor authenticatedActor,
     IFileStorageClient fileStorageClient)
