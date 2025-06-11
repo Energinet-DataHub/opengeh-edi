@@ -341,7 +341,7 @@ public class GivenRequestMeasurementsTests(
         var now = CreateDateInstant(localNow.Year, localNow.Month, localNow.Day);
         var oneYearAgo = localNow.Minus(Period.FromYears(1));
         var periodStart = CreateDateInstant(oneYearAgo.Year, oneYearAgo.Month, oneYearAgo.Day);
-        var businessReason = BusinessReason.PeriodicMetering;
+        var businessReason = BusinessReason.YearlyMetering;
 
         GivenNowIs(now);
         GivenAuthenticatedActorIs(senderActor.ActorNumber, senderActor.ActorRole);
