@@ -55,17 +55,15 @@ public class MeasurementsSync(ILogger<MeasurementsSync> logger,
         _logger.LogInformation("Received message for measurements synchronization: {MessageId}", message.MessageId);
         if (await _featureManager.SyncMeasurementsAsync().ConfigureAwait(false))
         {
-            var stream = await _measurementsJsonToEbixStreamWriter.WriteStreamAsync(message.Body).ConfigureAwait(false);
-            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(stream.Sender), Restriction.Owned, ActorRole.GridAccessProvider, null,  Guid.Parse("00000000-0000-0000-0000-000000000001")));
+            var streamAndSender = await _measurementsJsonToEbixStreamWriter.WriteStreamAsync(message.Body).ConfigureAwait(false);
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(streamAndSender.Sender), Restriction.Owned, ActorRole.GridAccessProvider, null,  null));
             await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
-                    new IncomingMarketMessageStream(stream.Document),
+                    new IncomingMarketMessageStream(streamAndSender.Document),
                     DocumentFormat.Ebix,
                     IncomingDocumentType.NotifyValidatedMeasureData,
                     DocumentFormat.Ebix,
                     cancellationToken)
                 .ConfigureAwait(false);
         }
-
-        await Task.CompletedTask.ConfigureAwait(false);
     }
 }

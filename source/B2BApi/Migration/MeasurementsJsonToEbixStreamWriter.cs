@@ -32,12 +32,10 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
     {
         // Deserialize the JSON into the Root object for processing
         var root = JsonSerializer.Deserialize<Root>(timeSeriesPayload) ?? throw new Exception("Root is null.");
-        var orgSender = root.MeteredDataTimeSeriesDH3.Header.SenderIdentification;
 
-        root.MeteredDataTimeSeriesDH3.Header.SenderIdentification =
-            root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification;
-
-        root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification = orgSender;
+        // We need to swap the sender and recipient identification in the header
+        (root.MeteredDataTimeSeriesDH3.Header.SenderIdentification, root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification) =
+            (root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification, root.MeteredDataTimeSeriesDH3.Header.SenderIdentification);
 
         // Extract the header and time series data
         var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
@@ -45,8 +43,6 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
         var creationTime = header.Creation.ToInstant();
 
         // Create the outgoing message header using the deserialized header data
-        // Sender DH2
-        // Recipient DH3
         var outgoingMessageHeader = new OutgoingMessageHeader(
             BusinessReason.FromCode(header.EnergyBusinessProcess).Name,
             header.SenderIdentification.Content,
@@ -65,6 +61,7 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
             meteredDataForMeteringPointMarketActivityRecords.Select(_serializer.Serialize).ToList(),
             CancellationToken.None).ConfigureAwait(false);
 
+        // Load the stream into an XmlDocument for removing the header and formatting.
         var xmlDoc = new XmlDocument();
         xmlDoc.Load(stream.Stream);
 
@@ -79,7 +76,7 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
         var outputStream = new MemoryStream();
         var settings = new XmlWriterSettings
         {
-            Encoding = new UTF8Encoding(false), // No BOM
+            Encoding = new UTF8Encoding(false),
             Indent = true,
             OmitXmlDeclaration = false,
             Async = true,
@@ -87,7 +84,7 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
 
         using (var writer = XmlWriter.Create(outputStream, settings))
         {
-            await writer.WriteStartDocumentAsync().ConfigureAwait(false); // Writes only <?xml version="1.0" encoding="utf-8"?>
+            await writer.WriteStartDocumentAsync().ConfigureAwait(false);
             dataSeriesNode.WriteTo(writer);
             await writer.WriteEndDocumentAsync().ConfigureAwait(false);
         }
