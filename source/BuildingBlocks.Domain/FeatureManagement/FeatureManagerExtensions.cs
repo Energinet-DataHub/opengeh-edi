@@ -78,6 +78,6 @@ public static class FeatureManagerExtensions
     /// </summary>
     public static Task<bool> SyncMeasurementsAsync(this IFeatureManager featureManager)
     {
-        return featureManager.IsEnabledAsync(FeatureFlagNames.PeekMeasurementMessages);
+        return featureManager.IsEnabledAsync(FeatureFlagNames.SyncMeasurements);
     }
 }

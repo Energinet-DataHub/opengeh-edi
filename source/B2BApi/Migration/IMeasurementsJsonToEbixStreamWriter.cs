@@ -23,5 +23,5 @@ public interface IMeasurementsJsonToEbixStreamWriter
     /// </summary>
     /// <param name="timeSeriesPayload">Json payload containing all time series in message.</param>
     /// <returns>MarketDocumentStream containing all quantity observations.</returns>
-    Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload);
+    Task<Stream> WriteStreamAsync(BinaryData timeSeriesPayload);
 }

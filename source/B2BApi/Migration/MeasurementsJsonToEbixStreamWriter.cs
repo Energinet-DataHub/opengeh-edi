@@ -12,32 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using System.Text.Json;
+using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
-public class MeasurementsJsonToEbixStreamWriter(
-    Serializer serializer,
-    JsonSerializerOptions jsonSerializerOptions,
-    MeasurementsToMarketActivityRecordTransformer measurementsToMarketActivityRecordTransformer)
-    : IMeasurementsJsonToEbixStreamWriter
+public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumerable<IDocumentWriter> documentWriters) : IMeasurementsJsonToEbixStreamWriter
 {
-    private readonly Serializer _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-    private readonly JsonSerializerOptions _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
-    private readonly MeasurementsToMarketActivityRecordTransformer _measurementsToMarketActivityRecordTransformer = measurementsToMarketActivityRecordTransformer ?? throw new ArgumentNullException(nameof(measurementsToMarketActivityRecordTransformer));
-    private readonly MeteredDataForMeteringPointEbixDocumentWriter _writer = new(new MessageRecordParser(serializer));
+    private readonly ISerializer _serializer = serializer;
+    private readonly IEnumerable<IDocumentWriter> _documentWriters = documentWriters;
 
-    public async Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload)
+    public async Task<Stream> WriteStreamAsync(BinaryData timeSeriesPayload)
     {
         // Deserialize the JSON into the Root object for processing
-        var root = JsonSerializer.Deserialize<Root>(timeSeriesPayload, _jsonSerializerOptions) ?? throw new Exception("Root is null.");
+        var root = JsonSerializer.Deserialize<Root>(timeSeriesPayload) ?? throw new Exception("Root is null.");
 
         // Extract the header and time series data
         var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
@@ -45,6 +39,8 @@ public class MeasurementsJsonToEbixStreamWriter(
         var creationTime = header.Creation.ToInstant();
 
         // Create the outgoing message header using the deserialized header data
+        // Sender DH2
+        // Recipient DH3
         var outgoingMessageHeader = new OutgoingMessageHeader(
             BusinessReason.FromCode(header.EnergyBusinessProcess).Name,
             header.SenderIdentification.Content,
@@ -55,14 +51,33 @@ public class MeasurementsJsonToEbixStreamWriter(
             null,
             creationTime);
 
-        var meteredDataForMeteringPointMarketActivityRecords = _measurementsToMarketActivityRecordTransformer.Transform(creationTime, series);
+        var meteredDataForMeteringPointMarketActivityRecords = MeasurementsToMarketActivityRecordTransformer.Transform(creationTime, series);
 
         // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
-        var stream = await _writer.WriteAsync(
+        var stream = await _documentWriters.First(x => x.HandlesType(DocumentType.NotifyValidatedMeasureData) && x.HandlesFormat(DocumentFormat.Ebix)).WriteAsync(
             outgoingMessageHeader,
             meteredDataForMeteringPointMarketActivityRecords.Select(_serializer.Serialize).ToList(),
             CancellationToken.None).ConfigureAwait(false);
 
-        return stream;
+        var xmlDoc = new XmlDocument();
+        xmlDoc.Load(stream.Stream);
+
+        var nsmgr = new XmlNamespaceManager(xmlDoc.NameTable);
+        nsmgr.AddNamespace("b2b", "urn:www:datahub:dk:b2b:v01");
+        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3");
+
+        // Find the DK_MeteredDataTimeSeries node inside Payload
+        var innerDoc = xmlDoc.SelectSingleNode("//ns0:DK_MeteredDataTimeSeries", nsmgr);
+        if (innerDoc == null)
+            throw new InvalidOperationException("Could not find DK_MeteredDataTimeSeries in the XML.");
+
+        // Wrap it in a new XML declaration
+        var resultXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + innerDoc.OuterXml;
+
+        // Return it as a MemoryStream
+        var outputBytes = Encoding.UTF8.GetBytes(resultXml);
+        var outputStream = new MemoryStream(outputBytes);
+        outputStream.Position = 0;
+        return outputStream;
     }
 }

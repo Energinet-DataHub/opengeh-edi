@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using Energinet.DataHub.EDI.B2BApi.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.B2BApi.Configuration;
+namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
-public class MigrationOptions
+public static class MigrationExtensions
 {
-    public const string SectionName = "Migration";
+    public static IServiceCollection AddMigration(
+        this IServiceCollection services)
+    {
+        services.AddScoped<IMeasurementsJsonToEbixStreamWriter, MeasurementsJsonToEbixStreamWriter>();
 
-    /// <summary>
-    /// Migration TimeSeries Sync Service Bus topic name
-    /// </summary>
-    [Required(AllowEmptyStrings = false)]
-    public string TopicName { get; set; } = string.Empty;
+        services
+            .AddOptions<MigrationOptions>()
+            .BindConfiguration(MigrationOptions.SectionName)
+            .ValidateDataAnnotations();
 
-    /// <summary>
-    /// Migration TimeSeries Sync Service Bus subscription name
-    /// </summary>
-    [Required(AllowEmptyStrings = false)]
-    public string TimeSeriesSync_SubscriptionName { get; set; } = string.Empty;
+        return services;
+    }
 }
