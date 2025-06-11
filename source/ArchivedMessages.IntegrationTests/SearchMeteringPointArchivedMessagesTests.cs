@@ -48,8 +48,10 @@ public class SearchMeteringPointArchivedMessagesTests : IAsyncLifetime
         _fixture = fixture;
 
         var services = _fixture.BuildService(testOutputHelper);
+        services
+            .GetRequiredService<AuthenticatedActor>()
+            .SetAuthenticatedActor(_authenticatedActor);
 
-        services.GetRequiredService<AuthenticatedActor>().SetAuthenticatedActor(_authenticatedActor);
         _sut = services.GetRequiredService<IArchivedMessagesClient>();
     }
 
