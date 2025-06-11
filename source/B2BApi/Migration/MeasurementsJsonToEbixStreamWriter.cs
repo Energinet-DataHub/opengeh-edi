@@ -28,10 +28,16 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
     private readonly ISerializer _serializer = serializer;
     private readonly IEnumerable<IDocumentWriter> _documentWriters = documentWriters;
 
-    public async Task<Stream> WriteStreamAsync(BinaryData timeSeriesPayload)
+    public async Task<(Stream, string)> WriteStreamAsync(BinaryData timeSeriesPayload)
     {
         // Deserialize the JSON into the Root object for processing
         var root = JsonSerializer.Deserialize<Root>(timeSeriesPayload) ?? throw new Exception("Root is null.");
+        var orgSender = root.MeteredDataTimeSeriesDH3.Header.SenderIdentification;
+
+        root.MeteredDataTimeSeriesDH3.Header.SenderIdentification =
+            root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification;
+
+        root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification = orgSender;
 
         // Extract the header and time series data
         var series = root.MeteredDataTimeSeriesDH3.TimeSeries;
@@ -62,22 +68,31 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
         var xmlDoc = new XmlDocument();
         xmlDoc.Load(stream.Stream);
 
-        var nsmgr = new XmlNamespaceManager(xmlDoc.NameTable);
-        nsmgr.AddNamespace("b2b", "urn:www:datahub:dk:b2b:v01");
-        nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3");
+        var mgr = new XmlNamespaceManager(xmlDoc.NameTable);
+        mgr.AddNamespace("b2b", "urn:www:datahub:dk:b2b:v01");
+        mgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3");
 
-        // Find the DK_MeteredDataTimeSeries node inside Payload
-        var innerDoc = xmlDoc.SelectSingleNode("//ns0:DK_MeteredDataTimeSeries", nsmgr);
-        if (innerDoc == null)
+        var dataSeriesNode = xmlDoc.SelectSingleNode("//ns0:DK_MeteredDataTimeSeries", mgr);
+        if (dataSeriesNode == null)
             throw new InvalidOperationException("Could not find DK_MeteredDataTimeSeries in the XML.");
 
-        // Wrap it in a new XML declaration
-        var resultXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + innerDoc.OuterXml;
+        var outputStream = new MemoryStream();
+        var settings = new XmlWriterSettings
+        {
+            Encoding = new UTF8Encoding(false), // No BOM
+            Indent = true,
+            OmitXmlDeclaration = false,
+            Async = true,
+        };
 
-        // Return it as a MemoryStream
-        var outputBytes = Encoding.UTF8.GetBytes(resultXml);
-        var outputStream = new MemoryStream(outputBytes);
+        using (var writer = XmlWriter.Create(outputStream, settings))
+        {
+            await writer.WriteStartDocumentAsync().ConfigureAwait(false); // Writes only <?xml version="1.0" encoding="utf-8"?>
+            dataSeriesNode.WriteTo(writer);
+            await writer.WriteEndDocumentAsync().ConfigureAwait(false);
+        }
+
         outputStream.Position = 0;
-        return outputStream;
+        return (outputStream, root.MeteredDataTimeSeriesDH3.Header.SenderIdentification.Content);
     }
 }

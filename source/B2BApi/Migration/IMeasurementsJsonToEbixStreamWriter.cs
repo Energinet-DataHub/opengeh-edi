@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
-
 namespace Energinet.DataHub.EDI.B2BApi.Migration;
 
 public interface IMeasurementsJsonToEbixStreamWriter
@@ -23,5 +21,5 @@ public interface IMeasurementsJsonToEbixStreamWriter
     /// </summary>
     /// <param name="timeSeriesPayload">Json payload containing all time series in message.</param>
     /// <returns>MarketDocumentStream containing all quantity observations.</returns>
-    Task<Stream> WriteStreamAsync(BinaryData timeSeriesPayload);
+    Task<(Stream Document, string Sender)> WriteStreamAsync(BinaryData timeSeriesPayload);
 }

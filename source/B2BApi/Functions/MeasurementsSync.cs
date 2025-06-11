@@ -55,10 +55,10 @@ public class MeasurementsSync(ILogger<MeasurementsSync> logger,
         _logger.LogInformation("Received message for measurements synchronization: {MessageId}", message.MessageId);
         if (await _featureManager.SyncMeasurementsAsync().ConfigureAwait(false))
         {
-            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(DataHubDetails.DataHubActorNumber, Restriction.Owned, ActorRole.GridAccessProvider, null,  Guid.Parse("00000000-0000-0000-0000-000000000001")));
             var stream = await _measurementsJsonToEbixStreamWriter.WriteStreamAsync(message.Body).ConfigureAwait(false);
+            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(stream.Sender), Restriction.Owned, ActorRole.GridAccessProvider, null,  Guid.Parse("00000000-0000-0000-0000-000000000001")));
             await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
-                    new IncomingMarketMessageStream(stream),
+                    new IncomingMarketMessageStream(stream.Document),
                     DocumentFormat.Ebix,
                     IncomingDocumentType.NotifyValidatedMeasureData,
                     DocumentFormat.Ebix,

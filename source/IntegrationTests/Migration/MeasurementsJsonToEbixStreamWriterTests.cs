@@ -45,7 +45,7 @@ public class MeasurementsJsonToEbixStreamWriterTests
         var stream = await timeSeriesJsonToEbixStreamWriter.WriteStreamAsync(new BinaryData(timeSeriesPayload));
 
         // Assert
-        var res = await meteredDataForMeteringPointEbixMessageParser.ParseAsync(new IncomingMarketMessageStream(stream), CancellationToken.None);
+        var res = await meteredDataForMeteringPointEbixMessageParser.ParseAsync(new IncomingMarketMessageStream(stream.Item1), CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
         res.Errors.Should().BeEmpty();
