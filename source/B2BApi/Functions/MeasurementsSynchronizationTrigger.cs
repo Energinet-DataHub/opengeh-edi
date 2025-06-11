@@ -15,7 +15,7 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
-using Energinet.DataHub.EDI.B2BApi.Migration;
+using Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
@@ -31,19 +31,19 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions;
 /// <summary>
 /// Service Bus Trigger to process measurements synchronization from DataHub 2.
 /// </summary>
-public class MeasurementsSync(ILogger<MeasurementsSync> logger,
+public class MeasurementsSynchronizationTrigger(ILogger<MeasurementsSynchronizationTrigger> logger,
     IFeatureManager featureManager,
     IMeasurementsJsonToEbixStreamWriter measurementsJsonToEbixStreamWriter,
     IIncomingMessageClient incomingMessageClient,
     AuthenticatedActor authenticatedActor)
 {
-    private readonly ILogger<MeasurementsSync> _logger = logger;
+    private readonly ILogger<MeasurementsSynchronizationTrigger> _logger = logger;
     private readonly IFeatureManager _featureManager = featureManager;
     private readonly IMeasurementsJsonToEbixStreamWriter _measurementsJsonToEbixStreamWriter = measurementsJsonToEbixStreamWriter;
     private readonly IIncomingMessageClient _incomingMessageClient = incomingMessageClient;
     private readonly AuthenticatedActor _authenticatedActor = authenticatedActor;
 
-    [Function(nameof(MeasurementsSync))]
+    [Function(nameof(MeasurementsSynchronizationTrigger))]
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{MigrationOptions.SectionName}:{nameof(MigrationOptions.TopicName)}%",

@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime.Extensions;
 
-namespace Energinet.DataHub.EDI.B2BApi.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 
 public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumerable<IDocumentWriter> documentWriters) : IMeasurementsJsonToEbixStreamWriter
 {

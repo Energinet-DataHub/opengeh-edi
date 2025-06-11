@@ -15,11 +15,11 @@
 using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.B2BApi.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 
 public static class MigrationExtensions
 {
-    public static IServiceCollection AddMigration(
+    public static IServiceCollection AddMeasurementsSynchronization(
         this IServiceCollection services)
     {
         services.AddScoped<IMeasurementsJsonToEbixStreamWriter, MeasurementsJsonToEbixStreamWriter>();

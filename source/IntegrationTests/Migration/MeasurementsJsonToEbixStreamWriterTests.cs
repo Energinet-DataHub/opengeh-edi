@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text;
-using Energinet.DataHub.EDI.B2BApi.Migration;
+using Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Schemas.Ebix;

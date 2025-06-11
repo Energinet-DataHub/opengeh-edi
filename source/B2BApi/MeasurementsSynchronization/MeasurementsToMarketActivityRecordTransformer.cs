@@ -18,7 +18,7 @@ using NodaTime;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
-namespace Energinet.DataHub.EDI.B2BApi.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 
 public static class MeasurementsToMarketActivityRecordTransformer
 {

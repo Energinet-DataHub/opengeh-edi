@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.B2BApi.Migration;
+using Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Extensions.DependencyInjection;
@@ -97,7 +97,7 @@ public static class HostFactory
                     .AddOutboxClient<OutboxContext>()
                     .AddOutboxProcessor<OutboxContext>()
                     .AddOutboxRetention()
-                    .AddMigration()
+                    .AddMeasurementsSynchronization()
 
                     // Enqueue messages from PM (using Edi Topic)
                     .AddEnqueueActorMessagesFromProcessManager()

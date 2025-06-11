@@ -30,11 +30,11 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class MeasurementsSyncTests : IAsyncLifetime
+public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
 {
     private readonly B2BApiAppFixture _fixture;
 
-    public MeasurementsSyncTests(
+    public MeasurementsSynchronizationTriggerTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {
@@ -71,7 +71,7 @@ public class MeasurementsSyncTests : IAsyncLifetime
         // => Then accepted message is enqueued
         // Verify the function was executed
         var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
-            functionName: nameof(MeasurementsSync));
+            functionName: nameof(B2BApi.Functions.MeasurementsSynchronizationTrigger));
 
         functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
 
