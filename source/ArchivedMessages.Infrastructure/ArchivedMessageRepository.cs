@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
-public class ArchivedMessageRepository : IArchivedMessageRepository
+internal class ArchivedMessageRepository : IArchivedMessageRepository
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly AuthenticatedActor _authenticatedActor;
