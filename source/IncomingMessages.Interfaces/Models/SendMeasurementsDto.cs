@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
 
-public sealed class Actor(ActorNumber actorNumber, ActorRole actorRole)
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+
+public record SendMeasurementsDto(
+    MessageId MessageId,
+    TransactionId TransactionId,
+    Actor Sender,
+    Instant CreatedAt,
+    Resolution Resolution,
+    Instant Start,
+    Instant End,
+    MeteringPointId MeteringPointId,
+    MeteringPointType MeteringPointType,
+    IReadOnlyCollection<SendMeasurementsDto.MeasurementDto> Measurements)
 {
-    public ActorNumber ActorNumber { get; init; } = actorNumber;
-
-    public ActorRole ActorRole { get; init; } = actorRole;
-
-    public static Actor From(string actorNumber, string actorRoleName)
-    {
-        return new Actor(
-            ActorNumber.Create(actorNumber),
-            ActorRole.FromName(actorRoleName));
-    }
-
-    public override string ToString()
-    {
-        return $"ActorNumber: {ActorNumber.Value}, ActorRole: {ActorRole.Name}";
-    }
+    public record MeasurementDto(
+        int Position,
+        decimal Quantity,
+        Quality Quality);
 }

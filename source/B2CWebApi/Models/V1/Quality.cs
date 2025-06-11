@@ -12,23 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 
-public sealed class Actor(ActorNumber actorNumber, ActorRole actorRole)
+public enum Quality
 {
-    public ActorNumber ActorNumber { get; init; } = actorNumber;
-
-    public ActorRole ActorRole { get; init; } = actorRole;
-
-    public static Actor From(string actorNumber, string actorRoleName)
-    {
-        return new Actor(
-            ActorNumber.Create(actorNumber),
-            ActorRole.FromName(actorRoleName));
-    }
-
-    public override string ToString()
-    {
-        return $"ActorNumber: {ActorNumber.Value}, ActorRole: {ActorRole.Name}";
-    }
+    Calculated,
+    Measured,
 }

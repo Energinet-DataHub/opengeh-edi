@@ -179,6 +179,16 @@ public static class B2CWebApiRequests
         return request;
     }
 
+    public static HttpRequestMessage CreateSendMeasurementsV1Request(SendMeasurementsRequestV1 request)
+    {
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/SendMeasurements")
+        {
+            Content = CreateJsonContent(request),
+        };
+
+        return httpRequest;
+    }
+
     private static StringContent CreateJsonContent(object payload)
     {
         var serializedObject = JsonSerializer.Serialize(payload);
