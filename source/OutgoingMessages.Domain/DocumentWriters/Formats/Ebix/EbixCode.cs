@@ -51,7 +51,7 @@ public static class EbixCode
             return "D42";
 
         if (businessReason == BusinessReason.ReminderOfMissingMeasurementLog)
-            return "D25"; // D25, D26, D27 are possible.
+            return "D24";
 
         throw NoCodeFoundFor(businessReason.Name);
     }

@@ -40,10 +40,8 @@ public static class EnqueueBrs024AcceptedMeasurementsFactory
             OriginalTransactionId: originalActorTransactionId,
             MeteringPointId: "123456789012345678",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
-            ProductNumber: "test-product-number",
             ActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: actor.ActorRole.ToProcessManagerActorRole(),
-            MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
             AggregatedMeasurements: new List<AggregatedMeasurement>
             {
                 new(
@@ -52,8 +50,7 @@ public static class EnqueueBrs024AcceptedMeasurementsFactory
                     Resolution: resolution,
                     EnergyQuantity: 10000,
                     QuantityQuality: PMValueTypes.Quality.AsProvided),
-            },
-            GridAreaCode: "804");
+            });
 
         return CreateServiceBusMessage(accepted, actor, eventId);
     }

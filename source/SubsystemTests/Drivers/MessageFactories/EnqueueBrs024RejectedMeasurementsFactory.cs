@@ -36,7 +36,6 @@ public static class EnqueueBrs024RejectedMeasurementsFactory
             OriginalTransactionId: originalActorTransactionId,
             ActorNumber: actor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: actor.ActorRole.ToProcessManagerActorRole(),
-            BusinessReason: PMValueTypes.BusinessReason.PeriodicMetering,
             MeteringPointId: "12345678912346",
             ValidationErrors:
             [
