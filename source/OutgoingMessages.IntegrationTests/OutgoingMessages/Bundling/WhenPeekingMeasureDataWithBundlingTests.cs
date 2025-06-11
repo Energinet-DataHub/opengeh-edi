@@ -92,7 +92,6 @@ public class WhenPeekingMeasureDataWithBundlingTests : OutgoingMessagesTestBase
                     receiver: receiver.ToActor(),
                     businessReason: BusinessReason.PeriodicMetering,
                     relatedToMessageId: MessageId.New(),
-                    gridAreaCode: "804",
                     series: new MeasurementsDto(
                         TransactionId: TransactionId.New(),
                         MeteringPointId: "1234567890123456",

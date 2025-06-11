@@ -90,7 +90,6 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
             OriginalTransactionId: Guid.NewGuid().ToString(),
             MeteringPointId: "1234567890123",
             MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
-            ProductNumber: "test-product-number",
             AggregatedMeasurements: new List<AggregatedMeasurement>
             {
                new(
@@ -101,9 +100,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
                     QuantityQuality: PMValueTypes.Quality.AsProvided),
             },
             ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
-            ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole(),
-            MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-            GridAreaCode: "804");
+            ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole());
 
         var orchestrationInstanceId = Guid.NewGuid();
         var enqueueActorMessages = new EnqueueActorMessagesV1
@@ -176,7 +173,6 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
             OriginalTransactionId: Guid.NewGuid().ToString(),
             ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
             ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole(),
-            BusinessReason: PMValueTypes.BusinessReason.PeriodicMetering,
             MeteringPointId: "1234567890123",
             ValidationErrors:
             [

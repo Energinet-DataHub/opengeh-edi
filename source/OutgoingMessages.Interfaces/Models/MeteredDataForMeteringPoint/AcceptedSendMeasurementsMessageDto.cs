@@ -22,7 +22,6 @@ public sealed class AcceptedSendMeasurementsMessageDto(
     Actor receiver,
     BusinessReason businessReason,
     MessageId relatedToMessageId,
-    string gridAreaCode,
     MeasurementsDto series)
     : OutgoingMessageDto(
         DocumentType.NotifyValidatedMeasureData,
@@ -35,6 +34,4 @@ public sealed class AcceptedSendMeasurementsMessageDto(
         relatedToMessageId)
 {
     public MeasurementsDto Series { get; } = series;
-
-    public string GridAreaCode { get; set; } = gridAreaCode;
 }

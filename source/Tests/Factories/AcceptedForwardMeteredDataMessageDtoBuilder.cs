@@ -56,7 +56,6 @@ public class AcceptedForwardMeteredDataMessageDtoBuilder
             receiver: _receiver,
             businessReason: _businessReason,
             relatedToMessageId: MessageId.New(),
-            gridAreaCode: "804",
             series: new MeasurementsDto(
                 TransactionId: TransactionId.New(),
                 MeteringPointId: _meteringPointId,
