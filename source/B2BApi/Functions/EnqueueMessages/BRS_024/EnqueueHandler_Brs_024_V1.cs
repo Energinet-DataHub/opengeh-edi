@@ -132,7 +132,7 @@ public class EnqueueHandler_Brs_024_V1(
             documentReceiverNumber: ActorNumber.Create(rejectedData.ActorNumber.Value),
             processId: orchestrationInstanceId,
             eventId: EventId.From(serviceBusMessageId),
-            businessReason: BusinessReason.YearlyMetering.Name,
+            businessReason: BusinessReason.YearlyMetering,
             series: rejectedTimeSeries);
     }
 
