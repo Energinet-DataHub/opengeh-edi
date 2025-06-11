@@ -21,10 +21,10 @@ public record SendMeasurementsDto(
     MessageId MessageId,
     TransactionId TransactionId,
     Actor Sender,
-    Instant CreatedAt,
+    DateTimeOffset CreatedAt,
     Resolution Resolution,
-    Instant Start,
-    Instant End,
+    DateTimeOffset Start,
+    DateTimeOffset End,
     MeteringPointId MeteringPointId,
     MeteringPointType MeteringPointType,
     IReadOnlyCollection<SendMeasurementsDto.MeasurementDto> Measurements)

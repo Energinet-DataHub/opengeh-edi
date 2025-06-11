@@ -38,10 +38,10 @@ public class SendMeasurementsDtoFactory(
             MeteringPointId: MeteringPointId.From(request.MeteringPointId),
             MeteringPointType: MapMeteringPointType(request.MeteringPointType),
             Sender: sender,
-            CreatedAt: _clock.GetCurrentInstant(),
+            CreatedAt: _clock.GetCurrentInstant().ToDateTimeOffset(),
             Resolution: MapResolution(request.Resolution),
-            Start: request.Start.ToInstant(),
-            End: request.End.ToInstant(),
+            Start: request.Start,
+            End: request.End,
             Measurements: request.Measurements.Select(
                 m => new SendMeasurementsDto.MeasurementDto(
                     m.Position,

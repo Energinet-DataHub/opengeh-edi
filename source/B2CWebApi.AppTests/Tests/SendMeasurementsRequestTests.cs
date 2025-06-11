@@ -27,11 +27,11 @@ using Resolution = Energinet.DataHub.EDI.B2CWebApi.Models.V1.Resolution;
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Tests;
 
 [Collection(nameof(B2CWebApiCollectionFixture))]
-public class SendMeasurementsTests : IAsyncLifetime
+public class SendMeasurementsRequestTests : IAsyncLifetime
 {
     private readonly B2CWebApiFixture _fixture;
 
-    public SendMeasurementsTests(B2CWebApiFixture fixture, ITestOutputHelper logger)
+    public SendMeasurementsRequestTests(B2CWebApiFixture fixture, ITestOutputHelper logger)
     {
         _fixture = fixture;
         _fixture.SetTestOutputHelper(logger);
@@ -40,16 +40,50 @@ public class SendMeasurementsTests : IAsyncLifetime
     private Claim[] RequiredActorClaims =>
     [
         new("actornumber", "1234567890123"),
-        new("marketroles", ActorRole.MeteredDataResponsible.Name), // TODO: Update to the correct role
+        new("marketroles", ActorRole.MeteredDataResponsible.Name), // TODO: Update to the correct role ?
     ];
 
     public static TheoryData<MeteringPointType, Resolution, Quality> RequestsWithAllResolutions()
     {
         var theoryData = new TheoryData<MeteringPointType, Resolution, Quality>();
 
-        foreach (var resolution in Enum.GetValues<Resolution>())
+        var ignoredResolutions = new[]
+        {
+            Resolution.Monthly, // Monthly resolution is not supported in Send Measurements
+        };
+        var resolutions = Enum.GetValues<Resolution>().Except(ignoredResolutions);
+
+        foreach (var resolution in resolutions)
         {
             theoryData.Add(MeteringPointType.Consumption, resolution, Quality.Measured);
+        }
+
+        return theoryData;
+    }
+
+    public static TheoryData<MeteringPointType, Resolution, Quality> RequestsWithAllMeteringPointTypes()
+    {
+        var theoryData = new TheoryData<MeteringPointType, Resolution, Quality>();
+
+        var meteringPointTypes = Enum.GetValues<MeteringPointType>();
+
+        foreach (var meteringPointType in meteringPointTypes)
+        {
+            theoryData.Add(meteringPointType, Resolution.QuarterHourly, Quality.Measured);
+        }
+
+        return theoryData;
+    }
+
+    public static TheoryData<MeteringPointType, Resolution, Quality> RequestsWithAllQualities()
+    {
+        var theoryData = new TheoryData<MeteringPointType, Resolution, Quality>();
+
+        var qualities = Enum.GetValues<Quality>();
+
+        foreach (var quality in qualities)
+        {
+            theoryData.Add(MeteringPointType.Consumption, Resolution.QuarterHourly, quality);
         }
 
         return theoryData;
@@ -67,7 +101,9 @@ public class SendMeasurementsTests : IAsyncLifetime
     }
 
     [Theory]
+    [MemberData(nameof(RequestsWithAllMeteringPointTypes))]
     [MemberData(nameof(RequestsWithAllResolutions))]
+    [MemberData(nameof(RequestsWithAllQualities))]
     public async Task Given_SendMeasurementsRequest_When_ValidRequest_Then_Success(
         MeteringPointType meteringPointType,
         Resolution resolution,
@@ -87,18 +123,18 @@ public class SendMeasurementsTests : IAsyncLifetime
         var end = start.Plus(resolutionAsDuration * positions);
 
         var request = new SendMeasurementsRequestV1(
-            "123456789012345678",
-            meteringPointType,
-            resolution,
-            quality,
-            start.ToDateTimeOffset(),
-            end.ToDateTimeOffset(),
-            new List<SendMeasurementsRequestV1.Measurement>()
-            {
+            MeteringPointId: "123456789012345678",
+            MeteringPointType: meteringPointType,
+            Resolution: resolution,
+            Quality: quality,
+            Start: start.ToDateTimeOffset(),
+            End: end.ToDateTimeOffset(),
+            Measurements:
+            [
                 // 2 positions, must match the "positions" const above
                 new(1, 42.123m),
                 new(2, 1337m),
-            });
+            ]);
 
         using var httpRequest = B2CWebApiRequests.CreateSendMeasurementsV1Request(request);
         httpRequest.Headers.Authorization = await _fixture.OpenIdJwtManager.JwtProvider

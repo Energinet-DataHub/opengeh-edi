@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using NodaTime.Extensions;
 using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.MessageParsers.RSM012;
@@ -26,20 +27,25 @@ public class SendMeasurementsB2CJsonMessageParser(
     ISerializer serializer)
     : B2CJsonMessageParserBase<SendMeasurementsDto>(serializer)
 {
+    private const string ElectricityBusinessType = "23";
+
     public override IncomingDocumentType DocumentType => IncomingDocumentType.B2CSendMeasurements;
 
     public override DocumentFormat DocumentFormat => DocumentFormat.Json;
 
     protected override IIncomingMessage MapIncomingMessage(SendMeasurementsDto incomingMessageDto)
     {
+        // TODO: Correct pattern?
+        var instantPatternWithoutSeconds = InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd'T'HH:mm'Z'");
+
         var series = new MeteredDataForMeteringPointSeries(
             TransactionId: incomingMessageDto.TransactionId.Value,
             Resolution: incomingMessageDto.Resolution.Code,
-            StartDateTime: InstantPattern.General.Format(incomingMessageDto.Start),
-            EndDateTime: InstantPattern.General.Format(incomingMessageDto.End),
-            ProductNumber: ProductType.EnergyActive.Code, // TODO: Correct product number
-            RegisteredAt: InstantPattern.General.Format(incomingMessageDto.CreatedAt),
-            ProductUnitType: MeasurementUnit.KilowattHour.Code, // TODO: Correct product unit type?
+            StartDateTime: instantPatternWithoutSeconds.Format(incomingMessageDto.Start.ToInstant()),
+            EndDateTime: instantPatternWithoutSeconds.Format(incomingMessageDto.End.ToInstant()),
+            ProductNumber: ProductType.EnergyActive.Code,
+            RegisteredAt: instantPatternWithoutSeconds.Format(incomingMessageDto.CreatedAt.ToInstant()),
+            ProductUnitType: MeasurementUnit.KilowattHour.Code,
             MeteringPointType: incomingMessageDto.MeteringPointType.Code,
             MeteringPointLocationId: incomingMessageDto.MeteringPointId.Value,
             SenderNumber: incomingMessageDto.Sender.ActorNumber.Value,
@@ -53,14 +59,14 @@ public class SendMeasurementsB2CJsonMessageParser(
 
         return new MeteredDataForMeteringPointMessageBase(
             messageId: incomingMessageDto.MessageId.Value,
-            messageType: BuildingBlocks.Domain.Models.DocumentType.NotifyValidatedMeasureData.Name, // TODO: Correct message type
-            createdAt: InstantPattern.General.Format(incomingMessageDto.CreatedAt),
+            messageType: MessageType.ValidatedMeteredData.Code,
+            createdAt: InstantPattern.General.Format(incomingMessageDto.CreatedAt.ToInstant()),
             senderNumber: incomingMessageDto.Sender.ActorNumber.Value,
             receiverNumber: DataHubDetails.DataHubActorNumber.Value,
             senderRoleCode: incomingMessageDto.Sender.ActorRole.Code,
             businessReason: BusinessReason.PeriodicMetering.Code,
-            receiverRoleCode: ActorRole.SystemOperator.Code, // TODO: Correct receiver role code?
-            businessType: "A", // TODO: Correct business type?
+            receiverRoleCode: ActorRole.MeteredDataAdministrator.Code,
+            businessType: ElectricityBusinessType,
             series: [series]);
     }
 }
