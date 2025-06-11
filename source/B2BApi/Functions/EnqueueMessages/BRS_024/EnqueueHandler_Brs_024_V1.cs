@@ -136,7 +136,7 @@ public class EnqueueHandler_Brs_024_V1(
             series: rejectedTimeSeries);
     }
 
-    private AcceptedSendMeasurementsMessageDto GetAcceptedRequestMeasurementsMessageDto(
+    private AcceptedRequestMeasurementsMessageDto GetAcceptedRequestMeasurementsMessageDto(
         Guid serviceBusMessageId,
         Guid orchestrationInstanceId,
         RequestYearlyMeasurementsAcceptedV1 acceptedData,
@@ -147,7 +147,7 @@ public class EnqueueHandler_Brs_024_V1(
             Quantity: aggregatedMeasurement.EnergyQuantity,
             Quality: Quality.FromName(aggregatedMeasurement.QuantityQuality.Name));
 
-        var acceptedRequestMeasurementsMessageDto = new AcceptedSendMeasurementsMessageDto(
+        var acceptedRequestMeasurementsMessageDto = new AcceptedRequestMeasurementsMessageDto(
             eventId: EventId.From(serviceBusMessageId),
             externalId: new ExternalId(orchestrationInstanceId),
             receiver: new Actor(ActorNumber.Create(acceptedData.ActorNumber), ActorRole.FromName(acceptedData.ActorRole.Name)),
@@ -169,7 +169,7 @@ public class EnqueueHandler_Brs_024_V1(
     }
 
     private async Task EnqueueAcceptMessageAsync(
-        AcceptedSendMeasurementsMessageDto acceptedRequestMeasurementsMessageDto,
+        AcceptedRequestMeasurementsMessageDto acceptedRequestMeasurementsMessageDto,
         CancellationToken cancellationToken)
     {
         await _outgoingMessagesClient.EnqueueAsync(acceptedRequestMeasurementsMessageDto, cancellationToken)

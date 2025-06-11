@@ -280,4 +280,18 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId.Value;
     }
+
+    public async Task<Guid> EnqueueAsync(
+        AcceptedRequestMeasurementsMessageDto acceptedSendMeasurementsMessageDto,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessageFactory.CreateMessage(
+            acceptedSendMeasurementsMessageDto,
+            _serializer,
+            _clock.GetCurrentInstant());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+
+        return messageId.Value;
+    }
 }
