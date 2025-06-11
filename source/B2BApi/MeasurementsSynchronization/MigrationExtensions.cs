@@ -25,8 +25,8 @@ public static class MigrationExtensions
         services.AddScoped<IMeasurementsJsonToEbixStreamWriter, MeasurementsJsonToEbixStreamWriter>();
 
         services
-            .AddOptions<MigrationOptions>()
-            .BindConfiguration(MigrationOptions.SectionName)
+            .AddOptions<MeasurementsSynchronizationOptions>()
+            .BindConfiguration(MeasurementsSynchronizationOptions.SectionName)
             .ValidateDataAnnotations();
 
         return services;

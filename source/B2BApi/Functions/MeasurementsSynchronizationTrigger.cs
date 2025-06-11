@@ -46,8 +46,8 @@ public class MeasurementsSynchronizationTrigger(ILogger<MeasurementsSynchronizat
     [Function(nameof(MeasurementsSynchronizationTrigger))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            $"%{MigrationOptions.SectionName}:{nameof(MigrationOptions.TopicName)}%",
-            $"%{MigrationOptions.SectionName}:{nameof(MigrationOptions.TimeSeriesSync_SubscriptionName)}%",
+            $"%{MeasurementsSynchronizationOptions.SectionName}:{nameof(MeasurementsSynchronizationOptions.TopicName)}%",
+            $"%{MeasurementsSynchronizationOptions.SectionName}:{nameof(MeasurementsSynchronizationOptions.TimeSeriesSync_SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message,
         CancellationToken cancellationToken)

@@ -16,7 +16,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.EDI.B2BApi.Configuration;
 
-public class MigrationOptions
+public class MeasurementsSynchronizationOptions
 {
     public const string SectionName = "Migration";
 

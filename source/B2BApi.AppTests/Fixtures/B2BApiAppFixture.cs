@@ -272,10 +272,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         MeasurementsSyncTopicResource = await ServiceBusResourceProvider
             .BuildTopic("migration")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{MigrationOptions.SectionName}__{nameof(MigrationOptions.TopicName)}", topic.Name))
+                .Add($"{MeasurementsSynchronizationOptions.SectionName}__{nameof(MeasurementsSynchronizationOptions.TopicName)}", topic.Name))
             .AddSubscription("subscription")
             .Do(subscription => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{MigrationOptions.SectionName}__{nameof(MigrationOptions.TimeSeriesSync_SubscriptionName)}", subscription.SubscriptionName))
+                .Add($"{MeasurementsSynchronizationOptions.SectionName}__{nameof(MeasurementsSynchronizationOptions.TimeSeriesSync_SubscriptionName)}", subscription.SubscriptionName))
             .CreateAsync();
 
         LogStopwatch(stopwatch, nameof(IntegrationEventsTopicResource));

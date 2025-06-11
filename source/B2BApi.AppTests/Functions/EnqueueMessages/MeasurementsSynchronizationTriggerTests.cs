@@ -57,26 +57,24 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_MeteredDataTimeSeriesDH3Message_When_MessageIsReceived_Then_AcceptedMessagesIsEnqueued()
+    public async Task Given_MeteredDataTimeSeriesDH3Message_When_MessageIsReceived_Then_Brs021StartCommandIsCreated()
     {
-        // => Given Migrate measurements data from DH2
+        // => Given measurements data from DH2
         var testDataResultSet = JsonPayloadConstants.SingleTimeSeriesWithSingleObservation;
-        var orchestrationInstanceId = Guid.NewGuid();
 
         var message = new ServiceBusMessage(testDataResultSet);
 
         // => When message is received
         await _fixture.MeasurementsSyncTopicResource.SenderClient.SendMessageAsync(message);
 
-        // => Then accepted message is enqueued
         // Verify the function was executed
         var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
-            functionName: nameof(B2BApi.Functions.MeasurementsSynchronizationTrigger));
+            functionName: nameof(MeasurementsSynchronizationTrigger));
 
         functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
 
+        // => Then accepted message is enqueued
         using var assertionScope = new AssertionScope();
-
         var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
             .When(msg =>
             {
