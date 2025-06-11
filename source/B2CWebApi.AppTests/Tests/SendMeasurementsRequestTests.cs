@@ -40,7 +40,7 @@ public class SendMeasurementsRequestTests : IAsyncLifetime
     private Claim[] RequiredActorClaims =>
     [
         new("actornumber", "1234567890123"),
-        new("marketroles", ActorRole.MeteredDataResponsible.Name), // TODO: Update to the correct role ?
+        new("marketroles", ActorRole.MeteredDataResponsible.Name), // TODO #1670: Update to the correct role ?
     ];
 
     public static TheoryData<MeteringPointType, Resolution, Quality> RequestsWithAllResolutions()
@@ -110,7 +110,6 @@ public class SendMeasurementsRequestTests : IAsyncLifetime
         Quality quality)
     {
         // Arrange
-
         const int positions = 2;
         var resolutionAsDuration = resolution switch
         {

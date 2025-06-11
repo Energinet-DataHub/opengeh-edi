@@ -35,7 +35,7 @@ public class SendMeasurementsB2CJsonMessageParser(
 
     protected override IIncomingMessage MapIncomingMessage(SendMeasurementsDto incomingMessageDto)
     {
-        // TODO: Correct pattern?
+        // TODO #1670: Correct pattern?
         var instantPatternWithoutSeconds = InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd'T'HH:mm'Z'");
 
         var series = new MeteredDataForMeteringPointSeries(

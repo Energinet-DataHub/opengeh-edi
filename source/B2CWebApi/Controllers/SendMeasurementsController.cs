@@ -34,7 +34,7 @@ public class SendMeasurementsController(
     SendMeasurementsDtoFactory sendMeasurementsDtoFactory,
     IIncomingMessageClient incomingMessageClient) : ControllerBase
 {
-    public const string RequiredRole = "send-measurements:update"; // TODO: Update with correct role?
+    public const string RequiredRole = "send-measurements:update"; // TODO #1670: Update with correct role?
 
     private readonly UserContext<FrontendUser> _userContext = userContext;
     private readonly SendMeasurementsDtoFactory _sendMeasurementsDtoFactory = sendMeasurementsDtoFactory;
@@ -42,7 +42,7 @@ public class SendMeasurementsController(
 
     [ApiVersion("1.0")]
     [HttpPost]
-    [Authorize(Roles = RequiredRole)] // TODO: Update with correct role?
+    [Authorize(Roles = RequiredRole)] // TODO #1670: Update with correct role?
     public async Task<ActionResult> RequestAsync(
         SendMeasurementsRequestV1 request,
         CancellationToken cancellationToken)
