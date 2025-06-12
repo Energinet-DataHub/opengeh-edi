@@ -33,6 +33,10 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\AccessRights\202512061200 Grant execution plan rights.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Scripts\Model\202207041353 Re-create QueuedInternalCommands table.sql" />
     <EmbeddedResource Include="Scripts\Model\202207080938 Add effective date for electrical heating.sql" />
     <EmbeddedResource Include="Scripts\Model\202208181332 Add actor table to BtwoB.sql" />
