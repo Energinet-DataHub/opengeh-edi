@@ -18,11 +18,11 @@ using NodaTime;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
-namespace Energinet.DataHub.EDI.B2BApi.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 
-public class MeasurementsToMarketActivityRecordTransformer : IMeasurementsToMarketActivityRecordTransformer
+public static class MeasurementsToMarketActivityRecordTransformer
 {
-    public List<MeteredDataForMeteringPointMarketActivityRecord> Transform(Instant creationTime, List<TimeSeries> timeSeries)
+    public static List<MeteredDataForMeteringPointMarketActivityRecord> Transform(Instant creationTime, List<TimeSeries> timeSeries)
     {
         var series = GetNonNullOriginalTransactionIdTimeSeries(timeSeries);
         var nonDeletedTimeSeries = GetNonDeletedTimeSeries(series);
