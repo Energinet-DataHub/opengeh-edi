@@ -32,6 +32,8 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
         (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Ebix),
         (IncomingDocumentType.B2CRequestAggregatedMeasureData, DocumentFormat.Xml),
         (IncomingDocumentType.B2CRequestWholesaleSettlement, DocumentFormat.Xml),
+        (IncomingDocumentType.B2CSendMeasurements, DocumentFormat.Xml),
+        (IncomingDocumentType.B2CSendMeasurements, DocumentFormat.Ebix),
     };
 
     public GivenNewIncomingDocumentTypeTests(IncomingMessagesTestFixture incomingMessagesTestFixture, ITestOutputHelper testOutputHelper)

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -22,6 +23,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public readonly record struct MessageId
 {
+    [JsonConstructor]
     private MessageId(string value)
     {
         Value = value;

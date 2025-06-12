@@ -205,6 +205,8 @@ public class ReceiveIncomingMarketMessage
                 return DocumentType.RequestWholesaleSettlement;
             case var incomingDocType when incomingDocType == IncomingDocumentType.NotifyValidatedMeasureData:
                 return DocumentType.NotifyValidatedMeasureData;
+            case var incomingDocType when incomingDocType == IncomingDocumentType.B2CSendMeasurements:
+                return DocumentType.NotifyValidatedMeasureData;
             case var incomingDocType when incomingDocType == IncomingDocumentType.RequestValidatedMeasurements:
                 return DocumentType.RequestMeasurements;
             default:
