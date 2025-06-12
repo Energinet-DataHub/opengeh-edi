@@ -17,11 +17,8 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Migration;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
@@ -57,7 +54,7 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_MeteredDataTimeSeriesDH3Message_When_MessageIsReceived_Then_Brs021StartCommandIsCreated()
+    public async Task Given_MeteredDataTimeSeriesDH3Message_When_MessageIsReceived_Then_Brs021StartCommandIsSent()
     {
         // => Given measurements data from DH2
         var testDataResultSet = JsonPayloadConstants.SingleTimeSeriesWithSingleObservation;
@@ -73,7 +70,7 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
 
         functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
 
-        // => Then accepted message is enqueued
+        // => Then a BRS_021_ForwardMeteredData message should be sent to the service bus
         using var assertionScope = new AssertionScope();
         var verifyServiceBusMessages = await _fixture.ServiceBusListenerMock
             .When(msg =>
@@ -84,9 +81,9 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
                 var parsedNotification = StartOrchestrationInstanceV1.Parser.ParseJson(
                     msg.Body.ToString());
 
-                var matchingOrchestrationId = parsedNotification.MeteringPointId == "571051839308770693";
+                var meteringPointId = parsedNotification.MeteringPointId == "571051839308770693";
 
-                return matchingOrchestrationId;
+                return meteringPointId;
             })
             .VerifyCountAsync(1);
         var wasSent = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(30));

@@ -74,7 +74,7 @@ public static class FeatureManagerExtensions
     }
 
     /// <summary>
-    /// Whether to disallow actors to request measurements messages in CIM.
+    /// Enable sync of DH2 data to DH3 sent by migrations
     /// </summary>
     public static Task<bool> SyncMeasurementsAsync(this IFeatureManager featureManager)
     {

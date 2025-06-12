@@ -56,15 +56,15 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
         var meteredDataForMeteringPointMarketActivityRecords = MeasurementsToMarketActivityRecordTransformer.Transform(creationTime, series);
 
         // Write the document using the MeteredDataForMeteringPointMarketActivityRecords and the outgoing message header
-        var stream = await _documentWriters.First(x => x.HandlesType(DocumentType.NotifyValidatedMeasureData) && x.HandlesFormat(DocumentFormat.Ebix)).WriteAsync(
+        var marketDocumentStream = await _documentWriters.First(x => x.HandlesType(DocumentType.NotifyValidatedMeasureData) && x.HandlesFormat(DocumentFormat.Ebix)).WriteAsync(
             outgoingMessageHeader,
             meteredDataForMeteringPointMarketActivityRecords.Select(_serializer.Serialize).ToList(),
             CancellationToken.None).ConfigureAwait(false);
 
         // Load the stream into an XmlDocument for removing the header and formatting.
         var xmlDoc = new XmlDocument();
-        xmlDoc.Load(stream.Stream);
-
+        xmlDoc.Load(marketDocumentStream.Stream);
+        await marketDocumentStream.Stream.DisposeAsync().ConfigureAwait(false);
         var mgr = new XmlNamespaceManager(xmlDoc.NameTable);
         mgr.AddNamespace("b2b", "urn:www:datahub:dk:b2b:v01");
         mgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3");

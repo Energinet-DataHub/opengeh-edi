@@ -17,7 +17,6 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -31,7 +30,8 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions;
 /// <summary>
 /// Service Bus Trigger to process measurements synchronization from DataHub 2.
 /// </summary>
-public class MeasurementsSynchronizationTrigger(ILogger<MeasurementsSynchronizationTrigger> logger,
+public class MeasurementsSynchronizationTrigger(
+    ILogger<MeasurementsSynchronizationTrigger> logger,
     IFeatureManager featureManager,
     IMeasurementsJsonToEbixStreamWriter measurementsJsonToEbixStreamWriter,
     IIncomingMessageClient incomingMessageClient,
@@ -53,17 +53,25 @@ public class MeasurementsSynchronizationTrigger(ILogger<MeasurementsSynchronizat
         CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received message for measurements synchronization: {MessageId}", message.MessageId);
+
         if (await _featureManager.SyncMeasurementsAsync().ConfigureAwait(false))
         {
             var streamAndSender = await _measurementsJsonToEbixStreamWriter.WriteStreamAsync(message.Body).ConfigureAwait(false);
+
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(streamAndSender.Sender), Restriction.Owned, ActorRole.GridAccessProvider, null,  null));
-            await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
+
+            var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                     new IncomingMarketMessageStream(streamAndSender.Document),
                     DocumentFormat.Ebix,
                     IncomingDocumentType.NotifyValidatedMeasureData,
                     DocumentFormat.Ebix,
                     cancellationToken)
                 .ConfigureAwait(false);
+
+            if (responseMessage.IsErrorResponse)
+            {
+                _logger.LogWarning("Received error response for message {MessageId}: {ErrorMessage}", message.MessageId, responseMessage.MessageBody);
+            }
         }
     }
 }
