@@ -20,7 +20,9 @@ public static class Program
 {
     public static int Main(string[] args)
     {
+        // First argument must be the connection string
         var connectionString = ParseConnectionStringFrom(args);
+        // If environment is specified, it must be the second argument
         var environment = EnvironmentParser.Parse(args);
         var isDryRun = args.Contains("dryRun");
 
