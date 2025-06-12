@@ -43,63 +43,24 @@ public class MeteringPointArchivedMessageController(
     [Route("search")]
     [ProducesResponseType(typeof(MeteringPointArchivedMessageSearchResponseV1), StatusCodes.Status200OK)]
     public async Task<ActionResult> SearchV1Async(
-        MeteringPointArchivedMessageSearchCriteria request,
+        MeteringPointArchivedMessageSearchCriteria searchCriteria,
         CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.MeteringPointArchivedMessageSearch,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
-                activityPayload: request,
+                activityPayload: searchCriteria,
                 affectedEntityType: _affectedEntityType,
                 affectedEntityKey: null,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        var messageCreationPeriod = new MessageCreationPeriodDto(
-            request.CreatedDuringPeriod.Start.ToInstant(),
-            request.CreatedDuringPeriod.End.ToInstant());
+        var query = CreateMeteringPointMessagesQuery(searchCriteria);
+        var queryResult = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
+        var searchResponse = MapToSearchResponse(queryResult);
 
-        var cursor = request.Pagination.Cursor != null
-            ? new SortingCursorDto(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
-            : null;
-        var pageSize = request.Pagination.PageSize;
-        var navigationForward = request.Pagination.NavigationForward;
-        var fieldToSortBy = FieldToSortByMapper.MapToFieldToSortBy(request.Pagination.SortBy);
-        var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
-
-        var sender = request.Sender != null
-            ? ActorMapper.ToDomainActor(request.Sender!)
-            : null;
-        var receiver = request.Receiver != null
-            ? ActorMapper.ToDomainActor(request.Receiver!)
-            : null;
-        var documentTypes = request.MeasureDataDocumentTypes?.Select(MeasureDataDocumentTypeMapper.ToDocumentType).ToList().AsReadOnly();
-        var query = new GetMeteringPointMessagesQueryDto(
-            new SortedCursorBasedPaginationDto(
-                cursor,
-                pageSize,
-                navigationForward,
-                fieldToSortBy,
-                directionToSortBy),
-            CreationPeriod: messageCreationPeriod,
-            Sender: sender,
-            Receiver: receiver,
-            DocumentTypes: documentTypes,
-            MeteringPointId: MeteringPointId.From(request.MeteringPointId));
-
-        var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
-
-        var messages = result.Messages.Select(
-            x => new MeteringPointArchivedMessageV1(
-                CursorValue: x.CursorValue,
-                Id: x.Id,
-                DocumentType: MeasureDataDocumentTypeMapper.ToMeteringPointDocumentType(x.DocumentType),
-                Sender: new Actor(x.SenderNumber, ActorRoleMapper.ToActorRole(x.SenderRoleCode!)),
-                Receiver: new Actor(x.ReceiverNumber, ActorRoleMapper.ToActorRole(x.ReceiverRoleCode!)),
-                CreatedAt: x.CreatedAt.ToDateTimeOffset()));
-
-        return Ok(new MeteringPointArchivedMessageSearchResponseV1(messages, TotalCount: result.TotalAmountOfMessages));
+        return Ok(searchResponse);
     }
 
     [HttpGet("{id:guid}")]
@@ -120,5 +81,56 @@ public class MeteringPointArchivedMessageController(
         var archivedMessageStream = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
 
         return archivedMessageStream is null ? NoContent() : Ok(archivedMessageStream.Stream);
+    }
+
+    private static GetMeteringPointMessagesQueryDto CreateMeteringPointMessagesQuery(MeteringPointArchivedMessageSearchCriteria request)
+    {
+        var cursor = request.Pagination.Cursor != null
+            ? new SortingCursorDto(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
+            : null;
+        var pageSize = request.Pagination.PageSize;
+        var navigationForward = request.Pagination.NavigationForward;
+        var fieldToSortBy = FieldToSortByMapper.MapToFieldToSortBy(request.Pagination.SortBy);
+        var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
+
+        var messageCreationPeriod = new MessageCreationPeriodDto(
+                 request.CreatedDuringPeriod.Start.ToInstant(),
+                 request.CreatedDuringPeriod.End.ToInstant());
+        var sender = request.Sender != null
+            ? ActorMapper.ToDomainActor(request.Sender!)
+            : null;
+        var receiver = request.Receiver != null
+            ? ActorMapper.ToDomainActor(request.Receiver!)
+            : null;
+        var documentTypes = request.MeasureDataDocumentTypes?.Select(MeasureDataDocumentTypeMapper.ToDocumentType).ToList().AsReadOnly();
+
+        return new GetMeteringPointMessagesQueryDto(
+            new SortedCursorBasedPaginationDto(
+                cursor,
+                pageSize,
+                navigationForward,
+                fieldToSortBy,
+                directionToSortBy),
+            CreationPeriod: messageCreationPeriod,
+            Sender: sender,
+            Receiver: receiver,
+            DocumentTypes: documentTypes,
+            MeteringPointId: MeteringPointId.From(request.MeteringPointId));
+    }
+
+    private static MeteringPointArchivedMessageSearchResponseV1 MapToSearchResponse(MessageSearchResultDto result)
+    {
+        var messages = result.Messages.Select(
+            x => new MeteringPointArchivedMessageV1(
+                CursorValue: x.CursorValue,
+                Id: x.Id,
+                DocumentType: MeasureDataDocumentTypeMapper.ToMeteringPointDocumentType(x.DocumentType),
+                Sender: new Actor(x.SenderNumber, ActorRoleMapper.ToActorRole(x.SenderRoleCode!)),
+                Receiver: new Actor(x.ReceiverNumber, ActorRoleMapper.ToActorRole(x.ReceiverRoleCode!)),
+                CreatedAt: x.CreatedAt.ToDateTimeOffset()));
+
+        return new MeteringPointArchivedMessageSearchResponseV1(
+            messages,
+            TotalCount: result.TotalAmountOfMessages);
     }
 }
