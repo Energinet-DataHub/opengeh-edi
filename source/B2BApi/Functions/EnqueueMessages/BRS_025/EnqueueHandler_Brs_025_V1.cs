@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMet
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.MeteredDataForMeteringPoint.Request;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Client;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025.V1.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
@@ -34,9 +33,8 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_025;
 
 /// <summary>
-/// Enqueue accepted/rejected messages for BRS-024 (RequestMeasurements).
+/// Enqueue accepted/rejected messages for BRS-025 (RequestMeasurements).
 /// </summary>
-/// <param name="logger"></param>
 public class EnqueueHandler_Brs_025_V1(
     ILogger<EnqueueHandler_Brs_025_V1> logger,
     IOutgoingMessagesClient outgoingMessagesClient,
@@ -60,7 +58,7 @@ public class EnqueueHandler_Brs_025_V1(
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
-            "Received enqueue accepted message(s) for BRS 024. Data: {0}.",
+            "Received enqueue accepted message(s) for BRS 025. Data: {0}.",
             acceptedData);
 
         foreach (var measurement in acceptedData.Measurements)
@@ -90,7 +88,7 @@ public class EnqueueHandler_Brs_025_V1(
         CancellationToken cancellationToken)
     {
         _logger.LogInformation(
-            "Received enqueue rejected message(s) for BRS 024. Data: {0}.",
+            "Received enqueue rejected message(s) for BRS 025. Data: {0}.",
             rejectedData);
 
         var rejectRequestMeasurementsMessageDto = GetRejectRequestMeasurementsMessageDto(
@@ -190,7 +188,7 @@ public class EnqueueHandler_Brs_025_V1(
 
         await executionPolicy.ExecuteAsync(
             () => _processManagerMessageClient.NotifyOrchestrationInstanceAsync(
-                new RequestYearlyMeasurementsNotifyEventV1(orchestrationInstanceId.ToString()),
+                new RequestMeasurementsNotifyEventV1(orchestrationInstanceId.ToString()),
                 CancellationToken.None)).ConfigureAwait(false);
     }
 

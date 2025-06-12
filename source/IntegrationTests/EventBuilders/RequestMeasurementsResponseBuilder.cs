@@ -16,7 +16,8 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
-using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
+using Energinet.DataHub.ProcessManager.Components.Abstractions.BusinessValidation;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime;
@@ -24,7 +25,7 @@ using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.Va
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
-public class RequestMeasurementsResponseBuilder
+public static class RequestMeasurementsResponseBuilder
 {
     public static ServiceBusMessage GenerateAcceptedFrom(
         RequestMeasurementsInputV1 requestMeasurementsInputV1,
@@ -55,6 +56,24 @@ public class RequestMeasurementsResponseBuilder
         return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, accepted);
     }
 
+    public static ServiceBusMessage GenerateRejectedFrom(
+        RequestMeasurementsInputV1 requestYearlyMeasurementsInputV1,
+        Actor receiverActor,
+        string validationErrorMessage,
+        string validationErrorCode,
+        Guid orchestrationInstanceId)
+    {
+        var rejected = new RequestMeasurementsRejectV1(
+            OriginalActorMessageId: requestYearlyMeasurementsInputV1.ActorMessageId,
+            OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
+            ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
+            ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
+            MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
+            ValidationErrors: [new ValidationErrorDto(validationErrorMessage, validationErrorCode)]);
+
+        return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, rejected);
+    }
+
     private static IReadOnlyCollection<MeasurementPoint> GetMeasurements(
         IList<(int Position, string QuantityQuality, decimal EnergyQuantity)> measurements)
     {
@@ -74,7 +93,7 @@ public class RequestMeasurementsResponseBuilder
     {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
-            OrchestrationName = Brs_024.Name,
+            OrchestrationName = Brs_025.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {

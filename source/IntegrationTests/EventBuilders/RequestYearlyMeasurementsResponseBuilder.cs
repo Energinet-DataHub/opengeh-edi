@@ -21,12 +21,11 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
 using Energinet.DataHub.ProcessManager.Shared.Extensions;
 using NodaTime;
-using PMQuality = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects.Quality;
 using PMValueTypes = Energinet.DataHub.ProcessManager.Components.Abstractions.ValueObjects;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
-public class RequestYearlyMeasurementsResponseBuilder
+public static class RequestYearlyMeasurementsResponseBuilder
 {
     public static ServiceBusMessage GenerateAcceptedFrom(
         RequestYearlyMeasurementsInputV1 requestYearlyMeasurementsInputV1,

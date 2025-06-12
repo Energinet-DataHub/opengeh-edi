@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_025;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.DataAccess;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025;
@@ -65,16 +66,12 @@ public class EnqueueBrs025MessagesTests : EnqueueMessagesTestBase
     [Fact]
     public async Task Given_EnqueueAcceptedBrs025Message_When_MessageIsReceived_Then_AcceptedMessageIsEnqueued()
     {
+        // Arrange
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
             new(FeatureFlagNames.PeekMeasurementMessages, true),
             new(FeatureFlagNames.UsePM28Enqueue, true)
         ]);
-
-        // Arrange
-        // => Given enqueue BRS-025 service bus message
-        var senderActorNumber = DataHubDetails.DataHubActorNumber;
-        var senderActorRole = ActorRole.MeteredDataAdministrator;
 
         const string receiverEnergySupplier = "1111111111111";
         var receiverEnergySupplierRole = ActorRole.EnergySupplier;
@@ -83,56 +80,19 @@ public class EnqueueBrs025MessagesTests : EnqueueMessagesTestBase
         var endDateTime = startDateTime.Plus(Duration.FromDays(1));
 
         var eventId = EventId.From(Guid.NewGuid());
+        var orchestrationInstanceId = Guid.NewGuid();
 
         var resolution = PMValueTypes.Resolution.QuarterHourly;
-        var enqueueMessagesData = new RequestMeasurementsAcceptedV1(
-            OriginalActorMessageId: Guid.NewGuid().ToString(),
-            OriginalTransactionId: Guid.NewGuid().ToString(),
-            MeteringPointId: "1234567890123",
-            MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
-            Measurements: new List<Measurement>
-            {
-               new(
-                    StartDateTime: startDateTime.ToDateTimeOffset(),
-                    EndDateTime: endDateTime.ToDateTimeOffset(),
-                    Resolution: resolution,
-                    MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
-                    MeasurementPoints: GetMeasurementPoints(startDateTime.ToDateTimeOffset(), endDateTime.ToDateTimeOffset(), resolution)),
-            },
-            ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
-            ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole());
-
-        var orchestrationInstanceId = Guid.NewGuid();
-        var enqueueActorMessages = new EnqueueActorMessagesV1
-        {
-            OrchestrationName = Brs_025.Name,
-            OrchestrationVersion = 1,
-            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
-            {
-                ActorNumber = senderActorNumber.Value,
-                ActorRole = senderActorRole.ToProcessManagerActorRole().ToActorRoleV1(),
-            },
-            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
-        };
-        enqueueActorMessages.SetData(enqueueMessagesData);
+        var requestMeasurementsAcceptedV1Event = CreateRequestMeasurementsAcceptedV1(startDateTime, endDateTime, resolution, receiverEnergySupplier, receiverEnergySupplierRole);
 
         // Act
-        await GivenEnqueueAcceptedBrs025Message(enqueueActorMessages, eventId);
+        await GivenEnqueueAcceptedBrs025Message(requestMeasurementsAcceptedV1Event, eventId, orchestrationInstanceId);
 
-        // => Then accepted message is enqueued
-        // Verify the function was executed
-        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
-            functionName: nameof(EnqueueTrigger_Brs_025));
-
-        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
-
-        // Verify that outgoing messages were enqueued
-        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
-        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId == eventId)
-            .ToListAsync();
-
+        // Assert
         using var assertionScope = new AssertionScope();
+        await EnsureFunctionIsExecuted(nameof(EnqueueTrigger_Brs_025));
+        var enqueuedOutgoingMessages = await EnsureOutgoingMessagesIsEnqueued(eventId);
+
         enqueuedOutgoingMessages.Should()
             .HaveCount(1)
             .And.AllSatisfy(
@@ -141,9 +101,11 @@ public class EnqueueBrs025MessagesTests : EnqueueMessagesTestBase
                     om.DocumentType.Should().Be(DocumentType.NotifyValidatedMeasureData);
                     om.BusinessReason.Should().Be(BusinessReason.PeriodicMetering.Name);
                     om.RelatedToMessageId.Should().NotBeNull();
-                    om.RelatedToMessageId!.Value.Value.Should().Be(enqueueMessagesData.OriginalActorMessageId);
-                    om.Receiver.Number.Value.Should().Be(enqueueMessagesData.ActorNumber.Value);
-                    om.Receiver.ActorRole.Name.Should().Be(enqueueMessagesData.ActorRole.Name);
+                    om.RelatedToMessageId!.Value.Value.Should().Be(requestMeasurementsAcceptedV1Event.OriginalActorMessageId);
+                    om.Receiver.Number.Value.Should().Be(requestMeasurementsAcceptedV1Event.ActorNumber.Value);
+                    om.Receiver.ActorRole.Name.Should().Be(requestMeasurementsAcceptedV1Event.ActorRole.Name);
+                    om.SenderId.Value.Should().Be(DataHubDetails.DataHubActorNumber.Value);
+                    om.SenderRole.Name.Should().Be(ActorRole.MeteredDataAdministrator.Name);
                 });
 
         var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
@@ -155,20 +117,54 @@ public class EnqueueBrs025MessagesTests : EnqueueMessagesTestBase
     [Fact]
     public async Task Given_EnqueueRejectedBrs025Message_When_MessageIsReceived_Then_RejectedMessageIsEnqueued()
     {
+        // Arrange
         _fixture.EnsureAppHostUsesFeatureFlagValue(
         [
             new(FeatureFlagNames.PeekMeasurementMessages, true),
             new(FeatureFlagNames.UsePM28Enqueue, true)
         ]);
 
-        // Arrange
-        // => Given enqueue BRS-025 rejected service bus message
         const string receiverEnergySupplier = "1111111111111";
         var receiverEnergySupplierRole = ActorRole.EnergySupplier;
 
         var eventId = EventId.From(Guid.NewGuid());
+        var orchestrationInstanceId = Guid.NewGuid();
 
-        var rejectedMessage = new RequestMeasurementsRejectV1(
+        var requestMeasurementsRejectedV1 = CreateRequestMeasurementsRejectedV1(receiverEnergySupplier, receiverEnergySupplierRole);
+
+        // Act
+        await GivenEnqueueRejectedBrs025Message(requestMeasurementsRejectedV1, eventId, orchestrationInstanceId);
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        await EnsureFunctionIsExecuted(nameof(EnqueueTrigger_Brs_025));
+        var enqueuedOutgoingMessages = await EnsureOutgoingMessagesIsEnqueued(eventId);
+
+        enqueuedOutgoingMessages.Should()
+            .HaveCount(1)
+            .And.AllSatisfy(
+                (om) =>
+                {
+                    om.DocumentType.Should().Be(DocumentType.RejectRequestMeasurements);
+                    om.BusinessReason.Should().Be(BusinessReason.PeriodicMetering.Name);
+                    om.RelatedToMessageId!.Value.Value.Should().Be(requestMeasurementsRejectedV1.OriginalActorMessageId);
+                    om.Receiver.Number.Value.Should().Be(requestMeasurementsRejectedV1.ActorNumber.Value);
+                    om.Receiver.ActorRole.Name.Should().Be(requestMeasurementsRejectedV1.ActorRole.Name);
+                    om.SenderId.Value.Should().Be(DataHubDetails.DataHubActorNumber.Value);
+                    om.SenderRole.Name.Should().Be(ActorRole.MeteredDataAdministrator.Name);
+                });
+
+        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
+            orchestrationInstanceId,
+            RequestMeasurementsNotifyEventV1.OrchestrationInstanceEventName);
+        notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
+    }
+
+    private static RequestMeasurementsRejectV1 CreateRequestMeasurementsRejectedV1(
+        string receiverEnergySupplier,
+        ActorRole receiverEnergySupplierRole)
+    {
+        return new RequestMeasurementsRejectV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
             ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
@@ -183,58 +179,69 @@ public class EnqueueBrs025MessagesTests : EnqueueMessagesTestBase
                     ErrorCode: "D18"),
 
             ]);
+    }
 
-        var orchestrationInstanceId = Guid.NewGuid();
+    private async Task EnsureFunctionIsExecuted(string functionName)
+    {
+        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
+            functionName: functionName);
+
+        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
+    }
+
+    private async Task<List<OutgoingMessage>> EnsureOutgoingMessagesIsEnqueued(EventId eventId)
+    {
+        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
+        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
+            .Where(om => om.EventId == eventId)
+            .ToListAsync();
+        return enqueuedOutgoingMessages;
+    }
+
+    private RequestMeasurementsAcceptedV1 CreateRequestMeasurementsAcceptedV1(
+        Instant startDateTime,
+        Instant endDateTime,
+        PMValueTypes.Resolution resolution,
+        string receiverEnergySupplier,
+        ActorRole receiverEnergySupplierRole)
+    {
+        var enqueueMessagesData = new RequestMeasurementsAcceptedV1(
+            OriginalActorMessageId: Guid.NewGuid().ToString(),
+            OriginalTransactionId: Guid.NewGuid().ToString(),
+            MeteringPointId: "1234567890123",
+            MeteringPointType: PMValueTypes.MeteringPointType.Consumption,
+            Measurements: new List<Measurement>
+            {
+                new(
+                    StartDateTime: startDateTime.ToDateTimeOffset(),
+                    EndDateTime: endDateTime.ToDateTimeOffset(),
+                    Resolution: resolution,
+                    MeasureUnit: PMValueTypes.MeasurementUnit.KilowattHour,
+                    MeasurementPoints: GetMeasurementPoints(startDateTime.ToDateTimeOffset(), endDateTime.ToDateTimeOffset(), resolution)),
+            },
+            ActorNumber: ActorNumber.Create(receiverEnergySupplier).ToProcessManagerActorNumber(),
+            ActorRole: receiverEnergySupplierRole.ToProcessManagerActorRole());
+        return enqueueMessagesData;
+    }
+
+    private async Task GivenEnqueueAcceptedBrs025Message(
+        RequestMeasurementsAcceptedV1 requestMeasurementsAccepted,
+        EventId eventId,
+        Guid orchestrationInstanceId)
+    {
         var enqueueActorMessages = new EnqueueActorMessagesV1
         {
             OrchestrationName = Brs_025.Name,
             OrchestrationVersion = 1,
             OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
             {
-                ActorNumber = receiverEnergySupplier,
-                ActorRole = receiverEnergySupplierRole.ToProcessManagerActorRole().ToActorRoleV1(),
+                ActorNumber = requestMeasurementsAccepted.ActorNumber.Value,
+                ActorRole = requestMeasurementsAccepted.ActorRole.ToActorRoleV1(),
             },
             OrchestrationInstanceId = orchestrationInstanceId.ToString(),
         };
-        enqueueActorMessages.SetData(rejectedMessage);
+        enqueueActorMessages.SetData(requestMeasurementsAccepted);
 
-        // Act
-        await GivenEnqueueRejectedBrs025Message(enqueueActorMessages, eventId);
-
-        // => Then reject message is enqueued
-        // Verify the function was executed
-        var functionResult = await _fixture.AppHostManager.WaitForFunctionToCompleteWithSucceededAsync(
-            functionName: nameof(EnqueueTrigger_Brs_025));
-
-        functionResult.Succeeded.Should().BeTrue("because the function should have been completed with success. Host log:\n{0}", functionResult.HostLog);
-
-        // Verify that outgoing messages were enqueued
-        await using var dbContext = _fixture.DatabaseManager.CreateDbContext<ActorMessageQueueContext>();
-        var enqueuedOutgoingMessages = await dbContext.OutgoingMessages
-            .Where(om => om.EventId == eventId)
-            .ToListAsync();
-
-        using var assertionScope = new AssertionScope();
-        enqueuedOutgoingMessages.Should()
-            .HaveCount(1)
-            .And.AllSatisfy(
-                (om) =>
-                {
-                    om.DocumentType.Should().Be(DocumentType.RejectRequestMeasurements);
-                    om.BusinessReason.Should().Be(BusinessReason.PeriodicMetering.Name);
-                    om.RelatedToMessageId!.Value.Value.Should().Be(rejectedMessage.OriginalActorMessageId);
-                    om.Receiver.Number.Value.Should().Be(rejectedMessage.ActorNumber.Value);
-                    om.Receiver.ActorRole.Name.Should().Be(rejectedMessage.ActorRole.Name);
-                });
-
-        var notifyMessageSent = await ThenNotifyOrchestrationInstanceWasSentOnServiceBusAsync(
-            orchestrationInstanceId,
-            RequestMeasurementsNotifyEventV1.OrchestrationInstanceEventName);
-        notifyMessageSent.Should().BeTrue("Notify EnqueueActorMessagesCompleted service bus message should be sent");
-    }
-
-    private async Task GivenEnqueueAcceptedBrs025Message(EnqueueActorMessagesV1 enqueueActorMessages, EventId eventId)
-    {
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
             idempotencyKey: eventId.Value);
@@ -242,8 +249,24 @@ public class EnqueueBrs025MessagesTests : EnqueueMessagesTestBase
         await _fixture.EdiTopicResource.SenderClient.SendMessageAsync(serviceBusMessage);
     }
 
-    private async Task GivenEnqueueRejectedBrs025Message(EnqueueActorMessagesV1 enqueueActorMessages, EventId eventId)
+    private async Task GivenEnqueueRejectedBrs025Message(
+        RequestMeasurementsRejectV1 rejectedMessage,
+        EventId eventId,
+        Guid orchestrationInstanceId)
     {
+        var enqueueActorMessages = new EnqueueActorMessagesV1
+        {
+            OrchestrationName = Brs_025.Name,
+            OrchestrationVersion = 1,
+            OrchestrationStartedByActor = new EnqueueActorMessagesActorV1
+            {
+                ActorNumber = rejectedMessage.ActorNumber.Value,
+                ActorRole = rejectedMessage.ActorRole.ToActorRoleV1(),
+            },
+            OrchestrationInstanceId = orchestrationInstanceId.ToString(),
+        };
+        enqueueActorMessages.SetData(rejectedMessage);
+
         var serviceBusMessage = enqueueActorMessages.ToServiceBusMessage(
             subject: EnqueueActorMessagesV1.BuildServiceBusMessageSubject(enqueueActorMessages.OrchestrationName),
             idempotencyKey: eventId.Value);

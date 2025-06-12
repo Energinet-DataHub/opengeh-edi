@@ -162,9 +162,14 @@ public class RequestMeasurementsBehaviourTestBase(
         await GivenProcessManagerResponseIsReceived(acceptedMessage);
     }
 
-    protected async Task GivenRequestMeasurementsRejectedIsReceived(ServiceBusMessage rejectedMessage)
+    protected async Task GivenRequestYearlyMeasurementsRejectedIsReceived(ServiceBusMessage rejectedMessage)
     {
         await GivenProcessManagerYearlyResponseIsReceived(rejectedMessage);
+    }
+
+    protected async Task GivenRequestMeasurementsRejectedIsReceived(ServiceBusMessage rejectedMessage)
+    {
+        await GivenProcessManagerResponseIsReceived(rejectedMessage);
     }
 
     protected async Task ThenNotifyValidatedMeasureDataDocumentIsCorrect(
