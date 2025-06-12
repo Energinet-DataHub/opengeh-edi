@@ -14,6 +14,10 @@
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+/// <summary>
+/// Do not rename these properties, unless you perform a database migration, since they are saved in
+/// the database (in the Delegation table etc.)
+/// </summary>
 public class ProcessType : EnumerationType
 {
     public static readonly ProcessType RequestEnergyResults = new(nameof(RequestEnergyResults));
