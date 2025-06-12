@@ -28,7 +28,7 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
     private readonly ISerializer _serializer = serializer;
     private readonly IEnumerable<IDocumentWriter> _documentWriters = documentWriters;
 
-    public async Task<(Stream, string)> WriteStreamAsync(BinaryData timeSeriesPayload)
+    public async Task<(Stream Document, string Sender)> WriteStreamAsync(string timeSeriesPayload)
     {
         // Deserialize the JSON into the Root object for processing
         var root = JsonSerializer.Deserialize<Root>(timeSeriesPayload) ?? throw new Exception("Root is null.");
