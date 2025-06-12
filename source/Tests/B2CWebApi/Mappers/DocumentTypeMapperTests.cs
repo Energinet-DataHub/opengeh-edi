@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Reflection;
+using Energinet.DataHub.EDI.ArchivedMessages.Application;
 using Energinet.DataHub.EDI.B2CWebApi.Mappers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
@@ -86,5 +87,17 @@ public class DocumentTypeMapperTests
 
         // Act & Assert
         documentTypes.Should().BeEquivalentTo(supportedDocumentTypes.ToList());
+    }
+
+    [Fact]
+    public void Given_MeteringPointDocumentTypes_When_Mapping_Then_AllMeteringPointDocumentTypesAreMapped()
+    {
+        // Arrange
+        var meteringPointDocumentTypes = ArchivedMessagesClient.MeteringPointDocumentTypes;
+
+        // Act
+        meteringPointDocumentTypes.Should()
+            .AllSatisfy(
+                documentType => MeasureDataDocumentTypeMapper.ToMeteringPointDocumentType(documentType.Name));
     }
 }

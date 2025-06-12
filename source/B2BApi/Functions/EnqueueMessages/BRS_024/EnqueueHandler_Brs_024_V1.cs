@@ -142,23 +142,6 @@ public class EnqueueHandler_Brs_024_V1(
         RequestYearlyMeasurementsAcceptedV1 acceptedData,
         AggregatedMeasurement aggregatedMeasurement)
     {
-        if (acceptedData == null) throw new ArgumentNullException(nameof(acceptedData));
-        if (aggregatedMeasurement == null) throw new ArgumentNullException(nameof(aggregatedMeasurement));
-        if (aggregatedMeasurement.Resolution.Name == null) throw new ArgumentNullException(nameof(aggregatedMeasurement.Resolution.Name));
-        if (aggregatedMeasurement.QuantityQuality.Name == null) throw new ArgumentNullException(nameof(aggregatedMeasurement.QuantityQuality.Name));
-        if (aggregatedMeasurement.EnergyQuantity == null) throw new ArgumentNullException(nameof(aggregatedMeasurement.EnergyQuantity));
-        if (acceptedData.ActorNumber == null) throw new ArgumentNullException(nameof(acceptedData.ActorNumber));
-        if (acceptedData.ActorRole == null) throw new ArgumentNullException(nameof(acceptedData.ActorRole));
-        if (acceptedData.OriginalActorMessageId == null) throw new ArgumentNullException(nameof(acceptedData.OriginalActorMessageId));
-        if (acceptedData.MeteringPointId == null) throw new ArgumentNullException(nameof(acceptedData.MeteringPointId));
-        if (acceptedData.OriginalTransactionId == null) throw new ArgumentNullException(nameof(acceptedData.OriginalTransactionId));
-        if (acceptedData.MeteringPointType.Name == null) throw new ArgumentNullException(nameof(acceptedData.MeteringPointType.Name));
-        if (aggregatedMeasurement.Resolution == null) throw new ArgumentNullException(nameof(aggregatedMeasurement.Resolution));
-#pragma warning disable CS8073 // The result of the expression is always the same since a value of this type is never equal to 'null'
-        if (aggregatedMeasurement.StartDateTime == null || aggregatedMeasurement.EndDateTime == null)
-#pragma warning restore CS8073 // The result of the expression is always the same since a value of this type is never equal to 'null'
-            throw new ArgumentNullException("StartDateTime or EndDateTime in aggregatedMeasurement is null.");
-
         var energyObservation = new MeasurementDto(
             Position: 1,
             Quantity: aggregatedMeasurement.EnergyQuantity,

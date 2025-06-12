@@ -1162,7 +1162,11 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
         Acknowledgement = 0,
 
-        NotifyValidatedMeasureData = 1,
+        ForwardMeasurements = 1,
+
+        RequestMeasurements = 2,
+
+        RejectRequestMeasurements = 3,
 
     }
 
