@@ -58,6 +58,8 @@ builder.Services
     .AddOutboxContext(builder.Configuration)
     .AddOutboxClient<OutboxContext>()
 
+    .AddSendMeasurements()
+
     // Modules
     .AddDataAccessUnitOfWorkModule()
     .AddIncomingMessagesModule(builder.Configuration)

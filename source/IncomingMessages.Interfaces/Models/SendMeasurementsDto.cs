@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public enum MeteringPointDocumentType
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+
+public record SendMeasurementsDto(
+    MessageId MessageId,
+    TransactionId TransactionId,
+    Actor Sender,
+    DateTimeOffset CreatedAt,
+    Resolution Resolution,
+    DateTimeOffset Start,
+    DateTimeOffset End,
+    MeteringPointId MeteringPointId,
+    MeteringPointType MeteringPointType,
+    IReadOnlyCollection<SendMeasurementsDto.MeasurementDto> Measurements)
 {
-    Acknowledgement = 0,
-    ForwardMeasurements = 1,
-    RequestMeasurements = 2,
-    RejectRequestMeasurements = 3,
+    public record MeasurementDto(
+        int Position,
+        decimal Quantity,
+        Quality Quality);
 }
