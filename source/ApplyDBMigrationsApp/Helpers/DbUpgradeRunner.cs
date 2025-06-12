@@ -20,7 +20,10 @@ public static class DbUpgradeRunner
 {
     private static bool _isRunning;
 
-    public static DatabaseUpgradeResult RunDbUpgrade(string connectionString, bool isDryRun = false)
+    public static DatabaseUpgradeResult RunDbUpgrade(
+        string connectionString,
+        Func<string, bool> scriptFilter,
+        bool isDryRun = false)
     {
         while (_isRunning)
         {
@@ -29,7 +32,10 @@ public static class DbUpgradeRunner
         }
 
         _isRunning = true;
-        var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, isDryRun);
+        var upgrader = UpgradeFactory.GetUpgradeEngine(
+            connectionString,
+            scriptFilter,
+            isDryRun);
 
         var result = upgrader.PerformUpgrade();
 

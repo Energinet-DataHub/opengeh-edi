@@ -20,7 +20,10 @@ namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
 public static class UpgradeFactory
 {
-    public static UpgradeEngine GetUpgradeEngine(string connectionString, bool isDryRun = false)
+    public static UpgradeEngine GetUpgradeEngine(
+        string connectionString,
+        Func<string, bool> scriptFilter,
+        bool isDryRun = false)
     {
         if (string.IsNullOrWhiteSpace(connectionString))
         {
@@ -32,10 +35,7 @@ public static class UpgradeFactory
         var builder = DeployChanges.To
             .SqlDatabase(connectionString)
             .WithScriptNameComparer(new ScriptComparer())
-            .WithScripts(
-                new CustomScriptProvider(
-                    Assembly.GetExecutingAssembly(),
-                    file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) && file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase)))
+            .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), scriptFilter))
             .LogToConsole();
 
         builder.Configure(configure => configure.ScriptExecutor.ExecutionTimeoutSeconds = 5 * 60); // 5 minutes timeout
