@@ -16,7 +16,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
 
 public static class XmlMessageConstants
 {
-    public const string PeekTwoTimeSeries = """
+    public const string PeekMessageContainingTwoTransactions = """
        <?xml version="1.0" encoding="UTF-8"?>
        <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Body>
@@ -34,7 +34,7 @@ public static class XmlMessageConstants
        </SOAP-ENV:Envelope>
        """;
 
-    public const string PeekThreeTransactions = """
+    public const string PeekMessageContainingThreeTransactions = """
         <?xml version="1.0" encoding="UTF-8"?>
         <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
             <SOAP-ENV:Body>
@@ -52,7 +52,7 @@ public static class XmlMessageConstants
         </SOAP-ENV:Envelope>
         """;
 
-    public const string PeekNoPayload = """
+    public const string PeekMessageWithoutPayload = """
       <?xml version="1.0" encoding="UTF-8"?>
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
        <SOAP-ENV:Body>

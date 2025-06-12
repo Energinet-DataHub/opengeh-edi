@@ -24,13 +24,13 @@ public class JsonFromXmlFieldExtractorTests
 {
     [Theory]
     [InlineAutoData(
-        XmlMessageConstants.PeekTwoTimeSeries,
+        XmlMessageConstants.PeekMessageContainingTwoTransactions,
         "83521745ef4f4ada83f2115dda402e30",
         "E17",
         "2023-12-31T23:00:00Z",
         "2024-01-16T08:54:58Z")]
     [InlineAutoData(
-        XmlMessageConstants.PeekThreeTransactions,
+        XmlMessageConstants.PeekMessageContainingThreeTransactions,
         "EH_1889555899",
         "D14",
         "2024-05-25T22:00:00Z",
@@ -66,7 +66,7 @@ public class JsonFromXmlFieldExtractorTests
     public void ExtractJsonFromXmlCData_InvalidXmlNoPayload_ThrowsInvalidOperationException()
     {
         // Arrange
-        const string peekedMessageContent = XmlMessageConstants.PeekNoPayload;
+        const string peekedMessageContent = XmlMessageConstants.PeekMessageWithoutPayload;
         const string expectedErrorMessage = "Could not parse '<ns0:CData>' from peeked message with reference: 7f071bd47baa493488aea08f41efcc08";
 
         // Act and Assert
