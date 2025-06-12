@@ -168,7 +168,7 @@ public static class B2CWebApiRequests
                     CreatedDuringPeriod: new MessageCreationPeriod(Start: DateTimeOffset.Parse("2024-08-27T00:00:00Z"), End: DateTimeOffset.Parse("2024-08-28T00:00:00Z")),
                     Sender: new Actor(ActorRole: ActorRole.DataHubAdministrator, ActorNumber: "1234567890123"),
                     Receiver: new Actor(ActorRole: ActorRole.MeteredDataResponsible, ActorNumber: "1234567890123"),
-                    MeasureDataDocumentTypes: [MeteringPointDocumentType.NotifyValidatedMeasureData])),
+                    MeasureDataDocumentTypes: [MeteringPointDocumentType.ForwardMeasurements])),
         };
         return request;
     }
@@ -177,6 +177,16 @@ public static class B2CWebApiRequests
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"/MeteringPointArchivedMessage/{Guid.NewGuid()}");
         return request;
+    }
+
+    public static HttpRequestMessage CreateSendMeasurementsV1Request(SendMeasurementsRequestV1 request)
+    {
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/SendMeasurements")
+        {
+            Content = CreateJsonContent(request),
+        };
+
+        return httpRequest;
     }
 
     private static StringContent CreateJsonContent(object payload)

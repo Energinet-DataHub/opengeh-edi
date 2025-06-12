@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
+using Energinet.DataHub.EDI.B2CWebApi.Factories.V1;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-public enum MeteringPointDocumentType
+namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
+
+public static class SendMeasurementsExtensions
 {
-    Acknowledgement = 0,
-    ForwardMeasurements = 1,
-    RequestMeasurements = 2,
-    RejectRequestMeasurements = 3,
+    public static IServiceCollection AddSendMeasurements(
+        this IServiceCollection services)
+    {
+        services.TryAddTransient<SendMeasurementsDtoFactory>();
+
+        return services;
+    }
 }

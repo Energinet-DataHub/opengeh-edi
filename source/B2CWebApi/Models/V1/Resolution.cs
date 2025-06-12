@@ -17,4 +17,6 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models.V1;
 public enum Resolution
 {
     Monthly,
+    Hourly,
+    QuarterHourly,
 }

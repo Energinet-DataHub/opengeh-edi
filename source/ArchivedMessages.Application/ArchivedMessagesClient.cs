@@ -25,16 +25,16 @@ public class ArchivedMessagesClient(
     IArchivedMessageRepository archivedMessageRepository,
     IMeteringPointArchivedMessageRepository meteringPointArchivedMessageRepository) : IArchivedMessagesClient
 {
-    private readonly IArchivedMessageRepository _archivedMessageRepository = archivedMessageRepository;
-    private readonly IMeteringPointArchivedMessageRepository _meteringPointArchivedMessageRepository = meteringPointArchivedMessageRepository;
-
-    private readonly IReadOnlyCollection<DocumentType> _meteringPointDocumentTypes = new[]
+    public static readonly IReadOnlyCollection<DocumentType> MeteringPointDocumentTypes = new[]
     {
         DocumentType.NotifyValidatedMeasureData,
         DocumentType.Acknowledgement,
         DocumentType.RequestMeasurements,
         DocumentType.RejectRequestMeasurements,
     };
+
+    private readonly IArchivedMessageRepository _archivedMessageRepository = archivedMessageRepository;
+    private readonly IMeteringPointArchivedMessageRepository _meteringPointArchivedMessageRepository = meteringPointArchivedMessageRepository;
 
     public async Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken)
     {
@@ -88,7 +88,7 @@ public class ArchivedMessagesClient(
 
     private bool IsMeteringPointMessage(DocumentType messageDocumentType)
     {
-        return _meteringPointDocumentTypes
+        return MeteringPointDocumentTypes
             .Any(x => x == messageDocumentType);
     }
 }

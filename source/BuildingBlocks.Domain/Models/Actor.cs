@@ -20,6 +20,13 @@ public sealed class Actor(ActorNumber actorNumber, ActorRole actorRole)
 
     public ActorRole ActorRole { get; init; } = actorRole;
 
+    public static Actor From(string actorNumber, string actorRoleName)
+    {
+        return new Actor(
+            ActorNumber.Create(actorNumber),
+            ActorRole.FromName(actorRoleName));
+    }
+
     public override string ToString()
     {
         return $"ActorNumber: {ActorNumber.Value}, ActorRole: {ActorRole.Name}";
