@@ -34,10 +34,11 @@ internal static class EnvironmentParser
         var environment = GetEnvironmentArgument(args);
         if (environment.Contains("DEV") || environment.Contains("TEST"))
         {
+            // In DEV and TEST environments we want to apply an additional script
             return file =>
                 file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
                 && (
-                    file.Contains(".Scripts.AccessRights.", StringComparison.OrdinalIgnoreCase)
+                    file.Contains("202512061200 Grant execution plan rights", StringComparison.OrdinalIgnoreCase)
                     || file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
         }
 
