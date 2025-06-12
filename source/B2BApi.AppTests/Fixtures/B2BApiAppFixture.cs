@@ -31,7 +31,6 @@ using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.B2BApi.Functions.BundleMessages;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.FeatureManagement;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
@@ -160,6 +159,8 @@ public class B2BApiAppFixture : IAsyncLifetime
     [NotNull]
     public TopicResource? EdiTopicResource { get; private set; }
 
+    public TopicResource MeasurementsSyncTopicResource { get; private set; } = null!;
+
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
 
     public DatabricksSchemaManager EdiDatabricksSchemaManager { get; }
@@ -272,6 +273,17 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_025_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
+
+        MeasurementsSyncTopicResource = await ServiceBusResourceProvider
+            .BuildTopic("migration")
+            .Do(topic => appHostSettings.ProcessEnvironmentVariables
+                .Add($"{MeasurementsSynchronizationOptions.SectionName}__{nameof(MeasurementsSynchronizationOptions.TopicName)}", topic.Name))
+            .AddSubscription("subscription")
+            .Do(subscription => appHostSettings.ProcessEnvironmentVariables
+                .Add($"{MeasurementsSynchronizationOptions.SectionName}__{nameof(MeasurementsSynchronizationOptions.TimeSeriesSync_SubscriptionName)}", subscription.SubscriptionName))
+            .CreateAsync();
+
+        LogStopwatch(stopwatch, nameof(IntegrationEventsTopicResource));
 
         LogStopwatch(stopwatch, nameof(ServiceBusListenerMock.AddQueueListenerAsync));
 
@@ -524,6 +536,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.{nameof(OutgoingMessagesBundler)}.Disabled",
             "true");
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{FeatureFlagNames.SectionName}__{FeatureFlagNames.SyncMeasurements}",
+            true.ToString().ToLower());
 
         // Bundling
         appHostSettings.ProcessEnvironmentVariables.Add(
