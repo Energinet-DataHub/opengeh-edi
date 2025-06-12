@@ -22,7 +22,7 @@ public static class UpgradeFactory
 {
     public static UpgradeEngine GetUpgradeEngine(
         string connectionString,
-        Func<string, bool> scriptFilter,
+        string environment,
         bool isDryRun = false)
     {
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -35,7 +35,7 @@ public static class UpgradeFactory
         var builder = DeployChanges.To
             .SqlDatabase(connectionString)
             .WithScriptNameComparer(new ScriptComparer())
-            .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), scriptFilter))
+            .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), GetScriptFilter(environment)))
             .LogToConsole();
 
         builder.Configure(configure => configure.ScriptExecutor.ExecutionTimeoutSeconds = 5 * 60); // 5 minutes timeout
@@ -50,5 +50,22 @@ public static class UpgradeFactory
         }
 
         return builder.Build();
+    }
+
+    private static Func<string, bool> GetScriptFilter(string environment)
+    {
+        if (environment.Contains("DEV") || environment.Contains("TEST"))
+        {
+            // In DEV and TEST environments we want to apply an additional script
+            return file =>
+                file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
+                && (
+                    file.Contains("202512061200 Grant access to query execution plan", StringComparison.OrdinalIgnoreCase)
+                    || file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
+        }
+
+        return file =>
+            file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
+            && file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -21,12 +21,12 @@ public static class Program
     public static int Main(string[] args)
     {
         var connectionString = ParseConnectionStringFrom(args);
-        var scriptFilter = EnvironmentParser.GetScriptFilter(args);
+        var environment = EnvironmentParser.Parse(args);
         var isDryRun = args.Contains("dryRun");
 
         var upgradeResult = DbUpgradeRunner.RunDbUpgrade(
             connectionString,
-            scriptFilter,
+            environment,
             isDryRun);
 
         return ResultReporter.ReportResult(upgradeResult);

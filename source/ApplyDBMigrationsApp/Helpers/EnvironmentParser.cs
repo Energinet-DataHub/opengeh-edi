@@ -27,31 +27,11 @@ internal static class EnvironmentParser
         "DEV-002",
         "DEV-003"];
 
-    public static Func<string, bool> GetScriptFilter(string[] args)
-    {
-        ArgumentNullException.ThrowIfNull(args, nameof(args));
-
-        var environment = GetEnvironmentArgument(args);
-        if (environment.Contains("DEV") || environment.Contains("TEST"))
-        {
-            // In DEV and TEST environments we want to apply an additional script
-            return file =>
-                file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
-                && (
-                    file.Contains("202512061200 Grant access to query execution plan", StringComparison.OrdinalIgnoreCase)
-                    || file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
-        }
-
-        return file =>
-            file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
-            && file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static string GetEnvironmentArgument(IReadOnlyList<string> args)
+    public static string Parse(string[] args)
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        return args.Count > 1 && _validEnvironments.Contains(args[1].ToUpperInvariant())
+        return args.Count() > 1 && _validEnvironments.Contains(args[1].ToUpperInvariant())
             ? args[1].ToUpperInvariant()
             : string.Empty;
     }

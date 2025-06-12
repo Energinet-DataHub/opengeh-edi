@@ -22,7 +22,7 @@ public static class DbUpgradeRunner
 
     public static DatabaseUpgradeResult RunDbUpgrade(
         string connectionString,
-        Func<string, bool> scriptFilter,
+        string environment = "",
         bool isDryRun = false)
     {
         while (_isRunning)
@@ -34,7 +34,7 @@ public static class DbUpgradeRunner
         _isRunning = true;
         var upgrader = UpgradeFactory.GetUpgradeEngine(
             connectionString,
-            scriptFilter,
+            environment,
             isDryRun);
 
         var result = upgrader.PerformUpgrade();
