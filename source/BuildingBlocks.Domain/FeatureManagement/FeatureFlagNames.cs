@@ -68,4 +68,9 @@ public static class FeatureFlagNames
     /// Whether to allow receiving CIM request messages for PM28.
     /// </summary>
     public const string PM28ReceiveCIMMessages = "PM28-CIM";
+
+    /// <summary>
+    /// Whether to allow synchronizing measurements from DataHub 2 to EDI.
+    /// </summary>
+    public const string SyncMeasurements = "SyncMeasurements";
 }

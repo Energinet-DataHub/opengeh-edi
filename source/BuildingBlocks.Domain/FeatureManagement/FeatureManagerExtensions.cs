@@ -72,4 +72,12 @@ public static class FeatureManagerExtensions
     {
         return featureManager.IsEnabledAsync(FeatureFlagNames.PM28ReceiveCIMMessages);
     }
+
+    /// <summary>
+    /// Enable sync of DH2 data to DH3 sent by migrations
+    /// </summary>
+    public static Task<bool> SyncMeasurementsAsync(this IFeatureManager featureManager)
+    {
+        return featureManager.IsEnabledAsync(FeatureFlagNames.SyncMeasurements);
+    }
 }

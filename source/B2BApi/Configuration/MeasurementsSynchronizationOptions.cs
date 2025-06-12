@@ -12,16 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
+using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.EDI.B2BApi.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.Configuration;
 
-public interface IMeasurementsJsonToEbixStreamWriter
+public class MeasurementsSynchronizationOptions
 {
+    public const string SectionName = "Migration";
+
     /// <summary>
-    /// Transform imported JSON TimeSeries message to an ebiX stream writer format.
+    /// Migration TimeSeries Sync Service Bus topic name
     /// </summary>
-    /// <param name="timeSeriesPayload">Json payload containing all time series in message.</param>
-    /// <returns>MarketDocumentStream containing all quantity observations.</returns>
-    Task<MarketDocumentStream> WriteStreamAsync(string timeSeriesPayload);
+    [Required(AllowEmptyStrings = false)]
+    public string TopicName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Migration TimeSeries Sync Service Bus subscription name
+    /// </summary>
+    [Required(AllowEmptyStrings = false)]
+    public string TimeSeriesSync_SubscriptionName { get; set; } = string.Empty;
 }
