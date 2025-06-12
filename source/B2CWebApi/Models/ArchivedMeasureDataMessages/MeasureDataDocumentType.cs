@@ -17,5 +17,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models.ArchivedMeasureDataMessages;
 public enum MeteringPointDocumentType
 {
     Acknowledgement = 0,
-    NotifyValidatedMeasureData = 1,
+    ForwardMeasurements = 1,
+    RequestMeasurements = 2,
+    RejectRequestMeasurements = 3,
 }

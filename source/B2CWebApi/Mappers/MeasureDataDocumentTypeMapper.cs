@@ -19,20 +19,24 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
 
 public static class MeasureDataDocumentTypeMapper
 {
-    private static readonly Dictionary<MeteringPointDocumentType, DocumentType> _measureDataDocumentTypeMappings = new()
+    private static readonly Dictionary<MeteringPointDocumentType, DocumentType> _meteringPointDocumentTypesB2CToDomain = new()
     {
         { MeteringPointDocumentType.Acknowledgement, DocumentType.Acknowledgement },
-        { MeteringPointDocumentType.NotifyValidatedMeasureData, DocumentType.NotifyValidatedMeasureData },
+        { MeteringPointDocumentType.ForwardMeasurements, DocumentType.NotifyValidatedMeasureData },
+        { MeteringPointDocumentType.RequestMeasurements, DocumentType.RequestMeasurements },
+        { MeteringPointDocumentType.RejectRequestMeasurements, DocumentType.RejectRequestMeasurements },
     };
+
+    private static readonly Dictionary<string, MeteringPointDocumentType> _meteringPointDocumentTypesDomainToB2C =
+        _meteringPointDocumentTypesB2CToDomain.ToDictionary(x => x.Value.Name, x => x.Key);
 
     public static DocumentType ToDocumentType(MeteringPointDocumentType meteringPointDocumentType)
     {
-        return _measureDataDocumentTypeMappings[meteringPointDocumentType];
+        return _meteringPointDocumentTypesB2CToDomain[meteringPointDocumentType];
     }
 
     public static MeteringPointDocumentType ToMeteringPointDocumentType(string documentTypeName)
     {
-        return _measureDataDocumentTypeMappings
-            .First(x => x.Value.ToString().Equals(documentTypeName, StringComparison.OrdinalIgnoreCase)).Key;
+        return _meteringPointDocumentTypesDomainToB2C[documentTypeName];
     }
 }
