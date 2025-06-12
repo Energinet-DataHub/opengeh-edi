@@ -35,7 +35,7 @@ public class JsonFromXmlFieldExtractorTests
         "D14",
         "2024-05-25T22:00:00Z",
         "2024-05-30T05:36:59Z")]
-    public void ExtractJsonFromXmlCData_ValidXml_ReturnsValidJson(
+    public void Given_XmlWithValidJson_When_ExtractJsonFromXmlCData_Then_ReturnsValidJson(
         string messageBody, string expectedOriginalTimeSeriesId, string expectedTypeOfMeteringPoint, string expectedStartTime, string expectedTransactionInsertDate)
     {
         // Arrange
@@ -63,7 +63,7 @@ public class JsonFromXmlFieldExtractorTests
     }
 
     [Fact]
-    public void ExtractJsonFromXmlCData_InvalidXmlNoPayload_ThrowsInvalidOperationException()
+    public void Given_XmlWithOutJson_When_ExtractJsonFromXmlCData_Then_ThrowsInvalidOperationException()
     {
         // Arrange
         const string peekedMessageContent = XmlMessageConstants.PeekMessageWithoutPayload;
