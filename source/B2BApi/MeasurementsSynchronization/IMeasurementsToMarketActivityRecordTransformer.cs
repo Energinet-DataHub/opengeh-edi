@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RSM012;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.B2BApi.Migration;
+namespace Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 
 public interface IMeasurementsToMarketActivityRecordTransformer
 {
