@@ -38,7 +38,7 @@ internal static class EnvironmentParser
             return file =>
                 file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
                 && (
-                    file.Contains("202512061200 Grant execution plan rights", StringComparison.OrdinalIgnoreCase)
+                    file.Contains("202512061200 Grant access to query execution plan", StringComparison.OrdinalIgnoreCase)
                     || file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
         }
 

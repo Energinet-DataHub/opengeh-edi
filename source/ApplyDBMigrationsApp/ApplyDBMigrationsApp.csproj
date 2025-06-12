@@ -33,7 +33,7 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\AccessRights\202512061200 Grant execution plan rights.sql" />
+    <EmbeddedResource Include="Scripts\AccessRights\202512061200 Grant access to query execution plan.sql" />
   </ItemGroup>
 
   <ItemGroup>
