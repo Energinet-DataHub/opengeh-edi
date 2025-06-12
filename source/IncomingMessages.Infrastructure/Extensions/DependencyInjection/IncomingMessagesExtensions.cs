@@ -163,6 +163,7 @@ public static class IncomingMessagesExtensions
         services.AddTransient<IMessageParser, MeteredDataForMeteringPointJsonMessageParser>();
         services.AddTransient<IMessageParser, MeteredDataForMeteringPointEbixMessageParser>();
         services.AddTransient<IMessageParser, MeteredDataForMeteringPointXmlMessageParser>();
+        services.AddTransient<IMessageParser, SendMeasurementsB2CJsonMessageParser>();
 
         services.AddTransient<IMessageParser, WholesaleSettlementXmlMessageParser>();
         services.AddTransient<IMessageParser, WholesaleSettlementJsonMessageParser>();

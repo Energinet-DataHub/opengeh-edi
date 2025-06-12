@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.B2CWebApi.Factories.V1;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-public sealed class Actor(ActorNumber actorNumber, ActorRole actorRole)
+namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
+
+public static class SendMeasurementsExtensions
 {
-    public ActorNumber ActorNumber { get; init; } = actorNumber;
-
-    public ActorRole ActorRole { get; init; } = actorRole;
-
-    public static Actor From(string actorNumber, string actorRoleName)
+    public static IServiceCollection AddSendMeasurements(
+        this IServiceCollection services)
     {
-        return new Actor(
-            ActorNumber.Create(actorNumber),
-            ActorRole.FromName(actorRoleName));
-    }
+        services.TryAddTransient<SendMeasurementsDtoFactory>();
 
-    public override string ToString()
-    {
-        return $"ActorNumber: {ActorNumber.Value}, ActorRole: {ActorRole.Name}";
+        return services;
     }
 }

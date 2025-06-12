@@ -161,6 +161,7 @@ public class DelegateIncomingMessage
             { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
             { IncomingDocumentType.NotifyValidatedMeasureData, ProcessType.IncomingMeteredDataForMeteringPoint },
+            { IncomingDocumentType.B2CSendMeasurements, ProcessType.IncomingMeteredDataForMeteringPoint },
             { IncomingDocumentType.RequestValidatedMeasurements, ProcessType.RequestMeasurements },
         };
 
