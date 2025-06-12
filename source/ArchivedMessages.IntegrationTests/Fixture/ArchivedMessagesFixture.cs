@@ -52,7 +52,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public ServiceProvider Services { get; private set; } = null!;
 
-    public ServiceCollection ServiceCollection { get; private set; } = null!;
+    private ServiceCollection ServiceCollection { get; set; } = null!;
 
     public void CleanupDatabase()
     {

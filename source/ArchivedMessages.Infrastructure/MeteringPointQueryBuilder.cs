@@ -38,7 +38,7 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
             throw new ArgumentNullException(nameof(query.CreationPeriod), "CreationPeriod cannot be null.");
 
         AddFilter(
-            "JSON_QUERY(MeteringPointIds) IS NOT NULL AND EXISTS (SELECT 1 FROM OPENJSON(MeteringPointIds) WHERE value = @MeteringPointId)",
+            "@MeteringPointId IN (SELECT [mpids].[value] FROM OPENJSON(MeteringPointIds) WITH ([value] NVARCHAR(50) '$') AS [mpids])",
             new KeyValuePair<string, object>("MeteringPointId", query.MeteringPointId.Value));
 
         AddFilter(
@@ -115,12 +115,12 @@ internal sealed class MeteringPointQueryBuilder(ActorIdentity actorIdentity)
                 : directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
         return isForward
             ? $"""
-                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursorValue < {cursor.CursorPosition} OR {cursor.CursorPosition} = 0)) 
+                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursorValue < {cursor.CursorPosition} OR {cursor.CursorPosition} = 0))
                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}'))
               """
             : $"""
-                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursorValue > {cursor.CursorPosition} OR {cursor.CursorPosition} = 0)) 
-                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}')) 
+                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (PaginationCursorValue > {cursor.CursorPosition} OR {cursor.CursorPosition} = 0))
+                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}'))
                """;
     }
 
