@@ -30,11 +30,11 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
 
     public async Task<(Stream Document, string Sender)> WriteStreamAsync(BinaryData timeSeriesPayload)
     {
-        var xml = JsonFromXmlFieldExtractor.ExtractJsonFromXmlCData(Encoding.UTF8.GetString(timeSeriesPayload));
+        var json = JsonFromXmlFieldExtractor.ExtractJsonFromXmlCData(Encoding.UTF8.GetString(timeSeriesPayload));
 
         // Deserialize the JSON into the Root object for processing
-        var root = JsonSerializer.Deserialize<Root>(xml) ?? throw new Exception("Root is null.");
-        xml = null;
+        var root = JsonSerializer.Deserialize<Root>(json) ?? throw new Exception("Root is null.");
+        json = null;
 
         // We need to swap the sender and recipient identification in the header
         (root.MeteredDataTimeSeriesDH3.Header.SenderIdentification, root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification) =
@@ -48,9 +48,9 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
         // Create the outgoing message header using the deserialized header data
         var outgoingMessageHeader = new OutgoingMessageHeader(
             BusinessReason.FromCode(header.EnergyBusinessProcess).Name,
-            header.SenderIdentification.Content,
+            header.SenderIdentification,
             ActorRole.GridAccessProvider.Code,
-            header.RecipientIdentification.Content,
+            header.RecipientIdentification,
             ActorRole.MeteredDataResponsible.Code,
             header.MessageId,
             null,
@@ -64,7 +64,7 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
             meteredDataForMeteringPointMarketActivityRecords.Select(_serializer.Serialize).ToList(),
             CancellationToken.None).ConfigureAwait(false);
 
-        var sender = root.MeteredDataTimeSeriesDH3.Header.SenderIdentification.Content;
+        var sender = root.MeteredDataTimeSeriesDH3.Header.SenderIdentification;
         if (sender == null)
             throw new InvalidOperationException("Could not find Sender in the XML.");
 
