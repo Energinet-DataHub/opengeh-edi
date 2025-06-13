@@ -28,10 +28,13 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
     private readonly ISerializer _serializer = serializer;
     private readonly IEnumerable<IDocumentWriter> _documentWriters = documentWriters;
 
-    public async Task<(Stream, string)> WriteStreamAsync(BinaryData timeSeriesPayload)
+    public async Task<(Stream Document, string Sender)> WriteStreamAsync(BinaryData timeSeriesPayload)
     {
+        var xml = JsonFromXmlFieldExtractor.ExtractJsonFromXmlCData(Encoding.UTF8.GetString(timeSeriesPayload));
+
         // Deserialize the JSON into the Root object for processing
-        var root = JsonSerializer.Deserialize<Root>(timeSeriesPayload) ?? throw new Exception("Root is null.");
+        var root = JsonSerializer.Deserialize<Root>(xml) ?? throw new Exception("Root is null.");
+        xml = null;
 
         // We need to swap the sender and recipient identification in the header
         (root.MeteredDataTimeSeriesDH3.Header.SenderIdentification, root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification) =
@@ -60,6 +63,12 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
             outgoingMessageHeader,
             meteredDataForMeteringPointMarketActivityRecords.Select(_serializer.Serialize).ToList(),
             CancellationToken.None).ConfigureAwait(false);
+
+        var sender = root.MeteredDataTimeSeriesDH3.Header.SenderIdentification.Content;
+        if (sender == null)
+            throw new InvalidOperationException("Could not find Sender in the XML.");
+
+        root = null;
 
         // Load the stream into an XmlDocument for removing the header and formatting.
         var xmlDoc = new XmlDocument();
@@ -90,6 +99,6 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
         }
 
         outputStream.Position = 0;
-        return (outputStream, root.MeteredDataTimeSeriesDH3.Header.SenderIdentification.Content);
+        return (outputStream, sender);
     }
 }
