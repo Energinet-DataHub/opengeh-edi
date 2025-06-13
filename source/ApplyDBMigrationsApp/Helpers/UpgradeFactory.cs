@@ -37,9 +37,8 @@ internal static class UpgradeFactory
             .SqlDatabase(connectionString)
             .WithScriptNameComparer(new ScriptComparer())
             .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), GetScriptFilter(environment)))
-            .LogToConsole();
-
-        builder.Configure(configure => configure.ScriptExecutor.ExecutionTimeoutSeconds = 5 * 60); // 5 minutes timeout
+            .LogToConsole()
+            .WithExecutionTimeout(TimeSpan.FromMinutes(5));
 
         if (isDryRun)
         {
@@ -53,6 +52,12 @@ internal static class UpgradeFactory
         return builder.Build();
     }
 
+    /// <summary>
+    /// We do not have a common implementation for handling DB migrations.
+    /// But we do use the same technique for executing a script based on environment
+    /// in both EDI and Process Manager. So if we make changes to this code, we should
+    /// probaly update it in both repositories.
+    /// </summary>
     private static Func<string, bool> GetScriptFilter(string environment)
     {
         if (environment.Contains("DEV") || environment.Contains("TEST"))
