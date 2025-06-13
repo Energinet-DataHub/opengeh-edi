@@ -16,6 +16,7 @@ using System.Text.Json;
 using AutoFixture.Xunit2;
 using Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Migration;
@@ -25,16 +26,10 @@ public class JsonFromXmlFieldExtractorTests
     [Theory]
     [InlineAutoData(
         XmlMessageConstants.PeekMessageContainingTwoTransactions,
-        "83521745ef4f4ada83f2115dda402e30",
-        "E17",
-        "2023-12-31T23:00:00Z",
-        "2024-01-16T08:54:58Z")]
-    [InlineAutoData(
-        XmlMessageConstants.PeekMessageContainingThreeTransactions,
-        "EH_1889555899",
+        "EH_1952236801",
         "D14",
-        "2024-05-25T22:00:00Z",
-        "2024-05-30T05:36:59Z")]
+        "2025-05-04T22:00:00Z",
+        "2025-05-22T13:11:02Z")]
     public void Given_XmlWithValidJson_When_ExtractJsonFromXmlCData_Then_ReturnsValidJson(
         string messageBody, string expectedOriginalTimeSeriesId, string expectedTypeOfMeteringPoint, string expectedStartTime, string expectedTransactionInsertDate)
     {
@@ -56,6 +51,7 @@ public class JsonFromXmlFieldExtractorTests
         var typeOfMp = timeSeries[0].GetProperty("TypeOfMP").GetString();
         var startTime = timeSeries[0].GetProperty("TimeSeriesPeriod").GetProperty("Start").GetString();
 
+        using var assertionScope = new AssertionScope();
         originalTimeSeriesId.Should().Be(expectedOriginalTimeSeriesId);
         transactionInsertDate.Should().Be(expectedTransactionInsertDate);
         typeOfMp.Should().Be(expectedTypeOfMeteringPoint);

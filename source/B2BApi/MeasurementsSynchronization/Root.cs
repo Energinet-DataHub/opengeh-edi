@@ -14,12 +14,10 @@
 
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.EDI.B2BApi.MeasurementsSynchronization;
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 public class Root
 {
     [JsonPropertyName("MeteredDataTimeSeriesDH3")]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     public MeteredDataTimeSeriesDH3 MeteredDataTimeSeriesDH3 { get; set; }
 }
 
@@ -34,27 +32,15 @@ public class Header
 {
     public string MessageId { get; set; }
 
-    public string DocumentType { get; set; }
-
     public DateTimeOffset Creation { get; set; }
 
     public string EnergyBusinessProcess { get; set; }
 
-    public string EnergyIndustryClassification { get; set; }
+    public string SenderIdentification { get; set; }
 
-    public Identification SenderIdentification { get; set; }
-
-    public Identification RecipientIdentification { get; set; }
+    public string RecipientIdentification { get; set; }
 
     public string EnergyBusinessProcessRole { get; set; }
-}
-
-public class Identification
-{
-    public string SchemeAgencyIdentifier { get; set; }
-
-    [JsonPropertyName("content")]
-    public string Content { get; set; }
 }
 
 public class TimeSeries
@@ -65,15 +51,9 @@ public class TimeSeries
 
     public string? OriginalTimeSeriesId { get; set; }
 
-    public string EnergyTimeSeriesFunction { get; set; }
-
-    public string EnergyTimeSeriesProduct { get; set; }
-
     public string EnergyTimeSeriesMeasureUnit { get; set; }
 
     public string TypeOfMP { get; set; }
-
-    public string SettlementMethod { get; set; }
 
     public AggregationCriteria AggregationCriteria { get; set; }
 
@@ -81,7 +61,7 @@ public class TimeSeries
 
     public TimeSeriesPeriod TimeSeriesPeriod { get; set; }
 
-    public DateTime TransactionInsertDate { get; set; }
+    public DateTimeOffset TransactionInsertDate { get; set; }
 
     public string TimeSeriesStatus { get; set; }
 }

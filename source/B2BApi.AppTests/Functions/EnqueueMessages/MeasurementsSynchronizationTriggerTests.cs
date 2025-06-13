@@ -81,7 +81,7 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
                 var parsedNotification = StartOrchestrationInstanceV1.Parser.ParseJson(
                     msg.Body.ToString());
 
-                var meteringPointId = parsedNotification.MeteringPointId == "571051839308770693";
+                var meteringPointId = parsedNotification.MeteringPointId == "571313124590127032";
 
                 return meteringPointId;
             })

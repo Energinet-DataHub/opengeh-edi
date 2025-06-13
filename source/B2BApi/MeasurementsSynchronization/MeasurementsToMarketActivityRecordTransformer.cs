@@ -35,7 +35,7 @@ public static class MeasurementsToMarketActivityRecordTransformer
                     ts.AggregationCriteria.MeteringPointId,
                     MeteringPointType.FromCode(ts.TypeOfMP),
                     null,
-                    ts.EnergyTimeSeriesProduct,
+                    ProductType.EnergyActive.Code,
                     MeasurementUnit.FromCode(ts.EnergyTimeSeriesMeasureUnit),
                     creationTime,
                     Resolution.FromCode(ts.TimeSeriesPeriod.ResolutionDuration),
