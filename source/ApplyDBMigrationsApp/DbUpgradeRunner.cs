@@ -12,26 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using DbUp.Engine;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
 namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp;
 
-public static class Program
+public static class DbUpgradeRunner
 {
-    public static int Main(string[] args)
-    {
-        // First argument must be the connection string
-        var connectionString = ConnectionStringParser.Parse(args);
-        // If environment is specified, it must be the second argument
-        var environment = EnvironmentParser.Parse(args);
-        var isDryRun = args.Contains("dryRun");
+    private static bool _isRunning;
 
-        Console.WriteLine($"Performing upgrade using parameter Environment={environment};");
-        var upgradeResult = DbUpgradeRunner.RunDbUpgrade(
+    public static DatabaseUpgradeResult RunDbUpgrade(
+        string connectionString,
+        string environment = "",
+        bool isDryRun = false)
+    {
+        while (_isRunning)
+        {
+            //To avoid both database fixtures from performing the upgrade at the same time
+            Thread.Sleep(2000);
+        }
+
+        _isRunning = true;
+        var upgrader = UpgradeFactory.GetUpgradeEngine(
             connectionString,
             environment,
             isDryRun);
 
-        return ResultReporter.ReportResult(upgradeResult);
+        var result = upgrader.PerformUpgrade();
+
+        _isRunning = false;
+        return result;
     }
 }

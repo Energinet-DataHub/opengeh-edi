@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
-using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.ApplyDBMigrationsApp;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
