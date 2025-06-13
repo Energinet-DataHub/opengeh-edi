@@ -236,6 +236,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202505161239 Update idempotency unique constraint on OutgoingMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202505161240 Delete ExternalId_OLD on OutgoingMessages table.sql" />
     <EmbeddedResource Include="Scripts\Model\202505190917 Create index IX_OutgoingMessages_MessagesReadyToBeBundled.sql" />
+    <EmbeddedResource Include="Scripts\Model\202506121258 Migrate OutgoingReminderOfMissingMeasureData process type in ProcessDelegation table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
