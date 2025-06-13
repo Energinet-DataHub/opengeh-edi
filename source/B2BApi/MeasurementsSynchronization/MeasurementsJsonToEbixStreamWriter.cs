@@ -64,6 +64,12 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
             meteredDataForMeteringPointMarketActivityRecords.Select(_serializer.Serialize).ToList(),
             CancellationToken.None).ConfigureAwait(false);
 
+        var sender = root.MeteredDataTimeSeriesDH3.Header.SenderIdentification.Content;
+        if (sender == null)
+            throw new InvalidOperationException("Could not find Sender in the XML.");
+
+        root = null;
+
         // Load the stream into an XmlDocument for removing the header and formatting.
         var xmlDoc = new XmlDocument();
         xmlDoc.Load(marketDocumentStream.Stream);
@@ -93,6 +99,6 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
         }
 
         outputStream.Position = 0;
-        return (outputStream, root.MeteredDataTimeSeriesDH3.Header.SenderIdentification.Content);
+        return (outputStream, sender);
     }
 }
