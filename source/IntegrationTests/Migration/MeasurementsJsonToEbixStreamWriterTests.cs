@@ -42,7 +42,7 @@ public class MeasurementsJsonToEbixStreamWriterTests
 
         // Act
         var (document, _) = await timeSeriesJsonToEbixStreamWriter.WriteStreamAsync(
-            JsonPayloadConstants.SingleTimeSeriesWithSingleObservation);
+            new BinaryData(Encoding.UTF8.GetBytes(XmlMessageConstants.PeekMessageContainingTwoTransactions)));
 
         // Assert
         var res = await meteredDataForMeteringPointEbixMessageParser.ParseAsync(

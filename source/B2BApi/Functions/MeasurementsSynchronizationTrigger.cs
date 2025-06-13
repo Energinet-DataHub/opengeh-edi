@@ -56,9 +56,7 @@ public class MeasurementsSynchronizationTrigger(
 
         if (await _featureManager.SyncMeasurementsAsync().ConfigureAwait(false))
         {
-            var messageJson = JsonFromXmlFieldExtractor.ExtractJsonFromXmlCData(message.Body.ToString());
-
-            var streamAndSender = await _measurementsJsonToEbixStreamWriter.WriteStreamAsync(messageJson).ConfigureAwait(false);
+            var streamAndSender = await _measurementsJsonToEbixStreamWriter.WriteStreamAsync(message.Body).ConfigureAwait(false);
 
             _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(streamAndSender.Sender), Restriction.Owned, ActorRole.GridAccessProvider, null,  null));
 

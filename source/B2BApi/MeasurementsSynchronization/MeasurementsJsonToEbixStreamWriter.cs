@@ -28,10 +28,13 @@ public class MeasurementsJsonToEbixStreamWriter(ISerializer serializer, IEnumera
     private readonly ISerializer _serializer = serializer;
     private readonly IEnumerable<IDocumentWriter> _documentWriters = documentWriters;
 
-    public async Task<(Stream Document, string Sender)> WriteStreamAsync(string timeSeriesPayload)
+    public async Task<(Stream Document, string Sender)> WriteStreamAsync(BinaryData timeSeriesPayload)
     {
+        var xml = JsonFromXmlFieldExtractor.ExtractJsonFromXmlCData(Encoding.UTF8.GetString(timeSeriesPayload));
+
         // Deserialize the JSON into the Root object for processing
-        var root = JsonSerializer.Deserialize<Root>(timeSeriesPayload) ?? throw new Exception("Root is null.");
+        var root = JsonSerializer.Deserialize<Root>(xml) ?? throw new Exception("Root is null.");
+        xml = null;
 
         // We need to swap the sender and recipient identification in the header
         (root.MeteredDataTimeSeriesDH3.Header.SenderIdentification, root.MeteredDataTimeSeriesDH3.Header.RecipientIdentification) =
