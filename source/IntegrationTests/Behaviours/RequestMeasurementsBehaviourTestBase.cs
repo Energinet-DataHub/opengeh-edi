@@ -15,15 +15,16 @@
 using System.Diagnostics.CodeAnalysis;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_025;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -78,6 +79,19 @@ public class RequestMeasurementsBehaviourTestBase(
         }
     }
 
+    internal StartOrchestrationInstanceV1 ThenRequestYearlyMeasurementsInputV1ServiceBusMessageIsCorrect(
+        ServiceBusSenderSpy senderSpy,
+        DocumentFormat documentFormat,
+        RequestMeasurementsInputV1AssertionInput assertionInput)
+    {
+        var assertionResult = ThenRequestYearlyMeasurementsInputV1ServiceBusMessagesIsCorrect(
+            senderSpy,
+            [assertionInput],
+            documentFormat);
+
+        return assertionResult.Single();
+    }
+
     internal StartOrchestrationInstanceV1 ThenRequestMeasurementsInputV1ServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
         DocumentFormat documentFormat,
@@ -107,6 +121,29 @@ public class RequestMeasurementsBehaviourTestBase(
             .Select(GetAssertServiceBusMessage);
 
         messages
+            .Select(x => x.ParseInput<RequestMeasurementsInputV1>())
+            .Should()
+            .SatisfyRespectively(assertionMethods);
+
+        return messages;
+    }
+
+    internal IList<StartOrchestrationInstanceV1> ThenRequestYearlyMeasurementsInputV1ServiceBusMessagesIsCorrect(
+        ServiceBusSenderSpy senderSpy,
+        IList<RequestMeasurementsInputV1AssertionInput> assertionInputs,
+        DocumentFormat documentFormat)
+    {
+        var messages = AssertProcessManagerServiceBusMessages(
+            senderSpy: senderSpy,
+            expectedCount: assertionInputs.Count,
+            parser: data => StartOrchestrationInstanceV1.Parser.ParseJson(data));
+
+        using var assertionScope = new AssertionScope();
+
+        var assertionMethods = assertionInputs
+            .Select(GetAssertYearlyServiceBusMessage);
+
+        messages
             .Select(x => x.ParseInput<RequestYearlyMeasurementsInputV1>())
             .Should()
             .SatisfyRespectively(assertionMethods);
@@ -114,9 +151,19 @@ public class RequestMeasurementsBehaviourTestBase(
         return messages;
     }
 
+    protected async Task GivenRequestYearlyMeasurementsAcceptedIsReceived(ServiceBusMessage acceptedMessage)
+    {
+        await GivenProcessManagerYearlyResponseIsReceived(acceptedMessage);
+    }
+
     protected async Task GivenRequestMeasurementsAcceptedIsReceived(ServiceBusMessage acceptedMessage)
     {
         await GivenProcessManagerResponseIsReceived(acceptedMessage);
+    }
+
+    protected async Task GivenRequestYearlyMeasurementsRejectedIsReceived(ServiceBusMessage rejectedMessage)
+    {
+        await GivenProcessManagerYearlyResponseIsReceived(rejectedMessage);
     }
 
     protected async Task GivenRequestMeasurementsRejectedIsReceived(ServiceBusMessage rejectedMessage)
@@ -152,7 +199,7 @@ public class RequestMeasurementsBehaviourTestBase(
         return message;
     }
 
-    private static Action<RequestYearlyMeasurementsInputV1> GetAssertServiceBusMessage(
+    private static Action<RequestYearlyMeasurementsInputV1> GetAssertYearlyServiceBusMessage(
         RequestMeasurementsInputV1AssertionInput input)
     {
         return (message) =>
@@ -165,7 +212,19 @@ public class RequestMeasurementsBehaviourTestBase(
         };
     }
 
-    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage message)
+    private static Action<RequestMeasurementsInputV1> GetAssertServiceBusMessage(
+        RequestMeasurementsInputV1AssertionInput input)
+    {
+        return (message) =>
+        {
+            message.ActorNumber.Should().Be(input.RequestedForActor.ActorNumber.Value);
+            message.ActorRole.Should().Be(input.RequestedForActor.ActorRole.Name);
+            message.TransactionId.Should().Be(input.TransactionId.Value);
+            message.MeteringPointId.Should().Be(input.MeteringPointId.Value);
+        };
+    }
+
+    private async Task GivenProcessManagerYearlyResponseIsReceived(ServiceBusMessage message)
     {
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
             messageId: Guid.NewGuid().ToString(),
@@ -173,6 +232,17 @@ public class RequestMeasurementsBehaviourTestBase(
             body: message.Body,
             properties: message.ApplicationProperties);
         var enqueueHandler = GetService<EnqueueHandler_Brs_024_V1>();
+        await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
+    }
+
+    private async Task GivenProcessManagerResponseIsReceived(ServiceBusMessage message)
+    {
+        var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
+            messageId: Guid.NewGuid().ToString(),
+            subject: message.Subject,
+            body: message.Body,
+            properties: message.ApplicationProperties);
+        var enqueueHandler = GetService<EnqueueHandler_Brs_025_V1>();
         await enqueueHandler.EnqueueAsync(serviceBusReceivedMessage, CancellationToken.None);
     }
 }

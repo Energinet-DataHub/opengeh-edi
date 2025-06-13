@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.ProcessManager.Abstractions.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026.V1.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028.V1.Model;
 using NodaTime;
@@ -141,7 +142,7 @@ public class RequestProcessOrchestrationStarter(
         await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
     }
 
-    public async Task StartRequestMeasurementsOrchestrationAsync(
+    public async Task StartRequestYearlyMeasurementsOrchestrationAsync(
         InitializeRequestMeasurementsProcessDto initializeProcessDto,
         CancellationToken cancellationToken)
     {
@@ -160,6 +161,35 @@ public class RequestProcessOrchestrationStarter(
                     ActorRole: transaction.OriginalActor.ActorRole.Name,
                     ReceivedAt: _clock.GetCurrentInstant().ToString(),
                     MeteringPointId: transaction.MeteringPointId.Value),
+                IdempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.OriginalActor));
+
+            var startProcessTask = processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);
+            startProcessTasks.Add(startProcessTask);
+        }
+
+        await Task.WhenAll(startProcessTasks).ConfigureAwait(false);
+    }
+
+    public async Task StartRequestMeasurementsOrchestrationAsync(
+        InitializeRequestMeasurementsProcessDto initializeProcessDto,
+        CancellationToken cancellationToken)
+    {
+        var actorIdentity = GetAuthenticatedActorIdentityDto(initializeProcessDto.MessageId);
+        var processManagerMessageClient = _processManagerMessageClientFactory.CreateMessageClient(initializeProcessDto.MessageId);
+
+        var startProcessTasks = new List<Task>();
+        foreach (var transaction in initializeProcessDto.Series)
+        {
+            var startCommand = new RequestMeasurementsCommandV1(
+                OperatingIdentity: actorIdentity,
+                InputParameter: new RequestMeasurementsInputV1(
+                    ActorMessageId: initializeProcessDto.MessageId,
+                    TransactionId: transaction.Id.Value,
+                    ActorNumber: transaction.OriginalActor.ActorNumber.Value,
+                    ActorRole: transaction.OriginalActor.ActorRole.Name,
+                    MeteringPointId: transaction.MeteringPointId.Value,
+                    StartDateTime: transaction.StartDateTime,
+                    EndDateTime: transaction.EndDateTime),
                 IdempotencyKey: CreateIdempotencyKey(transaction.Id.Value, transaction.OriginalActor));
 
             var startProcessTask = processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);

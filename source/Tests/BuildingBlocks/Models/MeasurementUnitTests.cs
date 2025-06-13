@@ -38,6 +38,12 @@ public class MeasurementUnitTests
             (MeasurementUnit.KilowattHour, "KilowattHour", "KWH"),
             (MeasurementUnit.Pieces, "Pieces", "H87"),
             (MeasurementUnit.KiloVoltAmpereReactiveHour, "KiloVoltAmpereReactiveHour", "K3"),
+            (MeasurementUnit.Ampere, "Ampere", "AMP"),
+            (MeasurementUnit.Kilowatt, "Kilowatt", "KWT"),
+            (MeasurementUnit.Megawatt, "Megawatt", "MAW"),
+            (MeasurementUnit.MegawattHour, "MegawattHour", "MWH"),
+            (MeasurementUnit.MetricTon, "MetricTon", "TNE"),
+            (MeasurementUnit.MegaVoltAmpereReactivePower, "MegaVoltAmpereReactivePower", "Z03"),
         };
 
         using var scope = new AssertionScope();
