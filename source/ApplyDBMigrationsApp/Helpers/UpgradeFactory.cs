@@ -66,7 +66,7 @@ internal static class UpgradeFactory
             return file =>
                 file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)
                 && (
-                    file.Contains("202512061200 Grant access to query execution plan", StringComparison.OrdinalIgnoreCase)
+                    file.Contains("202506131200 Grant access to query execution plan", StringComparison.OrdinalIgnoreCase)
                     || file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
         }
 
