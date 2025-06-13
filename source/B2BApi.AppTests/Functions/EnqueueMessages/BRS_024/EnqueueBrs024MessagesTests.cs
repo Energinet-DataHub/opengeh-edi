@@ -84,7 +84,7 @@ public class EnqueueBrs024MessagesTests : EnqueueMessagesTestBase
 
         var eventId = EventId.From(Guid.NewGuid());
 
-        var resolution = PMValueTypes.Resolution.QuarterHourly;
+        var resolution = PMValueTypes.Resolution.Yearly;
         var enqueueMessagesData = new RequestYearlyMeasurementsAcceptedV1(
             OriginalActorMessageId: Guid.NewGuid().ToString(),
             OriginalTransactionId: Guid.NewGuid().ToString(),
