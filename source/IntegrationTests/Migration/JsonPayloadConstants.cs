@@ -25,14 +25,8 @@ public static class JsonPayloadConstants
                    "Creation": "2024-01-16T07:55:33Z",
                    "EnergyBusinessProcess": "D42",
                    "EnergyIndustryClassification": "23",
-                   "SenderIdentification": {
-                       "SchemeAgencyIdentifier": "9",
-                       "content": "5790001330552"
-                   },
-                   "RecipientIdentification": {
-                       "SchemeAgencyIdentifier": "9",
-                       "content": "5790001330595"
-                   },
+                   "SenderIdentification": "5790001330552",
+                   "RecipientIdentification": "5790001330595",
                    "EnergyBusinessProcessRole": "D3M"
                },
                "TimeSeries": [
@@ -77,14 +71,8 @@ public static class JsonPayloadConstants
                    "Creation": "2024-01-16T07:55:33Z",
                    "EnergyBusinessProcess": "D42",
                    "EnergyIndustryClassification": "23",
-                   "SenderIdentification": {
-                       "SchemeAgencyIdentifier": "9",
-                       "content": "5790001330552"
-                   },
-                   "RecipientIdentification": {
-                       "SchemeAgencyIdentifier": "9",
-                       "content": "5790001330595"
-                   },
+                   "SenderIdentification": "5790001330552",
+                   "RecipientIdentification": "5790001330595",
                    "EnergyBusinessProcessRole": "D3M"
                },
                "TimeSeries": [
@@ -129,14 +117,8 @@ public static class JsonPayloadConstants
                     "Creation": "2024-01-16T07:55:33Z",
                     "EnergyBusinessProcess": "D42",
                     "EnergyIndustryClassification": "23",
-                    "SenderIdentification": {
-                        "SchemeAgencyIdentifier": "9",
-                        "_content_": "5790001330552"
-                    },
-                    "RecipientIdentification": {
-                        "SchemeAgencyIdentifier": "9",
-                        "_content_": "5790001330595"
-                    },
+                    "SenderIdentification": "5790001330552",
+                    "RecipientIdentification": "5790001330595",
                     "EnergyBusinessProcessRole": "D3M"
                 },
                 "TimeSeries": [
@@ -438,14 +420,8 @@ public static class JsonPayloadConstants
                   "Creation": "2024-01-16T07:55:33Z",
                   "EnergyBusinessProcess": "D42",
                   "EnergyIndustryClassification": "23",
-                  "SenderIdentification": {
-                      "SchemeAgencyIdentifier": "9",
-                      "_content_": "5790001330552"
-                  },
-                  "RecipientIdentification": {
-                      "SchemeAgencyIdentifier": "9",
-                      "_content_": "5790001330595"
-                  },
+                  "SenderIdentification": "5790001330552",
+                  "RecipientIdentification": "5790001330595",
                   "EnergyBusinessProcessRole": "D3M"
               }
           }
@@ -461,14 +437,8 @@ public static class JsonPayloadConstants
                     "Creation": "2024-01-16T07:55:33Z",
                     "EnergyBusinessProcess": "D42",
                     "EnergyIndustryClassification": "23",
-                    "SenderIdentification": {
-                        "SchemeAgencyIdentifier": "9",
-                        "_content_": "5790001330552"
-                    },
-                    "RecipientIdentification": {
-                        "SchemeAgencyIdentifier": "9",
-                        "_content_": "5790001330595"
-                    },
+                    "SenderIdentification": "5790001330552",
+                    "RecipientIdentification": "5790001330595",
                     "EnergyBusinessProcessRole": "D3M"
                 },
                 "TimeSeries": [
@@ -518,14 +488,8 @@ public static class JsonPayloadConstants
                     "Creation": "2024-01-16T07:55:33Z",
                     "EnergyBusinessProcess": "D42",
                     "EnergyIndustryClassification": "23",
-                    "SenderIdentification": {
-                        "SchemeAgencyIdentifier": "9",
-                        "_content_": "5790001330552"
-                    },
-                    "RecipientIdentification": {
-                        "SchemeAgencyIdentifier": "9",
-                        "_content_": "5790001330595"
-                    },
+                    "SenderIdentification": "5790001330552",
+                    "RecipientIdentification": "5790001330595",
                     "EnergyBusinessProcessRole": "D3M"
                 },
                 "TimeSeries": [
