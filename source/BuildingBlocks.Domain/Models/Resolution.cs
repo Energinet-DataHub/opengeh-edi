@@ -25,6 +25,7 @@ public class Resolution : DataHubType<Resolution>
     public static readonly Resolution Hourly = new(PMTypes.Resolution.Hourly.Name, "PT1H");
     public static readonly Resolution Daily = new(PMTypes.Resolution.Daily.Name, "P1D");
     public static readonly Resolution Monthly = new(PMTypes.Resolution.Monthly.Name, "P1M");
+    public static readonly Resolution Yearly = new(PMTypes.Resolution.Yearly.Name, "P1Y");
 
     [JsonConstructor]
     private Resolution(string name, string code)

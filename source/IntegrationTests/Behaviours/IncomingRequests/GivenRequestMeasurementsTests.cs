@@ -164,7 +164,7 @@ public class GivenRequestMeasurementsTests(
             .HasProduct(1, "8716867000030")
             .HasQuantityMeasureUnit(1, MeasurementUnit.KilowattHour.Code)
             .HasRegistrationDateTime(1, now.ToString())
-            .HasResolution(1, Resolution.QuarterHourly.Code)
+            .HasResolution(1, Resolution.Yearly.Code)
             .HasStartedDateTime(
                 1,
                 startDate.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture))
