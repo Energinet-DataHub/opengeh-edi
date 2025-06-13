@@ -35,7 +35,7 @@ public static class RequestYearlyMeasurementsResponseBuilder
         Guid orchestrationInstanceId,
         (int Position, string QuantityQuality, decimal EnergyQuantity) aggregatedMeasurement)
     {
-        var resolution = PMValueTypes.Resolution.QuarterHourly;
+        var resolution = PMValueTypes.Resolution.Yearly;
         var accepted = new RequestYearlyMeasurementsAcceptedV1(
             OriginalActorMessageId: requestYearlyMeasurementsInputV1.ActorMessageId,
             OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
