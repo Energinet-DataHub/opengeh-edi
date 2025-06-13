@@ -78,4 +78,10 @@ public interface IIncomingMessage
     IReadOnlyCollection<ActorRole> AllowedSenderRoles { get; }
 
     IReadOnlyList<MeteringPointId> MeteringPointIds { get; }
+
+    /// <summary>
+    /// Specifies the channel through which we received the data.
+    /// Default is ActorSystem.
+    /// </summary>
+    DataSource DataSource { get; set; }
 }

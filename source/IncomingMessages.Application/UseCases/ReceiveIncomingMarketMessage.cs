@@ -69,6 +69,7 @@ public class ReceiveIncomingMarketMessage
         DocumentFormat incomingDocumentFormat,
         IncomingDocumentType documentType,
         DocumentFormat responseDocumentFormat,
+        DataSource dataSource,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(documentType);
@@ -99,6 +100,8 @@ public class ReceiveIncomingMarketMessage
         }
 
         stopwatch.Restart();
+        incomingMarketMessageParserResult.IncomingMessage.DataSource = dataSource;
+
         await ArchiveIncomingMessageAsync(
                 incomingMarketMessageStream,
                 incomingMarketMessageParserResult.IncomingMessage,

@@ -46,6 +46,8 @@ public record RequestWholesaleServicesMessage(
     ];
 
     public IReadOnlyList<MeteringPointId> MeteringPointIds => Array.Empty<MeteringPointId>();
+
+    public DataSource DataSource { get; set; }
 }
 
 public record RequestWholesaleServicesSeries(

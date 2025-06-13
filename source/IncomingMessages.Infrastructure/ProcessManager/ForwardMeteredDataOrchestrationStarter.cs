@@ -85,8 +85,11 @@ public class ForwardMeteredDataOrchestrationStarter(
                         MeteredDataList:
                                 transaction.EnergyObservations
                                     .Select(MapToMeteredData)
-                                    .ToList()),
-                    $"{transaction.SenderNumber}-{transaction.TransactionId}");
+                                    .ToList(),
+                        meteredDataForMeteringPointMessageBase.DataSource == DataSource.MigrationSubSystem ?
+                            ForwardMeteredDataInputV1.DataSourceEnum.MigrationSubsystem :
+                            ForwardMeteredDataInputV1.DataSourceEnum.ActorSystem),
+                    idempotencyKey: $"{transaction.SenderNumber}-{transaction.TransactionId}");
 
             var startProcessTask =
                 processManagerMessageClient.StartNewOrchestrationInstanceAsync(startCommand, cancellationToken);

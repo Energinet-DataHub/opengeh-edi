@@ -48,6 +48,8 @@ public record RequestAggregatedMeasureDataMessage(
     ];
 
     public IReadOnlyList<MeteringPointId> MeteringPointIds => Array.Empty<MeteringPointId>();
+
+    public DataSource DataSource { get; set; }
 }
 
 public record RequestAggregatedMeasureDataMessageSeries(
