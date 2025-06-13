@@ -33,7 +33,8 @@ public class IncomingMessageClient : IIncomingMessageClient
         DocumentFormat incomingDocumentFormat,
         IncomingDocumentType incomingDocumentType,
         DocumentFormat responseDocumentFormat,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        DataSource dataSource)
     {
         ArgumentNullException.ThrowIfNull(incomingDocumentType);
         ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
@@ -43,6 +44,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             incomingDocumentFormat,
             incomingDocumentType,
             responseDocumentFormat,
+            dataSource,
             cancellationToken).ConfigureAwait(false);
     }
 }

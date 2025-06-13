@@ -30,5 +30,6 @@ public interface IIncomingMessageClient
         DocumentFormat incomingDocumentFormat,
         IncomingDocumentType incomingDocumentType,
         DocumentFormat responseDocumentFormat,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        DataSource dataSource = DataSource.ActorSystem);
 }

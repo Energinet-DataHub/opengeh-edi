@@ -65,7 +65,8 @@ public class MeasurementsSynchronizationTrigger(
                     DocumentFormat.Ebix,
                     IncomingDocumentType.NotifyValidatedMeasureData,
                     DocumentFormat.Ebix,
-                    cancellationToken)
+                    cancellationToken,
+                    DataSource.MigrationSubSystem)
                 .ConfigureAwait(false);
 
             if (responseMessage.IsErrorResponse)

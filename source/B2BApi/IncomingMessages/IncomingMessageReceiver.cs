@@ -121,7 +121,7 @@ public class IncomingMessageReceiver
             .ReceiveIncomingMarketMessageAsync(
                 incomingMarketMessageStream,
                 incomingDocumentFormat: documentFormat,
-                incomingDocumentType,
+                incomingDocumentType: incomingDocumentType,
                 responseDocumentFormat: documentFormat,
                 cancellationToken)
             .ConfigureAwait(false);

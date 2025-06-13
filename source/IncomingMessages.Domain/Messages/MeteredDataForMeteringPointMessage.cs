@@ -69,6 +69,8 @@ public class MeteredDataForMeteringPointMessageBase(
         .Where(x => x.MeteringPointLocationId != null)
         .Select(x => MeteringPointId.From(x.MeteringPointLocationId!))
         .ToList();
+
+    public DataSource DataSource { get; set; }
 }
 
 public record MeteredDataForMeteringPointSeries(

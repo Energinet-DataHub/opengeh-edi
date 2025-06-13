@@ -17,8 +17,10 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IntegrationTests.Migration;
 using Energinet.DataHub.ProcessManager.Abstractions.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData.V1.Model;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
@@ -58,6 +60,7 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
     {
         // => Given measurements data from DH2
         var testDataResultSet = XmlMessageConstants.PeekMessageContainingTwoTransactions;
+        var serializer = new Serializer();
 
         var message = new ServiceBusMessage(testDataResultSet);
 
@@ -81,9 +84,10 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
                 var parsedNotification = StartOrchestrationInstanceV1.Parser.ParseJson(
                     msg.Body.ToString());
 
-                var meteringPointId = parsedNotification.MeteringPointId == "571051839308770693";
+                var expectedMeteringPointId = parsedNotification.MeteringPointId == "571051839308770693";
+                var expectedDataSource = serializer.Deserialize<ForwardMeteredDataInputV1>(parsedNotification.Input).DataSource == ForwardMeteredDataInputV1.DataSourceEnum.MigrationSubsystem;
 
-                return meteringPointId;
+                return expectedMeteringPointId && expectedDataSource;
             })
             .VerifyCountAsync(1);
         var wasSent = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(30));

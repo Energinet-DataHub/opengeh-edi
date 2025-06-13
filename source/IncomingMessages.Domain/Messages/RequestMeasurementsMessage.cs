@@ -73,6 +73,8 @@ public class RequestMeasurementsMessageBase(
         .Cast<RequestMeasurementsSeries>()
         .Select(x => x.MeteringPointId)
         .ToList();
+
+    public DataSource DataSource { get; set; }
 }
 
 public record RequestMeasurementsSeries(
