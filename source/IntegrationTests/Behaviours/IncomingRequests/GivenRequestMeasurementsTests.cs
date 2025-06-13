@@ -210,16 +210,9 @@ public class GivenRequestMeasurementsTests(
         var transactionId = TransactionId.From("12356478912356478912356478912356478");
         var meteringPointId = MeteringPointId.From("579999993331812345");
 
-        // TODO: Xml is not yet supported #691
-        var incomingDocumentFormat = documentFormat;
-        if (documentFormat == DocumentFormat.Xml)
-        {
-            incomingDocumentFormat = DocumentFormat.Json;
-        }
-
         // Act
         await GivenRequestMeasurements(
-            documentFormat: incomingDocumentFormat,
+            documentFormat: documentFormat,
             senderActor: senderActor,
             MessageId.New(),
             businessReason,
@@ -361,7 +354,7 @@ public class GivenRequestMeasurementsTests(
 
         // Act
         await GivenRequestMeasurements(
-            documentFormat: DocumentFormat.Json, // Currently only Json is supported for this test
+            documentFormat: documentFormat,
             senderActor: senderActor,
             MessageId.New(),
             businessReason,
@@ -462,7 +455,7 @@ public class GivenRequestMeasurementsTests(
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy(StartSenderClientNames.ProcessManagerStartSender);
         var senderSpyNotify = CreateServiceBusSenderSpy(NotifySenderClientNames.ProcessManagerNotifySender);
-        const string notifyEventName = RequestYearlyMeasurementsNotifyEventV1.OrchestrationInstanceEventName;
+        const string notifyEventName = RequestMeasurementsNotifyEventV1.OrchestrationInstanceEventName;
         var senderActor = new Actor(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier);
         var receiverActor = senderActor;
         var orchestrationInstanceId = Guid.NewGuid();
@@ -481,7 +474,7 @@ public class GivenRequestMeasurementsTests(
 
         // Act
         await GivenRequestMeasurements(
-            documentFormat: DocumentFormat.Json, // Currently only Json is supported for this test
+            documentFormat: documentFormat,
             senderActor: senderActor,
             MessageId.New(),
             businessReason,
