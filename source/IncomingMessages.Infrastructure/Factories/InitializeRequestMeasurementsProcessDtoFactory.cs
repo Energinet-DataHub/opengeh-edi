@@ -41,7 +41,7 @@ public static class InitializeRequestMeasurementsProcessDtoFactory
             .ToList().AsReadOnly();
 
         return new InitializeRequestMeasurementsProcessDto(
-            BusinessReason: requestMeasurementsMessageBase.BusinessReason,
+            BusinessReason: BusinessReason.FromCode(requestMeasurementsMessageBase.BusinessReason),
             MessageId: requestMeasurementsMessageBase.MessageId,
             Series: series);
     }

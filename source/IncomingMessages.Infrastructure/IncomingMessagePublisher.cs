@@ -14,6 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
@@ -108,9 +109,19 @@ public class IncomingMessagePublisher
     {
         ArgumentNullException.ThrowIfNull(initializeRequestMeasurementsProcessDto);
 
-        await _requestProcessOrchestrationStarter.StartRequestMeasurementsOrchestrationAsync(
+        if (initializeRequestMeasurementsProcessDto.BusinessReason == BusinessReason.YearlyMetering)
+        {
+            await _requestProcessOrchestrationStarter.StartRequestYearlyMeasurementsOrchestrationAsync(
                 initializeRequestMeasurementsProcessDto,
                 cancellationToken)
             .ConfigureAwait(false);
+        }
+        else
+        {
+            await _requestProcessOrchestrationStarter.StartRequestMeasurementsOrchestrationAsync(
+                    initializeRequestMeasurementsProcessDto,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
     }
 }

@@ -44,6 +44,7 @@ using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_021.ForwardMeteredData;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_023_027;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_024;
+using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_025;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_026;
 using Energinet.DataHub.ProcessManager.Orchestrations.Abstractions.Processes.BRS_026_028.BRS_028;
 using Energinet.DataHub.RevisionLog.Integration.Options;
@@ -267,6 +268,10 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .AddSubjectFilter(EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_024.V1))
                 .Do(s => appHostSettings.ProcessEnvironmentVariables
                     .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_024_SubscriptionName)}", s.SubscriptionName))
+            .AddSubscription("enqueue-brs-025-subscription")
+                .AddSubjectFilter(EnqueueActorMessagesV1.BuildServiceBusMessageSubject(Brs_025.V1))
+                .Do(s => appHostSettings.ProcessEnvironmentVariables
+                    .Add($"{EdiTopicOptions.SectionName}__{nameof(EdiTopicOptions.EnqueueBrs_025_SubscriptionName)}", s.SubscriptionName))
             .CreateAsync();
 
         MeasurementsSyncTopicResource = await ServiceBusResourceProvider

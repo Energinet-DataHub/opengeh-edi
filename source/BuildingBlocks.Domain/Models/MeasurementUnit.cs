@@ -27,6 +27,12 @@ public class MeasurementUnit : DataHubType<MeasurementUnit>
     public static readonly MeasurementUnit Pieces = new(PMTypes.MeasurementUnit.Pieces.Name, "H87");
 
     public static readonly MeasurementUnit KiloVoltAmpereReactiveHour = new(PMTypes.MeasurementUnit.KiloVoltAmpereReactiveHour.Name, "K3");
+    public static readonly MeasurementUnit Ampere = new(PMTypes.MeasurementUnit.Ampere.Name, "AMP");
+    public static readonly MeasurementUnit Kilowatt = new(PMTypes.MeasurementUnit.Kilowatt.Name, "KWT");
+    public static readonly MeasurementUnit Megawatt = new(PMTypes.MeasurementUnit.Megawatt.Name, "MAW");
+    public static readonly MeasurementUnit MegawattHour = new(PMTypes.MeasurementUnit.MegawattHour.Name, "MWH");
+    public static readonly MeasurementUnit MetricTon = new(PMTypes.MeasurementUnit.MetricTon.Name, "TNE");
+    public static readonly MeasurementUnit MegaVoltAmpereReactivePower = new(PMTypes.MeasurementUnit.MegaVoltAmpereReactivePower.Name, "Z03");
 
     [JsonConstructor]
     private MeasurementUnit(string name, string code)
