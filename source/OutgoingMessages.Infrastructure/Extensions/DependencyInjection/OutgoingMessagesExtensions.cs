@@ -162,7 +162,7 @@ public static class OutgoingMessagesExtensions
             .AddScoped<EnergyResultEnumerator>()
             .AddScoped<WholesaleResultEnumerator>()
             .AddScoped<WholesaleResultActorsEnumerator>()
-            .AddDatabricksSqlStatementExecution(configuration)
+            .AddDatabricksSqlStatementExecution(configuration, TokenProvider.ServicePrincipalTokenProvider)
             .AddHealthChecks()
                 .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
 
