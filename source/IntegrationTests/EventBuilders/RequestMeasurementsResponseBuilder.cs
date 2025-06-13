@@ -57,18 +57,18 @@ public static class RequestMeasurementsResponseBuilder
     }
 
     public static ServiceBusMessage GenerateRejectedFrom(
-        RequestMeasurementsInputV1 requestYearlyMeasurementsInputV1,
+        RequestMeasurementsInputV1 requestMeasurementsInputV1,
         Actor receiverActor,
         string validationErrorMessage,
         string validationErrorCode,
         Guid orchestrationInstanceId)
     {
         var rejected = new RequestMeasurementsRejectV1(
-            OriginalActorMessageId: requestYearlyMeasurementsInputV1.ActorMessageId,
-            OriginalTransactionId: requestYearlyMeasurementsInputV1.TransactionId,
+            OriginalActorMessageId: requestMeasurementsInputV1.ActorMessageId,
+            OriginalTransactionId: requestMeasurementsInputV1.TransactionId,
             ActorNumber: receiverActor.ActorNumber.ToProcessManagerActorNumber(),
             ActorRole: receiverActor.ActorRole.ToProcessManagerActorRole(),
-            MeteringPointId: requestYearlyMeasurementsInputV1.MeteringPointId,
+            MeteringPointId: requestMeasurementsInputV1.MeteringPointId,
             ValidationErrors: [new ValidationErrorDto(validationErrorMessage, validationErrorCode)]);
 
         return CreateServiceBusMessage(receiverActor, orchestrationInstanceId, rejected);
