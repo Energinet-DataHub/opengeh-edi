@@ -32,7 +32,7 @@ public class Header
 {
     public string MessageId { get; set; }
 
-    public DateTime Creation { get; set; }
+    public DateTimeOffset Creation { get; set; }
 
     public string EnergyBusinessProcess { get; set; }
 
