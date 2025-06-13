@@ -12,13 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.RegularExpressions;
-
 namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
-public static class NamingConvention
+internal static class EnvironmentParser
 {
-    // Matches                                                  {type} {timestamp } {name}
-    // Energinet.DataHub.MarketData.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
-    public static readonly Regex Regex = new Regex(@".*Scripts\.(?<type>Model|Seed|Test)\.(?<timestamp>\d{12}) (?<name>).*\b.sql");
+    private static readonly string[] _validEnvironments = [
+        "TEST-001",
+        "TEST-002",
+        "PREPROD-001",
+        "PREPROD-002",
+        "PROD-001",
+        "SANDBOX-002",
+        "DEV-001",
+        "DEV-002",
+        "DEV-003"];
+
+    public static string Parse(string[] args)
+    {
+        ArgumentNullException.ThrowIfNull(args);
+
+        return args.Count() > 1 && _validEnvironments.Contains(args[1].ToUpperInvariant())
+            ? args[1].ToUpperInvariant()
+            : string.Empty;
+    }
 }
