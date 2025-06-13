@@ -17,7 +17,7 @@ using DbUp.Engine;
 using DbUp.Engine.Transactions;
 using DbUp.ScriptProviders;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Extensibility.DbUp;
 
 public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
 {
@@ -33,9 +33,7 @@ public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
         foreach (var script in sqlScripts)
         {
             if (!NamingConvention.Regex.IsMatch(script.Name))
-            {
                 throw new FormatException($"The script '{script.Name}' doesn't adhere to the naming convention.");
-            }
         }
 
         return sqlScripts;

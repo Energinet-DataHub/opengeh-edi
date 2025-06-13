@@ -14,11 +14,11 @@
 
 using System.Text.RegularExpressions;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Extensibility.DbUp;
 
 public static class NamingConvention
 {
-    // Matches                                                  {type} {timestamp } {name}
-    // Energinet.DataHub.MarketData.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
-    public static readonly Regex Regex = new Regex(@".*Scripts\.(?<type>Model|AccessRights)\.(?<timestamp>\d{12}) (?<name>).*\b.sql");
+    // Matches                                           {type} {timestamp } {name}
+    // Energinet.DataHub.EDI.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
+    public static readonly Regex Regex = new Regex(@".*Scripts\.(?<type>Model|Permissions)\.(?<timestamp>\d{12}) (?<name>).*\b.sql");
 }

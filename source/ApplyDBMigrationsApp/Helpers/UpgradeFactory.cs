@@ -15,10 +15,11 @@
 using System.Reflection;
 using DbUp;
 using DbUp.Engine;
+using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Extensibility.DbUp;
 
 namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
-public static class UpgradeFactory
+internal static class UpgradeFactory
 {
     public static UpgradeEngine GetUpgradeEngine(
         string connectionString,
