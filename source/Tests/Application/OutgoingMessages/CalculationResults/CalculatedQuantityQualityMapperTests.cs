@@ -248,7 +248,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             }
 
             // Resolutions
-            foreach (var resolution in EnumerationType.GetAll<Resolution>().Except([Resolution.QuarterHourly]))
+            foreach (var resolution in EnumerationType.GetAll<Resolution>().Except([Resolution.QuarterHourly, Resolution.Yearly]))
             {
                 wholesaleQuantityQualityTestCases
                     .Select(testCase => testCase[1])
