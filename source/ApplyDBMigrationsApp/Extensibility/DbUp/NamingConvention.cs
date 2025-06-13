@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using System.Text.RegularExpressions;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Extensibility.DbUp;
 
-public record InitializeRequestMeasurementsProcessDto(
-    BusinessReason BusinessReason,
-    string MessageId,
-    IReadOnlyCollection<InitializeRequestMeasurementsProcessSeries> Series);
-
-public record InitializeRequestMeasurementsProcessSeries(
-    TransactionId Id,
-    string StartDateTime,
-    string? EndDateTime,
-    MeteringPointId MeteringPointId,
-    OriginalActor OriginalActor);
+public static class NamingConvention
+{
+    // Matches                                           {type} {timestamp } {name}
+    // Energinet.DataHub.EDI.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
+    public static readonly Regex Regex = new Regex(@".*Scripts\.(?<type>Model|Permissions)\.(?<timestamp>\d{12}) (?<name>).*\b.sql");
+}

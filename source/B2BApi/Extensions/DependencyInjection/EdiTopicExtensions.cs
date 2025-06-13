@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_021;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_023_027;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_024;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_025;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_026;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_028;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.BRS_045;
@@ -77,6 +78,7 @@ public static class EdiTopicExtensions
         services
             .AddTransient<EnqueueHandler_Brs_023_027_V1>()
             .AddTransient<EnqueueHandler_Brs_024_V1>()
+            .AddTransient<EnqueueHandler_Brs_025_V1>()
             .AddTransient<EnqueueHandler_Brs_026_V1>()
             .AddTransient<EnqueueHandler_Brs_028_V1>()
             .AddTransient<EnqueueHandler_Brs_021_ForwardMeteredData_V1>()

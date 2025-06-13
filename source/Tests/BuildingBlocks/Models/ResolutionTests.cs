@@ -39,6 +39,7 @@ public class ResolutionTests
             (Resolution.Hourly, "Hourly", "PT1H"),
             (Resolution.Daily, "Daily", "P1D"),
             (Resolution.Monthly, "Monthly", "P1M"),
+            (Resolution.Yearly, "Yearly", "P1Y"),
         };
 
         using var scope = new AssertionScope();

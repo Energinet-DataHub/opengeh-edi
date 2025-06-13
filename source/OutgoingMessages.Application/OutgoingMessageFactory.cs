@@ -550,7 +550,7 @@ public static class OutgoingMessageFactory
             createdAt: timestamp,
             messageCreatedFromProcess: ProcessType.RequestMeasurements,
             relatedToMessageId: message.RelatedToMessageId,
-            gridAreaCode: message.GridAreaCode,
+            gridAreaCode: null,
             externalId: message.ExternalId,
             calculationId: null,
             message.Series.Period.Start,

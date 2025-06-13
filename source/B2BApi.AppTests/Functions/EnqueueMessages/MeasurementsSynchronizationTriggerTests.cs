@@ -59,7 +59,7 @@ public class MeasurementsSynchronizationTriggerTests : IAsyncLifetime
     public async Task Given_MeteredDataTimeSeriesDH3Message_When_MessageIsReceived_Then_Brs021StartCommandIsSent()
     {
         // => Given measurements data from DH2
-        var testDataResultSet = JsonPayloadConstants.SingleTimeSeriesWithSingleObservation;
+        var testDataResultSet = XmlMessageConstants.PeekMessageContainingTwoTransactions;
         var serializer = new Serializer();
 
         var message = new ServiceBusMessage(testDataResultSet);
