@@ -25,7 +25,6 @@ public interface IIncomingMessageClient
     /// <summary>
     /// Responsible for receiving the incoming market message.
     /// </summary>
-    /// DataSource is used to determine the origin of the data, e.g., ActorSystem or MigrationSubSystem.
     Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         DocumentFormat incomingDocumentFormat,
